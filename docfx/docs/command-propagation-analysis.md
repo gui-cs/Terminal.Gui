@@ -453,24 +453,31 @@ When a user activates a CheckBox in this hierarchy:
    ├─ MenuBarItem.PropagatedCommands contains Command.Activate? YES
    ↓
 10. MenuBar.RaiseActivating(ctx)
-    ├─ OnActivating receives ctx.Source = CheckBox (original source!)
+    ├─ OnActivating receives ctx.SourceId = "AutoSave", ctx.Value = CheckState.Checked
     ├─ Can identify the originating view and respond appropriately
     └─ HANDLED - MenuBar can now react to deep activations
 ```
 
 ### Source Tracking Through the Chain
 
-The `ctx.Source` property is critical for this scenario:
+The `ctx.SourceId` and `ctx.Value` properties are critical for this scenario:
 
-| Step | View Processing | `ctx.Source` | `this` / `sender` |
-|------|-----------------|--------------|-------------------|
-| 2 | CheckBox | CheckBox | CheckBox |
-| 4 | FlagSelector | CheckBox | FlagSelector |
-| 6 | MenuItem | CheckBox | MenuItem |
-| 8 | Menu | CheckBox | Menu |
-| 10 | MenuBar | CheckBox | MenuBar |
+| Step | View Processing | `ctx.SourceId` | `ctx.Value` | `this` / `sender` |
+|------|-----------------|----------------|-------------|-------------------|
+| 2 | CheckBox | "AutoSave" | CheckState.Checked | CheckBox |
+| 4 | FlagSelector | "AutoSave" | CheckState.Checked | FlagSelector |
+| 6 | MenuItem | "AutoSave" | CheckState.Checked | MenuItem |
+| 8 | Menu | "AutoSave" | CheckState.Checked | Menu |
+| 10 | MenuBar | "AutoSave" | CheckState.Checked | MenuBar |
 
-**`ctx.Source` remains constant** (the CheckBox that was activated), while `this`/`sender` changes at each propagation step. This allows MenuBar's handler to know exactly which leaf view initiated the command.
+**`ctx.SourceId` and `ctx.Value` remain constant** throughout propagation, while `this`/`sender` changes at each step. This allows MenuBar's handler to:
+- Identify which view triggered the command via `SourceId` (the user-defined `View.Id`)
+- Access the relevant data via `Value` (from views implementing `IValue<T>`)
+
+**Why SourceId instead of Source (View reference)?** The original design used `ctx.Source` (a View reference), but this creates a **lifecycle issue**: when a superview receives a propagated event, the Source reference may be invalid if an intermediate view has removed or disposed the original subview. Using `SourceId` (string) and `Value` (object?) eliminates this issue:
+- **SourceId** is a stable identifier (the `View.Id` string)
+- **Value** is the data captured at invocation time (from `IValue<T>.GetValue()`)
+- No dangling references - handlers don't need the View itself
 
 ### Accept Flow (Similar Pattern)
 
@@ -486,6 +493,368 @@ CheckBox.Accept → FlagSelector.Accept → MenuItem.Accept
 1. FlagSelector forwards Accept to itself (already does via `OnCheckboxOnAccepting`)
 2. MenuItem (as Shortcut) forwards Accept from CommandView (already does via `CommandViewOnAccepted`)
 3. Propagation continues from MenuItem → Menu → MenuBar
+
+### Developer Experience for MenuBar
+
+#### Current (Problematic) Approach
+
+Today (demo code from in MenuBar.EnableForDesign; abbreviated) - **This approach has issues:**
+
+```cs
+public MenuBar CreateMenuBar()
+{
+    var autoSaveCb = new CheckBox
+    {
+        Title = "_Auto Save"
+    };
+
+    var mutuallyExclusiveOptionsSelector = new OptionSelector
+    {
+        Labels = ["G_ood", "_Bad", "U_gly"],
+        Value = 0
+    };
+
+    var menuBgColorCp = new ColorPicker
+    {
+        Width = 30
+    };
+    menuBgColorCp.ColorChanged += (sender, args) =>
+                                    {
+                                        // BUGBUG: This is weird.
+                                        SetScheme (
+                                                    GetScheme () with
+                                                    {
+                                                        Normal = new (
+                                                                    GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                    args.Result,
+                                                                    GetAttributeForRole (VisualRole.Normal).Style)
+                                                    });
+                                    };
+
+    Add (new MenuBarItem (Strings.menuFile,
+        [
+            // Demonstrates propagation based on Accept of Command.New
+            new MenuItem (targetView as View, Command.New),
+            // Demonstrates propagation based on Activate in a CheckBox (doesn't actually work)
+            new MenuItem
+            {
+                Title = "_File Options",
+                SubMenu = new (
+                                [
+                                    new ()
+                                    {
+                                        Id = "AutoSave",
+                                        Text = "(no Command)",
+                                        Key = Key.F10,
+                                        CommandView = autoSaveCb
+                                    }
+                                ]
+                                )
+            },
+            // Demonstrates a submenu
+            new MenuItem
+            {
+                Title = "_Preferences",
+                SubMenu = new (
+                                [
+                                    // Demonstrates nested propagation based on Activate in a OptionSelector  (doesn't actually work)
+                                    new MenuItem
+                                    {
+                                        HelpText = "3 Mutually Exclusive Options",
+                                        CommandView = mutuallyExclusiveOptionsSelector,
+                                        Key = Key.F7
+                                    },
+                                    // Demonstrates nested propagation based on Activate in a CheckBox (doesn't actually work)
+                                    new MenuItem
+                                    {
+                                        HelpText = "MenuBar BG Color",
+                                        CommandView = menuBgColorCp,
+                                        Key = Key.F8
+                                    }
+                                ]
+                                )
+            }
+        ]
+        )
+     );
+}
+
+// Usage
+menuBar.OnAccepted += (sender, args) =>
+{
+    // menuBgColorCp is already handeled via ColorChanged event above
+
+    // Handle AutoSave CheckBox
+    if (args.Context?.Source is CheckBox cb && cb.Id == "AutoSave")
+    {
+        _autoSave = cb.CheckState == CheckState.Checked;
+    }
+
+    // Handle MutuallyExclusiveOptionsSelector OptionSelector
+    if (args.Context?.Source is OptionSelector os && os.Id == "MutuallyExclusiveOptionsSelector")
+    {
+        _selectedOption = os.Value;
+    }
+};
+
+```
+
+**Problems with this approach:**
+1. **Lifecycle issue**: `args.Context?.Source` is a View reference that could become invalid if an intermediate view disposes the subview during propagation
+2. **Casting required**: Must cast to specific types (`CheckBox`, `OptionSelector`) to access properties
+3. **Separate event subscriptions**: Need to subscribe to `ColorChanged` event separately for `ColorPicker`
+4. **Verbose**: Repeated type checking and casting patterns
+
+#### Proposed (Improved) Approach
+
+No need to subscribe to events on CommandViews. Just set up the MenuBar and MenuItems as usual:
+```csharp
+MenuBar menuBar = new ()
+{
+    PropagatedCommands = [Command.Accept, Command.Activate],
+    MenuBarItems =
+    [
+        new MenuBarItem (
+            "File",
+            [
+                new MenuItem (targetView as View, Command.New),
+                new ()
+                {
+                    Title = "File Options",
+                    SubMenu = new Menu (
+                        [
+                            new ()
+                            {
+                                Id = "AutoSave",
+                                Text = "(no Command)",
+                                Key = Key.F10,
+                                CommandView = new CheckBox
+                                {
+                                    Title = "_Auto Save",
+                                    Id = "AutoSave"
+                                }
+                            }
+                        ]
+                    )
+                },
+                new ()
+                {
+                    Title = "Preferences",
+                    SubMenu = new Menu (
+                        [
+                            new ()
+                            {
+                                HelpText = "3 Mutually Exclusive Options",
+                                CommandView = new OptionSelector
+                                {
+                                    Id = "MutuallyExclusiveOptionsSelector",
+                                    Labels = ["G_ood", "_Bad", "U_gly"],
+                                    Value = 0
+                                },
+                                Key = Key.F7
+                            },
+                            new ()
+                            {
+                                HelpText = "MenuBar BG Color",
+                                CommandView = new ColorPicker
+                                {
+                                    Id = "MenuBgColorCp",
+                                    Width = 30,
+                                    Value = Color.Blue
+                                },
+                                Key = Key.F8
+                            }
+                        ]
+                    )
+                }
+            ]
+        )
+    ]
+};
+
+// Handle Accepting (cancellable) - the "New" menuitem is handled automatically via Command.New binding
+menuBar.Accepting += (sender, args) =>
+{
+    switch (args.Context?.SourceId)
+    {
+        case "AutoSave":
+            _autoSave = args.Context?.Value is CheckState checkState && checkState == CheckState.Checked;
+            break;
+
+        case "MutuallyExclusiveOptionsSelector":
+            _selectedOption = args.Context?.Value is int optionValue ? optionValue : 0;
+            break;
+
+        case "MenuBgColorCp":
+            if (args.Context?.Value is Color color)
+            {
+                menuBar.SetScheme (
+                    menuBar.GetScheme () with
+                    {
+                        Normal = new (
+                            menuBar.GetAttributeForRole (VisualRole.Normal).Foreground,
+                            color,
+                            menuBar.GetAttributeForRole (VisualRole.Normal).Style)
+                    });
+            }
+            break;
+    }
+};
+```
+
+#### Alternative: Direct Subscription on CommandView
+
+For some scenarios, you may want to handle the activation directly on the CommandView rather than at the MenuBar level. This is useful when the handling logic is specific to that view and doesn't need centralized management:
+
+```cs
+// Create a LinearRange with direct event subscription
+LinearRange zoomRange = new ()
+{
+    Id = "ZoomLevel",
+    Minimum = 10,
+    Maximum = 200,
+    Value = 100
+};
+
+// Subscribe directly to the CommandView's Activating event
+zoomRange.Activating += (sender, args) =>
+{
+    // Handle the activation locally - no propagation needed
+    if (args.Context?.Value is int zoomLevel)
+    {
+        _currentZoom = zoomLevel;
+        UpdateZoomDisplay (zoomLevel);
+    }
+    args.Handled = true;  // Prevent further propagation if desired
+};
+
+// Add the MenuItem with the CommandView
+MenuBarItem viewMenu = new (
+    "View",
+    [
+        new MenuItem
+        {
+            Title = "Zoom",
+            HelpText = "Adjust zoom level",
+            CommandView = zoomRange,
+            Key = Key.F9
+        }
+    ]
+);
+```
+
+**When to use direct subscription vs MenuBar-level handling:**
+- **Direct subscription**: When the logic is self-contained and specific to that CommandView
+- **MenuBar-level handling**: When you want centralized handling of multiple CommandViews, or when the response requires access to MenuBar state
+
+**Note**: If `args.Handled = true` is set in the direct handler, the event will NOT propagate to the MenuBar's Accepting handler. This gives you control over whether events bubble up or are handled locally.
+
+#### Handling at MenuItem Level
+
+You can handle events directly on a MenuItem, which is useful when you want to respond before the event propagates further up the hierarchy:
+
+```cs
+MenuItem settingsMenuItem = new ()
+{
+    Id = "SettingsItem",
+    Title = "Settings",
+    CommandView = new CheckBox
+    {
+        Id = "DarkMode",
+        Title = "_Dark Mode"
+    }
+};
+
+// Handle Accepting at the MenuItem level (cancellable)
+settingsMenuItem.Accepting += (sender, args) =>
+{
+    // args.Context?.SourceId = "DarkMode" (the CheckBox that was activated)
+    // args.Context?.Value = CheckState from the CheckBox
+    if (args.Context?.Value is CheckState state)
+    {
+        ApplyTheme (state == CheckState.Checked ? Theme.Dark : Theme.Light);
+    }
+    // Don't set args.Handled = true if you want it to continue propagating to Menu/MenuBar
+};
+```
+
+#### Handling at Menu Level
+
+Handling at the Menu level lets you respond to any MenuItem within that menu:
+
+```cs
+Menu fileMenu = new (
+    [
+        new MenuItem { Id = "New", Title = "_New", Key = Key.N.WithCtrl },
+        new MenuItem { Id = "Open", Title = "_Open", Key = Key.O.WithCtrl },
+        new MenuItem { Id = "Save", Title = "_Save", Key = Key.S.WithCtrl }
+    ]
+);
+
+// Handle Accepting at the Menu level (cancellable)
+fileMenu.Accepting += (sender, args) =>
+{
+    switch (args.Context?.SourceId)
+    {
+        case "New":
+            CreateNewDocument ();
+            break;
+        case "Open":
+            OpenDocument ();
+            break;
+        case "Save":
+            SaveDocument ();
+            break;
+    }
+    // args.Handled = true; // Set if you want to stop propagation to MenuBar
+};
+```
+
+#### Handling at MenuBarItem Level
+
+MenuBarItem is useful for handling all items within a top-level menu category:
+
+```cs
+MenuBarItem editMenuBarItem = new (
+    "Edit",
+    [
+        new MenuItem { Id = "Cut", Title = "Cu_t", Key = Key.X.WithCtrl },
+        new MenuItem { Id = "Copy", Title = "_Copy", Key = Key.C.WithCtrl },
+        new MenuItem { Id = "Paste", Title = "_Paste", Key = Key.V.WithCtrl }
+    ]
+);
+
+// Handle Accepting at the MenuBarItem level (cancellable)
+editMenuBarItem.Accepting += (sender, args) =>
+{
+    switch (args.Context?.SourceId)
+    {
+        case "Cut":
+            CutToClipboard ();
+            break;
+        case "Copy":
+            CopyToClipboard ();
+            break;
+        case "Paste":
+            PasteFromClipboard ();
+            break;
+    }
+};
+```
+
+#### Summary: Event Handling Levels
+
+| Level | Use Case | SourceId Contains |
+|-------|----------|-------------------|
+| **CommandView** | Self-contained logic for a specific control | N/A (you have the view directly) |
+| **MenuItem** | Handle a specific menu item and its CommandView | CommandView's Id (if present) or MenuItem's Id |
+| **Menu** | Handle all items in a submenu | The originating MenuItem or CommandView Id |
+| **MenuBarItem** | Handle all items under a top-level menu | The originating MenuItem or CommandView Id |
+| **MenuBar** | Centralized handling for entire menu system | The originating MenuItem or CommandView Id |
+
+**Propagation order**: CommandView → MenuItem → Menu → MenuBarItem → MenuBar
+
+Set `args.Handled = true` at any level to stop propagation to higher levels.
 
 ### Views That Must Opt-In to Propagation
 
@@ -509,17 +878,17 @@ For this scenario to work, the following views must include `Command.Activate` i
 
 1. **Activate propagation through full hierarchy**:
    - Create MenuBar with MenuBarItem containing PopoverMenu with Menu with MenuItem
-   - Set MenuItem.CommandView = FlagSelector with CheckBox
+   - Set MenuItem.CommandView = FlagSelector with CheckBox (Id = "AutoSave")
    - Activate CheckBox
-   - Verify MenuBar.OnActivating receives event with `ctx.Source` = CheckBox
+   - Verify MenuBar.OnActivating receives event with `ctx.SourceId` = "AutoSave" and `ctx.Value` = CheckState
 
 2. **Accept propagation through full hierarchy**:
    - Same setup as above
    - Accept (double-click) CheckBox
-   - Verify MenuBar.OnAccepting receives event with `ctx.Source` = CheckBox
+   - Verify MenuBar.OnAccepting receives event with `ctx.SourceId` = "AutoSave" and `ctx.Value` = CheckState
 
-3. **Source preservation**:
-   - Verify `ctx.Source` remains the original CheckBox at every level
+3. **SourceId and Value preservation**:
+   - Verify `ctx.SourceId` and `ctx.Value` remain constant at every level (FlagSelector, MenuItem, Menu, MenuBar)
    - Verify `ctx.Binding` is preserved (KeyBinding or MouseBinding from original input)
 
 4. **Handled at intermediate level**:
@@ -593,7 +962,43 @@ Introduce a **propagation registry** that allows superviews to declare which com
 public IReadOnlyList<Command> PropagatedCommands { get; set; } = new List<Command> { Command.Accept };
 ```
 
-#### 2. Create a Propagation Helper Method
+#### 2. Update `CommandContext` to Use SourceId and Value
+
+Replace `View? Source` with `string? SourceId` and add `object? Value`:
+
+```csharp
+public record struct CommandContext : ICommandContext
+{
+    public Command Command { get; set; }
+    public string? SourceId { get; set; }       // Replaces View? Source - uses View.Id
+    public object? Value { get; set; }          // Value from IValue<T>.GetValue() if available
+    public IInputBinding? Binding { get; set; }
+}
+```
+
+**Why this change?**
+- **Lifecycle safety**: View references can become invalid if intermediate views dispose subviews during propagation
+- **Developer experience**: `SourceId` enables meaningful switch/case patterns (`case "AutoSave":`)
+- **Data access**: `Value` provides the relevant data (CheckState, selected option, color, etc.) without needing the View
+
+#### 3. Add Non-Generic `IValue` Interface
+
+To support boxing values from generic `IValue<T>` implementations:
+
+```csharp
+public interface IValue
+{
+    object? GetValue();
+}
+
+public interface IValue<TValue> : IValue
+{
+    TValue? Value { get; set; }
+    object? IValue.GetValue() => Value;  // Default implementation
+}
+```
+
+#### 4. Create a Propagation Helper Method
 
 ```csharp
 /// <summary>
@@ -709,8 +1114,12 @@ Add a new override or update the existing `Command.Activate` handler in `MenuBar
 ```csharp
 protected override bool OnActivating(CommandEventArgs args)
 {
-    // If a MenuItem is being activated, show its popover if applicable
-    if (args.Context?.Source is MenuBarItem { PopoverMenuOpen: false } menuBarItem)
+    // Look up the MenuBarItem by SourceId (direct SubViews only - lifecycle safe)
+    MenuBarItem? menuBarItem = SubViews.OfType<MenuBarItem>()
+        .FirstOrDefault(m => m.Id == args.Context?.SourceId);
+
+    // If a MenuBarItem is being activated, show its popover if applicable
+    if (menuBarItem is { PopoverMenuOpen: false })
     {
         if (!CanFocus)
         {
@@ -739,31 +1148,48 @@ During command propagation, handlers need to identify which subview initiated th
 |----------|---------|----------------------------|
 | `sender` parameter | The View currently raising the event | **Yes** - changes at each propagation step |
 | `this` in virtual override | The View currently processing | **Yes** - changes at each propagation step |
-| `args.Context?.Source` | The View that originally invoked the command | **No** - remains constant |
-| `args.Context?.Binding?.Source` | The View where the binding was defined | **No** - remains constant |
+| `args.Context?.SourceId` | The `Id` of the View that originally invoked | **No** - remains constant |
+| `args.Context?.Value` | The value from the source (if `IValue<T>`) | **No** - remains constant |
 | `args.Context?.Binding` | The original binding (`KeyBinding`, `MouseBinding`, etc.) | **No** - passed unchanged |
 
-**For propagation handlers**, use `args.Context?.Source` to identify the originating view:
+**For propagation handlers**, use `args.Context?.SourceId` and `args.Context?.Value` to identify and process the originating view's data:
 
 ```csharp
-protected override bool OnActivating(CommandEventArgs args)
+// Option 1: Switch on SourceId for multiple handlers (cancellable)
+menuBar.Accepting += (sender, args) =>
 {
-    // args.Context?.Source = the View that first invoked Command.Activate
-    // This remains the original MenuBarItem even if propagated through intermediate views
-    if (args.Context?.Source is MenuBarItem menuBarItem)
+    switch (args.Context?.SourceId)
     {
-        ShowItem(menuBarItem);
+        case "AutoSave":
+            _autoSave = args.Context?.Value is CheckState.Checked;
+            break;
+        case "MenuBgColorCp":
+            if (args.Context?.Value is Color color)
+                SetBackgroundColor (color);
+            break;
+    }
+};
+
+// Option 2: Override in subclass
+protected override bool OnActivating (CommandEventArgs args)
+{
+    // Use SourceId to identify, Value to get the data
+    if (args.Context?.SourceId == "settings" && args.Context?.Value is bool enabled)
+    {
+        ApplySettings (enabled);
         return true;
     }
-    return base.OnActivating(args);
+    return base.OnActivating (args);
 }
 ```
 
 **Important**: The binding type (`KeyBinding`, `MouseBinding`, or future `InputBinding`) is preserved during propagation. When `PropagateCommand` calls `SuperView.InvokeCommand(command, ctx)`, the original `ICommandContext` (including its binding) is passed unchanged. This means:
 
 - Pattern matching on `args.Context?.Binding` works correctly at any propagation level
-- The binding's `Source`, `Data`, and type-specific properties remain accessible
+- The binding's `Data` and type-specific properties remain accessible
 - Propagation does **not** create a new binding - it forwards the existing one
+
+**Note on SourceId uniqueness**: `SourceId` uses the `View.Id` property, which is developer-defined (like HTML element ids). Uniqueness within your application is your responsibility. If two views have the same `Id`, only one will match in switch statements.
 
 ### Migration Path
 
@@ -852,7 +1278,7 @@ These custom events were workarounds for missing `Command.Activate` propagation.
    - Create hierarchy: MenuBar → MenuBarItem → PopoverMenu → Menu → MenuItem → FlagSelector → CheckBox
    - **Activate propagation**: Activate CheckBox, verify MenuBar.OnActivating receives event
    - **Accept propagation**: Accept CheckBox, verify MenuBar.OnAccepting receives event
-   - **Source preservation**: Verify `ctx.Source` = CheckBox at every level (FlagSelector, MenuItem, Menu, MenuBar)
+   - **SourceId/Value preservation**: Verify `ctx.SourceId` and `ctx.Value` remain constant at every level (FlagSelector, MenuItem, Menu, MenuBar)
    - **Binding preservation**: Verify `ctx.Binding` is the original KeyBinding/MouseBinding at every level
    - **Intermediate handling**: Menu.OnActivating handles → verify MenuBar.OnActivating NOT called
    - **Event interception**: Verify FlagSelector and Shortcut correctly forward (not block) commands
@@ -1002,4 +1428,6 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 | 2026-01-20 | Claude Opus 4.5 | Added "Identifying the Originating View in Handlers" section; clarified binding preservation during propagation; updated for alpha status (breaking changes OK); added binding refactor dependency |
 | 2026-01-22 | Claude Opus 4.5 | Updated constraints: binding refactor is now complete; ready for implementation |
 | 2026-01-22 | Claude Opus 4.5 | Added "FlagSelector in MenuItem in MenuBar Scenario" section; expanded test cases and files to modify; documented class hierarchy (MenuBar IS-A Menu, MenuBarItem IS-A MenuItem IS-A Shortcut) |
+| 2026-01-21 | Claude Opus 4.5 | **Major design change**: Replaced `ctx.Source` (View?) with `ctx.SourceId` (string) and `ctx.Value` (object?) to fix lifecycle issues; added non-generic `IValue` interface; updated all handler examples to use switch/case on SourceId |
+| 2026-01-21 | Claude Opus 4.5 | Fixed code style in all examples: explicit types (no `var`), `new ()` syntax, space before `()`, changed `Accepted` to `Accepting` (cancellable) |
 
