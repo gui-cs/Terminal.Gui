@@ -53,6 +53,7 @@ public class ScenariosStressTests
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
         Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType)!;
+        string scenarioName = scenario.GetName ();
 
         Stopwatch? stopwatch = null;
 
@@ -127,7 +128,12 @@ public class ScenariosStressTests
             
             app.SessionBegun -= OnApplicationSessionBegun;
             app.Iteration -= OnApplicationOnIteration;
-            stopwatch!.Stop ();
+            
+            if (stopwatch is { })
+            {
+                stopwatch.Stop ();
+            }
+            
             _output.WriteLine ($"Application instance disposed");
         }
 
@@ -177,7 +183,7 @@ public class ScenariosStressTests
             }
 
             _output.WriteLine (
-                               $"'{scenario!.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
+                               $"'{scenarioName}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             app?.RequestStop ();
 
