@@ -67,7 +67,7 @@ public class TextValidateField : View, IDesignable
     }
 
     /// <summary>Text</summary>
-    public new string Text
+    public override string Text
     {
         get => _provider is null ? string.Empty : _provider.Text;
         set

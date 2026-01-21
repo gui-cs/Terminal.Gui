@@ -157,11 +157,17 @@ public partial class TextField
     private void SetText (IEnumerable<string> newText) { SetText (newText.ToList ()); }
 
     /// <summary>Sets or gets the text held by the view.</summary>
-    public new string Text
+    public override string Text
     {
         get => StringExtensions.ToString (_text);
         set
         {
+            // Guard against base constructor calling before _text is initialized
+            if (_text is null)
+            {
+                return;
+            }
+
             var oldText = StringExtensions.ToString (_text);
 
             if (oldText == value)

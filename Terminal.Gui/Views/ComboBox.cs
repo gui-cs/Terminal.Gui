@@ -197,10 +197,20 @@ public class ComboBox : View, IDesignable
     }
 
     /// <summary>The text of the currently selected list item</summary>
-    public new string Text
+    public override string Text
     {
         get => _text;
-        set => SetSearchText (value);
+        set
+        {
+            // Guard against base constructor calling before _search is initialized
+            if (_search is null)
+            {
+                _text = value;
+                return;
+            }
+
+            SetSearchText (value);
+        }
     }
 
     /// <summary>
