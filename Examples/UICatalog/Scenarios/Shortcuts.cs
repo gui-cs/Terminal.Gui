@@ -46,10 +46,7 @@ public class Shortcuts : Scenario
             Title = "E_vents"
         };
 
-        eventLog.Width = Dim.Func (
-                                   _ => Math.Min (
-                                                  eventLog.SuperView!.Viewport.Width / 2,
-                                                  eventLog.MaxLength + eventLog.GetAdornmentsThickness ().Horizontal));
+        eventLog.Width = Dim.Func (_ => Math.Min (eventLog.SuperView!.Viewport.Width / 2, eventLog.MaxLength + eventLog.GetAdornmentsThickness ().Horizontal));
         _app?.TopRunnableView.Add (eventLog);
 
         var alignKeysShortcut = new Shortcut
@@ -59,29 +56,38 @@ public class Shortcuts : Scenario
             Y = 0,
             Width = Dim.Fill () - Dim.Width (eventLog),
             HelpText = "Fill to log",
-            CommandView = new CheckBox
-            {
-                Text = "_Align Keys",
-                CanFocus = false,
-                MouseHighlightStates = MouseState.None,
-                CheckedState = CheckState.Checked
-            },
+            CommandView = new CheckBox { Text = "_Align Keys", CanFocus = false, MouseHighlightStates = MouseState.None, CheckedState = CheckState.Checked },
             Key = Key.F5.WithCtrl.WithAlt.WithShift
         };
+
+        alignKeysShortcut.Activating += (sender, args) =>
+                                        {
+                                            if (sender is Shortcut shortcut)
+                                            {
+                                                if (args.Context?.Binding is { } binding)
+                                                {
+                                                    eventSource.Add ($"{shortcut.Id}.Activating - Source: {args.Context?.Source?.ToDebugString ()}, Binding Source: {binding}");
+                                                    eventLog.MoveDown ();
+                                                }
+                                            }
+                                        };
 
         ((CheckBox)alignKeysShortcut.CommandView).CheckedStateChanging += (_, a) =>
                                                                           {
                                                                               if (alignKeysShortcut.CommandView is CheckBox cb)
                                                                               {
                                                                                   bool align = a.Result == CheckState.Checked;
-                                                                                  eventSource.Add (
-                                                                                                   $"{alignKeysShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
+
+                                                                                  eventSource.Add ($"{
+                                                                                      alignKeysShortcut.Id
+                                                                                  }.CommandView.CheckedStateChanging: {
+                                                                                      cb.Text
+                                                                                  }");
                                                                                   eventLog.MoveDown ();
 
                                                                                   AlignKeys (align);
                                                                               }
                                                                           };
-
 
         _app?.TopRunnableView.Add (alignKeysShortcut);
 
@@ -92,12 +98,7 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (alignKeysShortcut),
             Width = Dim.Fill () - Dim.Width (eventLog),
             HelpText = "Show _Command first",
-            CommandView = new CheckBox
-            {
-                Text = "Command _First",
-                CanFocus = false,
-                MouseHighlightStates = MouseState.None
-            },
+            CommandView = new CheckBox { Text = "Command _First", CanFocus = false, MouseHighlightStates = MouseState.None },
             Key = Key.F.WithCtrl
         };
 
@@ -108,11 +109,15 @@ public class Shortcuts : Scenario
                                                                              {
                                                                                  if (commandFirstShortcut.CommandView is CheckBox cb)
                                                                                  {
-                                                                                     eventSource.Add (
-                                                                                                      $"{commandFirstShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
+                                                                                     eventSource.Add ($"{
+                                                                                         commandFirstShortcut.Id
+                                                                                     }.CommandView.CheckedStateChanging: {
+                                                                                         cb.Text
+                                                                                     }");
                                                                                      eventLog.MoveDown ();
 
-                                                                                     foreach (Shortcut peer in _app!.TopRunnableView!.SubViews.OfType<Shortcut> ())
+                                                                                     foreach (Shortcut peer in _app!.TopRunnableView!.SubViews
+                                                                                                  .OfType<Shortcut> ())
                                                                                      {
                                                                                          if (eventArgs.Result == CheckState.Checked)
                                                                                          {
@@ -136,7 +141,7 @@ public class Shortcuts : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Key = Key.F4,
             HelpText = "Changes all CommandView.CanFocus",
-            CommandView = new CheckBox { Text = "_CommandView.CanFocus" },
+            CommandView = new CheckBox { Text = "_CommandView.CanFocus" }
         };
 
         ((CheckBox)canFocusShortcut.CommandView).CheckedStateChanging += (_, a) =>
@@ -172,12 +177,7 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (appShortcut),
             Width = Dim.Fill () - Dim.Width (eventLog),
             HelpText = "Accepting pops MB",
-            CommandView = new Button
-            {
-                Title = "_Button",
-                ShadowStyle = ShadowStyle.None,
-                MouseHighlightStates = MouseState.None
-            },
+            CommandView = new Button { Title = "_Button", ShadowStyle = ShadowStyle.None, MouseHighlightStates = MouseState.None },
             Key = Key.K
         };
         buttonShortcut.Accepting += Button_Clicked;
@@ -192,23 +192,20 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (buttonShortcut),
             Key = Key.F2,
             Width = Dim.Fill () - Dim.Width (eventLog),
-            CommandView = new OptionSelector ()
+            CommandView = new OptionSelector
             {
-                Orientation = Orientation.Vertical,
-                Labels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
-                MouseHighlightStates = MouseState.None,
-            },
+                Orientation = Orientation.Vertical, Labels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"], MouseHighlightStates = MouseState.None
+            }
         };
 
         ((OptionSelector)optionSelectorShortcut.CommandView).ValueChanged += (send, args) =>
-                                                                                {
-                                                                                    if (send is not null)
-                                                                                    {
-                                                                                        eventSource.Add (
-                                                                                                         $"ValueChanged: {send.GetType ().Name} - {args.Value}");
-                                                                                        eventLog.MoveDown ();
-                                                                                    }
-                                                                                };
+                                                                             {
+                                                                                 if (send is { })
+                                                                                 {
+                                                                                     eventSource.Add ($"ValueChanged: {send.GetType ().Name} - {args.Value}");
+                                                                                     eventLog.MoveDown ();
+                                                                                 }
+                                                                             };
 
         _app?.TopRunnableView.Add (optionSelectorShortcut);
 
@@ -219,39 +216,35 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (optionSelectorShortcut),
             Width = Dim.Fill () - Dim.Width (eventLog),
             HelpText = "LinearRanges work!",
-            CommandView = new LinearRange<string>
-            {
-                Orientation = Orientation.Horizontal,
-                AllowEmpty = true
-            },
+            CommandView = new LinearRange<string> { Orientation = Orientation.Horizontal, AllowEmpty = true },
             Key = Key.F5
         };
 
-        ((LinearRange<string>)sliderShortcut.CommandView).Options = [new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" }];
+        ((LinearRange<string>)sliderShortcut.CommandView).Options =
+        [
+            new LinearRangeOption<string> { Legend = "A" }, new LinearRangeOption<string> { Legend = "B" }, new LinearRangeOption<string> { Legend = "C" }
+        ];
         ((LinearRange<string>)sliderShortcut.CommandView).SetOption (0);
 
         ((LinearRange<string>)sliderShortcut.CommandView).OptionsChanged += (send, _) =>
-                                                                       {
-                                                                           if (send is LinearRange<string> lr)
-                                                                           {
-                                                                               eventSource.Add (
-                                                                                                $"OptionsChanged: {lr.GetType ().Name} - {string.Join (",", lr.GetSetOptions ())}");
-                                                                               eventLog.MoveDown ();
-                                                                           }
-                                                                       };
+                                                                            {
+                                                                                if (send is LinearRange<string> lr)
+                                                                                {
+                                                                                    eventSource.Add ($"OptionsChanged: {
+                                                                                        lr.GetType ().Name
+                                                                                    } - {
+                                                                                        string.Join (",", lr.GetSetOptions ())
+                                                                                    }");
+                                                                                    eventLog.MoveDown ();
+                                                                                }
+                                                                            };
 
         _app?.TopRunnableView.Add (sliderShortcut);
 
-        ListView listView = new ListView ()
-        {
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            Title = "ListView",
-            BorderStyle = LineStyle.Single
-        };
+        var listView = new ListView { Height = Dim.Auto (), Width = Dim.Auto (), Title = "ListView", BorderStyle = LineStyle.Single };
         listView.EnableForDesign ();
 
-        var listViewShortcut = new Shortcut ()
+        var listViewShortcut = new Shortcut
         {
             Id = "listViewShortcut",
             X = 0,
@@ -259,7 +252,7 @@ public class Shortcuts : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             HelpText = "A ListView with Border",
             CommandView = listView,
-            Key = Key.F5.WithCtrl,
+            Key = Key.F5.WithCtrl
         };
 
         _app?.TopRunnableView.Add (listViewShortcut);
@@ -282,7 +275,6 @@ public class Shortcuts : Scenario
             X = 0,
             Y = Pos.Bottom (noCommandShortcut),
             Width = Dim.Width (noCommandShortcut),
-
             Title = "No Ke_y",
             HelpText = "Keyless"
         };
@@ -316,15 +308,16 @@ public class Shortcuts : Scenario
             Arrangement = ViewArrangement.RightResizable | ViewArrangement.BottomResizable
         };
         framedShortcut.Border!.Settings = BorderSettings.Title;
+
         //framedShortcut.Orientation = Orientation.Horizontal;
 
-        if (framedShortcut.Padding is not null)
+        if (framedShortcut.Padding is { })
         {
-            framedShortcut.Padding.Thickness = new (0, 1, 0, 0);
+            framedShortcut.Padding.Thickness = new Thickness (0, 1, 0, 0);
             framedShortcut.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
         }
 
-        if (framedShortcut.CommandView.Margin is not null)
+        if (framedShortcut.CommandView.Margin is { })
         {
             framedShortcut.CommandView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
             framedShortcut.HelpView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error);
@@ -357,10 +350,7 @@ public class Shortcuts : Scenario
         progressShortcut.CommandView.Height = 1;
         progressShortcut.CommandView.CanFocus = false;
 
-        Timer timer = new (10)
-        {
-            AutoReset = true
-        };
+        Timer timer = new (10) { AutoReset = true };
 
         timer.Elapsed += (_, _) =>
                          {
@@ -380,12 +370,7 @@ public class Shortcuts : Scenario
 
         _app?.TopRunnableView.Add (progressShortcut);
 
-        var textField = new TextField
-        {
-            Text = "Edit me",
-            Width = 10,
-            Height = 1
-        };
+        var textField = new TextField { Text = "Edit me", Width = 10, Height = 1 };
 
         var textFieldShortcut = new Shortcut
         {
@@ -410,11 +395,7 @@ public class Shortcuts : Scenario
             HelpText = "Cycles BG Color"
         };
 
-        var bgColor = new ColorPicker16
-        {
-            BoxHeight = 1,
-            BoxWidth = 1
-        };
+        var bgColor = new ColorPicker16 { BoxHeight = 1, BoxWidth = 1 };
 
         bgColorShortcut.Activating += (_, _) => { };
 
@@ -433,19 +414,22 @@ public class Shortcuts : Scenario
 
         bgColor.ColorChanged += (sendingView, args) =>
                                 {
-                                    if (sendingView is not null)
+                                    if (sendingView is { })
                                     {
                                         eventSource.Add ($"ColorChanged: {sendingView.GetType ().Name} - {args.Result}");
                                         eventLog.MoveDown ();
 
-                                        _app!.TopRunnableView!.SetScheme (
-                                                                   new (_app.TopRunnableView.GetScheme ())
-                                                                   {
-                                                                       Normal = new (
-                                                                                     _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                                     args.Result,
-                                                                                     _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Style)
-                                                                   });
+                                        _app!.TopRunnableView!.SetScheme (new Scheme (_app.TopRunnableView.GetScheme ())
+                                        {
+                                            Normal =
+                                                new Attribute (_app.TopRunnableView
+                                                                   .GetAttributeForRole (VisualRole.Normal)
+                                                                   .Foreground,
+                                                               args.Result,
+                                                               _app.TopRunnableView
+                                                                   .GetAttributeForRole (VisualRole.Normal)
+                                                                   .Style)
+                                        });
                                     }
                                 };
         bgColorShortcut.CommandView = bgColor;
@@ -469,27 +453,32 @@ public class Shortcuts : Scenario
         foreach (Shortcut shortcut in _app!.TopRunnableView!.SubViews.OfType<Shortcut> ())
         {
             shortcut.Activating += (_, args) =>
-                                  {
-                                      if (args.Handled)
-                                      {
-                                          return;
-                                      }
+                                   {
+                                       if (args.Handled)
+                                       {
+                                           return;
+                                       }
 
-                                      eventSource.Add ($"{shortcut.Id}.Activating: {shortcut.CommandView.Text} {shortcut.CommandView.GetType ().Name}");
-                                      eventLog.MoveDown ();
-                                  };
+                                       eventSource.Add ($"{shortcut.Id}.Activating: {shortcut.CommandView.Text} {shortcut.CommandView.GetType ().Name}");
+                                       eventLog.MoveDown ();
+                                   };
 
             shortcut.CommandView.Activating += (_, args) =>
-                                              {
-                                                  if (args.Handled)
-                                                  {
-                                                      return;
-                                                  }
+                                               {
+                                                   if (args.Handled)
+                                                   {
+                                                       return;
+                                                   }
 
-                                                  eventSource.Add (
-                                                                   $"{shortcut.Id}.CommandView.Activating: {shortcut.CommandView.Text} {shortcut.CommandView.GetType ().Name}");
-                                                  eventLog.MoveDown ();
-                                              };
+                                                   eventSource.Add ($"{
+                                                       shortcut.Id
+                                                   }.CommandView.Activating: {
+                                                       shortcut.CommandView.Text
+                                                   } {
+                                                       shortcut.CommandView.GetType ().Name
+                                                   }");
+                                                   eventLog.MoveDown ();
+                                               };
 
             shortcut.Accepting += (_, _) =>
                                   {
@@ -499,8 +488,13 @@ public class Shortcuts : Scenario
 
             shortcut.CommandView.Accepting += (_, _) =>
                                               {
-                                                  eventSource.Add (
-                                                                   $"{shortcut.Id}.CommandView.Accepting: {shortcut.CommandView.Text} {shortcut.CommandView.GetType ().Name}");
+                                                  eventSource.Add ($"{
+                                                      shortcut.Id
+                                                  }.CommandView.Accepting: {
+                                                      shortcut.CommandView.Text
+                                                  } {
+                                                      shortcut.CommandView.GetType ().Name
+                                                  }");
                                                   eventLog.MoveDown ();
                                               };
         }

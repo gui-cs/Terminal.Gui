@@ -15,4 +15,19 @@ public interface IInputBinding
     /// </summary>
     public object? Data { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the <see cref="View"/> that is the origin of this binding.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         For key bindings, this is the view where the binding was added.
+    ///     </para>
+    ///     <para>
+    ///         For mouse bindings, this is the view that received the mouse event.
+    ///     </para>
+    ///     <para>
+    ///         For programmatic invocations, this is the view that called <see cref="View.InvokeCommand(Command)"/>.
+    ///     </para>
+    /// </remarks>
+    public View? Source { get; set; }
 }
