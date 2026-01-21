@@ -13,12 +13,22 @@ Terminal.Gui v2 uses a sophisticated driver architecture that separates concerns
  
 ## Available Drivers
 
-Terminal.Gui provides console driver implementations optimized for different platforms:
+Terminal.Gui provides four console driver implementations optimized for different platforms:
 
-- **DotNetDriver (`dotnet`)** - A cross-platform driver that uses the .NET `System.Console` API. Works on all platforms (Windows, macOS, Linux). Best for maximum compatibility.
-- **WindowsDriver (`windows`)** - A Windows-optimized driver that uses native Windows Console APIs for enhanced performance and platform-specific features.
-- **UnixDriver (`unix`)** - A Unix/Linux/macOS-optimized driver that uses platform-specific APIs for better integration and performance.
-- **AnsiDriver (`ansi`)** - A pure ANSI escape sequence driver for unit testing and headless environments. Simulates console behavior without requiring a real terminal.
+
+|  | **ansi** | **dotnet** | **unix** | **windows** |
+|---|---|---|---|---|
+| **Theme** | Showcase driver with pure ANSI implementation. Works on all platforms. Ideal for testing/CI. Deterministic behavior with virtual time support. | Cross-platform managed .NET driver. Simplest implementation using `System.Console` API. Works with .NET BCL only. | Optimized Unix/Linux/macOS driver. Direct syscall access. | High-performance Windows-only driver. Native Win32 Console API. Direct access to Windows-specific features. |
+| **Input Model** | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `ConsoleKeyInfo` from `System.Console`, converts to Terminal.Gui events | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `INPUT_RECORD` structures directly, converts to Terminal.Gui events |
+| **Unix Read APIs** | `poll(STDIN_FILENO, ...)`, `read(STDIN_FILENO, buffer, len)`, `tcgetattr()`/`tcsetattr()` for raw mode via `UnixRawModeHelper` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) reads `char` | `poll()`, `read()` syscalls on stdin (fd 0), `tcgetattr()`/`tcsetattr()` for termios raw mode | N/A (Windows-only) |
+| **Windows Read APIs** | P/Invokes `ReadFile()` reads `char` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) | N/A (Unix-only) | P/Invokes `ReadConsoleInputW()` reads `INPUT_RECORD`, `GetConsoleMode()`/`SetConsoleMode()` enables mouse input and raw mode |
+| **Output Model** | Pure ANSI escape sequences | Managed .NET + ANSI sequences (when VT mode enabled) | Pure ANSI escape sequences | Direct character output via Win32 API with double buffering |
+| **Unix Write APIs** | `write()` syscall to stdout (fd 1) | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | `write()` syscall to stdout, ANSI SGR sequences for colors (16-color and 24-bit RGB) | N/A (Windows-only) |
+| **Windows Write APIs** | P/Invokes `WriteFile()` | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | N/A (Unix-only) | P/Invokes `WriteConsoleW()`, `CreateConsoleScreenBuffer()`/`SetConsoleActiveScreenBuffer()` for double buffering, `SetConsoleTextAttribute()` |
+| **Screen Model** | ANSI query-based resize. Throttled to 500ms. Falls back to polling. | Polling-based re-size: `Console.WindowWidth`/`Console.WindowHeight` queried periodically. Falls back to 80x25 on `IOException`. | Polling-based resize: `ioctl(TIOCGWINSZ)` syscall with platform-specific constants (Linux `0x5413`, macOS `0x40087468`). Queries `WinSize` struct. | Event-based re-size: `WINDOW_BUFFER_SIZE_EVENT` received in input stream via `ReadConsoleInputW()`. Immediate resize notification. `GetConsoleScreenBufferInfoEx()` queries dimensions. |
+| **Cursor Handling** | ANSI sequences: DECTCEM (`CSI ? 25 h/l`) for show/hide, DECSCUSR (`CSI Ps SP q`) for style. Full `CursorStyle` support. | ANSI sequences (same as ansi driver). Falls back to `Console.SetCursorPosition()` on Windows. | ANSI sequences (same as ansi driver). Full `CursorStyle` support. | • Legacy mode: Win32 `CONSOLE_CURSOR_INFO` (size percentage only, no blinking control). <br>• Modern VT mode: ANSI sequences (same as ansi driver). Full `CursorStyle` support. |
+| **Advantages** | • Cross-platform (all platforms)<br>• Pure, clean implementation<br>• Perfect for testing/CI<br>• Virtual time support<br>• Deterministic behavior<br> | • Cross-platform (all platforms)<br>• Maximum compatibility<br>• Simple implementation<br>• No P/Invoke; Works with .NET BCL<br> | • Immediate resize detection<br> | • Highest performance on Windows<br>• Immediate resize detection<br> |
+| **Disadvantages** | • Requires proper ANSI support<br>• Throttled size detection (500ms) | • Lower performance (managed overhead)<br>• Limited feature set<br>• `System.ReadKey` has bugs on Windows<br>• Polling-based resize | • Unix-only<br>• Polling-based resize detection | • Windows-only<br>• More complex P/Invoke code |
 
 ### Automatic Driver Selection
 
@@ -42,10 +52,7 @@ Method 1: Set ForceDriver using Configuration Manager
 Method 2: Pass driver name to Init
 
 ```csharp
-// Using string directly
-Application.Init(driverName: "unix");
-
-// Or using type-safe constant
+// Use type-safe constants from DriverRegistry.Names
 Application.Init(driverName: DriverRegistry.Names.UNIX);
 ```
 
@@ -70,9 +77,9 @@ The `ForceDriver` property is a configuration property marked with `[Configurati
 
 ```csharp
 // Subscribe to driver changes
-Application.ForceDriverChanged += (sender, e) =>
+Application.ForceDriverChanged += (_, e) =>
 {
-    Console.WriteLine($"Driver changed: {e.OldValue} → {e.NewValue}");
+    Logging.Information($"Driver changed: {e.OldValue} → {e.NewValue}");
 };
 
 // Change driver
@@ -87,10 +94,10 @@ Terminal.Gui provides several methods to discover available drivers at runtime t
 // Get driver names (AOT-friendly, no reflection)
 IEnumerable<string> driverNames = Application.GetRegisteredDriverNames();
 
-Console.WriteLine("Available drivers:");
+Logging.Information("Available drivers:");
 foreach (string name in driverNames)
 {
-    Console.WriteLine($"  - {name}");
+    Logging.Information($"  - {name}");
 }
 
 // Output:
@@ -105,13 +112,13 @@ For more detailed information about each driver:
 
 ```csharp
 // Get driver metadata
-foreach (var descriptor in Application.GetRegisteredDrivers())
+foreach (DriverRegistry.DriverDescriptor descriptor in Application.GetRegisteredDrivers())
 {
-    Console.WriteLine($"{descriptor.DisplayName}");
-    Console.WriteLine($"  Name: {descriptor.Name}");
-    Console.WriteLine($"  Description: {descriptor.Description}");
-    Console.WriteLine($"  Platforms: {string.Join(", ", descriptor.SupportedPlatforms)}");
-    Console.WriteLine();
+    Logging.Information($"{descriptor.DisplayName}");
+    Logging.Information($"  Name: {descriptor.Name}");
+    Logging.Information($"  Description: {descriptor.Description}");
+    Logging.Information($"  Platforms: {string.Join(", ", descriptor.SupportedPlatforms)}");
+    Logging.Information("");
 }
 
 // Output:
@@ -138,8 +145,8 @@ if (Application.IsDriverNameValid(userInput))
 }
 else
 {
-    Console.WriteLine($"Invalid driver: {userInput}");
-    Console.WriteLine($"Valid options: {string.Join(", ", Application.GetRegisteredDriverNames())}");
+    Logging.Information($"Invalid driver: {userInput}");
+    Logging.Information($"Valid options: {string.Join(", ", Application.GetRegisteredDriverNames())}");
 }
 ```
 
@@ -174,24 +181,24 @@ string dotnetDriver = DriverRegistry.Names.DOTNET;    // "dotnet"
 string ansiDriver = DriverRegistry.Names.ANSI;        // "ansi"
 
 // Get detailed driver information
-if (DriverRegistry.TryGetDriver("windows", out var descriptor))
+if (DriverRegistry.TryGetDriver(DriverRegistry.Names.WINDOWS, out DriverRegistry.DriverDescriptor descriptor))
 {
-    Console.WriteLine($"Found: {descriptor.DisplayName}");
-    Console.WriteLine($"Description: {descriptor.Description}");
+    Logging.Information($"Found: {descriptor.DisplayName}");
+    Logging.Information($"Description: {descriptor.Description}");
     
     // Check if supported on current platform
     bool isSupported = descriptor.SupportedPlatforms.Contains(Environment.OSVersion.Platform);
 }
 
 // Get drivers supported on current platform
-foreach (var driver in DriverRegistry.GetSupportedDrivers())
+foreach (DriverRegistry.DriverDescriptor driver in DriverRegistry.GetSupportedDrivers())
 {
-    Console.WriteLine($"{driver.Name} - {driver.DisplayName}");
+    Logging.Information($"{driver.Name} - {driver.DisplayName}");
 }
 
 // Get the default driver for current platform
-var defaultDriver = DriverRegistry.GetDefaultDriver();
-Console.WriteLine($"Default driver: {defaultDriver.Name}");
+DriverRegistry.DriverDescriptor defaultDriver = DriverRegistry.GetDefaultDriver();
+Logging.Information($"Default driver: {defaultDriver.Name}");
 ```
 
 ### Component Factory Pattern
@@ -215,19 +222,25 @@ The factory pattern ensures proper component creation and initialization while m
 Each driver is composed of specialized components, each with a single responsibility:
 
 #### IInput&lt;T&gt;
-Reads raw console input events from the terminal. The generic type `T` represents the platform-specific input type:
-- `ConsoleKeyInfo` for DotNetDriver
-- `WindowsConsole.InputRecord` for WindowsDriver
-- `char` for UnixDriver and AnsiDriver
+Reads raw console input events from the terminal on a dedicated input thread. The generic type `T` represents the platform-specific input record type:
+- `ConsoleKeyInfo` for DotNetDriver (from `Console.ReadKey()`)
+- `WindowsConsole.InputRecord` for WindowsDriver (from `ReadConsoleInputW()`)
+- `char` for UnixDriver and AnsiDriver (raw bytes from `read()` syscall or `ReadFile()`)
 
-Runs on a dedicated input thread to avoid blocking the UI.
+Input runs on a separate thread managed by `MainLoopCoordinator`, continuously reading from the console and queueing events into a thread-safe `ConcurrentQueue<T>` to avoid blocking the UI thread.
 
 #### IOutput
-Renders the output buffer to the terminal. Handles:
-- Writing text and ANSI escape sequences
-- Setting cursor position
-- Managing cursor visibility
-- Detecting terminal window size
+Renders the output buffer to the terminal. Platform-specific implementations:
+- **WindowsOutput**: Uses `WriteConsoleW()` for direct character output
+- **UnixOutput**: Writes ANSI sequences to stdout via `write()` syscall
+- **NetOutput**: Uses `Console.Write()` with ANSI sequences (VT mode on Windows)
+- **AnsiOutput**: Pure ANSI escape sequences via `WriteFile()` (Windows) or `write()` (Unix)
+
+Responsibilities include:
+- Writing characters, strings, and ANSI escape sequences
+- Cursor positioning and visibility control
+- Querying terminal window size
+- Managing the active screen buffer
 
 #### IInputProcessor
 Translates raw console input into Terminal.Gui events:
@@ -347,18 +360,21 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 - `Refresh()`, `ToString()`, `ToAnsi()` - Output rendering
 
 #### Cursor
-- `SetCursorPosition(int col, int row)` - Set cursor position in screen coordinates
-- `SetCursorVisibility(CursorStyle style)` - Set cursor style/visibility (ANSI DECSCUSR-based)
-- `SetCursorNeedsUpdate(bool needsUpdate)` - Signal cursor position needs update without redraw
+
+Drivers implement cursor control through `IDriver` which delegates to `IOutput`:
+- `SetCursor(Cursor cursor)` - Set cursor position and style atomically
+- `GetCursor()` - Get current cursor state
+- `SetCursorNeedsUpdate(bool)` / `GetCursorNeedsUpdate()` - Optimization flag for cursor updates
 
 > [!NOTE]
-> The cursor system is managed by `ApplicationNavigation`. Drivers should not directly manage cursor state.
-> See [Cursor Management](cursor.md) for details.
+> The cursor system is managed by `ApplicationNavigation`. Drivers implement the low-level cursor control; views use the `View.Cursor` property.
+> See [Cursor Management](cursor.md) for complete details.
 
 #### Input Events
-- `KeyDown`, `MouseEvent` - Input events
-- `InjectKeyEvent()` - Test support
-- `InjectMouseEvent()` - Test support
+- `KeyDown`, `MouseEvent` - Input events raised by the driver when input is processed
+
+> [!NOTE]
+> For testing, use the input injection API. See [Input Injection](input-injection.md) for details.
 
 #### ANSI Escape Sequences
 - `QueueAnsiRequest()` - ANSI request handling
@@ -395,7 +411,7 @@ if (DriverRegistry.TryGetDriver(driverName, out descriptor))
     IComponentFactory factory = descriptor.CreateFactory();
     
     // Factory creates all driver components
-    var coordinator = new MainLoopCoordinator<TInputRecord>(
+    MainLoopCoordinator<TInputRecord> coordinator = new (
         timedEvents,
         inputQueue,
         mainLoop,
@@ -411,144 +427,35 @@ This architecture provides:
 - **Extensibility** - custom drivers can register themselves
 - **AOT compatibility** - no reflection required
 
-## Platform-Specific Details
-
-### DotNetDriver (NetComponentFactory)
-
-- Uses `System.Console` for all I/O operations
-- Input: Reads `ConsoleKeyInfo` via `Console.ReadKey()`
-- Output: Uses `Console.Write()` and ANSI escape sequences
-- Works on all platforms but may have limited features
-- Best for maximum compatibility and simple applications
-
-### WindowsDriver (WindowsComponentFactory)
-
-- Uses Windows Console API via P/Invoke
-- Input: Reads `InputRecord` structs via `ReadConsoleInput`
-- Output: Uses Windows Console API for optimal performance
-- Supports Windows-specific features and better performance
-- Automatically selected on Windows platforms
-
-#### Visual Studio Debug Console Support
-
-When running in Visual Studio's debug console (`VSDebugConsole.exe`), WindowsDriver detects the `VSAPPIDNAME` environment variable and automatically adjusts its behavior:
-
-- Disables the alternative screen buffer (which is not supported in VS debug console)
-- Preserves the original console colors on startup
-- Restores the original colors and clears the screen on shutdown
-
-This ensures Terminal.Gui applications can be debugged directly in Visual Studio without rendering issues.
-
-### UnixDriver (UnixComponentFactory)
-
-- Uses Unix/Linux terminal APIs via P/Invoke to libc
-- Input: Reads raw `char` data from stdin using `poll()` and `read()` syscalls
-- Output: Writes ANSI escape sequences to stdout using `write()` syscall
-- Terminal control: Uses termios for raw mode (via `UnixRawModeHelper`)
-- Size detection: Uses `ioctl(TIOCGWINSZ)` to get terminal dimensions
-- Automatically selected on Unix/Linux/macOS platforms
-
-### AnsiDriver (AnsiComponentFactory)
-
-- Pure ANSI escape sequence cross-platform driver
-- **Windows**: Uses Virtual Terminal Input mode (`ReadFile` API)
-- **Unix/Linux/macOS**: Uses the same low-level syscalls as UnixDriver (`poll()`, `read()`) via shared `UnixIOHelper`
-- Shares code with UnixDriver:
-  - `UnixRawModeHelper` - Terminal raw mode configuration (termios)
-  - `UnixIOHelper` - Shared Unix syscall wrappers (poll, read, write, ioctl)
-- Best for unit testing, headless environments, and maximum portability
-- Specify with `IApplication.ForceDriver = "ansi"` or `DriverRegistry.Names.ANSI`
-
 ## Testing and Input Injection
 
-Terminal.Gui provides a sophisticated input injection system for testing applications without requiring actual keyboard/mouse hardware or terminal interaction. The ANSI driver is the **recommended driver for testing** because:
+For comprehensive documentation on testing Terminal.Gui applications with input injection, virtual time control, and deterministic testing, see [Input Injection](input-injection.md).
 
-- ✅ **Cross-platform** - Works identically on all platforms
-- ✅ **Full pipeline testing** - Tests the complete ANSI encoding/parsing pipeline
-- ✅ **Deterministic** - Virtual time control eliminates timing-related test flakiness
-- ✅ **Fast** - No real delays needed for escape sequence handling
+**Quick Summary:**
 
-### Simple Test Example
+- Use the **ANSI driver** for testing - it's cross-platform and deterministic
+- Use **Virtual Time** (`VirtualTimeProvider`) for timing control
+- The default **Direct Mode** is fastest for most tests
+- Use **Pipeline Mode** only when testing ANSI encoding/parsing
+
+**Example:**
 
 ```csharp
-// Create app with virtual time for testing
 VirtualTimeProvider time = new ();
 using IApplication app = Application.Create(time);
-app.Init(DriverRegistry.Names.ANSI);  // Use ANSI driver
+app.Init(DriverRegistry.Names.ANSI);
 
-Button button = new () { Text = "Click Me" };
-bool acceptingCalled = false;
-button.Accepting += (s, e) => acceptingCalled = true;
-
-// Single-call injection - handles everything automatically
+// Inject input
 app.InjectKey(Key.Enter);
+app.InjectMouse(new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (5, 5) });
 
-Assert.True(acceptingCalled);
+// Verify behavior
+Assert.True(eventFired);
 ```
 
-### Virtual Time Control
-
-The input injection system supports **virtual time** via `VirtualTimeProvider`, enabling deterministic testing of timing-dependent behavior like double-clicks:
-
-```csharp
-// Test double-click with precise timing
-VirtualTimeProvider time = new ();
-using IApplication app = Application.Create(time);
-app.Init(DriverRegistry.Names.ANSI);
-
-// First click at T+0
-app.InjectMouse(new () { 
-    Flags = MouseFlags.LeftButtonPressed,
-    Position = new (5, 5)
-});
-app.InjectMouse(new () { 
-    Flags = MouseFlags.LeftButtonReleased,
-    Position = new (5, 5)
-});
-
-// Advance virtual time by 300ms (within double-click threshold)
-time.Advance(TimeSpan.FromMilliseconds(300));
-
-// Second click at T+300
-app.InjectMouse(new () { 
-    Flags = MouseFlags.LeftButtonPressed,
-    Position = new (5, 5)
-});
-app.InjectMouse(new () { 
-    Flags = MouseFlags.LeftButtonReleased,
-    Position = new (5, 5)
-});
-
-// Verify double-click was detected
-Assert.Contains(receivedEvents, e => e.Flags.HasFlag(MouseFlags.LeftButtonDoubleClicked));
-```
-
-### Input Injection Modes
-
-The input injection system supports two modes:
-
-- **Direct Mode** (default) - Bypasses ANSI encoding/decoding for faster, simpler tests. Input events are raised directly.
-- **Pipeline Mode** - Goes through full ANSI encoding → parsing → decoding pipeline. Use when testing ANSI escape sequence handling.
-
-```csharp
-// Test ANSI encoding/decoding pipeline
-VirtualTimeProvider time = new ();
-using IApplication app = Application.Create(time);
-app.Init(DriverRegistry.Names.ANSI);
-
-InputInjectionOptions options = new () 
-{ 
-    Mode = InputInjectionMode.Pipeline,
-    TimeProvider = time 
-};
-
-// This will encode to ANSI, parse back, and raise events
-app.InjectKey(Key.F1, options);
-```
-
-### Key Concepts
-
-- **Single-call injection** - `app.InjectKey(key)` and `app.InjectMouse(mouse)` handle injection, processing, and event raising in one call
-- **Virtual time** - Control time explicitly via `VirtualTimeProvider.Advance()` for deterministic tests
-- **No manual queue management** - The old 3-step dance (inject → simulate thread → process queue) is handled automatically
-- **Automatic escape handling** - Escape sequences are processed without manual `Thread.Sleep()` delays
+See [Input Injection](input-injection.md) for:
+- Complete API documentation
+- Testing patterns and best practices
+- Virtual time control details
+- Injection modes (Direct vs Pipeline)
+- Troubleshooting guide
