@@ -223,6 +223,8 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                 string text = enc.GetString (buffer, 0, bytesRead);
 
+                //Logging.Trace ($"AnsiInput.Read: read {bytesRead} text: {text}");
+
                 foreach (char ch in text)
                 {
                     yield return ch;

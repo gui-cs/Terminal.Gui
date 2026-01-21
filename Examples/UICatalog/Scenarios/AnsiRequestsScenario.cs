@@ -81,7 +81,9 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             "CSI_SendDeviceAttributes",
             "CSI_ReportTerminalSizeInChars",
             "CSI_RequestCursorPositionReport",
-            "CSI_SendDeviceAttributes2"
+            "CSI_SendDeviceAttributes2",
+            "CSI_RequestWindowSizeInPixels",
+            "CSI_RequestSixelResolution"
         };
         // TODO: This UI would be cleaner/less rigid if Pos.Align were used
         var cbRequests = new ComboBox () { Width = 40, Height = 5, ReadOnly = true, Source = new ListWrapper<string> (new (scrRequests)) };
@@ -125,6 +127,14 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                                       break;
                                                   case "CSI_SendDeviceAttributes2":
                                                       selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_SendDeviceAttributes2;
+
+                                                      break;
+                                                  case "CSI_RequestWindowSizeInPixels":
+                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestWindowSizeInPixels;
+
+                                                      break;
+                                                  case "CSI_RequestSixelResolution":
+                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestSixelResolution;
 
                                                       break;
                                               }
@@ -320,6 +330,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
         return w;
     }
+
     private void UpdateResponses ()
     {
         _lblSummary!.Text = GetSummary ();
@@ -333,12 +344,14 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             return "No requests sent yet";
         }
 
+        var totalSends = _sends.Count;
+
         var last = _answers.Last ().Value;
 
         var unique = _answers.Values.Distinct ().Count ();
-        var total = _answers.Count;
+        var totalAnswers = _answers.Count;
 
-        return $"Last:{last} U:{unique} T:{total}";
+        return $"TS:{totalSends} Last:{last} U:{unique} TA:{totalAnswers}";
     }
 
     private void SetupGraph ()
@@ -383,13 +396,14 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
     private void SendDar ()
     {
-        _app?.Driver?.QueueAnsiRequest (
-                                              new ()
-                                              {
-                                                  Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
-                                                  Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
-                                                  ResponseReceived = HandleResponse!
-                                              });
+        _app?.Driver?.QueueAnsiRequest (new AnsiEscapeSequenceRequest
+        {
+            Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
+            Value = EscSeqUtils.CSI_SendDeviceAttributes.Value,
+            Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
+            ResponseReceived = HandleResponse!
+        });
+
         _sends.Add (DateTime.Now);
     }
 

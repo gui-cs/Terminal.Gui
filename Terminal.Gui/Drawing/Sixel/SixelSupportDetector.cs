@@ -59,10 +59,13 @@ public class SixelSupportDetector ()
 
                           // Finished
                           resultCallback.Invoke (result);
+                          //Logging.Information ($"Receive resolution response {result.Resolution}");
                       },
 
                       // Request failed, so try to compute instead
                       () => TryComputeResolution (result, resultCallback));
+
+        //Logging.Information ($"Sent resolution request {EscSeqUtils.CSI_RequestSixelResolution.Request}");
     }
 
     private void TryComputeResolution (SixelSupportResult result, Action<SixelSupportResult> resultCallback)
@@ -87,6 +90,8 @@ public class SixelSupportDetector ()
                                         () => resultCallback (result));
                       },
                       () => resultCallback (result));
+
+        //Logging.Information ($"Sent pixel size request {EscSeqUtils.CSI_RequestWindowSizeInPixels.Request}");
     }
 
     private void ComputeResolution (SixelSupportResult result, string consoleSize, string sizeInChars)
@@ -128,6 +133,7 @@ public class SixelSupportDetector ()
                       r =>
                       {
                           result.IsSupported = ResponseIndicatesSupport (r);
+                          //Logging.Information ($"Receive dar response {result.IsSupported}");
 
                           if (result.IsSupported)
                           {
@@ -139,6 +145,8 @@ public class SixelSupportDetector ()
                           }
                       },
                       () => resultCallback (result));
+
+        //Logging.Information ($"Sent dar request {EscSeqUtils.CSI_SendDeviceAttributes.Request}");
     }
 
     private void QueueRequest (AnsiEscapeSequence req, Action<string> responseCallback, Action abandoned)
@@ -146,6 +154,7 @@ public class SixelSupportDetector ()
         var newRequest = new AnsiEscapeSequenceRequest
         {
             Request = req.Request,
+            Value = req.Value,
             Terminator = req.Terminator,
             ResponseReceived = responseCallback!,
             Abandoned = abandoned

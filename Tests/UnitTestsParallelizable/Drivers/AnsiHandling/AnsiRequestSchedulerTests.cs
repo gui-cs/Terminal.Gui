@@ -29,10 +29,10 @@ public class AnsiRequestSchedulerTests
         };
 
         // we have no outstanding for c already
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Once);
+        _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (false).Verifiable (Times.Once);
 
         // then we should execute our request
-        _parserMock.Setup (p => p.ExpectResponse ("c", It.IsAny<Action<string>> ()!, null, false)).Verifiable (Times.Once);
+        _parserMock.Setup (p => p.ExpectResponse ("c", null, It.IsAny<Action<string?>> ()!, null, false)).Verifiable (Times.Once);
 
         // Act
         bool result = _scheduler.SendOrSchedule (null, request);
@@ -55,7 +55,7 @@ public class AnsiRequestSchedulerTests
         };
 
         // Parser already has an ongoing request for "c"
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (true).Verifiable (Times.Once);
+        _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (true).Verifiable (Times.Once);
 
         // Act
         bool result = _scheduler.SendOrSchedule (null, request1);
@@ -78,8 +78,8 @@ public class AnsiRequestSchedulerTests
         };
 
         // Set up to expect no outstanding request for "c" i.e. parser instantly gets response and resolves it
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Exactly (2));
-        _parserMock.Setup (p => p.ExpectResponse ("c", It.IsAny<Action<string>> ()!, null, false)).Verifiable (Times.Exactly (2));
+        _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (false).Verifiable (Times.Exactly (2));
+        _parserMock.Setup (p => p.ExpectResponse ("c", null, It.IsAny<Action<string?>> ()!, null, false)).Verifiable (Times.Exactly (2));
 
         _scheduler.SendOrSchedule (null, request);
 
@@ -109,8 +109,8 @@ public class AnsiRequestSchedulerTests
         };
 
         // Set up to expect no outstanding request for "c" i.e. parser instantly gets response and resolves it
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Exactly (2));
-        _parserMock.Setup (p => p.ExpectResponse ("c", It.IsAny<Action<string>> ()!, null, false)).Verifiable (Times.Exactly (2));
+        _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (false).Verifiable (Times.Exactly (2));
+        _parserMock.Setup (p => p.ExpectResponse ("c", null, It.IsAny<Action<string?>> ()!, null, false)).Verifiable (Times.Exactly (2));
 
         _scheduler.SendOrSchedule (null, request);
 
@@ -154,13 +154,13 @@ public class AnsiRequestSchedulerTests
         };
 
         // Send
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Once);
-        _parserMock.Setup (p => p.ExpectResponse ("c", It.IsAny<Action<string>> ()!, null, false)).Verifiable (Times.Exactly (2));
+        _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (false).Verifiable (Times.Once);
+        _parserMock.Setup (p => p.ExpectResponse ("c", null, It.IsAny<Action<string?>> ()!, null, false)).Verifiable (Times.Exactly (2));
 
         Assert.True (_scheduler.SendOrSchedule (null, request1));
 
         // Parser already has an ongoing request for "c"
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (true).Verifiable (Times.Exactly (2));
+        _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (true).Verifiable (Times.Exactly (2));
 
         // Cannot send because there is already outstanding request
         Assert.False (_scheduler.SendOrSchedule (null, request1));
@@ -170,11 +170,11 @@ public class AnsiRequestSchedulerTests
         SetTime (5001); // Exceeds stale timeout
 
         // Parser should be told to give up on this one (evicted)
-        _parserMock.Setup (p => p.StopExpecting ("c", false))
+        _parserMock.Setup (p => p.StopExpecting ("c", null, false))
                    .Callback (() =>
                               {
                                   // When we tell parser to evict - it should now tell us it is no longer expecting
-                                  _parserMock.Setup (p => p.IsExpecting ("c")).Returns (false).Verifiable (Times.Once);
+                                  _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (false).Verifiable (Times.Once);
                               })
                    .Verifiable ();
 
@@ -207,11 +207,11 @@ public class AnsiRequestSchedulerTests
         var request2 = new AnsiEscapeSequenceRequest { Request = "\u001b[0x", Terminator = "x", ResponseReceived = r => { } };
 
         // Already have a 'c' ongoing
-        _parserMock.Setup (p => p.IsExpecting ("c")).Returns (true).Verifiable (Times.Once);
+        _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (true).Verifiable (Times.Once);
 
         // 'x' is free
-        _parserMock.Setup (p => p.IsExpecting ("x")).Returns (false).Verifiable (Times.Once);
-        _parserMock.Setup (p => p.ExpectResponse ("x", It.IsAny<Action<string>> ()!, null, false)).Verifiable (Times.Once);
+        _parserMock.Setup (p => p.IsExpecting ("x", null)).Returns (false).Verifiable (Times.Once);
+        _parserMock.Setup (p => p.ExpectResponse ("x", null, It.IsAny<Action<string?>> ()!, null, false)).Verifiable (Times.Once);
 
         // Act
         bool a = _scheduler.SendOrSchedule (null, request1);
