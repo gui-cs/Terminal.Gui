@@ -220,12 +220,25 @@ The parser supports waiting for specific terminal responses (e.g., device attrib
 ```csharp
 var request = new AnsiEscapeSequenceRequest
 {
-    Request = "\x1B[0c",           // Send Device Attributes
-    Terminator = "c",              // Response ends with 'c'
+    Request = "\x1B[6t",           // Request cursor position
+    Terminator = "t",              // Response ends with 't'
+    Value = "6",                   // Optional: disambiguate from other 't' responses
     ResponseReceived = response => HandleResponse(response),
     Abandoned = () => HandleTimeout()
 };
 ```
+
+**Value-Based Disambiguation:**
+
+The `Value` property enables distinguishing between multiple requests that share the same terminator. For example:
+- `\x1B[6t` (cursor position report) and `\x1B[8t` (screen size report) both end with `t`
+- Setting `Value = "6"` ensures the expectation only matches responses containing `[6;...t`
+- If `Value` is null/empty, any response ending with the terminator matches
+
+The matching logic:
+1. Response must end with `Terminator`
+2. If `Value` is specified, extracts the first numeric token after `[` (e.g., `[8;24;80t` → `"8"`)
+3. Matches if extracted value equals the specified `Value`
 
 ### Expectation Types
 
@@ -233,18 +246,28 @@ var request = new AnsiEscapeSequenceRequest
 2. **Persistent expectations** - Remain active for repeated events (e.g., continuous mouse tracking)
 3. **Late responses** - Swallowed without callback when `StopExpecting()` was called
 
+**Thread Safety:** All expectation operations (`Expect()`, `StopExpecting()`) are protected by internal locks to ensure safe concurrent access.
+
 ### AnsiRequestScheduler
 
 Manages request throttling and queuing:
-- Prevents duplicate requests with same terminator
+- Prevents duplicate requests with same terminator **and value combination**
 - Throttles requests (100ms default) to avoid overwhelming the terminal
 - Evicts stale requests (1s timeout) that never received responses
+- **Thread-safe:** All queued request operations are protected by internal locks
 
 ```csharp
 var scheduler = new AnsiRequestScheduler(parser);
 scheduler.SendOrSchedule(driver, request);  // Sends or queues
 scheduler.RunSchedule(driver);              // Processes queued requests
 ```
+
+**Collision Prevention:**
+
+The scheduler tracks outstanding requests by `(Terminator, Value)` tuple:
+- Prevents sending `\x1B[6t` if a prior `[6t` request is still pending
+- Allows sending `\x1B[8t` concurrently (different value, same terminator)
+- Queues new requests until the matching `(Terminator, Value)` pair clears or times out
 
 ## Encoding (Test Support)
 
