@@ -1009,4 +1009,16 @@ Three
         Assert.Equal (3, cb.Source.Count);
         top.Dispose ();
     }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Text_Polymorphism_Works ()
+    {
+        // Test that ComboBox.Text works correctly when accessed via View base class
+        ComboBox cb = new () { Text = "Test" };
+        cb.BeginInit ();
+        cb.EndInit ();
+        Assert.Equal ("Test", cb.Text);
+        Assert.Equal ("Test", ((View)cb).Text); // Should be same due to polymorphism
+    }
 }

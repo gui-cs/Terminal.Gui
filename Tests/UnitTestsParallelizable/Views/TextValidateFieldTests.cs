@@ -654,4 +654,17 @@ public class TextValidateField_Regex_Provider_Tests : TestDriverBase
 
         Assert.False (field.IsValid);
     }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Text_Polymorphism_Works ()
+    {
+        // Test that TextValidateField.Text works correctly when accessed via View base class
+        var field = new TextValidateField
+        {
+            Provider = new NetMaskedTextProvider ("0000") { Text = "1234" }
+        };
+        Assert.Equal ("1234", field.Text);
+        Assert.Equal ("1234", ((View)field).Text); // Should be same due to polymorphism
+    }
 }

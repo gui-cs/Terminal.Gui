@@ -834,4 +834,14 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal ("Hello World", tf.SelectedText);
         Assert.Equal (11, tf.SelectedLength);
     }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Text_Polymorphism_Works ()
+    {
+        // Test that TextField.Text works correctly when accessed via View base class
+        TextField tf = new () { Text = "Test" };
+        Assert.Equal ("Test", tf.Text);
+        Assert.Equal ("Test", ((View)tf).Text); // Should be same due to polymorphism
+    }
 }
