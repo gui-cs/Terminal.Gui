@@ -40,6 +40,7 @@ public class ScenariosStressTests
         uint maxIterations = 25;
         uint abortTime = 2000;
         object? timeout = null;
+        IApplication? app = null;
 
         var iterationCount = 0;
         var clearedContentCount = 0;
@@ -51,17 +52,19 @@ public class ScenariosStressTests
         var laidOutCount = 0;
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
-        var scenario = (Scenario)Activator.CreateInstance (scenarioType)!;
+        Scenario? scenario = (Scenario)Activator.CreateInstance (scenarioType)!;
 
         Stopwatch? stopwatch = null;
 
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+        Application.InstanceInitialized += OnApplicationInstanceInitialized;
+        Application.InstanceDisposed += OnApplicationInstanceDisposed;
         Application.ForceDriver = DriverRegistry.Names.ANSI;
         scenario!.Main ();
         scenario.Dispose ();
         scenario = null;
         Application.ForceDriver = string.Empty;
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+        Application.InstanceInitialized -= OnApplicationInstanceInitialized;
+        Application.InstanceDisposed -= OnApplicationInstanceDisposed;
 
         lock (_timeoutLock)
         {
@@ -87,27 +90,35 @@ public class ScenariosStressTests
 
         return;
 
-        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
+        void OnApplicationInstanceInitialized (object? s, EventArgs<IApplication> a)
         {
-            if (a.Value)
+            app = a.Value;
+            
+            lock (_timeoutLock)
             {
-                lock (_timeoutLock)
-                {
-                    timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
-                }
-
-                Application.Iteration += OnApplicationOnIteration;
-                Application.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
-                Application.SessionBegun += OnApplicationSessionBegun;
-
-                stopwatch = Stopwatch.StartNew ();
-            }
-            else
-            {
-                stopwatch!.Stop ();
+                timeout = app.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
             }
 
-            _output.WriteLine ($"Initialized == {a.Value}");
+            app.Iteration += OnApplicationOnIteration;
+            app.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
+            app.SessionBegun += OnApplicationSessionBegun;
+
+            stopwatch = Stopwatch.StartNew ();
+            _output.WriteLine ($"Application instance initialized");
+        }
+
+        void OnApplicationInstanceDisposed (object? s, EventArgs<IApplication> a)
+        {
+            if (a.Value != app)
+            {
+                return;
+            }
+
+            app!.Driver!.ClearedContents -= (sender, args) => clearedContentCount++;
+            app.SessionBegun -= OnApplicationSessionBegun;
+            app.Iteration -= OnApplicationOnIteration;
+            stopwatch!.Stop ();
+            _output.WriteLine ($"Application instance disposed");
         }
 
         void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
@@ -118,9 +129,7 @@ public class ScenariosStressTests
             {
                 // Press QuitKey
                 _output.WriteLine ("Attempting to quit scenario with RequestStop");
-                Application.Iteration -= OnApplicationOnIteration;
-                Application.SessionBegun -= OnApplicationSessionBegun;
-                Application.RequestStop ();
+                app?.RequestStop ();
             }
         }
 
@@ -140,7 +149,7 @@ public class ScenariosStressTests
                 }
             }
 
-            SubscribeAllSubViews (Application.TopRunnableView!);
+            SubscribeAllSubViews (app!.TopRunnableView!);
         }
 
         // If the scenario doesn't close within the abort time, this will force it to quit
@@ -155,11 +164,9 @@ public class ScenariosStressTests
             }
 
             _output.WriteLine (
-                               $"'{scenario!.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
+                               $"'{scenario!.GetName ()}' failed to Quit with {app!.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
-            Application.Iteration -= OnApplicationOnIteration;
-            Application.SessionBegun -= OnApplicationSessionBegun;
-            Application.RequestStop ();
+            app.RequestStop ();
 
             return false;
         }

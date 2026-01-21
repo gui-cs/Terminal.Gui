@@ -88,7 +88,7 @@ public class ApplicationStressTests
 
                         if (topRunnableWaitMs > maxWaitMs)
                         {
-                            application.Invoke (application.Dispose);
+                            application.Invoke (() => application.RequestStop ());
 
                             throw new TimeoutException (
                                                         $"Timeout: TopRunnableView never started running on pass {j + 1}"
@@ -109,7 +109,7 @@ public class ApplicationStressTests
                     if (elapsedMs > maxWaitMs)
                     {
                         // No change after maximum wait: Idle handlers added via Application.Invoke have gone missing
-                        application.Invoke (application.Dispose);
+                        application.Invoke (() => application.RequestStop ());
 
                         throw new TimeoutException (
                                                     $"Timeout: Increment lost. _tbCounter ({_tbCounter}) didn't "
@@ -120,7 +120,7 @@ public class ApplicationStressTests
                 }
             }
 
-            application.Invoke (application.Dispose);
+            application.Invoke (() => application.RequestStop ());
         }
 
         static void Launch (IApplication application, Random random, TextField textField, int target)
