@@ -17,9 +17,8 @@ namespace Terminal.Gui.App;
 ///         This base class provides:
 ///     </para>
 ///     <list type="bullet">
-///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
+///         <item>Inherits from <see cref="Runnable"/>, which fills the screen by default, can focus, and implements <see cref="IRunnable"/> for session management.</item>
 ///         <item>Transparent viewport settings (<see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>) for visual and mouse transparency.</item>
-///         <item>Runnable behavior via <see cref="IRunnable"/> interface, enabling popovers to be used as independent sessions.</item>
 ///         <item>Automatic layout when becoming visible.</item>
 ///         <item>Focus restoration when hidden.</item>
 ///         <item>Default <see cref="Command.Quit"/> implementation that hides the popover.</item>
@@ -48,7 +47,6 @@ public abstract class PopoverBaseImpl : Runnable, IPopover
     protected PopoverBaseImpl ()
     {
         Id = "popoverBaseImpl";
-        
         // Make the popover transparent (visually and to the mouse)
         ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
 
