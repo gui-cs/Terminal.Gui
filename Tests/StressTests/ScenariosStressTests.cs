@@ -52,16 +52,15 @@ public class ScenariosStressTests
         var laidOutCount = 0;
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
-        Scenario? scenario = (Scenario)Activator.CreateInstance (scenarioType)!;
+        Scenario scenario = (Scenario)Activator.CreateInstance (scenarioType)!;
 
         Stopwatch? stopwatch = null;
 
         Application.InstanceInitialized += OnApplicationInstanceInitialized;
         Application.InstanceDisposed += OnApplicationInstanceDisposed;
         Application.ForceDriver = DriverRegistry.Names.ANSI;
-        scenario!.Main ();
+        scenario.Main ();
         scenario.Dispose ();
-        scenario = null;
         Application.ForceDriver = string.Empty;
         Application.InstanceInitialized -= OnApplicationInstanceInitialized;
         Application.InstanceDisposed -= OnApplicationInstanceDisposed;
@@ -116,7 +115,7 @@ public class ScenariosStressTests
 
         void OnApplicationInstanceDisposed (object? s, EventArgs<IApplication> a)
         {
-            if (a.Value is null || app is null || a.Value != app)
+            if (a.Value is null || app is null)
             {
                 return;
             }
@@ -160,7 +159,10 @@ public class ScenariosStressTests
                 }
             }
 
-            SubscribeAllSubViews (app!.TopRunnableView!);
+            if (app?.TopRunnableView is { })
+            {
+                SubscribeAllSubViews (app.TopRunnableView);
+            }
         }
 
         // If the scenario doesn't close within the abort time, this will force it to quit
