@@ -138,7 +138,7 @@ public class ColorPickers : Scenario
             Value = _foregroundColorPicker.Style.ShowColorName ? CheckState.Checked : CheckState.UnChecked
         };
 
-        cbShowName.ValueChanging += OnCbShowTextFieldsOnValueChanging;
+        cbShowName.ValueChanging += OnCbShowColorNameOnValueChanging;
 
         window.Add (cbShowName);
 
@@ -180,6 +180,15 @@ public class ColorPickers : Scenario
             _foregroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
             _foregroundColorPicker.ApplyStyleChanges ();
             _backgroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
+            _backgroundColorPicker.ApplyStyleChanges ();
+        }
+
+
+        void OnCbShowColorNameOnValueChanging (object? _, ValueChangingEventArgs<CheckState> e)
+        {
+            _foregroundColorPicker.Style.ShowColorName = e.NewValue == CheckState.Checked;
+            _foregroundColorPicker.ApplyStyleChanges ();
+            _backgroundColorPicker.Style.ShowColorName = e.NewValue == CheckState.Checked;
             _backgroundColorPicker.ApplyStyleChanges ();
         }
 

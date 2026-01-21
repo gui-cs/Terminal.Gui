@@ -38,6 +38,7 @@ However, this approach has **three critical problems**:
 This document analyzes the current state, identifies problems, establishes design requirements, and proposes a solution that:
 
 - Generalizes propagation to support multiple commands
+- Maintains backward compatibility
 - Enables opt-in propagation for superviews
 - Preserves the decoupling principle of the Cancellable Work Pattern (CWP)
 
