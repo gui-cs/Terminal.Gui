@@ -309,11 +309,11 @@ public class TextInputControls : Scenario
         {
             X = Pos.Left (dateField),
             Y = Pos.Bottom (dateField) + 1,
-            Text = "_NetMaskedTextProvider [ +99 (000) 000-0000 ]:"
+            Text = "_NetMaskedTextProvider [ 999 000 LLL >LLL |AAA aaa ]:"
         };
         win.Add (netProviderLabel);
 
-        NetMaskedTextProvider netProvider = new ("+99 (000) 000-0000");
+        NetMaskedTextProvider netProvider = new ("999 000 LLL >LLL |AAA aaa");
 
         TextValidateField netProviderField = new ()
         {
