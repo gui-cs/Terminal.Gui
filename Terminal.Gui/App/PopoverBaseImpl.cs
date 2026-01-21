@@ -1,8 +1,11 @@
 
+using Terminal.Gui.Views;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Abstract base class for popover views in Terminal.Gui. Implements <see cref="IPopover"/>.
+///     Abstract base class for popover views in Terminal.Gui. 
+///     Implements <see cref="IPopover"/> and inherits from <see cref="Runnable"/> to provide transparent, runnable behavior.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -10,20 +13,13 @@ namespace Terminal.Gui.App;
 ///         <see cref="ApplicationPopover.Register"/> before they can be shown.
 ///     </para>
 ///     <para>
-///         <b>Requirements:</b><br/>
-///         Derived classes must:
-///     </para>
-///     <list type="bullet">
-///         <item>Set <see cref="View.ViewportSettings"/> to include <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
-///         <item>Add a key binding for <see cref="Command.Quit"/> (typically bound to <see cref="Application.QuitKey"/>).</item>
-///     </list>
-///     <para>
 ///         <b>Default Behavior:</b><br/>
 ///         This base class provides:
 ///     </para>
 ///     <list type="bullet">
 ///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
-///         <item>Transparent viewport settings for proper mouse event handling.</item>
+///         <item>Transparent viewport settings (<see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>) for visual and mouse transparency.</item>
+///         <item>Runnable behavior via <see cref="IRunnable"/> interface, enabling popovers to be used as independent sessions.</item>
 ///         <item>Automatic layout when becoming visible.</item>
 ///         <item>Focus restoration when hidden.</item>
 ///         <item>Default <see cref="Command.Quit"/> implementation that hides the popover.</item>
@@ -34,7 +30,7 @@ namespace Terminal.Gui.App;
 ///         set <see cref="View.Visible"/> to <see langword="false"/> to hide.
 ///     </para>
 /// </remarks>
-public abstract class PopoverBaseImpl : View, IPopover
+public abstract class PopoverBaseImpl : Runnable, IPopover
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverBaseImpl"/> class.
@@ -44,25 +40,19 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///         Sets up default popover behavior:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
-    ///         <item>Sets <see cref="View.CanFocus"/> to <see langword="true"/>.</item>
-    ///         <item>Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
+    ///         <item>Inherits runnable behavior from <see cref="Runnable"/> (fills the screen, can focus, etc.).</item>
+    ///         <item>Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/> for visual and mouse transparency.</item>
     ///         <item>Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when invoked.</item>
     ///     </list>
     /// </remarks>
     protected PopoverBaseImpl ()
     {
         Id = "popoverBaseImpl";
-        CanFocus = true;
-        Width = Dim.Fill ();
-        Height = Dim.Fill ();
+        
+        // Make the popover transparent (visually and to the mouse)
         ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
 
-        // TODO: Add a diagnostic setting for this?
-        //TextFormatter.VerticalAlignment = Alignment.End;
-        //TextFormatter.Alignment = Alignment.End;
-        //base.Text = "popover";
-
+        // Add Command.Quit to hide the popover when user presses QuitKey
         AddCommand (Command.Quit, Quit);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
 
