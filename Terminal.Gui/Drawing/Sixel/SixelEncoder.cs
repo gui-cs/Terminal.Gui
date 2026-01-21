@@ -76,12 +76,12 @@ public class SixelEncoder
         // Iterate over each 'row' of the image. Because each sixel write operation
         // outputs a screen area 6 pixels high (and 1+ across) we must process the image
         // 6 'y' units at once (1 band)
-        for (var y = 0; y < height; y += 6)
+        for (var y = 0; y < height; y += PIXEL_HIGH)
         {
-            sb.Append (ProcessBand (pixels, y, Math.Min (6, height - y), width));
+            sb.Append (ProcessBand (pixels, y, Math.Min (PIXEL_HIGH, height - y), width));
 
             // Line separator between bands
-            if (y + 6 < height) // Only add separator if not the last band
+            if (y + PIXEL_HIGH < height) // Only add separator if not the last band
             {
                 // This completes the drawing of the current line of sixel and
                 // returns the 'cursor' to beginning next line, newly drawn sixel
