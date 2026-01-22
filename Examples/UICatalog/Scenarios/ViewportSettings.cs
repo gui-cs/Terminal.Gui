@@ -1,7 +1,7 @@
 ﻿#nullable enable
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ViewportSettings", "Demonstrates manipulating Viewport, ViewportSettings, and ContentSize to scroll content.")]
+[ScenarioMetadata ("ViewportSettings", "Demonstrates manipulating Viewport, ViewportSettings, and ContentSize to scroll content")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Scrolling")]

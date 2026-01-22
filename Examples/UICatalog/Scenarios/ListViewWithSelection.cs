@@ -34,7 +34,7 @@ public class ListViewWithSelection : Scenario
 
         _scenarios = GetScenarios ();
 
-        _customRenderCb = new CheckBox { X = 0, Y = 0, Text = "Custom _Rendering" };
+        _customRenderCb = new CheckBox { X = 0, Y = 0, Text = "Custom _Rendering", Value = CheckState.UnChecked };
         _appWindow.Add (_customRenderCb);
         _customRenderCb.ValueChanging += CustomRenderCB_Toggle;
 
@@ -63,8 +63,7 @@ public class ListViewWithSelection : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _appWindow.Add (_keep);
-        _keep.ValueChanging += AllowYGreaterThanContentHeightCB_Toggle;
+        _appWindow.Add (_viewportSettingsEditor);
 
         _listView = new ListView
         {
@@ -104,22 +103,26 @@ public class ListViewWithSelection : Scenario
         _listView.VerticalScrollBar.AutoShow = true;
         _listView.HorizontalScrollBar.AutoShow = true;
 
+        _listView.Initialized += (_, _) => _viewportSettingsEditor.ViewToEdit = _listView;
+
+        app.Run (_appWindow);
+        _appWindow.Dispose ();
+
+        return;
+
         bool? LogEvent (View sender, string message)
         {
-            var msg = $"{message,-7}: {args}";
+            var msg = $"{message}";
             _eventList.Add (msg);
             _eventListView.MoveDown ();
 
             return null;
         }
-
-        app.Run (_appWindow);
-        _appWindow.Dispose ();
     }
 
     private void CustomRenderCB_Toggle (object sender, ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.NewValue == CheckState.Checked)
+        if (stateEventArgs.NewValue != CheckState.Checked)
         {
             // Scenario.GetString automatically pads the name to the width of the longest name
             _listView.SetSource (_scenarios);
@@ -145,10 +148,10 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDraw ();
     }
 
+    private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
 
-    private void AllowYGreaterThanContentHeightCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.NewValue == CheckState.Checked)
+        if (_customRenderCb.Value == CheckState.Checked)
         {
             // Only use the built-in RowRender event when we're not using custom rendering
             return;
@@ -243,7 +246,7 @@ public class ListViewWithSelection : Scenario
 
             if (item % 2 == 0)
             {
-                rowAttribute = listView.GetAttributeForRole (VisualRole.Active);
+                rowAttribute = listView.GetAttributeForRole (VisualRole.Normal);
             }
             else
             {
@@ -252,15 +255,15 @@ public class ListViewWithSelection : Scenario
 
             if (item == listView.SelectedItem)
             {
-                rowAttribute = listView.GetAttributeForRole (VisualRole.Focus);
+                rowAttribute = listView.GetAttributeForRole (VisualRole.Normal);
             }
 
             var used = 0;
 
             used = RenderString (listView, viewportX + col, used, width, rowAttribute, $"{Scenarios [item].GetName ()}: ");
-            used = RenderString (listView, viewportX + used, used, width, rowAttribute with { Style = TextStyle.Italic }, $"{Scenarios [item].GetDescription ()}");
+            used = RenderString (listView, viewportX + used, used, width + viewportX, rowAttribute with { Style = TextStyle.Underline }, $"{Scenarios [item].GetDescription ()}");
 
-            while (used < width)
+            while (used < width + viewportX)
             {
                 listView.AddRune ((Rune)' ');
                 used++;
@@ -280,7 +283,7 @@ public class ListViewWithSelection : Scenario
                 (Rune rune, int size) = str.DecodeRune (index, index - str.Length);
                 int count = rune.GetColumns ();
 
-                if (used + count >= remaining)
+                if (used + count > remaining)
                 {
                     break;
                 }
