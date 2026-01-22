@@ -7,7 +7,7 @@
 | **0** | Fix broken Command.Activate handler | ✅ COMPLETED |
 | **1** | Add selection tracking infrastructure | ✅ COMPLETED (already implemented) |
 | **2** | Add extend commands and key bindings | ✅ COMPLETED |
-| **3** | Mouse Shift+Click and Ctrl+Click support | ⏳ PENDING |
+| **3** | Mouse Shift+Click and Ctrl+Click support | ✅ COMPLETED |
 | **4** | Multi-selection rendering | ⏳ PENDING |
 | **5** | Fix mark rendering attribute | ⏳ PENDING |
 | **6** | Custom mark rendering API | ⏳ PENDING |
@@ -729,7 +729,9 @@ dotnet test Tests/IntegrationTests --no-build
 
 ---
 
-## Phase 3: Mouse Shift+Click and Ctrl+Click Support
+## Phase 3: Mouse Shift+Click and Ctrl+Click Support ✅ COMPLETED
+
+> **Status:** ✅ Completed - Shift+Click extends selection from anchor, Ctrl+Click toggles individual items. Mouse bindings added for modifier combinations. 5 new tests added, all 60 ListView tests pass.
 
 ### 3.1 Update Command.Activate Handler for Mouse Modifiers
 

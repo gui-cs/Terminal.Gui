@@ -108,13 +108,40 @@ public class ListView : View, IDesignable
 
                             if (Source is { } && index < Source.Count)
                             {
-                                SelectedItem = index;
+                                bool shift = mouse.Flags.HasFlag (MouseFlags.Shift);
+                                bool ctrl = mouse.Flags.HasFlag (MouseFlags.Ctrl);
 
-                                // Mark item only on Clicked (not Pressed) to avoid double-toggle
-                                // since both Pressed and Clicked trigger Command.Activate
-                                if (AllowsMarking && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                if (ctrl && AllowsMultipleSelection)
                                 {
-                                    MarkUnmarkSelectedItem ();
+                                    // Ctrl+Click: Toggle item in multi-selection
+                                    if (MultiSelectedItems.Contains (index))
+                                    {
+                                        MultiSelectedItems.Remove (index);
+                                    }
+                                    else
+                                    {
+                                        MultiSelectedItems.Add (index);
+                                    }
+
+                                    // Update SelectedItem and anchor to clicked item
+                                    SelectedItem = index;
+                                }
+                                else if (shift && AllowsMultipleSelection)
+                                {
+                                    // Shift+Click: Extend selection from anchor
+                                    SetSelection (index, true);
+                                }
+                                else
+                                {
+                                    // Normal click: Clear multi-selection and select item
+                                    SetSelection (index, false);
+
+                                    // Mark item only on Clicked (not Pressed) to avoid double-toggle
+                                    // since both Pressed and Clicked trigger Command.Activate
+                                    if (AllowsMarking && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                    {
+                                        MarkUnmarkSelectedItem ();
+                                    }
                                 }
                             }
 
@@ -194,6 +221,13 @@ public class ListView : View, IDesignable
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed, Command.Activate);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+
+        // Shift+Click and Ctrl+Click for multi-selection (overrides base View bindings)
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed | MouseFlags.Shift, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Shift, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Activate);
+
         MouseBindings.ReplaceCommands (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);

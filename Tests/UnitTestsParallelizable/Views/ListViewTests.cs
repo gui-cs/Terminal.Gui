@@ -2009,4 +2009,214 @@ hree - lon",
     }
 
     #endregion
+
+    #region Phase 3: Mouse Shift+Click and Ctrl+Click Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_ShiftClick_Extends_Selection ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true,
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        lv.SelectedItem = 0;
+
+        // Shift+Click on item 2
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift
+        });
+
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_CtrlClick_Toggles_Individual_Items ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true,
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Ctrl+Click on item 0
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 0),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Contains (0, lv.MultiSelectedItems);
+
+        // Ctrl+Click on item 2
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.DoesNotContain (1, lv.MultiSelectedItems);
+
+        // Ctrl+Click on item 0 again - should toggle off
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 0),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.DoesNotContain (0, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_NormalClick_Clears_MultiSelection ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true,
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Build up a selection
+        lv.SetSelection (0, false);
+        lv.SetSelection (2, true);
+        Assert.Equal (3, lv.MultiSelectedItems.Count);
+
+        // Normal click should clear multi-selection
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 3),
+            Flags = MouseFlags.LeftButtonPressed
+        });
+
+        Assert.Equal (3, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_ShiftClick_Without_AllowsMultipleSelection_Does_Not_Extend ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = false, // Disabled
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        lv.SelectedItem = 0;
+
+        // Shift+Click on item 2 - should just select, not extend
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift
+        });
+
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems); // No multi-selection
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_CtrlClick_Without_AllowsMultipleSelection_Does_Not_Toggle ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = false, // Disabled
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Ctrl+Click on item 0 - should just select, not add to multi-selection
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 0),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Equal (0, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+
+        // Ctrl+Click on item 2 - should just select, not add
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    #endregion
 }
