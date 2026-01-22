@@ -218,7 +218,7 @@ internal class MouseImpl : IMouse, IDisposable
             // If the mouse is grabbed by another view, don't send MouseEnter events to other views.
             // This prevents views from highlighting when the user drags the mouse over them while holding
             // a button down on a different view.
-            if (!IsGrabbed (view) && _mouseGrabViewRef is not null)
+            if (_mouseGrabViewRef is not null && !IsGrabbed (view))
             {
                 continue;
             }
