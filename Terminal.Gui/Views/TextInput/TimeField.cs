@@ -159,7 +159,7 @@ public class TimeField : TextField
     /// <seealso cref="FieldLength"/>
     public override int InsertionPoint
     {
-        get => base.InsertionPoint;
+        get => Math.Max (Math.Min (base.InsertionPoint, FieldLength), 1);
         set => base.InsertionPoint = Math.Max (Math.Min (value, FieldLength), 1);
     }
 
@@ -480,7 +480,7 @@ public class TimeField : TextField
         List<Rune> newText = text.GetRange (0, InsertionPoint);
         newText.Add (key);
 
-        if (InsertionPoint < FieldLength)
+        if (InsertionPoint + 1 < text.Count)
         {
             newText =
             [

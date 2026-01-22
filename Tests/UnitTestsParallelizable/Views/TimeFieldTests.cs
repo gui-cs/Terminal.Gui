@@ -97,7 +97,7 @@ public class TimeFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.Equal (1, tf.SelectedStart);
         Assert.Equal (1, tf.SelectedLength);
-        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (1, tf.InsertionPoint);  // Clamped to 1, can't be 0
 
         // Without selection
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
@@ -137,7 +137,7 @@ public class TimeFieldTests
         var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
         tf.BeginInit ();
         tf.EndInit ();
-        Assert.Equal (9, tf.InsertionPoint);
+        Assert.Equal (8, tf.InsertionPoint);  // Clamped to FieldLength
         tf.InsertionPoint = 1;
         tf.ReadOnly = true;
         Assert.True (tf.NewKeyDownEvent (Key.Delete));
@@ -202,5 +202,150 @@ public class TimeFieldTests
         // The format was normalized and replaced again with :
         Assert.Equal (" 12:12:19", tf.Text);
         Assert.Equal (4, tf.InsertionPoint);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CursorPosition_After_ClearingSelection_RightArrow ()
+    {
+        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Simulate selecting all text (like when field gets focus)
+        tf.SelectedStart = 1;
+        tf.InsertionPoint = 9;  // End of selection
+        Assert.Equal (1, tf.SelectedStart);
+        Assert.Equal (7, tf.SelectedLength);  // It's 7 because InsertionPoint was clamped to 8
+        Assert.Equal (8, tf.InsertionPoint);  // Clamped from 9 to 8
+
+        // Press Right arrow - should clear selection and move to end
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
+
+        // Debug output
+        Console.WriteLine ($"After Right arrow: InsertionPoint={tf.InsertionPoint}, SelectedStart={tf.SelectedStart}, SelectedLength={tf.SelectedLength}");
+
+        // After clearing selection, cursor should be at the end (position 8, the max valid position)
+        Assert.Equal (-1, tf.SelectedStart);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (8, tf.InsertionPoint);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CursorPosition_After_ClearingSelection_Backspace ()
+    {
+        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Simulate selecting all text (like when field gets focus)
+        tf.SelectedStart = 1;
+        tf.InsertionPoint = 9;  // End of selection
+        Assert.Equal (1, tf.SelectedStart);
+        Assert.Equal (7, tf.SelectedLength);  // Length is 7 because InsertionPoint was clamped to 8
+        Assert.Equal (8, tf.InsertionPoint);  // Clamped from 9 to 8
+
+        // Press Backspace - should clear selection, replace char at InsertionPoint with '0', and move left
+        Assert.True (tf.NewKeyDownEvent (Key.Backspace));
+
+        // The character at position 8 ('0') is replaced with '0' (no visible change)
+        // Then DecrementInsertionPoint moves cursor from 8 to 7
+        Assert.Equal (" 08:52:40", tf.Text);  // No change
+        Assert.Equal (-1, tf.SelectedStart);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (7, tf.InsertionPoint);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CursorPosition_After_ClearingSelection_End ()
+    {
+        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Simulate selecting all text (like when field gets focus)
+        tf.SelectedStart = 1;
+        tf.InsertionPoint = 9;  // End of selection
+        Assert.Equal (1, tf.SelectedStart);
+        Assert.Equal (8, tf.SelectedLength);
+        Assert.Equal (9, tf.InsertionPoint);
+
+        // Press End - should clear selection and move to end
+        Assert.True (tf.NewKeyDownEvent (Key.End));
+
+        // After End key, cursor should be at the end (position 8)
+        Assert.Equal (-1, tf.SelectedStart);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (8, tf.InsertionPoint);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CursorPosition_After_SelectAll_RightArrow ()
+    {
+        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Simulate selecting all text via SelectAll() (like when field gets focus)
+        tf.SelectAll ();
+        
+        // After SelectAll, InsertionPoint should be clamped to FieldLength
+        Assert.Equal (0, tf.SelectedStart);
+        Assert.Equal (9, tf.SelectedLength);  // Full text length
+        // The underlying _insertionPoint is 9, but the getter clamps it to 8
+        Assert.Equal (8, tf.InsertionPoint);
+
+        // Press Right arrow - should clear selection and keep cursor at end
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
+
+        // After clearing selection, cursor should be at the end (position 8)
+        Assert.Equal (-1, tf.SelectedStart);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (8, tf.InsertionPoint);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CursorPosition_After_SelectAll_End ()
+    {
+        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Simulate selecting all text via SelectAll()
+        tf.SelectAll ();
+
+        // Press End - should clear selection and keep cursor at end
+        Assert.True (tf.NewKeyDownEvent (Key.End));
+
+        // After End key, cursor should be at the end (position 8)
+        Assert.Equal (-1, tf.SelectedStart);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (8, tf.InsertionPoint);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CursorPosition_After_SelectAll_Backspace ()
+    {
+        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Simulate selecting all text via SelectAll()
+        tf.SelectAll ();
+
+        // Press Backspace - should clear selection, replace char at InsertionPoint with '0', and move left
+        Assert.True (tf.NewKeyDownEvent (Key.Backspace));
+
+        // The character at position 8 ('0') is replaced with '0' (no visible change)
+        // Then DecrementInsertionPoint moves cursor from 8 to 7
+        Assert.Equal (" 08:52:40", tf.Text);  // No change
+        Assert.Equal (-1, tf.SelectedStart);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (7, tf.InsertionPoint);
     }
 }

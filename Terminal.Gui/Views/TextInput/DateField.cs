@@ -150,7 +150,7 @@ public class DateField : TextField
     /// <seealso cref="AdjustInsertionPoint"/>
     public override int InsertionPoint
     {
-        get => base.InsertionPoint;
+        get => Math.Max (Math.Min (base.InsertionPoint, FormatLength), 1);
         set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1);
     }
 
@@ -631,7 +631,7 @@ public class DateField : TextField
         List<Rune> newText = text.GetRange (0, InsertionPoint);
         newText.Add (key);
 
-        if (InsertionPoint < FormatLength)
+        if (InsertionPoint + 1 < text.Count)
         {
             newText =
             [
