@@ -97,8 +97,13 @@ public class ListView : View, IDesignable
                             return true;
                         }
 
-                        Point pos = mouse.Position!.Value;
-                        SelectedItem = pos.Y;
+                        Point position = mouse.Position!.Value;
+                        int index = Viewport.Y + position.Y;
+
+                        if (Source is { } && index < Source.Count)
+                        {
+                            SelectedItem = index;
+                        }
 
                         return true;
                     });
