@@ -297,7 +297,7 @@ internal class MouseImpl : IMouse, IDisposable
         RaiseGrabbedMouseEvent (view);
 
         // _mouseGrabViewRef is only set if the application is initialized.
-        _mouseGrabViewRef = new WeakReference<View> (view);
+        _mouseGrabViewRef = new (view);
     }
 
     /// <inheritdoc/>
