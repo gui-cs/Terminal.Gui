@@ -956,7 +956,7 @@ public class ComboBox : View, IDesignable
                 {
                     _isFocusing = true;
                     _highlighted = _container.SelectedItem;
-                    Application.Mouse.GrabMouse (this);
+                    App?.Mouse.GrabMouse (this);
                 }
             }
             else
@@ -965,7 +965,7 @@ public class ComboBox : View, IDesignable
                 {
                     _isFocusing = false;
                     _highlighted = _container.SelectedItem;
-                    Application.Mouse.UngrabMouse ();
+                    App?.Mouse.UngrabMouse ();
                 }
             }
         }

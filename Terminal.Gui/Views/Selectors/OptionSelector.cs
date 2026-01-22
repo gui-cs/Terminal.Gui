@@ -78,7 +78,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return false;
         }
 
-        if (args.Context is CommandContext<KeyBinding> { } && (int)checkBox.Data! == Value)
+        if (args.Context?.Binding is KeyBinding && (int)checkBox.Data! == Value)
         {
             // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
             Cycle ();
@@ -127,7 +127,7 @@ public class OptionSelector : SelectorBase, IDesignable
         // Verify at most one is checked
         Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
 
-        if (args.Context is CommandContext<MouseBinding> { } && checkbox.CheckedState == CheckState.Checked)
+        if (args.Context?.Binding is MouseBinding && checkbox.CheckedState == CheckState.Checked)
         {
             // If user clicks with mouse and item is already checked, do nothing
             args.Handled = true;
@@ -135,7 +135,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
 
-        if (args.Context is CommandContext<KeyBinding> binding && binding.Command == Command.HotKey && checkbox.CheckedState == CheckState.Checked)
+        if (args.Context?.Binding is KeyBinding && args.Context.Command == Command.HotKey && checkbox.CheckedState == CheckState.Checked)
         {
             // If user uses an item hotkey and the item is already checked, do nothing
             args.Handled = true;
