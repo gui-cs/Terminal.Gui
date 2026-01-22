@@ -329,10 +329,10 @@ public class ListViewTests (ITestOutputHelper output)
         // first item should be deselected by default
         Assert.Null (lv.SelectedItem);
 
-        // bind shift down to move down twice in control
-        lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.Down, Command.Down);
+        // bind Ctrl+D to move down twice in control (using Ctrl+D since Shift+Down is now used for DownExtend)
+        lv.KeyBindings.Add (Key.D.WithCtrl, Command.Down, Command.Down);
 
-        Key ev = Key.CursorDown.WithShift;
+        Key ev = Key.D.WithCtrl;
 
         Assert.True (lv.NewKeyDownEvent (ev), "The first time we move down 2 it should be possible");
 
@@ -1759,6 +1759,253 @@ hree - lon",
         bool result = lv.MarkAll (true);
 
         Assert.False (result);
+    }
+
+    #endregion
+
+    #region Phase 2: Extend Commands and Key Bindings Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveDown_With_Extend_False_Clears_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (0, false);
+        lv.SetSelection (2, true); // Select 0-2
+        Assert.Equal (3, lv.MultiSelectedItems.Count);
+
+        lv.MoveDown (false); // Move without extending
+
+        Assert.Equal (3, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveDown_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (1, false); // Anchor at 1
+        lv.MoveDown (true); // Extend to 2
+
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveUp_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (2, false); // Anchor at 2
+        lv.MoveUp (true); // Extend to 1
+
+        Assert.Equal (1, lv.SelectedItem);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftDown_Key_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 0;
+        Assert.True (lv.NewKeyDownEvent (Key.CursorDown.WithShift));
+
+        Assert.Equal (1, lv.SelectedItem);
+        Assert.True (lv.IsSelected (0));
+        Assert.True (lv.IsSelected (1));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftUp_Key_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 2;
+        Assert.True (lv.NewKeyDownEvent (Key.CursorUp.WithShift));
+
+        Assert.Equal (1, lv.SelectedItem);
+        Assert.True (lv.IsSelected (1));
+        Assert.True (lv.IsSelected (2));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftPageDown_Key_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
+            AllowsMultipleSelection = true,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 0;
+        Assert.True (lv.NewKeyDownEvent (Key.PageDown.WithShift));
+
+        // Should select from 0 to wherever PageDown lands
+        Assert.True (lv.IsSelected (0));
+        Assert.True (lv.SelectedItem > 0);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftHome_Key_Extends_To_Beginning ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 3;
+        Assert.True (lv.NewKeyDownEvent (Key.Home.WithShift));
+
+        Assert.Equal (0, lv.SelectedItem);
+        Assert.True (lv.IsSelected (0));
+        Assert.True (lv.IsSelected (1));
+        Assert.True (lv.IsSelected (2));
+        Assert.True (lv.IsSelected (3));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftEnd_Key_Extends_To_End ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 1;
+        Assert.True (lv.NewKeyDownEvent (Key.End.WithShift));
+
+        Assert.Equal (4, lv.SelectedItem);
+        Assert.True (lv.IsSelected (1));
+        Assert.True (lv.IsSelected (2));
+        Assert.True (lv.IsSelected (3));
+        Assert.True (lv.IsSelected (4));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MovePageDown_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
+            AllowsMultipleSelection = true,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SetSelection (0, false); // Anchor at 0
+        lv.MovePageDown (true);
+
+        // Should have multiple items selected
+        Assert.True (lv.MultiSelectedItems.Count > 1);
+        Assert.Contains (0, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MovePageUp_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
+            AllowsMultipleSelection = true,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SetSelection (9, false); // Anchor at end
+        lv.MovePageUp (true);
+
+        // Should have multiple items selected
+        Assert.True (lv.MultiSelectedItems.Count > 1);
+        Assert.Contains (9, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveHome_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (3, false); // Anchor at 3
+        lv.MoveHome (true);
+
+        Assert.Equal (0, lv.SelectedItem);
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.Contains (3, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveEnd_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (1, false); // Anchor at 1
+        lv.MoveEnd (true);
+
+        Assert.Equal (4, lv.SelectedItem);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.Contains (3, lv.MultiSelectedItems);
+        Assert.Contains (4, lv.MultiSelectedItems);
     }
 
     #endregion

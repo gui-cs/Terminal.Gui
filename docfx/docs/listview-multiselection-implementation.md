@@ -6,12 +6,21 @@
 |-------|-------------|--------|
 | **0** | Fix broken Command.Activate handler | ✅ COMPLETED |
 | **1** | Add selection tracking infrastructure | ✅ COMPLETED (already implemented) |
-| **2** | Add extend commands and key bindings | ⏳ PENDING |
+| **2** | Add extend commands and key bindings | ✅ COMPLETED |
 | **3** | Mouse Shift+Click and Ctrl+Click support | ⏳ PENDING |
 | **4** | Multi-selection rendering | ⏳ PENDING |
 | **5** | Fix mark rendering attribute | ⏳ PENDING |
 | **6** | Custom mark rendering API | ⏳ PENDING |
 | **7** | Fix scrolling width and offset clamping | ⏳ PENDING |
+
+Each phase is complete when:
+
+- New unit tests (parallizable) have been added to ensure the new functionality is sifficedntly tested.
+- All 3 test projects (IntegationTests, UnitTests, and UnitTests.Paralllizable) pass
+- THis plan doc is updated to reflect progress (and tersified to remove dated info).
+- THe changes are commited
+- REFRESH.md is re-read
+
 
 ---
 
@@ -494,7 +503,9 @@ dotnet test Tests/IntegrationTests --no-build
 
 ---
 
-## Phase 2: Add Extend Commands and Key Bindings
+## Phase 2: Add Extend Commands and Key Bindings ✅ COMPLETED
+
+> **Status:** ✅ Completed - All movement methods updated with `extend` parameter, extend commands added, key bindings configured. 12 new tests added, all 55 ListView tests pass.
 
 ### 2.1 Update Movement Methods
 
