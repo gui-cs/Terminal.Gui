@@ -2565,5 +2565,48 @@ hree - lon",
         Assert.Equal (0, lv.LeftItem);
     }
 
+    // Claude - Opus 4.5
+    [Fact]
+    public void ContentSize_Includes_MarkWidth_When_AllowsMarking ()
+    {
+        ObservableCollection<string> source = new (["Item"]); // 4 chars
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10,
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Without marks: content width = 4
+        Assert.Equal (4, lv.GetContentSize ().Width);
+
+        // With marks: content width = 4 + 2 (mark checkbox + space) = 6
+        lv.AllowsMarking = true;
+        Assert.Equal (6, lv.GetContentSize ().Width);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void HorizontalScroll_With_Marks_Accounts_For_MarkWidth ()
+    {
+        ObservableCollection<string> source = new (["Item"]); // 4 chars
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            AllowsMarking = true, // Mark width = 2
+            Width = 5,            // Viewport smaller than content (4 + 2 = 6)
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Effective content width = 4 (item) + 2 (marks) = 6
+        // Max LeftItem = 6 - 5 = 1
+        lv.LeftItem = 10;
+        Assert.Equal (1, lv.LeftItem);
+    }
+
     #endregion
 }

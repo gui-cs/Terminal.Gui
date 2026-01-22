@@ -246,6 +246,13 @@ public class ListView : View, IDesignable
         set
         {
             field = value;
+
+            // Recalculate content size since mark columns affect effective width
+            if (Source is { })
+            {
+                SetContentSize (new Size (EffectiveMaxItemLength, Source.Count));
+            }
+
             SetNeedsDraw ();
         }
     }
@@ -340,7 +347,8 @@ public class ListView : View, IDesignable
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
     /// <value>The left position.</value>
     /// <remarks>
-    ///     Values are clamped to the valid range [0, MaxItemLength - Viewport.Width].
+    ///     Values are clamped to the valid range [0, EffectiveMaxItemLength - Viewport.Width].
+    ///     When <see cref="AllowsMarking"/> is true, the effective width includes the mark columns.
     /// </remarks>
     public int LeftItem
     {
@@ -352,8 +360,8 @@ public class ListView : View, IDesignable
                 return;
             }
 
-            // Clamp to valid range: [0, MaxItemLength - Viewport.Width]
-            int maxLeftItem = Math.Max (0, MaxItemLength - Viewport.Width);
+            // Clamp to valid range: [0, EffectiveMaxItemLength - Viewport.Width]
+            int maxLeftItem = Math.Max (0, EffectiveMaxItemLength - Viewport.Width);
             value = Math.Clamp (value, 0, maxLeftItem);
 
             Viewport = Viewport with { X = value };
@@ -401,6 +409,12 @@ public class ListView : View, IDesignable
 
     /// <summary>Gets the widest item in the list.</summary>
     public int MaxItemLength => Source?.MaxItemLength ?? 0;
+
+    /// <summary>Gets the width reserved for mark rendering (checkbox and space).</summary>
+    private int MarkWidth => AllowsMarking ? 2 : 0;
+
+    /// <summary>Gets the effective content width including mark columns when <see cref="AllowsMarking"/> is true.</summary>
+    private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
 
     /// <summary>
     ///     Selects all items when <see cref="AllowsMultipleSelection"/> is <see langword="true"/>.
@@ -859,7 +873,7 @@ public class ListView : View, IDesignable
             if (field is { })
             {
                 field.CollectionChanged += Source_CollectionChanged;
-                SetContentSize (new Size (field?.MaxItemLength ?? Viewport.Width, field?.Count ?? Viewport.Width));
+                SetContentSize (new Size (EffectiveMaxItemLength, field?.Count ?? Viewport.Height));
                 KeystrokeNavigator.Collection = field?.ToList ();
             }
 
@@ -1089,11 +1103,11 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (MaxItemLength, Source?.Count ?? Viewport.Height));
+    protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
 
     private void Source_CollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
     {
-        SetContentSize (new Size (Source?.MaxItemLength ?? Viewport.Width, Source?.Count ?? Viewport.Width));
+        SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
 
         if (Source is { Count: > 0 } && SelectedItem.HasValue && SelectedItem > Source.Count - 1)
         {
