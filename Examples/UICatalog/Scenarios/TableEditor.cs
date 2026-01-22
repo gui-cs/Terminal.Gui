@@ -18,443 +18,148 @@ public class TableEditor : Scenario
 
     private readonly List<UnicodeRange>? _ranges =
     [
-        new (
-             0x0000,
-             0x001F,
-             "ASCII Control Characters"
-            ),
-
-        new (0x0080, 0x009F, "C0 Control Characters"),
-
-        new (
-             0x1100,
-             0x11ff,
-             "Hangul Jamo"
-            ), // This is where wide chars tend to start
-
-        new (0x20A0, 0x20CF, "Currency Symbols"),
-
-        new (0x2100, 0x214F, "Letterlike Symbols"),
-
-        new (0x2190, 0x21ff, "Arrows"),
-
-        new (0x2200, 0x22ff, "Mathematical symbols"),
-
-        new (
-             0x2300,
-             0x23ff,
-             "Miscellaneous Technical"
-            ),
-
-        new (
-             0x2500,
-             0x25ff,
-             "Box Drawing & Geometric Shapes"
-            ),
-
-        new (0x2600, 0x26ff, "Miscellaneous Symbols"),
-
-        new (0x2700, 0x27ff, "Dingbats"),
-
-        new (0x2800, 0x28ff, "Braille"),
-
-        new (
-             0x2b00,
-             0x2bff,
-             "Miscellaneous Symbols and Arrows"
-            ),
-
-        new (
-             0xFB00,
-             0xFb4f,
-             "Alphabetic Presentation Forms"
-            ),
-
-        new (
-             0x12400,
-             0x1240f,
-             "Cuneiform Numbers and Punctuation"
-            ),
-
-        new (
-             (uint)(Terminal.Gui.Views.UnicodeRange.Ranges.Max (r => r.End) - 16),
-             (uint)Terminal.Gui.Views.UnicodeRange.Ranges.Max (r => r.End),
-             "End"
-            ),
-
-        new (0x0020, 0x007F, "Basic Latin"),
-
-        new (0x00A0, 0x00FF, "Latin-1 Supplement"),
-
-        new (0x0100, 0x017F, "Latin Extended-A"),
-
-        new (0x0180, 0x024F, "Latin Extended-B"),
-
-        new (0x0250, 0x02AF, "IPA Extensions"),
-
-        new (
-             0x02B0,
-             0x02FF,
-             "Spacing Modifier Letters"
-            ),
-
-        new (
-             0x0300,
-             0x036F,
-             "Combining Diacritical Marks"
-            ),
-
-        new (0x0370, 0x03FF, "Greek and Coptic"),
-
-        new (0x0400, 0x04FF, "Cyrillic"),
-
-        new (0x0500, 0x052F, "Cyrillic Supplementary"),
-
-        new (0x0530, 0x058F, "Armenian"),
-
-        new (0x0590, 0x05FF, "Hebrew"),
-
-        new (0x0600, 0x06FF, "Arabic"),
-
-        new (0x0700, 0x074F, "Syriac"),
-
-        new (0x0780, 0x07BF, "Thaana"),
-
-        new (0x0900, 0x097F, "Devanagari"),
-
-        new (0x0980, 0x09FF, "Bengali"),
-
-        new (0x0A00, 0x0A7F, "Gurmukhi"),
-
-        new (0x0A80, 0x0AFF, "Gujarati"),
-
-        new (0x0B00, 0x0B7F, "Oriya"),
-
-        new (0x0B80, 0x0BFF, "Tamil"),
-
-        new (0x0C00, 0x0C7F, "Telugu"),
-
-        new (0x0C80, 0x0CFF, "Kannada"),
-
-        new (0x0D00, 0x0D7F, "Malayalam"),
-
-        new (0x0D80, 0x0DFF, "Sinhala"),
-
-        new (0x0E00, 0x0E7F, "Thai"),
-
-        new (0x0E80, 0x0EFF, "Lao"),
-
-        new (0x0F00, 0x0FFF, "Tibetan"),
-
-        new (0x1000, 0x109F, "Myanmar"),
-
-        new (0x10A0, 0x10FF, "Georgian"),
-
-        new (0x1100, 0x11FF, "Hangul Jamo"),
-
-        new (0x1200, 0x137F, "Ethiopic"),
-
-        new (0x13A0, 0x13FF, "Cherokee"),
-
-        new (
-             0x1400,
-             0x167F,
-             "Unified Canadian Aboriginal Syllabics"
-            ),
-
-        new (0x1680, 0x169F, "Ogham"),
-
-        new (0x16A0, 0x16FF, "Runic"),
-
-        new (0x1700, 0x171F, "Tagalog"),
-
-        new (0x1720, 0x173F, "Hanunoo"),
-
-        new (0x1740, 0x175F, "Buhid"),
-
-        new (0x1760, 0x177F, "Tagbanwa"),
-
-        new (0x1780, 0x17FF, "Khmer"),
-
-        new (0x1800, 0x18AF, "Mongolian"),
-
-        new (0x1900, 0x194F, "Limbu"),
-
-        new (0x1950, 0x197F, "Tai Le"),
-
-        new (0x19E0, 0x19FF, "Khmer Symbols"),
-
-        new (0x1D00, 0x1D7F, "Phonetic Extensions"),
-
-        new (
-             0x1E00,
-             0x1EFF,
-             "Latin Extended Additional"
-            ),
-
-        new (0x1F00, 0x1FFF, "Greek Extended"),
-
-        new (0x2000, 0x206F, "General Punctuation"),
-
-        new (
-             0x2070,
-             0x209F,
-             "Superscripts and Subscripts"
-            ),
-
-        new (0x20A0, 0x20CF, "Currency Symbols"),
-
-        new (
-             0x20D0,
-             0x20FF,
-             "Combining Diacritical Marks for Symbols"
-            ),
-
-        new (0x2100, 0x214F, "Letterlike Symbols"),
-
-        new (0x2150, 0x218F, "Number Forms"),
-
-        new (0x2190, 0x21FF, "Arrows"),
-
-        new (0x2200, 0x22FF, "Mathematical Operators"),
-
-        new (
-             0x2300,
-             0x23FF,
-             "Miscellaneous Technical"
-            ),
-
-        new (0x2400, 0x243F, "Control Pictures"),
-
-        new (
-             0x2440,
-             0x245F,
-             "Optical Character Recognition"
-            ),
-
-        new (0x2460, 0x24FF, "Enclosed Alphanumerics"),
-
-        new (0x2500, 0x257F, "Box Drawing"),
-
-        new (0x2580, 0x259F, "Block Elements"),
-
-        new (0x25A0, 0x25FF, "Geometric Shapes"),
-
-        new (0x2600, 0x26FF, "Miscellaneous Symbols"),
-
-        new (0x2700, 0x27BF, "Dingbats"),
-
-        new (
-             0x27C0,
-             0x27EF,
-             "Miscellaneous Mathematical Symbols-A"
-            ),
-
-        new (0x27F0, 0x27FF, "Supplemental Arrows-A"),
-
-        new (0x2800, 0x28FF, "Braille Patterns"),
-
-        new (0x2900, 0x297F, "Supplemental Arrows-B"),
-
-        new (
-             0x2980,
-             0x29FF,
-             "Miscellaneous Mathematical Symbols-B"
-            ),
-
-        new (
-             0x2A00,
-             0x2AFF,
-             "Supplemental Mathematical Operators"
-            ),
-
-        new (
-             0x2B00,
-             0x2BFF,
-             "Miscellaneous Symbols and Arrows"
-            ),
-
-        new (
-             0x2E80,
-             0x2EFF,
-             "CJK Radicals Supplement"
-            ),
-
-        new (0x2F00, 0x2FDF, "Kangxi Radicals"),
-
-        new (
-             0x2FF0,
-             0x2FFF,
-             "Ideographic Description Characters"
-            ),
-
-        new (
-             0x3000,
-             0x303F,
-             "CJK Symbols and Punctuation"
-            ),
-
-        new (0x3040, 0x309F, "Hiragana"),
-
-        new (0x30A0, 0x30FF, "Katakana"),
-
-        new (0x3100, 0x312F, "Bopomofo"),
-
-        new (
-             0x3130,
-             0x318F,
-             "Hangul Compatibility Jamo"
-            ),
-
-        new (0x3190, 0x319F, "Kanbun"),
-
-        new (0x31A0, 0x31BF, "Bopomofo Extended"),
-
-        new (
-             0x31F0,
-             0x31FF,
-             "Katakana Phonetic Extensions"
-            ),
-
-        new (
-             0x3200,
-             0x32FF,
-             "Enclosed CJK Letters and Months"
-            ),
-
-        new (0x3300, 0x33FF, "CJK Compatibility"),
-
-        new (
-             0x3400,
-             0x4DBF,
-             "CJK Unified Ideographs Extension A"
-            ),
-
-        new (
-             0x4DC0,
-             0x4DFF,
-             "Yijing Hexagram Symbols"
-            ),
-
-        new (0x4E00, 0x9FFF, "CJK Unified Ideographs"),
-
-        new (0xA000, 0xA48F, "Yi Syllables"),
-
-        new (0xA490, 0xA4CF, "Yi Radicals"),
-
-        new (0xAC00, 0xD7AF, "Hangul Syllables"),
-
-        new (0xD800, 0xDB7F, "High Surrogates"),
-
-        new (
-             0xDB80,
-             0xDBFF,
-             "High Private Use Surrogates"
-            ),
-
-        new (0xDC00, 0xDFFF, "Low Surrogates"),
-
-        new (0xE000, 0xF8FF, "Private Use Area"),
-
-        new (
-             0xF900,
-             0xFAFF,
-             "CJK Compatibility Ideographs"
-            ),
-
-        new (
-             0xFB00,
-             0xFB4F,
-             "Alphabetic Presentation Forms"
-            ),
-
-        new (
-             0xFB50,
-             0xFDFF,
-             "Arabic Presentation Forms-A"
-            ),
-
-        new (0xFE00, 0xFE0F, "Variation Selectors"),
-
-        new (0xFE20, 0xFE2F, "Combining Half Marks"),
-
-        new (
-             0xFE30,
-             0xFE4F,
-             "CJK Compatibility Forms"
-            ),
-
-        new (0xFE50, 0xFE6F, "Small Form Variants"),
-
-        new (
-             0xFE70,
-             0xFEFF,
-             "Arabic Presentation Forms-B"
-            ),
-
-        new (
-             0xFF00,
-             0xFFEF,
-             "Halfwidth and Fullwidth Forms"
-            ),
-
-        new (0xFFF0, 0xFFFF, "Specials"),
-
-        new (0x10000, 0x1007F, "Linear B Syllabary"),
-
-        new (0x10080, 0x100FF, "Linear B Ideograms"),
-
-        new (0x10100, 0x1013F, "Aegean Numbers"),
-
-        new (0x10300, 0x1032F, "Old Italic"),
-
-        new (0x10330, 0x1034F, "Gothic"),
-
-        new (0x10380, 0x1039F, "Ugaritic"),
-
-        new (0x10400, 0x1044F, "Deseret"),
-
-        new (0x10450, 0x1047F, "Shavian"),
-
-        new (0x10480, 0x104AF, "Osmanya"),
-
-        new (0x10800, 0x1083F, "Cypriot Syllabary"),
-
-        new (
-             0x1D000,
-             0x1D0FF,
-             "Byzantine Musical Symbols"
-            ),
-
-        new (0x1D100, 0x1D1FF, "Musical Symbols"),
-
-        new (
-             0x1D300,
-             0x1D35F,
-             "Tai Xuan Jing Symbols"
-            ),
-
-        new (
-             0x1D400,
-             0x1D7FF,
-             "Mathematical Alphanumeric Symbols"
-            ),
-
-        new (0x1F600, 0x1F532, "Emojis Symbols"),
-
-        new (
-             0x20000,
-             0x2A6DF,
-             "CJK Unified Ideographs Extension B"
-            ),
-
-        new (
-             0x2F800,
-             0x2FA1F,
-             "CJK Compatibility Ideographs Supplement"
-            ),
-
-        new (0xE0000, 0xE007F, "Tags")
+        new UnicodeRange (0x0000, 0x001F, "ASCII Control Characters"),
+        new UnicodeRange (0x0080, 0x009F, "C0 Control Characters"),
+        new UnicodeRange (0x1100, 0x11ff, "Hangul Jamo"), // This is where wide chars tend to start
+
+        new UnicodeRange (0x20A0, 0x20CF, "Currency Symbols"),
+        new UnicodeRange (0x2100, 0x214F, "Letterlike Symbols"),
+        new UnicodeRange (0x2190, 0x21ff, "Arrows"),
+        new UnicodeRange (0x2200, 0x22ff, "Mathematical symbols"),
+        new UnicodeRange (0x2300, 0x23ff, "Miscellaneous Technical"),
+        new UnicodeRange (0x2500, 0x25ff, "Box Drawing & Geometric Shapes"),
+        new UnicodeRange (0x2600, 0x26ff, "Miscellaneous Symbols"),
+        new UnicodeRange (0x2700, 0x27ff, "Dingbats"),
+        new UnicodeRange (0x2800, 0x28ff, "Braille"),
+        new UnicodeRange (0x2b00, 0x2bff, "Miscellaneous Symbols and Arrows"),
+        new UnicodeRange (0xFB00, 0xFb4f, "Alphabetic Presentation Forms"),
+        new UnicodeRange (0x12400, 0x1240f, "Cuneiform Numbers and Punctuation"),
+        new UnicodeRange ((uint)(Terminal.Gui.Views.UnicodeRange.Ranges.Max (r => r.End) - 16),
+                          (uint)Terminal.Gui.Views.UnicodeRange.Ranges.Max (r => r.End),
+                          "End"),
+        new UnicodeRange (0x0020, 0x007F, "Basic Latin"),
+        new UnicodeRange (0x00A0, 0x00FF, "Latin-1 Supplement"),
+        new UnicodeRange (0x0100, 0x017F, "Latin Extended-A"),
+        new UnicodeRange (0x0180, 0x024F, "Latin Extended-B"),
+        new UnicodeRange (0x0250, 0x02AF, "IPA Extensions"),
+        new UnicodeRange (0x02B0, 0x02FF, "Spacing Modifier Letters"),
+        new UnicodeRange (0x0300, 0x036F, "Combining Diacritical Marks"),
+        new UnicodeRange (0x0370, 0x03FF, "Greek and Coptic"),
+        new UnicodeRange (0x0400, 0x04FF, "Cyrillic"),
+        new UnicodeRange (0x0500, 0x052F, "Cyrillic Supplementary"),
+        new UnicodeRange (0x0530, 0x058F, "Armenian"),
+        new UnicodeRange (0x0590, 0x05FF, "Hebrew"),
+        new UnicodeRange (0x0600, 0x06FF, "Arabic"),
+        new UnicodeRange (0x0700, 0x074F, "Syriac"),
+        new UnicodeRange (0x0780, 0x07BF, "Thaana"),
+        new UnicodeRange (0x0900, 0x097F, "Devanagari"),
+        new UnicodeRange (0x0980, 0x09FF, "Bengali"),
+        new UnicodeRange (0x0A00, 0x0A7F, "Gurmukhi"),
+        new UnicodeRange (0x0A80, 0x0AFF, "Gujarati"),
+        new UnicodeRange (0x0B00, 0x0B7F, "Oriya"),
+        new UnicodeRange (0x0B80, 0x0BFF, "Tamil"),
+        new UnicodeRange (0x0C00, 0x0C7F, "Telugu"),
+        new UnicodeRange (0x0C80, 0x0CFF, "Kannada"),
+        new UnicodeRange (0x0D00, 0x0D7F, "Malayalam"),
+        new UnicodeRange (0x0D80, 0x0DFF, "Sinhala"),
+        new UnicodeRange (0x0E00, 0x0E7F, "Thai"),
+        new UnicodeRange (0x0E80, 0x0EFF, "Lao"),
+        new UnicodeRange (0x0F00, 0x0FFF, "Tibetan"),
+        new UnicodeRange (0x1000, 0x109F, "Myanmar"),
+        new UnicodeRange (0x10A0, 0x10FF, "Georgian"),
+        new UnicodeRange (0x1100, 0x11FF, "Hangul Jamo"),
+        new UnicodeRange (0x1200, 0x137F, "Ethiopic"),
+        new UnicodeRange (0x13A0, 0x13FF, "Cherokee"),
+        new UnicodeRange (0x1400, 0x167F, "Unified Canadian Aboriginal Syllabics"),
+        new UnicodeRange (0x1680, 0x169F, "Ogham"),
+        new UnicodeRange (0x16A0, 0x16FF, "Runic"),
+        new UnicodeRange (0x1700, 0x171F, "Tagalog"),
+        new UnicodeRange (0x1720, 0x173F, "Hanunoo"),
+        new UnicodeRange (0x1740, 0x175F, "Buhid"),
+        new UnicodeRange (0x1760, 0x177F, "Tagbanwa"),
+        new UnicodeRange (0x1780, 0x17FF, "Khmer"),
+        new UnicodeRange (0x1800, 0x18AF, "Mongolian"),
+        new UnicodeRange (0x1900, 0x194F, "Limbu"),
+        new UnicodeRange (0x1950, 0x197F, "Tai Le"),
+        new UnicodeRange (0x19E0, 0x19FF, "Khmer Symbols"),
+        new UnicodeRange (0x1D00, 0x1D7F, "Phonetic Extensions"),
+        new UnicodeRange (0x1E00, 0x1EFF, "Latin Extended Additional"),
+        new UnicodeRange (0x1F00, 0x1FFF, "Greek Extended"),
+        new UnicodeRange (0x2000, 0x206F, "General Punctuation"),
+        new UnicodeRange (0x2070, 0x209F, "Superscripts and Subscripts"),
+        new UnicodeRange (0x20A0, 0x20CF, "Currency Symbols"),
+        new UnicodeRange (0x20D0, 0x20FF, "Combining Diacritical Marks for Symbols"),
+        new UnicodeRange (0x2100, 0x214F, "Letterlike Symbols"),
+        new UnicodeRange (0x2150, 0x218F, "Number Forms"),
+        new UnicodeRange (0x2190, 0x21FF, "Arrows"),
+        new UnicodeRange (0x2200, 0x22FF, "Mathematical Operators"),
+        new UnicodeRange (0x2300, 0x23FF, "Miscellaneous Technical"),
+        new UnicodeRange (0x2400, 0x243F, "Control Pictures"),
+        new UnicodeRange (0x2440, 0x245F, "Optical Character Recognition"),
+        new UnicodeRange (0x2460, 0x24FF, "Enclosed Alphanumerics"),
+        new UnicodeRange (0x2500, 0x257F, "Box Drawing"),
+        new UnicodeRange (0x2580, 0x259F, "Block Elements"),
+        new UnicodeRange (0x25A0, 0x25FF, "Geometric Shapes"),
+        new UnicodeRange (0x2600, 0x26FF, "Miscellaneous Symbols"),
+        new UnicodeRange (0x2700, 0x27BF, "Dingbats"),
+        new UnicodeRange (0x27C0, 0x27EF, "Miscellaneous Mathematical Symbols-A"),
+        new UnicodeRange (0x27F0, 0x27FF, "Supplemental Arrows-A"),
+        new UnicodeRange (0x2800, 0x28FF, "Braille Patterns"),
+        new UnicodeRange (0x2900, 0x297F, "Supplemental Arrows-B"),
+        new UnicodeRange (0x2980, 0x29FF, "Miscellaneous Mathematical Symbols-B"),
+        new UnicodeRange (0x2A00, 0x2AFF, "Supplemental Mathematical Operators"),
+        new UnicodeRange (0x2B00, 0x2BFF, "Miscellaneous Symbols and Arrows"),
+        new UnicodeRange (0x2E80, 0x2EFF, "CJK Radicals Supplement"),
+        new UnicodeRange (0x2F00, 0x2FDF, "Kangxi Radicals"),
+        new UnicodeRange (0x2FF0, 0x2FFF, "Ideographic Description Characters"),
+        new UnicodeRange (0x3000, 0x303F, "CJK Symbols and Punctuation"),
+        new UnicodeRange (0x3040, 0x309F, "Hiragana"),
+        new UnicodeRange (0x30A0, 0x30FF, "Katakana"),
+        new UnicodeRange (0x3100, 0x312F, "Bopomofo"),
+        new UnicodeRange (0x3130, 0x318F, "Hangul Compatibility Jamo"),
+        new UnicodeRange (0x3190, 0x319F, "Kanbun"),
+        new UnicodeRange (0x31A0, 0x31BF, "Bopomofo Extended"),
+        new UnicodeRange (0x31F0, 0x31FF, "Katakana Phonetic Extensions"),
+        new UnicodeRange (0x3200, 0x32FF, "Enclosed CJK Letters and Months"),
+        new UnicodeRange (0x3300, 0x33FF, "CJK Compatibility"),
+        new UnicodeRange (0x3400, 0x4DBF, "CJK Unified Ideographs Extension A"),
+        new UnicodeRange (0x4DC0, 0x4DFF, "Yijing Hexagram Symbols"),
+        new UnicodeRange (0x4E00, 0x9FFF, "CJK Unified Ideographs"),
+        new UnicodeRange (0xA000, 0xA48F, "Yi Syllables"),
+        new UnicodeRange (0xA490, 0xA4CF, "Yi Radicals"),
+        new UnicodeRange (0xAC00, 0xD7AF, "Hangul Syllables"),
+        new UnicodeRange (0xD800, 0xDB7F, "High Surrogates"),
+        new UnicodeRange (0xDB80, 0xDBFF, "High Private Use Surrogates"),
+        new UnicodeRange (0xDC00, 0xDFFF, "Low Surrogates"),
+        new UnicodeRange (0xE000, 0xF8FF, "Private Use Area"),
+        new UnicodeRange (0xF900, 0xFAFF, "CJK Compatibility Ideographs"),
+        new UnicodeRange (0xFB00, 0xFB4F, "Alphabetic Presentation Forms"),
+        new UnicodeRange (0xFB50, 0xFDFF, "Arabic Presentation Forms-A"),
+        new UnicodeRange (0xFE00, 0xFE0F, "Variation Selectors"),
+        new UnicodeRange (0xFE20, 0xFE2F, "Combining Half Marks"),
+        new UnicodeRange (0xFE30, 0xFE4F, "CJK Compatibility Forms"),
+        new UnicodeRange (0xFE50, 0xFE6F, "Small Form Variants"),
+        new UnicodeRange (0xFE70, 0xFEFF, "Arabic Presentation Forms-B"),
+        new UnicodeRange (0xFF00, 0xFFEF, "Halfwidth and Fullwidth Forms"),
+        new UnicodeRange (0xFFF0, 0xFFFF, "Specials"),
+        new UnicodeRange (0x10000, 0x1007F, "Linear B Syllabary"),
+        new UnicodeRange (0x10080, 0x100FF, "Linear B Ideograms"),
+        new UnicodeRange (0x10100, 0x1013F, "Aegean Numbers"),
+        new UnicodeRange (0x10300, 0x1032F, "Old Italic"),
+        new UnicodeRange (0x10330, 0x1034F, "Gothic"),
+        new UnicodeRange (0x10380, 0x1039F, "Ugaritic"),
+        new UnicodeRange (0x10400, 0x1044F, "Deseret"),
+        new UnicodeRange (0x10450, 0x1047F, "Shavian"),
+        new UnicodeRange (0x10480, 0x104AF, "Osmanya"),
+        new UnicodeRange (0x10800, 0x1083F, "Cypriot Syllabary"),
+        new UnicodeRange (0x1D000, 0x1D0FF, "Byzantine Musical Symbols"),
+        new UnicodeRange (0x1D100, 0x1D1FF, "Musical Symbols"),
+        new UnicodeRange (0x1D300, 0x1D35F, "Tai Xuan Jing Symbols"),
+        new UnicodeRange (0x1D400, 0x1D7FF, "Mathematical Alphanumeric Symbols"),
+        new UnicodeRange (0x1F600, 0x1F532, "Emojis Symbols"),
+        new UnicodeRange (0x20000, 0x2A6DF, "CJK Unified Ideographs Extension B"),
+        new UnicodeRange (0x2F800, 0x2FA1F, "CJK Compatibility Ideographs Supplement"),
+        new UnicodeRange (0xE0000, 0xE007F, "Tags")
     ];
 
     private Scheme? _alternatingScheme;
@@ -506,14 +211,12 @@ public class TableEditor : Scenario
         // Setup - Create a top-level application window and configure it.
         using Runnable appWindow = new ();
 
-        _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _tableView = new TableView { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         var menu = new MenuBar ();
 
         // File menu
-        menu.Add (
-                  new MenuBarItem (
-                                   Strings.menuFile,
+        menu.Add (new MenuBarItem (Strings.menuFile,
                                    [
                                        new MenuItem { Title = "_OpenBigExample", Action = () => OpenExample (true) },
                                        new MenuItem { Title = "_OpenSmallExample", Action = () => OpenExample (false) },
@@ -521,65 +224,31 @@ public class TableEditor : Scenario
                                        new MenuItem { Title = "OpenTreeExample", Action = OpenTreeExample },
                                        new MenuItem { Title = "_CloseExample", Action = CloseExample },
                                        new MenuItem { Title = Strings.cmdQuit, Action = Quit }
-                                   ]
-                                  )
-                 );
+                                   ]));
 
         // View menu - created with helper method due to complexity
         menu.Add (CreateViewMenu ());
 
         // Column menu
-        menu.Add (
-                  new MenuBarItem (
-                                   "_Column",
+        menu.Add (new MenuBarItem ("_Column",
                                    [
                                        new MenuItem { Title = "_Set Max Width", Action = SetMaxWidth },
                                        new MenuItem { Title = "_Set Min Width", Action = SetMinWidth },
                                        new MenuItem { Title = "_Set MinAcceptableWidth", Action = SetMinAcceptableWidth },
                                        new MenuItem { Title = "_Set All MinAcceptableWidth=1", Action = SetMinAcceptableWidthToOne }
-                                   ]
-                                  )
-                 );
+                                   ]));
 
         appWindow.Add (menu);
 
-        var selectedCellLabel = new Label
-        {
-            Text = "0,0"
-        };
+        var selectedCellLabel = new Label { Text = "0,0" };
 
-        var statusBar = new StatusBar (
-                                       [
-                                           new (
-                                                Application.QuitKey,
-                                                "Quit",
-                                                Quit
-                                               ),
-                                           new (
-                                                Key.F2,
-                                                "OpenExample",
-                                                () => OpenExample (true)
-                                               ),
-                                           new (
-                                                Key.F3,
-                                                "CloseExample",
-                                                CloseExample
-                                               ),
-                                           new (
-                                                Key.F4,
-                                                "OpenSimple",
-                                                () => OpenSimple (true)
-                                               ),
-                                           new ()
-                                           {
-                                               HelpText = "Cell:",
-                                               CommandView = selectedCellLabel
-                                           }
-                                       ]
-                                      )
-        {
-            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
-        };
+        var statusBar = new StatusBar ([
+                                           new Shortcut (Application.QuitKey, "Quit", Quit),
+                                           new Shortcut (Key.F2, "OpenExample", () => OpenExample (true)),
+                                           new Shortcut (Key.F3, "CloseExample", CloseExample),
+                                           new Shortcut (Key.F4, "OpenSimple", () => OpenSimple (true)),
+                                           new Shortcut { HelpText = "Cell:", CommandView = selectedCellLabel }
+                                       ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
         appWindow.Add (statusBar);
 
         appWindow.Add (_tableView);
@@ -590,60 +259,60 @@ public class TableEditor : Scenario
 
         //SetupScrollBar ();
 
-        _redScheme = new ()
+        _redScheme = new Scheme
         {
             Disabled = appWindow.GetAttributeForRole (VisualRole.Disabled),
             HotFocus = appWindow.GetAttributeForRole (VisualRole.HotFocus),
             Focus = appWindow.GetAttributeForRole (VisualRole.Focus),
-            Normal = new (Color.Red, appWindow.GetAttributeForRole (VisualRole.Normal).Background)
+            Normal = new Attribute (Color.Red, appWindow.GetAttributeForRole (VisualRole.Normal).Background)
         };
 
-        _alternatingScheme = new ()
+        _alternatingScheme = new Scheme
         {
             Disabled = appWindow.GetAttributeForRole (VisualRole.Disabled),
             HotFocus = appWindow.GetAttributeForRole (VisualRole.HotFocus),
             Focus = appWindow.GetAttributeForRole (VisualRole.Focus),
-            Normal = new (Color.White, Color.BrightBlue)
+            Normal = new Attribute (Color.White, Color.BrightBlue)
         };
 
-        _redSchemeAlt = new ()
+        _redSchemeAlt = new Scheme
         {
             Disabled = appWindow.GetAttributeForRole (VisualRole.Disabled),
             HotFocus = appWindow.GetAttributeForRole (VisualRole.HotFocus),
             Focus = appWindow.GetAttributeForRole (VisualRole.Focus),
-            Normal = new (Color.Red, Color.BrightBlue)
+            Normal = new Attribute (Color.Red, Color.BrightBlue)
         };
 
         // if user clicks the mouse in TableView
         _tableView!.Activating += (s, e) =>
-                                 {
-                                     if (_currentTable == null)
-                                     {
-                                         return;
-                                     }
+                                  {
+                                      if (_currentTable == null)
+                                      {
+                                          return;
+                                      }
 
-                                     // Only handle mouse clicks
-                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
-                                     {
-                                         return;
-                                     }
+                                      // Only handle mouse clicks
+                                      if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
+                                      {
+                                          return;
+                                      }
 
-                                     _tableView!.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
+                                      _tableView!.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                     if (clickedCol != null)
-                                     {
-                                         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
-                                         {
-                                             // left click in a header
-                                             SortColumn (clickedCol.Value);
-                                         }
-                                         else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
-                                         {
-                                             // right click in a header
-                                             ShowHeaderContextMenu (clickedCol.Value, mouse);
-                                         }
-                                     }
-                                 };
+                                      if (clickedCol != null)
+                                      {
+                                          if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                          {
+                                              // left click in a header
+                                              SortColumn (clickedCol.Value);
+                                          }
+                                          else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
+                                          {
+                                              // right click in a header
+                                              ShowHeaderContextMenu (clickedCol.Value, mouse);
+                                          }
+                                      }
+                                  };
 
         _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
@@ -658,11 +327,7 @@ public class TableEditor : Scenario
 
         MenuItem CreateCheckBoxMenuItem (string key, string title, bool initialState, Action<bool> onToggle)
         {
-            CheckBox checkBox = new ()
-            {
-                Title = title,
-                CheckedState = initialState ? CheckState.Checked : CheckState.UnChecked
-            };
+            CheckBox checkBox = new () { Title = title, CheckedState = initialState ? CheckState.Checked : CheckState.UnChecked };
 
             checkBox.CheckedStateChanged += (s, e) => onToggle (checkBox.CheckedState == CheckState.Checked);
 
@@ -679,231 +344,202 @@ public class TableEditor : Scenario
             return item;
         }
 
-        return new (
-                    "_View",
-                    [
-                        CreateCheckBoxMenuItem (
-                                                "ShowHeaders",
-                                                "_ShowHeaders",
-                                                _tableView!.Style.ShowHeaders,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ShowHeaders = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "AlwaysShowHeaders",
-                                                "_AlwaysShowHeaders",
-                                                _tableView!.Style.AlwaysShowHeaders,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.AlwaysShowHeaders = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "HeaderOverline",
-                                                "_HeaderOverLine",
-                                                _tableView!.Style.ShowHorizontalHeaderOverline,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ShowHorizontalHeaderOverline = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "HeaderMidline",
-                                                "_HeaderMidLine",
-                                                _tableView!.Style.ShowVerticalHeaderLines,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ShowVerticalHeaderLines = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "HeaderUnderline",
-                                                "_HeaderUnderLine",
-                                                _tableView!.Style.ShowHorizontalHeaderUnderline,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ShowHorizontalHeaderUnderline = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "Bottomline",
-                                                "_BottomLine",
-                                                _tableView!.Style.ShowHorizontalBottomline,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ShowHorizontalBottomline = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "HorizontalScrollIndicators",
-                                                "_HorizontalScrollIndicators",
-                                                _tableView!.Style.ShowHorizontalScrollIndicators,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ShowHorizontalScrollIndicators = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "FullRowSelect",
-                                                "_FullRowSelect",
-                                                _tableView!.FullRowSelect,
-                                                state =>
-                                                {
-                                                    _tableView!.FullRowSelect = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "CellLines",
-                                                "_CellLines",
-                                                _tableView!.Style.ShowVerticalCellLines,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ShowVerticalCellLines = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "ExpandLastColumn",
-                                                "_ExpandLastColumn",
-                                                _tableView!.Style.ExpandLastColumn,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.ExpandLastColumn = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "AlwaysUseNormalColorForVerticalCellLines",
-                                                "_AlwaysUseNormalColorForVerticalCellLines",
-                                                _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "SmoothScrolling",
-                                                "_SmoothHorizontalScrolling",
-                                                _tableView!.Style.SmoothHorizontalScrolling,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.SmoothHorizontalScrolling = state;
-                                                    _tableView!.Update ();
-                                                }
-                                               ),
-                        new MenuItem
-                        {
-                            Title = "_AllLines",
-                            Action = () =>
-                                     {
-                                         _tableView!.Style.ShowHorizontalHeaderOverline = true;
-                                         _tableView!.Style.ShowVerticalHeaderLines = true;
-                                         _tableView!.Style.ShowHorizontalHeaderUnderline = true;
-                                         _tableView!.Style.ShowVerticalCellLines = true;
+        return new MenuBarItem ("_View",
+                                [
+                                    CreateCheckBoxMenuItem ("ShowHeaders",
+                                                            "_ShowHeaders",
+                                                            _tableView!.Style.ShowHeaders,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowHeaders = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("AlwaysShowHeaders",
+                                                            "_AlwaysShowHeaders",
+                                                            _tableView!.Style.AlwaysShowHeaders,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.AlwaysShowHeaders = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("HeaderOverline",
+                                                            "_HeaderOverLine",
+                                                            _tableView!.Style.ShowHorizontalHeaderOverline,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowHorizontalHeaderOverline = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("HeaderMidline",
+                                                            "_HeaderMidLine",
+                                                            _tableView!.Style.ShowVerticalHeaderLines,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowVerticalHeaderLines = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("HeaderUnderline",
+                                                            "_HeaderUnderLine",
+                                                            _tableView!.Style.ShowHorizontalHeaderUnderline,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowHorizontalHeaderUnderline = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("Bottomline",
+                                                            "_BottomLine",
+                                                            _tableView!.Style.ShowHorizontalBottomline,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowHorizontalBottomline = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("HorizontalScrollIndicators",
+                                                            "_HorizontalScrollIndicators",
+                                                            _tableView!.Style.ShowHorizontalScrollIndicators,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowHorizontalScrollIndicators = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("FullRowSelect",
+                                                            "_FullRowSelect",
+                                                            _tableView!.FullRowSelect,
+                                                            state =>
+                                                            {
+                                                                _tableView!.FullRowSelect = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("CellLines",
+                                                            "_CellLines",
+                                                            _tableView!.Style.ShowVerticalCellLines,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowVerticalCellLines = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("ExpandLastColumn",
+                                                            "_ExpandLastColumn",
+                                                            _tableView!.Style.ExpandLastColumn,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ExpandLastColumn = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("AlwaysUseNormalColorForVerticalCellLines",
+                                                            "_AlwaysUseNormalColorForVerticalCellLines",
+                                                            _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("SmoothScrolling",
+                                                            "_SmoothHorizontalScrolling",
+                                                            _tableView!.Style.SmoothHorizontalScrolling,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.SmoothHorizontalScrolling = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    new MenuItem
+                                    {
+                                        Title = "_AllLines",
+                                        Action = () =>
+                                                 {
+                                                     _tableView!.Style.ShowHorizontalHeaderOverline = true;
+                                                     _tableView!.Style.ShowVerticalHeaderLines = true;
+                                                     _tableView!.Style.ShowHorizontalHeaderUnderline = true;
+                                                     _tableView!.Style.ShowVerticalCellLines = true;
 
-                                         checkboxes ["HeaderOverline"].CheckedState = CheckState.Checked;
-                                         checkboxes ["HeaderMidline"].CheckedState = CheckState.Checked;
-                                         checkboxes ["HeaderUnderline"].CheckedState = CheckState.Checked;
-                                         checkboxes ["CellLines"].CheckedState = CheckState.Checked;
+                                                     checkboxes ["HeaderOverline"].CheckedState = CheckState.Checked;
+                                                     checkboxes ["HeaderMidline"].CheckedState = CheckState.Checked;
+                                                     checkboxes ["HeaderUnderline"].CheckedState = CheckState.Checked;
+                                                     checkboxes ["CellLines"].CheckedState = CheckState.Checked;
 
-                                         _tableView!.Update ();
-                                     }
-                        },
-                        new MenuItem
-                        {
-                            Title = "_NoLines",
-                            Action = () =>
-                                     {
-                                         _tableView!.Style.ShowHorizontalHeaderOverline = false;
-                                         _tableView!.Style.ShowVerticalHeaderLines = false;
-                                         _tableView!.Style.ShowHorizontalHeaderUnderline = false;
-                                         _tableView!.Style.ShowVerticalCellLines = false;
+                                                     _tableView!.Update ();
+                                                 }
+                                    },
+                                    new MenuItem
+                                    {
+                                        Title = "_NoLines",
+                                        Action = () =>
+                                                 {
+                                                     _tableView!.Style.ShowHorizontalHeaderOverline = false;
+                                                     _tableView!.Style.ShowVerticalHeaderLines = false;
+                                                     _tableView!.Style.ShowHorizontalHeaderUnderline = false;
+                                                     _tableView!.Style.ShowVerticalCellLines = false;
 
-                                         checkboxes ["HeaderOverline"].CheckedState = CheckState.UnChecked;
-                                         checkboxes ["HeaderMidline"].CheckedState = CheckState.UnChecked;
-                                         checkboxes ["HeaderUnderline"].CheckedState = CheckState.UnChecked;
-                                         checkboxes ["CellLines"].CheckedState = CheckState.UnChecked;
+                                                     checkboxes ["HeaderOverline"].CheckedState = CheckState.UnChecked;
+                                                     checkboxes ["HeaderMidline"].CheckedState = CheckState.UnChecked;
+                                                     checkboxes ["HeaderUnderline"].CheckedState = CheckState.UnChecked;
+                                                     checkboxes ["CellLines"].CheckedState = CheckState.UnChecked;
 
-                                         _tableView!.Update ();
-                                     }
-                        },
-                        CreateCheckBoxMenuItem (
-                                                "Checkboxes",
-                                                "_Checkboxes",
-                                                false,
-                                                state =>
-                                                {
-                                                    if (state)
-                                                    {
-                                                        ToggleCheckboxes (false);
-                                                        checkboxes ["Radioboxes"].CheckedState = CheckState.UnChecked;
-                                                    }
-                                                    else if (HasCheckboxes ())
-                                                    {
-                                                        ToggleCheckboxes (false);
-                                                    }
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "Radioboxes",
-                                                "_Radioboxes",
-                                                false,
-                                                state =>
-                                                {
-                                                    if (state)
-                                                    {
-                                                        ToggleCheckboxes (true);
-                                                        checkboxes ["Checkboxes"].CheckedState = CheckState.UnChecked;
-                                                    }
-                                                    else if (HasCheckboxes ())
-                                                    {
-                                                        ToggleCheckboxes (true);
-                                                    }
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "AlternatingColors",
-                                                "Alternating Colors",
-                                                false,
-                                                state =>
-                                                {
-                                                    if (state)
-                                                    {
-                                                        _tableView!.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingScheme : null; };
-                                                    }
-                                                    else
-                                                    {
-                                                        _tableView!.Style.RowColorGetter = null;
-                                                    }
+                                                     _tableView!.Update ();
+                                                 }
+                                    },
+                                    CreateCheckBoxMenuItem ("Checkboxes",
+                                                            "_Checkboxes",
+                                                            false,
+                                                            state =>
+                                                            {
+                                                                if (state)
+                                                                {
+                                                                    ToggleCheckboxes (false);
+                                                                    checkboxes ["Radioboxes"].CheckedState = CheckState.UnChecked;
+                                                                }
+                                                                else if (HasCheckboxes ())
+                                                                {
+                                                                    ToggleCheckboxes (false);
+                                                                }
+                                                            }),
+                                    CreateCheckBoxMenuItem ("Radioboxes",
+                                                            "_Radioboxes",
+                                                            false,
+                                                            state =>
+                                                            {
+                                                                if (state)
+                                                                {
+                                                                    ToggleCheckboxes (true);
+                                                                    checkboxes ["Checkboxes"].CheckedState = CheckState.UnChecked;
+                                                                }
+                                                                else if (HasCheckboxes ())
+                                                                {
+                                                                    ToggleCheckboxes (true);
+                                                                }
+                                                            }),
+                                    CreateCheckBoxMenuItem ("AlternatingColors",
+                                                            "Alternating Colors",
+                                                            false,
+                                                            state =>
+                                                            {
+                                                                if (state)
+                                                                {
+                                                                    _tableView!.Style.RowColorGetter = a =>
+                                                                                                       {
+                                                                                                           return a.RowIndex % 2 == 0
+                                                                                                               ? _alternatingScheme
+                                                                                                               : null;
+                                                                                                       };
+                                                                }
+                                                                else
+                                                                {
+                                                                    _tableView!.Style.RowColorGetter = null;
+                                                                }
 
-                                                    _tableView!.SetNeedsDraw ();
-                                                }
-                                               ),
-                        CreateCheckBoxMenuItem (
-                                                "Cursor",
-                                                "Invert Selected Cell First Character",
-                                                _tableView!.Style.InvertSelectedCellFirstCharacter,
-                                                state =>
-                                                {
-                                                    _tableView!.Style.InvertSelectedCellFirstCharacter = state;
-                                                    _tableView!.SetNeedsDraw ();
-                                                }
-                                               ),
-                        new MenuItem { Title = "_ClearColumnStyles", Action = ClearColumnStyles },
-                        new MenuItem { Title = "Sho_w All Columns", Action = ShowAllColumns }
-                    ]
-                   );
+                                                                _tableView!.SetNeedsDraw ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("Cursor",
+                                                            "Invert Selected Cell First Character",
+                                                            _tableView!.Style.InvertSelectedCellFirstCharacter,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.InvertSelectedCellFirstCharacter = state;
+                                                                _tableView!.SetNeedsDraw ();
+                                                            }),
+                                    new MenuItem { Title = "_ClearColumnStyles", Action = ClearColumnStyles },
+                                    new MenuItem { Title = "Sho_w All Columns", Action = ShowAllColumns }
+                                ]);
     }
 
     protected override void Dispose (bool disposing)
@@ -980,7 +616,7 @@ public class TableEditor : Scenario
         _tableView!.Update ();
     }
 
-    private void CloseExample () { _tableView!.Table = null; }
+    private void CloseExample () => _tableView!.Table = null;
 
     private void EditCurrentCell (object? sender, CellActivatedEventArgs e)
     {
@@ -1007,7 +643,7 @@ public class TableEditor : Scenario
         var cancel = new Button { Text = Strings.btnCancel };
         var d = new Dialog { Title = title, Buttons = [cancel, ok] };
         var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table.ColumnNames [e.Col] };
-        var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
+        var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
@@ -1020,8 +656,7 @@ public class TableEditor : Scenario
         {
             try
             {
-                _currentTable.Rows [e.Row] [tableCol] =
-                    string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
+                _currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
             }
             catch (Exception ex)
             {
@@ -1076,7 +711,19 @@ public class TableEditor : Scenario
     private string GetHumanReadableFileSize (long value, CultureInfo culture)
     {
         const long ByteConversion = 1024;
-        string [] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+        string [] SizeSuffixes =
+        {
+            "bytes",
+            "KB",
+            "MB",
+            "GB",
+            "TB",
+            "PB",
+            "EB",
+            "ZB",
+            "YB"
+        };
 
         if (value < 0)
         {
@@ -1114,7 +761,7 @@ public class TableEditor : Scenario
         return sort;
     }
 
-    private string GetUnicodeCategory (uint u) { return _ranges!.FirstOrDefault (r => u >= r.Start && u <= r.End)?.Category ?? "Unknown"; }
+    private string GetUnicodeCategory (uint u) => _ranges!.FirstOrDefault (r => u >= r.Start && u <= r.End)?.Category ?? "Unknown";
     private bool HasCheckboxes () => _tableView!.Table is CheckBoxTableSourceWrapperBase;
 
     private void HideColumn (int clickedCol)
@@ -1130,28 +777,23 @@ public class TableEditor : Scenario
         SetDemoTableStyles ();
     }
 
-    private void OpenSimple (bool big) { SetTable (BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5)); }
+    private void OpenSimple (bool big) => SetTable (BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5));
 
     private void OpenTreeExample ()
     {
         _tableView!.Style.ColumnStyles.Clear ();
 
-        TreeView<FileSystemInfo> tree = new ()
-        {
-            AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren)
-        };
+        TreeView<FileSystemInfo> tree = new () { AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren) };
 
-        TreeTableSource<FileSystemInfo> source = new (
-                                                      _tableView,
+        TreeTableSource<FileSystemInfo> source = new (_tableView,
                                                       "Name",
                                                       tree,
-                                                      new ()
+                                                      new Dictionary<string, Func<FileSystemInfo, object>>
                                                       {
                                                           { "Extension", f => f.Extension },
                                                           { "CreationTime", f => f.CreationTime },
                                                           { "FileSize", GetHumanReadableFileSize }
-                                                      }
-                                                     );
+                                                      });
 
         HashSet<string> seen = new ();
 
@@ -1178,14 +820,9 @@ public class TableEditor : Scenario
         _tableView?.Update ();
     }
 
-    private void Quit () { _tableView?.App?.RequestStop (); }
+    private void Quit () => _tableView?.App?.RequestStop ();
 
-    private void RunColumnWidthDialog (
-        int? col,
-        string prompt,
-        Action<ColumnStyle, int> setter,
-        Func<ColumnStyle, int> getter
-    )
+    private void RunColumnWidthDialog (int? col, string prompt, Action<ColumnStyle, int> setter, Func<ColumnStyle, int> getter)
     {
         if (col == null)
         {
@@ -1193,11 +830,7 @@ public class TableEditor : Scenario
         }
 
         var accepted = false;
-        var d = new Dialog
-        {
-            Title = prompt,
-            Buttons = [new () { Title = Strings.btnCancel }, new () { Title = Strings.btnOk }]
-        };
+        var d = new Dialog { Title = prompt, Buttons = [new Button { Title = Strings.btnCancel }, new Button { Title = Strings.btnOk }] };
 
         ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Value);
 
@@ -1235,9 +868,7 @@ public class TableEditor : Scenario
 
         var dateFormatStyle = new ColumnStyle
         {
-            Alignment = Alignment.End,
-            RepresentationGetter = v =>
-                                       v is DateTime d ? d.ToString ("yyyy-MM-dd") : v.ToString ()
+            Alignment = Alignment.End, RepresentationGetter = v => v is DateTime d ? d.ToString ("yyyy-MM-dd") : v.ToString ()
         };
 
         var negativeRight = new ColumnStyle
@@ -1263,9 +894,7 @@ public class TableEditor : Scenario
 
                                    // color 0 and negative values red
                                    d <= 0.0000001
-                                       ? a.RowIndex % 2 == 0
-                                             ? _redSchemeAlt
-                                             : _redScheme
+                                       ? a.RowIndex % 2 == 0 ? _redSchemeAlt : _redScheme
                                        :
 
                                        // use normal scheme for positive values
@@ -1294,12 +923,7 @@ public class TableEditor : Scenario
     {
         int? col = GetColumn ();
 
-        RunColumnWidthDialog (
-                              col,
-                              "MinAcceptableWidth",
-                              (s, v) => s.MinAcceptableWidth = v,
-                              s => s.MinAcceptableWidth
-                             );
+        RunColumnWidthDialog (col, "MinAcceptableWidth", (s, v) => s.MinAcceptableWidth = v, s => s.MinAcceptableWidth);
     }
 
     private void SetMinAcceptableWidthToOne ()
@@ -1317,7 +941,7 @@ public class TableEditor : Scenario
         RunColumnWidthDialog (col, "MinWidth", (s, v) => s.MinWidth = v, s => s.MinWidth);
     }
 
-    private void SetTable (DataTable dataTable) { _tableView!.Table = new DataTableSource (_currentTable = dataTable); }
+    private void SetTable (DataTable dataTable) => _tableView!.Table = new DataTableSource (_currentTable = dataTable);
 
     //private void SetupScrollBar ()
     //{
@@ -1374,24 +998,15 @@ public class TableEditor : Scenario
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
         string colName = _tableView!.Table.ColumnNames [clickedCol];
 
-        PopoverMenu? contextMenu = new (
-                                        [
-                                            new (
-                                                 $"Hide {TrimArrows (colName)}",
-                                                 "",
-                                                 () => HideColumn (clickedCol)
-                                                ),
-                                            new (
-                                                 $"Sort {StripArrows (sort)}",
-                                                 "",
-                                                 () => SortColumn (clickedCol, sort, isAsc)
-                                                )
+        PopoverMenu? contextMenu = new ([
+                                            new MenuItem ($"Hide {TrimArrows (colName)}", "", () => HideColumn (clickedCol)),
+                                            new MenuItem ($"Sort {StripArrows (sort)}", "", () => SortColumn (clickedCol, sort, isAsc))
                                         ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
         e.View?.App!.Popover?.Register (contextMenu);
-        contextMenu?.MakeVisible (new (e.ScreenPosition.X + 1, e.ScreenPosition.Y + 1));
+        contextMenu?.MakeVisible (new Point (e.ScreenPosition.X + 1, e.ScreenPosition.Y + 1));
     }
 
     private void SortColumn (int clickedCol)
@@ -1455,10 +1070,7 @@ public class TableEditor : Scenario
             if (_tableView!.FullRowSelect)
             {
                 // Delete button deletes all rows when in full row mode
-                foreach (int toRemove in _tableView!.GetAllSelectedCells ()
-                                                    .Select (p => p.Y)
-                                                    .Distinct ()
-                                                    .OrderByDescending (i => i))
+                foreach (int toRemove in _tableView!.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
                 {
                     _currentTable.Rows.RemoveAt (toRemove);
                 }
@@ -1496,13 +1108,10 @@ public class TableEditor : Scenario
         // Either toggling on checkboxes/radio or switching from radio to checkboxes (or vice versa)
         if (_tableView!.Table is TreeTableSource<FileSystemInfo> treeSource)
         {
-            source = new CheckBoxTableSourceWrapperByObject<FileSystemInfo> (
-                                                                             _tableView,
-                                                                             treeSource,
-                                                                             _checkedFileSystemInfos!.Contains,
-                                                                             CheckOrUncheckFile
-                                                                            )
-            { UseRadioButtons = radio };
+            source = new CheckBoxTableSourceWrapperByObject<FileSystemInfo> (_tableView, treeSource, _checkedFileSystemInfos!.Contains, CheckOrUncheckFile)
+            {
+                UseRadioButtons = radio
+            };
         }
         else
         {
@@ -1522,11 +1131,7 @@ public class TableEditor : Scenario
         return col;
     }
 
-    private string TrimArrows (string columnName) =>
-        columnName.TrimEnd (
-                            (char)Glyphs.UpArrow.Value,
-                            (char)Glyphs.DownArrow.Value
-                           );
+    private string TrimArrows (string columnName) => columnName.TrimEnd ((char)Glyphs.UpArrow.Value, (char)Glyphs.DownArrow.Value);
 
     public class UnicodeRange (uint start, uint end, string category)
     {

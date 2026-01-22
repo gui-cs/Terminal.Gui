@@ -12,7 +12,7 @@ public partial class View // Mouse APIs
 
     private void SetupMouse ()
     {
-        MouseBindings = new ();
+        MouseBindings = new MouseBindings ();
 
         // By default, left click activates. No binding to Accept by default.
         MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
@@ -93,7 +93,7 @@ public partial class View // Mouse APIs
     ///     <see langword="true"/> if the event was canceled, <see langword="false"/> if not. Cancelling the event
     ///     prevents Views higher in the visible hierarchy from receiving Enter/Leave events.
     /// </returns>
-    protected virtual bool OnMouseEnter (CancelEventArgs eventArgs) { return false; }
+    protected virtual bool OnMouseEnter (CancelEventArgs eventArgs) => false;
 
     /// <summary>
     ///     Raised when the mouse moves over the View's <see cref="Frame"/>. <see cref="MouseLeave"/> will
@@ -235,8 +235,7 @@ public partial class View // Mouse APIs
                 }
             }
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref _mouseHoldRepeat,
                                               value,
                                               OnMouseHoldRepeatChanging,
@@ -244,8 +243,7 @@ public partial class View // Mouse APIs
                                               DoWork,
                                               OnMouseHoldRepeatChanged,
                                               MouseHoldRepeatChanged,
-                                              out _
-                                             );
+                                              out _);
 
             return;
 
@@ -282,7 +280,7 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     Called before <see cref="MouseHoldRepeat"/> changes. Return <see langword="true"/> to cancel the change.
     /// </summary>
-    protected virtual bool OnMouseHoldRepeatChanging (ValueChangingEventArgs<MouseFlags?> args) { return false; }
+    protected virtual bool OnMouseHoldRepeatChanging (ValueChangingEventArgs<MouseFlags?> args) => false;
 
     /// <summary>
     ///     Raised before <see cref="MouseHoldRepeat"/> changes. Set <see cref="CancelEventArgs.Cancel"/> to
@@ -551,7 +549,7 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool OnMouseEvent (Mouse mouse) { return false; }
+    protected virtual bool OnMouseEvent (Mouse mouse) => false;
 
     /// <summary>Raised when a mouse event occurs.</summary>
     /// <remarks>
@@ -779,7 +777,7 @@ public partial class View // Mouse APIs
             return null;
         }
 
-        binding.MouseEventArgs = mouseEventArgs;
+        binding.MouseEvent = mouseEventArgs;
 
         return InvokeCommands (binding.Commands, binding);
     }
