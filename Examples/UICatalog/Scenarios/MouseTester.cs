@@ -155,7 +155,7 @@ public class MouseTester : Scenario
                                                  }
                                              };
 
-        cbRepeatOnHold.CheckedStateChanging += (_, _) =>
+        cbRepeatOnHold.ValueChanging += (_, _) =>
                                                {
                                                    demo.MouseHoldRepeat = demo.MouseHoldRepeat is null ? MouseFlags.LeftButtonPressed : null;
 

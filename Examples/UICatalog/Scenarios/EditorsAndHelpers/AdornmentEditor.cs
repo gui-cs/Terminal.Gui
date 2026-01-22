@@ -141,14 +141,14 @@ public class AdornmentEditor : EditorBase
         _foregroundColorPicker.X = 0;
         _foregroundColorPicker.Y = Pos.Bottom (copyTop);
 
-        _foregroundColorPicker.ColorChanged += ColorPickerColorChanged ();
+        _foregroundColorPicker.ValueChanged += ColorPickerColorChanged ();
         Add (_foregroundColorPicker);
 
         // Background ColorPicker.
         _backgroundColorPicker.X = Pos.Right (_foregroundColorPicker) - 1;
         _backgroundColorPicker.Y = Pos.Top (_foregroundColorPicker);
 
-        _backgroundColorPicker.ColorChanged += ColorPickerColorChanged ();
+        _backgroundColorPicker.ValueChanged += ColorPickerColorChanged ();
         Add (_backgroundColorPicker);
 
         _topEdit.Value = AdornmentToEdit?.Thickness.Top ?? 0;
@@ -160,17 +160,17 @@ public class AdornmentEditor : EditorBase
 
         if (AdornmentToEdit is not null)
         {
-            _diagThicknessCheckBox.CheckedState =
+            _diagThicknessCheckBox.Value =
                 AdornmentToEdit.Diagnostics.FastHasFlags (ViewDiagnosticFlags.Thickness) ? CheckState.Checked : CheckState.UnChecked;
         }
         else
         {
-            _diagThicknessCheckBox.CheckedState = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Thickness) ? CheckState.Checked : CheckState.UnChecked;
+            _diagThicknessCheckBox.Value = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Thickness) ? CheckState.Checked : CheckState.UnChecked;
         }
 
-        _diagThicknessCheckBox.CheckedStateChanging += (_, args) =>
+        _diagThicknessCheckBox.ValueChanging += (_, args) =>
                                                        {
-                                                           if (args.Result == CheckState.Checked)
+                                                           if (args.NewValue == CheckState.Checked)
                                                            {
                                                                AdornmentToEdit!.Diagnostics |= ViewDiagnosticFlags.Thickness;
                                                            }
@@ -187,16 +187,16 @@ public class AdornmentEditor : EditorBase
 
         if (AdornmentToEdit is not null)
         {
-            _diagRulerCheckBox.CheckedState = AdornmentToEdit.Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
+            _diagRulerCheckBox.Value = AdornmentToEdit.Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
         }
         else
         {
-            _diagRulerCheckBox.CheckedState = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
+            _diagRulerCheckBox.Value = Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
         }
 
-        _diagRulerCheckBox.CheckedStateChanging += (_, args) =>
+        _diagRulerCheckBox.ValueChanging += (_, args) =>
                                                    {
-                                                       if (args.Result == CheckState.Checked)
+                                                       if (args.NewValue == CheckState.Checked)
                                                        {
                                                            AdornmentToEdit!.Diagnostics |= ViewDiagnosticFlags.Ruler;
                                                        }
@@ -210,7 +210,7 @@ public class AdornmentEditor : EditorBase
         _diagRulerCheckBox.Y = Pos.Bottom (_diagThicknessCheckBox);
     }
 
-    private EventHandler<ResultEventArgs<Color>> ColorPickerColorChanged ()
+    private EventHandler<ValueChangedEventArgs<ColorName16>> ColorPickerColorChanged ()
     {
         return (_, _) =>
                {
@@ -228,11 +228,11 @@ public class AdornmentEditor : EditorBase
                };
     }
 
-    private void Top_ValueChanging (object? sender, CancelEventArgs<int> e)
+    private void Top_ValueChanging (object? sender, ValueChangingEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
-            e.Cancel = true;
+            e.Handled = true;
 
             return;
         }
@@ -240,11 +240,11 @@ public class AdornmentEditor : EditorBase
         AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, e.NewValue, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Left_ValueChanging (object? sender, CancelEventArgs<int> e)
+    private void Left_ValueChanging (object? sender, ValueChangingEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
-            e.Cancel = true;
+            e.Handled = true;
 
             return;
         }
@@ -252,11 +252,11 @@ public class AdornmentEditor : EditorBase
         AdornmentToEdit.Thickness = new (e.NewValue, AdornmentToEdit.Thickness.Top, AdornmentToEdit.Thickness.Right, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Right_ValueChanging (object? sender, CancelEventArgs<int> e)
+    private void Right_ValueChanging (object? sender, ValueChangingEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
-            e.Cancel = true;
+            e.Handled = true;
 
             return;
         }
@@ -264,11 +264,11 @@ public class AdornmentEditor : EditorBase
         AdornmentToEdit.Thickness = new (AdornmentToEdit.Thickness.Left, AdornmentToEdit.Thickness.Top, e.NewValue, AdornmentToEdit.Thickness.Bottom);
     }
 
-    private void Bottom_ValueChanging (object? sender, CancelEventArgs<int> e)
+    private void Bottom_ValueChanging (object? sender, ValueChangingEventArgs<int> e)
     {
         if (e.NewValue < 0 || AdornmentToEdit is null)
         {
-            e.Cancel = true;
+            e.Handled = true;
 
             return;
         }

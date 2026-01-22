@@ -42,7 +42,7 @@ public class ListViewWithSelection : Scenario
 
         _customRenderCb = new CheckBox { X = 0, Y = 0, Text = "Custom _Rendering" };
         _appWindow.Add (_customRenderCb);
-        _customRenderCb.CheckedStateChanging += CustomRenderCB_Toggle;
+        _customRenderCb.ValueChanging += CustomRenderCB_Toggle;
 
         _allowMarkingCb = new CheckBox
         {
@@ -52,17 +52,17 @@ public class ListViewWithSelection : Scenario
             AllowCheckStateNone = false
         };
         _appWindow.Add (_allowMarkingCb);
-        _allowMarkingCb.CheckedStateChanging += AllowsMarkingCB_Toggle;
+        _allowMarkingCb.ValueChanging += AllowsMarkingCB_Toggle;
 
         _allowMultipleCb = new CheckBox
         {
             X = Pos.Right (_allowMarkingCb) + 1,
             Y = 0,
-            Enabled = _allowMarkingCb.CheckedState == CheckState.Checked,
+            Enabled = _allowMarkingCb.Value == CheckState.Checked,
             Text = "AllowsMulti_Select"
         };
         _appWindow.Add (_allowMultipleCb);
-        _allowMultipleCb.CheckedStateChanging += AllowsMultipleSelectionCB_Toggle;
+        _allowMultipleCb.ValueChanging += AllowsMultipleSelectionCB_Toggle;
 
         _keep = new CheckBox
         {
@@ -71,7 +71,7 @@ public class ListViewWithSelection : Scenario
             Text = "Allow_YGreaterThanContentHeight"
         };
         _appWindow.Add (_keep);
-        _keep.CheckedStateChanging += AllowYGreaterThanContentHeightCB_Toggle;
+        _keep.ValueChanging += AllowYGreaterThanContentHeightCB_Toggle;
 
         _listView = new ListView
         {
@@ -103,18 +103,17 @@ public class ListViewWithSelection : Scenario
         _eventListView.SchemeName = "Runnable";
         _appWindow.Add (_eventListView);
 
-        _listView.SelectedItemChanged += (s, a) => LogEvent (s as View, a, "SelectedItemChanged");
-        _listView.OpenSelectedItem += (s, a) => LogEvent (s as View, a, "OpenSelectedItem");
-        _listView.CollectionChanged += (s, a) => LogEvent (s as View, a, "CollectionChanged");
-        _listView.Accepting += (s, a) => LogEvent (s as View, a, "Accept");
-        _listView.Activating += (s, a) => LogEvent (s as View, a, "Activate");
+        _listView.ValueChanged += (s, a) => LogEvent (s as View, $"ValueChanged: {a.OldValue} -> {a.NewValue}");
+        _listView.OpenSelectedItem += (s, a) => LogEvent (s as View, $"OpenSelectedItem: {a}");
+        _listView.CollectionChanged += (s, a) => LogEvent (s as View, $"CollectionChanged: {a}");
+        _listView.Accepting += (s, a) => LogEvent (s as View, $"Accept: {a}");
+        _listView.Activating += (s, a) => LogEvent (s as View, $"Activate: {a}");
         _listView.VerticalScrollBar.AutoShow = true;
         _listView.HorizontalScrollBar.AutoShow = true;
 
-        bool? LogEvent (View sender, EventArgs args, string message)
+        bool? LogEvent (View sender, string message)
         {
-            string msg = $"{message,-7}: {args}";
-            _eventList.Add (msg);
+            _eventList.Add (message);
             _eventListView.MoveDown ();
 
             return null;
@@ -124,9 +123,9 @@ public class ListViewWithSelection : Scenario
         _appWindow.Dispose ();
     }
 
-    private void CustomRenderCB_Toggle (object sender, ResultEventArgs<CheckState> stateEventArgs)
+    private void CustomRenderCB_Toggle (object sender, ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.Result == CheckState.Checked)
+        if (stateEventArgs.NewValue == CheckState.Checked)
         {
             _listView.SetSource (_scenarios);
         }
@@ -138,23 +137,23 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDraw ();
     }
 
-    private void AllowsMarkingCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
+    private void AllowsMarkingCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMarking = stateEventArgs.Result == CheckState.Checked;
+        _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
         _allowMultipleCb.Enabled = _listView.AllowsMarking;
         _appWindow.SetNeedsDraw ();
     }
 
-    private void AllowsMultipleSelectionCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
+    private void AllowsMultipleSelectionCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = stateEventArgs.Result == CheckState.Checked;
+        _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
         _appWindow.SetNeedsDraw ();
     }
 
 
-    private void AllowYGreaterThanContentHeightCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
+    private void AllowYGreaterThanContentHeightCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.Result == CheckState.Checked)
+        if (stateEventArgs.NewValue == CheckState.Checked)
         {
             _listView.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
         }
@@ -196,7 +195,7 @@ public class ListViewWithSelection : Scenario
         private int _count;
         private BitArray _marks;
         private ObservableCollection<Scenario> _scenarios;
-        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) { Scenarios = itemList; }
+        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) => Scenarios = itemList;
 
         public ObservableCollection<Scenario> Scenarios
         {

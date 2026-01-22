@@ -171,14 +171,14 @@ public class SyntaxHighlighting : Scenario
         CheckBox checkBox = new ()
         {
             Title = "_Word Wrap",
-            CheckedState = _textView?.WordWrap == true ? CheckState.Checked : CheckState.UnChecked
+            Value = _textView?.WordWrap == true ? CheckState.Checked : CheckState.UnChecked
         };
 
-        checkBox.CheckedStateChanged += (_, _) =>
+        checkBox.ValueChanged += (_, _) =>
                                         {
                                             if (_textView is not null)
                                             {
-                                                _textView.WordWrap = checkBox.CheckedState == CheckState.Checked;
+                                                _textView.WordWrap = checkBox.Value == CheckState.Checked;
                                             }
                                         };
 

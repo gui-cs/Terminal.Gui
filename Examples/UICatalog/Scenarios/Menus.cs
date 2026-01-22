@@ -231,8 +231,8 @@ public class Menus : Scenario
                 Y = Pos.Bottom (lastAcceptedLabel)
             };
 
-            autoSaveStatusCb.CheckedStateChanged += (_, _) => { autoSaveMenuItemCb!.CheckedState = autoSaveStatusCb.CheckedState; };
-            autoSaveMenuItemCb.CheckedStateChanged += (_, _) => { autoSaveStatusCb!.CheckedState = autoSaveMenuItemCb.CheckedState; };
+            autoSaveStatusCb.ValueChanged += (_, _) => { autoSaveMenuItemCb!.Value = autoSaveStatusCb.Value; };
+            autoSaveMenuItemCb.ValueChanged += (_, _) => { autoSaveStatusCb!.Value = autoSaveMenuItemCb.Value; };
 
             Add (autoSaveStatusCb);
 
@@ -251,11 +251,11 @@ public class Menus : Scenario
             // The source of truth is our status CB; any time it changes, update the menu item
             var enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithTitle ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
 
-            enableOverwriteStatusCb.CheckedStateChanged += (_, _) =>
+            enableOverwriteStatusCb.ValueChanged += (_, _) =>
                                                            {
                                                                if (enableOverwriteMenuItemCb is not null)
                                                                {
-                                                                   enableOverwriteMenuItemCb.CheckedState = enableOverwriteStatusCb.CheckedState;
+                                                                   enableOverwriteMenuItemCb.Value = enableOverwriteStatusCb.Value;
                                                                }
                                                            };
 
@@ -272,7 +272,7 @@ public class Menus : Scenario
                                     args.Handled = true;
 
                                     // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
-                                    enableOverwriteStatusCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
+                                    enableOverwriteStatusCb.Value = ((CheckBox)mi.CommandView).Value;
                                     lastAcceptedText.Text = args.Context?.Source?.Title!;
                                 };
 
@@ -305,11 +305,11 @@ public class Menus : Scenario
             // The source of truth is our status CB; any time it changes, update the menu item
             var editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
 
-            editModeStatusCb.CheckedStateChanged += (_, _) =>
+            editModeStatusCb.ValueChanged += (_, _) =>
                                                     {
                                                         if (editModeMenuItemCb is not null)
                                                         {
-                                                            editModeMenuItemCb.CheckedState = editModeStatusCb.CheckedState;
+                                                            editModeMenuItemCb.Value = editModeStatusCb.Value;
                                                         }
                                                     };
 
@@ -326,7 +326,7 @@ public class Menus : Scenario
                                     args.Handled = true;
 
                                     // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
-                                    editModeMenuItemCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
+                                    editModeMenuItemCb.Value = ((CheckBox)mi.CommandView).Value;
                                     lastAcceptedText.Text = args.Context?.Source?.Title!;
                                 };
 
