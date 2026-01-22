@@ -10,7 +10,7 @@
 |-------|--------|----------|
 | **1** Foundation | ✅ COMPLETE | No |
 | **2** WeakReference | ✅ COMPLETE | YES |
-| **3** Shortcut Propagation | ⏸️ NOT STARTED | No |
+| **3** Shortcut Propagation | ✅ COMPLETE | No |
 | **4** Re-enable Tests | ⏸️ NOT STARTED | No |
 | **5** MenuBar Propagation | ⏸️ DEFERRED | No |
 
@@ -47,7 +47,7 @@
 
 ---
 
-## Phase 3: Enable Shortcut Activate Propagation ⏸️ NOT STARTED
+## Phase 3: Enable Shortcut Activate Propagation ✅ COMPLETE
 
 **Test Sample**: `Examples/ShortcutTest/` - Standalone mini-app for testing Shortcut → Window propagation
 
@@ -57,9 +57,11 @@
 - Button (CommandView) → Shortcut → Window
 
 **Changes**:
-1. Update `RaiseActivating` in `View.Command.cs` to call `PropagateCommand` (same pattern as `RaiseAccepting`)
-2. Enable test: `PropagatedCommands_CanBeCustomized` (ViewCommandTests.cs:702)
-3. Test with ShortcutTest example
+1. ✅ Updated `RaiseActivating` in `View.Command.cs` to call `PropagateCommand`
+2. ✅ Enabled test: `PropagatedCommands_CanBeCustomized` (now passing)
+3. ✅ All 28 ViewCommandTests passing
+
+**Tests**: 13,262 passed, 51 skipped
 
 **Deferred**: MenuBar/Menu/PopoverMenu hierarchy (more complex - Phase 5)
 
