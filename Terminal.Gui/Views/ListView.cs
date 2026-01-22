@@ -261,14 +261,20 @@ public class ListView : View, IDesignable
         {
             field = value;
 
-            if (Source is { } && !field)
+            if (!field)
             {
-                // Clear all selections except selected
-                for (var i = 0; i < Source.Count; i++)
+                // Clear multi-selection tracking
+                MultiSelectedItems.Clear ();
+
+                if (Source is { })
                 {
-                    if (Source.IsMarked (i) && SelectedItem.HasValue && i != SelectedItem.Value)
+                    // Clear all marks except selected (existing behavior)
+                    for (var i = 0; i < Source.Count; i++)
                     {
-                        Source.SetMark (i, false);
+                        if (Source.IsMarked (i) && SelectedItem.HasValue && i != SelectedItem.Value)
+                        {
+                            Source.SetMark (i, false);
+                        }
                     }
                 }
             }
@@ -940,9 +946,29 @@ public class ListView : View, IDesignable
         for (var row = 0; row < f.Height; row++, item++)
         {
             bool isSelected = item == SelectedItem;
+            bool isMultiSelected = MultiSelectedItems.Contains (item);
 
-            Attribute newAttribute = focused ? isSelected ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal) :
-                                     isSelected ? GetAttributeForRole (VisualRole.Active) : GetAttributeForRole (VisualRole.Normal);
+            // Determine visual role based on selection state
+            VisualRole role;
+
+            if (focused && isSelected)
+            {
+                role = VisualRole.Focus; // Focused + SelectedItem (cursor position)
+            }
+            else if (isMultiSelected)
+            {
+                role = VisualRole.Highlight; // In MultiSelectedItems (selection highlight)
+            }
+            else if (isSelected)
+            {
+                role = VisualRole.Active; // SelectedItem without focus
+            }
+            else
+            {
+                role = VisualRole.Normal; // Not selected
+            }
+
+            Attribute newAttribute = GetAttributeForRole (role);
 
             if (newAttribute != current)
             {

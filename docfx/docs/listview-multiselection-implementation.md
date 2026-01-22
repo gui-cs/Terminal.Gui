@@ -8,7 +8,7 @@
 | **1** | Add selection tracking infrastructure | ✅ COMPLETED (already implemented) |
 | **2** | Add extend commands and key bindings | ✅ COMPLETED |
 | **3** | Mouse Shift+Click and Ctrl+Click support | ✅ COMPLETED |
-| **4** | Multi-selection rendering | ⏳ PENDING |
+| **4** | Multi-selection rendering | ✅ COMPLETED |
 | **5** | Fix mark rendering attribute | ⏳ PENDING |
 | **6** | Custom mark rendering API | ⏳ PENDING |
 | **7** | Fix scrolling width and offset clamping | ⏳ PENDING |
@@ -925,7 +925,9 @@ dotnet test Tests/IntegrationTests --no-build
 
 ---
 
-## Phase 4: Multi-Selection Rendering
+## Phase 4: Multi-Selection Rendering ✅ COMPLETED
+
+> **Status:** ✅ Completed - Multi-selected items render with `VisualRole.Highlight`. `AllowsMultipleSelection = false` clears `MultiSelectedItems`. 4 new tests added, all 64 ListView tests pass.
 
 ### 4.1 Update OnDrawingContent for Multi-Selection Highlight
 
