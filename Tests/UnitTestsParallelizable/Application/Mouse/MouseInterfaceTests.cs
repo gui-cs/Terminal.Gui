@@ -342,7 +342,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     #region Mouse Grab Tests
 
     [Fact]
-    public void Mouse_GrabMouse_SetsMouseGrabView ()
+    public void Mouse_GrabMouse_IsGrabbed_ReturnsTrue ()
     {
         // Arrange
         MouseImpl mouse = new ();
@@ -356,7 +356,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Mouse_UngrabMouse_ClearsMouseGrabView ()
+    public void Mouse_UngrabMouse_IsGrabbed_ReturnsFalse ()
     {
         // Arrange
         MouseImpl mouse = new ();

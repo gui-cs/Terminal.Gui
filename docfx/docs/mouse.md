@@ -435,14 +435,14 @@ if (mouse.IsPressed &&
 
 #### 4.3: Mouse Grab Handling
 ```csharp
-if (MouseGrabView is {})
+if (_mouseGrabViewRef?.TryGetTarget(out View? grabbed) is true)
 {
     // Convert to grab view coordinates and send
-    Point viewportLoc = MouseGrabView.ScreenToViewport(mouse.ScreenPosition);
-    MouseGrabView.NewMouseEvent(new Mouse { 
+    Point viewportLoc = grabbed.ScreenToViewport(mouse.ScreenPosition);
+    grabbed.NewMouseEvent(new Mouse { 
         Position = viewportLoc, 
         ScreenPosition = mouse.ScreenPosition,
-        View = MouseGrabView 
+        View = grabbed 
     });
 }
 ```
@@ -495,7 +495,7 @@ if (RaiseMouseEvent(mouse) || mouse.Handled)
 
 **On Pressed:**
 ```csharp
-if (App.Mouse.MouseGrabView != this)
+if (!App.Mouse.IsGrabbed(this))
     App.Mouse.GrabMouse(this);
 if (!HasFocus && CanFocus) SetFocus();
 
@@ -513,7 +513,7 @@ MouseState &= ~MouseState.PressedOutside;
 
 **On Clicked:**
 ```csharp
-if (App.Mouse.MouseGrabView == this)
+if (App.Mouse.IsGrabbed(this))
     App.Mouse.UngrabMouse();
 ```
 
