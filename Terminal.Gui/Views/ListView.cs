@@ -237,6 +237,31 @@ public class ListView : View, IDesignable
     }
 
     /// <summary>
+    ///     Gets all selected item indices, including both <see cref="SelectedItem"/> and all items
+    ///     in <see cref="MultiSelectedItems"/>.
+    /// </summary>
+    /// <returns>An enumerable of selected item indices in ascending order.</returns>
+    public IEnumerable<int> GetAllSelectedItems ()
+    {
+        HashSet<int> all = [.. MultiSelectedItems];
+
+        if (SelectedItem.HasValue)
+        {
+            all.Add (SelectedItem.Value);
+        }
+
+        return all.OrderBy (i => i);
+    }
+
+    /// <summary>
+    ///     Returns <see langword="true"/> if the specified item is selected, either as <see cref="SelectedItem"/>
+    ///     or in <see cref="MultiSelectedItems"/>.
+    /// </summary>
+    /// <param name="item">The item index to check.</param>
+    /// <returns><see langword="true"/> if the item is selected; otherwise <see langword="false"/>.</returns>
+    public bool IsSelected (int item) { return item == SelectedItem || MultiSelectedItems.Contains (item); }
+
+    /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
     ///     user types.
     /// </summary>
@@ -304,6 +329,77 @@ public class ListView : View, IDesignable
 
     /// <summary>Gets the widest item in the list.</summary>
     public int MaxItemLength => Source?.MaxItemLength ?? 0;
+
+    /// <summary>
+    ///     Selects all items when <see cref="AllowsMultipleSelection"/> is <see langword="true"/>.
+    ///     All items are added to <see cref="MultiSelectedItems"/>.
+    /// </summary>
+    public void SelectAll ()
+    {
+        if (!AllowsMultipleSelection || Source is null)
+        {
+            return;
+        }
+
+        MultiSelectedItems.Clear ();
+
+        for (var i = 0; i < Source.Count; i++)
+        {
+            MultiSelectedItems.Add (i);
+        }
+
+        SetNeedsDraw ();
+    }
+
+    /// <summary>
+    ///     Sets the selected item, optionally extending the selection to create a range.
+    /// </summary>
+    /// <param name="item">The item index to select.</param>
+    /// <param name="extendExistingSelection">
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
+    ///     extends the selection from the anchor point to <paramref name="item"/>.
+    /// </param>
+    public void SetSelection (int item, bool extendExistingSelection)
+    {
+        if (Source is null || item < 0 || item >= Source.Count)
+        {
+            return;
+        }
+
+        if (!AllowsMultipleSelection || !extendExistingSelection)
+        {
+            // Clear multi-selection and set new anchor
+            MultiSelectedItems.Clear ();
+            _selectionAnchor = item;
+        }
+        else if (extendExistingSelection && _selectionAnchor.HasValue)
+        {
+            // Create range from anchor to item
+            MultiSelectedItems.Clear ();
+            int start = Math.Min (_selectionAnchor.Value, item);
+            int end = Math.Max (_selectionAnchor.Value, item);
+
+            for (int i = start; i <= end; i++)
+            {
+                MultiSelectedItems.Add (i);
+            }
+
+            // Note: anchor stays at original position
+        }
+
+        SelectedItem = item;
+        EnsureSelectedItemVisible ();
+        SetNeedsDraw ();
+    }
+
+    /// <summary>
+    ///     Clears all multi-selection, keeping only <see cref="SelectedItem"/>.
+    /// </summary>
+    public void UnselectAll ()
+    {
+        MultiSelectedItems.Clear ();
+        SetNeedsDraw ();
+    }
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the next item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
@@ -534,6 +630,13 @@ public class ListView : View, IDesignable
     public event EventHandler<ListViewRowEventArgs>? RowRender;
 
     private int? _lastSelectedItem;
+    private int? _selectionAnchor;
+
+    /// <summary>
+    ///     When <see cref="AllowsMultipleSelection"/> is enabled, contains the indices of all selected items.
+    ///     This is independent of <see cref="AllowsMarking"/> and provides selection tracking without visual marking.
+    /// </summary>
+    public HashSet<int> MultiSelectedItems { get; } = [];
 
     /// <summary>Gets or sets the index of the currently selected item.</summary>
     /// <value>The selected item or null if no item is selected.</value>
@@ -553,6 +656,7 @@ public class ListView : View, IDesignable
             }
 
             field = value;
+            _selectionAnchor = value; // Reset anchor when directly setting SelectedItem
             OnSelectedChanged ();
             SetNeedsDraw ();
         }
