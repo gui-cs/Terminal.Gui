@@ -102,6 +102,13 @@ public class ListWrapper<T> : IListDataSource
     public IList ToList () => _source ?? [];
 
     /// <inheritdoc/>
+    /// <remarks>
+    ///     The default implementation returns <see langword="false"/>, which causes <see cref="ListView"/> to use its
+    ///     built-in mark rendering. Override this method in a derived class to provide custom mark rendering.
+    /// </remarks>
+    public virtual bool RenderMark (ListView listView, int item, int row, bool isMarked, bool allowsMultiple) => false;
+
+    /// <inheritdoc/>
     public void Dispose ()
     {
         if (_source is { })

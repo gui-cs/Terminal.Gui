@@ -996,31 +996,41 @@ public class ListView : View, IDesignable
                     SetAttribute (current);
                 }
 
+                int markWidth = 0;
+
                 if (AllowsMarking)
                 {
-                    // Render marks with Normal attribute for visual clarity
-                    Attribute savedAttr = current;
-                    Attribute normalAttr = GetAttributeForRole (VisualRole.Normal);
+                    // Try custom mark rendering first
+                    bool customRendered = Source.RenderMark (this, item, row, Source.IsMarked (item), AllowsMultipleSelection);
 
-                    if (current != normalAttr)
+                    if (!customRendered)
                     {
-                        SetAttribute (normalAttr);
-                        current = normalAttr;
-                    }
+                        // Default rendering: marks with Normal attribute for visual clarity
+                        Attribute savedAttr = current;
+                        Attribute normalAttr = GetAttributeForRole (VisualRole.Normal);
 
-                    AddRune (Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
-                             AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
-                    AddRune ((Rune)' ');
+                        if (current != normalAttr)
+                        {
+                            SetAttribute (normalAttr);
+                            current = normalAttr;
+                        }
 
-                    // Restore attribute for content rendering
-                    if (current != savedAttr)
-                    {
-                        SetAttribute (savedAttr);
-                        current = savedAttr;
+                        AddRune (Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                 AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
+                        AddRune ((Rune)' ');
+                        markWidth = 2;
+
+                        // Restore attribute for content rendering
+                        if (current != savedAttr)
+                        {
+                            SetAttribute (savedAttr);
+                            current = savedAttr;
+                        }
                     }
                 }
 
-                Source.Render (this, isSelected, item, col, row, f.Width - col, start);
+                int contentCol = col > 0 ? col : markWidth;
+                Source.Render (this, isSelected, item, contentCol, row, f.Width - contentCol, start);
             }
         }
 

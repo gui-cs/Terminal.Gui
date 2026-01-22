@@ -10,7 +10,7 @@
 | **3** | Mouse Shift+Click and Ctrl+Click support | ✅ COMPLETED |
 | **4** | Multi-selection rendering | ✅ COMPLETED |
 | **5** | Fix mark rendering attribute | ✅ COMPLETED |
-| **6** | Custom mark rendering API | ⏳ PENDING |
+| **6** | Custom mark rendering API | ✅ COMPLETED |
 | **7** | Fix scrolling width and offset clamping | ⏳ PENDING |
 
 Each phase is complete when:
@@ -1160,7 +1160,9 @@ dotnet test Tests/IntegrationTests --no-build
 
 ---
 
-## Phase 6: Custom Mark Rendering API
+## Phase 6: Custom Mark Rendering API ✅ COMPLETED
+
+> **Status:** ✅ Completed - Added `RenderMark` method to `IListDataSource` interface with default implementation returning `false`. Added virtual `RenderMark` method to `ListWrapper<T>` to allow subclass overrides. Updated `OnDrawingContent` to call `Source.RenderMark()` before default mark rendering. Added 3 unit tests.
 
 ### 6.1 Add RenderMark to IListDataSource
 

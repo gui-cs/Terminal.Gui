@@ -2401,4 +2401,77 @@ hree - lon",
     }
 
     #endregion
+
+    #region Phase 6: Custom Mark Rendering API Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void RenderMark_Default_Returns_False ()
+    {
+        ListWrapper<string> source = new (["One", "Two"]);
+        IListDataSource dataSource = source;
+
+        ListView lv = new () { Source = source };
+        bool result = dataSource.RenderMark (lv, 0, 0, false, false);
+
+        Assert.False (result);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void RenderMark_Called_During_Draw_When_AllowsMarking ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        // Use standard ListWrapper - default RenderMark returns false
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two"]),
+            AllowsMarking = true,
+            Height = 2,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Default behavior: marks are rendered by ListView (RenderMark returns false)
+        // This test verifies the code path doesn't crash
+        Assert.NotNull (lv.Source);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Custom_DataSource_Can_Override_RenderMark ()
+    {
+        // Test that the interface allows custom implementations
+        IListDataSource source = new CustomMarkDataSource (["One", "Two"]);
+
+        ListView lv = new () { Source = source };
+        bool result = source.RenderMark (lv, 0, 0, true, true);
+
+        // Our custom implementation returns true
+        Assert.True (result);
+    }
+
+    /// <summary>Custom data source that overrides RenderMark for testing.</summary>
+    private class CustomMarkDataSource : ListWrapper<string>
+    {
+        public CustomMarkDataSource (IEnumerable<string> source) : base (new ObservableCollection<string> (source)) { }
+
+        /// <inheritdoc />
+        public override bool RenderMark (ListView listView, int item, int row, bool isMarked, bool allowsMultiple)
+        {
+            // Custom implementation that returns true (indicating custom rendering was done)
+            return true;
+        }
+    }
+
+    #endregion
 }

@@ -103,4 +103,26 @@ public interface IListDataSource : IDisposable
     ///     <see cref="ListView.KeystrokeNavigator"/>.
     /// </remarks>
     IList ToList ();
+
+    /// <summary>Renders the mark indicator for an item. Override to customize mark rendering.</summary>
+    /// <param name="listView">The <see cref="ListView"/> rendering to.</param>
+    /// <param name="item">The zero-based index of the item.</param>
+    /// <param name="row">The row in the viewport where the item is being rendered.</param>
+    /// <param name="isMarked">Whether the item is currently marked.</param>
+    /// <param name="allowsMultiple">Whether multiple selection is enabled.</param>
+    /// <returns>
+    ///     <see langword="true"/> if custom rendering was performed; <see langword="false"/> to use default rendering.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         The default implementation returns <see langword="false"/>, causing <see cref="ListView"/> to use its
+    ///         default mark rendering (checkbox glyphs in columns 0-1).
+    ///     </para>
+    ///     <para>
+    ///         Override and return <see langword="true"/> to provide custom mark glyphs, positioning, or attributes.
+    ///         When this returns <see langword="true"/>, you must render marks yourself (if desired) and
+    ///         <see cref="Render"/> will be called starting at column 0.
+    ///     </para>
+    /// </remarks>
+    bool RenderMark (ListView listView, int item, int row, bool isMarked, bool allowsMultiple) => false;
 }
