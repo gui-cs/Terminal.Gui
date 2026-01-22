@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace DriverTests.AnsiHandling;
 
@@ -29,7 +28,6 @@ public class AnsiInputTestableTests
             }
         }
     }
-
 
     /// <summary>
     ///     Processes the input queue with support for keys that may be held by the ANSI parser (like Esc).
@@ -69,7 +67,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var testableInput = (ITestableInput<char>)ansiInput;
+        ITestableInput<char> testableInput = ansiInput;
 
         // Act
         testableInput.InjectInput ('a');
@@ -110,7 +108,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var testableInput = (ITestableInput<char>)ansiInput;
+        ITestableInput<char> testableInput = ansiInput;
 
         // Act & Assert - Initially false
         Assert.False (ansiInput.Peek ());
@@ -134,7 +132,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var testableInput = (ITestableInput<char>)ansiInput;
+        ITestableInput<char> testableInput = ansiInput;
 
         // Act - Add inputs in specific order
         testableInput.InjectInput ('1');
@@ -154,7 +152,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -182,17 +180,13 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
         processor.SyntheticMouseEvent += (_, m) => receivedMouse.Add (m);
 
-        var mouse = new Mouse
-        {
-            Flags = MouseFlags.LeftButtonPressed,
-            ScreenPosition = new (10, 20)
-        };
+        var mouse = new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (10, 20) };
 
         // Act
         processor.InjectMouseEvent (null, mouse);
@@ -220,17 +214,13 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
         processor.SyntheticMouseEvent += (_, m) => receivedMouse.Add (m);
 
-        var mouse = new Mouse
-        {
-            Flags = MouseFlags.LeftButtonReleased,
-            ScreenPosition = new (10, 20)
-        };
+        var mouse = new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new Point (10, 20) };
 
         // Act
         processor.InjectMouseEvent (null, mouse);
@@ -254,27 +244,21 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
-        processor.SyntheticMouseEvent += (_, m) =>
-        {
-            receivedMouse.Add (m);
-        };
+        processor.SyntheticMouseEvent += (_, m) => { receivedMouse.Add (m); };
 
         // Test Ctrl+Alt (button code 24 for left button)
-        var mouse = new Mouse
-        {
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl | MouseFlags.Alt,
-            ScreenPosition = new (5, 5)
-        };
+        var mouse = new Mouse { Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl | MouseFlags.Alt, ScreenPosition = new Point (5, 5) };
 
         // Act
         processor.InjectMouseEvent (null, mouse);
 
         // Debug: check what's in the queue
         List<char> inputChars = [];
+
         while (ansiInput.Peek ())
         {
             inputChars.AddRange (ansiInput.Read ());
@@ -299,6 +283,7 @@ public class AnsiInputTestableTests
     [Theory]
     [InlineData (MouseFlags.WheeledUp)]
     [InlineData (MouseFlags.WheeledDown)]
+
     // Note: WheeledLeft and WheeledRight (codes 68/69) have complex ANSI encoding with Shift+Ctrl variations
     // These are tested separately in AnsiMouseParserDebugTests
     public void AnsiInputProcessor_InjectMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
@@ -308,17 +293,13 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
         processor.SyntheticMouseEvent += (_, m) => receivedMouse.Add (m);
 
-        var mouse = new Mouse
-        {
-            Flags = wheelFlag,
-            ScreenPosition = new (15, 15)
-        };
+        var mouse = new Mouse { Flags = wheelFlag, ScreenPosition = new Point (15, 15) };
 
         // Act
         processor.InjectMouseEvent (null, mouse);
@@ -334,7 +315,6 @@ public class AnsiInputTestableTests
         Assert.Equal (new Point (15, 15), wheelEvent.ScreenPosition);
     }
 
-
     #region AnsiInput InjectKeyDownEvent Tests
 
     [Fact]
@@ -345,7 +325,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -374,7 +354,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         Key [] keys = [Key.A, Key.B, Key.C, Key.Enter];
@@ -409,7 +389,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
@@ -473,7 +453,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
@@ -508,7 +488,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         var keyDownCount = 0;
@@ -541,21 +521,9 @@ public class AnsiInputTestableTests
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a complete click: press → release
-        processor.InjectMouseEvent (
-                                     null,
-                                     new ()
-                                     {
-                                         Position = new (10, 5),
-                                         Flags = MouseFlags.LeftButtonPressed
-                                     });
+        processor.InjectMouseEvent (null, new Mouse { Position = new Point (10, 5), Flags = MouseFlags.LeftButtonPressed });
 
-        processor.InjectMouseEvent (
-                                     null,
-                                     new ()
-                                     {
-                                         Position = new (10, 5),
-                                         Flags = MouseFlags.LeftButtonReleased
-                                     });
+        processor.InjectMouseEvent (null, new Mouse { Position = new Point (10, 5), Flags = MouseFlags.LeftButtonReleased });
 
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
@@ -563,6 +531,7 @@ public class AnsiInputTestableTests
         // Assert - Process() emits Pressed and Released immediately (clicks are deferred)
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonPressed));
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonReleased));
+
         // We should also see the synthetic Clicked event
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
         Assert.Equal (3, receivedEvents.Count);
@@ -587,13 +556,7 @@ public class AnsiInputTestableTests
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a wheel event
-        processor.InjectMouseEvent (
-                                     null,
-                                     new ()
-                                     {
-                                         Position = new (10, 5),
-                                         Flags = wheelEvent
-                                     });
+        processor.InjectMouseEvent (null, new Mouse { Position = new Point (10, 5), Flags = wheelEvent });
 
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
@@ -606,11 +569,11 @@ public class AnsiInputTestableTests
         if (wheelEvent is MouseFlags.WheeledLeft or MouseFlags.WheeledRight)
         {
             Mouse wheelEventReceived = receivedEvents.First (e => e.Flags.HasFlag (wheelEvent));
+
             Assert.True (wheelEventReceived.Flags.HasFlag (MouseFlags.Shift),
-                        $"Horizontal wheel events should include Shift flag, got: {wheelEventReceived.Flags}");
+                         $"Horizontal wheel events should include Shift flag, got: {wheelEventReceived.Flags}");
         }
     }
 
     #endregion
-
 }

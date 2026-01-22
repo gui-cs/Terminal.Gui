@@ -56,16 +56,11 @@ public class CharacterMap : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window top = new ()
-        {
-            BorderStyle = LineStyle.None
-        };
+        using Window top = new () { BorderStyle = LineStyle.None };
 
-        _charMap = new ()
+        _charMap = new CharMap
         {
-            X = 0,
-            Y = 1,
-            Height = Dim.Fill ()
+            X = 0, Y = 1, Height = Dim.Fill ()
 
             // SchemeName = "Base"
         };
@@ -73,10 +68,7 @@ public class CharacterMap : Scenario
 
         var jumpLabel = new Label
         {
-            X = Pos.Right (_charMap) + 1,
-            Y = Pos.Y (_charMap),
-            HotKeySpecifier = (Rune)'_',
-            Text = "_Jump To:"
+            X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap), HotKeySpecifier = (Rune)'_', Text = "_Jump To:"
 
             //SchemeName = "Dialog"
         };
@@ -84,28 +76,25 @@ public class CharacterMap : Scenario
 
         var jumpEdit = new TextField
         {
-            X = Pos.Right (jumpLabel) + 1,
-            Y = Pos.Y (_charMap),
-            Width = 17,
-            Title = "e.g. 01BE3 or ✈"
+            X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 17, Title = "e.g. 01BE3 or ✈"
 
             //SchemeName = "Dialog"
         };
         top.Add (jumpEdit);
 
-        _charMap.SelectedCodePointChanged += (_, args) =>
+        _charMap.ValueChanged += (_, args) =>
                                              {
-                                                 if (Rune.IsValid (args.Value))
+                                                 if (Rune.IsValid (args.NewValue.Value))
                                                  {
-                                                     jumpEdit.Text = ((Rune)args.Value).ToString ();
+                                                     jumpEdit.Text = args.NewValue.ToString ();
                                                  }
                                                  else
                                                  {
-                                                     jumpEdit.Text = $"U+{args.Value:x5}";
+                                                     jumpEdit.Text = $"U+{args.NewValue.Value:x5}";
                                                  }
                                              };
 
-        _errorLabel = new ()
+        _errorLabel = new Label
         {
             X = Pos.Right (jumpEdit) + 1,
             Y = Pos.Y (_charMap),
@@ -117,11 +106,9 @@ public class CharacterMap : Scenario
 
         jumpEdit.Accepting += JumpEditOnAccept;
 
-        _categoryList = new ()
+        _categoryList = new TableView
         {
-            X = Pos.Right (_charMap),
-            Y = Pos.Bottom (jumpLabel),
-            Height = Dim.Fill ()
+            X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill ()
 
             //SchemeName = "Dialog"
         };
@@ -137,41 +124,38 @@ public class CharacterMap : Scenario
 
         // if user clicks the mouse in TableView
         _categoryList.Activating += (_, e) =>
-                                   {
-                                       // Only handle mouse clicks
-                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
-                                       {
-                                           return;
-                                       }
+                                    {
+                                        // Only handle mouse clicks
+                                        if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
+                                        {
+                                            return;
+                                        }
 
-                                       _categoryList.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
+                                        _categoryList.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                       if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
-                                       {
-                                           EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                                           string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
-                                           isDescending = !isDescending;
+                                        if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                        {
+                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                                            isDescending = !isDescending;
 
-                                           _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+                                            _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
-                                           table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                            table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
 
-                                           _categoryList.SelectedRow = table.Data
-                                                                            .Select ((item, index) => new { item, index })
-                                                                            .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                                            ?.index
-                                                                       ?? -1;
-                                       }
-                                   };
+                                            _categoryList.SelectedRow =
+                                                table.Data.Select ((item, index) => new { item, index })
+                                                     .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                     ?.index
+                                                ?? -1;
+                                        }
+                                    };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 
-        _categoryList.Style.ColumnStyles.Add (
-                                              0,
-                                              new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
-                                             );
-        _categoryList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1, MinWidth = 6 });
-        _categoryList.Style.ColumnStyles.Add (2, new () { MaxWidth = 1, MinWidth = 6 });
+        _categoryList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
+        _categoryList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
+        _categoryList.Style.ColumnStyles.Add (2, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
 
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
@@ -188,21 +172,9 @@ public class CharacterMap : Scenario
         {
             Menus =
             [
-                new (
-                     Strings.menuFile,
-                     new MenuItem []
-                     {
-                         new (
-                              Strings.cmdQuit,
-                              $"{Application.QuitKey}",
-                              () => _charMap?.App?.RequestStop ()
-                             )
-                     }
-                    ),
-                new (
-                     "_Options",
-                     [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()]
-                    )
+                new MenuBarItem (Strings.menuFile,
+                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.QuitKey}", () => _charMap?.App?.RequestStop ()) }),
+                new MenuBarItem ("_Options", [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()])
             ]
         };
         top.Add (menu);
@@ -282,8 +254,7 @@ public class CharacterMap : Scenario
 
             EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList!.Table;
 
-            _categoryList.SelectedRow = table.Data
-                                             .Select ((item, index) => new { item, index })
+            _categoryList.SelectedRow = table.Data.Select ((item, index) => new { item, index })
                                              .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
                                              ?.index
                                         ?? -1;
@@ -314,33 +285,32 @@ public class CharacterMap : Scenario
                 categorySort = sortIndicator;
 
                 break;
+
             case 1:
                 orderBy = r => r.Start;
                 startSort = sortIndicator;
 
                 break;
+
             case 2:
                 orderBy = r => r.End;
                 endSort = sortIndicator;
 
                 break;
+
             default:
                 throw new ArgumentException ("Invalid column number.");
         }
 
-        IOrderedEnumerable<UnicodeRange> sortedRanges = descending
-                                                            ? UnicodeRange.Ranges.OrderByDescending (orderBy)
-                                                            : UnicodeRange.Ranges.OrderBy (orderBy);
+        IOrderedEnumerable<UnicodeRange> sortedRanges = descending ? UnicodeRange.Ranges.OrderByDescending (orderBy) : UnicodeRange.Ranges.OrderBy (orderBy);
 
-        return new (
-                    sortedRanges,
-                    new ()
-                    {
-                        { $"Category{categorySort}", s => s.Category },
-                        { $"Start{startSort}", s => $"{s.Start:x5}" },
-                        { $"End{endSort}", s => $"{s.End:x5}" }
-                    }
-                   );
+        return new EnumerableTableSource<UnicodeRange> (sortedRanges,
+                                                        new Dictionary<string, Func<UnicodeRange, object>>
+                                                        {
+                                                            { $"Category{categorySort}", s => s.Category },
+                                                            { $"Start{startSort}", s => $"{s.Start:x5}" },
+                                                            { $"End{endSort}", s => $"{s.End:x5}" }
+                                                        });
     }
 
     private MenuItem CreateMenuShowWidth ()
@@ -348,15 +318,15 @@ public class CharacterMap : Scenario
         CheckBox cb = new ()
         {
             Title = "_Show Glyph Width",
-            CheckedState = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
+            Value = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
         };
         var item = new MenuItem { CommandView = cb };
 
         item.Action += () =>
                        {
-                           if (_charMap is not null)
+                           if (_charMap is { })
                            {
-                               _charMap.ShowGlyphWidths = cb.CheckedState == CheckState.Checked;
+                               _charMap.ShowGlyphWidths = cb.Value == CheckState.Checked;
                            }
                        };
 
@@ -381,6 +351,6 @@ public class CharacterMap : Scenario
 
         selector.ValueChanged += (_, e) => _charMap.ShowUnicodeCategory = e.Value;
 
-        return new () { CommandView = selector };
+        return new MenuItem { CommandView = selector };
     }
 }

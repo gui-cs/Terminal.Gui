@@ -14,11 +14,12 @@ namespace Terminal.Gui.Drivers;
 ///         This processor integrates with Terminal.Gui's ANSI infrastructure:
 ///         <list type="bullet">
 ///             <item>
-///                 <see cref="AnsiResponseParser{TInputRecord}"/> - Automatically parses ANSI escape sequences
+///                 <see cref="AnsiResponseParser"/> - Automatically parses ANSI escape sequences
 ///                 from the input stream, extracting keyboard events, mouse events, and terminal responses.
 ///             </item>
 ///             <item>
-///                 <see cref="AnsiRequestScheduler"/> - Manages outgoing ANSI requests (via <see cref="IDriver.QueueAnsiRequest"/>)
+///                 <see cref="AnsiRequestScheduler"/> - Manages outgoing ANSI requests (via
+///                 <see cref="IDriver.QueueAnsiRequest"/>)
 ///                 and matches responses from the parser.
 ///             </item>
 ///             <item>
@@ -41,10 +42,10 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
     /// <inheritdoc/>
     /// <param name="inputBuffer">The input buffer to process.</param>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    public AnsiInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null)
-        : base (inputBuffer, new AnsiKeyConverter (), timeProvider)
-    {
-    }
+    public AnsiInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null) : base (inputBuffer,
+                                                                                                              new AnsiKeyConverter (),
+                                                                                                              timeProvider)
+    { }
 
     /// <inheritdoc/>
     protected override void Process (char input)
@@ -55,7 +56,7 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void InjectKeyDownEvent (Key key)
     {
         // Convert Key → ANSI sequence (if needed) or char
@@ -73,10 +74,11 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void InjectMouseEvent (IApplication? app, Mouse mouse)
     {
         base.InjectMouseEvent (app, mouse);
+
         // Convert Mouse to ANSI SGR format escape sequence
         string ansiSequence = AnsiMouseEncoder.Encode (mouse);
 

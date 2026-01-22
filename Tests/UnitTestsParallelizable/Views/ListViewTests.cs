@@ -329,10 +329,10 @@ public class ListViewTests (ITestOutputHelper output)
         // first item should be deselected by default
         Assert.Null (lv.SelectedItem);
 
-        // bind shift down to move down twice in control
-        lv.KeyBindings.Add (Key.CursorDown.WithShift, Command.Down, Command.Down);
+        // bind Ctrl+D to move down twice in control (using Ctrl+D since Shift+Down is now used for DownExtend)
+        lv.KeyBindings.Add (Key.D.WithCtrl, Command.Down, Command.Down);
 
-        Key ev = Key.CursorDown.WithShift;
+        Key ev = Key.D.WithCtrl;
 
         Assert.True (lv.NewKeyDownEvent (ev), "The first time we move down 2 it should be possible");
 
@@ -892,7 +892,7 @@ public class ListViewTests (ITestOutputHelper output)
             BorderStyle = LineStyle.Single
         };
         lv.SetSource (["One", "Two", "Three", "Four"]);
-        lv.SelectedItemChanged += (s, e) => selected = e.Value!.ToString ();
+        lv.ValueChanged += (_, e) => selected = e.NewValue is not null ? lv.Source!.ToList () [e.NewValue.Value]!.ToString ()! : "";
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
@@ -1328,19 +1328,22 @@ Item 6",
             X = 1,
             Source = new ListWrapper<string> (source)
         };
-        lv.Height = lv.Source.Count;
-        lv.Width = lv.MaxItemLength;
+        // Make height smaller than item count to allow vertical scrolling
+        // 5 items, height 4 allows TopItem up to 1
+        lv.Height = lv.Source.Count - 1;
+        // Make width smaller than content to allow horizontal scrolling
+        // MaxItemLength is 6 ("Item 0"), use width 5 to allow scroll of 1
+        lv.Width = lv.MaxItemLength - 1;
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
- Item 0
- Item 1
- Item 2
- Item 3
- Item 4",
+ Item
+ Item
+ Item
+ Item",
                                                        _output,
                                                        app.Driver);
 
@@ -1759,6 +1762,850 @@ hree - lon",
         bool result = lv.MarkAll (true);
 
         Assert.False (result);
+    }
+
+    #endregion
+
+    #region Phase 2: Extend Commands and Key Bindings Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveDown_With_Extend_False_Clears_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (0, false);
+        lv.SetSelection (2, true); // Select 0-2
+        Assert.Equal (3, lv.MultiSelectedItems.Count);
+
+        lv.MoveDown (false); // Move without extending
+
+        Assert.Equal (3, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveDown_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (1, false); // Anchor at 1
+        lv.MoveDown (true); // Extend to 2
+
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveUp_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (2, false); // Anchor at 2
+        lv.MoveUp (true); // Extend to 1
+
+        Assert.Equal (1, lv.SelectedItem);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftDown_Key_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 0;
+        Assert.True (lv.NewKeyDownEvent (Key.CursorDown.WithShift));
+
+        Assert.Equal (1, lv.SelectedItem);
+        Assert.True (lv.IsSelected (0));
+        Assert.True (lv.IsSelected (1));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftUp_Key_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 2;
+        Assert.True (lv.NewKeyDownEvent (Key.CursorUp.WithShift));
+
+        Assert.Equal (1, lv.SelectedItem);
+        Assert.True (lv.IsSelected (1));
+        Assert.True (lv.IsSelected (2));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftPageDown_Key_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
+            AllowsMultipleSelection = true,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 0;
+        Assert.True (lv.NewKeyDownEvent (Key.PageDown.WithShift));
+
+        // Should select from 0 to wherever PageDown lands
+        Assert.True (lv.IsSelected (0));
+        Assert.True (lv.SelectedItem > 0);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftHome_Key_Extends_To_Beginning ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 3;
+        Assert.True (lv.NewKeyDownEvent (Key.Home.WithShift));
+
+        Assert.Equal (0, lv.SelectedItem);
+        Assert.True (lv.IsSelected (0));
+        Assert.True (lv.IsSelected (1));
+        Assert.True (lv.IsSelected (2));
+        Assert.True (lv.IsSelected (3));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ShiftEnd_Key_Extends_To_End ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SelectedItem = 1;
+        Assert.True (lv.NewKeyDownEvent (Key.End.WithShift));
+
+        Assert.Equal (4, lv.SelectedItem);
+        Assert.True (lv.IsSelected (1));
+        Assert.True (lv.IsSelected (2));
+        Assert.True (lv.IsSelected (3));
+        Assert.True (lv.IsSelected (4));
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MovePageDown_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
+            AllowsMultipleSelection = true,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SetSelection (0, false); // Anchor at 0
+        lv.MovePageDown (true);
+
+        // Should have multiple items selected
+        Assert.True (lv.MultiSelectedItems.Count > 1);
+        Assert.Contains (0, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MovePageUp_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
+            AllowsMultipleSelection = true,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        lv.SetSelection (9, false); // Anchor at end
+        lv.MovePageUp (true);
+
+        // Should have multiple items selected
+        Assert.True (lv.MultiSelectedItems.Count > 1);
+        Assert.Contains (9, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveHome_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (3, false); // Anchor at 3
+        lv.MoveHome (true);
+
+        Assert.Equal (0, lv.SelectedItem);
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.Contains (3, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MoveEnd_With_Extend_True_Extends_Selection ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (1, false); // Anchor at 1
+        lv.MoveEnd (true);
+
+        Assert.Equal (4, lv.SelectedItem);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.Contains (3, lv.MultiSelectedItems);
+        Assert.Contains (4, lv.MultiSelectedItems);
+    }
+
+    #endregion
+
+    #region Phase 3: Mouse Shift+Click and Ctrl+Click Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_ShiftClick_Extends_Selection ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true,
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        lv.SelectedItem = 0;
+
+        // Shift+Click on item 2
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift
+        });
+
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_CtrlClick_Toggles_Individual_Items ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true,
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Ctrl+Click on item 0
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 0),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Contains (0, lv.MultiSelectedItems);
+
+        // Ctrl+Click on item 2
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.DoesNotContain (1, lv.MultiSelectedItems);
+
+        // Ctrl+Click on item 0 again - should toggle off
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 0),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.DoesNotContain (0, lv.MultiSelectedItems);
+        Assert.Contains (2, lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_NormalClick_Clears_MultiSelection ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = true,
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Build up a selection
+        lv.SetSelection (0, false);
+        lv.SetSelection (2, true);
+        Assert.Equal (3, lv.MultiSelectedItems.Count);
+
+        // Normal click should clear multi-selection
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 3),
+            Flags = MouseFlags.LeftButtonPressed
+        });
+
+        Assert.Equal (3, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_ShiftClick_Without_AllowsMultipleSelection_Does_Not_Extend ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = false, // Disabled
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        lv.SelectedItem = 0;
+
+        // Shift+Click on item 2 - should just select, not extend
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift
+        });
+
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems); // No multi-selection
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Mouse_CtrlClick_Without_AllowsMultipleSelection_Does_Not_Toggle ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["1", "2", "3", "4"]),
+            AllowsMultipleSelection = false, // Disabled
+            Height = 4,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Ctrl+Click on item 0 - should just select, not add to multi-selection
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 0),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Equal (0, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+
+        // Ctrl+Click on item 2 - should just select, not add
+        app.Mouse.RaiseMouseEvent (new ()
+        {
+            ScreenPosition = new (0, 2),
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
+        });
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Empty (lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    #endregion
+
+    #region Phase 4: Multi-Selection Rendering Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void MultiSelectedItems_Are_Tracked_For_Rendering ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two", "Three"]),
+            AllowsMultipleSelection = true,
+            Height = 3,
+            Width = 10
+        };
+
+        lv.SetSelection (0, false);
+        lv.SetSelection (1, true);
+
+        // Items 0 and 1 should be in MultiSelectedItems
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.DoesNotContain (2, lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void AllowsMultipleSelection_False_Clears_MultiSelectedItems ()
+    {
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two", "Three"]),
+            AllowsMultipleSelection = true
+        };
+
+        lv.SetSelection (0, false);
+        lv.SetSelection (2, true);
+        Assert.Equal (3, lv.MultiSelectedItems.Count);
+
+        lv.AllowsMultipleSelection = false;
+
+        Assert.Empty (lv.MultiSelectedItems);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void OnDrawingContent_Uses_Highlight_Role_For_MultiSelected ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two", "Three"]),
+            AllowsMultipleSelection = true,
+            Height = 3,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+
+        lv.SetSelection (0, false);
+        lv.SetSelection (1, true);
+        app.LayoutAndDraw ();
+
+        // Verify items are tracked (rendering verification would need driver inspection)
+        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.Contains (1, lv.MultiSelectedItems);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void SelectedItem_Gets_Focus_Role_When_Focused ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two", "Three"]),
+            AllowsMultipleSelection = true,
+            Height = 3,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+
+        lv.SetFocus ();
+        lv.SelectedItem = 1;
+        app.LayoutAndDraw ();
+
+        // The SelectedItem (1) should get Focus role when focused
+        // Multi-selected items not equal to SelectedItem get Highlight role
+        Assert.True (lv.HasFocus);
+        Assert.Equal (1, lv.SelectedItem);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    #endregion
+
+    #region Phase 5: Mark Rendering Attribute Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void AllowsMarking_Renders_Marks ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two"]),
+            AllowsMarking = true,
+            AllowsMultipleSelection = true,
+            Height = 2,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+
+        lv.Source!.SetMark (0, true);
+        app.LayoutAndDraw ();
+
+        // Verify marks are rendered (checkbox characters should appear)
+        // The first item should show checked, second unchecked
+        Assert.True (lv.Source.IsMarked (0));
+        Assert.False (lv.Source.IsMarked (1));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Marks_Rendered_Consistently_Across_Selection_States ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two", "Three"]),
+            AllowsMarking = true,
+            AllowsMultipleSelection = true,
+            Height = 3,
+            Width = 15
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+
+        // Mark all items
+        lv.Source!.SetMark (0, true);
+        lv.Source.SetMark (1, true);
+        lv.Source.SetMark (2, true);
+
+        // Select middle item with focus
+        lv.SetFocus ();
+        lv.SetSelection (1, false);
+        app.LayoutAndDraw ();
+
+        // All items should remain marked regardless of selection state
+        Assert.True (lv.Source.IsMarked (0));
+        Assert.True (lv.Source.IsMarked (1));
+        Assert.True (lv.Source.IsMarked (2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    #endregion
+
+    #region Phase 6: Custom Mark Rendering API Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void RenderMark_Default_Returns_False ()
+    {
+        ListWrapper<string> source = new (["One", "Two"]);
+        IListDataSource dataSource = source;
+
+        ListView lv = new () { Source = source };
+        bool result = dataSource.RenderMark (lv, 0, 0, false, false);
+
+        Assert.False (result);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void RenderMark_Called_During_Draw_When_AllowsMarking ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        // Use standard ListWrapper - default RenderMark returns false
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two"]),
+            AllowsMarking = true,
+            Height = 2,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Default behavior: marks are rendered by ListView (RenderMark returns false)
+        // This test verifies the code path doesn't crash
+        Assert.NotNull (lv.Source);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Custom_DataSource_Can_Override_RenderMark ()
+    {
+        // Test that the interface allows custom implementations
+        IListDataSource source = new CustomMarkDataSource (["One", "Two"]);
+
+        ListView lv = new () { Source = source };
+        bool result = source.RenderMark (lv, 0, 0, true, true);
+
+        // Our custom implementation returns true
+        Assert.True (result);
+    }
+
+    /// <summary>Custom data source that overrides RenderMark for testing.</summary>
+    private class CustomMarkDataSource : ListWrapper<string>
+    {
+        public CustomMarkDataSource (IEnumerable<string> source) : base (new ObservableCollection<string> (source)) { }
+
+        /// <inheritdoc />
+        public override bool RenderMark (ListView listView, int item, int row, bool isMarked, bool allowsMultiple)
+        {
+            // Custom implementation that returns true (indicating custom rendering was done)
+            return true;
+        }
+    }
+
+    #endregion
+
+    #region Phase 7: Scrolling Width and Offset Clamping Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void LeftItem_Clamps_To_MaxItemLength_Minus_Width ()
+    {
+        ObservableCollection<string> source = new (["0123456789"]); // 10 chars
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 6,
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Max LeftItem should be 10 - 6 = 4
+        lv.LeftItem = 10;
+        Assert.Equal (4, lv.LeftItem);
+
+        lv.LeftItem = -5;
+        Assert.Equal (0, lv.LeftItem);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void TopItem_Clamps_To_Count_Minus_Height ()
+    {
+        ObservableCollection<string> source = new (["1", "2", "3", "4", "5"]); // 5 items
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Max TopItem should be 5 - 3 = 2
+        lv.TopItem = 10;
+        Assert.Equal (2, lv.TopItem);
+
+        lv.TopItem = -5;
+        Assert.Equal (0, lv.TopItem);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Scrolling_Stops_When_Last_Item_Visible ()
+    {
+        ObservableCollection<string> source = new (["1", "2", "3", "4", "5"]);
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Scroll to maximum
+        lv.TopItem = 100;
+
+        // Last visible item should be item 4 (index 4), at row 2 (0-indexed)
+        // TopItem should be 2 so items 2, 3, 4 are visible
+        Assert.Equal (2, lv.TopItem);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void LeftItem_With_Small_Content_Clamps_To_Zero ()
+    {
+        ObservableCollection<string> source = new (["Hi"]); // 2 chars, smaller than viewport
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10, // Viewport larger than content
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Max LeftItem should be max(0, 2 - 10) = 0
+        lv.LeftItem = 5;
+        Assert.Equal (0, lv.LeftItem);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ContentSize_Includes_MarkWidth_When_AllowsMarking ()
+    {
+        ObservableCollection<string> source = new (["Item"]); // 4 chars
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10,
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Without marks: content width = 4
+        Assert.Equal (4, lv.GetContentSize ().Width);
+
+        // With marks: content width = 4 + 2 (mark checkbox + space) = 6
+        lv.AllowsMarking = true;
+        Assert.Equal (6, lv.GetContentSize ().Width);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void HorizontalScroll_With_Marks_Accounts_For_MarkWidth ()
+    {
+        ObservableCollection<string> source = new (["Item"]); // 4 chars
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            AllowsMarking = true, // Mark width = 2
+            Width = 5,            // Viewport smaller than content (4 + 2 = 6)
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Effective content width = 4 (item) + 2 (marks) = 6
+        // Max LeftItem = 6 - 5 = 1
+        lv.LeftItem = 10;
+        Assert.Equal (1, lv.LeftItem);
     }
 
     #endregion

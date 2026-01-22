@@ -82,7 +82,7 @@ public class LinearRanges : Scenario
             Y = Pos.Bottom (optionsSlider)
         };
 
-        dimAutoUsesMin.CheckedStateChanging += (_, _) =>
+        dimAutoUsesMin.ValueChanging += (_, _) =>
                                                {
                                                    foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
                                                    {
@@ -155,7 +155,7 @@ public class LinearRanges : Scenario
                                             {
                                                 if (e.NewValue < 0)
                                                 {
-                                                    e.Cancel = true;
+                                                    e.Handled = true;
 
                                                     return;
                                                 }

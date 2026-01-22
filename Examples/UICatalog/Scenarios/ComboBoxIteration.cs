@@ -42,11 +42,11 @@ public class ComboBoxIteration : Scenario
         };
         comboBox.SetSource (items);
 
-        listview.SelectedItemChanged += (_, e) =>
-                                        {
-                                            lbListView.Text = items [e.Item!.Value];
-                                            comboBox.SelectedItem = e.Item.Value;
-                                        };
+        listview.ValueChanged += (_, e) =>
+                                 {
+                                     lbListView.Text = items [e.NewValue!.Value];
+                                     comboBox.SelectedItem = e.NewValue.Value;
+                                 };
 
         comboBox.SelectedItemChanged += (_, text) =>
                                         {

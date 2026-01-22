@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -9,7 +8,7 @@ namespace Terminal.Gui.Views;
 ///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items
 ///     using <see cref="object.ToString()"/>.
 /// </summary>
-public class ListWrapper<T> : IListDataSource, IDisposable
+public class ListWrapper<T> : IListDataSource
 {
     /// <summary>
     ///     Creates a new instance of <see cref="ListWrapper{T}"/> that wraps the specified
@@ -18,21 +17,20 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     /// <param name="source"></param>
     public ListWrapper (ObservableCollection<T>? source)
     {
-        if (source is { })
+        if (source is null)
         {
-            _count = source.Count;
-            _marks = new (_count);
-            _source = source;
-            _source.CollectionChanged += Source_CollectionChanged;
-            MaxItemLength = GetMaxLengthItem ();
+            return;
         }
+        _count = source.Count;
+        _marks = new BitArray (_count);
+        _source = source;
+        _source.CollectionChanged += Source_CollectionChanged;
+        MaxItemLength = GetMaxLengthItem ();
     }
 
     private readonly ObservableCollection<T>? _source;
     private int _count;
     private BitArray? _marks;
-
-    private bool _suspendCollectionChangedEvent;
 
     /// <inheritdoc/>
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
@@ -46,12 +44,12 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     /// <inheritdoc/>
     public bool SuspendCollectionChangedEvent
     {
-        get => _suspendCollectionChangedEvent;
+        get;
         set
         {
-            _suspendCollectionChangedEvent = value;
+            field = value;
 
-            if (!_suspendCollectionChangedEvent)
+            if (!field)
             {
                 CheckAndResizeMarksIfRequired ();
             }
@@ -59,15 +57,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     }
 
     /// <inheritdoc/>
-    public void Render (
-        ListView container,
-        bool marked,
-        int item,
-        int col,
-        int line,
-        int width,
-        int viewportX = 0
-    )
+    public void Render (ListView container, bool marked, int item, int col, int line, int width, int viewportX = 0)
     {
         container.Move (Math.Max (col - viewportX, 0), line);
 
@@ -78,20 +68,13 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
         object? t = _source [item];
 
-        if (t is null)
+        switch (t)
         {
-            RenderString (container, "", col, line, width);
-        }
-        else
-        {
-            if (t is string s)
-            {
-                RenderString (container, s, col, line, width, viewportX);
-            }
-            else
-            {
-                RenderString (container, t.ToString ()!, col, line, width, viewportX);
-            }
+            case null: RenderString (container, "", width); break;
+
+            case string s: RenderString (container, s, width, viewportX); break;
+
+            default: RenderString (container, t.ToString ()!, width, viewportX); break;
         }
     }
 
@@ -116,7 +99,14 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     }
 
     /// <inheritdoc/>
-    public IList ToList () { return _source ?? []; }
+    public IList ToList () => _source ?? [];
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     The default implementation returns <see langword="false"/>, which causes <see cref="ListView"/> to use its
+    ///     built-in mark rendering. Override this method in a derived class to provide custom mark rendering.
+    /// </remarks>
+    public virtual bool RenderMark (ListView listView, int item, int row, bool isMarked, bool allowsMultiple) => false;
 
     /// <inheritdoc/>
     public void Dispose ()
@@ -128,7 +118,8 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     }
 
     /// <summary>
-    ///     INTERNAL: Searches the underlying collection for the first string element that starts with the specified search value,
+    ///     INTERNAL: Searches the underlying collection for the first string element that starts with the specified search
+    ///     value,
     ///     using a case-insensitive comparison.
     /// </summary>
     /// <remarks>
@@ -156,7 +147,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
             if (t is string u)
             {
-                if (u.ToUpper ().StartsWith (search.ToUpperInvariant ()))
+                if (u.ToUpper ().StartsWith (search.ToUpperInvariant (), StringComparison.Ordinal))
                 {
                     return i;
                 }
@@ -172,20 +163,21 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
     private void CheckAndResizeMarksIfRequired ()
     {
-        if (_source != null && _count != _source.Count && _marks is { })
+        if (_source == null || _count == _source.Count || _marks is null)
         {
-            _count = _source.Count;
-            var newMarks = new BitArray (_count);
-
-            for (var i = 0; i < Math.Min (_marks.Length, newMarks.Length); i++)
-            {
-                newMarks [i] = _marks [i];
-            }
-
-            _marks = newMarks;
-
-            MaxItemLength = GetMaxLengthItem ();
+            return;
         }
+        _count = _source.Count;
+        var newMarks = new BitArray (_count);
+
+        for (var i = 0; i < Math.Min (_marks.Length, newMarks.Length); i++)
+        {
+            newMarks [i] = _marks [i];
+        }
+
+        _marks = newMarks;
+
+        MaxItemLength = GetMaxLengthItem ();
     }
 
     private int GetMaxLengthItem ()
@@ -206,9 +198,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
                 continue;
             }
 
-            int l;
-
-            l = t is string u ? u.GetColumns () : t.ToString ()!.Length;
+            int l = t is string u ? u.GetColumns () : t.ToString ()!.Length;
 
             if (l > maxLength)
             {
@@ -219,7 +209,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
         return maxLength;
     }
 
-    private static void RenderString (View driver, string str, int col, int line, int width, int viewportX = 0)
+    private static void RenderString (View driver, string str, int width, int viewportX = 0)
     {
         if (string.IsNullOrEmpty (str) || viewportX >= str.GetColumns ())
         {
@@ -234,7 +224,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
         int runeLength = str.ToRunes ().Length;
         int startIndex = Math.Min (viewportX, Math.Max (0, runeLength - 1));
-        string substring = str.Substring (startIndex);
+        string substring = str [startIndex..];
         string u = TextFormatter.ClipAndJustify (substring, width, Alignment.Start);
         driver.AddStr (u);
         width -= u.GetColumns ();
@@ -247,10 +237,11 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
     private void Source_CollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (!SuspendCollectionChangedEvent)
+        if (SuspendCollectionChangedEvent)
         {
-            CheckAndResizeMarksIfRequired ();
-            CollectionChanged?.Invoke (sender, e);
+            return;
         }
+        CheckAndResizeMarksIfRequired ();
+        CollectionChanged?.Invoke (sender, e);
     }
 }

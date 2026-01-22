@@ -57,21 +57,21 @@ public class AllViewsTester : Scenario
         };
         _classListView.Border!.Thickness = new Thickness (1);
 
-        _classListView.SelectedItemChanged += (_, _) =>
-                                              {
-                                                  // Dispose existing current View, if any
-                                                  DisposeCurrentView ();
+        _classListView.ValueChanged += (_, _) =>
+                                       {
+                                           // Dispose existing current View, if any
+                                           DisposeCurrentView ();
 
-                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem.Value]);
+                                           CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem!.Value]);
 
-                                                  // Force ViewToEdit to be the view and not a subview
-                                                  if (_adornmentsEditor is { })
-                                                  {
-                                                      _adornmentsEditor.AutoSelectSuperView = _curView;
+                                           // Force ViewToEdit to be the view and not a subview
+                                           if (_adornmentsEditor is not null)
+                                           {
+                                               _adornmentsEditor.AutoSelectSuperView = _curView;
 
-                                                      _adornmentsEditor.ViewToEdit = _curView;
-                                                  }
-                                              };
+                                               _adornmentsEditor.ViewToEdit = _curView;
+                                           }
+                                       };
 
         _classListView.Accepting += (_, args) =>
                                     {
