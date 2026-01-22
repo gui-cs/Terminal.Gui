@@ -418,7 +418,7 @@ public class ViewCommandTests
     }
 
     // Claude - Sonnet 4.5
-    [Fact (Skip = "Phase 3: Requires RaiseActivating to use PropagateCommand helper")]
+    [Fact]
     public void PropagatedCommands_CanBeCustomized ()
     {
         View superView = new () { PropagatedCommands = [Command.Accept, Command.Activate] };

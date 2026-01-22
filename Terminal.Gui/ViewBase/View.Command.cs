@@ -429,7 +429,8 @@ public partial class View // Command APIs
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         Activating?.Invoke (this, args);
 
-        return Activating is null ? null : args.Handled;
+        // Use PropagateCommand helper to handle Activate propagation (opt-in via PropagatedCommands)
+        return PropagateCommand (Command.Activate, ctx, args.Handled);
     }
 
     /// <summary>
