@@ -121,7 +121,7 @@ public class ApplicationMouseTests
 
     [Fact (Skip = "Rebuild to use ScrollBar")]
     [AutoInitShutdown]
-    public void MouseGrabView_WithNullMouseEventView ()
+    public void IsGrabbed_WithNullMouseEventView ()
     {
         //var tf = new TextField { Width = 10 };
         //var sv = new ScrollView { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -140,39 +140,39 @@ public class ApplicationMouseTests
         //                             if (iterations == 0)
         //                             {
         //                                 Assert.True (tf.HasFocus);
-        //                                 Assert.Null (Application.Mouse.MouseGrabView);
+        //                                 Assert.False (Application.Mouse.IsGrabbed (anyView));
 
         //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.PositionReport });
 
-        //                                 Assert.Equal (sv, Application.Mouse.MouseGrabView);
+        //                                 Assert.True (Application.Mouse.IsGrabbed (sv));
 
         //                                 MessageBox.Query (App, "Title", "Test", "Ok");
 
-        //                                 Assert.Null (Application.Mouse.MouseGrabView);
+        //                                 Assert.False (Application.Mouse.IsGrabbed (anyView));
         //                             }
         //                             else if (iterations == 1)
         //                             {
-        //                                 // Application.Mouse.MouseGrabView is null because
+        //                                 // Application.Mouse.IsGrabbed is false because
         //                                 // another runnable (Dialog) was opened
-        //                                 Assert.Null (Application.Mouse.MouseGrabView);
+        //                                 Assert.False (Application.Mouse.IsGrabbed (anyView));
 
         //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.PositionReport });
 
-        //                                 Assert.Null (Application.Mouse.MouseGrabView);
+        //                                 Assert.False (Application.Mouse.IsGrabbed (anyView));
 
         //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (40, 12), Flags = MouseFlags.PositionReport });
 
-        //                                 Assert.Null (Application.Mouse.MouseGrabView);
+        //                                 Assert.False (Application.Mouse.IsGrabbed (anyView));
 
         //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
 
-        //                                 Assert.Null (Application.Mouse.MouseGrabView);
+        //                                 Assert.False (Application.Mouse.IsGrabbed (anyView));
 
         //                                 Application.RequestStop ();
         //                             }
         //                             else if (iterations == 2)
         //                             {
-        //                                 Assert.Null (Application.Mouse.MouseGrabView);
+        //                                 Assert.False (Application.Mouse.IsGrabbed (anyView));
 
         //                                 Application.RequestStop ();
         //                             }
@@ -184,7 +184,7 @@ public class ApplicationMouseTests
 
     [Fact]
     [AutoInitShutdown]
-    public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
+    public void IsGrabbed_GrabbedMouse_UnGrabbedMouse ()
     {
         View? grabView = null;
         var count = 0;
@@ -199,12 +199,12 @@ public class ApplicationMouseTests
         Application.Mouse.GrabMouse (view1);
         Assert.Equal (0, count);
         Assert.Equal (grabView, view1);
-        Assert.Equal (view1, Application.Mouse.MouseGrabView);
+        Assert.True (Application.Mouse.IsGrabbed (view1));
 
         Application.Mouse.UngrabMouse ();
         Assert.Equal (1, count);
         Assert.Equal (grabView, view1);
-        Assert.Null (Application.Mouse.MouseGrabView);
+        Assert.False (Application.Mouse.IsGrabbed (view1));
 
         Application.Mouse.GrabbedMouse += Application_GrabbedMouse;
         Application.Mouse.UnGrabbedMouse += Application_UnGrabbedMouse;
@@ -212,14 +212,14 @@ public class ApplicationMouseTests
         Application.Mouse.GrabMouse (view2);
         Assert.Equal (1, count);
         Assert.Equal (grabView, view2);
-        Assert.Equal (view2, Application.Mouse.MouseGrabView);
+        Assert.True (Application.Mouse.IsGrabbed (view2));
 
         Application.Mouse.UngrabMouse ();
         Assert.Equal (2, count);
         Assert.Equal (grabView, view2);
-        Assert.Equal (view3, Application.Mouse.MouseGrabView);
+        Assert.True (Application.Mouse.IsGrabbed (view3));
         Application.Mouse.UngrabMouse ();
-        Assert.Null (Application.Mouse.MouseGrabView);
+        Assert.False (Application.Mouse.IsGrabbed (view3));
 
         void Application_GrabbedMouse (object? sender, ViewEventArgs e)
         {
@@ -273,9 +273,9 @@ public class ApplicationMouseTests
         top.Add (view);
         Application.Begin (top);
 
-        Assert.Null (Application.Mouse.MouseGrabView);
+        Assert.False (Application.Mouse.IsGrabbed (view));
         Application.Mouse.GrabMouse (view);
-        Assert.Equal (view, Application.Mouse.MouseGrabView);
+        Assert.True (Application.Mouse.IsGrabbed (view));
         top.Remove (view);
         Application.Mouse.UngrabMouse ();
         view.Dispose ();
@@ -284,7 +284,7 @@ public class ApplicationMouseTests
 #endif
 
         Application.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Null (Application.Mouse.MouseGrabView);
+        Assert.False (Application.Mouse.IsGrabbed (view));
         Assert.Equal (0, count);
         top.Dispose ();
     }
@@ -293,8 +293,8 @@ public class ApplicationMouseTests
     [AutoInitShutdown]
     public void MouseGrab_EventSentToGrabView_HasCorrectView ()
     {
-        // BEFORE FIX: viewRelativeMouseEvent.View = deepestViewUnderMouse ?? MouseGrabView (potentially targetView).
-        // AFTER FIX: viewRelativeMouseEvent.View = MouseGrabView (always the grab view).
+        // BEFORE FIX: viewRelativeMouseEvent.View = deepestViewUnderMouse ?? IsGrabbed (potentially targetView).
+        // AFTER FIX: viewRelativeMouseEvent.View = IsGrabbed (always the grab view).
         // Test fails before fix (receivedView == targetView), passes after fix (receivedView == grabView).
 
         var grabView = new View
@@ -324,7 +324,7 @@ public class ApplicationMouseTests
         Application.Begin (top);
 
         Application.Mouse.GrabMouse (grabView);
-        Assert.Equal (grabView, Application.Mouse.MouseGrabView);
+        Assert.True (Application.Mouse.IsGrabbed (grabView));
 
         Application.RaiseMouseEvent (new Mouse
         {

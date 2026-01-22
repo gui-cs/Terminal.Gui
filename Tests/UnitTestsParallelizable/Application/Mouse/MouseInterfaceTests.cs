@@ -352,7 +352,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse.GrabMouse (testView);
 
         // Assert
-        Assert.Equal (testView, mouse.MouseGrabView);
+        Assert.True (mouse.IsGrabbed (testView));
     }
 
     [Fact]
@@ -367,7 +367,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse.UngrabMouse ();
 
         // Assert
-        Assert.Null (mouse.MouseGrabView);
+        Assert.False (mouse.IsGrabbed (testView));
     }
 
     [Fact]
@@ -389,7 +389,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (eventFired);
-        Assert.Null (mouse.MouseGrabView); // Should not be set because it was cancelled
+        Assert.False (mouse.IsGrabbed (testView)); // Should not be set because it was cancelled
     }
 
     [Fact]
