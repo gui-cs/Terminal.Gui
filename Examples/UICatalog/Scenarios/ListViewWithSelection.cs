@@ -240,7 +240,7 @@ public class ListViewWithSelection : Scenario
 
         void IListDataSource.Render (ListView listView, bool selected, int item, int col, int row, int width, int viewportX)
         {
-            listView.Move (col, row);
+            listView.Move (col - viewportX, row);
 
             Attribute rowAttribute;
 
