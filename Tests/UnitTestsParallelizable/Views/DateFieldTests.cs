@@ -13,7 +13,7 @@ public class DateFieldTests
     {
         var df = new DateField ();
         df.Layout ();
-        Assert.Equal (DateTime.MinValue, df.Date);
+        Assert.Equal (DateTime.MinValue, df.Value);
         Assert.Equal (1, df.InsertionPoint);
         Assert.Equal (new (0, 0, 12, 1), df.Frame);
         Assert.Equal (" 01/01/0001", df.Text);
@@ -21,14 +21,14 @@ public class DateFieldTests
         DateTime date = DateTime.Now;
         df = new (date);
         df.Layout ();
-        Assert.Equal (date, df.Date);
+        Assert.Equal (date, df.Value);
         Assert.Equal (1, df.InsertionPoint);
         Assert.Equal (new (0, 0, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
 
         df = new (date) { X = 1, Y = 2 };
         df.Layout ();
-        Assert.Equal (date, df.Date);
+        Assert.Equal (date, df.Value);
         Assert.Equal (1, df.InsertionPoint);
         Assert.Equal (new (1, 2, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
@@ -113,7 +113,7 @@ public class DateFieldTests
     {
         var df = new DateField (DateTime.Parse ("01/01/0001"));
         Assert.Equal (" 01/01/0001", df.Text);
-        df.Date = DateTime.Parse ("12/31/9999");
+        df.Value = DateTime.Parse ("12/31/9999");
         Assert.Equal (" 12/31/9999", df.Text);
     }
 
@@ -206,7 +206,7 @@ public class DateFieldTests
 
             // If InvariantCulture was used this will fail but not with PT culture
             Assert.Equal (" 13/12/1971", df.Text);
-            Assert.Equal ("13/12/1971", df.Date!.Value.ToString (CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern));
+            Assert.Equal ("13/12/1971", df.Value!.Value.ToString (CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern));
             Assert.Equal (4, df.InsertionPoint);
         }
         finally
@@ -313,7 +313,7 @@ public class DateFieldTests
             // Just verify DateField doesn't crash with RTL cultures
             // and produces some text
             Assert.NotEmpty (df.Text);
-            Assert.NotNull (df.Date);
+            Assert.NotNull (df.Value);
         }
         catch (CultureNotFoundException)
         {
@@ -355,7 +355,7 @@ public class DateFieldTests
             // Buddhist calendar is 543 years ahead (1971 + 543 = 2514)
             // Just verify it doesn't crash and produces valid output
             Assert.NotEmpty (df.Text);
-            Assert.NotNull (df.Date);
+            Assert.NotNull (df.Value);
         }
         catch (CultureNotFoundException)
         {

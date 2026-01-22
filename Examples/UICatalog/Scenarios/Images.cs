@@ -88,7 +88,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 0,
-            CheckedState = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
+            Value = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
             Text = "supports true color "
         };
@@ -98,7 +98,7 @@ public class Images : Scenario
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 1,
-            CheckedState = CheckState.UnChecked,
+            Value = CheckState.UnChecked,
             Text = "Supports Sixel"
         };
 
@@ -109,14 +109,14 @@ public class Images : Scenario
             Text = "(Check if your terminal supports Sixel)"
         };
 
-        /*        CheckedState = _sixelSupportResult.IsSupported
+        /*        Value = _sixelSupportResult.IsSupported
                                    ? CheckState.Checked
                                    : CheckState.UnChecked;*/
 
-        _cbSupportsSixel.CheckedStateChanging += (_, e) =>
+        _cbSupportsSixel.ValueChanging += (_, e) =>
                                                  {
-                                                     _sixelSupportResult.IsSupported = e.Result == CheckState.Checked;
-                                                     SetupSixelSupported (e.Result == CheckState.Checked);
+                                                     _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
+                                                     SetupSixelSupported (e.NewValue == CheckState.Checked);
                                                      ApplyShowTabViewHack ();
                                                  };
 
@@ -126,11 +126,11 @@ public class Images : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
-            CheckedState = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            Value = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => Driver.Force16Colors = evt.Result == CheckState.UnChecked;
+        cbUseTrueColor.ValueChanging += (_, evt) => Driver.Force16Colors = evt.NewValue == CheckState.UnChecked;
         _win.Add (cbUseTrueColor);
 
         Button btnOpenImage = new () { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
@@ -147,7 +147,7 @@ public class Images : Scenario
         BuildBasicTab (tabBasic);
         BuildSixelTab ();
 
-        SetupSixelSupported (_cbSupportsSixel.CheckedState == CheckState.Checked);
+        SetupSixelSupported (_cbSupportsSixel.Value == CheckState.Checked);
 
         btnOpenImage.Accepting += OpenImage;
 
@@ -166,7 +166,7 @@ public class Images : Scenario
     {
         _sixelSupportResult = newResult;
 
-        _cbSupportsSixel.CheckedState = newResult.IsSupported ? CheckState.Checked : CheckState.UnChecked;
+        _cbSupportsSixel.Value = newResult.IsSupported ? CheckState.Checked : CheckState.UnChecked;
         _pxX.Value = _sixelSupportResult.Resolution.Width;
         _pxY.Value = _sixelSupportResult.Resolution.Height;
     }

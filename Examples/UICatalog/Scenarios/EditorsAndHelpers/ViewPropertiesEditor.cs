@@ -17,14 +17,14 @@ public class ViewPropertiesEditor : EditorBase
             Title = "CanFocus",
             X = 0,
             Y = 0,
-            CheckedState = ViewToEdit is not null ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
+            Value = ViewToEdit is not null ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
-        _canFocusCheckBox.CheckedStateChanged += (_, _) =>
+        _canFocusCheckBox.ValueChanged += (_, _) =>
                                                  {
                                                      if (ViewToEdit is not null)
                                                      {
-                                                         ViewToEdit.CanFocus = _canFocusCheckBox.CheckedState == CheckState.Checked;
+                                                         ViewToEdit.CanFocus = _canFocusCheckBox.Value == CheckState.Checked;
                                                      }
                                                  };
         base.Add (_canFocusCheckBox);
@@ -34,14 +34,14 @@ public class ViewPropertiesEditor : EditorBase
             Title = "Enabled",
             X = Pos.Right (_canFocusCheckBox) + 1,
             Y = Pos.Top (_canFocusCheckBox),
-            CheckedState = ViewToEdit is not null ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
+            Value = ViewToEdit is not null ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
-        _enabledCheckBox.CheckedStateChanged += (_, _) =>
+        _enabledCheckBox.ValueChanged += (_, _) =>
                                                 {
                                                     if (ViewToEdit is not null)
                                                     {
-                                                        ViewToEdit.Enabled = _enabledCheckBox.CheckedState == CheckState.Checked;
+                                                        ViewToEdit.Enabled = _enabledCheckBox.Value == CheckState.Checked;
                                                     }
                                                 };
         base.Add (_enabledCheckBox);
@@ -100,8 +100,8 @@ public class ViewPropertiesEditor : EditorBase
 
         if (ViewToEdit is not null and not Adornment)
         {
-            _canFocusCheckBox!.CheckedState = ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked;
-            _enabledCheckBox!.CheckedState = ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked;
+            _canFocusCheckBox!.Value = ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked;
+            _enabledCheckBox!.Value = ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked;
 
             if (ViewToEdit is IOrientation orientatedView)
             {

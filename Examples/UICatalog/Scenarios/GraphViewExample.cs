@@ -101,18 +101,18 @@ public class GraphViewExample : Scenario
         _showBorderCheckBox = new ()
         {
             Title = "_Enable Margin, Border, and Padding",
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
-        _showBorderCheckBox.CheckedStateChanged += (_, _) => ShowBorder ();
+        _showBorderCheckBox.ValueChanged += (_, _) => ShowBorder ();
 
         _diagCheckBox = new ()
         {
             Title = "_Diagnostics",
-            CheckedState = View.Diagnostics == (ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler)
+            Value = View.Diagnostics == (ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler)
                                ? CheckState.Checked
                                : CheckState.UnChecked
         };
-        _diagCheckBox.CheckedStateChanged += (_, _) => ToggleDiagnostics ();
+        _diagCheckBox.ValueChanged += (_, _) => ToggleDiagnostics ();
 
         menu.Add (
                   new MenuBarItem (
@@ -229,13 +229,13 @@ public class GraphViewExample : Scenario
 
         if (sender is Shortcut { CommandView: CheckBox checkBox })
         {
-            checkBox.CheckedState = _diagCheckBox?.CheckedState ?? CheckState.UnChecked;
+            checkBox.Value = _diagCheckBox?.Value ?? CheckState.UnChecked;
         }
     }
 
     private void ToggleDiagnostics ()
     {
-        View.Diagnostics = _diagCheckBox?.CheckedState == CheckState.Checked
+        View.Diagnostics = _diagCheckBox?.Value == CheckState.Checked
                                ? ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler
                                : ViewDiagnosticFlags.Off;
         _app?.LayoutAndDraw ();
@@ -918,7 +918,7 @@ public class GraphViewExample : Scenario
             return;
         }
 
-        if (_showBorderCheckBox?.CheckedState == CheckState.Checked)
+        if (_showBorderCheckBox?.Value == CheckState.Checked)
         {
             _graphView.BorderStyle = LineStyle.Single;
             _graphView.Border!.Thickness = _thickness;

@@ -31,27 +31,27 @@ public class DatePickerTests : TestDriverBase
     public void DatePicker_Default_Constructor_ShouldSetCurrenDate ()
     {
         var datePicker = new DatePicker ();
-        Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
-        Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
-        Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Value.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Value.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Value.Year);
     }
 
     [Fact]
     public void DatePicker_Constrctor_Now_ShouldSetCurrenDate ()
     {
         var datePicker = new DatePicker (DateTime.Now);
-        Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
-        Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
-        Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Value.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Value.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Value.Year);
     }
 
     [Fact]
     public void DatePicker_X_Y_Init ()
     {
         var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
-        Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
-        Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
-        Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Value.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Value.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Value.Year);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class DatePickerTests : TestDriverBase
         var newDate = new DateTime (2024, 1, 15);
         string format = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 
-        datePicker.Date = newDate;
+        datePicker.Value = newDate;
         Assert.Equal (newDate.ToString (format), datePicker.Text);
     }
 }
