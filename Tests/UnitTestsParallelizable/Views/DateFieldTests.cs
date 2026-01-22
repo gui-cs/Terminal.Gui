@@ -51,7 +51,7 @@ public class DateFieldTests
             Assert.True (df2.NewKeyDownEvent (Key.End.WithShift));
             Assert.Equal (1, df2.SelectedStart);
             Assert.Equal (10, df2.SelectedLength);
-            Assert.Equal (11, df2.InsertionPoint);
+            Assert.Equal (10, df2.InsertionPoint);  // Clamped to FormatLength
 
             // Copy from df2
             Assert.True (df2.NewKeyDownEvent (Key.C.WithCtrl));
@@ -59,7 +59,7 @@ public class DateFieldTests
             // Paste into df1
             Assert.True (df1.NewKeyDownEvent (Key.V.WithCtrl));
             Assert.Equal (" 12/31/2023", df1.Text);
-            Assert.Equal (11, df1.InsertionPoint);
+            Assert.Equal (10, df1.InsertionPoint);  // Clamped to FormatLength
         }
         finally
         {
@@ -89,7 +89,7 @@ public class DateFieldTests
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.Equal (1, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
-        Assert.Equal (0, df.InsertionPoint);
+        Assert.Equal (1, df.InsertionPoint);  // Clamped to 1, can't be 0
 
         // Without selection
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft));
@@ -100,7 +100,7 @@ public class DateFieldTests
         Assert.True (df.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (10, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
-        Assert.Equal (11, df.InsertionPoint);
+        Assert.Equal (10, df.InsertionPoint);  // Clamped to FormatLength
         Assert.True (df.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (-1, df.SelectedStart);
         Assert.Equal (0, df.SelectedLength);

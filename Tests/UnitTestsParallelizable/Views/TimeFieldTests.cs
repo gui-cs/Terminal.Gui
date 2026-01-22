@@ -56,7 +56,7 @@ public class TimeFieldTests
             Assert.True (tf2.NewKeyDownEvent (Key.End.WithShift));
             Assert.Equal (1, tf2.SelectedStart);
             Assert.Equal (8, tf2.SelectedLength);
-            Assert.Equal (9, tf2.InsertionPoint);
+            Assert.Equal (8, tf2.InsertionPoint);  // Clamped to FieldLength
 
             // Copy from tf2
             Assert.True (tf2.NewKeyDownEvent (Key.C.WithCtrl));
@@ -64,7 +64,7 @@ public class TimeFieldTests
             // Paste into tf1
             Assert.True (tf1.NewKeyDownEvent (Key.V.WithCtrl));
             Assert.Equal (" 12:59:01", tf1.Text);
-            Assert.Equal (9, tf1.InsertionPoint);
+            Assert.Equal (8, tf1.InsertionPoint);  // Clamped to FieldLength
         }
         finally
         {
@@ -108,7 +108,7 @@ public class TimeFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (8, tf.SelectedStart);
         Assert.Equal (1, tf.SelectedLength);
-        Assert.Equal (9, tf.InsertionPoint);
+        Assert.Equal (8, tf.InsertionPoint);  // Clamped to FieldLength
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (-1, tf.SelectedStart);
         Assert.Equal (0, tf.SelectedLength);
@@ -120,11 +120,11 @@ public class TimeFieldTests
         tf.IsShortFormat = true;
         Assert.Equal (5, tf.InsertionPoint);
 
-        // Start selection
+        // Start selection - at position 5 (max), pressing Right with Shift doesn't create selection
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift));
-        Assert.Equal (5, tf.SelectedStart);
-        Assert.Equal (1, tf.SelectedLength);
-        Assert.Equal (6, tf.InsertionPoint);
+        Assert.Equal (-1, tf.SelectedStart);  // No selection because already at max
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (5, tf.InsertionPoint);  // Still at max
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (-1, tf.SelectedStart);
         Assert.Equal (0, tf.SelectedLength);
@@ -269,8 +269,8 @@ public class TimeFieldTests
         tf.SelectedStart = 1;
         tf.InsertionPoint = 9;  // End of selection
         Assert.Equal (1, tf.SelectedStart);
-        Assert.Equal (8, tf.SelectedLength);
-        Assert.Equal (9, tf.InsertionPoint);
+        Assert.Equal (7, tf.SelectedLength);  // Length is 7 because InsertionPoint was clamped to 8
+        Assert.Equal (8, tf.InsertionPoint);  // Clamped from 9 to 8
 
         // Press End - should clear selection and move to end
         Assert.True (tf.NewKeyDownEvent (Key.End));
