@@ -44,6 +44,15 @@ public class SixelEncoder
     public ColorQuantizer Quantizer { get; set; } = new ();
 
     /// <summary>
+    ///     Gets or sets a value indicating whether to avoid bottom scroll.
+    ///     When <see langword="true"/> and height is grater than PIXEL_HIGH (6), the encoder will subtract one sixel band
+    ///     (PIXEL_HIGH (6) rows).
+    ///     This can be used to avoid forcing the terminal to scroll when dumping sixel output starting at the bottom row.
+    ///     Default is <see langword="false"/>.
+    /// </summary>
+    public bool AvoidBottomScroll { get; set; } = false;
+
+    /// <summary>
     ///     Encode the given bitmap into sixel encoding
     /// </summary>
     /// <param name="pixels"></param>
@@ -72,7 +81,7 @@ public class SixelEncoder
         var sb = new StringBuilder ();
         int height = pixels.GetLength (1);
 
-        if (height > PIXEL_HIGH)
+        if (AvoidBottomScroll && height > PIXEL_HIGH)
         {
             height -= PIXEL_HIGH;
         }
@@ -235,7 +244,7 @@ public class SixelEncoder
         int widthInChars = pixels.GetLength (0);
         int heightInChars = pixels.GetLength (1);
 
-        if (heightInChars > PIXEL_HIGH)
+        if (AvoidBottomScroll && heightInChars > PIXEL_HIGH)
         {
             heightInChars -= PIXEL_HIGH;
         }
@@ -248,7 +257,7 @@ public class SixelEncoder
         int width = pixels.GetLength (0);
         int height = pixels.GetLength (1);
 
-        if (height > PIXEL_HIGH)
+        if (AvoidBottomScroll && height > PIXEL_HIGH)
         {
             height -= PIXEL_HIGH;
         }
@@ -267,5 +276,37 @@ public class SixelEncoder
         }
 
         return false; // No pixel with A of 0 was found
+    }
+
+    /// <summary>
+    ///     Calculates the renderable height in pixels for sixel output based on the
+    ///     maximum available cell height and the vertical pixel density per cell.
+    /// </summary>
+    /// <param name="maxSizeHeight">The maximum available height expressed in character cells.</param>
+    /// <param name="pixelsPerCellY">The number of vertical pixels represented by a single character cell.</param>
+    /// <returns>
+    ///     The total height, in pixels, that can be safely rendered without causing the console buffer to scroll.
+    /// </returns>
+    /// <remarks>
+    ///     Sixel graphics are encoded in vertical bands of six pixels. When
+    ///     <see cref="AvoidBottomScroll"/> is enabled and the available height exceeds
+    ///     a single sixel band, the cell height is rounded down to the nearest multiple
+    ///     of six to ensure that no partial sixel band is emitted at the bottom of the
+    ///     console. This prevents unintended upward scrolling of the console buffer.
+    /// </remarks>
+    public int GetHeightInPixels (int maxSizeHeight, int pixelsPerCellY)
+    {
+        int cellHeight = maxSizeHeight;
+
+        if (AvoidBottomScroll && maxSizeHeight > PIXEL_HIGH)
+        {
+            cellHeight -= cellHeight % 6;
+        }
+        else if (AvoidBottomScroll)
+        {
+            cellHeight = 0;
+        }
+
+        return cellHeight * pixelsPerCellY;
     }
 }
