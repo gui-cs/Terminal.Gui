@@ -9,8 +9,11 @@
 > - ✅ IValue Interface Implementation - Complete
 >
 > **Implementation Status**:
-> - ⏸️ PropagatedCommands mechanism - NOT STARTED
-> - ⏸️ CommandContext WeakReference enhancement - NOT STARTED
+> - ✅ **Phase 1 Complete** - PropagatedCommands property and helper method added
+> - ⏸️ Phase 2 - CommandContext WeakReference enhancement - NOT STARTED
+> - ⏸️ Phase 3 - Enable Command.Activate propagation - NOT STARTED
+> - ⏸️ Phase 4 - Update tests and remove legacy code - NOT STARTED
+> - ⏸️ Phase 5 - Documentation and polish - NOT STARTED
 > - 🤔 CommandContext Value enhancement - DEBATABLE (may not be needed)
 
 ## Table of Contents
