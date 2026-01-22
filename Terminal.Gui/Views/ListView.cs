@@ -336,7 +336,7 @@ public class ListView : View, IDesignable, IValue<int?>
     /// </summary>
     /// <param name="item">The item index to check.</param>
     /// <returns><see langword="true"/> if the item is selected; otherwise <see langword="false"/>.</returns>
-    public bool IsSelected (int item) { return item == SelectedItem || MultiSelectedItems.Contains (item); }
+    public bool IsSelected (int item) => item == SelectedItem || MultiSelectedItems.Contains (item);
 
     /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
@@ -345,12 +345,8 @@ public class ListView : View, IDesignable, IValue<int?>
     public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator ();
 
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
-    /// <value>The left position.</value>
-    /// <remarks>
-    ///     Values are clamped to the valid range [0, EffectiveMaxItemLength - Viewport.Width].
-    ///     When <see cref="AllowsMarking"/> is true, the effective width includes the mark columns.
-    /// </remarks>
-    public int LeftItem
+    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
+    internal int LeftItem
     {
         get => Viewport.X;
         set
@@ -808,6 +804,12 @@ public class ListView : View, IDesignable, IValue<int?>
             field = value;
             SetNeedsDraw ();
 
+            // Initialize selection anchor when item is selected
+            if (value.HasValue)
+            {
+                _selectionAnchor = value.Value;
+            }
+
             if (SelectedItem != _lastSelectedItem)
             {
                 _lastSelectedItem = SelectedItem;
@@ -1056,7 +1058,7 @@ public class ListView : View, IDesignable, IValue<int?>
                     SetAttribute (current);
                 }
 
-                int markWidth = 0;
+                var markWidth = 0;
 
                 if (AllowsMarking)
                 {
