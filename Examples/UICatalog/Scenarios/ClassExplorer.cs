@@ -88,13 +88,13 @@ public class ClassExplorer : Scenario
         {
             Title = "_Include Private"
         };
-        _showPrivateCheckBox.CheckedStateChanged += (_, _) => ShowPrivate ();
+        _showPrivateCheckBox.ValueChanged += (_, _) => ShowPrivate ();
 
         _highlightModelTextOnlyCheckBox = new ()
         {
             Title = "_Highlight Model Text Only"
         };
-        _highlightModelTextOnlyCheckBox.CheckedStateChanged += (_, _) => OnCheckHighlightModelTextOnly ();
+        _highlightModelTextOnlyCheckBox.ValueChanged += (_, _) => OnCheckHighlightModelTextOnly ();
 
         menuBar.Add (
                      new MenuBarItem (
@@ -181,7 +181,7 @@ public class ClassExplorer : Scenario
     }
 
     private BindingFlags GetFlags () =>
-        _showPrivateCheckBox?.CheckedState == CheckState.Checked
+        _showPrivateCheckBox?.Value == CheckState.Checked
             ? BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic
             : BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
@@ -211,7 +211,7 @@ public class ClassExplorer : Scenario
             return;
         }
 
-        _treeView.Style.HighlightModelTextOnly = _highlightModelTextOnlyCheckBox?.CheckedState == CheckState.Checked;
+        _treeView.Style.HighlightModelTextOnly = _highlightModelTextOnlyCheckBox?.Value == CheckState.Checked;
         _treeView.SetNeedsDraw ();
     }
 

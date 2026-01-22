@@ -121,7 +121,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (numButtonsLabel),
             TextAlignment = Alignment.End,
             Text = $"Add {char.ConvertFromUtf32 (WIDE_CODE_POINT)} to button text to stress wide char support",
-            CheckedState = CheckState.UnChecked
+            Value = CheckState.UnChecked
         };
         frame.Add (glyphsNotWords);
 
@@ -355,7 +355,7 @@ public class Dialogs : Scenario
             int buttonId = i;
             Button button;
 
-            if (glyphsNotWords.CheckedState == CheckState.Checked)
+            if (glyphsNotWords.Value == CheckState.Checked)
             {
                 buttonId = i;
 
@@ -384,7 +384,7 @@ public class Dialogs : Scenario
         TextField textField = new () { Y = Pos.Bottom (label), Width = Dim.Fill (0, 60), Text = new string ("0123456789").Repeat (6)! };
         dialog.Add (textField);
 
-        CheckBox checkBox = new () { Title = "_Check Me", Y = Pos.Bottom (textField), CheckedState = CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "_Check Me", Y = Pos.Bottom (textField), Value = CheckState.UnChecked };
         dialog.Add (checkBox);
 
         OptionSelector<Schemes> optionSelector = new () { Y = Pos.Bottom (checkBox), Value = Schemes.Error, AssignHotKeys = true };

@@ -56,20 +56,20 @@ public sealed class Selectors : Scenario
             X = Pos.Right (horizontalSpace) + 1,
             Y = Pos.Top (horizontalSpace),
             Title = "Border _& Title",
-            CheckedState = CheckState.Checked,
+            Value = CheckState.Checked,
             BorderStyle = LineStyle.Dotted
         };
-        showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
+        showBorderAndTitle.ValueChanged += ShowBorderAndTitleOnValueChanged;
 
         CheckBox canFocus = new ()
         {
             X = Pos.Right (showBorderAndTitle) + 1,
             Y = Pos.Top (horizontalSpace),
             Title = "_CanFocus",
-            CheckedState = CheckState.Checked,
+            Value = CheckState.Checked,
             BorderStyle = LineStyle.Dotted
         };
-        canFocus.CheckedStateChanged += CanFocusOnCheckedStateChanged;
+        canFocus.ValueChanged += CanFocusOnValueChanged;
 
         optionSelectorsFrame = new ()
         {
@@ -212,11 +212,11 @@ public sealed class Selectors : Scenario
             }
         }
 
-        void HorizontalSpaceOnValueChanging (object? sender, CancelEventArgs<int> e)
+        void HorizontalSpaceOnValueChanging (object? sender, ValueChangingEventArgs<int> e)
         {
             if (sender is not NumericUpDown<int> || e.NewValue < 0)
             {
-                e.Cancel = true;
+                e.Handled = true;
 
                 return;
             }
@@ -229,7 +229,7 @@ public sealed class Selectors : Scenario
             }
         }
 
-        void ShowBorderAndTitleOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
+        void ShowBorderAndTitleOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> e)
         {
             if (sender is not CheckBox cb)
             {
@@ -240,11 +240,11 @@ public sealed class Selectors : Scenario
 
             foreach (SelectorBase selector in selectors)
             {
-                selector.Border!.Thickness = cb.CheckedState == CheckState.Checked ? new (1) : new Thickness (0);
+                selector.Border!.Thickness = cb.Value == CheckState.Checked ? new (1) : new Thickness (0);
             }
         }
 
-        void CanFocusOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
+        void CanFocusOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> e)
         {
             if (sender is not CheckBox cb)
             {
@@ -255,7 +255,7 @@ public sealed class Selectors : Scenario
 
             foreach (SelectorBase selector in selectors)
             {
-                selector.CanFocus = cb.CheckedState == CheckState.Checked;
+                selector.CanFocus = cb.Value == CheckState.Checked;
             }
         }
 

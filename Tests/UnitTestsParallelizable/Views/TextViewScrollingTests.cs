@@ -172,7 +172,7 @@ public class TextViewScrollingTests
         Assert.True (tv.VerticalScrollBar.Visible, "Scrollbar should be visible after content change");
 
         // Act: Change scrollbar position
-        tv.VerticalScrollBar.Position = 5;
+        tv.VerticalScrollBar.Value = 5;
 
         // Assert: Viewport.Y should change to match scrollbar position
         Assert.Equal (5, tv.Viewport.Y);
@@ -200,7 +200,7 @@ public class TextViewScrollingTests
         tv.Viewport = tv.Viewport with { Y = 3 };
 
         // Assert: ScrollBar position should match Viewport.Y
-        Assert.Equal (3, tv.VerticalScrollBar.Position);
+        Assert.Equal (3, tv.VerticalScrollBar.Value);
     }
 
     /// <summary>
@@ -298,7 +298,7 @@ public class TextViewScrollingTests
         int initialViewportY = tv.Viewport.Y;
 
         // Act: Change scrollbar position (simulating user dragging)
-        tv.VerticalScrollBar.Position = 5;
+        tv.VerticalScrollBar.Value = 5;
 
         // Assert: Viewport should have changed
         Assert.Equal (5, tv.Viewport.Y);
@@ -329,7 +329,7 @@ public class TextViewScrollingTests
         Assert.Equal (0, tv.CurrentColumn);
 
         // Act: Scroll down via scrollbar
-        tv.VerticalScrollBar.Position = 5;
+        tv.VerticalScrollBar.Value = 5;
 
         // Verify viewport changed
         Assert.Equal (5, tv.Viewport.Y);
@@ -365,7 +365,7 @@ public class TextViewScrollingTests
         tv.LayoutSubViews ();
 
         // Scroll down
-        tv.VerticalScrollBar.Position = 5;
+        tv.VerticalScrollBar.Value = 5;
         Assert.Equal (5, tv.Viewport.Y);
 
         // Simulate focus change (this might trigger PositionCursor or other methods)
