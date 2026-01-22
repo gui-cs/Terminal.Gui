@@ -998,9 +998,26 @@ public class ListView : View, IDesignable
 
                 if (AllowsMarking)
                 {
+                    // Render marks with Normal attribute for visual clarity
+                    Attribute savedAttr = current;
+                    Attribute normalAttr = GetAttributeForRole (VisualRole.Normal);
+
+                    if (current != normalAttr)
+                    {
+                        SetAttribute (normalAttr);
+                        current = normalAttr;
+                    }
+
                     AddRune (Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
                              AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
                     AddRune ((Rune)' ');
+
+                    // Restore attribute for content rendering
+                    if (current != savedAttr)
+                    {
+                        SetAttribute (savedAttr);
+                        current = savedAttr;
+                    }
                 }
 
                 Source.Render (this, isSelected, item, col, row, f.Width - col, start);

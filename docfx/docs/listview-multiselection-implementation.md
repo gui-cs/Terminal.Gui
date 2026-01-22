@@ -9,7 +9,7 @@
 | **2** | Add extend commands and key bindings | ✅ COMPLETED |
 | **3** | Mouse Shift+Click and Ctrl+Click support | ✅ COMPLETED |
 | **4** | Multi-selection rendering | ✅ COMPLETED |
-| **5** | Fix mark rendering attribute | ⏳ PENDING |
+| **5** | Fix mark rendering attribute | ✅ COMPLETED |
 | **6** | Custom mark rendering API | ⏳ PENDING |
 | **7** | Fix scrolling width and offset clamping | ⏳ PENDING |
 
@@ -1056,7 +1056,9 @@ dotnet test Tests/IntegrationTests --no-build
 
 ---
 
-## Phase 5: Fix Mark Rendering Attribute
+## Phase 5: Fix Mark Rendering Attribute ✅ COMPLETED
+
+> **Status:** ✅ Completed - Marks now render with `VisualRole.Normal` attribute for visual clarity. 2 new tests added, all 66 ListView tests pass.
 
 ### 5.1 Render Marks with Normal Attribute
 

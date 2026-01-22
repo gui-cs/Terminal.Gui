@@ -2326,4 +2326,79 @@ hree - lon",
     }
 
     #endregion
+
+    #region Phase 5: Mark Rendering Attribute Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void AllowsMarking_Renders_Marks ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two"]),
+            AllowsMarking = true,
+            AllowsMultipleSelection = true,
+            Height = 2,
+            Width = 10
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+
+        lv.Source!.SetMark (0, true);
+        app.LayoutAndDraw ();
+
+        // Verify marks are rendered (checkbox characters should appear)
+        // The first item should show checked, second unchecked
+        Assert.True (lv.Source.IsMarked (0));
+        Assert.False (lv.Source.IsMarked (1));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Marks_Rendered_Consistently_Across_Selection_States ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (["One", "Two", "Three"]),
+            AllowsMarking = true,
+            AllowsMultipleSelection = true,
+            Height = 3,
+            Width = 15
+        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+
+        // Mark all items
+        lv.Source!.SetMark (0, true);
+        lv.Source.SetMark (1, true);
+        lv.Source.SetMark (2, true);
+
+        // Select middle item with focus
+        lv.SetFocus ();
+        lv.SetSelection (1, false);
+        app.LayoutAndDraw ();
+
+        // All items should remain marked regardless of selection state
+        Assert.True (lv.Source.IsMarked (0));
+        Assert.True (lv.Source.IsMarked (1));
+        Assert.True (lv.Source.IsMarked (2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    #endregion
 }
