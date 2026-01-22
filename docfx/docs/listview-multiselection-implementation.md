@@ -11,7 +11,7 @@
 | **4** | Multi-selection rendering | ✅ COMPLETED |
 | **5** | Fix mark rendering attribute | ✅ COMPLETED |
 | **6** | Custom mark rendering API | ✅ COMPLETED |
-| **7** | Fix scrolling width and offset clamping | ⏳ PENDING |
+| **7** | Fix scrolling width and offset clamping | ✅ COMPLETED |
 
 Each phase is complete when:
 
@@ -1296,7 +1296,9 @@ dotnet test Tests/IntegrationTests --no-build
 
 ---
 
-## Phase 7: Fix Horizontal Scrolling Width and Offset Clamping
+## Phase 7: Fix Horizontal Scrolling Width and Offset Clamping ✅ COMPLETED
+
+> **Status:** ✅ Completed - Updated `LeftItem` setter to clamp values to valid range [0, MaxItemLength - Viewport.Width] instead of throwing ArgumentException. Updated `TopItem` setter to clamp values to valid range [0, Count - Viewport.Height]. Added 4 unit tests. Updated existing `LeftItem_TopItem_Tests` to use smaller viewport to properly test scrolling with clamping behavior.
 
 ### 7.1 Fix Horizontal Scrolling Width Issue
 

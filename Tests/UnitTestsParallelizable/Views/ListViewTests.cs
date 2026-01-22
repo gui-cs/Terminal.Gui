@@ -1328,19 +1328,22 @@ Item 6",
             X = 1,
             Source = new ListWrapper<string> (source)
         };
-        lv.Height = lv.Source.Count;
-        lv.Width = lv.MaxItemLength;
+        // Make height smaller than item count to allow vertical scrolling
+        // 5 items, height 4 allows TopItem up to 1
+        lv.Height = lv.Source.Count - 1;
+        // Make width smaller than content to allow horizontal scrolling
+        // MaxItemLength is 6 ("Item 0"), use width 5 to allow scroll of 1
+        lv.Width = lv.MaxItemLength - 1;
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
- Item 0
- Item 1
- Item 2
- Item 3
- Item 4",
+ Item
+ Item
+ Item
+ Item",
                                                        _output,
                                                        app.Driver);
 
@@ -2471,6 +2474,95 @@ hree - lon",
             // Custom implementation that returns true (indicating custom rendering was done)
             return true;
         }
+    }
+
+    #endregion
+
+    #region Phase 7: Scrolling Width and Offset Clamping Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void LeftItem_Clamps_To_MaxItemLength_Minus_Width ()
+    {
+        ObservableCollection<string> source = new (["0123456789"]); // 10 chars
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 6,
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Max LeftItem should be 10 - 6 = 4
+        lv.LeftItem = 10;
+        Assert.Equal (4, lv.LeftItem);
+
+        lv.LeftItem = -5;
+        Assert.Equal (0, lv.LeftItem);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void TopItem_Clamps_To_Count_Minus_Height ()
+    {
+        ObservableCollection<string> source = new (["1", "2", "3", "4", "5"]); // 5 items
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Max TopItem should be 5 - 3 = 2
+        lv.TopItem = 10;
+        Assert.Equal (2, lv.TopItem);
+
+        lv.TopItem = -5;
+        Assert.Equal (0, lv.TopItem);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Scrolling_Stops_When_Last_Item_Visible ()
+    {
+        ObservableCollection<string> source = new (["1", "2", "3", "4", "5"]);
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10,
+            Height = 3
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Scroll to maximum
+        lv.TopItem = 100;
+
+        // Last visible item should be item 4 (index 4), at row 2 (0-indexed)
+        // TopItem should be 2 so items 2, 3, 4 are visible
+        Assert.Equal (2, lv.TopItem);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void LeftItem_With_Small_Content_Clamps_To_Zero ()
+    {
+        ObservableCollection<string> source = new (["Hi"]); // 2 chars, smaller than viewport
+        ListView lv = new ()
+        {
+            Source = new ListWrapper<string> (source),
+            Width = 10, // Viewport larger than content
+            Height = 1
+        };
+        lv.BeginInit ();
+        lv.EndInit ();
+
+        // Max LeftItem should be max(0, 2 - 10) = 0
+        lv.LeftItem = 5;
+        Assert.Equal (0, lv.LeftItem);
     }
 
     #endregion

@@ -339,6 +339,9 @@ public class ListView : View, IDesignable
 
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
     /// <value>The left position.</value>
+    /// <remarks>
+    ///     Values are clamped to the valid range [0, MaxItemLength - Viewport.Width].
+    /// </remarks>
     public int LeftItem
     {
         get => Viewport.X;
@@ -349,10 +352,9 @@ public class ListView : View, IDesignable
                 return;
             }
 
-            if (value < 0 || (MaxItemLength > 0 && value >= MaxItemLength))
-            {
-                throw new ArgumentException ("value");
-            }
+            // Clamp to valid range: [0, MaxItemLength - Viewport.Width]
+            int maxLeftItem = Math.Max (0, MaxItemLength - Viewport.Width);
+            value = Math.Clamp (value, 0, maxLeftItem);
 
             Viewport = Viewport with { X = value };
             SetNeedsDraw ();
@@ -877,6 +879,9 @@ public class ListView : View, IDesignable
     ///     This a helper property for accessing <c>listView.Viewport.Y</c>.
     /// </remarks>
     /// <value>The top item.</value>
+    /// <remarks>
+    ///     Values are clamped to the valid range [0, Count - Viewport.Height].
+    /// </remarks>
     public int TopItem
     {
         get => Viewport.Y;
@@ -886,6 +891,10 @@ public class ListView : View, IDesignable
             {
                 return;
             }
+
+            // Clamp to valid range: [0, Count - Viewport.Height]
+            int maxTopItem = Math.Max (0, Source.Count - Viewport.Height);
+            value = Math.Clamp (value, 0, maxTopItem);
 
             Viewport = Viewport with { Y = value };
         }
