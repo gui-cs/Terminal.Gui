@@ -120,7 +120,7 @@ internal sealed class Arranger : IDisposable
     /// </remarks>
     private void ApplicationOnGrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
-        if (_border.App?.Mouse.IsGrabbed (_border) is true && IsDragging)
+        if (_border.App is { } && _border.App.Mouse.IsGrabbed (_border) && IsDragging)
         {
             e.Cancel = true;
         }
@@ -645,7 +645,8 @@ internal sealed class Arranger : IDisposable
 
         // Dragging - update position
         if (mouseEvent.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
-            && _border.App?.Mouse.IsGrabbed (_border) is true
+            && _border.App is { }
+            && _border.App.Mouse.IsGrabbed (_border)
             && _dragPosition.HasValue)
         {
             HandleMouseDrag (mouseEvent);
@@ -986,9 +987,9 @@ internal sealed class Arranger : IDisposable
     public void Dispose ()
     {
         // Ungrab mouse if we're still holding it
-        if (IsDragging && _border.App?.Mouse.IsGrabbed (_border) is true)
+        if (IsDragging && _border.App is { } && _border.App.Mouse.IsGrabbed (_border))
         {
-            _border.App?.Mouse.UngrabMouse ();
+            _border.App.Mouse.UngrabMouse ();
         }
 
         ExitArrangeMode ();

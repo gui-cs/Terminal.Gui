@@ -62,7 +62,7 @@ public partial class TextField
             _isButtonReleased = false;
             PrepareSelection (x);
 
-            if (!App?.Mouse.IsGrabbed (this) is true)
+            if (App is null || !App.Mouse.IsGrabbed (this))
             {
                 App?.Mouse.GrabMouse (this);
             }

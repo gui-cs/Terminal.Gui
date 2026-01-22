@@ -435,16 +435,9 @@ if (mouse.IsPressed &&
 
 #### 4.3: Mouse Grab Handling
 ```csharp
-if (_mouseGrabViewRef?.TryGetTarget(out View? grabbed) is true)
-{
-    // Convert to grab view coordinates and send
-    Point viewportLoc = grabbed.ScreenToViewport(mouse.ScreenPosition);
-    grabbed.NewMouseEvent(new Mouse { 
-        Position = viewportLoc, 
-        ScreenPosition = mouse.ScreenPosition,
-        View = grabbed 
-    });
-}
+// Check if a view has grabbed the mouse (internal implementation uses WeakReference)
+// and route the event to that view
+// This is handled internally by MouseImpl.HandleMouseGrab(deepestViewUnderMouse, mouse)
 ```
 
 #### 4.4: Convert to View Coordinates

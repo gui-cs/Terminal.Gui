@@ -125,9 +125,9 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
             smoothTimeout.Reset ();
         }
 
-        if (_mouseGrabber?.IsGrabbed (_mouseGrabView) is true)
+        if (_mouseGrabber is { } && _mouseGrabber.IsGrabbed (_mouseGrabView))
         {
-            _mouseGrabber?.UngrabMouse ();
+            _mouseGrabber.UngrabMouse ();
         }
 
         if (_timeoutToken != null)
@@ -141,7 +141,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
 
     public void Dispose ()
     {
-        if (_mouseGrabber?.IsGrabbed (_mouseGrabView) is true)
+        if (_mouseGrabber is { } && _mouseGrabber.IsGrabbed (_mouseGrabView))
         {
             //Logging.Trace ($"host: {_mouseGrabView.Id} Disposing and ungrabbing mouse");
             Stop ();
