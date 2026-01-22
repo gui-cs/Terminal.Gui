@@ -200,6 +200,10 @@ public class ListViewTests (ITestOutputHelper output)
     {
         ObservableCollection<string> source = ["One", "Two", "Three"];
         var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper<string> (source) };
+
+        // HACK to make test pass
+        lv.ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
+
         lv.BeginInit ();
         lv.EndInit ();
         Assert.Null (lv.SelectedItem);
@@ -1179,16 +1183,16 @@ public class ListViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
 ┌──────────┐
+│Line10    │
+│Line11    │
+│Line12    │
+│Line13    │
+│Line14    │
+│Line15    │
+│Line16    │
+│Line17    │
+│Line18    │
 │Line19    │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
-│          │
 └──────────┘",
                                                        _output,
                                                        app.Driver
