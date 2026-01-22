@@ -47,13 +47,13 @@ public class ComboBox : View, IDesignable
                                    SelectText ();
                                };
 
-        _listview.SelectedItemChanged += (sender, e) =>
-                                         {
-                                             if (e.Item >= 0 && !HideDropdownListOnClick && _searchSet.Count > 0)
-                                             {
-                                                 SetValue (_searchSet [e.Item.Value]);
-                                             }
-                                         };
+        _listview.ValueChanged += (sender, e) =>
+                                  {
+                                      if (e.NewValue >= 0 && !HideDropdownListOnClick && _searchSet.Count > 0)
+                                      {
+                                          SetValue (_searchSet [e.NewValue.Value]);
+                                      }
+                                  };
         Add (_search, _listview);
 
         // BUGBUG: This should not be needed; LayoutComplete will handle
@@ -970,17 +970,15 @@ public class ComboBox : View, IDesignable
             }
         }
 
-        public override bool OnSelectedChanged ()
+        protected override void OnValueChanged (ValueChangedEventArgs<int?> args)
         {
-            bool res = base.OnSelectedChanged ();
+            base.OnValueChanged (args);
 
             if (SelectedItem is null)
             {
-                return res;
+                return;
             }
             _highlighted = SelectedItem.Value;
-
-            return res;
         }
 
         private bool IsMousePositionValid (Mouse me)

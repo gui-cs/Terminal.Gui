@@ -892,7 +892,7 @@ public class ListViewTests (ITestOutputHelper output)
             BorderStyle = LineStyle.Single
         };
         lv.SetSource (["One", "Two", "Three", "Four"]);
-        lv.SelectedItemChanged += (s, e) => selected = e.Value!.ToString ();
+        lv.ValueChanged += (_, e) => selected = e.NewValue is not null ? lv.Source!.ToList () [e.NewValue.Value]!.ToString ()! : "";
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);

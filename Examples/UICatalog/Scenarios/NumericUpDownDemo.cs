@@ -157,7 +157,7 @@ internal sealed class NumericUpDownEditor<T> : View where T : notnull
 
         void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs) { _increment.Text = _numericUpDown!.Increment?.ToString ()!; }
 
-        void NumericUpDownOnValueChanged (object? o, EventArgs<T> eventArgs) { _value.Text = _numericUpDown.Text; }
+        void NumericUpDownOnValueChanged (object? o, ValueChangedEventArgs<T?> eventArgs) { _value.Text = _numericUpDown.Text; }
 
         void FormatOnAccept (object? o, EventArgs eventArgs)
         {
