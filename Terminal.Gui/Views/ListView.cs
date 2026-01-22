@@ -92,17 +92,31 @@ public class ListView : View, IDesignable
                             SetFocus ();
                         }
 
-                        if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse })
+                        // Handle mouse clicks
+                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
                         {
+                            Point position = mouse.Position!.Value;
+                            int index = Viewport.Y + position.Y;
+
+                            if (Source is { } && index < Source.Count)
+                            {
+                                SelectedItem = index;
+
+                                // Mark item only on Clicked (not Pressed) to avoid double-toggle
+                                // since both Pressed and Clicked trigger Command.Activate
+                                if (AllowsMarking && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                {
+                                    MarkUnmarkSelectedItem ();
+                                }
+                            }
+
                             return true;
                         }
 
-                        Point position = mouse.Position!.Value;
-                        int index = Viewport.Y + position.Y;
-
-                        if (Source is { } && index < Source.Count)
+                        // Handle keyboard (Space key) - mark item when AllowsMarking is enabled
+                        if (AllowsMarking && SelectedItem.HasValue)
                         {
-                            SelectedItem = index;
+                            MarkUnmarkSelectedItem ();
                         }
 
                         return true;

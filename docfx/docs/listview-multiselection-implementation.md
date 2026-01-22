@@ -25,9 +25,14 @@ Fixes nine related issues in ListView (Issue #4580):
 
 ---
 
-## Phase 0: Fix Existing Broken Command.Activate Handler
+## Phase 0: Fix Existing Broken Command.Activate Handler ✅ COMPLETED
 
 **CRITICAL:** Tests currently fail because the `Command.Activate` handler is broken. Must fix this FIRST.
+
+> **Status:** ✅ Completed - Fixed the `Command.Activate` handler to:
+> 1. Call `MarkUnmarkSelectedItem()` for keyboard events (Space key) when `AllowsMarking=true`
+> 2. Call `MarkUnmarkSelectedItem()` for mouse events only on `LeftButtonClicked` (not `LeftButtonPressed`) to avoid double-toggling
+> All 4 failing tests now pass.
 
 ### Current Failing Tests (4 total):
 1. `KeyBindings_Command` - Space key doesn't mark items
@@ -134,7 +139,13 @@ dotnet test Tests/IntegrationTests --no-build
 
 ---
 
-## Phase 1: Add Selection Tracking Infrastructure
+## Phase 1: Add Selection Tracking Infrastructure ✅ COMPLETED
+
+> **Status:** ✅ Already implemented - All selection tracking infrastructure was already in place:
+> - `MultiSelectedItems` property
+> - `_selectionAnchor` field
+> - `SetSelection()`, `GetAllSelectedItems()`, `IsSelected()`, `SelectAll()`, `UnselectAll()` methods
+> - `SelectedItem` setter resets anchor
 
 ### 1.1 Add Properties
 
