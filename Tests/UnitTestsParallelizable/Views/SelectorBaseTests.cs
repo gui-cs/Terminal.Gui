@@ -85,7 +85,7 @@ public class SelectorBaseTests
         selector.Labels = ["Option1", "Option2"];
 
         int? capturedValue = null;
-        selector.ValueChanged += (s, e) => capturedValue = e.Value;
+        selector.ValueChanged += (s, e) => capturedValue = e.NewValue;
 
         selector.Value = 1;
 
