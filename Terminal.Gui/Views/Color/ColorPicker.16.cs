@@ -1,7 +1,7 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
-public class ColorPicker16 : View
+public class ColorPicker16 : View, IValue<ColorName16>
 {
     /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
     public ColorPicker16 () => SetInitialProperties ();
@@ -49,9 +49,6 @@ public class ColorPicker16 : View
             }
         }
     }
-
-    /// <summary>Fired when a color is picked.</summary>
-    public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <summary>Cursor for the selected color.</summary>
     public Point Caret
@@ -175,7 +172,9 @@ public class ColorPicker16 : View
         return true;
     }
 
-    /// <summary>Selected color.</summary>
+    #region IValue<ColorName16> Implementation
+
+    /// <summary>Gets or sets the selected color.</summary>
     public ColorName16 SelectedColor
     {
         get => (ColorName16)_selectColorIndex;
@@ -186,12 +185,57 @@ public class ColorPicker16 : View
                 return;
             }
 
-            _selectColorIndex = (int)value;
+            var oldValue = (ColorName16)_selectColorIndex;
 
-            ColorChanged?.Invoke (this, new ResultEventArgs<Color> (value));
+            ValueChangingEventArgs<ColorName16> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            _selectColorIndex = (int)value;
             SetNeedsDraw ();
+
+            ValueChangedEventArgs<ColorName16> changedArgs = new (oldValue, value);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
     }
+
+    /// <inheritdoc/>
+    public ColorName16 Value { get => SelectedColor; set => SelectedColor = value; }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => SelectedColor;
+
+    /// <summary>
+    ///     Called when the <see cref="ColorPicker16"/> <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<ColorName16> args) => false;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<ColorName16>>? ValueChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="ColorPicker16"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<ColorName16> args) { }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<ColorName16>>? ValueChanged;
+
+    #endregion
 
     /// <summary>Add the commands.</summary>
     private void AddCommands ()
@@ -204,15 +248,18 @@ public class ColorPicker16 : View
         AddCommand (Command.Activate,
                     ctx =>
                     {
-                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
+                        if (ctx?.Binding is MouseBinding mouseCommandContext)
                         {
                             if (RaiseActivating (ctx) == true)
                             {
                                 return true;
                             }
 
-                            Caret = new Point (mouse.Position!.Value.X / _boxWidth,
-                                               mouse.Position!.Value.Y / _boxHeight);
+                            if (mouseCommandContext.MouseEvent is { })
+                            {
+                                Caret = new Point (mouseCommandContext.MouseEvent.Position!.Value.X / _boxWidth,
+                                                   mouseCommandContext.MouseEvent.Position!.Value.Y / _boxHeight);
+                            }
 
                             return SetFocus ();
                         }
@@ -257,7 +304,7 @@ public class ColorPicker16 : View
 
     private void DrawFocusRect (Rectangle rect)
     {
-        var lc = new LineCanvas ();
+        LineCanvas lc = new ();
 
         if (rect.Width == 1)
         {

@@ -148,29 +148,29 @@ public class TabViewExample : Scenario
         _miShowTopLineCheckBox = new ()
         {
             Title = "_Show Top Line",
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
-        _miShowTopLineCheckBox.CheckedStateChanged += (_, _) => ShowTopLine ();
+        _miShowTopLineCheckBox.ValueChanged += (_, _) => ShowTopLine ();
 
         _miShowBorderCheckBox = new ()
         {
             Title = "_Show Border",
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
-        _miShowBorderCheckBox.CheckedStateChanged += (_, _) => ShowBorder ();
+        _miShowBorderCheckBox.ValueChanged += (_, _) => ShowBorder ();
 
         _miTabsOnBottomCheckBox = new ()
         {
             Title = "_Tabs On Bottom"
         };
-        _miTabsOnBottomCheckBox.CheckedStateChanged += (_, _) => SetTabsOnBottom ();
+        _miTabsOnBottomCheckBox.ValueChanged += (_, _) => SetTabsOnBottom ();
 
         _miShowTabViewBorderCheckBox = new ()
         {
             Title = "_Show TabView Border",
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
-        _miShowTabViewBorderCheckBox.CheckedStateChanged += (_, _) => ShowTabViewBorder ();
+        _miShowTabViewBorderCheckBox.ValueChanged += (_, _) => ShowTabViewBorder ();
 
         menu.Add (
                   new MenuBarItem (
@@ -285,7 +285,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.Style.TabsOnBottom = _miTabsOnBottomCheckBox.CheckedState == CheckState.Checked;
+        _tabView.Style.TabsOnBottom = _miTabsOnBottomCheckBox.Value == CheckState.Checked;
         _tabView.ApplyStyleChanges ();
     }
 
@@ -296,7 +296,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.Style.ShowBorder = _miShowBorderCheckBox.CheckedState == CheckState.Checked;
+        _tabView.Style.ShowBorder = _miShowBorderCheckBox.Value == CheckState.Checked;
         _tabView.ApplyStyleChanges ();
     }
 
@@ -307,7 +307,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.BorderStyle = _miShowTabViewBorderCheckBox.CheckedState == CheckState.Checked
+        _tabView.BorderStyle = _miShowTabViewBorderCheckBox.Value == CheckState.Checked
                                    ? LineStyle.Single
                                    : LineStyle.None;
         _tabView.ApplyStyleChanges ();
@@ -320,7 +320,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.Style.ShowTopLine = _miShowTopLineCheckBox.CheckedState == CheckState.Checked;
+        _tabView.Style.ShowTopLine = _miShowTopLineCheckBox.Value == CheckState.Checked;
         _tabView.ApplyStyleChanges ();
     }
 }

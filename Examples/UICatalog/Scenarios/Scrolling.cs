@@ -50,39 +50,39 @@ public class Scrolling : Scenario
             X = Pos.X (demoView),
             Y = Pos.Bottom (demoView),
             Text = "_HorizontalScrollBar.Visible",
-            CheckedState = demoView.HorizontalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
+            Value = demoView.HorizontalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
         };
         win.Add (hCheckBox);
-        hCheckBox.CheckedStateChanged += (_, args) => { demoView.HorizontalScrollBar.Visible = args.Value == CheckState.Checked; };
+        hCheckBox.ValueChanged += (_, args) => { demoView.HorizontalScrollBar.Visible = args.NewValue == CheckState.Checked; };
 
         var vCheckBox = new CheckBox
         {
             X = Pos.Right (hCheckBox) + 3,
             Y = Pos.Bottom (demoView),
             Text = "_VerticalScrollBar.Visible",
-            CheckedState = demoView.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
+            Value = demoView.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
         };
         win.Add (vCheckBox);
-        vCheckBox.CheckedStateChanged += (_, args) => { demoView.VerticalScrollBar.Visible = args.Value == CheckState.Checked; };
+        vCheckBox.ValueChanged += (_, args) => { demoView.VerticalScrollBar.Visible = args.NewValue == CheckState.Checked; };
 
         var ahCheckBox = new CheckBox
         {
             X = Pos.Left (demoView),
             Y = Pos.Bottom (hCheckBox),
             Text = "_AutoShow (both)",
-            CheckedState = demoView.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
+            Value = demoView.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
         };
 
-        ahCheckBox.CheckedStateChanging += (_, e) =>
+        ahCheckBox.ValueChanging += (_, e) =>
                                            {
-                                               demoView.HorizontalScrollBar.AutoShow = e.Result == CheckState.Checked;
-                                               demoView.VerticalScrollBar.AutoShow = e.Result == CheckState.Checked;
+                                               demoView.HorizontalScrollBar.AutoShow = e.NewValue == CheckState.Checked;
+                                               demoView.VerticalScrollBar.AutoShow = e.NewValue == CheckState.Checked;
                                            };
         win.Add (ahCheckBox);
 
-        demoView.VerticalScrollBar.VisibleChanging += (_, args) => { vCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
+        demoView.VerticalScrollBar.VisibleChanging += (_, args) => { vCheckBox.Value = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
 
-        demoView.HorizontalScrollBar.VisibleChanging += (_, args) => { hCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
+        demoView.HorizontalScrollBar.VisibleChanging += (_, args) => { hCheckBox.Value = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
 
         // Add a progress bar to cause constant redraws
         var progress = new ProgressBar

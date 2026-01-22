@@ -343,20 +343,20 @@ public class ScenarioTests : TestsAllViews
 
         classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
 
-        classListView.SelectedItemChanged += (s, args) =>
-                                             {
-                                                 // Remove existing class, if any
-                                                 if (curView is { })
-                                                 {
-                                                     curView.SubViewsLaidOut -= LayoutCompleteHandler;
-                                                     hostPane.Remove (curView);
-                                                     curView.Dispose ();
-                                                     curView = null;
-                                                     hostPane.FillRect (hostPane.Viewport);
-                                                 }
+        classListView.ValueChanged += (_, _) =>
+                                      {
+                                          // Remove existing class, if any
+                                          if (curView is { })
+                                          {
+                                              curView.SubViewsLaidOut -= LayoutCompleteHandler;
+                                              hostPane.Remove (curView);
+                                              curView.Dispose ();
+                                              curView = null;
+                                              hostPane.FillRect (hostPane.Viewport);
+                                          }
 
-                                                 curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem!.Value]);
-                                             };
+                                          curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem!.Value]);
+                                      };
 
         xOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
 
