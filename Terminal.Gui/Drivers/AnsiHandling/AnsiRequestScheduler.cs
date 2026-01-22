@@ -208,7 +208,7 @@ public class AnsiRequestScheduler
 
     private void Send (IDriver? driver, AnsiEscapeSequenceRequest r)
     {
-        Logging.Trace ($"AnsiRequestScheduler.Send: Terminator='{r.Terminator}' Value='{r.Value ?? "<null>"}'");
+        //Logging.Trace ($"AnsiRequestScheduler.Send: Terminator='{r.Terminator}' Value='{r.Value ?? "<null>"}'");
 
         _lastSend.AddOrUpdate ((r.Terminator!, r.Value), _ => Now (), (_, _) => Now ());
         _parser.ExpectResponse (r.Terminator, r.Value, r.ResponseReceived, r.Abandoned, false);
