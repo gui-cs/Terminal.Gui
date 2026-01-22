@@ -156,7 +156,7 @@ internal class MouseImpl : IMouse, IDisposable
             RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
         }
 
-        while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabView is not { })
+        while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && _mouseGrabViewRef is null)
         {
             if (deepestViewUnderMouse is Adornment adornmentView)
             {
@@ -218,7 +218,7 @@ internal class MouseImpl : IMouse, IDisposable
             // If the mouse is grabbed by another view, don't send MouseEnter events to other views.
             // This prevents views from highlighting when the user drags the mouse over them while holding
             // a button down on a different view.
-            if (MouseGrabView is { } && view != MouseGrabView)
+            if (!IsGrabbed (view) && _mouseGrabViewRef is not null)
             {
                 continue;
             }
@@ -254,8 +254,18 @@ internal class MouseImpl : IMouse, IDisposable
 
     #region IMouseGrabHandler Implementation
 
+    private WeakReference<View>? _mouseGrabViewRef;
+
     /// <inheritdoc/>
-    public View? MouseGrabView { get; private set; }
+    public bool IsGrabbed (View? view)
+    {
+        if (view is null || _mouseGrabViewRef is null)
+        {
+            return false;
+        }
+
+        return _mouseGrabViewRef.TryGetTarget (out View? grabbed) && ReferenceEquals (grabbed, view);
+    }
 
     /// <inheritdoc/>
     public event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
@@ -286,23 +296,22 @@ internal class MouseImpl : IMouse, IDisposable
 
         RaiseGrabbedMouseEvent (view);
 
-        // MouseGrabView is only set if the application is initialized.
-        MouseGrabView = view;
+        // _mouseGrabViewRef is only set if the application is initialized.
+        _mouseGrabViewRef = new WeakReference<View> (view);
     }
 
     /// <inheritdoc/>
     public void UngrabMouse ()
     {
-        if (MouseGrabView is null)
+        if (_mouseGrabViewRef is null || !_mouseGrabViewRef.TryGetTarget (out View? grabbedView))
         {
             return;
         }
 
-        if (!RaiseUnGrabbingMouseEvent (MouseGrabView))
+        if (!RaiseUnGrabbingMouseEvent (grabbedView))
         {
-            View view = MouseGrabView;
-            MouseGrabView = null;
-            RaiseUnGrabbedMouseEvent (view);
+            _mouseGrabViewRef = null;
+            RaiseUnGrabbedMouseEvent (grabbedView);
 
             // After ungrabbing, immediately update enter/leave state for views under the current mouse position
             // This ensures that if the mouse was released over a different view, that view receives MouseEnter
@@ -376,18 +385,18 @@ internal class MouseImpl : IMouse, IDisposable
     /// <returns><see langword="true"/> if the event was handled by the grab handler; otherwise <see langword="false"/>.</returns>
     public bool HandleMouseGrab (View? deepestViewUnderMouse, Mouse mouse)
     {
-        if (MouseGrabView is { })
+        if (_mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true)
         {
 #if DEBUG_IDISPOSABLE
-            if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
+            if (View.EnableDebugIDisposableAsserts && grabbed.WasDisposed)
             {
-                throw new ObjectDisposedException (MouseGrabView.ToDebugString ());
+                throw new ObjectDisposedException (grabbed.ToDebugString ());
             }
 #endif
 
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (mouse.ScreenPosition);
+            Point frameLoc = grabbed.ScreenToViewport (mouse.ScreenPosition);
 
             Mouse viewRelativeMouseEvent = new ()
             {
@@ -395,11 +404,11 @@ internal class MouseImpl : IMouse, IDisposable
                 Position = frameLoc,
                 Flags = mouse.Flags,
                 ScreenPosition = mouse.ScreenPosition,
-                View = MouseGrabView // Always set to the grab view. See Issue #4370
+                View = grabbed // Always set to the grab view. See Issue #4370
             };
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent);
+            grabbed.NewMouseEvent (viewRelativeMouseEvent);
 
             // When the mouse is grabbed, always return true to prevent the event from propagating
             // to other views, regardless of whether the grabbed view handled it or not.
@@ -419,7 +428,7 @@ internal class MouseImpl : IMouse, IDisposable
         // Do not clear LastMousePosition; Popovers require it to stay set with last mouse pos.
         CachedViewsUnderMouse.Clear ();
         MouseEvent = null;
-        MouseGrabView = null;
+        _mouseGrabViewRef = null;
     }
 
     /// <inheritdoc/>

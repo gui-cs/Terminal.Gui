@@ -577,7 +577,7 @@ public partial class View // Mouse APIs
         }
 
         // If the user has just pressed the mouse, grab the mouse and set focus
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             App?.Mouse.GrabMouse (this);
 
@@ -611,7 +611,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             return false;
         }
@@ -637,7 +637,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             return false;
         }
@@ -870,7 +870,7 @@ public partial class View // Mouse APIs
             MouseHoldRepeater.Dispose ();
         }
 
-        if (App?.Mouse.MouseGrabView == this)
+        if (App?.Mouse.IsGrabbed (this) is true)
         {
             App.Mouse.UngrabMouse ();
         }

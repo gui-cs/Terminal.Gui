@@ -171,7 +171,7 @@ public partial class TextView
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
 
-            if (App?.Mouse.MouseGrabView is null)
+            if (!App?.Mouse.IsGrabbed (this) is true)
             {
                 App?.Mouse.GrabMouse (this);
             }

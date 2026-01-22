@@ -309,7 +309,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
         {
             if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed) && _lastLocation == -1)
             {
-                if (App?.Mouse.MouseGrabView != this)
+                if (!App?.Mouse.IsGrabbed (this) is true)
                 {
                     App?.Mouse.GrabMouse (this);
                     _lastLocation = location;
@@ -336,7 +336,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
             {
                 _lastLocation = -1;
 
-                if (App?.Mouse.MouseGrabView == this)
+                if (App?.Mouse.IsGrabbed (this) is true)
                 {
                     App?.Mouse.UngrabMouse ();
                 }

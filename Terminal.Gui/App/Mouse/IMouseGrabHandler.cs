@@ -55,13 +55,19 @@ public interface IMouseGrabHandler
     public void GrabMouse (View? view);
 
     /// <summary>
-    ///     Gets the view that currently has grabbed the mouse (e.g., for dragging).
+    ///     Determines whether the specified view currently has the mouse grabbed.
     ///     <para>
-    ///         When this property is not <see langword="null"/>, all mouse events are routed to this view until
-    ///         <see cref="UngrabMouse"/> is called or the mouse is released.
+    ///         This method uses reference equality to check if the given view is the one that currently
+    ///         has exclusive mouse event routing. If the grabbed view has been disposed or garbage collected,
+    ///         this method returns <see langword="false"/>.
     ///     </para>
     /// </summary>
-    public View? MouseGrabView { get; }
+    /// <param name="view">The view to check. If <see langword="null"/>, returns <see langword="false"/>.</param>
+    /// <returns>
+    ///     <see langword="true"/> if the specified view currently has the mouse grabbed;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    public bool IsGrabbed (View? view);
 
     /// <summary>
     ///     Occurs after a view has released the mouse grab.
