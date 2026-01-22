@@ -46,7 +46,6 @@ public class ListViewWithSelection : Scenario
         {
             X = Pos.Right (_allowMarkingCb) + 1,
             Y = 0,
-            Enabled = _allowMarkingCb.Value == CheckState.Checked,
             Text = "AllowsMulti_Select"
         };
         _appWindow.Add (_allowMultipleCb);
@@ -138,7 +137,6 @@ public class ListViewWithSelection : Scenario
     private void AllowsMarkingCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
         _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
-        _allowMultipleCb.Enabled = _listView.AllowsMarking;
         _appWindow.SetNeedsDraw ();
     }
 
@@ -151,32 +149,32 @@ public class ListViewWithSelection : Scenario
     private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
 
     {
-        if (_customRenderCb.Value == CheckState.Checked)
-        {
-            // Only use the built-in RowRender event when we're not using custom rendering
-            return;
-        }
+        //if (_customRenderCb.Value == CheckState.Checked)
+        //{
+        //    // Only use the built-in RowRender event when we're not using custom rendering
+        //    return;
+        //}
 
-        if (obj.Row == _listView.SelectedItem)
-        {
-            return;
-        }
+        //if (obj.Row == _listView.SelectedItem)
+        //{
+        //    return;
+        //}
 
-        if (_listView.AllowsMarking && _listView.Source!.IsMarked (obj.Row))
-        {
-            obj.RowAttribute = _listView.GetAttributeForRole (VisualRole.Highlight);
+        //if (_listView.AllowsMarking && _listView.Source!.IsMarked (obj.Row))
+        //{
+        //    obj.RowAttribute = _listView.GetAttributeForRole (VisualRole.Highlight);
 
-            return;
-        }
+        //    return;
+        //}
 
-        if (obj.Row % 2 == 0)
-        {
-            obj.RowAttribute = _listView.GetAttributeForRole (VisualRole.Active);
-        }
-        else
-        {
-            obj.RowAttribute = _listView.GetAttributeForRole (VisualRole.Normal);
-        }
+        //if (obj.Row % 2 == 0)
+        //{
+        //    obj.RowAttribute = _listView.GetAttributeForRole (VisualRole.Active);
+        //}
+        //else
+        //{
+        //    obj.RowAttribute = _listView.GetAttributeForRole (VisualRole.Normal);
+        //}
     }
 
     // This is basically the same implementation used by the UICatalog main window
@@ -246,7 +244,7 @@ public class ListViewWithSelection : Scenario
 
             if (item % 2 == 0)
             {
-                rowAttribute = listView.GetAttributeForRole (VisualRole.Normal);
+                rowAttribute = listView.GetAttributeForRole (VisualRole.Active);
             }
             else
             {
@@ -255,7 +253,7 @@ public class ListViewWithSelection : Scenario
 
             if (item == listView.SelectedItem)
             {
-                rowAttribute = listView.GetAttributeForRole (VisualRole.Normal);
+                rowAttribute = listView.GetAttributeForRole (VisualRole.Focus);
             }
 
             var used = 0;
