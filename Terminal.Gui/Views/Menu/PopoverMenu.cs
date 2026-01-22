@@ -595,13 +595,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
 
-        if (e.Context?.Source is MenuItem { SubMenu: null })
+        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true)
         {
-            HideAndRemoveSubMenu (_root);
-        }
-        else if (e.Context?.Source is MenuItem { SubMenu: { } } menuItemWithSubMenu)
-        {
-            ShowSubMenu (menuItemWithSubMenu);
+            if (sourceView is MenuItem { SubMenu: null })
+            {
+                HideAndRemoveSubMenu (_root);
+            }
+            else if (sourceView is MenuItem { SubMenu: { } } menuItemWithSubMenu)
+            {
+                ShowSubMenu (menuItemWithSubMenu);
+            }
         }
 
         RaiseAccepted (e.Context);

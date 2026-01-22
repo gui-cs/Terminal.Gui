@@ -70,7 +70,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return true;
         }
 
-        if (!CanFocus || args.Context?.Source is not CheckBox checkBox)
+        if (!CanFocus || args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
         {
             Cycle ();
 

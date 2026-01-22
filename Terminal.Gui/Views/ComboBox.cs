@@ -84,7 +84,7 @@ public class ComboBox : View, IDesignable
         AddCommand (Command.Accept,
                     ctx =>
                     {
-                        if (ctx?.Source == _search)
+                        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true && sourceView == _search)
                         {
                             return null;
                         }

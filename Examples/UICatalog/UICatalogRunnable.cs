@@ -260,10 +260,12 @@ public sealed class UICatalogRunnable : Runnable
 
             _diagnosticFlagsSelector.Activating += (_, args) =>
                                                    {
-                                                       _diagnosticFlags =
-                                                           (ViewDiagnosticFlags)(int)args.Context!.Source!
-                                                                                         .Data!; // (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                                                       Diagnostics = _diagnosticFlags;
+                                                       if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true)
+                                                       {
+                                                           _diagnosticFlags =
+                                                               (ViewDiagnosticFlags)(int)sourceView.Data!; // (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                                           Diagnostics = _diagnosticFlags;
+                                                       }
                                                    };
 
             var diagFlagMenuItem = new MenuItem { CommandView = _diagnosticFlagsSelector, HelpText = "View Diagnostics" };

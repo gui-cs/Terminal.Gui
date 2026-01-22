@@ -179,7 +179,7 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (new CommandContext { Command = command, Source = this, Binding = binding });
+        return implementation! (new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding });
     }
 
     /// <summary>
@@ -222,7 +222,7 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (new CommandContext { Command = command, Source = this, Binding = null });
+        return implementation! (new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = null });
     }
 
     #endregion Invoke
