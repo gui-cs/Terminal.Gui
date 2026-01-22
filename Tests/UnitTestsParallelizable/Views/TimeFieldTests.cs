@@ -204,7 +204,6 @@ public class TimeFieldTests
         Assert.Equal (4, tf.InsertionPoint);
     }
 
-    // Claude - Opus 4.5
     [Fact]
     public void CursorPosition_After_ClearingSelection_RightArrow ()
     {
@@ -223,7 +222,6 @@ public class TimeFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
 
         // Debug output
-        Console.WriteLine ($"After Right arrow: InsertionPoint={tf.InsertionPoint}, SelectedStart={tf.SelectedStart}, SelectedLength={tf.SelectedLength}");
 
         // After clearing selection, cursor should be at the end (position 8, the max valid position)
         Assert.Equal (-1, tf.SelectedStart);
@@ -231,7 +229,6 @@ public class TimeFieldTests
         Assert.Equal (8, tf.InsertionPoint);
     }
 
-    // Claude - Opus 4.5
     [Fact]
     public void CursorPosition_After_ClearingSelection_Backspace ()
     {
@@ -257,7 +254,6 @@ public class TimeFieldTests
         Assert.Equal (7, tf.InsertionPoint);
     }
 
-    // Claude - Opus 4.5
     [Fact]
     public void CursorPosition_After_ClearingSelection_End ()
     {
@@ -281,7 +277,6 @@ public class TimeFieldTests
         Assert.Equal (8, tf.InsertionPoint);
     }
 
-    // Claude - Opus 4.5
     [Fact]
     public void CursorPosition_After_SelectAll_RightArrow ()
     {
@@ -307,7 +302,6 @@ public class TimeFieldTests
         Assert.Equal (8, tf.InsertionPoint);
     }
 
-    // Claude - Opus 4.5
     [Fact]
     public void CursorPosition_After_SelectAll_End ()
     {
@@ -327,7 +321,6 @@ public class TimeFieldTests
         Assert.Equal (8, tf.InsertionPoint);
     }
 
-    // Claude - Opus 4.5
     [Fact]
     public void CursorPosition_After_SelectAll_Backspace ()
     {
