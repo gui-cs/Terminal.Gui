@@ -647,6 +647,8 @@ Test the complete MenuBar scenario with:
 
 ### Phase 1: Foundation - Add PropagatedCommands Property
 
+**Status**: ✅ **COMPLETE** - Compiles | All existing tests pass | New tests written and passing
+
 **Objective**: Add core infrastructure without breaking changes.
 
 **Changes**:
@@ -662,8 +664,6 @@ Test the complete MenuBar scenario with:
 3. Update `RaiseAccepting` to use `PropagateCommand` helper:
    - Replace direct propagation logic with helper call
    - Should maintain 100% backward compatibility
-
-**Status**: ✅ Compiles | ✅ All existing tests pass
 
 **Test Impact**: None - backward compatible
 
