@@ -207,7 +207,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_After_ClearingSelection_RightArrow ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        TimeField tf = new () { Time = TimeSpan.Parse ("08:52:40") };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -221,8 +221,6 @@ public class TimeFieldTests
         // Press Right arrow - should clear selection and move to end
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
 
-        // Debug output
-
         // After clearing selection, cursor should be at the end (position 8, the max valid position)
         Assert.Equal (-1, tf.SelectedStart);
         Assert.Equal (0, tf.SelectedLength);
@@ -232,7 +230,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_After_ClearingSelection_Backspace ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        TimeField tf = new () { Time = TimeSpan.Parse ("08:52:40") };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -257,7 +255,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_After_ClearingSelection_End ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        TimeField tf = new () { Time = TimeSpan.Parse ("08:52:40") };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -280,7 +278,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_After_SelectAll_RightArrow ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        TimeField tf = new () { Time = TimeSpan.Parse ("08:52:40") };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -305,7 +303,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_After_SelectAll_End ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        TimeField tf = new () { Time = TimeSpan.Parse ("08:52:40") };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -324,7 +322,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_After_SelectAll_Backspace ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("08:52:40") };
+        TimeField tf = new () { Time = TimeSpan.Parse ("08:52:40") };
         tf.BeginInit ();
         tf.EndInit ();
 
