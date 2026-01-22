@@ -46,7 +46,7 @@ public sealed class Themes : Scenario
                                                  {
                                                      return;
                                                  }
-                                                 string? newTheme = optionSelector.Labels! [(int)args.Value!] as string;
+                                                 string? newTheme = optionSelector.Labels! [(int)args.NewValue!] as string;
                                                  // strip off the leading underscore
                                                  ThemeManager.Theme = newTheme!.Substring (1);
                                                  ConfigurationManager.Apply ();
@@ -103,24 +103,30 @@ public sealed class Themes : Scenario
         };
         viewFrame.Border!.Thickness = new (0, 1, 0, 0);
 
-        viewListView.SelectedItemChanged += (_, args) =>
-                                            {
-                                                if (_view is not null)
-                                                {
-                                                    viewPropertiesEditor.ViewToEdit = null;
-                                                    viewFrame.Remove (_view);
-                                                    _view.Dispose ();
-                                                    _view = null;
-                                                }
+        viewListView.ValueChanged += (_, args) =>
+                                     {
+                                         if (_view is not null)
+                                         {
+                                             viewPropertiesEditor.ViewToEdit = null;
+                                             viewFrame.Remove (_view);
+                                             _view.Dispose ();
+                                             _view = null;
+                                         }
 
-                                                _view = CreateView (viewClasses [(args.Value as string)!]);
+                                         if (args.NewValue is null)
+                                         {
+                                             return;
+                                         }
 
-                                                if (_view is not null)
-                                                {
-                                                    viewFrame.Add (_view);
-                                                    viewPropertiesEditor.ViewToEdit = _view;
-                                                }
-                                            };
+                                         string viewName = (string)viewListView.Source!.ToList () [args.NewValue.Value]!;
+                                         _view = CreateView (viewClasses [viewName]);
+
+                                         if (_view is not null)
+                                         {
+                                             viewFrame.Add (_view);
+                                             viewPropertiesEditor.ViewToEdit = _view;
+                                         }
+                                     };
 
 
         appWindow.Add (themeOptionSelector, themeViewer, allViewsCheckBox, viewListView, viewPropertiesEditor, viewFrame);
@@ -144,9 +150,9 @@ public sealed class Themes : Scenario
 
         AllViewsView? allViewsView = null;
 
-        allViewsCheckBox.CheckedStateChanged += (_, args) =>
+        allViewsCheckBox.ValueChanged += (_, args) =>
                                                 {
-                                                    if (args.Value == CheckState.Checked)
+                                                    if (args.NewValue == CheckState.Checked)
                                                     {
                                                         viewListView.Visible = false;
                                                         appWindow.Remove (viewFrame);

@@ -41,7 +41,7 @@ namespace Terminal.Gui.Views;
 ///         first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
-public class ListView : View, IDesignable
+public class ListView : View, IDesignable, IValue<int?>
 {
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
@@ -544,32 +544,70 @@ public class ListView : View, IDesignable
                 throw new ArgumentException (@"SelectedItem must be greater than 0 or less than the number of items.");
             }
 
+            int? oldValue = field;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            ValueChangingEventArgs<int?> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
             field = value;
-            OnSelectedChanged ();
             SetNeedsDraw ();
+
+            if (SelectedItem != _lastSelectedItem)
+            {
+                _lastSelectedItem = SelectedItem;
+                EnsureSelectedItemVisible ();
+            }
+
+            ValueChangedEventArgs<int?> changedArgs = new (oldValue, field);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
     }
 
-    // TODO: Use CWP event model
-    /// <summary>Invokes the <see cref="SelectedItemChanged"/> event if it is defined.</summary>
-    /// <returns></returns>
-    public virtual bool OnSelectedChanged ()
-    {
-        if (SelectedItem == _lastSelectedItem)
-        {
-            return false;
-        }
+    #region IValue<int?> Implementation
 
-        object? value = SelectedItem.HasValue && Source?.Count > 0 ? Source.ToList () [SelectedItem.Value] : null;
-        SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs (SelectedItem, value));
-        _lastSelectedItem = SelectedItem;
-        EnsureSelectedItemVisible ();
+    /// <inheritdoc/>
+    public int? Value { get => SelectedItem; set => SelectedItem = value; }
 
-        return true;
-    }
+    /// <inheritdoc/>
+    object? IValue.GetValue () => SelectedItem;
 
-    /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
-    public event EventHandler<ListViewItemEventArgs>? SelectedItemChanged;
+    /// <summary>
+    ///     Called when the <see cref="ListView"/> <see cref="SelectedItem"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="ListView"/> <see cref="SelectedItem"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+    #endregion
 
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>

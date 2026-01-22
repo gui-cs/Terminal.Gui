@@ -90,7 +90,7 @@ public class HexEditor : Scenario
         CheckBox cb = new ()
         {
             Title = _miReadOnly.Title,
-            CheckedState = _hexView.ReadOnly ? CheckState.Checked : CheckState.None,
+            Value = _hexView.ReadOnly ? CheckState.Checked : CheckState.None,
         };
         _miReadOnly.CommandView = cb;
         _win.Add (menu);
@@ -108,9 +108,9 @@ public class HexEditor : Scenario
 
         addressWidthUpDown.ValueChanging += (_, args) =>
                                             {
-                                                args.Cancel = args.NewValue is < 0 or > 8;
+                                                args.Handled = args.NewValue < 0 || args.NewValue > 8;
 
-                                                if (!args.Cancel)
+                                                if (!args.Handled)
                                                 {
                                                     _hexView.AddressWidth = args.NewValue;
 
@@ -121,9 +121,9 @@ public class HexEditor : Scenario
 
         addressUpDown.ValueChanging += (_, args) =>
                                        {
-                                           args.Cancel = args.NewValue is < 0;
+                                           args.Handled = args.NewValue < 0;
 
-                                           if (!args.Cancel)
+                                           if (!args.Handled)
                                            {
                                                _hexView.Address = args.NewValue;
                                            }
@@ -280,6 +280,6 @@ public class HexEditor : Scenario
             return;
         }
 
-        _hexView!.ReadOnly = cb.CheckedState == CheckState.Checked;
+        _hexView!.ReadOnly = cb.Value == CheckState.Checked;
     }
 }

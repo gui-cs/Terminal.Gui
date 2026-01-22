@@ -378,7 +378,7 @@ public class DynamicStatusBar : Scenario
             btnCancel.Accepting += (s, e) => { SetFrameDetails (_currentEditStatusItem); };
             Add (btnCancel);
 
-            _lstItems.SelectedItemChanged += (s, e) => { SetFrameDetails (); };
+            _lstItems.ValueChanged += (_, _) => { SetFrameDetails (); };
 
             btnOk.Accepting += (s, e) =>
                               {
