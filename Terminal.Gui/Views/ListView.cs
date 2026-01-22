@@ -92,14 +92,13 @@ public class ListView : View, IDesignable
                             SetFocus ();
                         }
 
-                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
+                        if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse })
                         {
-                            Point position = mouse.Position!.Value;
-                            SelectedItem = position.Y;
+                            return true;
                         }
 
-                        Point position = mouseCommandContext.Binding.MouseEventArgs.Position!.Value;
-                        SelectedItem = position.Y;
+                        Point pos = mouse.Position!.Value;
+                        SelectedItem = pos.Y;
 
                         return true;
                     });

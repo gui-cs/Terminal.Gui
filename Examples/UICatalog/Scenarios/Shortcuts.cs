@@ -46,7 +46,7 @@ public class Shortcuts : Scenario
             Title = "E_vents"
         };
 
-        eventLog.Width = Dim.Func (_ => Math.Min (eventLog.SuperView!.Viewport.Width / 2, eventLog.MaxLength + eventLog.GetAdornmentsThickness ().Horizontal));
+        eventLog.Width = Dim.Func (_ => Math.Min (eventLog.SuperView!.Viewport.Width / 2, eventLog.MaxItemLength + eventLog.GetAdornmentsThickness ().Horizontal));
         _app?.TopRunnableView.Add (eventLog);
 
         var alignKeysShortcut = new Shortcut

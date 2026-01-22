@@ -36,4 +36,15 @@ public sealed class Generic : Scenario
         // Run - Start the application.
         app.Run (appWindow);
     }
+
+    private class TestPopover : PopoverBaseImpl
+    {
+        public TestPopover ()
+        {
+            BorderStyle = LineStyle.Dotted;
+            Title = "TestPopover";
+            Text = "Some Text";
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable;
+        }
+    }
 }
