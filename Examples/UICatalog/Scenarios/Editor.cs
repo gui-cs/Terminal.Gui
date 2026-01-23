@@ -104,12 +104,12 @@ public class Editor : Scenario
 
         _miForceMinimumPosToZeroCheckBox = new CheckBox
         {
-            Title = "ForceMinimumPosTo_Zero", CheckedState = _forceMinimumPosToZero ? CheckState.Checked : CheckState.UnChecked
+            Title = "ForceMinimumPosTo_Zero", Value = _forceMinimumPosToZero ? CheckState.Checked : CheckState.UnChecked
         };
 
-        _miForceMinimumPosToZeroCheckBox.CheckedStateChanging += (s, e) =>
+        _miForceMinimumPosToZeroCheckBox.ValueChanging += (s, e) =>
                                                                  {
-                                                                     _forceMinimumPosToZero = e.Result == CheckState.Checked;
+                                                                     _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
 
                                                                      // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
                                                                      // if (_textView?.ContextMenu is not null)
@@ -265,9 +265,9 @@ public class Editor : Scenario
 
         List<MenuItem> menuItems = [];
 
-        CheckBox scrollBarCheckBox = new () { Title = "_Scroll Bars", CheckedState = _textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked };
+        CheckBox scrollBarCheckBox = new () { Title = "_Scroll Bars", Value = _textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked };
 
-        scrollBarCheckBox.CheckedStateChanged += (s, e) => { _textView.ScrollBars = scrollBarCheckBox.CheckedState == CheckState.Checked; };
+        scrollBarCheckBox.ValueChanged += (s, e) => { _textView.ScrollBars = scrollBarCheckBox.Value == CheckState.Checked; };
 
         MenuItem verticalItem = new () { CommandView = scrollBarCheckBox };
 
@@ -295,19 +295,19 @@ public class Editor : Scenario
 
         void CreateCultureMenuItem (string title, string cultureName, bool isChecked)
         {
-            CheckBox checkBox = new () { Title = title, CheckedState = isChecked ? CheckState.Checked : CheckState.UnChecked };
+            CheckBox checkBox = new () { Title = title, Value = isChecked ? CheckState.Checked : CheckState.UnChecked };
 
             allCheckBoxes.Add (checkBox);
 
-            checkBox.CheckedStateChanging += (s, e) =>
+            checkBox.ValueChanging += (s, e) =>
                                              {
-                                                 if (e.Result == CheckState.Checked)
+                                                 if (e.NewValue == CheckState.Checked)
                                                  {
                                                      Thread.CurrentThread.CurrentUICulture = new CultureInfo (cultureName);
 
                                                      foreach (CheckBox cb in allCheckBoxes)
                                                      {
-                                                         cb.CheckedState = cb == checkBox ? CheckState.Checked : CheckState.UnChecked;
+                                                         cb.Value = cb == checkBox ? CheckState.Checked : CheckState.UnChecked;
                                                      }
                                                  }
                                              };
@@ -344,9 +344,9 @@ public class Editor : Scenario
             return new MenuItem { Title = "Word Wrap" };
         }
 
-        CheckBox checkBox = new () { Title = "_Word Wrap", CheckedState = _textView.WordWrap ? CheckState.Checked : CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "_Word Wrap", Value = _textView.WordWrap ? CheckState.Checked : CheckState.UnChecked };
 
-        checkBox.CheckedStateChanged += (s, e) => { _textView.WordWrap = checkBox.CheckedState == CheckState.Checked; };
+        checkBox.ValueChanged += (s, e) => { _textView.WordWrap = checkBox.Value == CheckState.Checked; };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -369,11 +369,11 @@ public class Editor : Scenario
         SingleWordSuggestionGenerator singleWordGenerator = new ();
         _textView.Autocomplete.SuggestionGenerator = singleWordGenerator;
 
-        CheckBox checkBox = new () { Title = "Autocomplete", CheckedState = CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "Autocomplete", Value = CheckState.UnChecked };
 
-        checkBox.CheckedStateChanged += (s, e) =>
+        checkBox.ValueChanged += (s, e) =>
                                         {
-                                            if (checkBox.CheckedState == CheckState.Checked)
+                                            if (checkBox.Value == CheckState.Checked)
                                             {
                                                 singleWordGenerator.AllSuggestions =
                                                     Regex.Matches (_textView.Text, "\\w+").Select (s => s.Value).Distinct ().ToList ();
@@ -402,9 +402,9 @@ public class Editor : Scenario
             return new MenuItem { Title = "Tab Enters Tab" };
         }
 
-        CheckBox checkBox = new () { Title = "Tab Enters Tab", CheckedState = _textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "Tab Enters Tab", Value = _textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked };
 
-        checkBox.CheckedStateChanged += (s, e) => { _textView.TabKeyAddsTab = checkBox.CheckedState == CheckState.Checked; };
+        checkBox.ValueChanged += (s, e) => { _textView.TabKeyAddsTab = checkBox.Value == CheckState.Checked; };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -424,9 +424,9 @@ public class Editor : Scenario
             return new MenuItem { Title = "Read Only" };
         }
 
-        CheckBox checkBox = new () { Title = "Read Only", CheckedState = _textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "Read Only", Value = _textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked };
 
-        checkBox.CheckedStateChanged += (s, e) => { _textView.ReadOnly = checkBox.CheckedState == CheckState.Checked; };
+        checkBox.ValueChanged += (s, e) => { _textView.ReadOnly = checkBox.Value == CheckState.Checked; };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -448,10 +448,10 @@ public class Editor : Scenario
 
         CheckBox checkBox = new ()
         {
-            Title = "UseSameRuneTypeForWords", CheckedState = _textView.UseSameRuneTypeForWords ? CheckState.Checked : CheckState.UnChecked
+            Title = "UseSameRuneTypeForWords", Value = _textView.UseSameRuneTypeForWords ? CheckState.Checked : CheckState.UnChecked
         };
 
-        checkBox.CheckedStateChanged += (s, e) => { _textView.UseSameRuneTypeForWords = checkBox.CheckedState == CheckState.Checked; };
+        checkBox.ValueChanged += (s, e) => { _textView.UseSameRuneTypeForWords = checkBox.Value == CheckState.Checked; };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -473,10 +473,10 @@ public class Editor : Scenario
 
         CheckBox checkBox = new ()
         {
-            Title = "SelectWordOnlyOnDoubleClick", CheckedState = _textView.SelectWordOnlyOnDoubleClick ? CheckState.Checked : CheckState.UnChecked
+            Title = "SelectWordOnlyOnDoubleClick", Value = _textView.SelectWordOnlyOnDoubleClick ? CheckState.Checked : CheckState.UnChecked
         };
 
-        checkBox.CheckedStateChanged += (s, e) => { _textView.SelectWordOnlyOnDoubleClick = checkBox.CheckedState == CheckState.Checked; };
+        checkBox.ValueChanged += (s, e) => { _textView.SelectWordOnlyOnDoubleClick = checkBox.Value == CheckState.Checked; };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -496,11 +496,11 @@ public class Editor : Scenario
             return new MenuItem { Title = "CanFocus" };
         }
 
-        CheckBox checkBox = new () { Title = "CanFocus", CheckedState = _textView.CanFocus ? CheckState.Checked : CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "CanFocus", Value = _textView.CanFocus ? CheckState.Checked : CheckState.UnChecked };
 
-        checkBox.CheckedStateChanged += (s, e) =>
+        checkBox.ValueChanged += (s, e) =>
                                         {
-                                            _textView.CanFocus = checkBox.CheckedState == CheckState.Checked;
+                                            _textView.CanFocus = checkBox.Value == CheckState.Checked;
 
                                             if (_textView.CanFocus)
                                             {
@@ -526,11 +526,11 @@ public class Editor : Scenario
             return new MenuItem { Title = "Enabled" };
         }
 
-        CheckBox checkBox = new () { Title = "Enabled", CheckedState = _textView.Enabled ? CheckState.Checked : CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "Enabled", Value = _textView.Enabled ? CheckState.Checked : CheckState.UnChecked };
 
-        checkBox.CheckedStateChanged += (s, e) =>
+        checkBox.ValueChanged += (s, e) =>
                                         {
-                                            _textView.Enabled = checkBox.CheckedState == CheckState.Checked;
+                                            _textView.Enabled = checkBox.Value == CheckState.Checked;
 
                                             if (_textView.Enabled)
                                             {
@@ -556,11 +556,11 @@ public class Editor : Scenario
             return new MenuItem { Title = "Visible" };
         }
 
-        CheckBox checkBox = new () { Title = "Visible", CheckedState = _textView.Visible ? CheckState.Checked : CheckState.UnChecked };
+        CheckBox checkBox = new () { Title = "Visible", Value = _textView.Visible ? CheckState.Checked : CheckState.UnChecked };
 
-        checkBox.CheckedStateChanged += (s, e) =>
+        checkBox.ValueChanged += (s, e) =>
                                         {
-                                            _textView.Visible = checkBox.CheckedState == CheckState.Checked;
+                                            _textView.Visible = checkBox.Value == CheckState.Checked;
 
                                             if (_textView.Visible)
                                             {
@@ -737,16 +737,16 @@ public class Editor : Scenario
 
         CheckBox ckbMatchCase = new ()
         {
-            X = 0, Y = Pos.Top (txtToFind) + 2, CheckedState = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
+            X = 0, Y = Pos.Top (txtToFind) + 2, Value = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.CheckedStateChanging += (s, e) => { _matchCase = e.Result == CheckState.Checked; };
+        ckbMatchCase.ValueChanging += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchCase);
 
         CheckBox ckbMatchWholeWord = new ()
         {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, CheckedState = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
+            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Value = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.CheckedStateChanging += (s, e) => { _matchWholeWord = e.Result == CheckState.Checked; };
+        ckbMatchWholeWord.ValueChanging += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchWholeWord);
 
         return d;
@@ -817,16 +817,16 @@ public class Editor : Scenario
 
         CheckBox ckbMatchCase = new ()
         {
-            X = 0, Y = Pos.Top (txtToFind) + 2, CheckedState = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
+            X = 0, Y = Pos.Top (txtToFind) + 2, Value = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.CheckedStateChanging += (s, e) => { _matchCase = e.Result == CheckState.Checked; };
+        ckbMatchCase.ValueChanging += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchCase);
 
         CheckBox ckbMatchWholeWord = new ()
         {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, CheckedState = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
+            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Value = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.CheckedStateChanging += (s, e) => { _matchWholeWord = e.Result == CheckState.Checked; };
+        ckbMatchWholeWord.ValueChanging += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchWholeWord);
 
         return d;

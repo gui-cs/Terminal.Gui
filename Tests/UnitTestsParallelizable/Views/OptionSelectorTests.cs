@@ -27,7 +27,7 @@ public class OptionSelectorTests
         Assert.Equal (0, optionSelector.Value);
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1");
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
     }
 
 
@@ -56,10 +56,10 @@ public class OptionSelectorTests
         optionSelector.Value = 1;
 
         CheckBox selectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == 1);
-        Assert.Equal (CheckState.Checked, selectedCheckBox.CheckedState);
+        Assert.Equal (CheckState.Checked, selectedCheckBox.Value);
 
         CheckBox unselectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data == 0);
-        Assert.Equal (CheckState.UnChecked, unselectedCheckBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, unselectedCheckBox.Value);
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public class OptionSelectorTests
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1");
         Assert.Equal (0, optionSelector.Value);
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
 
         var mouse = new Mouse
         {
@@ -186,8 +186,8 @@ public class OptionSelectorTests
         checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (0, optionSelector.Value);
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
-        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").CheckedState);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").Value);
     }
 
 
@@ -202,8 +202,8 @@ public class OptionSelectorTests
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
         Assert.Equal (0, optionSelector.Value);
-        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
-        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
         var mouse = new Mouse
         {
@@ -214,8 +214,8 @@ public class OptionSelectorTests
         checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (1, optionSelector.Value);
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
-        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
     }
 
 
@@ -230,13 +230,13 @@ public class OptionSelectorTests
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1");
         Assert.Equal (0, optionSelector.Value);
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
 
         checkBox.NewKeyDownEvent (Key.Space);
 
         Assert.Equal (1, optionSelector.Value);
-        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
-        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").CheckedState);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").Value);
     }
 
 
@@ -251,14 +251,14 @@ public class OptionSelectorTests
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
         Assert.Equal (0, optionSelector.Value);
-        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
-        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
         checkBox.NewKeyDownEvent (Key.Space);
 
         Assert.Equal (1, optionSelector.Value);
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
-        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
     }
     [Fact]
     public void Values_ShouldUseOptions_WhenValuesIsNull ()
@@ -298,11 +298,11 @@ public class OptionSelectorTests
         // Verify that the CheckBox states align with the non-sequential Values
         CheckBox selectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ()
             .First (cb => (int)cb.Data == 5);
-        Assert.Equal (CheckState.Checked, selectedCheckBox.CheckedState);
+        Assert.Equal (CheckState.Checked, selectedCheckBox.Value);
 
         CheckBox unselectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ()
             .First (cb => (int)cb.Data! == 0); // Index 0 corresponds to value 0
-        Assert.Equal (CheckState.UnChecked, unselectedCheckBox.CheckedState);
+        Assert.Equal (CheckState.UnChecked, unselectedCheckBox.Value);
     }
 
 
@@ -441,8 +441,8 @@ public class OptionSelectorTests
         Assert.Equal (1, optionSelector.Cursor);
 
         CheckBox [] checkBoxes = optionSelector.SubViews.OfType<CheckBox> ().ToArray ();
-        Assert.Equal (CheckState.Checked, checkBoxes [0].CheckedState);
-        Assert.Equal (CheckState.UnChecked, checkBoxes [1].CheckedState);
+        Assert.Equal (CheckState.Checked, checkBoxes [0].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [1].Value);
         Assert.True (checkBoxes [1].HasFocus);
     }
 }

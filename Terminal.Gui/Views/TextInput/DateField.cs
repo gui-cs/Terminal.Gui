@@ -67,7 +67,7 @@ namespace Terminal.Gui.Views;
 ///         </list>
 ///     </para>
 /// </remarks>
-public class DateField : TextField
+public class DateField : TextField, IValue<DateTime?>
 {
     /// <summary>
     ///     Unicode Right-to-Left Mark character, used to handle RTL date formats in some cultures.
@@ -119,7 +119,7 @@ public class DateField : TextField
             _culture = value ?? CultureInfo.CurrentCulture;
             _separator = GetDataSeparator (_culture.DateTimeFormat.DateSeparator);
             _format = " " + StandardizeDateFormat (_culture.DateTimeFormat.ShortDatePattern);
-            Text = Date?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
+            Text = Value?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
         }
     }
 
@@ -148,42 +148,7 @@ public class DateField : TextField
     ///     </para>
     /// </remarks>
     /// <seealso cref="AdjustInsertionPoint"/>
-    public override int InsertionPoint
-    {
-        get => base.InsertionPoint;
-        set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1);
-    }
-
-    /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
-    /// <remarks></remarks>
-    public DateTime? Date
-    {
-        get => _date;
-        set
-        {
-            if (ReadOnly)
-            {
-                return;
-            }
-
-            DateTime? oldData = _date;
-            _date = value;
-
-            if (_format is null)
-            {
-                return;
-            }
-
-            Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ())).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
-            EventArgs<DateTime> args = new (value!.Value);
-
-            if (oldData != value)
-            {
-                OnDateChanged (args);
-                DateChanged?.Invoke (this, args);
-            }
-        }
-    }
+    public override int InsertionPoint { get => base.InsertionPoint; set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1); }
 
     /// <summary>
     ///     Gets the length of the date format string (excluding the leading space), which represents
@@ -198,10 +163,78 @@ public class DateField : TextField
     /// </remarks>
     private int FormatLength => StandardizeDateFormat (_format).Trim ().Length;
 
-    /// <summary>DateChanged event, raised when the <see cref="Date"/> property has changed.</summary>
-    /// <remarks>This event is raised when the <see cref="Date"/> property changes.</remarks>
-    /// <remarks>The passed event arguments containing the old value, new value, and format string.</remarks>
-    public event EventHandler<EventArgs<DateTime>>? DateChanged;
+    #region IValue<DateTime?> Implementation
+
+    /// <summary>Gets or sets the date value of the <see cref="DateField"/>.</summary>
+    public new DateTime? Value
+    {
+        get => _date;
+        set
+        {
+            if (ReadOnly)
+            {
+                return;
+            }
+
+            DateTime? oldValue = _date;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            ValueChangingEventArgs<DateTime?> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            _date = value;
+
+            if (_format is null)
+            {
+                return;
+            }
+
+            Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ())).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
+
+            ValueChangedEventArgs<DateTime?> changedArgs = new (oldValue, _date);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
+        }
+    }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => _date;
+
+    /// <summary>
+    ///     Called when the <see cref="DateField"/> <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<DateTime?> args) => false;
+
+    /// <inheritdoc/>
+    public new event EventHandler<ValueChangingEventArgs<DateTime?>>? ValueChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="DateField"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<DateTime?> args) { }
+
+    /// <inheritdoc/>
+    public new event EventHandler<ValueChangedEventArgs<DateTime?>>? ValueChanged;
+
+    #endregion
 
     /// <inheritdoc/>
     public override bool DeleteCharLeft (bool useOldCursorPos)
@@ -214,6 +247,7 @@ public class DateField : TextField
         ClearAllSelection ();
         SetText ((Rune)'0');
         DecrementInsertionPoint ();
+
         return true;
     }
 
@@ -246,10 +280,6 @@ public class DateField : TextField
 
         return mouse.Handled;
     }
-
-    /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>
-    /// <param name="args">Event arguments</param>
-    protected virtual void OnDateChanged (EventArgs<DateTime> args) { }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key a)
@@ -366,7 +396,7 @@ public class DateField : TextField
             spaces += FormatLength;
             string trimmedText = e.Result [..spaces];
             spaces -= FormatLength;
-            trimmedText = trimmedText.Replace (new (' ', spaces), " ");
+            trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
             var date = Convert.ToDateTime (trimmedText).ToString (_format!.Trim ());
 
             if ($" {date}" != e.Result)
@@ -552,37 +582,33 @@ public class DateField : TextField
             }
         }
 
-        return new (fmtText);
+        return new string (fmtText);
     }
 
     private void SetInitialProperties (DateTime date)
     {
         _format = $" {StandardizeDateFormat (Culture!.DateTimeFormat.ShortDatePattern)}";
         _separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
-        Date = date;
+        Value = date;
         InsertionPoint = 1;
         TextChanging += OnTextChanging;
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.DeleteCharRight,
+        AddCommand (Command.DeleteCharRight,
                     () =>
                     {
                         DeleteCharRight ();
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.DeleteCharLeft,
+        AddCommand (Command.DeleteCharLeft,
                     () =>
                     {
                         DeleteCharLeft (false);
 
                         return true;
-                    }
-                   );
+                    });
         AddCommand (Command.LeftStart, () => MoveHome ());
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
@@ -633,11 +659,7 @@ public class DateField : TextField
 
         if (InsertionPoint < FormatLength)
         {
-            newText =
-            [
-                .. newText,
-                .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))
-            ];
+            newText = [.. newText, .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))];
         }
 
         return SetText (StringExtensions.ToString (newText));
@@ -724,7 +746,7 @@ public class DateField : TextField
             return false;
         }
 
-        Date = date;
+        Value = date;
 
         return true;
     }
@@ -732,38 +754,36 @@ public class DateField : TextField
     // Converts various date formats to a uniform 10-character format.
     // This aids in simplifying the handling of single-digit months and days,
     // and reduces the number of distinct date formats to maintain.
-    private static string StandardizeDateFormat (string? format)
-    {
-        return format switch
-               {
-                   "MM/dd/yyyy" => "MM/dd/yyyy",
-                   "yyyy-MM-dd" => "yyyy-MM-dd",
-                   "yyyy/MM/dd" => "yyyy/MM/dd",
-                   "dd/MM/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy" => "dd/MM/yyyy",
-                   "dd.MM.yyyy" => "dd.MM.yyyy",
-                   "dd-MM-yyyy" => "dd-MM-yyyy",
-                   "dd/MM yyyy" => "dd/MM/yyyy",
-                   "d. M. yyyy" => "dd.MM.yyyy",
-                   "yyyy.MM.dd" => "yyyy.MM.dd",
-                   "g yyyy/M/d" => "yyyy/MM/dd",
-                   "d/M/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy g" => "dd/MM/yyyy",
-                   "d-M-yyyy" => "dd-MM-yyyy",
-                   "d.MM.yyyy" => "dd.MM.yyyy",
-                   "d.MM.yyyy '?'." => "dd.MM.yyyy",
-                   "M/d/yyyy" => "MM/dd/yyyy",
-                   "d. M. yyyy." => "dd.MM.yyyy",
-                   "d.M.yyyy." => "dd.MM.yyyy",
-                   "g yyyy-MM-dd" => "yyyy-MM-dd",
-                   "d.M.yyyy" => "dd.MM.yyyy",
-                   "d/MM/yyyy" => "dd/MM/yyyy",
-                   "yyyy/M/d" => "yyyy/MM/dd",
-                   "dd. MM. yyyy." => "dd.MM.yyyy",
-                   "yyyy. MM. dd." => "yyyy.MM.dd",
-                   "yyyy. M. d." => "yyyy.MM.dd",
-                   "d. MM. yyyy" => "dd.MM.yyyy",
-                   _ => "dd/MM/yyyy"
-               };
-    }
+    private static string StandardizeDateFormat (string? format) =>
+        format switch
+        {
+            "MM/dd/yyyy" => "MM/dd/yyyy",
+            "yyyy-MM-dd" => "yyyy-MM-dd",
+            "yyyy/MM/dd" => "yyyy/MM/dd",
+            "dd/MM/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy" => "dd/MM/yyyy",
+            "dd.MM.yyyy" => "dd.MM.yyyy",
+            "dd-MM-yyyy" => "dd-MM-yyyy",
+            "dd/MM yyyy" => "dd/MM/yyyy",
+            "d. M. yyyy" => "dd.MM.yyyy",
+            "yyyy.MM.dd" => "yyyy.MM.dd",
+            "g yyyy/M/d" => "yyyy/MM/dd",
+            "d/M/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy g" => "dd/MM/yyyy",
+            "d-M-yyyy" => "dd-MM-yyyy",
+            "d.MM.yyyy" => "dd.MM.yyyy",
+            "d.MM.yyyy '?'." => "dd.MM.yyyy",
+            "M/d/yyyy" => "MM/dd/yyyy",
+            "d. M. yyyy." => "dd.MM.yyyy",
+            "d.M.yyyy." => "dd.MM.yyyy",
+            "g yyyy-MM-dd" => "yyyy-MM-dd",
+            "d.M.yyyy" => "dd.MM.yyyy",
+            "d/MM/yyyy" => "dd/MM/yyyy",
+            "yyyy/M/d" => "yyyy/MM/dd",
+            "dd. MM. yyyy." => "dd.MM.yyyy",
+            "yyyy. MM. dd." => "yyyy.MM.dd",
+            "yyyy. M. d." => "yyyy.MM.dd",
+            "d. MM. yyyy" => "dd.MM.yyyy",
+            _ => "dd/MM/yyyy"
+        };
 }

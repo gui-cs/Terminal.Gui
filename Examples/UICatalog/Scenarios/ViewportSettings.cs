@@ -49,7 +49,7 @@ public class ViewportSettings : Scenario
         ColorPicker16 colorPicker = new () { Title = "_BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (), Y = 10 };
         colorPicker.BorderStyle = LineStyle.RoundedDotted;
 
-        colorPicker.ColorChanged += (_, e) =>
+        colorPicker.ValueChanged += (_, e) =>
                                     {
                                         colorPicker.SuperView!.SetScheme (
                                                                           new (colorPicker.SuperView.GetScheme ())
@@ -57,7 +57,7 @@ public class ViewportSettings : Scenario
                                                                               Normal = new (
                                                                                             colorPicker.SuperView.GetAttributeForRole (VisualRole.Normal)
                                                                                                        .Foreground,
-                                                                                            e.Result
+                                                                                            e.NewValue
                                                                                            )
                                                                           });
                                     };

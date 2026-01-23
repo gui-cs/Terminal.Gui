@@ -89,11 +89,6 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
         SetNeedsLayout ();
     }
 
-    /// <summary>
-    ///     Fired when color is changed.
-    /// </summary>
-    public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
-
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
@@ -215,7 +210,7 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
             bar.Dispose ();
         }
 
-        _bars = new List<IColorBar> ();
+        _bars = [];
         _textFields.Clear ();
 
         if (_lbHex != null)
@@ -276,9 +271,6 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
 
             // Do the work
             _selectedColor = value;
-
-            // Fire legacy event for backwards compatibility
-            ColorChanged?.Invoke (this, new ResultEventArgs<Color> (value));
 
             // CWP: Fire ValueChanged
             ValueChangedEventArgs<Color?> changedArgs = new (oldValue, value);
