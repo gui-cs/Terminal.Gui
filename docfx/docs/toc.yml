@@ -44,6 +44,8 @@
   href: keyboard.md
 - name: Layout
   href: layout.md
+- name: ListView Selection vs Marking
+  href: listview-selection-vs-marking.md
 - name: Logging
   href: logging.md
 - name: Mouse
