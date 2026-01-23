@@ -187,8 +187,8 @@ public class TimeField : TextField, IValue<TimeSpan>
     /// <seealso cref="FieldLength"/>
     public override int InsertionPoint
     {
-        get => Math.Max (Math.Min (base.InsertionPoint, FieldLength), 1);
-        set => base.InsertionPoint = Math.Max (Math.Min (value, FieldLength), 1);
+        get => Math.Max (Math.Min (base.InsertionPoint, FieldLength + 1), 1);
+        set => base.InsertionPoint = Math.Max (Math.Min (value, FieldLength + 1), 1);
     }
 
     /// <summary>Get or sets whether <see cref="TimeField"/> uses the short or long time format.</summary>
@@ -406,9 +406,9 @@ public class TimeField : TextField, IValue<TimeSpan>
         int newPoint = point;
 
         // Clamp to valid bounds
-        if (point > FieldLength)
+        if (point > FieldLength + 1)
         {
-            newPoint = FieldLength;
+            newPoint = FieldLength + 1;
         }
 
         if (point < 1)
@@ -474,9 +474,9 @@ public class TimeField : TextField, IValue<TimeSpan>
     /// </remarks>
     private void IncrementInsertionPoint ()
     {
-        if (InsertionPoint >= FieldLength)
+        if (InsertionPoint >= FieldLength + 1)
         {
-            InsertionPoint = FieldLength;
+            InsertionPoint = FieldLength + 1;
 
             return;
         }
@@ -488,7 +488,7 @@ public class TimeField : TextField, IValue<TimeSpan>
     private new bool MoveEnd ()
     {
         ClearAllSelection ();
-        InsertionPoint = FieldLength;
+        InsertionPoint = FieldLength + 1;
 
         return true;
     }
