@@ -179,8 +179,11 @@ public class SixelEncoderTests
         // Assert: Expect the result to be fully transparent encoded output
         Assert.Equal (expected, result);
     }
-    [Fact]
-    public void EncodeSixel_VerticalMix_TransparentAndColor_ReturnsExpectedSixel ()
+
+    [Theory]
+    [InlineData (false)]
+    [InlineData (true)]
+    public void EncodeSixel_VerticalMix_TransparentAndColor_ReturnsExpectedSixel (bool avoidBottomScroll)
     {
         string expected = "\u001bP" // Start sixel sequence
                           + "0;1;0" // Defaults for aspect ratio and grid size (1 indicates support for transparent pixels)
@@ -223,8 +226,15 @@ public class SixelEncoderTests
         }
 
         // Act: Encode the image
-        var encoder = new SixelEncoder ();
+        var encoder = new SixelEncoder () { AvoidBottomScroll = avoidBottomScroll };
         string result = encoder.EncodeSixel (pixels);
+
+        if (avoidBottomScroll)
+        {
+            string [] bands = expected.Split ('-');
+            bands [0] = bands [0].Replace ("12#", "6#");
+            expected = bands [0] + "\u001b\\";
+        }
 
         // Assert: Expect the result to match the expected sixel output
         Assert.Equal (expected, result);
