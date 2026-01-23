@@ -4,7 +4,7 @@ public partial class ListView
 {
     /// <summary>Changes the <see cref="SelectedItem"/> to the next item in the list, scrolling the list if needed.</summary>
     /// <param name="extend">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
     ///     extends the selection from the anchor to the new item. If <see langword="false"/>,
     ///     clears any existing multi-selection.
     /// </param>
@@ -59,7 +59,7 @@ public partial class ListView
 
     /// <summary>Changes the <see cref="SelectedItem"/> to last item in the list, scrolling the list if needed.</summary>
     /// <param name="extend">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
     ///     extends the selection from the anchor to the new item. If <see langword="false"/>,
     ///     clears any existing multi-selection.
     /// </param>
@@ -89,7 +89,7 @@ public partial class ListView
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the first item in the list, scrolling the list if needed.</summary>
     /// <param name="extend">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
     ///     extends the selection from the anchor to the new item. If <see langword="false"/>,
     ///     clears any existing multi-selection.
     /// </param>
@@ -112,7 +112,7 @@ public partial class ListView
     ///     needed.
     /// </summary>
     /// <param name="extend">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
     ///     extends the selection from the anchor to the new item. If <see langword="false"/>,
     ///     clears any existing multi-selection.
     /// </param>
@@ -152,7 +152,7 @@ public partial class ListView
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the item at the top of the visible list.</summary>
     /// <param name="extend">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
     ///     extends the selection from the anchor to the new item. If <see langword="false"/>,
     ///     clears any existing multi-selection.
     /// </param>
@@ -184,7 +184,7 @@ public partial class ListView
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the previous item in the list, scrolling the list if needed.</summary>
     /// <param name="extend">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
     ///     extends the selection from the anchor to the new item. If <see langword="false"/>,
     ///     clears any existing multi-selection.
     /// </param>

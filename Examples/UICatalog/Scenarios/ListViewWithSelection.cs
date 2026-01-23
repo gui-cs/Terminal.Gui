@@ -49,7 +49,7 @@ public class ListViewWithSelection : Scenario
             Text = "AllowsMulti_Select"
         };
         _appWindow.Add (_allowMultipleCb);
-        _allowMultipleCb.ValueChanging += AllowsMultipleSelectionCB_Toggle;
+        _allowMultipleCb.ValueChanging += AllowsMultipleMarkingCB_Toggle;
 
         _viewportSettingsEditor = new ViewportSettingsEditor
         {
@@ -72,7 +72,7 @@ public class ListViewWithSelection : Scenario
             Width = Dim.Func (_ => _listView?.MaxItemLength ?? 10),
             Height = Dim.Fill (),
             AllowsMarking = false,
-            AllowsMultipleSelection = false,
+            AllowsMultipleMarking = false,
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.Resizable
         };
@@ -140,9 +140,9 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDraw ();
     }
 
-    private void AllowsMultipleSelectionCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
+    private void AllowsMultipleMarkingCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
+        _listView.AllowsMultipleMarking = stateEventArgs.NewValue == CheckState.Checked;
         _appWindow.SetNeedsDraw ();
     }
 

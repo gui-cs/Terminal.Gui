@@ -25,39 +25,32 @@ public partial class ListView
         for (var row = 0; row < f.Height; row++, item++)
         {
             bool isSelected = item == SelectedItem;
-            bool isMultiSelected = MultiSelectedItems.Contains (item);
+            bool isMarked = Source!.IsMarked (item);
 
-            // Determine visual role based on selection state
+            // Determine visual role based on selection and mark state
             VisualRole role;
 
             if (focused && isSelected)
             {
                 role = VisualRole.Focus; // Focused + SelectedItem (cursor position)
             }
-            else if (!Source!.IsMarked (item) && isMultiSelected)
+            else if (isMarked && !isSelected)
             {
-                role = VisualRole.Highlight; // In MultiSelectedItems (selection highlight)
+                role = VisualRole.Highlight; // Marked item (not currently selected)
             }
-            else if (!Source.IsMarked (item) && isSelected)
+            else if (isSelected)
             {
                 role = VisualRole.Active; // SelectedItem without focus
             }
             else
             {
-                role = VisualRole.Normal; // Not selected
+                role = VisualRole.Normal; // Not selected or marked
             }
 
             Attribute newAttribute = GetAttributeForRole (role);
 
             if (newAttribute != current)
             {
-                if (!Source!.IsMarked (item) && isMultiSelected)
-                {
-                    newAttribute = newAttribute with
-                    {
-                        Foreground = GetAttributeForRole (VisualRole.Highlight).Foreground, Style = GetAttributeForRole (VisualRole.Highlight).Style
-                    };
-                }
                 SetAttribute (newAttribute);
                 current = newAttribute;
             }
@@ -87,7 +80,7 @@ public partial class ListView
                 if (AllowsMarking)
                 {
                     // Try custom mark rendering first
-                    bool customRendered = Source.RenderMark (this, item, row, Source.IsMarked (item), AllowsMultipleSelection);
+                    bool customRendered = Source.RenderMark (this, item, row, Source.IsMarked (item), AllowsMultipleMarking);
 
                     if (!customRendered)
                     {
@@ -101,8 +94,8 @@ public partial class ListView
                             current = normalAttr;
                         }
 
-                        AddRune (Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
-                                 AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
+                        AddRune (Source.IsMarked (item) ? AllowsMultipleMarking ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                 AllowsMultipleMarking ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
                         AddRune ((Rune)' ');
                         markWidth = 2;
 

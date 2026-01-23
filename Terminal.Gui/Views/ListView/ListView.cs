@@ -198,44 +198,23 @@ public partial class ListView : View, IDesignable, IValue<int?>
         bool shift = mouse.Flags.HasFlag (MouseFlags.Shift);
         bool ctrl = mouse.Flags.HasFlag (MouseFlags.Ctrl);
 
-        if (ctrl && AllowsMultipleSelection)
+        if (ctrl && AllowsMultipleMarking && AllowsMarking)
         {
-            // Ctrl+Click: Toggle item in multi-selection
-            if (!MultiSelectedItems.Add (index))
-            {
-                MultiSelectedItems.Remove (index);
-            }
+            // Ctrl+Click: Toggle mark state directly
+            Source.SetMark (index, !Source.IsMarked (index));
 
-            if (AllowsMarking)
-            {
-                // Update marks to match multi-selection
-                for (var i = 0; i < Source.Count; i++)
-                {
-                    Source.SetMark (i, MultiSelectedItems.Contains (i));
-                }
-            }
-
-            // Update SelectedItem and anchor to clicked item
+            // Update SelectedItem to clicked item
             SelectedItem = index;
+            SetNeedsDraw ();
         }
-        else if (shift && AllowsMultipleSelection)
+        else if (shift && AllowsMultipleMarking)
         {
-            // Shift+Click: Extend selection from anchor
+            // Shift+Click: Extend marking from anchor
             SetSelection (index, true);
-
-            if (AllowsMarking)
-            {
-                // Update marks to match multi-selection
-                for (var i = 0; i < Source.Count; i++)
-                {
-                    Source.SetMark (i, MultiSelectedItems.Contains (i));
-                }
-            }
-
         }
         else
         {
-            // Normal click: Clear multi-selection and select item
+            // Normal click: Clear marks and select item
             SetSelection (index, false);
 
             // Mark item only on Clicked (not Pressed) to avoid double-toggle
@@ -298,14 +277,14 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     /// <summary>
-    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>,
+    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleMarking"/> are both <see langword="true"/>,
     ///     marks all items.
     /// </summary>
     /// <param name="mark"><see langword="true"/> marks all items; otherwise unmarks all items.</param>
     /// <returns><see langword="true"/> if marking was successful.</returns>
     public bool MarkAll (bool mark)
     {
-        if (!AllowsMarking || !AllowsMultipleSelection)
+        if (!AllowsMarking || !AllowsMultipleMarking)
         {
             return false;
         }

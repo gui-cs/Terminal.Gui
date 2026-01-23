@@ -3,30 +3,26 @@ namespace Terminal.Gui.Views;
 public partial class ListView
 {
     /// <summary>
-    ///     If set to <see langword="true"/> more than one item can be selected. If <see langword="false"/> selecting an
-    ///     item will cause all others to be un-selected. The default is <see langword="false"/>.
+    ///     If set to <see langword="true"/> more than one item can be marked simultaneously.
+    ///     If <see langword="false"/> marking an item will cause all others to be unmarked.
+    ///     The default is <see langword="false"/>.
+    ///     Requires <see cref="AllowsMarking"/> to be <see langword="true"/> for visual indicators.
     /// </summary>
-    public bool AllowsMultipleSelection
+    public bool AllowsMultipleMarking
     {
         get;
         set
         {
             field = value;
 
-            if (!field)
+            if (!field && Source is { })
             {
-                // Clear multi-selection tracking
-                MultiSelectedItems.Clear ();
-
-                if (Source is { })
+                // Clear all marks except selected
+                for (var i = 0; i < Source.Count; i++)
                 {
-                    // Clear all marks except selected (existing behavior)
-                    for (var i = 0; i < Source.Count; i++)
+                    if (Source.IsMarked (i) && SelectedItem.HasValue && i != SelectedItem.Value)
                     {
-                        if (Source.IsMarked (i) && SelectedItem.HasValue && i != SelectedItem.Value)
-                        {
-                            Source.SetMark (i, false);
-                        }
+                        Source.SetMark (i, false);
                     }
                 }
             }
@@ -54,29 +50,36 @@ public partial class ListView
     }
 
     /// <summary>
-    ///     Gets all selected item indices, including both <see cref="SelectedItem"/> and all items
-    ///     in <see cref="MultiSelectedItems"/>.
+    ///     Gets all marked item indices from the data source.
     /// </summary>
-    /// <returns>An enumerable of selected item indices in ascending order.</returns>
-    public IEnumerable<int> GetAllSelectedItems ()
+    /// <returns>An enumerable of marked item indices in ascending order.</returns>
+    public IEnumerable<int> GetAllMarkedItems ()
     {
-        HashSet<int> all = [..MultiSelectedItems];
-
-        if (SelectedItem.HasValue)
+        if (Source is null)
         {
-            all.Add (SelectedItem.Value);
+            return [];
         }
 
-        return all.OrderBy (i => i);
+        List<int> marked = [];
+
+        for (var i = 0; i < Source.Count; i++)
+        {
+            if (Source.IsMarked (i))
+            {
+                marked.Add (i);
+            }
+        }
+
+        return marked;
     }
 
     /// <summary>
-    ///     Returns <see langword="true"/> if the specified item is selected, either as <see cref="SelectedItem"/>
-    ///     or in <see cref="MultiSelectedItems"/>.
+    ///     Returns <see langword="true"/> if the specified item is selected (is the <see cref="SelectedItem"/>)
+    ///     or marked (via <see cref="IListDataSource.IsMarked"/>).
     /// </summary>
     /// <param name="item">The item index to check.</param>
-    /// <returns><see langword="true"/> if the item is selected; otherwise <see langword="false"/>.</returns>
-    public bool IsSelected (int item) => item == SelectedItem || MultiSelectedItems.Contains (item);
+    /// <returns><see langword="true"/> if the item is selected or marked; otherwise <see langword="false"/>.</returns>
+    public bool IsSelected (int item) => item == SelectedItem || (Source?.IsMarked (item) ?? false);
 
     /// <summary>Marks the <see cref="SelectedItem"/> if it is not already marked.</summary>
     /// <returns><see langword="true"/> if the <see cref="SelectedItem"/> was marked.</returns>
@@ -94,33 +97,12 @@ public partial class ListView
     }
 
     /// <summary>
-    ///     Selects all items when <see cref="AllowsMultipleSelection"/> is <see langword="true"/>.
-    ///     All items are added to <see cref="MultiSelectedItems"/>.
-    /// </summary>
-    public void SelectAll ()
-    {
-        if (!AllowsMultipleSelection || Source is null)
-        {
-            return;
-        }
-
-        MultiSelectedItems.Clear ();
-
-        for (var i = 0; i < Source.Count; i++)
-        {
-            MultiSelectedItems.Add (i);
-        }
-
-        SetNeedsDraw ();
-    }
-
-    /// <summary>
-    ///     Sets the selected item, optionally extending the selection to create a range.
+    ///     Sets the selected item, optionally extending marking to create a range.
     /// </summary>
     /// <param name="item">The item index to select.</param>
     /// <param name="extendExistingSelection">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleSelection"/> is enabled,
-    ///     extends the selection from the anchor point to <paramref name="item"/>.
+    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
+    ///     extends marking from the anchor point to <paramref name="item"/>.
     /// </param>
     public void SetSelection (int item, bool extendExistingSelection)
     {
@@ -129,34 +111,32 @@ public partial class ListView
             return;
         }
 
-        if (!AllowsMultipleSelection || !extendExistingSelection)
+        if (!AllowsMultipleMarking || !extendExistingSelection)
         {
-            // Clear multi-selection and set new anchor
-            MultiSelectedItems.Clear ();
+            // Single-selection mode or not extending: just move SelectedItem
+            if (!AllowsMultipleMarking && AllowsMarking)
+            {
+                // Clear all marks except the new selection
+                for (var i = 0; i < Source.Count; i++)
+                {
+                    Source.SetMark (i, i == item);
+                }
+            }
+
             _selectionAnchor = item;
         }
-        else if (extendExistingSelection && _selectionAnchor.HasValue)
+        else if (extendExistingSelection && _selectionAnchor.HasValue && AllowsMarking)
         {
-            // Create range from anchor to item
-            MultiSelectedItems.Clear ();
+            // Multi-marking mode: mark range from anchor to item
             int start = Math.Min (_selectionAnchor.Value, item);
             int end = Math.Max (_selectionAnchor.Value, item);
 
             for (int i = start; i <= end; i++)
             {
-                MultiSelectedItems.Add (i);
+                Source.SetMark (i, true);
             }
 
             // Note: anchor stays at original position
-
-            if (AllowsMarking)
-            {
-                // Update marks to match multi-selection
-                for (var i = 0; i < Source.Count; i++)
-                {
-                    Source.SetMark (i, MultiSelectedItems.Contains (i));
-                }
-            }
         }
 
         SelectedItem = item;
@@ -165,11 +145,20 @@ public partial class ListView
     }
 
     /// <summary>
-    ///     Clears all multi-selection, keeping only <see cref="SelectedItem"/>.
+    ///     Clears all marks in the data source.
     /// </summary>
-    public void UnselectAll ()
+    public void UnmarkAll ()
     {
-        MultiSelectedItems.Clear ();
+        if (Source is null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < Source.Count; i++)
+        {
+            Source.SetMark (i, false);
+        }
+
         SetNeedsDraw ();
     }
 
@@ -191,12 +180,6 @@ public partial class ListView
 
     private int? _lastSelectedItem;
     private int? _selectionAnchor;
-
-    /// <summary>
-    ///     When <see cref="AllowsMultipleSelection"/> is enabled, contains the indices of all selected items.
-    ///     This is independent of <see cref="AllowsMarking"/> and provides selection tracking without visual marking.
-    /// </summary>
-    public HashSet<int> MultiSelectedItems { get; } = [];
 
     /// <summary>Gets or sets the index of the currently selected item.</summary>
     /// <value>The selected item or null if no item is selected.</value>
@@ -239,8 +222,8 @@ public partial class ListView
             field = value;
             SetNeedsDraw ();
 
-            // Initialize selection anchor when item is selected
-            if (MultiSelectedItems.Count == 0 && value.HasValue)
+            // Initialize selection anchor when no anchor is set
+            if (!_selectionAnchor.HasValue && value.HasValue)
             {
                 _selectionAnchor = value.Value;
             }
@@ -258,7 +241,7 @@ public partial class ListView
     }
 
     /// <summary>
-    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleSelection"/> are both <see langword="true"/>,
+    ///     If <see cref="AllowsMarking"/> is <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is <see langword="false"/>,
     ///     unmarks all marked items other than <see cref="SelectedItem"/>.
     /// </summary>
     /// <returns><see langword="true"/> if unmarking was successful.</returns>
@@ -269,7 +252,7 @@ public partial class ListView
             return false;
         }
 
-        if (AllowsMultipleSelection)
+        if (AllowsMultipleMarking)
         {
             return true;
         }

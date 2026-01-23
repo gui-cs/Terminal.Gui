@@ -936,8 +936,8 @@ public class ComboBox : View, IDesignable
 
                     if (AllowsMarking)
                     {
-                        AddRune (Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
-                                 AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
+                        AddRune (Source.IsMarked (item) ? AllowsMultipleMarking ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                 AllowsMultipleMarking ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
                         AddRune ((Rune)' ');
                     }
 

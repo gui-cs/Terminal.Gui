@@ -135,7 +135,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Null (lv.Source);
         Assert.True (lv.CanFocus);
         Assert.Null (lv.SelectedItem);
-        Assert.False (lv.AllowsMultipleSelection);
+        Assert.False (lv.AllowsMultipleMarking);
 
         lv = new () { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
@@ -355,7 +355,7 @@ public class ListViewTests (ITestOutputHelper output)
     {
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         lv.AllowsMarking = true;
-        lv.AllowsMultipleSelection = false;
+        lv.AllowsMultipleMarking = false;
 
         Assert.NotNull (lv.Source);
 
@@ -416,7 +416,7 @@ public class ListViewTests (ITestOutputHelper output)
     {
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         lv.AllowsMarking = true;
-        lv.AllowsMultipleSelection = true;
+        lv.AllowsMultipleMarking = true;
 
         Assert.NotNull (lv.Source);
 
@@ -1585,9 +1585,9 @@ hree - lon",
     }
 
     [Fact]
-    public void AllowsMultipleSelection_Set_To_False_Unmarks_All_But_Selected ()
+    public void AllowsMultipleMarking_Set_To_False_Unmarks_All_But_Selected ()
     {
-        ListView lv = new () { AllowsMarking = true, AllowsMultipleSelection = true };
+        ListView lv = new () { AllowsMarking = true, AllowsMultipleMarking = true };
         ListWrapper<string> source = new (["One", "Two", "Three"]);
         lv.Source = source;
 
@@ -1600,7 +1600,7 @@ hree - lon",
         Assert.True (source.IsMarked (1));
         Assert.True (source.IsMarked (2));
 
-        lv.AllowsMultipleSelection = false;
+        lv.AllowsMultipleMarking = false;
 
         Assert.True (source.IsMarked (0));
         Assert.False (source.IsMarked (1));
@@ -1670,9 +1670,9 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void Mouse_Click_With_AllowsMultipleSelection_Marks_Multiple_Items ()
+    public void Mouse_Click_With_AllowsMultipleMarking_Marks_Multiple_Items ()
     {
-        // Tests that clicking on items with AllowsMultipleSelection=true marks multiple items
+        // Tests that clicking on items with AllowsMultipleMarking=true marks multiple items
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
@@ -1681,7 +1681,7 @@ hree - lon",
             Width = 10,
             Height = 5,
             AllowsMarking = true,
-            AllowsMultipleSelection = true
+            AllowsMultipleMarking = true
         };
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
 
@@ -1753,13 +1753,13 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void MarkAll_Returns_False_When_AllowsMultipleSelection_Is_False ()
+    public void MarkAll_Returns_False_When_AllowsMultipleMarking_Is_False ()
     {
-        // Tests that MarkAll returns false when AllowsMultipleSelection=false
+        // Tests that MarkAll returns false when AllowsMultipleMarking=false
         ListView lv = new ()
         {
             AllowsMarking = true,
-            AllowsMultipleSelection = false
+            AllowsMultipleMarking = false
         };
         lv.SetSource (["One", "Two", "Three"]);
 
@@ -1779,17 +1779,18 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
 
         lv.SetSelection (0, false);
         lv.SetSelection (2, true); // Select 0-2
-        Assert.Equal (3, lv.MultiSelectedItems.Count);
+        Assert.Equal (3, lv.GetAllMarkedItems().Count());
 
         lv.MoveDown (false); // Move without extending
 
         Assert.Equal (3, lv.SelectedItem);
-        Assert.Empty (lv.MultiSelectedItems);
+        Assert.True (lv.GetAllMarkedItems().Count() == 0);
     }
 
     // Claude - Opus 4.5
@@ -1799,15 +1800,16 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
 
         lv.SetSelection (1, false); // Anchor at 1
         lv.MoveDown (true); // Extend to 2
 
         Assert.Equal (2, lv.SelectedItem);
-        Assert.Contains (1, lv.MultiSelectedItems);
-        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (1));
+        Assert.True (lv.Source!.IsMarked (2));
     }
 
     // Claude - Opus 4.5
@@ -1817,15 +1819,16 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
 
         lv.SetSelection (2, false); // Anchor at 2
         lv.MoveUp (true); // Extend to 1
 
         Assert.Equal (1, lv.SelectedItem);
-        Assert.Contains (1, lv.MultiSelectedItems);
-        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (1));
+        Assert.True (lv.Source!.IsMarked (2));
     }
 
     // Claude - Opus 4.5
@@ -1835,7 +1838,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1855,7 +1859,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1875,7 +1880,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 3
         };
         lv.BeginInit ();
@@ -1896,7 +1902,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1918,7 +1925,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1940,7 +1948,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 3
         };
         lv.BeginInit ();
@@ -1950,8 +1959,8 @@ hree - lon",
         lv.MovePageDown (true);
 
         // Should have multiple items selected
-        Assert.True (lv.MultiSelectedItems.Count > 1);
-        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.True (lv.GetAllMarkedItems().Count() > 1);
+        Assert.True (lv.Source!.IsMarked (0));
     }
 
     // Claude - Opus 4.5
@@ -1961,7 +1970,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 3
         };
         lv.BeginInit ();
@@ -1971,8 +1981,8 @@ hree - lon",
         lv.MovePageUp (true);
 
         // Should have multiple items selected
-        Assert.True (lv.MultiSelectedItems.Count > 1);
-        Assert.Contains (9, lv.MultiSelectedItems);
+        Assert.True (lv.GetAllMarkedItems().Count() > 1);
+        Assert.True (lv.Source!.IsMarked (9));
     }
 
     // Claude - Opus 4.5
@@ -1982,17 +1992,18 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
 
         lv.SetSelection (3, false); // Anchor at 3
         lv.MoveHome (true);
 
         Assert.Equal (0, lv.SelectedItem);
-        Assert.Contains (0, lv.MultiSelectedItems);
-        Assert.Contains (1, lv.MultiSelectedItems);
-        Assert.Contains (2, lv.MultiSelectedItems);
-        Assert.Contains (3, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (0));
+        Assert.True (lv.Source!.IsMarked (1));
+        Assert.True (lv.Source!.IsMarked (2));
+        Assert.True (lv.Source!.IsMarked (3));
     }
 
     // Claude - Opus 4.5
@@ -2002,17 +2013,18 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
 
         lv.SetSelection (1, false); // Anchor at 1
         lv.MoveEnd (true);
 
         Assert.Equal (4, lv.SelectedItem);
-        Assert.Contains (1, lv.MultiSelectedItems);
-        Assert.Contains (2, lv.MultiSelectedItems);
-        Assert.Contains (3, lv.MultiSelectedItems);
-        Assert.Contains (4, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (1));
+        Assert.True (lv.Source!.IsMarked (2));
+        Assert.True (lv.Source!.IsMarked (3));
+        Assert.True (lv.Source!.IsMarked (4));
     }
 
     #endregion
@@ -2029,7 +2041,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 4,
             Width = 10
         };
@@ -2049,9 +2062,9 @@ hree - lon",
         });
 
         Assert.Equal (2, lv.SelectedItem);
-        Assert.Contains (0, lv.MultiSelectedItems);
-        Assert.Contains (1, lv.MultiSelectedItems);
-        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (0));
+        Assert.True (lv.Source!.IsMarked (1));
+        Assert.True (lv.Source!.IsMarked (2));
 
         top.Dispose ();
         app.Dispose ();
@@ -2067,7 +2080,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 4,
             Width = 10
         };
@@ -2083,7 +2097,7 @@ hree - lon",
             ScreenPosition = new (0, 0),
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
         });
-        Assert.Contains (0, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (0));
 
         // Ctrl+Click on item 2
         app.Mouse.RaiseMouseEvent (new ()
@@ -2091,9 +2105,9 @@ hree - lon",
             ScreenPosition = new (0, 2),
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
         });
-        Assert.Contains (0, lv.MultiSelectedItems);
-        Assert.Contains (2, lv.MultiSelectedItems);
-        Assert.DoesNotContain (1, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (0));
+        Assert.True (lv.Source!.IsMarked (2));
+        Assert.False (lv.Source!.IsMarked (1));
 
         // Ctrl+Click on item 0 again - should toggle off
         app.Mouse.RaiseMouseEvent (new ()
@@ -2101,8 +2115,8 @@ hree - lon",
             ScreenPosition = new (0, 0),
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
         });
-        Assert.DoesNotContain (0, lv.MultiSelectedItems);
-        Assert.Contains (2, lv.MultiSelectedItems);
+        Assert.False (lv.Source!.IsMarked (0));
+        Assert.True (lv.Source!.IsMarked (2));
 
         top.Dispose ();
         app.Dispose ();
@@ -2118,7 +2132,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 4,
             Width = 10
         };
@@ -2131,7 +2146,7 @@ hree - lon",
         // Build up a selection
         lv.SetSelection (0, false);
         lv.SetSelection (2, true);
-        Assert.Equal (3, lv.MultiSelectedItems.Count);
+        Assert.Equal (3, lv.GetAllMarkedItems().Count());
 
         // Normal click should clear multi-selection
         app.Mouse.RaiseMouseEvent (new ()
@@ -2141,7 +2156,7 @@ hree - lon",
         });
 
         Assert.Equal (3, lv.SelectedItem);
-        Assert.Empty (lv.MultiSelectedItems);
+        Assert.True (lv.GetAllMarkedItems().Count() == 0);
 
         top.Dispose ();
         app.Dispose ();
@@ -2149,7 +2164,7 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void Mouse_ShiftClick_Without_AllowsMultipleSelection_Does_Not_Extend ()
+    public void Mouse_ShiftClick_Without_AllowsMultipleMarking_Does_Not_Extend ()
     {
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -2157,7 +2172,7 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = false, // Disabled
+            AllowsMultipleMarking = false, // Disabled
             Height = 4,
             Width = 10
         };
@@ -2177,7 +2192,7 @@ hree - lon",
         });
 
         Assert.Equal (2, lv.SelectedItem);
-        Assert.Empty (lv.MultiSelectedItems); // No multi-selection
+        Assert.True (lv.GetAllMarkedItems().Count() == 0); // No multi-selection
 
         top.Dispose ();
         app.Dispose ();
@@ -2185,7 +2200,7 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void Mouse_CtrlClick_Without_AllowsMultipleSelection_Does_Not_Toggle ()
+    public void Mouse_CtrlClick_Without_AllowsMultipleMarking_Does_Not_Toggle ()
     {
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -2193,7 +2208,7 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleSelection = false, // Disabled
+            AllowsMultipleMarking = false, // Disabled
             Height = 4,
             Width = 10
         };
@@ -2210,7 +2225,7 @@ hree - lon",
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
         });
         Assert.Equal (0, lv.SelectedItem);
-        Assert.Empty (lv.MultiSelectedItems);
+        Assert.True (lv.GetAllMarkedItems().Count() == 0);
 
         // Ctrl+Click on item 2 - should just select, not add
         app.Mouse.RaiseMouseEvent (new ()
@@ -2219,7 +2234,7 @@ hree - lon",
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl
         });
         Assert.Equal (2, lv.SelectedItem);
-        Assert.Empty (lv.MultiSelectedItems);
+        Assert.True (lv.GetAllMarkedItems().Count() == 0);
 
         top.Dispose ();
         app.Dispose ();
@@ -2236,7 +2251,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 3,
             Width = 10
         };
@@ -2245,28 +2261,29 @@ hree - lon",
         lv.SetSelection (1, true);
 
         // Items 0 and 1 should be in MultiSelectedItems
-        Assert.Contains (0, lv.MultiSelectedItems);
-        Assert.Contains (1, lv.MultiSelectedItems);
-        Assert.DoesNotContain (2, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (0));
+        Assert.True (lv.Source!.IsMarked (1));
+        Assert.False (lv.Source!.IsMarked (2));
     }
 
     // Claude - Opus 4.5
     [Fact]
-    public void AllowsMultipleSelection_False_Clears_MultiSelectedItems ()
+    public void AllowsMultipleMarking_False_Clears_MultiSelectedItems ()
     {
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMultipleSelection = true
+            AllowsMarking = true,
+            AllowsMultipleMarking = true
         };
 
         lv.SetSelection (0, false);
         lv.SetSelection (2, true);
-        Assert.Equal (3, lv.MultiSelectedItems.Count);
+        Assert.Equal (3, lv.GetAllMarkedItems().Count());
 
-        lv.AllowsMultipleSelection = false;
+        lv.AllowsMultipleMarking = false;
 
-        Assert.Empty (lv.MultiSelectedItems);
+        Assert.True (lv.GetAllMarkedItems().Count() == 0);
     }
 
     // Claude - Opus 4.5
@@ -2279,7 +2296,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 3,
             Width = 10
         };
@@ -2293,8 +2311,8 @@ hree - lon",
         app.LayoutAndDraw ();
 
         // Verify items are tracked (rendering verification would need driver inspection)
-        Assert.Contains (0, lv.MultiSelectedItems);
-        Assert.Contains (1, lv.MultiSelectedItems);
+        Assert.True (lv.Source!.IsMarked (0));
+        Assert.True (lv.Source!.IsMarked (1));
 
         top.Dispose ();
         app.Dispose ();
@@ -2310,7 +2328,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMultipleSelection = true,
+            AllowsMarking = true,
+            AllowsMultipleMarking = true,
             Height = 3,
             Width = 10
         };
@@ -2347,7 +2366,7 @@ hree - lon",
         {
             Source = new ListWrapper<string> (["One", "Two"]),
             AllowsMarking = true,
-            AllowsMultipleSelection = true,
+            AllowsMultipleMarking = true,
             Height = 2,
             Width = 10
         };
@@ -2379,7 +2398,7 @@ hree - lon",
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
             AllowsMarking = true,
-            AllowsMultipleSelection = true,
+            AllowsMultipleMarking = true,
             Height = 3,
             Width = 15
         };
