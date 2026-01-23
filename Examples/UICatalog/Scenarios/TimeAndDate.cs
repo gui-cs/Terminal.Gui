@@ -29,9 +29,9 @@ public class TimeAndDate : Scenario
             Y = 2,
             IsShortFormat = false,
             ReadOnly = false,
-            Time = DateTime.Now.TimeOfDay
+            Value = DateTime.Now.TimeOfDay
         };
-        longTime.TimeChanged += TimeChanged;
+        longTime.ValueChanged += TimeChanged;
         win.Add (longTime);
 
         TimeField shortTime = new ()
@@ -40,23 +40,23 @@ public class TimeAndDate : Scenario
             Y = Pos.Bottom (longTime) + 1,
             IsShortFormat = true,
             ReadOnly = false,
-            Time = DateTime.Now.TimeOfDay
+            Value = DateTime.Now.TimeOfDay
         };
-        shortTime.TimeChanged += TimeChanged;
+        shortTime.ValueChanged += TimeChanged;
         win.Add (shortTime);
 
         DateField shortDate = new (DateTime.Now)
         {
             X = Pos.Center (), Y = Pos.Bottom (shortTime) + 1, ReadOnly = true
         };
-        shortDate.DateChanged += DateChanged;
+        shortDate.ValueChanged += DateChanged;
         win.Add (shortDate);
 
         DateField longDate = new (DateTime.Now)
         {
             X = Pos.Center (), Y = Pos.Bottom (shortDate) + 1, ReadOnly = false
         };
-        longDate.DateChanged += DateChanged;
+        longDate.ValueChanged += DateChanged;
         win.Add (longDate);
 
         _lblOldTime = new()
@@ -146,13 +146,13 @@ public class TimeAndDate : Scenario
         app.Run (win);
     }
 
-    private void DateChanged (object? sender, EventArgs<DateTime> e)
+    private void DateChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
     {
-        _lblNewDate!.Text = $"New Date: {e.Value}";
+        _lblNewDate!.Text = $"New Date: {e.NewValue}";
     }
 
-    private void TimeChanged (object? sender, EventArgs<TimeSpan> e)
+    private void TimeChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
     {
-        _lblNewTime!.Text = $"New Time: {e.Value}";
+        _lblNewTime!.Text = $"New Time: {e.NewValue}";
     }
 }

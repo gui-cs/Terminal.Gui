@@ -117,10 +117,10 @@ public class TextInputControls : Scenario
         {
             X = Pos.Left (textView),
             Y = Pos.Bottom (textView),
-            CheckedState = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked,
+            Value = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked,
             Text = "Read_Only"
         };
-        chxReadOnly.CheckedStateChanging += (_, args) => textView.ReadOnly = args.Result == CheckState.Checked;
+        chxReadOnly.ValueChanging += (_, args) => textView.ReadOnly = args.NewValue == CheckState.Checked;
         win.Add (chxReadOnly);
 
         // By default, TextView is a multi-line control. It can be forced to single-line mode.
@@ -128,7 +128,7 @@ public class TextInputControls : Scenario
         {
             X = Pos.Right (chxReadOnly) + 2,
             Y = Pos.Bottom (textView),
-            CheckedState = textView.Multiline ? CheckState.Checked : CheckState.UnChecked,
+            Value = textView.Multiline ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Multiline"
         };
         win.Add (chxMultiline);
@@ -137,10 +137,10 @@ public class TextInputControls : Scenario
         {
             X = Pos.Right (chxMultiline) + 2,
             Y = Pos.Top (chxMultiline),
-            CheckedState = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
+            Value = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.CheckedStateChanging += (_, e) => textView.WordWrap = e.Result == CheckState.Checked;
+        chxWordWrap.ValueChanging += (_, e) => textView.WordWrap = e.NewValue == CheckState.Checked;
         win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
@@ -150,34 +150,34 @@ public class TextInputControls : Scenario
         {
             X = Pos.Right (chxWordWrap) + 2,
             Y = Pos.Top (chxWordWrap),
-            CheckedState = textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked,
+            Value = textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked,
             Text = "Tab Ke_y Adds Tab"
         };
 
-        chxMultiline.CheckedStateChanging += (_, e) =>
+        chxMultiline.ValueChanging += (_, e) =>
                                              {
-                                                 textView.Multiline = e.Result == CheckState.Checked;
+                                                 textView.Multiline = e.NewValue == CheckState.Checked;
 
-                                                 if (!textView.Multiline && chxWordWrap.CheckedState == CheckState.Checked)
+                                                 if (!textView.Multiline && chxWordWrap.Value == CheckState.Checked)
                                                  {
-                                                     chxWordWrap.CheckedState = CheckState.UnChecked;
+                                                     chxWordWrap.Value = CheckState.UnChecked;
                                                  }
 
-                                                 if (!textView.Multiline && chxCaptureTabs.CheckedState == CheckState.Checked)
+                                                 if (!textView.Multiline && chxCaptureTabs.Value == CheckState.Checked)
                                                  {
-                                                     chxCaptureTabs.CheckedState = CheckState.UnChecked;
+                                                     chxCaptureTabs.Value = CheckState.UnChecked;
                                                  }
                                              };
 
         Key? keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
         Key? keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
 
-        chxCaptureTabs.CheckedStateChanging += (_, e) =>
+        chxCaptureTabs.ValueChanging += (_, e) =>
                                                {
-                                                   textView.TabKeyAddsTab = e.Result == CheckState.Checked;
+                                                   textView.TabKeyAddsTab = e.NewValue == CheckState.Checked;
 
                                                    // TODO: This should be in TextView.TabKeyAddsTab_set
-                                                   if (e.Result == CheckState.Checked)
+                                                   if (e.NewValue == CheckState.Checked)
                                                    {
                                                        textView.KeyBindings.Add (keyTab!, Command.NextTabStop);
                                                        textView.KeyBindings.Add (keyBackTab!, Command.PreviousTabStop);
@@ -195,10 +195,10 @@ public class TextInputControls : Scenario
             X = Pos.Left (textView),
             Y = Pos.Bottom (chxCaptureTabs),
             Title = "_ScrollBars",
-            CheckedState = textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked
+            Value = textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
 
-        scrollBars.CheckedStateChanged += (_, _) => { textView.ScrollBars = scrollBars.CheckedState == CheckState.Checked; };
+        scrollBars.ValueChanged += (_, _) => { textView.ScrollBars = scrollBars.Value == CheckState.Checked; };
 
         win.Add (scrollBars);
 
@@ -256,7 +256,7 @@ public class TextInputControls : Scenario
             Y = Pos.Top (dateField),
             Width = 20,
             IsShortFormat = false,
-            Time = DateTime.Now.TimeOfDay
+            Value = DateTime.Now.TimeOfDay
         };
         win.Add (_timeField);
 
@@ -270,7 +270,7 @@ public class TextInputControls : Scenario
         };
         win.Add (_labelMirroringTimeField);
 
-        _timeField.TimeChanged += TimeChanged;
+        _timeField.ValueChanged += TimeChanged;
 
         // MaskedTextProvider - uses .NET MaskedTextProvider
         Label netProviderLabel = new () { X = Pos.Left (dateField), Y = Pos.Bottom (dateField) + 1, Text = "_NetMaskedTextProvider [ +99 (000) 000-0000 ]:" };
@@ -473,7 +473,7 @@ public class TextInputControls : Scenario
         void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e) => win.SetNeedsDraw ();
     }
 
-    private void TimeChanged (object? sender, EventArgs<TimeSpan> e)
+    private void TimeChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
     {
         if (_labelMirroringTimeField is { } && _timeField is { })
         {

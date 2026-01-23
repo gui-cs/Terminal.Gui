@@ -14,7 +14,7 @@ public class ScrollBarTests
         Assert.Equal (0, scrollBar.ScrollableContentSize);
         Assert.Equal (0, scrollBar.VisibleContentSize);
         Assert.Equal (0, scrollBar.GetSliderPosition ());
-        Assert.Equal (0, scrollBar.Position);
+        Assert.Equal (0, scrollBar.Value);
         Assert.False (scrollBar.AutoShow);
     }
 
@@ -202,7 +202,7 @@ public class ScrollBarTests
         };
         super.Add (scrollBar);
         scrollBar.Layout ();
-        scrollBar.Position = 1;
+        scrollBar.Value = 1;
         scrollBar.Orientation = Orientation.Horizontal;
 
         Assert.Equal (0, scrollBar.GetSliderPosition ());
@@ -227,24 +227,24 @@ public class ScrollBarTests
         scrollBar.ScrollableContentSize = 5;
         scrollBar.Frame = new Rectangle (0, 0, 1, 4); // Needs to be at least 4 for slider to move
 
-        scrollBar.PositionChanging += (s, e) =>
+        scrollBar.ValueChanging += (s, e) =>
                                             {
                                                 if (changingCount == 0)
                                                 {
-                                                    e.Cancel = true;
+                                                    e.Handled = true;
                                                 }
 
                                                 changingCount++;
                                             };
-        scrollBar.PositionChanged += (s, e) => changedCount++;
+        scrollBar.ValueChanged += (s, e) => changedCount++;
 
-        scrollBar.Position = 1;
-        Assert.Equal (0, scrollBar.Position);
+        scrollBar.Value = 1;
+        Assert.Equal (0, scrollBar.Value);
         Assert.Equal (1, changingCount);
         Assert.Equal (0, changedCount);
 
-        scrollBar.Position = 1;
-        Assert.Equal (1, scrollBar.Position);
+        scrollBar.Value = 1;
+        Assert.Equal (1, scrollBar.Value);
         Assert.Equal (2, changingCount);
         Assert.Equal (1, changedCount);
     }

@@ -327,9 +327,13 @@ public class TableEditor : Scenario
 
         MenuItem CreateCheckBoxMenuItem (string key, string title, bool initialState, Action<bool> onToggle)
         {
-            CheckBox checkBox = new () { Title = title, CheckedState = initialState ? CheckState.Checked : CheckState.UnChecked };
+            CheckBox checkBox = new ()
+            {
+                Title = title,
+                Value = initialState ? CheckState.Checked : CheckState.UnChecked
+            };
 
-            checkBox.CheckedStateChanged += (s, e) => onToggle (checkBox.CheckedState == CheckState.Checked);
+            checkBox.ValueChanged += (s, e) => onToggle (checkBox.Value == CheckState.Checked);
 
             MenuItem item = new () { CommandView = checkBox };
 
@@ -452,10 +456,10 @@ public class TableEditor : Scenario
                                                      _tableView!.Style.ShowHorizontalHeaderUnderline = true;
                                                      _tableView!.Style.ShowVerticalCellLines = true;
 
-                                                     checkboxes ["HeaderOverline"].CheckedState = CheckState.Checked;
-                                                     checkboxes ["HeaderMidline"].CheckedState = CheckState.Checked;
-                                                     checkboxes ["HeaderUnderline"].CheckedState = CheckState.Checked;
-                                                     checkboxes ["CellLines"].CheckedState = CheckState.Checked;
+                                         checkboxes ["HeaderOverline"].Value = CheckState.Checked;
+                                         checkboxes ["HeaderMidline"].Value = CheckState.Checked;
+                                         checkboxes ["HeaderUnderline"].Value = CheckState.Checked;
+                                         checkboxes ["CellLines"].Value = CheckState.Checked;
 
                                                      _tableView!.Update ();
                                                  }
@@ -470,62 +474,62 @@ public class TableEditor : Scenario
                                                      _tableView!.Style.ShowHorizontalHeaderUnderline = false;
                                                      _tableView!.Style.ShowVerticalCellLines = false;
 
-                                                     checkboxes ["HeaderOverline"].CheckedState = CheckState.UnChecked;
-                                                     checkboxes ["HeaderMidline"].CheckedState = CheckState.UnChecked;
-                                                     checkboxes ["HeaderUnderline"].CheckedState = CheckState.UnChecked;
-                                                     checkboxes ["CellLines"].CheckedState = CheckState.UnChecked;
+                                         checkboxes ["HeaderOverline"].Value = CheckState.UnChecked;
+                                         checkboxes ["HeaderMidline"].Value = CheckState.UnChecked;
+                                         checkboxes ["HeaderUnderline"].Value = CheckState.UnChecked;
+                                         checkboxes ["CellLines"].Value = CheckState.UnChecked;
 
-                                                     _tableView!.Update ();
-                                                 }
-                                    },
-                                    CreateCheckBoxMenuItem ("Checkboxes",
-                                                            "_Checkboxes",
-                                                            false,
-                                                            state =>
-                                                            {
-                                                                if (state)
-                                                                {
-                                                                    ToggleCheckboxes (false);
-                                                                    checkboxes ["Radioboxes"].CheckedState = CheckState.UnChecked;
-                                                                }
-                                                                else if (HasCheckboxes ())
-                                                                {
-                                                                    ToggleCheckboxes (false);
-                                                                }
-                                                            }),
-                                    CreateCheckBoxMenuItem ("Radioboxes",
-                                                            "_Radioboxes",
-                                                            false,
-                                                            state =>
-                                                            {
-                                                                if (state)
-                                                                {
-                                                                    ToggleCheckboxes (true);
-                                                                    checkboxes ["Checkboxes"].CheckedState = CheckState.UnChecked;
-                                                                }
-                                                                else if (HasCheckboxes ())
-                                                                {
-                                                                    ToggleCheckboxes (true);
-                                                                }
-                                                            }),
-                                    CreateCheckBoxMenuItem ("AlternatingColors",
-                                                            "Alternating Colors",
-                                                            false,
-                                                            state =>
-                                                            {
-                                                                if (state)
-                                                                {
-                                                                    _tableView!.Style.RowColorGetter = a =>
-                                                                                                       {
-                                                                                                           return a.RowIndex % 2 == 0
-                                                                                                               ? _alternatingScheme
-                                                                                                               : null;
-                                                                                                       };
-                                                                }
-                                                                else
-                                                                {
-                                                                    _tableView!.Style.RowColorGetter = null;
-                                                                }
+                                         _tableView!.Update ();
+                                     }
+                        },
+                        CreateCheckBoxMenuItem (
+                                                "Checkboxes",
+                                                "_Checkboxes",
+                                                false,
+                                                state =>
+                                                {
+                                                    if (state)
+                                                    {
+                                                        ToggleCheckboxes (false);
+                                                        checkboxes ["Radioboxes"].Value = CheckState.UnChecked;
+                                                    }
+                                                    else if (HasCheckboxes ())
+                                                    {
+                                                        ToggleCheckboxes (false);
+                                                    }
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "Radioboxes",
+                                                "_Radioboxes",
+                                                false,
+                                                state =>
+                                                {
+                                                    if (state)
+                                                    {
+                                                        ToggleCheckboxes (true);
+                                                        checkboxes ["Checkboxes"].Value = CheckState.UnChecked;
+                                                    }
+                                                    else if (HasCheckboxes ())
+                                                    {
+                                                        ToggleCheckboxes (true);
+                                                    }
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "AlternatingColors",
+                                                "Alternating Colors",
+                                                false,
+                                                state =>
+                                                {
+                                                    if (state)
+                                                    {
+                                                        _tableView!.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingScheme : null; };
+                                                    }
+                                                    else
+                                                    {
+                                                        _tableView!.Style.RowColorGetter = null;
+                                                    }
 
                                                                 _tableView!.SetNeedsDraw ();
                                                             }),

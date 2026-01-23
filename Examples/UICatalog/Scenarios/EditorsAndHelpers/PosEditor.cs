@@ -118,7 +118,7 @@ public class PosEditor : EditorBase
         Add (_posOptionSelector);
     }
 
-    private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { PosChanged (); }
+    private void OnOptionSelectorOnValueChanged (object? s, ValueChangedEventArgs<int?> args) { PosChanged (); }
 
     // These need to have same order
     private readonly List<string> _posNames = ["Absolute", "Align", "AnchorEnd", "Center", "Func", "Percent"];

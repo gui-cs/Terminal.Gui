@@ -152,6 +152,13 @@ public partial class TextField
             }
 
             string newText = value.Replace ("\t", "").Split ("\n") [0];
+
+            // Raise IValue<string>.ValueChanging
+            if (RaiseValueChanging (oldText, newText))
+            {
+                return;
+            }
+
             ResultEventArgs<string> args = new (newText);
             RaiseTextChanging (args);
 
@@ -178,6 +185,9 @@ public partial class TextField
             }
 
             OnTextChanged ();
+
+            // Raise IValue<string>.ValueChanged
+            RaiseValueChanged (oldText, StringExtensions.ToString (_text));
 
             ProcessAutocomplete ();
 

@@ -10,7 +10,7 @@ namespace Terminal.Gui.Views;
 ///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
 ///     <see cref="decimal"/>. Attempting to use any other type will result in an <see cref="InvalidOperationException"/>.
 /// </remarks>
-public class NumericUpDown<T> : View where T : notnull
+public class NumericUpDown<T> : View, IValue<T> where T : notnull
 {
     private readonly Button _down;
 
@@ -152,7 +152,7 @@ public class NumericUpDown<T> : View where T : notnull
         }
     }
 
-    private T _value = default!;
+    private T? _value = default;
 
     /// <summary>
     ///     Gets or sets the value that will be incremented or decremented.
@@ -160,45 +160,63 @@ public class NumericUpDown<T> : View where T : notnull
     /// <remarks>
     ///     <para>
     ///         <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events are raised when the value changes.
-    ///         The <see cref="ValueChanging"/> event can be canceled the change setting
-    ///         <see cref="HandledEventArgs"/><c>.Handled</c> to <see langword="true"/>.
+    ///         Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
     ///     </para>
     /// </remarks>
-    public T Value
+    public T? Value
     {
         get => _value;
         set
         {
-            if (_value.Equals (value))
+            if (EqualityComparer<T?>.Default.Equals (_value, value))
             {
                 return;
             }
 
-            T oldValue = value;
-            CancelEventArgs<T> args = new (in _value, ref value);
-            ValueChanging?.Invoke (this, args);
+            T? oldValue = _value;
+            ValueChangingEventArgs<T?> changingArgs = new (oldValue, value);
 
-            if (args.Cancel)
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
             {
                 return;
             }
 
-            _value = value;
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            _value = changingArgs.NewValue;
             SetText ();
-            ValueChanged?.Invoke (this, new (in value));
+
+            ValueChangedEventArgs<T?> changedArgs = new (oldValue, _value);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
     }
 
     /// <summary>
-    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}"/><c>.Cancel</c> to true to prevent the
-    ///     change.
+    ///     Raised when <see cref="Value"/> is about to change.
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
     /// </summary>
-    public event EventHandler<CancelEventArgs<T>>? ValueChanging;
+    public event EventHandler<ValueChangingEventArgs<T?>>? ValueChanging;
 
     /// <summary>
-    ///     Raised when the value has changed.
+    ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
-    public event EventHandler<EventArgs<T>>? ValueChanged;
+    public event EventHandler<ValueChangedEventArgs<T?>>? ValueChanged;
+
+    /// <summary>
+    ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
+    /// </summary>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<T?> args) => false;
+
+    /// <summary>
+    ///     Called after <see cref="Value"/> has changed.
+    /// </summary>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<T?> args) { }
 
     private string _format = "{0}";
 

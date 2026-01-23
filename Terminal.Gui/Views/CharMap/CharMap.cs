@@ -10,7 +10,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     See <see href="../docs/CharacterMap.md"/> for details.
 /// </remarks>
-public class CharMap : View, IDesignable
+public class CharMap : View, IDesignable, IValue<Rune>
 {
     /// <summary>
     ///     Gets or sets the default cursor style.
@@ -110,8 +110,8 @@ public class CharMap : View, IDesignable
     }
 
     // Visible rows management: each entry is the starting code point of a 16-wide row
-    private readonly List<int> _visibleRowStarts = new ();
-    private readonly Dictionary<int, int> _rowStartToVisibleIndex = new ();
+    private readonly List<int> _visibleRowStarts = [];
+    private readonly Dictionary<int, int> _rowStartToVisibleIndex = [];
 
     private void RebuildVisibleRows ()
     {
@@ -199,7 +199,25 @@ public class CharMap : View, IDesignable
                 return;
             }
 
+            int oldSelectedCodePoint = _selectedCodepoint;
             int newSelectedCodePoint = Math.Clamp (value, 0, MAX_CODE_POINT);
+
+            Rune oldValue = new (oldSelectedCodePoint);
+            Rune newValue = new (newSelectedCodePoint);
+
+            ValueChangingEventArgs<Rune> changingArgs = new (oldValue, newValue);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
 
             Point offsetToNewCursor = GetCursor (newSelectedCodePoint);
 
@@ -210,14 +228,41 @@ public class CharMap : View, IDesignable
 
             SetNeedsDraw ();
             UpdateCursor ();
-            SelectedCodePointChanged?.Invoke (this, new EventArgs<int> (SelectedCodePoint));
+
+            ValueChangedEventArgs<Rune> changedArgs = new (oldValue, new Rune (_selectedCodepoint));
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
     }
 
+    #region IValue<Rune> Implementation
+
+    /// <inheritdoc/>
+    public Rune Value { get => new (SelectedCodePoint); set => SelectedCodePoint = value.Value; }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => new Rune (SelectedCodePoint);
+
     /// <summary>
-    ///     Raised when the selected code point changes.
+    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> is changing.
     /// </summary>
-    public event EventHandler<EventArgs<int>>? SelectedCodePointChanged;
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<Rune> args) => false;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<Rune>>? ValueChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<Rune> args) { }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<Rune>>? ValueChanged;
+
+    #endregion
 
     /// <summary>
     ///     Gets or sets whether the number of columns each glyph is displayed.
@@ -357,9 +402,9 @@ public class CharMap : View, IDesignable
 
         Dialog? waitIndicator = new () { Title = Strings.charMapCPInfoDlgTitle, Buttons = [new Button { Text = Strings.btnCancel }] };
 
-        var errorLabel = new Label { Text = UcdApiClient.BaseUrl, X = 0, Y = 0, TextAlignment = Alignment.Center };
+        Label errorLabel = new () { Text = UcdApiClient.BaseUrl, X = 0, Y = 0, TextAlignment = Alignment.Center };
 
-        var spinner = new SpinnerView { X = Pos.Center (), Y = Pos.Bottom (errorLabel), Style = new SpinnerStyle.Aesthetic () };
+        SpinnerView spinner = new () { X = Pos.Center (), Y = Pos.Bottom (errorLabel), Style = new SpinnerStyle.Aesthetic () };
         spinner.AutoSpin = true;
         waitIndicator.Add (errorLabel);
         waitIndicator.Add (spinner);
@@ -417,7 +462,7 @@ public class CharMap : View, IDesignable
         dlg.Title = title;
 
         var rune = (Rune)SelectedCodePoint;
-        var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
+        Label label = new () { Text = "IsAscii: ", X = 0, Y = 0 };
         dlg.Add (label);
 
         label = new Label { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
@@ -477,7 +522,7 @@ public class CharMap : View, IDesignable
         };
         dlg.Add (label);
 
-        var json = new TextView
+        TextView json = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),

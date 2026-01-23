@@ -280,7 +280,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                {
                                    if (e.NewValue is < 0 or > 20)
                                    {
-                                       e.Cancel = true;
+                                       e.Handled = true;
                                    }
                                };
         w.Add (cbDar);
