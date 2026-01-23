@@ -143,7 +143,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScenarioRunner", "Examples\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortcutTest", "D:\s\gui-cs\Terminal.Gui\Examples\ShortcutTest\ShortcutTest.csproj", "{0EECEC4F-AD8D-1076-1B40-562926DE1CB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortcutTest", "Examples\ShortcutTest\ShortcutTest.csproj", "{0EECEC4F-AD8D-1076-1B40-562926DE1CB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
