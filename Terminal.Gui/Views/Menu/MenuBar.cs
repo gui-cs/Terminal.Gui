@@ -328,7 +328,7 @@ public class MenuBar : Menu, IDesignable
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // TODO: Ensure sourceMenuBar is actually one of our bar items
-        if (Visible && Enabled && args.Context?.Source is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
+        if (Visible && Enabled && args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
         {
             if (!CanFocus)
             {
@@ -362,7 +362,7 @@ public class MenuBar : Menu, IDesignable
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
         base.OnAccepted (args);
 
-        if (SubViews.OfType<MenuBarItem> ().Contains (args.Context?.Source))
+        if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
         {
             return;
         }

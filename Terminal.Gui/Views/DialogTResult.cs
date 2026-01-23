@@ -190,12 +190,17 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (!Buttons.Contains (args.Context?.Source))
+        if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not Button sourceButton)
         {
             return false;
         }
 
-        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == args.Context?.Source)
+        if (!Buttons.Contains (sourceButton))
+        {
+            return false;
+        }
+
+        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == sourceButton)
         {
             // Default button pressed
             return false;
