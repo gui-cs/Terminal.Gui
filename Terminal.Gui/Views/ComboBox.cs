@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui.Views;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
+[Obsolete ("ComboBox is obsolete and will be removed before v2 Beta. See Issue ##2404.")]
 public class ComboBox : View, IDesignable
 {
     private readonly ComboListView _listview;
