@@ -344,6 +344,125 @@ else if (ctx.Binding is InputBinding ib)
 - **`IInputBinding.Source`**: The View where the binding was defined/added.
 - **`sender` (event parameter)**: The View currently raising the event (changes during propagation).
 
+### Value Access: IValue and IValue&lt;T&gt;
+
+Views that represent user-selectable values implement the `IValue<T>` interface, providing standardized access to their primary value. This enables generic programming, value propagation during command handling, and consistent event patterns.
+
+#### IValue Interfaces
+
+```csharp
+/// <summary>
+/// Non-generic interface for accessing a View's value as a boxed object.
+/// Used by command propagation to carry values without knowing the generic type.
+/// </summary>
+public interface IValue
+{
+    /// <summary>Gets the value as a boxed object.</summary>
+    object? GetValue ();
+}
+
+/// <summary>
+/// Interface for Views that provide a strongly-typed value.
+/// </summary>
+public interface IValue<TValue> : IValue
+{
+    /// <summary>Gets or sets the value.</summary>
+    TValue? Value { get; set; }
+
+    /// <summary>
+    /// Raised when <see cref="Value"/> is about to change.
+    /// Set <see cref="ValueChangingEventArgs{T}.Handled"/> to cancel.
+    /// </summary>
+    event EventHandler<ValueChangingEventArgs<TValue?>>? ValueChanging;
+
+    /// <summary>
+    /// Raised when <see cref="Value"/> has changed.
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<TValue?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => Value;
+}
+```
+
+#### Views Implementing IValue&lt;T&gt;
+
+| View | Value Type | Meaning |
+|------|-----------|---------|
+| `CheckBox` | `CheckState` | Current checked state (Unchecked, Checked, CheckedMark) |
+| `TextField` | `string` | Text content |
+| `TextView` | `string` | Full text content |
+| `DateField` | `DateTime?` | Selected date and time |
+| `TimeField` | `TimeSpan` | Selected time |
+| `ScrollBar` | `int` | Current scroll position |
+| `Slider` | `int` | Current slider value |
+| `ListView` | `int` | Selected item index |
+| `OptionSelector` | `int` | Selected option index |
+| `RadioGroup` | `int` | Selected radio button index |
+| `LineCanvas` | `List<Line>` | Collection of lines |
+| `CharMap` | `Rune` | Selected character |
+
+#### Using IValue in Handlers
+
+**Example: Accessing value during command propagation:**
+
+```csharp
+menuBar.Accepting += (sender, args) =>
+{
+    // Access the value from the originating view
+    if (args.Context?.Source is IValue valueView)
+    {
+        object? value = valueView.GetValue ();
+
+        // Pattern match on value type
+        if (value is CheckState checkState)
+        {
+            _autoSave = checkState == CheckState.Checked;
+        }
+        else if (value is int optionIndex)
+        {
+            _selectedOption = optionIndex;
+        }
+    }
+};
+```
+
+**Example: Generic value handling:**
+
+```csharp
+void ProcessValueView<T> (IValue<T> valueView)
+{
+    T? currentValue = valueView.Value;
+
+    valueView.ValueChanged += (sender, args) =>
+    {
+        T? newValue = args.NewValue;
+        T? oldValue = args.OldValue;
+        // Handle value change
+    };
+}
+```
+
+#### Value vs Legacy Properties
+
+Many Views have legacy properties (e.g., `TextField.Text`, `CheckBox.CheckedState`) that predate the `IValue<T>` interface. The `Value` property typically maps to these legacy properties:
+
+```csharp
+// CheckBox example
+public class CheckBox : View, IValue<CheckState>
+{
+    public CheckState CheckedState { get; set; }  // Legacy property
+
+    public CheckState? Value  // IValue<T> property
+    {
+        get => CheckedState;
+        set => CheckedState = value ?? CheckState.None;
+    }
+}
+```
+
+**Best practice:** Use the `Value` property for new code, as it provides consistent access patterns across all value-bearing Views.
+
 ## Best Practices
 
 1. **Event Naming**:
