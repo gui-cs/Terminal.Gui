@@ -144,6 +144,44 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// </summary>
     public void ResumeSuspendCollectionChangedEvent () => Source?.SuspendCollectionChangedEvent = false;
 
+    // TODO: Make CollectionChange follow the CWP
+    private void SourceOnCollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
+
+        if (Source is { Count: > 0 } && SelectedItem.HasValue && SelectedItem > Source.Count - 1)
+        {
+            SelectedItem = Source.Count - 1;
+        }
+
+        SetNeedsDraw ();
+        OnCollectionChanged (e);
+    }
+
+    /// <summary>
+    ///     Call the event to raises the <see cref="CollectionChanged"/>.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke (this, e);
+
+    /// <summary>
+    ///     Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// </summary>
+    public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+    #endregion IListDataSource
+
+    #region Viewport/ContentSize Management
+
+    /// <inheritdoc/>
+    protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
+
+    /// <summary>INTERNAL: Gets the width reserved for mark rendering (checkbox and space).</summary>
+    private int MarkWidth => ShowMarks ? 2 : 0;
+
+    /// <summary>INTERNAL: Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
+    private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
+
     /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
     /// <remarks>
     ///     This a helper property for accessing <c>listView.Viewport.Y</c>.
@@ -189,44 +227,6 @@ public partial class ListView : View, IDesignable, IValue<int?>
             SetNeedsDraw ();
         }
     }
-
-    // TODO: Make CollectionChange follow the CWP
-    private void SourceOnCollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
-
-        if (Source is { Count: > 0 } && SelectedItem.HasValue && SelectedItem > Source.Count - 1)
-        {
-            SelectedItem = Source.Count - 1;
-        }
-
-        SetNeedsDraw ();
-        OnCollectionChanged (e);
-    }
-
-    /// <summary>
-    ///     Call the event to raises the <see cref="CollectionChanged"/>.
-    /// </summary>
-    /// <param name="e"></param>
-    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke (this, e);
-
-    /// <summary>
-    ///     Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
-    /// </summary>
-    public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
-    #endregion IListDataSource
-
-    #region Viewport/ContentSize Management
-
-    /// <inheritdoc/>
-    protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
-
-    /// <summary>INTERNAL: Gets the width reserved for mark rendering (checkbox and space).</summary>
-    private int MarkWidth => ShowMarks ? 2 : 0;
-
-    /// <summary>INTERNAL: Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
-    private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
 
     #endregion Viewport/ContentSize Management
 
