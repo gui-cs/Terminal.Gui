@@ -36,11 +36,6 @@ public class ComboBox : View, IDesignable
         _search.TextChanged += Search_Changed;
 
         _listview.Y = Pos.Bottom (_search);
-        _listview.Accepting += (sender, a) =>
-                               {
-                                   SelectText ();
-                                   a.Handled = true;
-                               };
 
         _listview.Accepting += (sender, args) =>
                                {
@@ -855,7 +850,7 @@ public class ComboBox : View, IDesignable
                 }
                 else if (isMousePositionValid)
                 {
-                    // BUGBUG: ????
+                    return RaiseAccepting (new CommandContext (Command.Accept, this, new InputBinding ())) == true;
                 }
                 else
                 {
