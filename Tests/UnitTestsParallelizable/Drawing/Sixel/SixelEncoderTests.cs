@@ -339,4 +339,76 @@ public class SixelEncoderTests
         Assert.True (encoder.Quantizer.Palette.Count <= 2);
         Assert.False (string.IsNullOrEmpty (result));
     }
+
+    [Fact]
+    public void GetHeightInPixels_DoesNotRound_WhenAvoidBottomScrollIsFalse ()
+    {
+        SixelEncoder encoder = new ()
+        {
+            AvoidBottomScroll = false
+        };
+
+        int result = encoder.GetHeightInPixels (maxSizeHeight: 13, pixelsPerCellY: 2);
+
+        Assert.Equal (13 * 2, result);
+    }
+
+    [Fact]
+    public void GetHeightInPixels_RoundsDownToMultipleOf6_WhenAvoidBottomScrollIsTrue ()
+    {
+        SixelEncoder encoder = new ()
+        {
+            AvoidBottomScroll = true
+        };
+
+        int result = encoder.GetHeightInPixels (maxSizeHeight: 13, pixelsPerCellY: 2);
+
+        // 13 → 12 → 24 pixels
+        Assert.Equal (12 * 2, result);
+    }
+
+    [Theory]
+    [InlineData (false)]
+    [InlineData (true)]
+    public void GetHeightInPixels_ExactMultipleOf6_IsNotModified (bool avoidBottomScroll)
+    {
+        SixelEncoder encoder = new ()
+        {
+            AvoidBottomScroll = avoidBottomScroll
+        };
+
+        int result = encoder.GetHeightInPixels (maxSizeHeight: 12, pixelsPerCellY: 2);
+
+        Assert.Equal (12 * 2, result);
+    }
+
+    [Fact]
+    public void GetHeightInPixels_HeightBelowPixelHigh_IsNotRounded_WhenAvoidBottomScrollIsFalse ()
+    {
+        SixelEncoder encoder = new ()
+        {
+            AvoidBottomScroll = false
+        };
+
+        const int SMALL_HEIGHT = 5;
+
+        int result = encoder.GetHeightInPixels (maxSizeHeight: SMALL_HEIGHT, pixelsPerCellY: 2);
+
+        Assert.Equal (SMALL_HEIGHT * 2, result);
+    }
+
+    [Fact]
+    public void GetHeightInPixels_HeightBelowPixelHigh_IsZero_WhenAvoidBottomScrollIsTrue ()
+    {
+        SixelEncoder encoder = new ()
+        {
+            AvoidBottomScroll = true
+        };
+
+        const int SMALL_HEIGHT = 5;
+
+        int result = encoder.GetHeightInPixels (maxSizeHeight: SMALL_HEIGHT, pixelsPerCellY: 2);
+
+        Assert.Equal (0 * 2, result);
+    }
 }

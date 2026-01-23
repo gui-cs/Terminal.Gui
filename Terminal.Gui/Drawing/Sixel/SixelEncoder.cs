@@ -302,7 +302,7 @@ public class SixelEncoder
         {
             cellHeight -= cellHeight % 6;
         }
-        else if (AvoidBottomScroll)
+        else if (AvoidBottomScroll && maxSizeHeight < PIXEL_HIGH)
         {
             cellHeight = 0;
         }
