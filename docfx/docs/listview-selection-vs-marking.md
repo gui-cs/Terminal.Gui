@@ -213,6 +213,151 @@ processButton.Accepting += (s, e) =>
 };
 ```
 
+## Comparison with Other UI Libraries
+
+Terminal.Gui's approach to ListView is similar to patterns found in other popular UI frameworks, though implementations vary. Understanding these similarities helps clarify the design rationale.
+
+### WPF (Windows Presentation Foundation)
+
+**ListBox Control:**
+- **Selection:** Uses `SelectedItems` property (collection) for multi-selection
+- **SelectionMode:** `Single`, `Multiple`, or `Extended` (with Ctrl/Shift modifiers)
+- **Per-Item Selection:** Items have `IsSelected` property for MVVM binding
+- **No Built-in Marking:** No separate "checked" state; use custom templates if needed
+
+**Key Difference:** WPF allows multiple items to be *selected* (highlighted) simultaneously when `SelectionMode` is `Multiple` or `Extended`. Terminal.Gui only allows one selected item but supports multiple marked items.
+
+```xml
+<!-- WPF: Multiple highlighted selections -->
+<ListBox SelectionMode="Extended">
+  <!-- User can Ctrl+Click to highlight multiple items -->
+</ListBox>
+```
+
+### WinForms
+
+**ListBox vs CheckedListBox:**
+- **ListBox:** 
+  - `SelectionMode`: `One`, `MultiSimple`, or `MultiExtended`
+  - Can highlight multiple items with `MultiSimple`/`MultiExtended`
+  - No checkboxes
+- **CheckedListBox:**
+  - Displays checkboxes for each item
+  - `SelectionMode` limited to `One` or `None` (can't highlight multiple)
+  - Checked items tracked via `CheckedItems` collection
+  - Checking and selection are independent
+
+**Key Similarity:** WinForms' `CheckedListBox` has the closest model to Terminal.Gui ListView - selection (highlight) is separate from checked state, though WinForms only allows single selection when checkboxes are present.
+
+```csharp
+// WinForms: Separate controls for different needs
+var listBox = new ListBox { SelectionMode = SelectionMode.MultiExtended }; // Multiple highlights, no checks
+var checkedListBox = new CheckedListBox(); // Checkboxes, single highlight only
+```
+
+### GTK+ (TreeView)
+
+**TreeView with GtkTreeSelection:**
+- **Selection Mode:** `NONE`, `SINGLE`, `BROWSE`, or `MULTIPLE`
+- **Multiple Selection:** Allows multiple rows to be selected (highlighted) with `GTK_SELECTION_MULTIPLE`
+- **No Built-in Checked State:** Must add checkboxes as cell renderers manually
+- **Separation:** Selection (highlighting) handled by view; checked state (if added) is in the model
+
+**Key Similarity:** GTK separates visual selection from data state. If you add checkboxes via cell renderers, they function independently from selection - similar to Terminal.Gui's approach.
+
+```c
+// GTK: Selection mode controls highlighting
+GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
+gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
+// Checkboxes require custom cell renderer and model column
+```
+
+### Qt (QListWidget)
+
+**QListWidget:**
+- **Selection Mode:** `SingleSelection`, `MultiSelection`, `ExtendedSelection`, etc.
+- **Multiple Selection:** Can highlight multiple items with appropriate mode
+- **Check State:** Items can have checkboxes via `setCheckState(Qt.Checked)`
+- **Independence:** Selection (highlighting) and check state are completely independent
+
+**Key Similarity:** Qt clearly separates selection from check state, just like Terminal.Gui. You can have items that are checked but not selected, selected but not checked, or both.
+
+```python
+# Qt: Independent selection and checking
+list_widget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+item.setCheckState(Qt.Checked)  # Checking doesn't affect selection
+selected = list_widget.selectedItems()  # Different from checked items
+```
+
+### Java Swing (JList)
+
+**JList:**
+- **Selection Mode:** `SINGLE_SELECTION`, `SINGLE_INTERVAL_SELECTION`, `MULTIPLE_INTERVAL_SELECTION`
+- **Multiple Selection:** Supports multiple highlighted items with appropriate mode
+- **No Built-in Checkboxes:** Must use custom cell renderers for checkboxes
+- **Extension Required:** Checking behavior requires custom implementation
+
+**Key Difference:** Swing's JList focuses on selection only. Any checked state requires custom rendering and state management.
+
+```java
+// Swing: Selection mode for multiple highlights
+list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+// No built-in checked state - custom implementation needed
+```
+
+### HTML (Web)
+
+**Select Element:**
+- **Multiple Attribute:** `<select multiple>` allows multiple selections
+- **User Experience:** Requires Ctrl/Cmd key to select multiple (often confusing)
+- **No Visual Checkboxes:** Selected items are highlighted only
+
+**Checkbox Group:**
+- **Independent Checkboxes:** Each checkbox is independent
+- **Clear UX:** Visually obvious that multiple selections are possible
+- **No Single Selection Concept:** No "currently focused" item distinct from checked items
+
+**Key Insight:** Web developers often prefer checkbox groups over `<select multiple>` for better UX, mirroring the preference for distinct selection/marking in desktop applications.
+
+```html
+<!-- HTML: Checkbox group is clearer than select multiple -->
+<fieldset>
+  <legend>Select files</legend>
+  <label><input type="checkbox" name="files[]" value="1"> File 1</label>
+  <label><input type="checkbox" name="files[]" value="2"> File 2</label>
+</fieldset>
+```
+
+### Comparison Table
+
+| Library | Multiple Highlighted Selection | Separate Checked/Marked State | Terminal.Gui Equivalent |
+|---------|-------------------------------|-------------------------------|------------------------|
+| **WPF ListBox** | Yes (SelectionMode) | No (custom only) | Multiple selection ≈ marking |
+| **WinForms ListBox** | Yes (SelectionMode) | N/A | Multiple highlights |
+| **WinForms CheckedListBox** | No (single only) | Yes (CheckedItems) | ✓ Similar model |
+| **GTK TreeView** | Yes (SelectionMode) | Manual (cell renderer) | Flexible approach |
+| **Qt QListWidget** | Yes (SelectionMode) | Yes (CheckState) | ✓ Very similar |
+| **Swing JList** | Yes (SelectionMode) | No (custom only) | Selection only |
+| **HTML Select** | Yes (multiple attr) | N/A | Multiple highlights |
+| **HTML Checkboxes** | N/A | Yes (implicit) | Pure marking |
+| **Terminal.Gui ListView** | No (single only) | Yes (IsMarked) | ✓ Unique hybrid |
+
+### Why Terminal.Gui's Approach Makes Sense
+
+Terminal.Gui's design reflects the constraints and advantages of console UIs:
+
+1. **Console Navigation:** Terminal UIs naturally have a "current focus" (one highlighted item) due to keyboard-driven navigation. Unlike GUIs with mouse pointers, you can't visually show multiple "highlighted" items effectively in a console.
+
+2. **Clear Visual Language:** Using `[x]` for marked items and highlighting for the selected item provides clear, unambiguous visual feedback in character-based displays.
+
+3. **Familiar Pattern:** The model matches `CheckedListBox` in WinForms and checkbox behavior in Qt - proven patterns from GUI frameworks adapted for console constraints.
+
+4. **Practical Efficiency:** Users can quickly navigate (selection) while building a set of items for batch processing (marking), similar to how file managers work.
+
+5. **Naming Clarification:** While `AllowsMultipleSelection` might be better named `AllowsMultipleMarking`, the underlying dual-concept model aligns with established UI patterns.
+
+The key insight is that Terminal.Gui adapted the best aspects of GUI list controls for console environments, where "selection" naturally means "current focus" rather than "highlighted items," and "marking" provides the multi-item functionality that GUI frameworks achieve through multiple highlights.
+
 ## Summary
 
 | Aspect | Selection (SelectedItem) | Marking (IsMarked) |
