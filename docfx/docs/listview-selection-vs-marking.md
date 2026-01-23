@@ -342,22 +342,6 @@ list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 | **HTML Checkboxes** | N/A | Yes (implicit) | Pure marking |
 | **Terminal.Gui ListView** | No (single only) | Yes (IsMarked) | ✓ Unique hybrid |
 
-### Why Terminal.Gui's Approach Makes Sense
-
-Terminal.Gui's design reflects the constraints and advantages of console UIs:
-
-1. **Console Navigation:** Terminal UIs naturally have a "current focus" (one highlighted item) due to keyboard-driven navigation. Unlike GUIs with mouse pointers, you can't visually show multiple "highlighted" items effectively in a console.
-
-2. **Clear Visual Language:** Using `[x]` for marked items and highlighting for the selected item provides clear, unambiguous visual feedback in character-based displays.
-
-3. **Familiar Pattern:** The model matches `CheckedListBox` in WinForms and checkbox behavior in Qt - proven patterns from GUI frameworks adapted for console constraints.
-
-4. **Practical Efficiency:** Users can quickly navigate (selection) while building a set of items for batch processing (marking), similar to how file managers work.
-
-5. **Naming Clarification:** While `AllowsMultipleSelection` might be better named `AllowsMultipleMarking`, the underlying dual-concept model aligns with established UI patterns.
-
-The key insight is that Terminal.Gui adapted the best aspects of GUI list controls for console environments, where "selection" naturally means "current focus" rather than "highlighted items," and "marking" provides the multi-item functionality that GUI frameworks achieve through multiple highlights.
-
 ## Summary
 
 | Aspect | Selection (SelectedItem) | Marking (IsMarked) |
