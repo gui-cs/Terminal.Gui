@@ -15,28 +15,6 @@ namespace Terminal.Gui.Views;
 ///         <see cref="AllowsMarking"/> property is true, elements of the list can be marked by the user.
 ///     </para>
 ///     <para>
-///         <see cref="ListView"/> supports two distinct concepts:
-///     </para>
-///     <list type="bullet">
-///         <item>
-///             <term>Selection (<see cref="SelectedItem"/>)</term>
-///             <description>
-///                 The currently highlighted/focused item in the list. Only ONE item can be selected at a time.
-///                 This is the item that will be activated when the user presses ENTER. Selection is controlled
-///                 by arrow keys, mouse clicks, and keyboard navigation.
-///             </description>
-///         </item>
-///         <item>
-///             <term>Marking (<see cref="IListDataSource.IsMarked"/>)</term>
-///             <description>
-///                 Items that have been "checked" or "marked" by the user (shown with [x] when <see cref="AllowsMarking"/>
-///                 is true). Zero or more items can be marked. Marking is controlled by the SPACE key and allows users
-///                 to flag items for batch operations. Use <see cref="AllowsMultipleSelection"/> to control whether
-///                 multiple items can be marked simultaneously.
-///             </description>
-///         </item>
-///     </list>
-///     <para>
 ///         By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
 ///         <see cref="ObservableCollection{T}"/> object (e.g. arrays, <see cref="List{T}"/>, and other collections).
 ///         Alternatively, an
@@ -55,7 +33,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with [x] or [ ]
-///         and bind the SPACE key to toggle marking. To implement a different marking style set
+///         and bind the SPACE key to toggle the selection. To implement a different marking style set
 ///         <see cref="AllowsMarking"/> to false and implement custom rendering.
 ///     </para>
 ///     <para>
@@ -187,17 +165,8 @@ public class ListView : View, IDesignable, IValue<int?>
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
     /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
     /// <remarks>
-    ///     <para>
-    ///         If set to <see langword="true"/>, <see cref="ListView"/> will render marked items with "[x]", and
-    ///         unmarked items with "[ ]". The SPACE key will toggle marking of the currently selected item.
-    ///         The default is <see langword="false"/>.
-    ///     </para>
-    ///     <para>
-    ///         Marking is distinct from selection. The selected item (<see cref="SelectedItem"/>) is the currently
-    ///         highlighted/focused item, while marked items are items that have been "checked" by the user.
-    ///         Use <see cref="AllowsMultipleSelection"/> to control whether multiple items can be marked
-    ///         simultaneously.
-    ///     </para>
+    ///     If set to <see langword="true"/>, <see cref="ListView"/> will render items marked items with "[x]", and
+    ///     unmarked items with "[ ]". SPACE key will toggle marking. The default is <see langword="false"/>.
     /// </remarks>
     public bool AllowsMarking
     {
@@ -210,29 +179,9 @@ public class ListView : View, IDesignable, IValue<int?>
     }
 
     /// <summary>
-    ///     Gets or sets whether multiple items can be marked simultaneously. Only takes effect when
-    ///     <see cref="AllowsMarking"/> is <see langword="true"/>.
+    ///     If set to <see langword="true"/> more than one item can be selected. If <see langword="false"/> selecting an
+    ///     item will cause all others to be un-selected. The default is <see langword="false"/>.
     /// </summary>
-    /// <value>
-    ///     <see langword="true"/> to allow multiple items to be marked at the same time;
-    ///     <see langword="false"/> to allow only one item to be marked at a time (marking a new item
-    ///     automatically unmarks the previously marked item). The default is <see langword="false"/>.
-    /// </value>
-    /// <remarks>
-    ///     <para>
-    ///         This property controls marking behavior, not selection. Only ONE item can be selected
-    ///         (highlighted/focused via <see cref="SelectedItem"/>) at a time, regardless of this setting.
-    ///     </para>
-    ///     <para>
-    ///         When <see langword="true"/>, users can mark multiple items (shown with [x]) by pressing SPACE
-    ///         on different items. When <see langword="false"/>, marking a new item automatically unmarks
-    ///         the previously marked item, enforcing single-item marking behavior.
-    ///     </para>
-    ///     <para>
-    ///         When changed from <see langword="true"/> to <see langword="false"/>, all marked items except
-    ///         the currently selected item are automatically unmarked.
-    ///     </para>
-    /// </remarks>
     public bool AllowsMultipleSelection
     {
         get;
@@ -578,20 +527,8 @@ public class ListView : View, IDesignable, IValue<int?>
 
     private int? _lastSelectedItem;
 
-    /// <summary>Gets or sets the index of the currently selected (highlighted/focused) item.</summary>
-    /// <value>The zero-based index of the selected item, or <see langword="null"/> if no item is selected.</value>
-    /// <remarks>
-    ///     <para>
-    ///         This represents the currently highlighted/focused item in the list, not marked items.
-    ///         Only ONE item can be selected at a time. This is the item that will be activated when
-    ///         the user presses ENTER or double-clicks.
-    ///     </para>
-    ///     <para>
-    ///         Selection is independent of marking. An item can be selected without being marked,
-    ///         and marked items are not necessarily the currently selected item. Use
-    ///         <see cref="IListDataSource.IsMarked"/> to check if an item is marked.
-    ///     </para>
-    /// </remarks>
+    /// <summary>Gets or sets the index of the currently selected item.</summary>
+    /// <value>The selected item or null if no item is selected.</value>
     public int? SelectedItem
     {
         get;
