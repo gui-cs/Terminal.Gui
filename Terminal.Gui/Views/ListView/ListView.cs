@@ -62,11 +62,6 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// </summary>
     public int MaxItemLength => Source?.MaxItemLength ?? 0;
 
-    /// <summary>
-    ///     Allow resume the <see cref="CollectionChanged"/> event from being invoked,
-    /// </summary>
-    public void ResumeSuspendCollectionChangedEvent () => Source?.SuspendCollectionChangedEvent = false;
-
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>
     /// <remarks>
@@ -138,10 +133,16 @@ public partial class ListView : View, IDesignable, IValue<int?>
         }
     }
 
+    // TODO: Make these match the pattern in IListDataSource where it's just a property.
     /// <summary>
     ///     Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
     /// </summary>
     public void SuspendCollectionChangedEvent () => Source?.SuspendCollectionChangedEvent = true;
+
+    /// <summary>
+    ///     Allow resume the <see cref="CollectionChanged"/> event from being invoked,
+    /// </summary>
+    public void ResumeSuspendCollectionChangedEvent () => Source?.SuspendCollectionChangedEvent = false;
 
     /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
     /// <remarks>
