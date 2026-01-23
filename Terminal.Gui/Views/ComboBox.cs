@@ -885,7 +885,7 @@ public class ComboBox : View, IDesignable
             Rectangle f = Frame;
             int item = TopItem;
             bool focused = HasFocus;
-            int col = AllowsMarking ? 2 : 0;
+            int col = ShowMarks ? 2 : 0;
             int start = LeftItem;
 
             for (var row = 0; row < f.Height; row++, item++)
@@ -934,10 +934,10 @@ public class ComboBox : View, IDesignable
                         SetAttribute (current);
                     }
 
-                    if (AllowsMarking)
+                    if (ShowMarks)
                     {
-                        AddRune (Source.IsMarked (item) ? AllowsMultipleMarking ? Glyphs.CheckStateChecked : Glyphs.Selected :
-                                 AllowsMultipleMarking ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
+                        AddRune (Source.IsMarked (item) ? MarkMultiple ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                 MarkMultiple ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
                         AddRune ((Rune)' ');
                     }
 

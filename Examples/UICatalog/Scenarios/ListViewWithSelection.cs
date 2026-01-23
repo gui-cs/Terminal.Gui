@@ -12,8 +12,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Scrolling")]
 public class ListViewWithSelection : Scenario
 {
-    private CheckBox _allowMarkingCb;
-    private CheckBox _allowMultipleCb;
+    private CheckBox _showMarksCb;
+    private CheckBox _markMultipleCb;
     private CheckBox _customRenderCb;
     private ListView _listView;
     private ObservableCollection<Scenario> _scenarios;
@@ -38,23 +38,23 @@ public class ListViewWithSelection : Scenario
         _appWindow.Add (_customRenderCb);
         _customRenderCb.ValueChanging += CustomRenderCB_Toggle;
 
-        _allowMarkingCb = new CheckBox { X = Pos.Right (_customRenderCb) + 1, Y = 0, Text = "Allows_Marking", AllowCheckStateNone = false };
-        _appWindow.Add (_allowMarkingCb);
-        _allowMarkingCb.ValueChanging += AllowsMarkingCB_Toggle;
+        _showMarksCb = new CheckBox { X = Pos.Right (_customRenderCb) + 1, Y = 0, Text = "Show_Marks", AllowCheckStateNone = false };
+        _appWindow.Add (_showMarksCb);
+        _showMarksCb.ValueChanging += ShowMarksCB_Toggle;
 
-        _allowMultipleCb = new CheckBox
+        _markMultipleCb = new CheckBox
         {
-            X = Pos.Right (_allowMarkingCb) + 1,
+            X = Pos.Right (_showMarksCb) + 1,
             Y = 0,
-            Text = "AllowsMulti_Select"
+            Text = "Mark_Multiple"
         };
-        _appWindow.Add (_allowMultipleCb);
-        _allowMultipleCb.ValueChanging += AllowsMultipleMarkingCB_Toggle;
+        _appWindow.Add (_markMultipleCb);
+        _markMultipleCb.ValueChanging += MarkMultipleCB_Toggle;
 
         _viewportSettingsEditor = new ViewportSettingsEditor
         {
             Title = "_ViewportSettings",
-            Y = Pos.Bottom (_allowMultipleCb),
+            Y = Pos.Bottom (_markMultipleCb),
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             CanFocus = true,
@@ -71,8 +71,8 @@ public class ListViewWithSelection : Scenario
             Y = Pos.Bottom (_viewportSettingsEditor),
             Width = Dim.Func (_ => _listView?.MaxItemLength ?? 10),
             Height = Dim.Fill (),
-            AllowsMarking = false,
-            AllowsMultipleMarking = false,
+            ShowMarks = false,
+            MarkMultiple = false,
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.Resizable
         };
@@ -134,15 +134,15 @@ public class ListViewWithSelection : Scenario
         _appWindow.SetNeedsDraw ();
     }
 
-    private void AllowsMarkingCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
+    private void ShowMarksCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
+        _listView.ShowMarks = stateEventArgs.NewValue == CheckState.Checked;
         _appWindow.SetNeedsDraw ();
     }
 
-    private void AllowsMultipleMarkingCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
+    private void MarkMultipleCB_Toggle (object sender, [NotNull] ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleMarking = stateEventArgs.NewValue == CheckState.Checked;
+        _listView.MarkMultiple = stateEventArgs.NewValue == CheckState.Checked;
         _appWindow.SetNeedsDraw ();
     }
 
@@ -160,7 +160,7 @@ public class ListViewWithSelection : Scenario
         //    return;
         //}
 
-        //if (_listView.AllowsMarking && _listView.Source!.IsMarked (obj.Row))
+        //if (_listView.ShowMarks && _listView.Source!.IsMarked (obj.Row))
         //{
         //    obj.RowAttribute = _listView.GetAttributeForRole (VisualRole.Highlight);
 

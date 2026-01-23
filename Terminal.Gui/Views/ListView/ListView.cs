@@ -12,7 +12,7 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data. Items in
 ///         the can be activated firing an event (with the ENTER key or a mouse double-click). If the
-///         <see cref="AllowsMarking"/> property is true, elements of the list can be marked by the user.
+///         <see cref="ShowMarks"/> property is true, elements of the list can be marked by the user.
 ///     </para>
 ///     <para>
 ///         By default <see cref="ListView"/> uses <see cref="object.ToString"/> to render the items of any
@@ -32,9 +32,9 @@ namespace Terminal.Gui.Views;
 ///         used.
 ///     </para>
 ///     <para>
-///         When <see cref="AllowsMarking"/> is set to true the rendering will prefix the rendered items with [x] or [ ]
+///         When <see cref="ShowMarks"/> is set to true the rendering will prefix the rendered items with [x] or [ ]
 ///         and bind the SPACE key to toggle the selection. To implement a different marking style set
-///         <see cref="AllowsMarking"/> to false and implement custom rendering.
+///         <see cref="ShowMarks"/> to false and implement custom rendering.
 ///     </para>
 ///     <para>
 ///         Searching the ListView with the keyboard is supported. Users type the first characters of an item, and the
@@ -77,7 +77,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
         AddCommand (Command.Accept, HandleAccept);
 
-        // Activate (Space key and single-click) - If AllowsMarking, change mark and raise Activate event
+        // Activate (Space key and single-click) - If ShowMarks, change mark and raise Activate event
         AddCommand (Command.Activate, HandleActivate);
 
         // Hotkey - If none set, activate and raise Activate event. SetFocus. - DO NOT raise Accept
@@ -176,10 +176,12 @@ public partial class ListView : View, IDesignable, IValue<int?>
             SetFocus ();
         }
 
-        // Handle mouse clicks
+        // Handle keyboard (Space key) - mark item when marking is enabled
         if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse })
         {
-            if (AllowsMarking && SelectedItem.HasValue)
+            // Allow marking if: ShowMarks=true OR MarkMultiple=true
+            // Only disallow if both are false (Combination 1: standard selection mode)
+            if ((ShowMarks || MarkMultiple) && SelectedItem.HasValue)
             {
                 MarkUnmarkSelectedItem ();
             }
@@ -187,7 +189,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
             return true;
         }
 
-        // Handle keyboard (Space key) - mark item when AllowsMarking is enabled
+        // Handle mouse clicks
         Point position = mouse.Position!.Value;
         int index = Viewport.Y + position.Y;
 
@@ -198,7 +200,10 @@ public partial class ListView : View, IDesignable, IValue<int?>
         bool shift = mouse.Flags.HasFlag (MouseFlags.Shift);
         bool ctrl = mouse.Flags.HasFlag (MouseFlags.Ctrl);
 
-        if (ctrl && AllowsMultipleMarking && AllowsMarking)
+        // Allow marking if: ShowMarks=true OR MarkMultiple=true
+        bool allowMarking = ShowMarks || MarkMultiple;
+
+        if (ctrl && MarkMultiple && allowMarking)
         {
             // Ctrl+Click: Toggle mark state directly
             Source.SetMark (index, !Source.IsMarked (index));
@@ -207,7 +212,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
             SelectedItem = index;
             SetNeedsDraw ();
         }
-        else if (shift && AllowsMultipleMarking)
+        else if (shift && MarkMultiple && allowMarking)
         {
             // Shift+Click: Extend marking from anchor
             SetSelection (index, true);
@@ -219,7 +224,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
 
             // Mark item only on Clicked (not Pressed) to avoid double-toggle
             // since both Pressed and Clicked trigger Command.Activate
-            if (AllowsMarking && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+            if (allowMarking && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
             {
                 MarkUnmarkSelectedItem ();
             }
@@ -228,13 +233,22 @@ public partial class ListView : View, IDesignable, IValue<int?>
         return true;
     }
 
-    /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
-    /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
+    /// <summary>Gets or sets whether mark glyphs (checkboxes/radio buttons) are visually displayed.</summary>
+    /// <value>Set to <see langword="true"/> to show mark glyphs; <see langword="false"/> to hide them.</value>
     /// <remarks>
-    ///     If set to <see langword="true"/>, <see cref="ListView"/> will render items marked items with "[x]", and
-    ///     unmarked items with "[ ]". SPACE key will toggle marking. The default is <see langword="false"/>.
+    ///     <para>
+    ///         When <see langword="true"/>, marks are rendered with glyphs: checkboxes (☒/☐) when
+    ///         <see cref="MarkMultiple"/> is <see langword="true"/>, or radio buttons (◉/○) when <see langword="false"/>.
+    ///     </para>
+    ///     <para>
+    ///         When <see langword="false"/>, marks can still exist and affect rendering through visual roles
+    ///         (e.g., <see cref="VisualRole.Highlight"/>), but no glyphs are shown. The default is <see langword="false"/>.
+    ///     </para>
+    ///     <para>
+    ///         The SPACE key toggles marking regardless of this property's value.
+    ///     </para>
     /// </remarks>
-    public bool AllowsMarking
+    public bool ShowMarks
     {
         get;
         set
@@ -277,14 +291,14 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     /// <summary>
-    ///     If <see cref="AllowsMarking"/> and <see cref="AllowsMultipleMarking"/> are both <see langword="true"/>,
-    ///     marks all items.
+    ///     If <see cref="MarkMultiple"/> is <see langword="true"/>, marks or unmarks all items.
     /// </summary>
     /// <param name="mark"><see langword="true"/> marks all items; otherwise unmarks all items.</param>
     /// <returns><see langword="true"/> if marking was successful.</returns>
     public bool MarkAll (bool mark)
     {
-        if (!AllowsMarking || !AllowsMultipleMarking)
+        // Only allow MarkAll when multiple marking is enabled
+        if (!MarkMultiple)
         {
             return false;
         }
@@ -303,9 +317,9 @@ public partial class ListView : View, IDesignable, IValue<int?>
     public int MaxItemLength => Source?.MaxItemLength ?? 0;
 
     /// <summary>Gets the width reserved for mark rendering (checkbox and space).</summary>
-    private int MarkWidth => AllowsMarking ? 2 : 0;
+    private int MarkWidth => ShowMarks ? 2 : 0;
 
-    /// <summary>Gets the effective content width including mark columns when <see cref="AllowsMarking"/> is true.</summary>
+    /// <summary>Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
     private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
 
     /// <summary>This event is raised when the user Double-Clicks on an item or presses ENTER to open the selected item.</summary>

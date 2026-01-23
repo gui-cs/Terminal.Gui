@@ -3,12 +3,24 @@ namespace Terminal.Gui.Views;
 public partial class ListView
 {
     /// <summary>
-    ///     If set to <see langword="true"/> more than one item can be marked simultaneously.
-    ///     If <see langword="false"/> marking an item will cause all others to be unmarked.
-    ///     The default is <see langword="false"/>.
-    ///     Requires <see cref="AllowsMarking"/> to be <see langword="true"/> for visual indicators.
+    ///     Gets or sets whether multiple items can be marked simultaneously.
     /// </summary>
-    public bool AllowsMultipleMarking
+    /// <value>
+    ///     <see langword="true"/> to allow multiple marks (checkbox style);
+    ///     <see langword="false"/> for single mark (radio button style).
+    ///     The default is <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         When <see langword="true"/>, marking one item does not clear others (checkbox behavior).
+    ///         When <see langword="false"/>, marking one item clears all other marks (radio button behavior).
+    ///     </para>
+    ///     <para>
+    ///         Marks can exist and be set regardless of the <see cref="ShowMarks"/> property value.
+    ///         <see cref="ShowMarks"/> only controls whether mark glyphs are visually displayed.
+    ///     </para>
+    /// </remarks>
+    public bool MarkMultiple
     {
         get;
         set
@@ -85,7 +97,8 @@ public partial class ListView
     /// <returns><see langword="true"/> if the <see cref="SelectedItem"/> was marked.</returns>
     public bool MarkUnmarkSelectedItem ()
     {
-        if (!AllowsMarking || Source is null || SelectedItem is null || !UnmarkAllButSelected ())
+        // Allow marking if ShowMarks OR MarkMultiple is true (not in Combination 1)
+        if ((!ShowMarks && !MarkMultiple) || Source is null || SelectedItem is null || !UnmarkAllButSelected ())
         {
             return false;
         }
@@ -101,7 +114,7 @@ public partial class ListView
     /// </summary>
     /// <param name="item">The item index to select.</param>
     /// <param name="extendExistingSelection">
-    ///     If <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is enabled,
+    ///     If <see langword="true"/> and <see cref="MarkMultiple"/> is enabled,
     ///     extends marking from the anchor point to <paramref name="item"/>.
     /// </param>
     public void SetSelection (int item, bool extendExistingSelection)
@@ -111,12 +124,12 @@ public partial class ListView
             return;
         }
 
-        if (!AllowsMultipleMarking || !extendExistingSelection)
+        if (!MarkMultiple || !extendExistingSelection)
         {
             // Single-selection mode or not extending: just move SelectedItem
-            if (!AllowsMultipleMarking && AllowsMarking)
+            if (!MarkMultiple && ShowMarks)
             {
-                // Clear all marks except the new selection
+                // Clear all marks except the new selection (radio button mode)
                 for (var i = 0; i < Source.Count; i++)
                 {
                     Source.SetMark (i, i == item);
@@ -125,7 +138,7 @@ public partial class ListView
 
             _selectionAnchor = item;
         }
-        else if (extendExistingSelection && _selectionAnchor.HasValue && AllowsMarking)
+        else if (extendExistingSelection && _selectionAnchor.HasValue && (ShowMarks || MarkMultiple))
         {
             // Multi-marking mode: mark range from anchor to item
             int start = Math.Min (_selectionAnchor.Value, item);
@@ -241,18 +254,20 @@ public partial class ListView
     }
 
     /// <summary>
-    ///     If <see cref="AllowsMarking"/> is <see langword="true"/> and <see cref="AllowsMultipleMarking"/> is <see langword="false"/>,
+    ///     If marking is enabled (<see cref="ShowMarks"/> OR <see cref="MarkMultiple"/>)
+    ///     and <see cref="MarkMultiple"/> is <see langword="false"/>,
     ///     unmarks all marked items other than <see cref="SelectedItem"/>.
     /// </summary>
     /// <returns><see langword="true"/> if unmarking was successful.</returns>
     public bool UnmarkAllButSelected ()
     {
-        if (!AllowsMarking)
+        // Allow marking if ShowMarks OR MarkMultiple is true (not in Combination 1)
+        if (!ShowMarks && !MarkMultiple)
         {
             return false;
         }
 
-        if (AllowsMultipleMarking)
+        if (MarkMultiple)
         {
             return true;
         }

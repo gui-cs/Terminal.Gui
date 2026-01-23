@@ -103,7 +103,7 @@ public class CollectionNavigatorTester : Scenario
                                                      {
                                                          if (_listView is not null)
                                                          {
-                                                             _listView.AllowsMarking = _allowMarkingCheckBox.Value == CheckState.Checked;
+                                                             _listView.ShowMarks = _allowMarkingCheckBox.Value == CheckState.Checked;
                                                          }
 
                                                          if (_allowMultiSelectionCheckBox is not null)
@@ -122,7 +122,7 @@ public class CollectionNavigatorTester : Scenario
                                                             {
                                                                 if (_listView is not null)
                                                                 {
-                                                                    _listView.AllowsMultipleMarking =
+                                                                    _listView.MarkMultiple =
                                                                         _allowMultiSelectionCheckBox.Value == CheckState.Checked;
                                                                 }
                                                             };
@@ -207,8 +207,8 @@ public class CollectionNavigatorTester : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50) - 1,
             Height = Dim.Fill (),
-            AllowsMarking = false,
-            AllowsMultipleMarking = false
+            ShowMarks = false,
+            MarkMultiple = false
         };
         _top.Add (_listView);
 

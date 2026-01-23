@@ -135,7 +135,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Null (lv.Source);
         Assert.True (lv.CanFocus);
         Assert.Null (lv.SelectedItem);
-        Assert.False (lv.AllowsMultipleMarking);
+        Assert.False (lv.MarkMultiple);
 
         lv = new () { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
@@ -199,7 +199,7 @@ public class ListViewTests (ITestOutputHelper output)
     public void KeyBindings_Command ()
     {
         ObservableCollection<string> source = ["One", "Two", "Three"];
-        var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper<string> (source) };
+        var lv = new ListView { Height = 2, ShowMarks = true, Source = new ListWrapper<string> (source) };
 
         // HACK to make test pass
         lv.ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
@@ -351,11 +351,11 @@ public class ListViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void AllowsMarking_True_SpaceWithShift_SelectsThenDown_SingleSelection ()
+    public void ShowMarks_True_SpaceWithShift_SelectsThenDown_SingleSelection ()
     {
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
-        lv.AllowsMarking = true;
-        lv.AllowsMultipleMarking = false;
+        lv.ShowMarks = true;
+        lv.MarkMultiple = false;
 
         Assert.NotNull (lv.Source);
 
@@ -412,11 +412,11 @@ public class ListViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void AllowsMarking_True_SpaceWithShift_SelectsThenDown_MultipleSelection ()
+    public void ShowMarks_True_SpaceWithShift_SelectsThenDown_MultipleSelection ()
     {
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
-        lv.AllowsMarking = true;
-        lv.AllowsMultipleMarking = true;
+        lv.ShowMarks = true;
+        lv.MarkMultiple = true;
 
         Assert.NotNull (lv.Source);
 
@@ -1585,9 +1585,9 @@ hree - lon",
     }
 
     [Fact]
-    public void AllowsMultipleMarking_Set_To_False_Unmarks_All_But_Selected ()
+    public void MarkMultiple_Set_To_False_Unmarks_All_But_Selected ()
     {
-        ListView lv = new () { AllowsMarking = true, AllowsMultipleMarking = true };
+        ListView lv = new () { ShowMarks = true, MarkMultiple = true };
         ListWrapper<string> source = new (["One", "Two", "Three"]);
         lv.Source = source;
 
@@ -1600,7 +1600,7 @@ hree - lon",
         Assert.True (source.IsMarked (1));
         Assert.True (source.IsMarked (2));
 
-        lv.AllowsMultipleMarking = false;
+        lv.MarkMultiple = false;
 
         Assert.True (source.IsMarked (0));
         Assert.False (source.IsMarked (1));
@@ -1670,9 +1670,9 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void Mouse_Click_With_AllowsMultipleMarking_Marks_Multiple_Items ()
+    public void Mouse_Click_With_MarkMultiple_Marks_Multiple_Items ()
     {
-        // Tests that clicking on items with AllowsMultipleMarking=true marks multiple items
+        // Tests that clicking on items with MarkMultiple=true marks multiple items
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
@@ -1680,8 +1680,8 @@ hree - lon",
         {
             Width = 10,
             Height = 5,
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
 
@@ -1735,12 +1735,12 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void MarkUnmarkSelectedItem_Returns_False_When_AllowsMarking_Is_False ()
+    public void MarkUnmarkSelectedItem_Returns_False_When_ShowMarks_Is_False ()
     {
-        // Tests that MarkUnmarkSelectedItem returns false when AllowsMarking=false
+        // Tests that MarkUnmarkSelectedItem returns false when ShowMarks=false
         ListView lv = new ()
         {
-            AllowsMarking = false
+            ShowMarks = false
         };
         lv.SetSource (["One", "Two", "Three"]);
         lv.SelectedItem = 0;
@@ -1753,13 +1753,13 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void MarkAll_Returns_False_When_AllowsMultipleMarking_Is_False ()
+    public void MarkAll_Returns_False_When_MarkMultiple_Is_False ()
     {
-        // Tests that MarkAll returns false when AllowsMultipleMarking=false
+        // Tests that MarkAll returns false when MarkMultiple=false
         ListView lv = new ()
         {
-            AllowsMarking = true,
-            AllowsMultipleMarking = false
+            ShowMarks = true,
+            MarkMultiple = false
         };
         lv.SetSource (["One", "Two", "Three"]);
 
@@ -1779,8 +1779,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
 
         lv.SetSelection (0, false);
@@ -1800,8 +1800,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
 
         lv.SetSelection (1, false); // Anchor at 1
@@ -1819,8 +1819,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
 
         lv.SetSelection (2, false); // Anchor at 2
@@ -1838,8 +1838,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1859,8 +1859,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1880,8 +1880,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 3
         };
         lv.BeginInit ();
@@ -1902,8 +1902,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1925,8 +1925,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
         lv.BeginInit ();
         lv.EndInit ();
@@ -1948,8 +1948,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 3
         };
         lv.BeginInit ();
@@ -1970,8 +1970,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 3
         };
         lv.BeginInit ();
@@ -1992,8 +1992,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
 
         lv.SetSelection (3, false); // Anchor at 3
@@ -2013,8 +2013,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4", "5"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
 
         lv.SetSelection (1, false); // Anchor at 1
@@ -2041,8 +2041,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 4,
             Width = 10
         };
@@ -2080,8 +2080,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 4,
             Width = 10
         };
@@ -2132,8 +2132,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 4,
             Width = 10
         };
@@ -2164,7 +2164,7 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void Mouse_ShiftClick_Without_AllowsMultipleMarking_Does_Not_Extend ()
+    public void Mouse_ShiftClick_Without_MarkMultiple_Does_Not_Extend ()
     {
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -2172,7 +2172,7 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleMarking = false, // Disabled
+            MarkMultiple = false, // Disabled
             Height = 4,
             Width = 10
         };
@@ -2200,7 +2200,7 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void Mouse_CtrlClick_Without_AllowsMultipleMarking_Does_Not_Toggle ()
+    public void Mouse_CtrlClick_Without_MarkMultiple_Does_Not_Toggle ()
     {
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -2208,7 +2208,7 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["1", "2", "3", "4"]),
-            AllowsMultipleMarking = false, // Disabled
+            MarkMultiple = false, // Disabled
             Height = 4,
             Width = 10
         };
@@ -2251,8 +2251,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 3,
             Width = 10
         };
@@ -2268,20 +2268,20 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void AllowsMultipleMarking_False_Clears_MultiSelectedItems ()
+    public void MarkMultiple_False_Clears_MultiSelectedItems ()
     {
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true
+            ShowMarks = true,
+            MarkMultiple = true
         };
 
         lv.SetSelection (0, false);
         lv.SetSelection (2, true);
         Assert.Equal (3, lv.GetAllMarkedItems().Count());
 
-        lv.AllowsMultipleMarking = false;
+        lv.MarkMultiple = false;
 
         Assert.True (lv.GetAllMarkedItems().Count() == 0);
     }
@@ -2296,8 +2296,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 3,
             Width = 10
         };
@@ -2328,8 +2328,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 3,
             Width = 10
         };
@@ -2357,7 +2357,7 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void AllowsMarking_Renders_Marks ()
+    public void ShowMarks_Renders_Marks ()
     {
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -2365,8 +2365,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 2,
             Width = 10
         };
@@ -2397,8 +2397,8 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two", "Three"]),
-            AllowsMarking = true,
-            AllowsMultipleMarking = true,
+            ShowMarks = true,
+            MarkMultiple = true,
             Height = 3,
             Width = 15
         };
@@ -2445,7 +2445,7 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void RenderMark_Called_During_Draw_When_AllowsMarking ()
+    public void RenderMark_Called_During_Draw_When_ShowMarks ()
     {
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -2454,7 +2454,7 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (["One", "Two"]),
-            AllowsMarking = true,
+            ShowMarks = true,
             Height = 2,
             Width = 10
         };
@@ -2590,7 +2590,7 @@ hree - lon",
 
     // Claude - Opus 4.5
     [Fact]
-    public void ContentSize_Includes_MarkWidth_When_AllowsMarking ()
+    public void ContentSize_Includes_MarkWidth_When_ShowMarks ()
     {
         ObservableCollection<string> source = new (["Item"]); // 4 chars
         ListView lv = new ()
@@ -2606,7 +2606,7 @@ hree - lon",
         Assert.Equal (4, lv.GetContentSize ().Width);
 
         // With marks: content width = 4 + 2 (mark checkbox + space) = 6
-        lv.AllowsMarking = true;
+        lv.ShowMarks = true;
         Assert.Equal (6, lv.GetContentSize ().Width);
     }
 
@@ -2618,7 +2618,7 @@ hree - lon",
         ListView lv = new ()
         {
             Source = new ListWrapper<string> (source),
-            AllowsMarking = true, // Mark width = 2
+            ShowMarks = true, // Mark width = 2
             Width = 5,            // Viewport smaller than content (4 + 2 = 6)
             Height = 1
         };

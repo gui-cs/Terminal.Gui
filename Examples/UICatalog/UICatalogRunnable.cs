@@ -396,7 +396,7 @@ public sealed class UICatalogRunnable : Runnable
             Width = Dim.Fill (),
             Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
 
-            //AllowsMarking = false,
+            //ShowMarks = false,
             CanFocus = true,
             Title = "_Scenarios",
             BorderStyle = _categoryList!.BorderStyle,
@@ -479,7 +479,7 @@ public sealed class UICatalogRunnable : Runnable
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Auto (),
             Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
-            AllowsMarking = false,
+            ShowMarks = false,
             CanFocus = true,
             Title = "_Categories",
             BorderStyle = LineStyle.Rounded,

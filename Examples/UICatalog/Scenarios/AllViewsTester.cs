@@ -50,7 +50,7 @@ public class AllViewsTester : Scenario
             Y = 0,
             Width = Dim.Auto (),
             Height = Dim.Fill (),
-            AllowsMarking = false,
+            ShowMarks = false,
             SelectedItem = 0,
             Source = new ListWrapper<string> (new ObservableCollection<string> (_viewClasses.Keys.ToList ())),
             SuperViewRendersLineCanvas = true

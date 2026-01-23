@@ -19,35 +19,72 @@ public partial class ListView
         Rectangle f = Viewport;
         int item = Viewport.Y;
         bool focused = HasFocus;
-        int col = AllowsMarking ? 2 : 0;
+        int col = ShowMarks ? 2 : 0;
         int start = Viewport.X;
 
         for (var row = 0; row < f.Height; row++, item++)
         {
             bool isSelected = item == SelectedItem;
             bool isMarked = Source!.IsMarked (item);
+            bool hasFocus = focused;
 
-            // Determine visual role based on selection and mark state
+            // Determine visual role based on the 4 combinations of ShowMarks and MarkMultiple
             VisualRole role;
+            bool applyHighlightStyle = false;
 
-            if (focused && isSelected)
+            if (ShowMarks == false && MarkMultiple == false)
             {
-                role = VisualRole.Focus; // Focused + SelectedItem (cursor position)
+                // Combination 1: Standard selection mode (no marking)
+                // Mark glyphs: None (MarkWidth = 0)
+                // Visual roles: SelectedItem uses Focus (focused) or Active (not focused)
+                role = isSelected ? (hasFocus ? VisualRole.Focus : VisualRole.Active) : VisualRole.Normal;
             }
-            else if (isMarked && !isSelected)
+            else if (ShowMarks == false && MarkMultiple == true)
             {
-                role = VisualRole.Highlight; // Marked item (not currently selected)
+                // Combination 2: Hidden marks with visual role indicators
+                // Mark glyphs: None (MarkWidth = 0) - marks exist internally
+                // Visual roles use Highlight for marked items; compose TextStyle when marked+selected+focused
+                if (isSelected && isMarked)
+                {
+                    role = hasFocus ? VisualRole.Focus : VisualRole.Highlight;
+                    applyHighlightStyle = hasFocus; // Apply Highlight's TextStyle to Focus
+                }
+                else if (isSelected)
+                {
+                    role = hasFocus ? VisualRole.Focus : VisualRole.Normal;
+                }
+                else if (isMarked)
+                {
+                    role = VisualRole.Highlight;
+                }
+                else
+                {
+                    role = VisualRole.Normal;
+                }
             }
-            else if (isSelected)
+            else if (ShowMarks == true && MarkMultiple == false)
             {
-                role = VisualRole.Active; // SelectedItem without focus
+                // Combination 3: Radio button style
+                // Mark glyphs: Radio-button style (◉ marked, ○ unmarked)
+                // Visual roles: Standard selection (mark glyphs provide visual indication)
+                role = isSelected ? (hasFocus ? VisualRole.Focus : VisualRole.Active) : VisualRole.Normal;
             }
-            else
+            else // ShowMarks == true && MarkMultiple == true
             {
-                role = VisualRole.Normal; // Not selected or marked
+                // Combination 4: Checkbox style
+                // Mark glyphs: Checkbox style (☒ marked, ☐ unmarked)
+                // Visual roles: Standard selection (mark glyphs provide visual indication)
+                role = isSelected ? (hasFocus ? VisualRole.Focus : VisualRole.Active) : VisualRole.Normal;
             }
 
             Attribute newAttribute = GetAttributeForRole (role);
+
+            // Apply Highlight's TextStyle if needed (combination 2 only, when marked+selected+focused)
+            if (applyHighlightStyle)
+            {
+                Attribute highlightAttr = GetAttributeForRole (VisualRole.Highlight);
+                newAttribute = newAttribute with { Style = highlightAttr.Style };
+            }
 
             if (newAttribute != current)
             {
@@ -77,10 +114,10 @@ public partial class ListView
 
                 var markWidth = 0;
 
-                if (AllowsMarking)
+                if (ShowMarks)
                 {
                     // Try custom mark rendering first
-                    bool customRendered = Source.RenderMark (this, item, row, Source.IsMarked (item), AllowsMultipleMarking);
+                    bool customRendered = Source.RenderMark (this, item, row, Source.IsMarked (item), MarkMultiple);
 
                     if (!customRendered)
                     {
@@ -94,8 +131,8 @@ public partial class ListView
                             current = normalAttr;
                         }
 
-                        AddRune (Source.IsMarked (item) ? AllowsMultipleMarking ? Glyphs.CheckStateChecked : Glyphs.Selected :
-                                 AllowsMultipleMarking ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
+                        AddRune (Source.IsMarked (item) ? MarkMultiple ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                 MarkMultiple ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
                         AddRune ((Rune)' ');
                         markWidth = 2;
 

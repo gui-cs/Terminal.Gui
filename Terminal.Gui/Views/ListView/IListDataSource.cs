@@ -38,7 +38,7 @@ public interface IListDataSource : IDisposable
     /// <returns><see langword="true"/> if the item is marked; otherwise <see langword="false"/>.</returns>
     /// <remarks>
     ///     <see cref="ListView"/> calls this method to determine whether to render the item with a mark indicator when
-    ///     <see cref="ListView.AllowsMarking"/> is <see langword="true"/>.
+    ///     <see cref="ListView.ShowMarks"/> is <see langword="true"/>.
     /// </remarks>
     bool IsMarked (int item);
 
@@ -74,7 +74,7 @@ public interface IListDataSource : IDisposable
     /// <param name="value"><see langword="true"/> to mark the item; <see langword="false"/> to unmark it.</param>
     /// <remarks>
     ///     <see cref="ListView"/> calls this method when the user toggles marking (e.g., via the SPACE key) if
-    ///     <see cref="ListView.AllowsMarking"/> is <see langword="true"/>.
+    ///     <see cref="ListView.ShowMarks"/> is <see langword="true"/>.
     /// </remarks>
     void SetMark (int item, bool value);
 
@@ -101,14 +101,15 @@ public interface IListDataSource : IDisposable
     /// <param name="item">The zero-based index of the item.</param>
     /// <param name="row">The row in the viewport where the item is being rendered.</param>
     /// <param name="isMarked">Whether the item is currently marked.</param>
-    /// <param name="allowsMultiple">Whether multiple selection is enabled.</param>
+    /// <param name="markMultiple">Whether multiple marking is enabled (checkbox vs radio button style).</param>
     /// <returns>
     ///     <see langword="true"/> if custom rendering was performed; <see langword="false"/> to use default rendering.
     /// </returns>
     /// <remarks>
     ///     <para>
     ///         The default implementation returns <see langword="false"/>, causing <see cref="ListView"/> to use its
-    ///         default mark rendering (checkbox glyphs in columns 0-1).
+    ///         default mark rendering (checkbox glyphs when <paramref name="markMultiple"/> is <see langword="true"/>,
+    ///         radio button glyphs when <see langword="false"/>).
     ///     </para>
     ///     <para>
     ///         Override and return <see langword="true"/> to provide custom mark glyphs, positioning, or attributes.
@@ -116,5 +117,5 @@ public interface IListDataSource : IDisposable
     ///         <see cref="Render"/> will be called starting at column 0.
     ///     </para>
     /// </remarks>
-    bool RenderMark (ListView listView, int item, int row, bool isMarked, bool allowsMultiple) => false;
+    bool RenderMark (ListView listView, int item, int row, bool isMarked, bool markMultiple) => false;
 }
