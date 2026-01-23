@@ -38,6 +38,16 @@ namespace Terminal.Gui.Views;
 ///         The key text is set by setting the <see cref="Key"/> property.
 ///         If the <see cref="Key"/> is <see cref="Key.Empty"/>, the <see cref="Key"/> text is not displayed.
 ///     </para>
+///     <para>
+///         <see cref="View.MouseHighlightStates"/> defaults to <see cref="MouseState.In"/>, causing the Shortcut to
+///         highlight when the mouse is over it.
+///     </para>
+///     <para>
+///         When the <see cref="CommandView"/> raises <see cref="View.Activating"/> (e.g., when clicked), the Shortcut
+///         will also raise <see cref="View.Activating"/>. Similarly, when the <see cref="CommandView"/> raises
+///         <see cref="View.Accepting"/> (e.g., double-click on a <see cref="CheckBox"/>), the Shortcut will also raise
+///         <see cref="View.Accepting"/>.
+///     </para>
 /// </remarks>
 public class Shortcut : View, IOrientation, IDesignable
 {
@@ -60,21 +70,18 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        MouseHighlightStates = MouseState.None;
+        MouseHighlightStates = MouseState.In;
         CanFocus = true;
 
-        if (Border is { })
-        {
-            Border.Settings &= ~BorderSettings.Title;
-        }
+        Border?.Settings &= ~BorderSettings.Title;
 
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
         // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new OrientationHelper (this);
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
+        _orientationHelper.OrientationChanging += (_, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (_, e) => OrientationChanged?.Invoke (this, e);
 
         AddCommands ();
 
@@ -84,13 +91,9 @@ public class Shortcut : View, IOrientation, IDesignable
         Title = commandText ?? string.Empty;
 
         HelpView.Id = "_helpView";
-
-        //HelpView.CanFocus = false;
         HelpView.Text = helpText ?? string.Empty;
 
         KeyView.Id = "_keyView";
-
-        //KeyView.CanFocus = false;
         key ??= Key.Empty;
         Key = key;
 
@@ -192,7 +195,7 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
         ForceCalculateNaturalWidth ();
 
-        if (Width is DimAuto widthAuto || HelpView!.Margin is null)
+        if (Width.Has<DimAuto> (out _) || HelpView.Margin is null)
         {
             return;
         }
@@ -261,16 +264,18 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Logging.Debug ($"{Title} ({sourceTitle}) Command: {commandContext?.Command}");
 
-        if (keyBinding is { } kb && kb.Data != this)
+        // Invoke Activate on the CommandView to cause it to change state if it wants to
+        // CommandView is responsible for checking CanFocus before changing state
+        Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+
+        if (keyBinding is { } kb)
         {
-            // TODO: Optimize this to only do this if CommandView is custom (non View)
-            // Invoke Activate on the CommandView to cause it to change state if it wants to
-            // If this causes CommandView to raise Accept, we eat it
             KeyBinding updatedBinding = kb with { Data = this };
-
-            Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
-
             CommandView.InvokeCommand (Command.Activate, updatedBinding);
+        }
+        else
+        {
+            CommandView.InvokeCommand (Command.Activate, commandContext);
         }
 
         Logging.Debug ($"{Title} ({sourceTitle}) - RaiseActivating ...");
@@ -302,14 +307,15 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        if (Action is { })
+        if (Action is null)
         {
-            Logging.Debug ($"{Title} ({sourceTitle}) - Invoke Action...");
-            Action.Invoke ();
-
-            // Assume if there's a subscriber to Action, it's handled.
-            cancel = true;
+            return cancel;
         }
+        Logging.Debug ($"{Title} ({sourceTitle}) - Invoke Action...");
+        Action.Invoke ();
+
+        // Assume if there's a subscriber to Action, it's handled.
+        cancel = true;
 
         return cancel;
     }
@@ -406,26 +412,17 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             ArgumentNullException.ThrowIfNull (value);
 
-            if (value == null)
-            {
-                throw new ArgumentNullException ();
-            }
-
-            // Clean up old 
+            // Clean up old
             _commandView.Activating -= CommandViewOnActivating;
             _commandView.Accepting -= CommandViewOnAccepted;
             Remove (_commandView);
-            _commandView?.Dispose ();
+            _commandView.Dispose ();
 
             // Set new
             _commandView = value;
             _commandView.Id = "_commandView";
 
-            // The default behavior is for CommandView to not get focus. I
-            // If you want it to get focus, you need to set it.
-            // _commandView.CanFocus = false;
-
-            _commandView.HotKeyChanged += (s, e) =>
+            _commandView.HotKeyChanged += (_, e) =>
                                           {
                                               if (e.NewKey != Key.Empty)
                                               {
@@ -441,26 +438,53 @@ public class Shortcut : View, IOrientation, IDesignable
             _commandView.Activating += CommandViewOnActivating;
             _commandView.Accepting += CommandViewOnAccepted;
 
-            //ShowHide ();
             UpdateKeyBindings (Key.Empty);
 
             return;
 
-            void CommandViewOnAccepted (object? sender, CommandEventArgs e) =>
+            // Helper to check if command context originated from this Shortcut
+            bool IsFromShortcut (CommandEventArgs e)
+            {
+                // KeyBinding with Data == this means it came from DispatchCommand
+                if (e.Context?.Binding is KeyBinding { Data: var data } && data == this)
+                {
+                    return true;
+                }
 
-                // Always eat CommandView.Accept
-                e.Handled = true;
+                // Source == this means the event originated from clicking on Shortcut (not CommandView)
+                if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView == this)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            void CommandViewOnAccepted (object? sender, CommandEventArgs e)
+            {
+                // Forward Accept to Shortcut only if it originated from CommandView directly
+                // (e.g., user double-clicked on CheckBox)
+                // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
+                if (!IsFromShortcut (e))
+                {
+                    RaiseAccepting (e.Context);
+                }
+
+                // Don't set e.Handled - let CommandView continue processing
+            }
 
             void CommandViewOnActivating (object? sender, CommandEventArgs e)
             {
-                if ((e.Context?.Binding is KeyBinding { Data: var data } && data != this)
-                    || e.Context?.Binding is MouseBinding)
+                // Forward Activating to Shortcut only if it originated from CommandView directly
+                // (e.g., user clicked on CommandView)
+                // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
+                if (!IsFromShortcut (e))
                 {
-                    // Forward command to ourselves
-                    InvokeCommand (Command.Activate, e.Context);
+                    SetFocus ();
+                    RaiseActivating (e.Context);
                 }
 
-                e.Handled = true;
+                // Don't set e.Handled - let CommandView continue processing (change state, etc.)
             }
         }
     }
@@ -481,7 +505,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
 
-        //CommandView.MouseHighlightStates = MouseHighlightStates.None;
+        CommandView.MouseHighlightStates = MouseState.None;
         CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
@@ -515,8 +539,6 @@ public class Shortcut : View, IOrientation, IDesignable
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
-
-    //_commandView.Title = Title;
 
     #endregion Command
 
@@ -585,20 +607,18 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Key
 
-    private Key _key = Key.Empty;
-
     /// <summary>
     ///     Gets or sets the <see cref="Key"/> that will be bound to the <see cref="Command.Accept"/> command.
     /// </summary>
     public Key Key
     {
-        get => _key;
+        get;
         set
         {
             ArgumentNullException.ThrowIfNull (value);
 
-            Key oldKey = _key;
-            _key = value;
+            Key oldKey = field;
+            field = value;
 
             UpdateKeyBindings (oldKey);
 
@@ -607,23 +627,21 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private bool _bindKeyToApplication;
-
     /// <summary>
     ///     Gets or sets whether <see cref="Key"/> is bound to <see cref="Command"/> via <see cref="View.HotKeyBindings"/> or
     ///     <see cref="KeyBindings"/>.
     /// </summary>
     public bool BindKeyToApplication
     {
-        get => _bindKeyToApplication;
+        get;
         set
         {
-            if (value == _bindKeyToApplication)
+            if (value == field)
             {
                 return;
             }
 
-            if (_bindKeyToApplication)
+            if (field)
             {
                 App?.Keyboard.KeyBindings.Remove (Key);
             }
@@ -632,7 +650,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 HotKeyBindings.Remove (Key);
             }
 
-            _bindKeyToApplication = value;
+            field = value;
 
             UpdateKeyBindings (Key.Empty);
         }
@@ -656,7 +674,7 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             if (value == _minimumKeyTextSize)
             {
-                //return;
+                return;
             }
 
             _minimumKeyTextSize = value;
@@ -680,23 +698,25 @@ public class Shortcut : View, IOrientation, IDesignable
 
         KeyView.Visible = true;
 
-        // Right align the text in the keyview
+        // Right align the text
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
         KeyView.MouseHighlightStates = MouseState.None;
 
-        KeyView.GettingAttributeForRole += (sender, args) =>
+        KeyView.GettingAttributeForRole += (_, args) =>
                                            {
-                                               if (args.Role == VisualRole.Normal)
+                                               if (args.Role != VisualRole.Normal)
                                                {
-                                                   args.Result = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal)
-                                                                 ?? Attribute.Default;
-                                                   args.Handled = true;
+                                                   return;
                                                }
+
+                                               args.Result = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal)
+                                                             ?? Attribute.Default;
+                                               args.Handled = true;
                                            };
 
-        KeyView.ClearingViewport += (sender, args) =>
+        KeyView.ClearingViewport += (_, args) =>
                                     {
                                         // Do not clear; otherwise spaces will be printed with underlines
                                         args.Cancel = true;
@@ -736,17 +756,15 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Focus
 
-    private bool _forceFocusColors;
-
     /// <summary>
     ///     TODO: IS this needed?
     /// </summary>
     public bool ForceFocusColors
     {
-        get => _forceFocusColors;
+        get;
         set
         {
-            _forceFocusColors = value;
+            field = value;
             SetNeedsDraw ();
         }
     }
@@ -759,21 +777,20 @@ public class Shortcut : View, IOrientation, IDesignable
             return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
 
-        if (role == VisualRole.Normal)
+        switch (role)
         {
-            currentAttribute = GetAttributeForRole (VisualRole.Focus);
+            case VisualRole.Normal:
+                currentAttribute = GetAttributeForRole (VisualRole.Focus);
 
-            return true;
+                return true;
+
+            case VisualRole.HotNormal:
+                currentAttribute = GetAttributeForRole (VisualRole.HotFocus);
+
+                return true;
+
+            default: return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
-
-        if (role == VisualRole.HotNormal)
-        {
-            currentAttribute = GetAttributeForRole (VisualRole.HotFocus);
-
-            return true;
-        }
-
-        return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
 
     #endregion Focus

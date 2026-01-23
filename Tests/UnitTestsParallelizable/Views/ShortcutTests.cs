@@ -492,4 +492,333 @@ public class ShortcutTests
         Assert.Equal (expectedSelect, selected);
     }
 
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that a CheckBox with CanFocus=false CAN change state when
+    ///     Command.Activate is invoked directly on it.
+    ///     CanFocus only controls keyboard focus, not the ability to change state.
+    /// </summary>
+    [Fact]
+    public void CheckBox_CanFocus_False_Changes_State_On_Direct_Activate ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = false
+        };
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.False (checkBox.CanFocus);
+
+        // Act - Directly invoke Command.Activate on the CheckBox
+        checkBox.InvokeCommand (Command.Activate);
+
+        // Assert - CheckBox with CanFocus=false SHOULD change state
+        // CanFocus only controls keyboard focus, not state changes
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that a CheckBox with CanFocus=true DOES change state when
+    ///     Command.Activate is invoked directly on it.
+    /// </summary>
+    [Fact]
+    public void CheckBox_CanFocus_True_Changes_State_On_Direct_Activate ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = true
+        };
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.True (checkBox.CanFocus);
+
+        // Act - Directly invoke Command.Activate on the CheckBox
+        checkBox.InvokeCommand (Command.Activate);
+
+        // Assert - CheckBox with CanFocus=true SHOULD change state
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that a CheckBox used as a CommandView with CanFocus=false
+    ///     CAN change its state when the Shortcut is activated.
+    ///     CanFocus only controls keyboard focus, not the ability to change state.
+    /// </summary>
+    [Fact]
+    public void CheckBox_CanFocus_False_CommandView_Changes_State_On_Shortcut_Activate ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = false
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.False (checkBox.CanFocus);
+
+        // Act - Invoke Command.Activate on the Shortcut (simulating user activation)
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Assert - CheckBox with CanFocus=false SHOULD change state
+        // CanFocus only controls keyboard focus, not state changes
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that a CheckBox used as a CommandView with CanFocus=true
+    ///     DOES change its state when the Shortcut is activated.
+    ///     Focusable CheckBoxes should respond to activation commands.
+    /// </summary>
+    [Fact]
+    public void CheckBox_CanFocus_True_CommandView_Changes_State_On_Shortcut_Activate ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = true
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.True (checkBox.CanFocus);
+
+        // Act - Invoke Command.Activate on the Shortcut (simulating user activation)
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Assert - CheckBox with CanFocus=true SHOULD change state
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that a mouse press on a CheckBox CommandView changes its state.
+    ///     This tests that the mouse binding is correctly set up on the CheckBox.
+    /// </summary>
+    [Fact]
+    public void CheckBox_CommandView_MousePress_Changes_State ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = false
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        // Verify CheckBox has the expected mouse binding for LeftButtonPressed
+        Assert.True (checkBox.MouseBindings.TryGet (MouseFlags.LeftButtonPressed, out MouseBinding binding));
+        Assert.Contains (Command.Activate, binding.Commands);
+
+        // Act - Simulate a mouse press by invoking the bound command directly
+        // This is what NewMouseEvent would do internally
+        checkBox.NewMouseEvent (new ()
+        {
+            Position = new (0, 0),
+            Flags = MouseFlags.LeftButtonPressed
+        });
+
+        // Assert - CheckBox should change state
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that invoking Command.Activate directly on the CheckBox CommandView
+    ///     (simulating what a mouse press should do) changes its state.
+    /// </summary>
+    [Fact]
+    public void CheckBox_CommandView_Direct_Activate_Changes_State ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = false
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        // Act - Directly invoke Command.Activate on the CheckBox (what mouse press should trigger)
+        checkBox.InvokeCommand (Command.Activate);
+
+        // Assert - CheckBox should change state
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that MouseHighlightStates defaults to MouseState.In for Shortcut.
+    ///     This ensures Shortcuts highlight when the mouse hovers over them.
+    /// </summary>
+    [Fact]
+    public void MouseHighlightStates_Defaults_To_In ()
+    {
+        // Arrange & Act
+        Shortcut shortcut = new ();
+
+        // Assert
+        Assert.Equal (MouseState.In, shortcut.MouseHighlightStates);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that when CommandView raises Activating (e.g., from direct click),
+    ///     the Shortcut also raises its Activating event.
+    /// </summary>
+    [Fact]
+    public void CommandView_Activating_Forwards_To_Shortcut_Activating ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = false
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        var shortcutActivatingRaised = false;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
+
+        // Act - Invoke Command.Activate directly on CheckBox (simulating direct mouse click)
+        checkBox.InvokeCommand (Command.Activate);
+
+        // Assert - Shortcut.Activating should have been raised
+        Assert.True (shortcutActivatingRaised);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that when CommandView raises Accepting (e.g., double-click on CheckBox),
+    ///     the Shortcut also raises its Accepting event.
+    /// </summary>
+    [Fact]
+    public void CommandView_Accepting_Forwards_To_Shortcut_Accepting ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = true
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        var shortcutAcceptingRaised = false;
+        shortcut.Accepting += (_, _) => shortcutAcceptingRaised = true;
+
+        // Act - Invoke Command.Accept directly on CheckBox (simulating double-click)
+        checkBox.InvokeCommand (Command.Accept);
+
+        // Assert - Shortcut.Accepting should have been raised
+        Assert.True (shortcutAcceptingRaised);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that when Shortcut is activated via DispatchCommand (e.g., hotkey),
+    ///     the CommandView processes the activation but does NOT cause double-forwarding.
+    /// </summary>
+    [Fact]
+    public void Shortcut_Activate_Does_Not_Double_Forward_To_Shortcut ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = false
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        // Act - Invoke Command.Activate on Shortcut (simulating hotkey press)
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Assert - Shortcut.Activating should be raised exactly once (not twice from forwarding)
+        Assert.Equal (1, shortcutActivatingCount);
+        // And CheckBox should have changed state
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that CommandView with CanFocus=true still allows Shortcut.Activating
+    ///     to be raised when the CommandView is clicked directly.
+    /// </summary>
+    [Fact]
+    public void CommandView_CanFocus_True_Click_Raises_Shortcut_Activating ()
+    {
+        // Arrange
+        CheckBox checkBox = new ()
+        {
+            Title = "_Toggle",
+            CanFocus = true
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox
+        };
+
+        var shortcutActivatingRaised = false;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
+
+        // Act - Invoke Command.Activate directly on CheckBox (simulating mouse click)
+        checkBox.InvokeCommand (Command.Activate);
+
+        // Assert - Shortcut.Activating should have been raised
+        Assert.True (shortcutActivatingRaised);
+        // And CheckBox should have changed state
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+    }
+
 }

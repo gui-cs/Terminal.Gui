@@ -23,6 +23,8 @@ public sealed class ShortcutTestWindow : Window
     {
         Title = $"Shortcut Command Propagation Test ({Application.QuitKey} to quit)";
 
+        AssignHotKeys = true;
+
         // Event log on the right
         _eventLogView = new ListView
         {
@@ -32,30 +34,37 @@ public sealed class ShortcutTestWindow : Window
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventLog),
             BorderStyle = LineStyle.Double,
-            Title = "_Event Log"
+            Title = "Event Log"
         };
         Add (_eventLogView);
 
         // Test Shortcut 1: CheckBox CommandView
+        CheckBox cb1 = new () { Text = "Option 1", CanFocus = false };
         var shortcut1 = new Shortcut
         {
+            MouseHighlightStates = MouseState.In,
+            HelpText = "Option1",
             X = 0,
             Y = 0,
             Width = Dim.Fill () - Dim.Width (_eventLogView),
-            CommandView = new CheckBox { Text = "_Option 1", CanFocus = false },
+            CommandView = cb1,
             Key = Key.F5
         };
         shortcut1.Activating += (_, args) => LogEvent ("Shortcut1.Activating", args);
         shortcut1.Accepting += (_, args) => LogEvent ("Shortcut1.Accepting", args);
+        cb1.Activating += (_, args) => LogEvent ("CB1.Activating", args);
+        cb1.ValueChanged += (_, args) => LogEvent ($"CB1.ValueChanged: {args.OldValue} -> {args.NewValue}", null);
         Add (shortcut1);
 
         // Test Shortcut 2: CheckBox CommandView (CanFocus = true)
         var shortcut2 = new Shortcut
         {
+            MouseHighlightStates = MouseState.In,
+            HelpText = "Option2",
             X = 0,
             Y = Pos.Bottom (shortcut1) + 1,
             Width = Dim.Fill () - Dim.Width (_eventLogView),
-            CommandView = new CheckBox { Text = "_Option 2 (CanFocus)", CanFocus = true },
+            CommandView = new CheckBox { Text = "Option 2 (CanFocus)", CanFocus = true },
             Key = Key.F6
         };
         shortcut2.Activating += (_, args) => LogEvent ("Shortcut2.Activating", args);
@@ -65,6 +74,8 @@ public sealed class ShortcutTestWindow : Window
         // Test Shortcut 3: Button CommandView
         var shortcut3 = new Shortcut
         {
+            HelpText = "Button",
+            MouseHighlightStates = MouseState.In,
             X = 0,
             Y = Pos.Bottom (shortcut2) + 1,
             Width = Dim.Fill () - Dim.Width (_eventLogView),
@@ -87,15 +98,29 @@ public sealed class ShortcutTestWindow : Window
 
         // Window level handlers
         Activating += (_, args) => LogEvent ("Window.Activating", args);
-        Accepting += (_, args) => LogEvent ("Window.Accepting", args);
+        Accepting += (_, args) =>
+                     {
+                         LogEvent ("Window.Accepting", args);
+                         args.Handled = true;
+                     };
     }
 
-    private void LogEvent (string source, CommandEventArgs args)
+    private void LogEvent (string source, CommandEventArgs? args)
     {
-        View? sourceView = null;
-        args.Context?.Source?.TryGetTarget (out sourceView);
+        string entry;
 
-        string entry = $"{source}: Cmd={args.Context?.Command}, Source={sourceView?.Id ?? "null"}, Handled={args.Handled}";
+        if (args is null)
+        {
+            entry = source;
+        }
+        else
+        {
+            View? sourceView = null;
+            args.Context?.Source?.TryGetTarget (out sourceView);
+            string bindingType = args.Context?.Binding?.GetType ().Name ?? "null";
+            entry = $"{source}: Cmd={args.Context?.Command}, Binding={bindingType}, Src={sourceView?.Id ?? "null"}, Handled={args.Handled}";
+        }
+
         _eventLog.Add (entry);
         _eventLogView.MoveDown ();
     }
