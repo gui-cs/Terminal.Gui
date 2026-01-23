@@ -95,7 +95,6 @@ public class ListViewWithSelection : Scenario
         _appWindow.Add (_eventListView);
 
         _listView.ValueChanged += (s, a) => LogEvent (s as View, $"ValueChanged: {a.OldValue} -> {a.NewValue}");
-        _listView.OpenSelectedItem += (s, a) => LogEvent (s as View, $"OpenSelectedItem: {a}");
         _listView.CollectionChanged += (s, a) => LogEvent (s as View, $"CollectionChanged: {a}");
         _listView.Accepting += (s, a) => LogEvent (s as View, $"Accept: {a}");
         _listView.Activating += (s, a) => LogEvent (s as View, $"Activate: {a}");

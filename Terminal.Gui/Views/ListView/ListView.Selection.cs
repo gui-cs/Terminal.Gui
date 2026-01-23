@@ -1,7 +1,9 @@
-namespace Terminal.Gui.Views;
+﻿namespace Terminal.Gui.Views;
 
 public partial class ListView
 {
+    #region Marking
+
     /// <summary>
     ///     Gets or sets whether multiple items can be marked simultaneously.
     /// </summary>
@@ -43,22 +45,126 @@ public partial class ListView
         }
     }
 
-    /// <summary>Ensures the selected item is always visible on the screen.</summary>
-    public void EnsureSelectedItemVisible ()
+    /// <summary>Gets or sets whether mark glyphs (checkboxes/radio buttons) are visually displayed.</summary>
+    /// <value>Set to <see langword="true"/> to show mark glyphs; <see langword="false"/> to hide them.</value>
+    /// <remarks>
+    ///     <para>
+    ///         When <see langword="true"/>, marks are rendered with glyphs: checkboxes (☒/☐) when
+    ///         <see cref="MarkMultiple"/> is <see langword="true"/>, or radio buttons (◉/○) when <see langword="false"/>.
+    ///     </para>
+    ///     <para>
+    ///         When <see langword="false"/>, marks can still exist and affect rendering through visual roles
+    ///         (e.g., <see cref="VisualRole.Highlight"/>), but no glyphs are shown. The default is <see langword="false"/>.
+    ///     </para>
+    ///     <para>
+    ///         The SPACE key toggles marking regardless of this property's value.
+    ///     </para>
+    /// </remarks>
+    public bool ShowMarks
     {
-        if (SelectedItem is null)
+        get;
+        set
+        {
+            field = value;
+
+            // Recalculate content size since mark columns affect effective width
+            if (Source is { })
+            {
+                SetContentSize (new Size (EffectiveMaxItemLength, Source.Count));
+            }
+
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>Marks the <see cref="SelectedItem"/> if it is not already marked.</summary>
+    /// <returns><see langword="true"/> if the <see cref="SelectedItem"/> was marked.</returns>
+    public bool MarkUnmarkSelectedItem ()
+    {
+        // Allow marking if ShowMarks OR MarkMultiple is true (not in Combination 1)
+        if ((!ShowMarks && !MarkMultiple) || Source is null || SelectedItem is null || !UnmarkAllButSelected ())
+        {
+            return false;
+        }
+
+        Source.SetMark (SelectedItem.Value, !Source.IsMarked (SelectedItem.Value));
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     If <see cref="MarkMultiple"/> is <see langword="true"/>, marks or unmarks all items.
+    /// </summary>
+    /// <param name="mark"><see langword="true"/> marks all items; otherwise unmarks all items.</param>
+    /// <returns><see langword="true"/> if marking was successful.</returns>
+    public bool MarkAll (bool mark)
+    {
+        // Only allow MarkAll when multiple marking is enabled
+        if (!MarkMultiple)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < Source?.Count; i++)
+        {
+            Source.SetMark (i, mark);
+        }
+
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Clears all marks in the data source.
+    /// </summary>
+    public void UnmarkAll ()
+    {
+        if (Source is null)
         {
             return;
         }
 
-        if (SelectedItem < Viewport.Y)
+        for (var i = 0; i < Source.Count; i++)
         {
-            Viewport = Viewport with { Y = SelectedItem.Value };
+            Source.SetMark (i, false);
         }
-        else if (Viewport.Height > 0 && SelectedItem >= Viewport.Y + Viewport.Height)
+
+        SetNeedsDraw ();
+    }
+
+    /// <summary>
+    ///     If marking is enabled (<see cref="ShowMarks"/> OR <see cref="MarkMultiple"/>)
+    ///     and <see cref="MarkMultiple"/> is <see langword="false"/>,
+    ///     unmarks all marked items other than <see cref="SelectedItem"/>.
+    /// </summary>
+    /// <returns><see langword="true"/> if unmarking was successful.</returns>
+    public bool UnmarkAllButSelected ()
+    {
+        // Allow marking if ShowMarks OR MarkMultiple is true (not in Combination 1)
+        if (!ShowMarks && !MarkMultiple)
         {
-            Viewport = Viewport with { Y = SelectedItem.Value - Viewport.Height + 1 };
+            return false;
         }
+
+        if (MarkMultiple)
+        {
+            return true;
+        }
+
+        for (var i = 0; i < Source?.Count; i++)
+        {
+            if (!Source.IsMarked (i) || i == SelectedItem)
+            {
+                continue;
+            }
+            Source.SetMark (i, false);
+
+            return true;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -85,29 +191,45 @@ public partial class ListView
         return marked;
     }
 
+    #endregion Marking
+
+    /// <inheritdoc/>
+    protected override void OnFrameChanged (in Rectangle frame) => EnsureSelectedItemVisible ();
+
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? currentFocused, View? newFocused)
+    {
+        if (newHasFocus && _lastSelectedItem != SelectedItem)
+        {
+            EnsureSelectedItemVisible ();
+        }
+    }
+
+    /// <summary>Ensures the selected item is always visible on the screen.</summary>
+    public void EnsureSelectedItemVisible ()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        if (SelectedItem < Viewport.Y)
+        {
+            Viewport = Viewport with { Y = SelectedItem.Value };
+        }
+        else if (Viewport.Height > 0 && SelectedItem >= Viewport.Y + Viewport.Height)
+        {
+            Viewport = Viewport with { Y = SelectedItem.Value - Viewport.Height + 1 };
+        }
+    }
+
     /// <summary>
     ///     Returns <see langword="true"/> if the specified item is selected (is the <see cref="SelectedItem"/>)
     ///     or marked (via <see cref="IListDataSource.IsMarked"/>).
     /// </summary>
     /// <param name="item">The item index to check.</param>
     /// <returns><see langword="true"/> if the item is selected or marked; otherwise <see langword="false"/>.</returns>
-    public bool IsSelected (int item) => item == SelectedItem || (Source?.IsMarked (item) ?? false);
-
-    /// <summary>Marks the <see cref="SelectedItem"/> if it is not already marked.</summary>
-    /// <returns><see langword="true"/> if the <see cref="SelectedItem"/> was marked.</returns>
-    public bool MarkUnmarkSelectedItem ()
-    {
-        // Allow marking if ShowMarks OR MarkMultiple is true (not in Combination 1)
-        if ((!ShowMarks && !MarkMultiple) || Source is null || SelectedItem is null || !UnmarkAllButSelected ())
-        {
-            return false;
-        }
-
-        Source.SetMark (SelectedItem.Value, !Source.IsMarked (SelectedItem.Value));
-        SetNeedsDraw ();
-
-        return true;
-    }
+    public bool IsSelectedOrMarked (int item) => item == SelectedItem || (Source?.IsMarked (item) ?? false);
 
     /// <summary>
     ///     Sets the selected item, optionally extending marking to create a range.
@@ -126,21 +248,31 @@ public partial class ListView
 
         if (!MarkMultiple || !extendExistingSelection)
         {
-            // Single-selection mode or not extending: just move SelectedItem
+            // Single-selection mode or not extending: handle marks based on mode
             if (!MarkMultiple && ShowMarks)
             {
-                // Clear all marks except the new selection (radio button mode)
+                // Radio button mode: clear all marks except the new selection
                 for (var i = 0; i < Source.Count; i++)
                 {
                     Source.SetMark (i, i == item);
                 }
             }
+            else if (MarkMultiple && !ShowMarks)
+            {
+                // Hidden marks mode: clear all marks (transient range selections)
+                for (var i = 0; i < Source.Count; i++)
+                {
+                    Source.SetMark (i, false);
+                }
+            }
+
+            // Checkbox mode (ShowMarks=true, MarkMultiple=true): don't touch marks (persistent checkboxes)
 
             _selectionAnchor = item;
         }
-        else if (extendExistingSelection && _selectionAnchor.HasValue && (ShowMarks || MarkMultiple))
+        else if (extendExistingSelection && _selectionAnchor.HasValue && MarkMultiple)
         {
-            // Multi-marking mode: mark range from anchor to item
+            // Multi-select mode: mark range from anchor to item
             int start = Math.Min (_selectionAnchor.Value, item);
             int end = Math.Max (_selectionAnchor.Value, item);
 
@@ -157,45 +289,54 @@ public partial class ListView
         SetNeedsDraw ();
     }
 
-    /// <summary>
-    ///     Clears all marks in the data source.
-    /// </summary>
-    public void UnmarkAll ()
+    private bool? HandleSelectAll (ICommandContext? ctx)
     {
-        if (Source is null)
-        {
-            return;
-        }
-
-        for (var i = 0; i < Source.Count; i++)
-        {
-            Source.SetMark (i, false);
-        }
-
-        SetNeedsDraw ();
-    }
-
-    /// <summary>Invokes the <see cref="OpenSelectedItem"/> event if it is defined.</summary>
-    /// <returns><see langword="true"/> if the <see cref="OpenSelectedItem"/> event was fired.</returns>
-    public bool OnOpenSelectedItem ()
-    {
-        if (Source is null || SelectedItem is null || Source.Count <= SelectedItem || SelectedItem < 0 || OpenSelectedItem is null)
+        if (ctx?.Binding is not KeyBinding keyBinding)
         {
             return false;
         }
 
-        object? value = Source.ToList () [SelectedItem.Value];
-        OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (SelectedItem.Value, value!));
-
-        // BUGBUG: this should not blindly return true.
-        return true;
+        return keyBinding.Data is { } && MarkAll ((bool)keyBinding.Data);
     }
 
     private int? _lastSelectedItem;
     private int? _selectionAnchor;
 
+    #region IValue<int?> Implementation
+
     /// <summary>Gets or sets the index of the currently selected item.</summary>
-    /// <value>The selected item or null if no item is selected.</value>
+    /// <value>The index of selected item or <see langword="null"/> if no item is selected.</value>
+    public int? Value { get => SelectedItem; set => SelectedItem = value; }
+
+    /// <summary>Gets index of the currently selected item.</summary>
+    /// <value>The index of selected item or <see langword="null"/> if no item is selected.</value>
+    object? IValue.GetValue () => SelectedItem;
+
+    /// <summary>
+    ///     Called when the <see cref="ListView"/> <see cref="Value"/>/<see cref="SelectedItem"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
+
+    /// <summary>
+    ///     Raised when the <see cref="ListView"/> <see cref="Value"/>/<see cref="SelectedItem"/> is changing.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="ListView"/> <see cref="Value"/>/<see cref="SelectedItem"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+    #endregion
+
+    /// <summary>This is a convenience property that is an alias for <see cref="Value"/>. Get or set the index of the currently selected item.</summary>
+    /// <value>The index of selected item or <see langword="null"/> if no item is selected.</value>
     public int? SelectedItem
     {
         get;
@@ -251,38 +392,5 @@ public partial class ListView
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
         }
-    }
-
-    /// <summary>
-    ///     If marking is enabled (<see cref="ShowMarks"/> OR <see cref="MarkMultiple"/>)
-    ///     and <see cref="MarkMultiple"/> is <see langword="false"/>,
-    ///     unmarks all marked items other than <see cref="SelectedItem"/>.
-    /// </summary>
-    /// <returns><see langword="true"/> if unmarking was successful.</returns>
-    public bool UnmarkAllButSelected ()
-    {
-        // Allow marking if ShowMarks OR MarkMultiple is true (not in Combination 1)
-        if (!ShowMarks && !MarkMultiple)
-        {
-            return false;
-        }
-
-        if (MarkMultiple)
-        {
-            return true;
-        }
-
-        for (var i = 0; i < Source?.Count; i++)
-        {
-            if (!Source.IsMarked (i) || i == SelectedItem)
-            {
-                continue;
-            }
-            Source.SetMark (i, false);
-
-            return true;
-        }
-
-        return true;
     }
 }

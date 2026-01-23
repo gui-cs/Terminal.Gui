@@ -2,10 +2,6 @@ namespace Terminal.Gui.Views;
 
 public partial class ListView
 {
-    /// <summary>Virtual method that will invoke the <see cref="RowRender"/>.</summary>
-    /// <param name="rowEventArgs"></param>
-    public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs) => RowRender?.Invoke (this, rowEventArgs);
-
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
@@ -30,16 +26,16 @@ public partial class ListView
 
             // Determine visual role based on the 4 combinations of ShowMarks and MarkMultiple
             VisualRole role;
-            bool applyHighlightStyle = false;
+            var applyHighlightStyle = false;
 
-            if (ShowMarks == false && MarkMultiple == false)
+            if (!ShowMarks && !MarkMultiple)
             {
                 // Combination 1: Standard selection mode (no marking)
                 // Mark glyphs: None (MarkWidth = 0)
                 // Visual roles: SelectedItem uses Focus (focused) or Active (not focused)
-                role = isSelected ? (hasFocus ? VisualRole.Focus : VisualRole.Active) : VisualRole.Normal;
+                role = isSelected ? hasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
             }
-            else if (ShowMarks == false && MarkMultiple == true)
+            else if (!ShowMarks && MarkMultiple)
             {
                 // Combination 2: Hidden marks with visual role indicators
                 // Mark glyphs: None (MarkWidth = 0) - marks exist internally
@@ -62,19 +58,19 @@ public partial class ListView
                     role = VisualRole.Normal;
                 }
             }
-            else if (ShowMarks == true && MarkMultiple == false)
+            else if (ShowMarks && !MarkMultiple)
             {
                 // Combination 3: Radio button style
                 // Mark glyphs: Radio-button style (◉ marked, ○ unmarked)
                 // Visual roles: Standard selection (mark glyphs provide visual indication)
-                role = isSelected ? (hasFocus ? VisualRole.Focus : VisualRole.Active) : VisualRole.Normal;
+                role = isSelected ? hasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
             }
             else // ShowMarks == true && MarkMultiple == true
             {
                 // Combination 4: Checkbox style
                 // Mark glyphs: Checkbox style (☒ marked, ☐ unmarked)
                 // Visual roles: Standard selection (mark glyphs provide visual indication)
-                role = isSelected ? (hasFocus ? VisualRole.Focus : VisualRole.Active) : VisualRole.Normal;
+                role = isSelected ? hasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
             }
 
             Attribute newAttribute = GetAttributeForRole (role);
@@ -152,4 +148,16 @@ public partial class ListView
 
         return true;
     }
+
+    // TODO: RowRender should follow CWP.
+    // TODO: All this lets you do is customize the Attribute per row. It should be renamed
+    // TODO: to RowAttributeRender or something similar.
+    // TODO: Consider adding a set of events for more customization; but that's what's IListDataSource.Render is for
+    /// <summary>Virtual method that will invoke the <see cref="RowRender"/>.</summary>
+    /// <param name="rowEventArgs"></param>
+    public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs) => RowRender?.Invoke (this, rowEventArgs);
+
+    /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
+    public event EventHandler<ListViewRowEventArgs>? RowRender;
+
 }

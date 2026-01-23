@@ -486,7 +486,12 @@ public sealed class UICatalogRunnable : Runnable
             SuperViewRendersLineCanvas = true,
             Source = new ListWrapper<string> (CachedCategories)
         };
-        categoryList.OpenSelectedItem += (_, _) => { _scenarioList!.SetFocus (); };
+
+        categoryList.Accepting += (_, e) =>
+                                  {
+                                      _scenarioList!.SetFocus ();
+                                      e.Handled = true;
+                                  };
         categoryList.ValueChanged += CategoryView_SelectedChanged;
 
         // This enables the scrollbar by causing lazy instantiation to happen

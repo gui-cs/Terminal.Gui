@@ -51,316 +51,21 @@ public partial class ListView : View, IDesignable, IValue<int?>
     {
         CanFocus = true;
 
-        // Things this view knows how to do
-        // 
-        AddCommand (Command.Up, ctx => RaiseActivating (ctx) == true || MoveUp ());
-        AddCommand (Command.Down, ctx => RaiseActivating (ctx) == true || MoveDown ());
-
-        // TODO: add RaiseActivating to all of these
-        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
-        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
-        AddCommand (Command.PageUp, () => MovePageUp ());
-        AddCommand (Command.PageDown, () => MovePageDown ());
-        AddCommand (Command.Start, () => MoveHome ());
-        AddCommand (Command.End, () => MoveEnd ());
-        AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
-        AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
-
-        // Extend commands for multi-selection
-        AddCommand (Command.UpExtend, ctx => RaiseActivating (ctx) == true || MoveUp (true));
-        AddCommand (Command.DownExtend, ctx => RaiseActivating (ctx) == true || MoveDown (true));
-        AddCommand (Command.PageUpExtend, () => MovePageUp (true));
-        AddCommand (Command.PageDownExtend, () => MovePageDown (true));
-        AddCommand (Command.StartExtend, () => MoveHome (true));
-        AddCommand (Command.EndExtend, () => MoveEnd (true));
-
-        // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (Command.Accept, HandleAccept);
-
-        // Activate (Space key and single-click) - If ShowMarks, change mark and raise Activate event
-        AddCommand (Command.Activate, HandleActivate);
-
-        // Hotkey - If none set, activate and raise Activate event. SetFocus. - DO NOT raise Accept
-        AddCommand (Command.HotKey, HandleHotKey);
-
-        AddCommand (Command.SelectAll, HandleSelectAll);
-
-        // Default keybindings for all ListViews
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.P.WithCtrl, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.N.WithCtrl, Command.Down);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-
-        // Shift+Arrow for extending selection
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.P.WithCtrl.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
-        KeyBindings.Add (Key.N.WithCtrl.WithShift, Command.DownExtend);
-
-        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
-        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-        KeyBindings.Add (Key.Home.WithShift, Command.StartExtend);
-        KeyBindings.Add (Key.End.WithShift, Command.EndExtend);
-
-        // Key.Space is already bound to Command.Activate; this gives us activate then move down
-        KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);
-
-        // Use the form of Add that lets us pass context to the handler
-        KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
-        KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
-        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
-
-        // Shift+Click and Ctrl+Click for multi-selection (overrides base View bindings)
-        //MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed | MouseFlags.Shift, Command.Activate);
-        //MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Activate);
-        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Shift, Command.Activate);
-        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Activate);
-
-        MouseBindings.ReplaceCommands (MouseFlags.WheeledDown, Command.ScrollDown);
-        MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.ScrollUp);
-        MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);
-        MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
+        SetupBindingsAndCommands ();
     }
 
-    private bool? HandleSelectAll (ICommandContext? ctx)
-    {
-        if (ctx?.Binding is not KeyBinding keyBinding)
-        {
-            return false;
-        }
-
-        return keyBinding.Data is { } && MarkAll ((bool)keyBinding.Data);
-    }
-
-    private bool? HandleHotKey (ICommandContext? ctx)
-    {
-        if (SelectedItem is { })
-        {
-            return !SetFocus ();
-        }
-
-        SelectedItem = 0;
-
-        if (RaiseActivating (ctx) == true)
-        {
-            return true;
-        }
-
-        return !SetFocus ();
-    }
-
-    private bool? HandleAccept (ICommandContext? ctx)
-    {
-        if (RaiseAccepting (ctx) == true)
-        {
-            return true;
-        }
-
-        return OnOpenSelectedItem ();
-    }
-
-    private bool? HandleActivate (ICommandContext? ctx)
-    {
-        if (RaiseActivating (ctx) == true)
-        {
-            return true;
-        }
-
-        if (!HasFocus && CanFocus)
-        {
-            SetFocus ();
-        }
-
-        // Handle keyboard (Space key) - mark item when marking is enabled
-        if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse })
-        {
-            // Allow marking if: ShowMarks=true OR MarkMultiple=true
-            // Only disallow if both are false (Combination 1: standard selection mode)
-            if ((ShowMarks || MarkMultiple) && SelectedItem.HasValue)
-            {
-                MarkUnmarkSelectedItem ();
-            }
-
-            return true;
-        }
-
-        // Handle mouse clicks
-        Point position = mouse.Position!.Value;
-        int index = Viewport.Y + position.Y;
-
-        if (Source is null || index >= Source.Count)
-        {
-            return true;
-        }
-        bool shift = mouse.Flags.HasFlag (MouseFlags.Shift);
-        bool ctrl = mouse.Flags.HasFlag (MouseFlags.Ctrl);
-
-        // Allow marking if: ShowMarks=true OR MarkMultiple=true
-        bool allowMarking = ShowMarks || MarkMultiple;
-
-        if (ctrl && MarkMultiple && allowMarking)
-        {
-            // Ctrl+Click: Toggle mark state directly
-            Source.SetMark (index, !Source.IsMarked (index));
-
-            // Update SelectedItem to clicked item
-            SelectedItem = index;
-            SetNeedsDraw ();
-        }
-        else if (shift && MarkMultiple && allowMarking)
-        {
-            // Shift+Click: Extend marking from anchor
-            SetSelection (index, true);
-        }
-        else
-        {
-            // Normal click: Clear marks and select item
-            SetSelection (index, false);
-
-            // Mark item only on Clicked (not Pressed) to avoid double-toggle
-            // since both Pressed and Clicked trigger Command.Activate
-            if (allowMarking && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
-            {
-                MarkUnmarkSelectedItem ();
-            }
-        }
-
-        return true;
-    }
-
-    /// <summary>Gets or sets whether mark glyphs (checkboxes/radio buttons) are visually displayed.</summary>
-    /// <value>Set to <see langword="true"/> to show mark glyphs; <see langword="false"/> to hide them.</value>
-    /// <remarks>
-    ///     <para>
-    ///         When <see langword="true"/>, marks are rendered with glyphs: checkboxes (☒/☐) when
-    ///         <see cref="MarkMultiple"/> is <see langword="true"/>, or radio buttons (◉/○) when <see langword="false"/>.
-    ///     </para>
-    ///     <para>
-    ///         When <see langword="false"/>, marks can still exist and affect rendering through visual roles
-    ///         (e.g., <see cref="VisualRole.Highlight"/>), but no glyphs are shown. The default is <see langword="false"/>.
-    ///     </para>
-    ///     <para>
-    ///         The SPACE key toggles marking regardless of this property's value.
-    ///     </para>
-    /// </remarks>
-    public bool ShowMarks
-    {
-        get;
-        set
-        {
-            field = value;
-
-            // Recalculate content size since mark columns affect effective width
-            if (Source is { })
-            {
-                SetContentSize (new Size (EffectiveMaxItemLength, Source.Count));
-            }
-
-            SetNeedsDraw ();
-        }
-    }
+    #region IListDataSource
 
     /// <summary>
-    ///     Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    ///     Use <see cref="IListDataSource.MaxItemLength"/> to get the maximum item length. Note that the behavior is dependent
+    ///     on the data source.
     /// </summary>
-    public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
-    /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
-    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
-    internal int LeftItem
-    {
-        get => Viewport.X;
-        set
-        {
-            if (Source is null)
-            {
-                return;
-            }
-
-            // Clamp to valid range: [0, EffectiveMaxItemLength - Viewport.Width]
-            int maxLeftItem = Math.Max (0, EffectiveMaxItemLength - Viewport.Width);
-            value = Math.Clamp (value, 0, maxLeftItem);
-            Viewport = Viewport with { X = value };
-            SetNeedsDraw ();
-        }
-    }
-
-    /// <summary>
-    ///     If <see cref="MarkMultiple"/> is <see langword="true"/>, marks or unmarks all items.
-    /// </summary>
-    /// <param name="mark"><see langword="true"/> marks all items; otherwise unmarks all items.</param>
-    /// <returns><see langword="true"/> if marking was successful.</returns>
-    public bool MarkAll (bool mark)
-    {
-        // Only allow MarkAll when multiple marking is enabled
-        if (!MarkMultiple)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < Source?.Count; i++)
-        {
-            Source.SetMark (i, mark);
-        }
-
-        SetNeedsDraw ();
-
-        return true;
-    }
-
-    /// <summary>Gets the widest item in the list.</summary>
     public int MaxItemLength => Source?.MaxItemLength ?? 0;
-
-    /// <summary>Gets the width reserved for mark rendering (checkbox and space).</summary>
-    private int MarkWidth => ShowMarks ? 2 : 0;
-
-    /// <summary>Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
-    private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
-
-    /// <summary>This event is raised when the user Double-Clicks on an item or presses ENTER to open the selected item.</summary>
-    public event EventHandler<ListViewItemEventArgs>? OpenSelectedItem;
 
     /// <summary>
     ///     Allow resume the <see cref="CollectionChanged"/> event from being invoked,
     /// </summary>
     public void ResumeSuspendCollectionChangedEvent () => Source?.SuspendCollectionChangedEvent = false;
-
-    /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
-    public event EventHandler<ListViewRowEventArgs>? RowRender;
-
-    #region IValue<int?> Implementation
-
-    /// <inheritdoc/>
-    public int? Value { get => SelectedItem; set => SelectedItem = value; }
-
-    /// <inheritdoc/>
-    object? IValue.GetValue () => SelectedItem;
-
-    /// <summary>
-    ///     Called when the <see cref="ListView"/> <see cref="SelectedItem"/> is changing.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
-
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
-
-    /// <summary>
-    ///     Called when the <see cref="ListView"/> <see cref="SelectedItem"/> has changed.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
-
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
-
-    #endregion
 
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>
@@ -422,7 +127,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
 
             if (field is { })
             {
-                field.CollectionChanged += Source_CollectionChanged;
+                field.CollectionChanged += SourceOnCollectionChanged;
                 SetContentSize (new Size (EffectiveMaxItemLength, field?.Count ?? Viewport.Height));
                 KeystrokeNavigator.Collection = field?.ToList ();
             }
@@ -446,6 +151,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <remarks>
     ///     Values are clamped to the valid range [0, Count - Viewport.Height].
     /// </remarks>
+    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
     public int TopItem
     {
         get => Viewport.Y;
@@ -463,16 +169,28 @@ public partial class ListView : View, IDesignable, IValue<int?>
         }
     }
 
-    /// <summary>
-    ///     Call the event to raises the <see cref="CollectionChanged"/>.
-    /// </summary>
-    /// <param name="e"></param>
-    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke (this, e);
+    /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
+    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
+    internal int LeftItem
+    {
+        get => Viewport.X;
+        set
+        {
+            if (Source is null)
+            {
+                return;
+            }
 
-    /// <inheritdoc/>
-    protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
+            // Clamp to valid range: [0, EffectiveMaxItemLength - Viewport.Width]
+            int maxLeftItem = Math.Max (0, EffectiveMaxItemLength - Viewport.Width);
+            value = Math.Clamp (value, 0, maxLeftItem);
+            Viewport = Viewport with { X = value };
+            SetNeedsDraw ();
+        }
+    }
 
-    private void Source_CollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
+    // TODO: Make CollectionChange follow the CWP
+    private void SourceOnCollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
     {
         SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
 
@@ -485,21 +203,33 @@ public partial class ListView : View, IDesignable, IValue<int?>
         OnCollectionChanged (e);
     }
 
-    /// <inheritdoc/>
-    public bool EnableForDesign ()
-    {
-        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
-        Source = source;
+    /// <summary>
+    ///     Call the event to raises the <see cref="CollectionChanged"/>.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke (this, e);
 
-        return true;
-    }
+    /// <summary>
+    ///     Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
+    /// </summary>
+    public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+    #endregion IListDataSource
+
+    #region Viewport/ContentSize Management
 
     /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        Source?.Dispose ();
-        base.Dispose (disposing);
-    }
+    protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
+
+    /// <summary>INTERNAL: Gets the width reserved for mark rendering (checkbox and space).</summary>
+    private int MarkWidth => ShowMarks ? 2 : 0;
+
+    /// <summary>INTERNAL: Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
+    private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
+
+    #endregion Viewport/ContentSize Management
+
+    #region Keystroke Navigation
 
     /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
@@ -537,15 +267,21 @@ public partial class ListView : View, IDesignable, IValue<int?>
         return true;
     }
 
-    /// <inheritdoc/>
-    protected override void OnFrameChanged (in Rectangle frame) => EnsureSelectedItemVisible ();
+    #endregion Keystroke Navigation
 
     /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View? currentFocused, View? newFocused)
+    public bool EnableForDesign ()
     {
-        if (newHasFocus && _lastSelectedItem != SelectedItem)
-        {
-            EnsureSelectedItemVisible ();
-        }
+        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
+        Source = source;
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Source?.Dispose ();
+        base.Dispose (disposing);
     }
 }
