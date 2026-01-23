@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.InteropServices;
 using UnitTests_Parallelizable;
 
@@ -15,22 +14,22 @@ public class DateFieldTests
         df.Layout ();
         Assert.Equal (DateTime.MinValue, df.Value);
         Assert.Equal (1, df.InsertionPoint);
-        Assert.Equal (new (0, 0, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
         Assert.Equal (" 01/01/0001", df.Text);
 
         DateTime date = DateTime.Now;
-        df = new (date);
+        df = new DateField (date);
         df.Layout ();
         Assert.Equal (date, df.Value);
         Assert.Equal (1, df.InsertionPoint);
-        Assert.Equal (new (0, 0, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
 
-        df = new (date) { X = 1, Y = 2 };
+        df = new DateField (date) { X = 1, Y = 2 };
         df.Layout ();
         Assert.Equal (date, df.Value);
         Assert.Equal (1, df.InsertionPoint);
-        Assert.Equal (new (1, 2, 12, 1), df.Frame);
+        Assert.Equal (new Rectangle (1, 2, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
     }
 
@@ -38,8 +37,8 @@ public class DateFieldTests
     [TestDate]
     public void Copy_Paste ()
     {
-        IApplication app = Application.Create();
-        app.Init(DriverRegistry.Names.ANSI);
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.Clipboard = new FakeClipboard ();
 
         try
@@ -51,7 +50,7 @@ public class DateFieldTests
             Assert.True (df2.NewKeyDownEvent (Key.End.WithShift));
             Assert.Equal (1, df2.SelectedStart);
             Assert.Equal (10, df2.SelectedLength);
-            Assert.Equal (10, df2.InsertionPoint);  // Clamped to FormatLength
+            Assert.Equal (10, df2.InsertionPoint); // Clamped to FormatLength
 
             // Copy from df2
             Assert.True (df2.NewKeyDownEvent (Key.C.WithCtrl));
@@ -59,7 +58,7 @@ public class DateFieldTests
             // Paste into df1
             Assert.True (df1.NewKeyDownEvent (Key.V.WithCtrl));
             Assert.Equal (" 12/31/2023", df1.Text);
-            Assert.Equal (10, df1.InsertionPoint);  // Clamped to FormatLength
+            Assert.Equal (10, df1.InsertionPoint); // Clamped to FormatLength
         }
         finally
         {
@@ -89,7 +88,7 @@ public class DateFieldTests
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.Equal (1, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
-        Assert.Equal (1, df.InsertionPoint);  // Clamped to 1, can't be 0
+        Assert.Equal (1, df.InsertionPoint); // Clamped to 1, can't be 0
 
         // Without selection
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft));
@@ -100,7 +99,7 @@ public class DateFieldTests
         Assert.True (df.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (10, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
-        Assert.Equal (10, df.InsertionPoint);  // Clamped to FormatLength
+        Assert.Equal (10, df.InsertionPoint); // Clamped to FormatLength
         Assert.True (df.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (-1, df.SelectedStart);
         Assert.Equal (0, df.SelectedLength);
@@ -193,7 +192,7 @@ public class DateFieldTests
 
         try
         {
-            CultureInfo.CurrentCulture = new ("pt-PT");
+            CultureInfo.CurrentCulture = new CultureInfo ("pt-PT");
 
             var df = new DateField (DateTime.Parse ("12/12/1971"))
             {

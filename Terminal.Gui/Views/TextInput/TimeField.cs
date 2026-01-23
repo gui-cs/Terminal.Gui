@@ -78,12 +78,6 @@ public class TimeField : TextField, IValue<TimeSpan>
     private const int LONG_FIELD_LEN = 8;
 
     /// <summary>
-    ///     The format string for long time format with escaped separators (e.g., " hh\:mm\:ss").
-    ///     The leading space provides a visual buffer and keeps cursor position 0 inaccessible.
-    /// </summary>
-    private readonly string _longFormat;
-
-    /// <summary>
     ///     The time separator character for the current culture (typically ':').
     ///     The cursor automatically skips over these positions during navigation.
     /// </summary>
@@ -114,7 +108,7 @@ public class TimeField : TextField, IValue<TimeSpan>
     {
         CultureInfo cultureInfo = CultureInfo.CurrentCulture;
         _sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
-        _longFormat = $" hh\\{_sepChar}mm\\{_sepChar}ss";
+        Format = $" hh\\{_sepChar}mm\\{_sepChar}ss";
         _shortFormat = $" hh\\{_sepChar}mm";
         Width = FieldLength + 2;
         Value = TimeSpan.MinValue;
@@ -235,7 +229,7 @@ public class TimeField : TextField, IValue<TimeSpan>
     /// <summary>
     ///     Gets the current time format string based on <see cref="IsShortFormat"/>.
     /// </summary>
-    private string Format => _isShort ? _shortFormat : _longFormat;
+    private string Format => _isShort ? _shortFormat : field;
 
     /// <inheritdoc/>
     public override bool DeleteCharLeft (bool useOldCursorPos)
@@ -274,11 +268,12 @@ public class TimeField : TextField, IValue<TimeSpan>
             return true;
         }
 
-        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (SelectedLength != 0 || !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            int point = mouse.Position!.Value.X;
-            AdjustInsertionPoint (point);
+            return mouse.Handled;
         }
+        int point = mouse.Position!.Value.X;
+        AdjustInsertionPoint (point);
 
         return mouse.Handled;
     }
@@ -287,20 +282,22 @@ public class TimeField : TextField, IValue<TimeSpan>
     protected override bool OnKeyDownNotHandled (Key a)
     {
         // Ignore non-numeric characters.
-        if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9)
+        if (a.KeyCode is < (KeyCode)(int)KeyCode.D0 or > (KeyCode)(int)KeyCode.D9)
         {
-            if (!ReadOnly)
-            {
-                if (SetText ((Rune)a))
-                {
-                    IncrementInsertionPoint ();
-                }
-            }
+            return false;
+        }
 
+        if (ReadOnly)
+        {
             return true;
         }
 
-        return false;
+        if (SetText ((Rune)a))
+        {
+            IncrementInsertionPoint ();
+        }
+
+        return true;
     }
 
     #region IValue<TimeSpan> Implementation
@@ -346,8 +343,7 @@ public class TimeField : TextField, IValue<TimeSpan>
         }
     }
 
-    /// <inheritdoc/>
-    object? IValue.GetValue () => _time;
+    object IValue.GetValue () => _time;
 
     /// <summary>
     ///     Called when the <see cref="TimeField"/> <see cref="Value"/> is changing.

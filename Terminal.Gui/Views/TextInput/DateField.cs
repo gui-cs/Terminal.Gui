@@ -154,6 +154,20 @@ public class DateField : TextField, IValue<DateTime?>
         set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1);
     }
 
+    /// <summary>
+    ///     >
+    ///     Gets the length of the date format string (excluding the leading space), which represents
+    ///     the maximum valid cursor position.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         For a standard 10-character date format like "MM/dd/yyyy", this returns 10.
+    ///         The valid cursor range is [1, FormatLength], where position 1 is the first digit
+    ///         and FormatLength is the last digit.
+    ///     </para>
+    /// </remarks>
+    private int FormatLength => StandardizeDateFormat (_format).Trim ().Length;
+
     /// <summary>Gets or sets the date value of the <see cref="DateField"/>.</summary>
     public new DateTime? Value
     {
@@ -201,7 +215,6 @@ public class DateField : TextField, IValue<DateTime?>
         }
     }
 
-    /// <inheritdoc/>
     object? IValue.GetValue () => _date;
 
     /// <summary>
@@ -222,8 +235,6 @@ public class DateField : TextField, IValue<DateTime?>
 
     /// <inheritdoc/>
     public new event EventHandler<ValueChangedEventArgs<DateTime?>>? ValueChanged;
-
-    #endregion
 
     /// <inheritdoc/>
     public override bool DeleteCharLeft (bool useOldCursorPos)
@@ -274,20 +285,23 @@ public class DateField : TextField, IValue<DateTime?>
     protected override bool OnKeyDownNotHandled (Key a)
     {
         // Ignore non-numeric characters.
-        if (a >= Key.D0 && a <= Key.D9)
+        if (a < Key.D0 || a > Key.D9)
         {
-            if (!ReadOnly)
-            {
-                if (SetText ((Rune)a))
-                {
-                    IncrementInsertionPoint ();
-                }
-            }
+            return false;
+        }
 
+        if (ReadOnly)
+        {
             return true;
         }
 
-        return false;
+        if (SetText ((Rune)a))
+        {
+            IncrementInsertionPoint ();
+        }
+
+        return true;
+
     }
 
     /// <summary>
@@ -370,9 +384,9 @@ public class DateField : TextField, IValue<DateTime?>
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.Result.Length; i++)
+            foreach (char t in e.Result)
             {
-                if (e.Result [i] == ' ')
+                if (t == ' ')
                 {
                     spaces++;
                 }
@@ -473,12 +487,13 @@ public class DateField : TextField, IValue<DateTime?>
 
         for (var i = 0; i < fm.Length; i++)
         {
-            if (fm [i].Contains (t))
+            if (!fm [i].Contains (t))
             {
-                idx = i;
-
-                break;
+                continue;
             }
+            idx = i;
+
+            break;
         }
 
         return idx;
