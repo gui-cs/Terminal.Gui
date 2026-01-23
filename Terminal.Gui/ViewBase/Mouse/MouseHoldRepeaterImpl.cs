@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using Timeout = Terminal.Gui.App.Timeout;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -9,7 +9,7 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         This class implements an accelerating timeout pattern by default: the first tick occurs after 500ms, 
+///         This class implements an accelerating timeout pattern by default: the first tick occurs after 500ms,
 ///         subsequent ticks accelerate with a 0.7 decay factor down to a minimum of 50ms.
 ///     </para>
 ///     <para>
@@ -22,7 +22,8 @@ namespace Terminal.Gui.ViewBase;
 ///         enabling behaviors like auto-scrolling or button repeat.
 ///     </para>
 ///     <para>
-///         For testing or custom timing behavior, set the <see cref="Timeout"/> property before calling <see cref="Start"/>.
+///         For testing or custom timing behavior, set the <see cref="Timeout"/> property before calling
+///         <see cref="Start"/>.
 ///     </para>
 /// </remarks>
 internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
@@ -44,13 +45,13 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
     private readonly ITimedEvents? _timedEvents;
     private readonly IMouseGrabHandler? _mouseGrabber;
 
-    private App.Timeout? _timeout;
-    private App.Timeout? _userTimeout;
+    private Timeout? _timeout;
+    private Timeout? _userTimeout;
     private bool _isDown;
     private object? _timeoutToken;
 
     /// <inheritdoc/>
-    public App.Timeout? Timeout
+    public Timeout? Timeout
     {
         get => _userTimeout;
         set
@@ -64,9 +65,9 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
     }
 
     /// <summary>
-    /// The most recent mouse event arguments associated with the mouse held down action.
+    ///     The most recent mouse event arguments associated with the mouse held down action.
     /// </summary>
-    private Mouse? _mouseEvent = null;
+    private Mouse? _mouseEvent;
 
     public void Start (Mouse mouse)
     {
@@ -75,7 +76,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
             return;
         }
 
-        _mouseEvent = new ()
+        _mouseEvent = new Mouse
         {
             Timestamp = mouse.Timestamp,
             Flags = mouse.Flags,
@@ -83,6 +84,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
             ScreenPosition = mouse.ScreenPosition,
             View = mouse.View
         };
+
         //Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 
         _isDown = true;
@@ -96,11 +98,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
         }
         else
         {
-            _timeout = new SmoothAcceleratingTimeout (
-                TimeSpan.FromMilliseconds (500),
-                TimeSpan.FromMilliseconds (10),
-                0.8,
-                TickWhileMouseIsHeldDown);
+            _timeout = new SmoothAcceleratingTimeout (TimeSpan.FromMilliseconds (500), TimeSpan.FromMilliseconds (10), 0.8, TickWhileMouseIsHeldDown);
         }
 
         // Then periodic ticks
@@ -115,6 +113,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
 
             return;
         }
+
         //Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 
         _mouseEvent = null;
@@ -150,11 +149,11 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
 
     public event EventHandler<CancelEventArgs<Mouse>>? MouseIsHeldDownTick;
 
-    private bool RaiseMouseIsHeldDownTick ()
+    private void RaiseMouseIsHeldDownTick ()
     {
         Mouse currentMouseEventArgs = _mouseEvent ?? new Mouse ();
         Mouse newMouseEventArgs = _mouseEvent ?? new Mouse ();
-        CancelEventArgs<Mouse> args = new (currentValue: ref currentMouseEventArgs, newValue: ref newMouseEventArgs);
+        CancelEventArgs<Mouse> args = new (ref currentMouseEventArgs, ref newMouseEventArgs);
 
         MouseIsHeldDownTick?.Invoke (this, args);
 
@@ -165,8 +164,6 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
             //Logging.Trace ($"host: {_mouseGrabView.Id} MouseIsHeldDownTick cancelled, stopping");
             Stop ();
         }
-
-        return args.Cancel;
     }
 
     private bool TickWhileMouseIsHeldDown ()
