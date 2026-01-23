@@ -62,7 +62,7 @@ var listView = new ListView
 // - Press SPACE to mark it (IsMarked(0) = true)
 // - Navigate to File3.txt with arrow keys (SelectedItem = 2)
 // - Press SPACE to mark it (IsMarked(2) = true)
-// Now items 0 and 2 are marked, while item 1 is currently selected
+// Now items 0 and 2 are marked, while item 2 is currently selected
 ```
 
 ## AllowsMultipleSelection Property
@@ -194,7 +194,7 @@ var listView = new ListView
 var processButton = new Button("Delete Marked Files");
 processButton.Accepting += (s, e) =>
 {
-    List<string> markedFiles = [];
+    List<string> markedFiles = new ();
     
     for (int i = 0; i < listView.Source.Count; i++)
     {
