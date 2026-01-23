@@ -22,9 +22,9 @@ public record struct CommandContext : ICommandContext
     ///     Initializes a new instance with the specified <see cref="Command"/>.
     /// </summary>
     /// <param name="command">The command being invoked.</param>
-    /// <param name="source">The view that is the source of the command invocation.</param>
+    /// <param name="source">A weak reference to the view that is the source of the command invocation.</param>
     /// <param name="binding">The binding that triggered the command, if any.</param>
-    public CommandContext (Command command, View? source, IInputBinding? binding)
+    public CommandContext (Command command, WeakReference<View>? source, IInputBinding? binding)
     {
         Command = command;
         Binding = binding;
@@ -35,7 +35,7 @@ public record struct CommandContext : ICommandContext
     public Command Command { get; set; }
 
     /// <inheritdoc />
-    public View? Source { get; set; }
+    public WeakReference<View>? Source { get; set; }
 
     /// <inheritdoc />
     public IInputBinding? Binding { get; set; }

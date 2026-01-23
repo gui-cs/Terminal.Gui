@@ -37,7 +37,9 @@ public class CommandPropagationTests
 
         protected override bool OnActivating (CommandEventArgs args)
         {
-            EventLog.Add (("Activating", args.Context?.Source, args.Context?.Binding));
+            View? sourceView = null;
+            args.Context?.Source?.TryGetTarget (out sourceView);
+            EventLog.Add (("Activating", sourceView, args.Context?.Binding));
 
             if (HandleActivating)
             {
@@ -49,7 +51,9 @@ public class CommandPropagationTests
 
         protected override bool OnAccepting (CommandEventArgs args)
         {
-            EventLog.Add (("Accepting", args.Context?.Source, args.Context?.Binding));
+            View? sourceView = null;
+            args.Context?.Source?.TryGetTarget (out sourceView);
+            EventLog.Add (("Accepting", sourceView, args.Context?.Binding));
 
             if (HandleAccepting)
             {
@@ -72,7 +76,9 @@ public class CommandPropagationTests
 
         protected override bool OnActivating (CommandEventArgs args)
         {
-            EventLog.Add (("Activating", args.Context?.Source, args.Context?.Binding));
+            View? sourceView = null;
+            args.Context?.Source?.TryGetTarget (out sourceView);
+            EventLog.Add (("Activating", sourceView, args.Context?.Binding));
 
             if (HandleActivating)
             {
@@ -84,7 +90,9 @@ public class CommandPropagationTests
 
         protected override bool OnAccepting (CommandEventArgs args)
         {
-            EventLog.Add (("Accepting", args.Context?.Source, args.Context?.Binding));
+            View? sourceView = null;
+            args.Context?.Source?.TryGetTarget (out sourceView);
+            EventLog.Add (("Accepting", sourceView, args.Context?.Binding));
 
             if (HandleAccepting)
             {
@@ -104,8 +112,18 @@ public class CommandPropagationTests
 
         public void AttachTo (View flagSelector)
         {
-            flagSelector.Activating += (_, args) => EventLog.Add (("Activating", args.Context?.Source, args.Context?.Binding));
-            flagSelector.Accepting += (_, args) => EventLog.Add (("Accepting", args.Context?.Source, args.Context?.Binding));
+            flagSelector.Activating += (_, args) =>
+            {
+                View? sourceView = null;
+                args.Context?.Source?.TryGetTarget (out sourceView);
+                EventLog.Add (("Activating", sourceView, args.Context?.Binding));
+            };
+            flagSelector.Accepting += (_, args) =>
+            {
+                View? sourceView = null;
+                args.Context?.Source?.TryGetTarget (out sourceView);
+                EventLog.Add (("Accepting", sourceView, args.Context?.Binding));
+            };
         }
     }
 
@@ -166,7 +184,7 @@ public class CommandPropagationTests
 
         // Act: Invoke Command.Activate on the CheckBox (simulating user pressing Space)
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
-        CommandContext ctx = new () { Command = Command.Activate, Source = checkBox, Binding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
 
         checkBox.InvokeCommand (Command.Activate, ctx);
 
@@ -199,7 +217,7 @@ public class CommandPropagationTests
 
         // Act: Invoke Command.Activate on the CheckBox
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
-        CommandContext ctx = new () { Command = Command.Activate, Source = checkBox, Binding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
 
         checkBox.InvokeCommand (Command.Activate, ctx);
 
@@ -252,7 +270,7 @@ public class CommandPropagationTests
 
         // Act: Invoke Command.Accept on the CheckBox (simulating double-click)
         MouseBinding mouseBinding = new ([Command.Accept], MouseFlags.LeftButtonDoubleClicked) { Source = checkBox };
-        CommandContext ctx = new () { Command = Command.Accept, Source = checkBox, Binding = mouseBinding };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (checkBox), Binding = mouseBinding };
 
         checkBox.InvokeCommand (Command.Accept, ctx);
 
@@ -305,7 +323,7 @@ public class CommandPropagationTests
 
         // Act
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
-        CommandContext ctx = new () { Command = Command.Activate, Source = checkBox, Binding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
 
         checkBox.InvokeCommand (Command.Activate, ctx);
 
@@ -358,7 +376,7 @@ public class CommandPropagationTests
 
         // Create a distinctive binding we can verify
         KeyBinding originalBinding = new ([Command.Activate]) { Key = Key.F5, Source = checkBox, Data = "test-data-marker" };
-        CommandContext ctx = new () { Command = Command.Activate, Source = checkBox, Binding = originalBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = originalBinding };
 
         // Act
         checkBox.InvokeCommand (Command.Activate, ctx);
@@ -431,7 +449,7 @@ public class CommandPropagationTests
 
         // Act
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
-        CommandContext ctx = new () { Command = Command.Activate, Source = checkBox, Binding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
 
         checkBox.InvokeCommand (Command.Activate, ctx);
 
@@ -477,7 +495,7 @@ public class CommandPropagationTests
 
         // Act
         MouseBinding mouseBinding = new ([Command.Accept], MouseFlags.LeftButtonDoubleClicked) { Source = checkBox };
-        CommandContext ctx = new () { Command = Command.Accept, Source = checkBox, Binding = mouseBinding };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (checkBox), Binding = mouseBinding };
 
         checkBox.InvokeCommand (Command.Accept, ctx);
 
@@ -515,7 +533,7 @@ public class CommandPropagationTests
         superView.Activating += (_, args) =>
                                 {
                                     activatingReceived = true;
-                                    receivedSource = args.Context?.Source;
+                                    args.Context?.Source?.TryGetTarget (out receivedSource);
                                 };
 
         superView.Add (subView);
@@ -523,7 +541,7 @@ public class CommandPropagationTests
 
         // Act
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Enter, Source = subView };
-        CommandContext ctx = new () { Command = Command.Activate, Source = subView, Binding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (subView), Binding = keyBinding };
 
         subView.InvokeCommand (Command.Activate, ctx);
 
@@ -549,7 +567,7 @@ public class CommandPropagationTests
         superView.Accepting += (_, args) =>
                                {
                                    acceptingReceived = true;
-                                   receivedSource = args.Context?.Source;
+                                   args.Context?.Source?.TryGetTarget (out receivedSource);
                                };
 
         superView.Add (subView);
@@ -557,7 +575,7 @@ public class CommandPropagationTests
 
         // Act
         KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter, Source = subView };
-        CommandContext ctx = new () { Command = Command.Accept, Source = subView, Binding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (subView), Binding = keyBinding };
 
         subView.InvokeCommand (Command.Accept, ctx);
 

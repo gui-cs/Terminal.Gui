@@ -532,17 +532,18 @@ The current implementation of `Command.Activate` is local, but `MenuBar` require
     - In `Button`, `Activating` sets focus, which is inherently local.
 
 - **Accepting**: `Command.Accept` propagates to a default button (if present), the superview, or a `SuperMenuItem` (in menus), enabling hierarchical handling.
-  - **Rationale**: `Accepting` often involves actions that affect the broader UI context (e.g., closing a dialog, executing a menu command), requiring coordination with parent views. This is evident in `Menu`’s propagation to `SuperMenuItem` and `MenuBar`’s handling of `Accepted`:
+  - **Rationale**: `Accepting` often involves actions that affect the broader UI context (e.g., closing a dialog, executing a menu command), requiring coordination with parent views. This is evident in `Menu`'s propagation to `SuperMenuItem` and `MenuBar`'s handling of `Accepted`:
     ```csharp
-    protected override void OnAccepting(CommandEventArgs args)
+    protected override void OnAccepting (CommandEventArgs args)
     {
-        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.TypedBinding.Key == Application.QuitKey)
+        // Pattern match on binding type using ICommandContext.Binding
+        if (args.Context?.Binding is KeyBinding kb && kb.Key == Application.QuitKey)
         {
             return true;
         }
-        if (SuperView is null && SuperMenuItem is {})
+        if (SuperView is null && SuperMenuItem is { })
         {
-            return SuperMenuItem?.InvokeCommand(Command.Accept, args.Context) is true;
+            return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
         return false;
     }
@@ -628,13 +629,21 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
    - This ensures `Activating` only propagates state changes to the parent `FlagSelector` via `RaiseActivating`, and `Accepting` is triggered separately (e.g., via Enter on the `FlagSelector` itself) to confirm the `Value`.
 
 3. **Enhance ICommandContext with View-Specific State**:
-   - The `ICommandContext` interface now includes a `Binding` property that provides polymorphic access to the binding that triggered the command. This enables pattern matching on binding types:
+   - The `ICommandContext` interface includes a `Binding` property that provides polymorphic access to the binding that triggered the command.
+   - **Note**: `CommandContext` (the implementation of `ICommandContext`) is now **non-generic**. Previous versions used `CommandContext<T>` with a generic type parameter for the binding. This was removed to simplify the type system and enable easier pattern matching.
       ```csharp
       public interface ICommandContext
       {
           Command Command { get; }
           View? Source { get; set; }
           IInputBinding? Binding { get; }  // Polymorphic access to the binding
+      }
+
+      public record struct CommandContext : ICommandContext  // Non-generic
+      {
+          public Command Command { get; set; }
+          public View? Source { get; set; }
+          public IInputBinding? Binding { get; set; }
       }
       ```
    - Pattern match on `ctx.Binding` to access specific binding types:

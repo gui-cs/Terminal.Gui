@@ -912,31 +912,22 @@ public static class EscSeqUtils
 
     /// <summary>
     ///     CSI 16 t - Request sixel resolution (width and height in pixels)
+    ///     The terminator indicating a reply to <see cref="CSI_RequestSixelResolution"/> : ESC [ 6 ; heightPx ; widthPx t
     /// </summary>
-    public static readonly AnsiEscapeSequence CSI_RequestSixelResolution = new () { Request = CSI + "16t", Terminator = "t" };
+    public static readonly AnsiEscapeSequence CSI_RequestSixelResolution = new () { Request = CSI + "16t", Terminator = "t", Value = "6" };
 
     /// <summary>
     ///     CSI 14 t - Request window size in pixels (width x height)
+    ///     The terminator indicating a reply to <see cref="CSI_RequestWindowSizeInPixels"/> : ESC [ 4 ; heightPx ; widthPx t
     /// </summary>
-    public static readonly AnsiEscapeSequence CSI_RequestWindowSizeInPixels = new () { Request = CSI + "14t", Terminator = "t" };
+    public static readonly AnsiEscapeSequence CSI_RequestWindowSizeInPixels = new () { Request = CSI + "14t", Terminator = "t", Value = "4" };
 
     /// <summary>
-    ///     CSI 1 8 t  | yes | yes |  yes  | report window size in chars
+    ///     CSI 18 t  | yes | yes |  yes  | report window size in chars
     ///     https://terminalguide.namepad.de/seq/csi_st-18/
     ///     The terminator indicating a reply to <see cref="CSI_ReportWindowSizeInChars"/> : ESC [ 8 ; height ; width t
     /// </summary>
     public static readonly AnsiEscapeSequence CSI_ReportWindowSizeInChars = new () { Request = CSI + "18t", Terminator = "t", Value = "8" };
-
-    /// <summary>
-    ///     The terminator indicating a reply to <see cref="CSI_ReportWindowSizeInChars"/> : ESC [ 8 ; height ; width t
-    /// </summary>
-    public const string CSI_ReportWindowSizeInChars_Terminator = "t";
-
-    /// <summary>
-    ///     The value of the response to <see cref="CSI_ReportWindowSizeInChars"/> indicating value 1 and 2 are the terminal
-    ///     size in chars.
-    /// </summary>
-    public const string CSI_ReportWindowSizeInChars_ResponseValue = "8";
 
     /// <summary>
     ///     Valid ANSI response terminators per CSI specification. See

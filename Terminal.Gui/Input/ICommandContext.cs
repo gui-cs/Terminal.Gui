@@ -18,10 +18,14 @@ public interface ICommandContext
     public Command Command { get; set; }
 
     /// <summary>
-    ///     The View that was the source of the command invocation, if any.
+    ///     A weak reference to the View that was the source of the command invocation, if any.
     ///     (e.g. the view the user clicked on or the view that had focus when a key was pressed).
+    ///     Use <c>Source?.TryGetTarget(out View? view)</c> to safely access the source view.
     /// </summary>
-    public View? Source { get; set; }
+    /// <remarks>
+    ///     Uses WeakReference to prevent memory leaks when views are disposed during command propagation.
+    /// </remarks>
+    public WeakReference<View>? Source { get; set; }
 
     /// <summary>
     ///     The binding that triggered the command.

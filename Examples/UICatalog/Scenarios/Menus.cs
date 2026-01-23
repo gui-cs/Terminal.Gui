@@ -72,8 +72,9 @@ public class Menus : Scenario
                                           return;
                                       }
 
-                                      Logging.Debug ($"{sender.Id} Accepting: {args.Context?.Source?.Title}");
-                                      eventSource.Add ($"{sender.Id} Accepting: {args.Context?.Source?.Title}: ");
+                                      string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+                                      Logging.Debug ($"{sender.Id} Accepting: {sourceTitle}");
+                                      eventSource.Add ($"{sender.Id} Accepting: {sourceTitle}: ");
                                       eventLog.MoveDown ();
                                   };
 
@@ -84,8 +85,9 @@ public class Menus : Scenario
                                                       return;
                                                   }
 
-                                                  Logging.Debug ($"{sender.Id} Accepted: {args.Context?.Source?.Text}");
-                                                  eventSource.Add ($"{sender.Id} Accepted: {args.Context?.Source?.Text}: ");
+                                                  string sourceText = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Text : "null";
+                                                  Logging.Debug ($"{sender.Id} Accepted: {sourceText}");
+                                                  eventSource.Add ($"{sender.Id} Accepted: {sourceText}: ");
                                                   eventLog.MoveDown ();
                                               };
 
@@ -231,8 +233,8 @@ public class Menus : Scenario
                 Y = Pos.Bottom (lastAcceptedLabel)
             };
 
-            autoSaveStatusCb.CheckedStateChanged += (_, _) => { autoSaveMenuItemCb!.CheckedState = autoSaveStatusCb.CheckedState; };
-            autoSaveMenuItemCb.CheckedStateChanged += (_, _) => { autoSaveStatusCb!.CheckedState = autoSaveMenuItemCb.CheckedState; };
+            autoSaveStatusCb.ValueChanged += (_, _) => { autoSaveMenuItemCb!.Value = autoSaveStatusCb.Value; };
+            autoSaveMenuItemCb.ValueChanged += (_, _) => { autoSaveStatusCb!.Value = autoSaveMenuItemCb.Value; };
 
             Add (autoSaveStatusCb);
 
@@ -251,29 +253,29 @@ public class Menus : Scenario
             // The source of truth is our status CB; any time it changes, update the menu item
             var enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithTitle ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
 
-            enableOverwriteStatusCb.CheckedStateChanged += (_, _) =>
+            enableOverwriteStatusCb.ValueChanged += (_, _) =>
                                                            {
                                                                if (enableOverwriteMenuItemCb is not null)
                                                                {
-                                                                   enableOverwriteMenuItemCb.CheckedState = enableOverwriteStatusCb.CheckedState;
+                                                                   enableOverwriteMenuItemCb.Value = enableOverwriteStatusCb.Value;
                                                                }
                                                            };
 
             menuBar.Accepted += (_, args) =>
                                 {
-                                    if (args.Context?.Source is not MenuItem mi || mi.CommandView != enableOverwriteMenuItemCb)
+                                    if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi || mi.CommandView != enableOverwriteMenuItemCb)
                                     {
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
+                                    Logging.Debug ($"menuBar.Accepted: {sourceView.Title}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;
 
                                     // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
-                                    enableOverwriteStatusCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
-                                    lastAcceptedText.Text = args.Context?.Source?.Title!;
+                                    enableOverwriteStatusCb.Value = ((CheckBox)mi.CommandView).Value;
+                                    lastAcceptedText.Text = sourceView.Title!;
                                 };
 
             HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
@@ -305,29 +307,29 @@ public class Menus : Scenario
             // The source of truth is our status CB; any time it changes, update the menu item
             var editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
 
-            editModeStatusCb.CheckedStateChanged += (_, _) =>
+            editModeStatusCb.ValueChanged += (_, _) =>
                                                     {
                                                         if (editModeMenuItemCb is not null)
                                                         {
-                                                            editModeMenuItemCb.CheckedState = editModeStatusCb.CheckedState;
+                                                            editModeMenuItemCb.Value = editModeStatusCb.Value;
                                                         }
                                                     };
 
             menuBar.Accepted += (_, args) =>
                                 {
-                                    if (args.Context?.Source is not MenuItem mi || mi.CommandView != editModeMenuItemCb)
+                                    if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi || mi.CommandView != editModeMenuItemCb)
                                     {
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
+                                    Logging.Debug ($"menuBar.Accepted: {sourceView.Title}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;
 
                                     // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
-                                    editModeMenuItemCb.CheckedState = ((CheckBox)mi.CommandView).CheckedState;
-                                    lastAcceptedText.Text = args.Context?.Source?.Title!;
+                                    editModeMenuItemCb.Value = ((CheckBox)mi.CommandView).Value;
+                                    lastAcceptedText.Text = sourceView.Title!;
                                 };
 
             AddCommand (
@@ -359,7 +361,8 @@ public class Menus : Scenario
             // we need to subscribe to the ContextMenu's Accepted event.
             ContextMenu!.Accepted += (_, args) =>
                                      {
-                                         Logging.Debug ($"ContextMenu.Accepted: {args.Context?.Source?.Title}");
+                                         string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+                                         Logging.Debug ($"ContextMenu.Accepted: {sourceTitle}");
 
                                          // Forward the event to the MenuHost
                                          if (args.Context is not null)
@@ -377,7 +380,8 @@ public class Menus : Scenario
             openBtn.Accepting += (_, e) =>
                                  {
                                      e.Handled = true;
-                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {e.Context?.Source?.Title}");
+                                     string sourceTitle = e.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {sourceTitle}");
                                      NewKeyDownEvent (menuBar.Key);
                                  };
 

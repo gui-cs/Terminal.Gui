@@ -67,15 +67,7 @@ public interface IListDataSource : IDisposable
     ///         Implementations must fill the entire <paramref name="width"/> to avoid rendering artifacts.
     ///     </para>
     /// </remarks>
-    void Render (
-        ListView listView,
-        bool selected,
-        int item,
-        int col,
-        int line,
-        int width,
-        int viewportX = 0
-    );
+    void Render (ListView listView, bool selected, int item, int col, int line, int width, int viewportX = 0);
 
     /// <summary>Sets the marked state of the specified item.</summary>
     /// <param name="item">The zero-based index of the item.</param>
@@ -99,7 +91,7 @@ public interface IListDataSource : IDisposable
     /// <returns>The data source as an <see cref="IList"/>.</returns>
     /// <remarks>
     ///     <see cref="ListView"/> uses this method to access individual items for events like
-    ///     <see cref="ListView.SelectedItemChanged"/> and to enable keyboard search via
+    ///     <see cref="ListView.ValueChanged"/> and to enable keyboard search via
     ///     <see cref="ListView.KeystrokeNavigator"/>.
     /// </remarks>
     IList ToList ();

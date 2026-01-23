@@ -69,6 +69,6 @@ public class MarginEditor : AdornmentEditor
             _flagSelectorTransparent.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
 
-        _flagSelectorTransparent.ValueChanged += (_, args) => { ((Margin)AdornmentToEdit!).ViewportSettings = (ViewportSettingsFlags)args.Value!; };
+        _flagSelectorTransparent.ValueChanged += (_, args) => { ((Margin)AdornmentToEdit!).ViewportSettings = (ViewportSettingsFlags)args.NewValue!; };
     }
 }

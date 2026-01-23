@@ -58,7 +58,7 @@ public class Wizards : Scenario
             Title = "_Run Wizard as a modal",
             X = 0,
             Y = Pos.Bottom (label),
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
         settingsFrame.Add (cbRun);
 
@@ -88,16 +88,16 @@ public class Wizards : Scenario
         };
         win.Add (_actionLabel);
 
-        if (cbRun.CheckedState != CheckState.Checked)
+        if (cbRun.Value != CheckState.Checked)
         {
             showWizardButton.Enabled = false;
             _wizard = CreateWizard ();
             win.Add (_wizard);
         }
 
-        cbRun.CheckedStateChanged += (_, a) =>
+        cbRun.ValueChanged += (_, a) =>
         {
-            if (a.Value == CheckState.Checked)
+            if (a.NewValue == CheckState.Checked)
             {
                 showWizardButton.Enabled = true;
                 _wizard!.X = Pos.Center ();
