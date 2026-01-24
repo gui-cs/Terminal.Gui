@@ -1,8 +1,6 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 
 namespace UICatalog.Scenarios;
 
@@ -33,34 +31,31 @@ public class AllViewsTester : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window window = new ()
-        {
-            Title = GetQuitKeyAndName (),
-        };
+        using Window window = new ();
+        window.Title = GetQuitKeyAndName ();
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
         window.Border!.LineStyle = LineStyle.Heavy;
-        window.Border!.Thickness = new (0);
-
+        window.Border!.Thickness = new Thickness (0);
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
                        .Select (t => new KeyValuePair<string, Type> (t.Name, t))
                        .ToDictionary (t => t.Key, t => t.Value);
 
-        _classListView = new ()
+        _classListView = new ListView
         {
             Title = "Classes [_1]",
             X = 0,
             Y = 0,
             Width = Dim.Auto (),
             Height = Dim.Fill (),
-            AllowsMarking = false,
+            ShowMarks = false,
             SelectedItem = 0,
-            Source = new ListWrapper<string> (new (_viewClasses.Keys.ToList ())),
+            Source = new ListWrapper<string> (new ObservableCollection<string> (_viewClasses.Keys.ToList ())),
             SuperViewRendersLineCanvas = true
         };
-        _classListView.Border!.Thickness = new (1);
+        _classListView.Border!.Thickness = new Thickness (1);
 
         _classListView.ValueChanged += (_, _) =>
                                        {
@@ -84,7 +79,7 @@ public class AllViewsTester : Scenario
                                         args.Handled = true;
                                     };
 
-        _adornmentsEditor = new ()
+        _adornmentsEditor = new AdornmentsEditor
         {
             Title = "Adornments [_2]",
             X = Pos.Right (_classListView) - 1,
@@ -93,13 +88,13 @@ public class AllViewsTester : Scenario
             Height = Dim.Auto (),
             AutoSelectViewToEdit = false,
             AutoSelectAdornments = false,
-            SuperViewRendersLineCanvas = true,
+            SuperViewRendersLineCanvas = true
         };
-        _adornmentsEditor.Border!.Thickness = new (1);
+        _adornmentsEditor.Border!.Thickness = new Thickness (1);
         _adornmentsEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
         _adornmentsEditor.ExpanderButton.Enabled = false;
 
-        _arrangementEditor = new ()
+        _arrangementEditor = new ArrangementEditor
         {
             Title = "Arrangement [_3]",
             X = Pos.Right (_classListView) - 1,
@@ -112,17 +107,15 @@ public class AllViewsTester : Scenario
         };
         _arrangementEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
 
-        _arrangementEditor.ExpanderButton.CollapsedChanging += (_, args) =>
-                                                               {
-                                                                   _adornmentsEditor.ExpanderButton.Collapsed = args.NewValue;
-                                                               };
-        _arrangementEditor.Border!.Thickness = new (1);
+        _arrangementEditor.ExpanderButton.CollapsedChanging += (_, args) => { _adornmentsEditor.ExpanderButton.Collapsed = args.NewValue; };
+        _arrangementEditor.Border!.Thickness = new Thickness (1);
 
-        _layoutEditor = new ()
+        _layoutEditor = new LayoutEditor
         {
             Title = "Layout [_4]",
             X = Pos.Right (_arrangementEditor) - 1,
             Y = 0,
+
             //Width = Dim.Fill (), // set below
             Height = Dim.Auto (),
             CanFocus = true,
@@ -130,9 +123,9 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _layoutEditor.Border!.Thickness = new (1, 1, 1, 0);
+        _layoutEditor.Border!.Thickness = new Thickness (1, 1, 1, 0);
 
-        _viewportSettingsEditor = new ()
+        _viewportSettingsEditor = new ViewportSettingsEditor
         {
             Title = "ViewportSettings [_5]",
             X = Pos.Right (_arrangementEditor) - 1,
@@ -144,9 +137,9 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _viewportSettingsEditor.Border!.Thickness = new (1, 1, 1, 1);
+        _viewportSettingsEditor.Border!.Thickness = new Thickness (1, 1, 1, 1);
 
-        _propertiesEditor = new ()
+        _propertiesEditor = new ViewPropertiesEditor
         {
             Title = "View Properties [_6]",
             X = Pos.Right (_adornmentsEditor) - 1,
@@ -156,9 +149,9 @@ public class AllViewsTester : Scenario
             CanFocus = true,
             SuperViewRendersLineCanvas = true
         };
-        _propertiesEditor.Border!.Thickness = new (1, 1, 1, 0);
+        _propertiesEditor.Border!.Thickness = new Thickness (1, 1, 1, 0);
 
-        _eventLog = new ()
+        _eventLog = new EventLog
         {
             X = Pos.AnchorEnd () - 1,
             Y = 0,
@@ -166,11 +159,9 @@ public class AllViewsTester : Scenario
             Height = Dim.Fill (),
             SuperViewRendersLineCanvas = true
         };
-        _eventLog.Border!.Thickness = new (1);
+        _eventLog.Border!.Thickness = new Thickness (1);
 
-        _layoutEditor.Width = Dim.Fill (
-                                        Dim.Func (
-                                                  _ =>
+        _layoutEditor.Width = Dim.Fill (Dim.Func (_ =>
                                                   {
                                                       if (_eventLog.NeedsLayout)
                                                       {
@@ -180,13 +171,14 @@ public class AllViewsTester : Scenario
                                                           // BUGBUG: This Layout call is a hack to work around some bug in Layout.
                                                           // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
                                                           _eventLog.Layout ();
+
                                                           //throw new LayoutException ("_eventLog");
                                                       }
 
                                                       return _eventLog.Frame.Width;
                                                   }));
 
-        _hostPane = new ()
+        _hostPane = new FrameView
         {
             Id = "_hostPane",
             X = Pos.Right (_adornmentsEditor),
@@ -200,7 +192,7 @@ public class AllViewsTester : Scenario
             SuperViewRendersLineCanvas = true
         };
         _hostPane.Border!.SetScheme (window.GetScheme ());
-        _hostPane.Padding!.Thickness = new (1);
+        _hostPane.Padding!.Thickness = new Thickness (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
         _hostPane.Padding.SetScheme (window.GetScheme ());
 
@@ -223,9 +215,10 @@ public class AllViewsTester : Scenario
         Debug.Assert (_curView is null);
 
         // Skip RunnableWrapper types as they have generic constraints that cannot be satisfied
-        if (type.IsGenericType && type.GetGenericTypeDefinition().Name.StartsWith("RunnableWrapper"))
+        if (type.IsGenericType && type.GetGenericTypeDefinition ().Name.StartsWith ("RunnableWrapper"))
         {
             Logging.Warning ($"Cannot create an instance of {type.Name} because it is a RunnableWrapper with unsatisfiable generic constraints.");
+
             return;
         }
 
@@ -256,6 +249,7 @@ public class AllViewsTester : Scenario
         if (type.ContainsGenericParameters)
         {
             Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+
             //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
             return;
         }
@@ -275,7 +269,6 @@ public class AllViewsTester : Scenario
             view.Title = "_Test Title";
         }
 
-
         view.Initialized += CurrentView_Initialized;
         view.SubViewsLaidOut += CurrentView_LayoutComplete;
 
@@ -289,7 +282,6 @@ public class AllViewsTester : Scenario
         _propertiesEditor!.ViewToEdit = _curView;
         _curView.SetNeedsLayout ();
     }
-
 
     private void DisposeCurrentView ()
     {
@@ -311,9 +303,7 @@ public class AllViewsTester : Scenario
     private static List<Type> GetAllViewClassesCollection ()
     {
         List<Type> types = typeof (View).Assembly.GetTypes ()
-                                        .Where (
-                                                myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
-                                                          && myType.IsSubclassOf (typeof (View)))
+                                        .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true } && myType.IsSubclassOf (typeof (View)))
                                         .ToList ();
 
         types.Add (typeof (View));
@@ -321,9 +311,9 @@ public class AllViewsTester : Scenario
         return types;
     }
 
-    private void CurrentView_LayoutComplete (object? sender, LayoutEventArgs args) { UpdateHostTitle (_curView); }
+    private void CurrentView_LayoutComplete (object? sender, LayoutEventArgs args) => UpdateHostTitle (_curView);
 
-    private void UpdateHostTitle (View? view) { _hostPane!.Title = $"{view!.GetType ().Name} [_0]"; }
+    private void UpdateHostTitle (View? view) => _hostPane!.Title = $"{view!.GetType ().Name} [_0]";
 
     private void CurrentView_Initialized (object? sender, EventArgs e)
     {
@@ -347,9 +337,9 @@ public class AllViewsTester : Scenario
 
     public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
-        var keys = new List<Key> ();
+        List<Key> keys = new ();
 
-        for (int i = 0; i < GetAllViewClassesCollection ().Count; i++)
+        for (var i = 0; i < GetAllViewClassesCollection ().Count; i++)
         {
             keys.Add (Key.CursorDown);
         }

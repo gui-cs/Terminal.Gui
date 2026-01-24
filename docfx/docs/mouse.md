@@ -402,6 +402,7 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, 'm'=release)
 - Press and Release events pass through immediately
 - Click events synthesized immediately after release
 - Multi-click detection tracks timing/position/button
+- Modifier keys (Shift, Ctrl, Alt) are preserved in synthetic click events
 
 **Output:** Stream of `Mouse` events including synthesized clicks
 

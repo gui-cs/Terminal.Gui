@@ -92,6 +92,8 @@ public partial class TextView : View, IDesignable
         CanFocus = true;
         Used = true;
 
+        ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
+
         // By default, disable hotkeys (in case someone sets Title)
         base.HotKeySpecifier = new Rune ('\xffff');
 
