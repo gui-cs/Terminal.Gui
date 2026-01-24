@@ -46,6 +46,7 @@ namespace Terminal.Gui.Views;
 public class TimeEditor : TextValidateField, IValue<TimeSpan>
 {
     private TimeTextProvider TimeProvider => (TimeTextProvider)Provider!;
+    private TimeSpan _lastKnownValue = TimeSpan.Zero;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TimeEditor"/> class.
@@ -57,6 +58,9 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
         
         // Subscribe to provider's text changed to raise our value events
         TimeProvider.TextChanged += (_, _) => RaiseValueChangedEvents ();
+        
+        // Initialize last known value
+        _lastKnownValue = TimeProvider.TimeValue;
     }
 
     /// <summary>
@@ -165,8 +169,13 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
     {
         TimeSpan currentValue = TimeProvider.TimeValue;
         
-        // The provider already updated the value, just notify
-        ValueChangedEventArgs<TimeSpan> changedArgs = new (currentValue, currentValue);
+        if (_lastKnownValue == currentValue)
+        {
+            return;
+        }
+        
+        ValueChangedEventArgs<TimeSpan> changedArgs = new (_lastKnownValue, currentValue);
+        _lastKnownValue = currentValue;
         OnValueChanged (changedArgs);
         ValueChanged?.Invoke (this, changedArgs);
     }

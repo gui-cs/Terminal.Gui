@@ -3,7 +3,6 @@ using UnitTests;
 
 namespace ViewsTests;
 
-// Claude - Opus 4.5
 public class TimeEditorTests : TestDriverBase
 {
     [Fact]

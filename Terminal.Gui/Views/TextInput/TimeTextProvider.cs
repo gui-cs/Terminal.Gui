@@ -24,6 +24,14 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class TimeTextProvider : ITextValidateProvider
 {
+    // Constants for DateTime construction to avoid magic numbers
+    private const int BASE_YEAR = 2000;
+    private const int BASE_MONTH = 1;
+    private const int BASE_DAY = 1;
+    private const int SAMPLE_HOUR = 14;
+    private const int SAMPLE_MINUTE = 30;
+    private const int SAMPLE_SECOND = 45;
+
     private DateTimeFormatInfo _format = CultureInfo.CurrentCulture.DateTimeFormat;
     private string _separator = CultureInfo.CurrentCulture.DateTimeFormat.TimeSeparator;
     private TimeSpan _timeValue = TimeSpan.Zero;
@@ -313,7 +321,7 @@ public class TimeTextProvider : ITextValidateProvider
         _hasAmPm = pattern.Contains ("tt");
 
         // Build a sample time to determine field positions
-        DateTime sampleTime = new (2000, 1, 1, 14, 30, 45);
+        DateTime sampleTime = new (BASE_YEAR, BASE_MONTH, BASE_DAY, SAMPLE_HOUR, SAMPLE_MINUTE, SAMPLE_SECOND);
         string formatted = sampleTime.ToString (pattern, _format);
         
         _fieldLength = formatted.Length;
@@ -357,11 +365,23 @@ public class TimeTextProvider : ITextValidateProvider
                 hours = 12;
             }
             
+            // Convert to 24-hour format for DateTime construction
+            int hours24;
+            
+            if (_isPm)
+            {
+                hours24 = hours == 12 ? 12 : hours + 12;
+            }
+            else
+            {
+                hours24 = hours == 12 ? 0 : hours;
+            }
+            
             dt = new DateTime (
-                2000,
-                1,
-                1,
-                _isPm ? (hours == 12 ? 12 : hours + 12) : (hours == 12 ? 0 : hours),
+                BASE_YEAR,
+                BASE_MONTH,
+                BASE_DAY,
+                hours24,
                 _timeValue.Minutes,
                 _timeValue.Seconds
             );
