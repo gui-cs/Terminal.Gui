@@ -161,7 +161,6 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
         // stop the currently running operation.
         if (args.Cancel)
         {
-            //Logging.Trace ($"host: {_mouseGrabView.Id} MouseIsHeldDownTick cancelled, stopping");
             Stop ();
         }
     }

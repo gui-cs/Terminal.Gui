@@ -386,39 +386,43 @@ internal class MouseImpl : IMouse, IDisposable
     /// <returns><see langword="true"/> if the event was handled by the grab handler; otherwise <see langword="false"/>.</returns>
     public bool HandleMouseGrab (View? deepestViewUnderMouse, Mouse mouse)
     {
-        if (_mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true)
+        if (_mouseGrabViewRef?.TryGetTarget (out View? grabbed) is not true)
         {
-#if DEBUG_IDISPOSABLE
-            if (View.EnableDebugIDisposableAsserts && grabbed.WasDisposed)
-            {
-                throw new ObjectDisposedException (grabbed.ToDebugString ());
-            }
-#endif
-
-            // If the mouse is grabbed, send the event to the view that grabbed it.
-            // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = grabbed.ScreenToViewport (mouse.ScreenPosition);
-
-            Mouse viewRelativeMouseEvent = new ()
-            {
-                Timestamp = mouse.Timestamp,
-                Position = frameLoc,
-                Flags = mouse.Flags,
-                ScreenPosition = mouse.ScreenPosition,
-                View = grabbed // Always set to the grab view. See Issue #4370
-            };
-
-            //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            grabbed.NewMouseEvent (viewRelativeMouseEvent);
-
-            // When the mouse is grabbed, always return true to prevent the event from propagating
-            // to other views, regardless of whether the grabbed view handled it or not.
-            // This ensures that during a drag operation starting on one view, other views don't
-            // receive Enter/Leave events or process the mouse event.
-            return true;
+            return false;
         }
 
-        return false;
+#if DEBUG_IDISPOSABLE
+
+        // TODO: Now that we use WeakRef for IsMouseGrabbed, it should be theoretically
+        // TODO: impossible for this to happen.
+        // TODO: Leave this in for a while to see if it is encountered just to makes sure.
+        if (View.EnableDebugIDisposableAsserts && grabbed.WasDisposed)
+        {
+            throw new ObjectDisposedException (grabbed.ToDebugString ());
+        }
+#endif
+
+        // If the mouse is grabbed, send the event to the view that grabbed it.
+        // The coordinates are relative to the Bounds of the view that grabbed the mouse.
+        Point frameLoc = grabbed.ScreenToViewport (mouse.ScreenPosition);
+
+        Mouse viewRelativeMouseEvent = new ()
+        {
+            Timestamp = mouse.Timestamp,
+            Position = frameLoc,
+            Flags = mouse.Flags,
+            ScreenPosition = mouse.ScreenPosition,
+            View = grabbed // Always set to the grab view. See Issue #4370
+        };
+
+        //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+        grabbed.NewMouseEvent (viewRelativeMouseEvent);
+
+        // When the mouse is grabbed, always return true to prevent the event from propagating
+        // to other views, regardless of whether the grabbed view handled it or not.
+        // This ensures that during a drag operation starting on one view, other views don't
+        // receive Enter/Leave events or process the mouse event.
+        return true;
     }
 
     #endregion IMouseGrabHandler Implementation
