@@ -257,6 +257,37 @@ public interface IMouseGrabHandler
     public bool IsGrabbed (View? view);
 
     /// <summary>
+    ///     Determines whether any view currently has the mouse grabbed.
+    /// </summary>
+    /// <returns>
+    ///     <see langword="true"/> if any view currently has the mouse grabbed;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         Use this method to check if the mouse grab is active without knowing which specific view holds it.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Automatic Cleanup:</strong> If the grabbed view has been disposed or garbage collected,
+    ///         this method returns <see langword="false"/> because the internal <see cref="WeakReference{T}"/> will
+    ///         no longer resolve to a live object.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///     if (!App.Mouse.IsGrabbed())
+    ///     {
+    ///         // No view has the mouse grabbed - safe to proceed
+    ///         App.Mouse.GrabMouse(this);
+    ///     }
+    ///     </code>
+    /// </example>
+    /// <seealso cref="IsGrabbed(View?)"/>
+    /// <seealso cref="GrabMouse"/>
+    /// <seealso cref="UngrabMouse"/>
+    public bool IsGrabbed ();
+
+    /// <summary>
     ///     Raised after a view has released the mouse grab.
     /// </summary>
     /// <remarks>

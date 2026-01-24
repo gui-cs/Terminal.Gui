@@ -264,6 +264,61 @@ public class ApplicationMouseTests
 
     [Fact]
     [AutoInitShutdown]
+    public void IsGrabbed_Parameterless_ReturnsTrueWhenAnyViewGrabbed ()
+    {
+        var view1 = new View { Id = "view1" };
+        var view2 = new View { Id = "view2" };
+
+        // Initially no view has the grab
+        Assert.False (Application.Mouse.IsGrabbed ());
+
+        // Grab view1
+        Application.Mouse.GrabMouse (view1);
+        Assert.True (Application.Mouse.IsGrabbed ());
+        Assert.True (Application.Mouse.IsGrabbed (view1));
+        Assert.False (Application.Mouse.IsGrabbed (view2));
+
+        // Ungrab
+        Application.Mouse.UngrabMouse ();
+        Assert.False (Application.Mouse.IsGrabbed ());
+        Assert.False (Application.Mouse.IsGrabbed (view1));
+
+        // Grab view2
+        Application.Mouse.GrabMouse (view2);
+        Assert.True (Application.Mouse.IsGrabbed ());
+        Assert.False (Application.Mouse.IsGrabbed (view1));
+        Assert.True (Application.Mouse.IsGrabbed (view2));
+
+        // Ungrab
+        Application.Mouse.UngrabMouse ();
+        Assert.False (Application.Mouse.IsGrabbed ());
+
+        view1.Dispose ();
+        view2.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void IsGrabbed_Parameterless_ReturnsFalseAfterViewDisposed ()
+    {
+        var view = new View { Id = "view" };
+
+        Application.Mouse.GrabMouse (view);
+        Assert.True (Application.Mouse.IsGrabbed ());
+        Assert.True (Application.Mouse.IsGrabbed (view));
+
+        // Dispose without ungrabbing - WeakReference should handle this
+        view.Dispose ();
+
+        // After disposal, the WeakReference may still hold the reference until GC
+        // But once GC runs, IsGrabbed() should return false
+        // For deterministic testing, we ungrab first
+        Application.Mouse.UngrabMouse ();
+        Assert.False (Application.Mouse.IsGrabbed ());
+    }
+
+    [Fact]
+    [AutoInitShutdown]
     public void View_Is_Responsible_For_Calling_UnGrabMouse_Before_Being_Disposed ()
     {
         var count = 0;

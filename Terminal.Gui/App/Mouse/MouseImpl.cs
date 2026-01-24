@@ -267,6 +267,9 @@ internal class MouseImpl : IMouse, IDisposable
     }
 
     /// <inheritdoc/>
+    public bool IsGrabbed () => _mouseGrabViewRef is { } && _mouseGrabViewRef.TryGetTarget (out _);
+
+    /// <inheritdoc/>
     public event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
 
     /// <inheritdoc/>
