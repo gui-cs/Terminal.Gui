@@ -134,6 +134,11 @@ public class TimeEditorTests : TestDriverBase
     public void TimeTextProvider_Delete_ReplacesWithZero ()
     {
         TimeTextProvider provider = new ();
+        
+        // Use 24-hour format to avoid culture-specific issues
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
         provider.TimeValue = new TimeSpan (14, 30, 45);
         
         // Delete at position 0 should replace with '0'
