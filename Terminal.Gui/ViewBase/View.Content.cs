@@ -45,8 +45,7 @@ public partial class View
             throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
         }
 
-        CWPPropertyHelper.ChangeProperty (
-                                          this,
+        CWPPropertyHelper.ChangeProperty (this,
                                           ref _contentSize,
                                           contentSize,
                                           OnContentSizeChanging,
@@ -162,11 +161,7 @@ public partial class View
     ///         </item>
     ///     </list>
     /// </remarks>
-    public bool ContentSizeTracksViewport
-    {
-        get => _contentSize is null;
-        set => _contentSize = value ? null : _contentSize;
-    }
+    public bool ContentSizeTracksViewport { get => _contentSize is null; set => _contentSize = value ? null : _contentSize; }
 
     /// <summary>
     ///     Called before the content size changes, allowing subclasses to cancel or modify the change.
@@ -351,12 +346,7 @@ public partial class View
 
             Thickness thickness = GetAdornmentsThickness ();
 
-            return new (
-                        _viewportLocation,
-                        new (
-                             Math.Max (0, Frame.Size.Width - thickness.Horizontal),
-                             Math.Max (0, Frame.Size.Height - thickness.Vertical)
-                            ));
+            return new (_viewportLocation, new (Math.Max (0, Frame.Size.Width - thickness.Horizontal), Math.Max (0, Frame.Size.Height - thickness.Vertical)));
         }
         set => SetViewport (value);
     }
@@ -368,9 +358,7 @@ public partial class View
 
         Thickness thickness = GetAdornmentsThickness ();
 
-        Size newSize = new (
-                            viewport.Size.Width + thickness.Horizontal,
-                            viewport.Size.Height + thickness.Vertical);
+        Size newSize = new (viewport.Size.Width + thickness.Horizontal, viewport.Size.Height + thickness.Vertical);
 
         if (newSize == Frame.Size)
         {
@@ -391,10 +379,7 @@ public partial class View
         _viewportLocation = viewport.Location;
 
         // Update the Frame because we made it bigger or smaller which impacts subviews.
-        Frame = Frame with
-        {
-            Size = newSize
-        };
+        Frame = Frame with { Size = newSize };
 
         // Note, setting the Frame will cause ViewportChanged to be raised.
 
@@ -410,7 +395,15 @@ public partial class View
                 }
             }
 
-            // IMPORTANT: Check for negative location AFTER checking for location greater than content width
+            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth))
+            {
+                if (newViewport.X + newViewport.Width > GetContentSize ().Width)
+                {
+                    newViewport.X = GetContentSize ().Width - newViewport.Width;
+                }
+            }
+
+            // IMPORTANT: Check for negative location AFTER checking for location greater than content size
             if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX))
             {
                 if (newViewport.X < 0)
@@ -435,18 +428,26 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeYWhenHeightGreaterThanContentHeight))
+            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight))
             {
-                if (Viewport.Height > GetContentSize ().Height)
+                if (newViewport.Y + newViewport.Height > GetContentSize ().Height)
+                {
+                    newViewport.Y = GetContentSize ().Height - newViewport.Height;
+                }
+            }
+
+            // IMPORTANT: Check for negative location AFTER checking for location greater than content size
+            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY))
+            {
+                if (newViewport.Y < 0)
                 {
                     newViewport.Y = 0;
                 }
             }
 
-            // IMPORTANT: Check for negative location AFTER checking for location greater than content width
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY))
+            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeYWhenHeightGreaterThanContentHeight))
             {
-                if (newViewport.Y < 0)
+                if (Viewport.Height > GetContentSize ().Height)
                 {
                     newViewport.Y = 0;
                 }
@@ -464,11 +465,7 @@ public partial class View
 
             Point currentCursorPos = ScreenToViewport (Cursor.Position!.Value);
 
-            SetCursor (
-                       Cursor with
-                       {
-                           Position = ViewportToScreen (new Point (currentCursorPos.X + deltaX, currentCursorPos.Y + deltaY))
-                       });
+            SetCursor (Cursor with { Position = ViewportToScreen (new Point (currentCursorPos.X + deltaX, currentCursorPos.Y + deltaY)) });
         }
 
         DrawEventArgs args = new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
@@ -584,7 +581,7 @@ public partial class View
     /// <returns><see langword="true"/> if the <see cref="Viewport"/> was changed.</returns>
     public bool? ScrollHorizontal (int cols)
     {
-        if (GetContentSize () == Size.Empty || GetContentSize () == Viewport.Size)
+        if (GetContentSize () == Size.Empty || GetContentSize ().Width == Viewport.Size.Width)
         {
             return false;
         }
