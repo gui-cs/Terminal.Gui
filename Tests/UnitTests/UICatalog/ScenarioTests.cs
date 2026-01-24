@@ -259,7 +259,7 @@ public class ScenarioTests : TestsAllViews
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            AllowsMarking = false,
+            ShowMarks = false,
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (new ObservableCollection<string> (viewClasses.Keys.ToList ()))
         };
@@ -341,7 +341,11 @@ public class ScenarioTests : TestsAllViews
             SchemeName = "Dialog"
         };
 
-        classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
+        classListView.Accepting += (s, a) =>
+                                   {
+                                       settingsPane.SetFocus ();
+                                       a.Handled = true;
+                                   };
 
         classListView.ValueChanged += (_, _) =>
                                       {
