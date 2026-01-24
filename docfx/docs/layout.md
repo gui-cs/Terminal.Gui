@@ -32,9 +32,47 @@ To enable scrolling call `View.SetContentSize()` and then set `Viewport.Location
 
 See the [Scrolling Deep Dive](scrolling.md) for details on how to enable scrolling.
 
-The @Terminal.Gui.View.ViewportSettings property controls how the Viewport is constrained. By default, the `ViewportSettings` is set to `ViewportSettings.None`. To enable the viewport to be moved up-and-to-the-left of the content, use `ViewportSettings.AllowNegativeX` and or `ViewportSettings.AllowNegativeY`. 
+### Viewport Settings
 
-The default `ViewportSettings` also constrains the Viewport to the size of the content, ensuring the right-most column or bottom-most row of the content will always be visible (in v1 the equivalent concept was `ScrollBarView.AlwaysKeepContentInViewport`). To allow the Viewport to be smaller than the content, set `ViewportSettings.AllowXGreaterThanContentWidth` and/or `ViewportSettings.AllowXGreaterThanContentHeight`.
+The @Terminal.Gui.View.ViewportSettings property controls how the Viewport is constrained using @Terminal.Gui.ViewBase.ViewportSettingsFlags. By default, `ViewportSettings` is `None`, which provides sensible constraints for typical scrolling scenarios.
+
+#### Default Behavior (No Flags Set)
+
+With no flags set, the Viewport is constrained as follows:
+
+- **No negative scrolling**: `Viewport.X` and `Viewport.Y` cannot go below `0`. The user cannot scroll above or to the left of the content origin.
+- **Content fills the viewport**: The Viewport is clamped so that `Viewport.X + Viewport.Width <= ContentSize.Width` and `Viewport.Y + Viewport.Height <= ContentSize.Height`. This prevents blank space from appearing when scrolling - the content always fills the visible area.
+- **Last row/column always visible**: Even if trying to scroll past the end of content, at least the last row and last column remain visible.
+
+#### Flag Categories
+
+The flags are organized into categories:
+
+**Negative Location Flags** - Allow scrolling before the content origin (0,0):
+- `AllowNegativeX` - Permits `Viewport.X < 0` (scroll left of content)
+- `AllowNegativeY` - Permits `Viewport.Y < 0` (scroll above content)
+- `AllowNegativeLocation` - Combines both X and Y
+
+**Greater Than Content Flags** - Allow scrolling past the last row/column:
+- `AllowXGreaterThanContentWidth` - Permits `Viewport.X >= ContentSize.Width`  
+- `AllowYGreaterThanContentHeight` - Permits `Viewport.Y >= ContentSize.Height`
+- `AllowLocationGreaterThanContentSize` - Combines both X and Y
+
+**Blank Space Flags** - Allow blank space to appear when scrolling:
+- `AllowXPlusWidthGreaterThanContentWidth` - Permits `Viewport.X + Viewport.Width > ContentSize.Width` (blank space on right)
+- `AllowYPlusHeightGreaterThanContentHeight` - Permits `Viewport.Y + Viewport.Height > ContentSize.Height` (blank space on bottom)
+- `AllowLocationPlusSizeGreaterThanContentSize` - Combines both X and Y
+
+**Conditional Negative Flags** - Allow negative scrolling only when viewport is larger than content:
+- `AllowNegativeXWhenWidthGreaterThanContentWidth` - Useful for centering content smaller than the view
+- `AllowNegativeYWhenHeightGreaterThanContentHeight` - Useful for centering content smaller than the view
+- `AllowNegativeLocationWhenSizeGreaterThanContentSize` - Combines both X and Y
+
+**Drawing Flags** - Control clipping and clearing behavior:
+- `ClipContentOnly` - Clips drawing to the visible content area instead of the entire Viewport
+- `ClearContentOnly` - Clears only the visible content area (requires `ClipContentOnly`)
+- `Transparent` - The view does not clear its background when drawing
+- `TransparentMouse` - Mouse events pass through areas not occupied by SubViews
 
 ## Layout Engine
 

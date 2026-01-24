@@ -44,7 +44,7 @@ namespace UICatalog;
 /// </summary>
 public class Scenario : IDisposable
 {
-    private static int _maxScenarioNameLen = 30;
+    private static int _maxScenarioNameLen = 0;
 
     /// <summary>
     ///     Gets the benchmark results collected during benchmarking mode.
@@ -89,10 +89,8 @@ public class Scenario : IDisposable
     {
         List<Scenario> objects = [];
 
-        foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
-                                               .Where (myType => myType is { IsClass: true, IsAbstract: false }
-                                                                 && myType.IsSubclassOf (typeof (Scenario))
-                                                      ))
+        foreach (Type type in typeof (Scenario).Assembly.ExportedTypes.Where (myType => myType is { IsClass: true, IsAbstract: false }
+                                                                                        && myType.IsSubclassOf (typeof (Scenario))))
         {
             if (Activator.CreateInstance (type) is not Scenario { } scenario)
             {
@@ -100,10 +98,10 @@ public class Scenario : IDisposable
             }
 
             objects.Add (scenario);
-            _maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length + 1);
+            _maxScenarioNameLen = Math.Max (_maxScenarioNameLen, scenario.GetName ().Length);
         }
 
-        return new (objects.OrderBy (s => s.GetName ()).ToList ());
+        return new ObservableCollection<Scenario> (objects.OrderBy (s => s.GetName ()).ToList ());
     }
 
     /// <summary>
@@ -198,7 +196,7 @@ public class Scenario : IDisposable
         _stopwatch = Stopwatch.StartNew ();
     }
 
-    private void OnClearedContents (object? sender, EventArgs args) { BenchmarkResults.ClearedContentCount++; }
+    private void OnClearedContents (object? sender, EventArgs args) => BenchmarkResults.ClearedContentCount++;
 
     private void OnApplicationInstanceDisposed (object? s, EventArgs<IApplication> a)
     {
@@ -230,8 +228,7 @@ public class Scenario : IDisposable
 
         _demoKeys = GetDemoKeyStrokes (_benchmarkApp);
 
-        _benchmarkApp.AddTimeout (
-                                  new (0, 0, 0, 0, BENCHMARK_KEY_PACING),
+        _benchmarkApp.AddTimeout (new TimeSpan (0, 0, 0, 0, BENCHMARK_KEY_PACING),
                                   () =>
                                   {
                                       if (_currentDemoKey >= _demoKeys.Count)
@@ -271,8 +268,13 @@ public class Scenario : IDisposable
             }
         }
 
-        Logging.Warning (
-                       $@"  Failed to Quit with {Application.QuitKey} after {BenchmarkTimeout}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
+        Logging.Warning ($@"  Failed to Quit with {
+            Application.QuitKey
+        } after {
+            BenchmarkTimeout
+        }ms and {
+            BenchmarkResults.IterationCount
+        } iterations. Force quit.");
 
         _benchmarkApp?.RequestStop ();
 
@@ -281,7 +283,7 @@ public class Scenario : IDisposable
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
-    public override string ToString () => $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}";
+    public override string ToString () => $"{GetName ().PadRight (_maxScenarioNameLen)} {GetDescription ()}";
 
     #region IDispose
 
@@ -311,14 +313,11 @@ public class Scenario : IDisposable
         List<string> aCategories = [];
 
         aCategories = typeof (Scenario).Assembly.GetTypes ()
-                                       .Where (myType => myType is { IsClass: true, IsAbstract: false }
-                                                         && myType.IsSubclassOf (typeof (Scenario)))
+                                       .Where (myType => myType is { IsClass: true, IsAbstract: false } && myType.IsSubclassOf (typeof (Scenario)))
                                        .Select (type => System.Attribute.GetCustomAttributes (type).ToList ())
-                                       .Aggregate (
-                                                   aCategories,
+                                       .Aggregate (aCategories,
                                                    (current, attrs) => current
-                                                                       .Union (
-                                                                               attrs.Where (a => a is ScenarioCategory)
+                                                                       .Union (attrs.Where (a => a is ScenarioCategory)
                                                                                     .Select (a => ((ScenarioCategory)a).Name))
                                                                        .ToList ());
 
