@@ -84,6 +84,11 @@ public class CharMap : View, IDesignable, IValue<Rune>
         HorizontalScrollBar.Y = Pos.AnchorEnd ();
         HorizontalScrollBar.Width = Dim.Fill (1);
 
+        // CharMap has fixed row labels on the left that don't scroll, with scrollable content to the right.
+        // The default viewport clamping (which prevents blank space) doesn't work well with this model,
+        // so we allow the viewport to extend beyond content bounds.
+        ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
+
         // We want the horizontal scrollbar to only show when needed.
         // We can't use ScrollBar.AutoShow because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
