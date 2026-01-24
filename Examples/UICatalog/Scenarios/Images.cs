@@ -167,6 +167,12 @@ public class Images : Scenario
 
     private void Win_SubViewsLaidOut (object sender, LayoutEventArgs e)
     {
+        if (_sixelImage is { } && _imageView.GetContentSize () != _sixelImageSize)
+        {
+            LayoutEventArgs args = new (_imageView.GetContentSize ());
+            SixelView_SubViewsLaidOut (sender, args);
+        }
+
         if (_winSize == e.OldContentSize)
         {
             return;
@@ -582,10 +588,10 @@ public class Images : Scenario
 
     private void GenerateSixelImage (bool openDialog)
     {
-        _screenLocationForSixel = _sixelView.FrameToScreen ().Location;
+        _screenLocationForSixel = _sixelView.ViewportToScreen ().Location;
 
         _encodedSixelData = GenerateSixelData (_imageView.FullResImage,
-                                               _sixelView.Frame.Size,
+                                               _sixelView.Viewport.Size,
                                                _pxX.Value,
                                                _pxY.Value,
                                                openDialog);
@@ -621,7 +627,7 @@ public class Images : Scenario
 
     public string GenerateSixelData (Image<Rgba32> fullResImage, Size maxSize, int pixelsPerCellX, int pixelsPerCellY, bool openDialog)
     {
-        SixelEncoder encoder = new () { AvoidBottomScroll = true };
+        SixelEncoder encoder = new ();
         encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
         encoder.Quantizer.PaletteBuildingAlgorithm = GetPaletteBuilder ();
         encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();

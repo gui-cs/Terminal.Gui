@@ -79,13 +79,7 @@ public class SixelEncoder
     private string WriteSixel (Color [,] pixels)
     {
         var sb = new StringBuilder ();
-        int height = pixels.GetLength (1);
-
-        if (AvoidBottomScroll && height > PIXEL_HIGH)
-        {
-            height -= PIXEL_HIGH;
-        }
-
+        int height = GetPixelsHeight (pixels);
         int width = pixels.GetLength (0);
 
         // Iterate over each 'row' of the image. Because each sixel write operation
@@ -242,12 +236,7 @@ public class SixelEncoder
     private string GetFillArea (Color [,] pixels)
     {
         int widthInChars = pixels.GetLength (0);
-        int heightInChars = pixels.GetLength (1);
-
-        if (AvoidBottomScroll && heightInChars > PIXEL_HIGH)
-        {
-            heightInChars -= PIXEL_HIGH;
-        }
+        int heightInChars = GetPixelsHeight (pixels);
 
         return $"{widthInChars};{heightInChars}";
     }
@@ -255,12 +244,7 @@ public class SixelEncoder
     private bool AnyHasAlphaOfZero (Color [,] pixels)
     {
         int width = pixels.GetLength (0);
-        int height = pixels.GetLength (1);
-
-        if (AvoidBottomScroll && height > PIXEL_HIGH)
-        {
-            height -= PIXEL_HIGH;
-        }
+        int height = GetPixelsHeight (pixels);
 
         // Loop through each pixel in the 2D array
         for (var x = 0; x < width; x++)
@@ -276,6 +260,18 @@ public class SixelEncoder
         }
 
         return false; // No pixel with A of 0 was found
+    }
+
+    private int GetPixelsHeight (Color [,] pixels)
+    {
+        int height = pixels.GetLength (1);
+
+        if (AvoidBottomScroll && height > PIXEL_HIGH)
+        {
+            height -= PIXEL_HIGH;
+        }
+
+        return height;
     }
 
     /// <summary>
@@ -296,17 +292,13 @@ public class SixelEncoder
     /// </remarks>
     public int GetHeightInPixels (int maxSizeHeight, int pixelsPerCellY)
     {
-        int cellHeight = maxSizeHeight;
+        int pixelHeight = maxSizeHeight * pixelsPerCellY;
 
-        if (AvoidBottomScroll && maxSizeHeight > PIXEL_HIGH)
+        if (AvoidBottomScroll)
         {
-            cellHeight -= cellHeight % 6;
-        }
-        else if (AvoidBottomScroll && maxSizeHeight < PIXEL_HIGH)
-        {
-            cellHeight = 0;
+            pixelHeight -= pixelHeight % 6;
         }
 
-        return cellHeight * pixelsPerCellY;
+        return pixelHeight;
     }
 }

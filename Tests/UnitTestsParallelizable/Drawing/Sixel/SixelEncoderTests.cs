@@ -363,18 +363,20 @@ public class SixelEncoderTests
         Assert.Equal (13 * 2, result);
     }
 
-    [Fact]
-    public void GetHeightInPixels_RoundsDownToMultipleOf6_WhenAvoidBottomScrollIsTrue ()
+    [Theory]
+    [InlineData (13, 2, 24)]
+    [InlineData (26, 20, 516)]
+    public void GetHeightInPixels_RoundsDownToMultipleOf6_WhenAvoidBottomScrollIsTrue (int maxSizeHeight, int pixelsPerCellY, int expected)
     {
         SixelEncoder encoder = new ()
         {
             AvoidBottomScroll = true
         };
 
-        int result = encoder.GetHeightInPixels (maxSizeHeight: 13, pixelsPerCellY: 2);
+        int result = encoder.GetHeightInPixels (maxSizeHeight, pixelsPerCellY);
 
-        // 13 → 12 → 24 pixels
-        Assert.Equal (12 * 2, result);
+        // Max height rounded down to nearest multiple of 6
+        Assert.Equal (expected, result);
     }
 
     [Theory]
@@ -407,18 +409,20 @@ public class SixelEncoderTests
         Assert.Equal (SMALL_HEIGHT * 2, result);
     }
 
-    [Fact]
-    public void GetHeightInPixels_HeightBelowPixelHigh_IsZero_WhenAvoidBottomScrollIsTrue ()
+    [Theory]
+    [InlineData (5, 2, 6)]
+    [InlineData (5, 20, 96)]
+    [InlineData (1, 2, 0)]
+    [InlineData (1, 20, 18)]
+    public void GetHeightInPixels_HeightBelowPixelHigh_WhenAvoidBottomScrollIsTrue (int maxSizeHeight, int pixelsPerCellY, int expected)
     {
         SixelEncoder encoder = new ()
         {
             AvoidBottomScroll = true
         };
 
-        const int SMALL_HEIGHT = 5;
+        int result = encoder.GetHeightInPixels (maxSizeHeight, pixelsPerCellY);
 
-        int result = encoder.GetHeightInPixels (maxSizeHeight: SMALL_HEIGHT, pixelsPerCellY: 2);
-
-        Assert.Equal (0 * 2, result);
+        Assert.Equal (expected, result);
     }
 }
