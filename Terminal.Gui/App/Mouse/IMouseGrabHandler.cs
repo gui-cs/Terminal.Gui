@@ -205,7 +205,8 @@ public interface IMouseGrabHandler
     ///     </para>
     /// </remarks>
     /// <seealso cref="UngrabMouse"/>
-    /// <seealso cref="IsGrabbed"/>
+    /// <seealso cref="IsGrabbed(View)"/>
+    /// <seealso cref="IsGrabbed()"/>
     /// <seealso cref="GrabbingMouse"/>
     /// <seealso cref="GrabbedMouse"/>
     public void GrabMouse (View? view);
@@ -374,7 +375,8 @@ public interface IMouseGrabHandler
     ///     </para>
     /// </remarks>
     /// <seealso cref="GrabMouse"/>
-    /// <seealso cref="IsGrabbed"/>
+    /// <seealso cref="IsGrabbed(View)"/>
+    /// <seealso cref="IsGrabbed()"/>
     /// <seealso cref="UnGrabbingMouse"/>
     /// <seealso cref="UnGrabbedMouse"/>
     public void UngrabMouse ();
