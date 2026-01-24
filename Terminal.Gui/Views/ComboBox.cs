@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui.Views;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
+[Obsolete ("ComboBox is obsolete and will be removed before v2 Beta. See Issue ##2404.")]
 public class ComboBox : View, IDesignable
 {
     private readonly ComboListView _listview;
@@ -36,7 +37,6 @@ public class ComboBox : View, IDesignable
         _search.TextChanged += Search_Changed;
 
         _listview.Y = Pos.Bottom (_search);
-        _listview.OpenSelectedItem += (sender, a) => SelectText ();
 
         _listview.Accepting += (sender, args) =>
                                {
@@ -851,7 +851,7 @@ public class ComboBox : View, IDesignable
                 }
                 else if (isMousePositionValid)
                 {
-                    OnOpenSelectedItem ();
+                    return RaiseAccepting (new CommandContext (Command.Accept, this, new InputBinding ())) == true;
                 }
                 else
                 {
@@ -885,7 +885,7 @@ public class ComboBox : View, IDesignable
             Rectangle f = Frame;
             int item = TopItem;
             bool focused = HasFocus;
-            int col = AllowsMarking ? 2 : 0;
+            int col = ShowMarks ? 2 : 0;
             int start = LeftItem;
 
             for (var row = 0; row < f.Height; row++, item++)
@@ -934,10 +934,10 @@ public class ComboBox : View, IDesignable
                         SetAttribute (current);
                     }
 
-                    if (AllowsMarking)
+                    if (ShowMarks)
                     {
-                        AddRune (Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
-                                 AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
+                        AddRune (Source.IsMarked (item) ? MarkMultiple ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                 MarkMultiple ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
                         AddRune ((Rune)' ');
                     }
 
