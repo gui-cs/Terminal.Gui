@@ -102,6 +102,10 @@ public class TimeEditorTests : TestDriverBase
     {
         TimeTextProvider provider = new ();
         
+        // Use 24-hour format to ensure consistent behavior
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
         // CursorStart should return 0
         Assert.Equal (0, provider.CursorStart ());
         
@@ -119,6 +123,11 @@ public class TimeEditorTests : TestDriverBase
     public void TimeTextProvider_InsertAt_ReplacesDigit ()
     {
         TimeTextProvider provider = new ();
+        
+        // Use 24-hour format to ensure consistent behavior
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
         provider.TimeValue = TimeSpan.Zero; // "00:00:00" in 24h format
         
         // Insert '1' at position 0 (first hour digit)
@@ -318,7 +327,13 @@ public class TimeEditorTests : TestDriverBase
         
         try
         {
-            TimeEditor te = new () { App = app, Value = new TimeSpan (12, 34, 56) };
+            TimeEditor te = new () { App = app };
+            
+            // Use 24-hour format to ensure consistent behavior
+            DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+            te.Format = format24h;
+            
+            te.Value = new TimeSpan (12, 34, 56);
             te.Layout ();
             
             // Move to start and delete
@@ -361,6 +376,10 @@ public class TimeEditorTests : TestDriverBase
     public void TimeEditor_Text_Property_Updates_Value ()
     {
         TimeEditor te = new ();
+        
+        // Use 24-hour format to ensure consistent parsing
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        te.Format = format24h;
         
         // Set text directly
         te.Text = "14:30:45";
