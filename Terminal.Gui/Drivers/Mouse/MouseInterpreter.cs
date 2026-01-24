@@ -209,12 +209,13 @@ internal class MouseInterpreter
         {
             Timestamp = mouseEventArgs.Timestamp ?? TimeProvider.Now,
             Handled = false,
-            Flags = ToClicks (button, numberOfClicks),
+            Flags = ToClicks (button, numberOfClicks) | (mouseEventArgs.Flags & (MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)),
             ScreenPosition = mouseEventArgs.ScreenPosition
 
             // View is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
             // Position is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
         };
+
         //Logging.Trace ($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");
 
         return newClick;

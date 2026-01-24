@@ -25,7 +25,7 @@ public class EventLog : ListView
                                   return 0;
                               }
 
-                              return Math.Min (SuperView!.Viewport.Width / 3, MaxLength + GetAdornmentsThickness ().Horizontal);
+                              return Math.Min (SuperView!.Viewport.Width / 3, MaxItemLength + GetAdornmentsThickness ().Horizontal);
                           });
         Height = Dim.Fill ();
 
