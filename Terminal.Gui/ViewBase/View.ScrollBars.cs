@@ -10,7 +10,14 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         <see cref="ViewportSettings"/> controls how scrolling behaves for the View.
+    ///     </para>
+    ///     <para>
     ///         See <see cref="ScrollBar"/> for more information on how to use the ScrollBar.
+    ///     </para>
+    ///     <para>
+    ///         See the Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     /// </remarks>
     public ScrollBar HorizontalScrollBar => _horizontalScrollBar.Value;
@@ -23,9 +30,15 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         <see cref="ViewportSettings"/> controls how scrolling behaves for the View.
+    ///     </para>
+    ///     <para>
     ///         See <see cref="ScrollBar"/> for more information on how to use the ScrollBar.
     ///     </para>
-    /// </remarks>
+    ///     <para>
+    ///         See the Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>    /// </remarks>
     public ScrollBar VerticalScrollBar => _verticalScrollBar.Value;
 
     /// <summary>

@@ -1,7 +1,7 @@
 ﻿#nullable enable
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ViewportSettings", "Demonstrates manipulating Viewport, ViewportSettings, and ContentSize to scroll content.")]
+[ScenarioMetadata ("ViewportSettings", "Demonstrates manipulating Viewport, ViewportSettings, and ContentSize to scroll content")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Drawing")]
 [ScenarioCategory ("Scrolling")]
@@ -21,17 +21,11 @@ public class ViewportSettings : Scenario
 
         AdornmentsEditor adornmentsEditor = new ()
         {
-            BorderStyle = LineStyle.Single,
-            X = Pos.AnchorEnd (),
-            AutoSelectViewToEdit = true,
-            ShowViewIdentifier = true
+            BorderStyle = LineStyle.Single, X = Pos.AnchorEnd (), AutoSelectViewToEdit = true, ShowViewIdentifier = true
         };
         mainWindow.Add (adornmentsEditor);
 
-        ViewportSettingsEditor viewportSettingsEditor = new ()
-        {
-            Y = Pos.AnchorEnd ()
-        };
+        ViewportSettingsEditor viewportSettingsEditor = new () { Y = Pos.AnchorEnd () };
         mainWindow.Add (viewportSettingsEditor);
 
         ViewportSettingsDemoView view = new ()
@@ -46,49 +40,37 @@ public class ViewportSettings : Scenario
         // Add demo views to show that things work correctly
         TextField textField = new () { X = 20, Y = 7, Width = 15, Text = "Test Te_xtField" };
 
-        ColorPicker16 colorPicker = new () { Title = "_BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (), Y = 10 };
+        ColorPicker16 colorPicker = new ()
+        {
+            Title = "_BG",
+            BoxHeight = 1,
+            BoxWidth = 1,
+            X = Pos.AnchorEnd (),
+            Y = 10
+        };
         colorPicker.BorderStyle = LineStyle.RoundedDotted;
 
         colorPicker.ValueChanged += (_, e) =>
                                     {
-                                        colorPicker.SuperView!.SetScheme (
-                                                                          new (colorPicker.SuperView.GetScheme ())
-                                                                          {
-                                                                              Normal = new (
-                                                                                            colorPicker.SuperView.GetAttributeForRole (VisualRole.Normal)
-                                                                                                       .Foreground,
-                                                                                            e.NewValue
-                                                                                           )
-                                                                          });
+                                        colorPicker.SuperView!.SetScheme (new (colorPicker.SuperView.GetScheme ())
+                                        {
+                                            Normal = new (colorPicker.SuperView.GetAttributeForRole (VisualRole.Normal)
+                                                                     .Foreground,
+                                                          e.NewValue)
+                                        });
                                     };
-
-        TextView textView = new ()
-        {
-            X = Pos.Center (),
-            Y = 10,
-            Title = "TextVie_w",
-            Text = "I have a 3 row top border.\nMy border inherits from the SuperView.\nI have 3 lines of text with room for 2.",
-            TabKeyAddsTab = false,
-            Width = 30,
-            Height = 6 // TODO: Use Dim.Auto
-        };
-        textView.Border!.Thickness = new (1, 3, 1, 1);
 
         CharMap charMap = new ()
         {
             X = Pos.Center (),
-            Y = Pos.Bottom (textView) + 1,
+            Y = 17,
             Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (_ => view.GetContentSize ().Width)),
             Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20))
         };
 
-        charMap.Accepting += (s, _) =>
-                                 MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
+        charMap.Accepting += (s, _) => MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
 
-        Button buttonAnchored = new ()
-        {
-            X = Pos.AnchorEnd () - 10, Y = Pos.AnchorEnd () - 4, Text = "Bottom Rig_ht"
-        };
+        Button buttonAnchored = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Bottom Rig_ht" };
         buttonAnchored.Accepting += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", Strings.btnOk);
 
         view.Margin!.Data = "Margin";
@@ -99,7 +81,7 @@ public class ViewportSettings : Scenario
 
         view.Padding!.Data = "Padding";
 
-        view.Add (buttonAnchored, textField, colorPicker, charMap, textView);
+        view.Add (buttonAnchored, textField, colorPicker, charMap);
 
         Label longLabel = new ()
         {
@@ -220,14 +202,17 @@ internal class ViewportSettingsDemoView : FrameView
                 ScrollVertical (1);
 
                 return;
+
             case MouseFlags.WheeledUp:
                 ScrollVertical (-1);
 
                 return;
+
             case MouseFlags.WheeledRight:
                 ScrollHorizontal (1);
 
                 return;
+
             case MouseFlags.WheeledLeft:
                 ScrollHorizontal (-1);
 
@@ -239,7 +224,7 @@ internal class ViewportSettingsDemoView : FrameView
     {
         Label? frameLabel = Padding?.SubViews.OfType<Label> ().FirstOrDefault ();
 
-        if (frameLabel is not null)
+        if (frameLabel is { })
         {
             frameLabel.Text = $"Viewport: {Viewport}\nFrame: {Frame}";
         }
