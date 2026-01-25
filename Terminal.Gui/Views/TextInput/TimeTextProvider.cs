@@ -1,5 +1,5 @@
+using System.ComponentModel;
 using System.Globalization;
-using System.Text;
 
 namespace Terminal.Gui.Views;
 
@@ -11,10 +11,18 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         This provider parses the <see cref="DateTimeFormatInfo.LongTimePattern"/> to determine:
 ///         <list type="bullet">
-///             <item><description>12-hour (h/hh) vs 24-hour (H/HH) format</description></item>
-///             <item><description>Presence of AM/PM designator (tt)</description></item>
-///             <item><description>Time separator character</description></item>
-///             <item><description>Dynamic field width based on pattern</description></item>
+///             <item>
+///                 <description>12-hour (h/hh) vs 24-hour (H/HH) format</description>
+///             </item>
+///             <item>
+///                 <description>Presence of AM/PM designator (tt)</description>
+///             </item>
+///             <item>
+///                 <description>Time separator character</description>
+///             </item>
+///             <item>
+///                 <description>Dynamic field width based on pattern</description>
+///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
@@ -40,14 +48,12 @@ public class TimeTextProvider : ITextValidateProvider
     private int _fieldLength;
     private HashSet<int> _separatorPositions = [];
     private int _amPmPosition = -1;
+    private bool _isPm;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TimeTextProvider"/> class.
     /// </summary>
-    public TimeTextProvider ()
-    {
-        AnalyzePattern ();
-    }
+    public TimeTextProvider () => AnalyzePattern ();
 
     /// <summary>
     ///     Gets or sets the <see cref="DateTimeFormatInfo"/> used for time formatting.
@@ -90,7 +96,9 @@ public class TimeTextProvider : ITextValidateProvider
             {
                 string oldValue = Text;
                 _timeValue = parsedValue;
-                
+                _isPm = _timeValue.Hours >= 12;
+
+
                 if (oldValue != Text)
                 {
                     OnTextChanged (new (in oldValue));
@@ -103,14 +111,10 @@ public class TimeTextProvider : ITextValidateProvider
     public string DisplayText => " " + FormatTimeValue ();
 
     /// <inheritdoc/>
-    public bool IsValid
-    {
-        get
-        {
-            // Always valid - we auto-correct invalid values
-            return true;
-        }
-    }
+    public bool IsValid =>
+
+        // Always valid - we autocorrect invalid values
+        true;
 
     /// <inheritdoc/>
     public bool Fixed => true;
@@ -224,16 +228,17 @@ public class TimeTextProvider : ITextValidateProvider
 
         // Replace digit with '0'
         string currentText = FormatTimeValue ();
-        
+
         if (pos >= 0 && pos < currentText.Length && char.IsDigit (currentText [pos]))
         {
             StringBuilder sb = new (currentText);
             sb [pos] = '0';
-            
+
             if (TryParseTimeValue (sb.ToString (), out TimeSpan newValue))
             {
                 _timeValue = newValue;
                 OnTextChanged (new (in oldValue));
+
                 return true;
             }
         }
@@ -251,23 +256,20 @@ public class TimeTextProvider : ITextValidateProvider
         {
             if (char.ToUpperInvariant (ch) == 'A' || char.ToUpperInvariant (ch) == 'P')
             {
-                bool isPm = char.ToUpperInvariant (ch) == 'P';
-                
+                _isPm = char.ToUpperInvariant (ch) == 'P';
+
                 // Update the time value hours to reflect AM/PM change
                 int hours = _timeValue.Hours % 12;
-                
-                if (isPm && hours < 12)
+
+                if (_isPm && hours < 12)
                 {
                     hours += 12;
                 }
-                else if (!isPm && hours >= 12)
-                {
-                    hours -= 12;
-                }
-                
+
+
                 _timeValue = new TimeSpan (hours, _timeValue.Minutes, _timeValue.Seconds);
                 OnTextChanged (new (in oldValue));
-                
+
                 return true;
             }
 
@@ -282,17 +284,17 @@ public class TimeTextProvider : ITextValidateProvider
 
         // Replace digit at position
         string currentText = FormatTimeValue ();
-        
+
         if (pos >= 0 && pos < currentText.Length)
         {
             StringBuilder sb = new (currentText);
             sb [pos] = ch;
-            
+
             if (TryParseTimeValue (sb.ToString (), out TimeSpan newValue))
             {
                 _timeValue = newValue;
                 OnTextChanged (new (in oldValue));
-                
+
                 return true;
             }
         }
@@ -301,10 +303,35 @@ public class TimeTextProvider : ITextValidateProvider
     }
 
     /// <inheritdoc/>
-    public void OnTextChanged (EventArgs<string> args)
+    public bool VerifyChar (char input, int position, out MaskedTextResultHint hint)
     {
-        TextChanged?.Invoke (this, args);
+        hint = MaskedTextResultHint.Success;
+
+        // Handle AM/PM toggle
+        if (_hasAmPm && position == _amPmPosition)
+        {
+            if (char.ToUpperInvariant (input) == 'A' || char.ToUpperInvariant (input) == 'P')
+            {
+                return true;
+            }
+            hint = MaskedTextResultHint.InvalidInput;
+
+            return false;
+        }
+
+        // Only accept digits for time positions
+        if (!char.IsDigit (input))
+        {
+            hint = MaskedTextResultHint.InvalidInput;
+
+            return false;
+        }
+
+        return true;
     }
+
+    /// <inheritdoc/>
+    public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
 
     /// <summary>
     ///     Analyzes the LongTimePattern to detect format characteristics.
@@ -319,12 +346,12 @@ public class TimeTextProvider : ITextValidateProvider
 
         // Build a sample time to determine field positions
         DateTime sampleTime = new (BASE_YEAR, BASE_MONTH, BASE_DAY, SAMPLE_HOUR, SAMPLE_MINUTE, SAMPLE_SECOND);
-        string formatted = sampleTime.ToString (pattern, _format);
-        
+        var formatted = sampleTime.ToString (pattern, _format);
+
         _fieldLength = formatted.Length;
 
         // Find separator positions
-        for (int i = 0; i < formatted.Length; i++)
+        for (var i = 0; i < formatted.Length; i++)
         {
             if (formatted [i].ToString () == _separator)
             {
@@ -337,10 +364,10 @@ public class TimeTextProvider : ITextValidateProvider
         {
             string amDesignator = _format.AMDesignator;
             string pmDesignator = _format.PMDesignator;
-            
+
             int amIndex = formatted.IndexOf (amDesignator, StringComparison.Ordinal);
             int pmIndex = formatted.IndexOf (pmDesignator, StringComparison.Ordinal);
-            
+
             _amPmPosition = Math.Max (amIndex, pmIndex);
         }
     }
@@ -351,7 +378,33 @@ public class TimeTextProvider : ITextValidateProvider
     private string FormatTimeValue ()
     {
         DateTime dt = DateTime.Today.Add (_timeValue);
-        
+
+        // For 12-hour format, adjust the hours if needed
+        if (_is12Hour && _hasAmPm)
+        {
+            int hours = _timeValue.Hours % 12;
+
+            if (hours == 0)
+            {
+                hours = 12;
+            }
+
+            // Convert to 24-hour format for DateTime construction
+            int hours24;
+
+            if (_isPm)
+            {
+                hours24 = hours == 12 ? 12 : hours + 12;
+            }
+            else
+            {
+                hours24 = hours == 12 ? 0 : hours;
+            }
+
+            dt = new DateTime (BASE_YEAR, BASE_MONTH, BASE_DAY, hours24, _timeValue.Minutes, _timeValue.Seconds);
+        }
+
+
         return dt.ToString (_format.LongTimePattern, _format);
     }
 
@@ -370,16 +423,10 @@ public class TimeTextProvider : ITextValidateProvider
         text = text.Trim ();
 
         // Try to parse using the current pattern
-        if (DateTime.TryParseExact (
-                text,
-                _format.LongTimePattern,
-                _format,
-                DateTimeStyles.None,
-                out DateTime dt
-            ))
+        if (DateTime.TryParseExact (text, _format.LongTimePattern, _format, DateTimeStyles.None, out DateTime dt))
         {
             result = dt.TimeOfDay;
-            
+
             return true;
         }
 
@@ -397,16 +444,16 @@ public class TimeTextProvider : ITextValidateProvider
         try
         {
             string [] parts = text.Split (_separator [0]);
-            
+
             if (parts.Length < 2)
             {
                 return false;
             }
 
             // Extract AM/PM if present
-            bool isPm = false;
+            var isPm = false;
             string lastPart = parts [^1].Trim ();
-            
+
             if (_hasAmPm)
             {
                 if (lastPart.EndsWith (_format.PMDesignator, StringComparison.OrdinalIgnoreCase))
@@ -419,7 +466,7 @@ public class TimeTextProvider : ITextValidateProvider
                     isPm = false;
                     lastPart = lastPart.Substring (0, lastPart.Length - _format.AMDesignator.Length).Trim ();
                 }
-                
+
                 parts [^1] = lastPart;
             }
 
@@ -436,8 +483,8 @@ public class TimeTextProvider : ITextValidateProvider
             }
 
             // Parse seconds (if present)
-            int seconds = 0;
-            
+            var seconds = 0;
+
             if (parts.Length > 2 && !string.IsNullOrWhiteSpace (parts [2]))
             {
                 if (!int.TryParse (parts [2], out seconds))
@@ -451,7 +498,7 @@ public class TimeTextProvider : ITextValidateProvider
             {
                 // 12-hour format: 1-12
                 hours = Math.Max (1, Math.Min (12, hours));
-                
+
                 if (isPm && hours != 12)
                 {
                     hours += 12;
@@ -471,7 +518,9 @@ public class TimeTextProvider : ITextValidateProvider
             seconds = Math.Max (0, Math.Min (59, seconds));
 
             result = new TimeSpan (hours, minutes, seconds);
-            
+            _isPm = hours >= 12;
+
+
             return true;
         }
         catch (ArgumentException)

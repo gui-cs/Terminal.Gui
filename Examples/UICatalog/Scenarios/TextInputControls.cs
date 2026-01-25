@@ -115,10 +115,7 @@ public class TextInputControls : Scenario
 
         CheckBox chxReadOnly = new ()
         {
-            X = Pos.Left (textView),
-            Y = Pos.Bottom (textView),
-            Value = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked,
-            Text = "Read_Only"
+            X = Pos.Left (textView), Y = Pos.Bottom (textView), Value = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
         chxReadOnly.ValueChanging += (_, args) => textView.ReadOnly = args.NewValue == CheckState.Checked;
         win.Add (chxReadOnly);
@@ -155,39 +152,39 @@ public class TextInputControls : Scenario
         };
 
         chxMultiline.ValueChanging += (_, e) =>
-                                             {
-                                                 textView.Multiline = e.NewValue == CheckState.Checked;
+                                      {
+                                          textView.Multiline = e.NewValue == CheckState.Checked;
 
-                                                 if (!textView.Multiline && chxWordWrap.Value == CheckState.Checked)
-                                                 {
-                                                     chxWordWrap.Value = CheckState.UnChecked;
-                                                 }
+                                          if (!textView.Multiline && chxWordWrap.Value == CheckState.Checked)
+                                          {
+                                              chxWordWrap.Value = CheckState.UnChecked;
+                                          }
 
-                                                 if (!textView.Multiline && chxCaptureTabs.Value == CheckState.Checked)
-                                                 {
-                                                     chxCaptureTabs.Value = CheckState.UnChecked;
-                                                 }
-                                             };
+                                          if (!textView.Multiline && chxCaptureTabs.Value == CheckState.Checked)
+                                          {
+                                              chxCaptureTabs.Value = CheckState.UnChecked;
+                                          }
+                                      };
 
         Key? keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
         Key? keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
 
         chxCaptureTabs.ValueChanging += (_, e) =>
-                                               {
-                                                   textView.TabKeyAddsTab = e.NewValue == CheckState.Checked;
+                                        {
+                                            textView.TabKeyAddsTab = e.NewValue == CheckState.Checked;
 
-                                                   // TODO: This should be in TextView.TabKeyAddsTab_set
-                                                   if (e.NewValue == CheckState.Checked)
-                                                   {
-                                                       textView.KeyBindings.Add (keyTab!, Command.NextTabStop);
-                                                       textView.KeyBindings.Add (keyBackTab!, Command.PreviousTabStop);
-                                                   }
-                                                   else
-                                                   {
-                                                       textView.KeyBindings.Remove (keyTab!);
-                                                       textView.KeyBindings.Remove (keyBackTab!);
-                                                   }
-                                               };
+                                            // TODO: This should be in TextView.TabKeyAddsTab_set
+                                            if (e.NewValue == CheckState.Checked)
+                                            {
+                                                textView.KeyBindings.Add (keyTab!, Command.NextTabStop);
+                                                textView.KeyBindings.Add (keyBackTab!, Command.PreviousTabStop);
+                                            }
+                                            else
+                                            {
+                                                textView.KeyBindings.Remove (keyTab!);
+                                                textView.KeyBindings.Remove (keyBackTab!);
+                                            }
+                                        };
         win.Add (chxCaptureTabs);
 
         CheckBox scrollBars = new ()
@@ -273,10 +270,9 @@ public class TextInputControls : Scenario
         _timeField.ValueChanged += TimeChanged;
 
         // MaskedTextProvider - uses .NET MaskedTextProvider
-        Label netProviderLabel = new () { X = Pos.Left (dateField), Y = Pos.Bottom (dateField) + 1, Text = "_NetMaskedTextProvider [ +99 (000) 000-0000 ]:" };
-        win.Add (netProviderLabel);
-
         NetMaskedTextProvider netProvider = new ("+99 (000) 000-0000");
+        Label netProviderLabel = new () { X = Pos.Left (dateField), Y = Pos.Bottom (dateField) + 1, Text = $"_NetMaskedTextProvider ({netProvider.Mask}):" };
+        win.Add (netProviderLabel);
 
         TextValidateField netProviderField = new () { X = Pos.Right (netProviderLabel) + 1, Y = Pos.Y (netProviderLabel), Provider = netProvider };
         win.Add (netProviderField);
@@ -294,13 +290,13 @@ public class TextInputControls : Scenario
         netProviderField.Provider.TextChanged += (_, _) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
 
         // TextRegexProvider - Regex provider implemented by Terminal.Gui
+        TextRegexProvider provider2 = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
+
         Label regexProviderLabel = new ()
         {
-            X = Pos.Left (netProviderLabel), Y = Pos.Bottom (netProviderLabel) + 1, Text = "Text_RegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]:"
+            X = Pos.Left (netProviderLabel), Y = Pos.Bottom (netProviderLabel) + 1, Text = $"Text_RegexProvider ({provider2.Pattern}):"
         };
         win.Add (regexProviderLabel);
-
-        TextRegexProvider provider2 = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
 
         TextValidateField regexProviderField = new ()
         {

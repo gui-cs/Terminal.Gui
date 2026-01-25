@@ -1,5 +1,4 @@
 using System.Globalization;
-using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
@@ -10,11 +9,23 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         TimeEditor extends <see cref="TextValidateField"/> with time-specific functionality:
 ///         <list type="bullet">
-///             <item><description>Uses <see cref="TimeTextProvider"/> for validation and formatting</description></item>
-///             <item><description>Supports both 12-hour and 24-hour formats via <see cref="DateTimeFormatInfo"/></description></item>
-///             <item><description>Cursor automatically skips over separator characters</description></item>
-///             <item><description>Supports AM/PM toggling for 12-hour formats</description></item>
-///             <item><description>Auto-adjusts width based on time pattern</description></item>
+///             <item>
+///                 <description>Uses <see cref="TimeTextProvider"/> for validation and formatting</description>
+///             </item>
+///             <item>
+///                 <description>
+///                     Supports both 12-hour and 24-hour formats via <see cref="DateTimeFormatInfo"/>
+///                 </description>
+///             </item>
+///             <item>
+///                 <description>Cursor automatically skips over separator characters</description>
+///             </item>
+///             <item>
+///                 <description>Supports AM/PM toggling for 12-hour formats</description>
+///             </item>
+///             <item>
+///                 <description>Auto-adjusts width based on time pattern</description>
+///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
@@ -54,13 +65,12 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
     public TimeEditor ()
     {
         Provider = new TimeTextProvider ();
-        
-        // Set initial width based on current format
-        Width = TimeProvider.DisplayText.Length + 2;
-        
+        Width = Dim.Auto (minimumContentDim: 10);
+
+
         // Subscribe to provider's text changed to raise our value events
         TimeProvider.TextChanged += (_, _) => RaiseValueChangedEvents ();
-        
+
         // Initialize last known value
         _lastKnownValue = TimeProvider.TimeValue;
     }
@@ -157,19 +167,14 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
     /// </summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<TimeSpan> args)
-    {
-        return false;
-    }
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<TimeSpan> args) => false;
 
     /// <summary>
     ///     Called when the <see cref="Value"/> has changed.
     ///     Allows derived classes to react to value changes.
     /// </summary>
     /// <param name="args">The event arguments.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<TimeSpan> args)
-    {
-    }
+    protected virtual void OnValueChanged (ValueChangedEventArgs<TimeSpan> args) { }
 
     /// <summary>
     ///     Raises value events when the text changes through user input.
@@ -177,37 +182,39 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
     private void RaiseValueChangedEvents ()
     {
         TimeSpan currentValue = TimeProvider.TimeValue;
-        
+
         if (_lastKnownValue == currentValue)
         {
             return;
         }
-        
+
+
         // Raise ValueChanging to allow cancellation
         ValueChangingEventArgs<TimeSpan> changingArgs = new (_lastKnownValue, currentValue);
-        
+
         if (OnValueChanging (changingArgs) || changingArgs.Handled)
         {
             // Revert the change if cancelled
             TimeProvider.TimeValue = _lastKnownValue;
             Text = TimeProvider.Text;
             SetNeedsDraw ();
-            
+
             return;
         }
-        
+
         ValueChanging?.Invoke (this, changingArgs);
-        
+
         if (changingArgs.Handled)
         {
             // Revert the change if cancelled
             TimeProvider.TimeValue = _lastKnownValue;
             Text = TimeProvider.Text;
             SetNeedsDraw ();
-            
+
             return;
         }
-        
+
+
         ValueChangedEventArgs<TimeSpan> changedArgs = new (_lastKnownValue, currentValue);
         _lastKnownValue = currentValue;
         OnValueChanged (changedArgs);

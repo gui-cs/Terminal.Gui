@@ -32,6 +32,51 @@ public class TextValidateField : View, IDesignable
         KeyBindings.Add (Key.CursorRight, Command.Right);
     }
 
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
+    {
+        if (!newHasFocus)
+        {
+            Cursor = Cursor with { Position = null };
+
+            return;
+        }
+
+        // When we gain focus, put the insertion point at the start if it's before the start.
+        InsertionPoint = Math.Max (InsertionPoint, _provider!.CursorStart ());
+
+        // Match the cursor position to the insertion point.
+        // Don't call UpdateCursor so we can set the style too.
+        Cursor = Cursor with { Style = CursorStyle.BlinkingBar };
+        UpdateCursor ();
+    }
+
+    /// <summary>Updates the cursor position.</summary>
+    /// <remarks>
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor"/>.
+    /// </remarks>
+    private void UpdateCursor ()
+    {
+        (int left, int right) = GetMargins (Viewport.Width);
+
+        // Fixed = true, is for inputs that have fixed width, like masked ones.
+        // Fixed = false, is for normal input.
+        // When it's right-aligned and it's a normal input, the cursor behaves differently.
+        int curPos;
+
+        if (_provider?.Fixed == false && TextAlignment == Alignment.End)
+        {
+            curPos = _insertionPoint + left - 1;
+        }
+        else
+        {
+            curPos = _insertionPoint + left;
+        }
+
+        Cursor = Cursor with { Position = ViewportToScreen (new Point (curPos, 0)) };
+        SetNeedsDraw ();
+    }
+
     /// <summary>This property returns true if the input is valid.</summary>
     public virtual bool IsValid
     {
@@ -56,7 +101,8 @@ public class TextValidateField : View, IDesignable
 
             if (_provider!.Fixed)
             {
-                Width = _provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length;
+                // Add one so there is always a space at the end to show the cursor.
+                Width = (_provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length) + 1;
             }
 
             // HomeKeyHandler already call SetNeedsDisplay
@@ -94,23 +140,8 @@ public class TextValidateField : View, IDesignable
             }
 
             _insertionPoint = value;
-            (int left, _) = GetMargins (Viewport.Width);
 
-            // Fixed = true, is for inputs that have fixed width, like masked ones.
-            // Fixed = false, is for normal input.
-            // When it's right-aligned and it's a normal input, the cursor behaves differently.
-            int curPos;
-
-            if (_provider?.Fixed == false && TextAlignment == Alignment.End)
-            {
-                curPos = _insertionPoint + left - 1;
-            }
-            else
-            {
-                curPos = _insertionPoint + left;
-            }
-
-            Cursor = Cursor with { Position = ViewportToScreen (new Point (curPos, 0)), Style = CursorStyle.Default };
+            UpdateCursor ();
         }
     }
 
@@ -122,7 +153,19 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        int c = _provider!.Cursor (mouse.Position!.Value.X - GetMargins (Viewport.Width).left);
+        int cursorPos = mouse.Position!.Value.X - GetMargins (Viewport.Width).left;
+
+        if (cursorPos > _provider!.CursorEnd ())
+        {
+            InsertionPoint = cursorPos;
+            SetFocus ();
+            SetNeedsDraw ();
+            UpdateCursor ();
+
+            return true;
+        }
+
+        int c = _provider!.Cursor (cursorPos);
 
         if (!_provider.Fixed && TextAlignment == Alignment.End && Text.Length > 0)
         {
@@ -147,7 +190,7 @@ public class TextValidateField : View, IDesignable
             return true;
         }
 
-        VisualRole role = HasFocus ? VisualRole.Focus : VisualRole.Editable;
+        VisualRole role = VisualRole.Editable;
         Attribute textColor = IsValid ? GetAttributeForRole (role) : SchemeManager.GetScheme (Schemes.Error).GetAttributeForRole (role);
 
         (int marginLeft, int marginRight) = GetMargins (Viewport.Width);
@@ -179,6 +222,13 @@ public class TextValidateField : View, IDesignable
             AddRune ((Rune)' ');
         }
 
+        if (HasFocus && _provider.DisplayText.Length > 0 && InsertionPoint < _provider.DisplayText.Length)
+        {
+            SetAttributeForRole (VisualRole.Focus);
+            Move (InsertionPoint + marginLeft, 0);
+            AddRune ((Rune)_provider.DisplayText [InsertionPoint]);
+        }
+
         return true;
     }
 
@@ -190,23 +240,22 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        if (key.AsRune == default (Rune) || key == Application.QuitKey)
-        {
-            return false;
-        }
-
         Rune rune = key.AsRune;
+
+        if (!_provider.VerifyChar ((char)rune.Value, InsertionPoint, out _))
+        {
+            // Not a valid char. If it's a letter or, return true to eat it to prevent hotkeys from triggering.
+            return Rune.IsLetterOrDigit (rune);
+        }
 
         bool inserted = _provider.InsertAt ((char)rune.Value, InsertionPoint);
 
         if (inserted)
         {
             CursorRight ();
-
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>
@@ -215,12 +264,14 @@ public class TextValidateField : View, IDesignable
     {
         if (!_provider!.Fixed && TextAlignment == Alignment.End && InsertionPoint <= 1)
         {
-            return false;
+            //return false;
         }
 
         _insertionPoint = _provider.CursorLeft (InsertionPoint);
         _provider.Delete (InsertionPoint);
+
         SetNeedsDraw ();
+        UpdateCursor ();
 
         return true;
     }
@@ -251,8 +302,17 @@ public class TextValidateField : View, IDesignable
         }
 
         int current = InsertionPoint;
-        InsertionPoint = _provider.CursorRight (InsertionPoint);
+
+        InsertionPoint = _provider.CursorRight (current);
+
+        if (current == InsertionPoint && current <= _provider.CursorEnd ())
+        {
+            // Allow to move the cursor after the last char in this special case.
+            InsertionPoint++;
+        }
+
         SetNeedsDraw ();
+        UpdateCursor ();
 
         return current != InsertionPoint;
     }
@@ -276,7 +336,7 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool EndKeyHandler ()
     {
-        InsertionPoint = _provider!.CursorEnd ();
+        InsertionPoint = _provider!.CursorEnd () + 1;
         SetNeedsDraw ();
 
         return true;
@@ -294,7 +354,7 @@ public class TextValidateField : View, IDesignable
                {
                    Alignment.Start => (0, total),
                    Alignment.Center => (total / 2, total / 2 + total % 2),
-                   Alignment.End => (total, 0),
+                   Alignment.End => (total - 1, 1),
                    _ => (0, total)
                };
     }

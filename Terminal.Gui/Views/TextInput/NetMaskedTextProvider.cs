@@ -23,7 +23,7 @@ public class NetMaskedTextProvider : ITextValidateProvider
     private MaskedTextProvider? _provider;
 
     /// <summary>Empty Constructor</summary>
-    public NetMaskedTextProvider (string mask) { Mask = mask; }
+    public NetMaskedTextProvider (string mask) => Mask = mask;
 
     /// <summary>Mask property</summary>
     public string Mask
@@ -143,6 +143,12 @@ public class NetMaskedTextProvider : ITextValidateProvider
         }
 
         return result;
+    }
+
+    /// <inheritdoc />
+    public bool VerifyChar (char input, int position, out MaskedTextResultHint hint)
+    {
+        return _provider!.VerifyChar (input, position, out hint);
     }
 
     /// <inheritdoc/>

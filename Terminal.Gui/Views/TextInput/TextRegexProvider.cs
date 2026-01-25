@@ -1,4 +1,4 @@
-
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Views;
@@ -11,7 +11,7 @@ public class TextRegexProvider : ITextValidateProvider
     private List<Rune> _text = null!;
 
     /// <summary>Empty Constructor.</summary>
-    public TextRegexProvider (string pattern) { Pattern = pattern; }
+    public TextRegexProvider (string pattern) => Pattern = pattern;
 
     /// <summary>Regex pattern property.</summary>
     public string Pattern
@@ -68,10 +68,10 @@ public class TextRegexProvider : ITextValidateProvider
     }
 
     /// <inheritdoc/>
-    public int CursorStart () { return 0; }
+    public int CursorStart () => 0;
 
     /// <inheritdoc/>
-    public int CursorEnd () { return _text.Count; }
+    public int CursorEnd () => _text.Count;
 
     /// <inheritdoc/>
     public int CursorLeft (int pos)
@@ -114,7 +114,7 @@ public class TextRegexProvider : ITextValidateProvider
         List<Rune> aux = _text.ToList ();
         aux.Insert (pos, (Rune)ch);
 
-        if (Validate (aux) || ValidateOnInput == false)
+        if (Validate (aux) || !ValidateOnInput)
         {
             string oldValue = Text;
             _text.Insert (pos, (Rune)ch);
@@ -127,10 +127,34 @@ public class TextRegexProvider : ITextValidateProvider
     }
 
     /// <inheritdoc/>
-    public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
+    public bool VerifyChar (char input, int position, out MaskedTextResultHint hint)
+    {
+        if (position < 0 || position > _text.Count)
+        {
+            hint = MaskedTextResultHint.PositionOutOfRange;
+
+            return false;
+        }
+
+        List<Rune> aux = _text.ToList ();
+        aux.Insert (position, (Rune)input);
+
+        if (Validate (aux))
+        {
+            hint = MaskedTextResultHint.Success;
+
+            return true;
+        }
+        hint = MaskedTextResultHint.InvalidInput;
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
 
     /// <summary>Compiles the regex pattern for validation./></summary>
-    private void CompileMask () { _regex = new (StringExtensions.ToString (_pattern), RegexOptions.Compiled); }
+    private void CompileMask () => _regex = new (StringExtensions.ToString (_pattern), RegexOptions.Compiled);
 
     private void SetupText ()
     {
