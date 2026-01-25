@@ -316,7 +316,7 @@ public class ApplicationRunnableIntegrationTests
     }
 
     [Fact]
-    public void End_ClearsMouseGrabView ()
+    public void End_ClearsIsGrabbed ()
     {
         // Arrange
         IApplication app = CreateAndInitApp ();
@@ -326,7 +326,7 @@ public class ApplicationRunnableIntegrationTests
         app.Mouse.GrabMouse (runnable);
         app.End (token!);
 
-        Assert.Null (app.Mouse.MouseGrabView);
+        Assert.False (app.Mouse.IsGrabbed (runnable));
 
         runnable.Dispose ();
         app.Dispose ();

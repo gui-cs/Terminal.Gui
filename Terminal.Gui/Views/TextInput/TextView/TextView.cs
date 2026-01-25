@@ -156,9 +156,9 @@ public partial class TextView : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        if (App?.Mouse.MouseGrabView is { } && App?.Mouse.MouseGrabView == this)
+        if (App is { } && App.Mouse.IsGrabbed (this))
         {
-            App?.Mouse.UngrabMouse ();
+            App.Mouse.UngrabMouse ();
         }
 
         if (newHasFocus)
