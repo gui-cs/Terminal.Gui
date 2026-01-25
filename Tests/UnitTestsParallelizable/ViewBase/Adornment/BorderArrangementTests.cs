@@ -1,10 +1,8 @@
-﻿#nullable enable
-using System.Text;
+﻿using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
 namespace ViewBaseTests.Adornments;
-
 
 public class BorderArrangementTests (ITestOutputHelper output)
 {
@@ -32,8 +30,12 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         View view = new ()
         {
-            X = 2, Width = 4, Height = 4, BorderStyle = LineStyle.Single,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable, CanFocus = true
+            X = 2,
+            Width = 4,
+            Height = 4,
+            BorderStyle = LineStyle.Single,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            CanFocus = true
         };
         superview.Add (view);
 
@@ -41,8 +43,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         Assert.Equal ("Absolute(2)", view.X.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               🍎┌──┐
                                               🍎│  │
                                               🍎│  │
@@ -55,8 +56,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.F5.WithCtrl));
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               🍎◊↕─┐
                                               🍎↔  ↔
                                               🍎│  │
@@ -70,8 +70,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         Assert.Equal ("Absolute(1)", view.X.ToString ());
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               �◊↕─┐
                                               �↔  ↔
                                               �│  │
@@ -85,8 +84,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         Assert.Equal ("Absolute(0)", view.X.ToString ());
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               ◊↕─┐🍎
                                               ↔  ↔🍎
                                               │  │🍎
@@ -121,7 +119,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         ];
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
-        superview.SetScheme (new () { Normal = attributes [0], Focus = attributes [1] });
+        superview.SetScheme (new Scheme { Normal = attributes [0], Focus = attributes [1] });
 
         superview.Text = """
                          🍎🍎🍎🍎
@@ -134,15 +132,19 @@ public class BorderArrangementTests (ITestOutputHelper output)
                          """;
 
         View view = new () { X = 6, Width = 2, Height = 1, Text = "🦮" };
-        view.SetScheme (new () { Normal = attributes [2] });
+        view.SetScheme (new Scheme { Normal = attributes [2] });
 
         View view2 = new ()
         {
-            X = 2, Width = 6, Height = 6, Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable, CanFocus = true
+            X = 2,
+            Width = 6,
+            Height = 6,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            CanFocus = true
         };
-        view2.Border!.Thickness = new (1);
+        view2.Border!.Thickness = new Thickness (1);
         view2.Border.Add (new View { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Hi" });
-        view2.SetScheme (new () { Normal = attributes [3], HotNormal = attributes [4] });
+        view2.SetScheme (new Scheme { Normal = attributes [3], HotNormal = attributes [4] });
 
         superview.Add (view, view2);
 
@@ -150,8 +152,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         Assert.Equal ("Absolute(2)", view2.X.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               🍎Hi
                                               🍎
                                               🍎
@@ -163,8 +164,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
 
-        DriverAssert.AssertDriverAttributesAre (
-                                                """
+        DriverAssert.AssertDriverAttributesAre ("""
                                                 11333333
                                                 11333333
                                                 11333333
@@ -180,8 +180,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.F5.WithCtrl));
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               🍎◊i↕
                                               🍎
                                               🍎↔    ↔
@@ -193,8 +192,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
 
-        DriverAssert.AssertDriverAttributesAre (
-                                                """
+        DriverAssert.AssertDriverAttributesAre ("""
                                                 11433333
                                                 11333333
                                                 11333333
@@ -211,8 +209,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         Assert.Equal ("Absolute(1)", view2.X.ToString ());
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               �◊i↕
                                               �
                                               �↔    ↔
@@ -224,8 +221,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
 
-        DriverAssert.AssertDriverAttributesAre (
-                                                """
+        DriverAssert.AssertDriverAttributesAre ("""
                                                 14333332
                                                 13333330
                                                 13333330
@@ -242,8 +238,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         Assert.Equal ("Absolute(0)", view2.X.ToString ());
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               ◊i↕   🦮
                                                     🍎
                                               ↔    ↔🍎
@@ -255,8 +250,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
 
-        DriverAssert.AssertDriverAttributesAre (
-                                                """
+        DriverAssert.AssertDriverAttributesAre ("""
                                                 43333322
                                                 33333311
                                                 33333311
