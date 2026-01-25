@@ -22,6 +22,7 @@ public partial class TableView
         set
         {
             _table = value;
+            SetContentSize(CalculateContentSize());
             Update ();
         }
     }
