@@ -12,7 +12,7 @@ internal sealed class Arranger : IDisposable
     ///     Creates a new Arranger for the specified border.
     /// </summary>
     /// <param name="border">The border adornment to manage arrangement for.</param>
-    internal Arranger (Border border) { _border = border; }
+    internal Arranger (Border border) => _border = border;
 
     /// <summary>
     ///     Gets the current arrangement mode.
@@ -30,7 +30,6 @@ internal sealed class Arranger : IDisposable
     ///     Gets whether a mouse drag operation is in progress.
     /// </summary>
     internal bool IsDragging => _dragPosition.HasValue;
-
 
     /// <summary>
     ///     Starts "Arrange Mode" where <see cref="Adornment.Parent"/> of a <see cref="Border"/> can be moved and/or resized
@@ -58,6 +57,7 @@ internal sealed class Arranger : IDisposable
         bool mouseMode = _border.App is { } && _border.App.Mouse.IsGrabbed (_border);
 
         _border.HotKeyBindings.Add (Key.Esc, Command.Quit);
+
         if (_border.App?.Keyboard.ArrangeKey is { })
         {
             _border.HotKeyBindings.Add (_border.App.Keyboard.ArrangeKey, Command.Quit);
@@ -207,17 +207,12 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.Resizable))
         {
-            _allSizeButton = CreateArrangementButton (
-                                                      ArrangeButtons.AllSize,
-                                                      Glyphs.SizeBottomRight,
-                                                      Pos.AnchorEnd (),
-                                                      Pos.AnchorEnd ());
+            _allSizeButton = CreateArrangementButton (ArrangeButtons.AllSize, Glyphs.SizeBottomRight, Pos.AnchorEnd (), Pos.AnchorEnd ());
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
         {
-            _topSizeButton = CreateArrangementButton (
-                                                      ArrangeButtons.TopSize,
+            _topSizeButton = CreateArrangementButton (ArrangeButtons.TopSize,
                                                       Glyphs.SizeVertical,
                                                       Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal,
                                                       0);
@@ -225,8 +220,7 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
-            _rightSizeButton = CreateArrangementButton (
-                                                        ArrangeButtons.RightSize,
+            _rightSizeButton = CreateArrangementButton (ArrangeButtons.RightSize,
                                                         Glyphs.SizeHorizontal,
                                                         Pos.AnchorEnd (),
                                                         Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
@@ -234,8 +228,7 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            _leftSizeButton = CreateArrangementButton (
-                                                       ArrangeButtons.LeftSize,
+            _leftSizeButton = CreateArrangementButton (ArrangeButtons.LeftSize,
                                                        Glyphs.SizeHorizontal,
                                                        0,
                                                        Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
@@ -243,8 +236,7 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
-            _bottomSizeButton = CreateArrangementButton (
-                                                         ArrangeButtons.BottomSize,
+            _bottomSizeButton = CreateArrangementButton (ArrangeButtons.BottomSize,
                                                          Glyphs.SizeVertical,
                                                          Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal / 2,
                                                          Pos.AnchorEnd ());
@@ -299,8 +291,7 @@ internal sealed class Arranger : IDisposable
             SetVisibleButton (_allSizeButton);
         }
 
-        ShowResizableButtons (
-                              parentArrangement.HasFlag (ViewArrangement.LeftResizable),
+        ShowResizableButtons (parentArrangement.HasFlag (ViewArrangement.LeftResizable),
                               parentArrangement.HasFlag (ViewArrangement.RightResizable),
                               parentArrangement.HasFlag (ViewArrangement.TopResizable),
                               parentArrangement.HasFlag (ViewArrangement.BottomResizable));
@@ -395,36 +386,32 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private void ShowAllSizeButton (Pos x, Pos y)
     {
-        if (_allSizeButton != null)
+        if (_allSizeButton == null)
         {
-            _allSizeButton.X = x;
-            _allSizeButton.Y = y;
-            _allSizeButton.Visible = true;
+            return;
         }
+        _allSizeButton.X = x;
+        _allSizeButton.Y = y;
+        _allSizeButton.Visible = true;
     }
 
     /// <summary>
     ///     Helper method to make a button visible if it's not null.
     /// </summary>
-    private void SetVisibleButton (Button? button)
-    {
-        if (button != null)
-        {
-            button.Visible = true;
-        }
-    }
+    private void SetVisibleButton (Button? button) => button?.Visible = true;
 
     /// <summary>
     ///     Helper method to dispose and remove a button.
     /// </summary>
     private void DisposeSizeButton (ref Button? button)
     {
-        if (button is { })
+        if (button is null)
         {
-            _border.Remove (button);
-            button.Dispose ();
-            button = null;
+            return;
         }
+        _border.Remove (button);
+        button.Dispose ();
+        button = null;
     }
 
     #endregion Button Management
@@ -434,9 +421,8 @@ internal sealed class Arranger : IDisposable
     /// <summary>
     ///     Maps an <see cref="ArrangeButtons"/> to its corresponding <see cref="ViewArrangement"/>.
     /// </summary>
-    private static ViewArrangement GetArrangementForButton (ArrangeButtons button)
-    {
-        return button switch
+    private static ViewArrangement GetArrangementForButton (ArrangeButtons button) =>
+        button switch
         {
             ArrangeButtons.Move => ViewArrangement.Movable,
             ArrangeButtons.AllSize => ViewArrangement.Resizable,
@@ -446,7 +432,6 @@ internal sealed class Arranger : IDisposable
             ArrangeButtons.BottomSize => ViewArrangement.BottomResizable,
             _ => ViewArrangement.Fixed
         };
-    }
 
     /// <summary>
     ///     Gets the arrangement type from the border's currently focused button.
@@ -684,8 +669,7 @@ internal sealed class Arranger : IDisposable
 
         // Only start grabbing if the user clicks in the Thickness area
         // Adornment.Contains takes Parent SuperView=relative coords.
-        Point clickPoint = new (
-                                mouseEvent.Position!.Value.X + parent.Frame.X + _border.Frame.X,
+        Point clickPoint = new (mouseEvent.Position!.Value.X + parent.Frame.X + _border.Frame.X,
                                 mouseEvent.Position!.Value.Y + parent.Frame.Y + _border.Frame.Y);
 
         if (!_border.Contains (clickPoint))
@@ -700,9 +684,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Set the start grab point to the Frame coords
-        GrabPoint = new (
-                         mouseEvent.Position!.Value.X + _border.Frame.X,
-                         mouseEvent.Position!.Value.Y + _border.Frame.Y);
+        GrabPoint = new Point (mouseEvent.Position!.Value.X + _border.Frame.X, mouseEvent.Position!.Value.Y + _border.Frame.Y);
         _dragPosition = mouseEvent.Position;
 
         // Grab mouse
@@ -726,20 +708,9 @@ internal sealed class Arranger : IDisposable
             return;
         }
 
-        if (parent.SuperView is null)
-        {
-            // Redraw the entire app window.
-            _border.App?.TopRunnableView?.SetNeedsDraw ();
-        }
-        else
-        {
-            parent.SuperView.SetNeedsDraw ();
-        }
-
         _dragPosition = mouseEvent.Position;
 
-        Point parentLoc = parent.SuperView?.ScreenToViewport (
-                                                              new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
+        Point parentLoc = parent.SuperView?.ScreenToViewport (new Point (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
                           ?? mouseEvent.ScreenPosition;
 
         HandleDragOperation (parentLoc);
@@ -765,7 +736,7 @@ internal sealed class Arranger : IDisposable
     ///     Ends the current drag operation.
     ///     INTERNAL: Exposed for testing purposes.
     /// </summary>
-    internal void EndDrag () { _dragPosition = null; }
+    internal void EndDrag () => _dragPosition = null;
 
     /// <summary>
     ///     Determines the arrangement mode based on where the mouse was clicked.
@@ -799,8 +770,7 @@ internal sealed class Arranger : IDisposable
         // Right edge
         if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
-            Rectangle rightRect = new (
-                                       frame.X + frame.Width - thickness.Right,
+            Rectangle rightRect = new (frame.X + frame.Width - thickness.Right,
                                        frame.Y + thickness.Top,
                                        thickness.Right,
                                        frame.Height - thickness.Top - thickness.Bottom);
@@ -825,8 +795,7 @@ internal sealed class Arranger : IDisposable
         // Bottom edge
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
-            Rectangle bottomRect = new (
-                                        frame.X + thickness.Left,
+            Rectangle bottomRect = new (frame.X + thickness.Left,
                                         frame.Y + frame.Height - thickness.Bottom,
                                         frame.Width - thickness.Left - thickness.Right,
                                         thickness.Bottom);
@@ -874,7 +843,7 @@ internal sealed class Arranger : IDisposable
         // Top-left
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable) && parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            Rectangle corner = new (frame.X, frame.Y, thickness.Left, thickness.Top);
+            Rectangle corner = frame with { Width = thickness.Left, Height = thickness.Top };
 
             if (corner.Contains (clickPoint))
             {
@@ -898,7 +867,7 @@ internal sealed class Arranger : IDisposable
     /// <param name="mouseEvent">The mouse event containing screen position information.</param>
     internal void HandleDragOperation (Mouse mouseEvent)
     {
-        Point targetLocation = _border.Parent!.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
+        Point targetLocation = _border.Parent!.SuperView?.ScreenToViewport (new Point (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
                                ?? mouseEvent.ScreenPosition;
 
         HandleDragOperation (targetLocation);
