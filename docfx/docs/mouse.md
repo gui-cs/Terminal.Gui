@@ -51,7 +51,7 @@ ANSI Input ? AnsiMouseParser ? MouseInterpreter ? MouseImpl ? View ? Commands
 ```csharp
 view.Activating += (s, e) =>
 {
-    if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+    if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
     {
         Point position = mouse.Position;  // Viewport-relative
         HandleClick(position);
@@ -212,27 +212,27 @@ public class ClickableView : View
 {
     public ClickableView()
     {
-        Activating += OnActivating;
-    }
-    
-    private void OnActivating(object sender, CommandEventArgs e)
-    {
-        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
-        {
-            Point clickPosition = mouse.Position; // Viewport-relative
-            
-            if (mouse.Flags.HasFlag(MouseFlags.LeftButtonPressed))
-            {
-                HandleLeftClick(clickPosition);
-            }
-            else if (mouse.Flags.HasFlag(MouseFlags.RightButtonPressed))
-            {
-                ShowContextMenu(clickPosition);
-            }
-            
-            e.Handled = true;
+            Activating += OnActivating;
         }
-    }
+
+        private void OnActivating(object sender, CommandEventArgs e)
+        {
+            if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
+            {
+                Point clickPosition = mouse.Position; // Viewport-relative
+
+                if (mouse.Flags.HasFlag(MouseFlags.LeftButtonPressed))
+                {
+                    HandleLeftClick(clickPosition);
+                }
+                else if (mouse.Flags.HasFlag(MouseFlags.RightButtonPressed))
+                {
+                    ShowContextMenu(clickPosition);
+                }
+
+                e.Handled = true;
+            }
+        }
 }
 ```
 
@@ -279,22 +279,64 @@ view.MouseStateChanged += (sender, e) =>
 
 ### Mouse Grab
 
-Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled **automatically grab the mouse** when a button is pressed:
+Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled **automatically grab the mouse** when a button is pressed. For manual grab control, use the `IMouseGrabHandler` interface via `App.Mouse`.
 
 **Grab Lifecycle:**
-1. **Press inside** ? Auto-grab, set focus (if `CanFocus`), `MouseState |= Pressed`
-2. **Move outside** ? `MouseState |= PressedOutside` (unless `MouseHoldRepeat`)
-3. **Release** ? Ungrab, clear pressed state, invoke commands if inside
+1. **Press inside** ? Call `GrabMouse(view)` (auto or manual), fires `GrabbingMouse` (cancellable) then `GrabbedMouse`
+2. **During grab** ? ALL mouse events routed exclusively to grabbed view with viewport-relative coordinates
+3. **Move outside** ? `MouseState |= PressedOutside` (unless `MouseHoldRepeat`)
+4. **Release/Click** ? Call `UngrabMouse()`, fires `UnGrabbingMouse` (cancellable) then `UnGrabbedMouse`
 
 **Grabbed View Receives:**
 - ALL mouse events (even outside viewport)
-- Coordinates converted to viewport-relative
+- Coordinates converted to viewport-relative (`mouse.Position`)
 - `mouse.View` set to grabbed view
 
 **Auto-ungrab occurs when:**
 - Button released (via clicked event)
-- View removed from hierarchy
+- View disposed (uses `WeakReference<View>` internally)
 - Application ends
+
+**Manual Grab Example (for custom drag operations):**
+```csharp
+protected override bool OnMouseEvent(Mouse mouse)
+{
+    if (mouse.Flags.HasFlag(MouseFlags.Button1Pressed))
+    {
+        App?.Mouse.GrabMouse(this);
+        _isDragging = true;
+        return true;
+    }
+
+    if (_isDragging && mouse.Flags.HasFlag(MouseFlags.Button1Released))
+    {
+        App?.Mouse.UngrabMouse();
+        _isDragging = false;
+        return true;
+    }
+
+    if (_isDragging)
+    {
+        // mouse.Position is viewport-relative during grab
+        UpdateDragPosition(mouse.Position);
+        return true;
+    }
+
+    return false;
+}
+```
+
+**Preventing Grab Theft (for complex drag operations):**
+```csharp
+// Subscribe to prevent other views from stealing the grab during drag
+App.Mouse.GrabbingMouse += (sender, e) =>
+{
+    if (_isDragging && !ReferenceEquals(e.View, this))
+    {
+        e.Cancel = true; // Prevent other views from grabbing
+    }
+};
+```
 
 ### Continuous Button Press
 
@@ -402,6 +444,7 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, 'm'=release)
 - Press and Release events pass through immediately
 - Click events synthesized immediately after release
 - Multi-click detection tracks timing/position/button
+- Modifier keys (Shift, Ctrl, Alt) are preserved in synthetic click events
 
 **Output:** Stream of `Mouse` events including synthesized clicks
 
@@ -435,16 +478,11 @@ if (mouse.IsPressed &&
 
 #### 4.3: Mouse Grab Handling
 ```csharp
-if (MouseGrabView is {})
-{
-    // Convert to grab view coordinates and send
-    Point viewportLoc = MouseGrabView.ScreenToViewport(mouse.ScreenPosition);
-    MouseGrabView.NewMouseEvent(new Mouse { 
-        Position = viewportLoc, 
-        ScreenPosition = mouse.ScreenPosition,
-        View = MouseGrabView 
-    });
-}
+// If a view has grabbed the mouse, route events exclusively to that view
+// HandleMouseGrab converts coordinates to the grabbed view's viewport
+// and delivers the event directly, returning true to stop further processing
+if (HandleMouseGrab(deepestViewUnderMouse, mouse))
+    return; // Grabbed view received the event
 ```
 
 #### 4.4: Convert to View Coordinates
@@ -495,8 +533,12 @@ if (RaiseMouseEvent(mouse) || mouse.Handled)
 
 **On Pressed:**
 ```csharp
-if (App.Mouse.MouseGrabView != this)
+if (!App.Mouse.IsGrabbed(this))
+{
+    // GrabbingMouse event fires first (can be cancelled)
+    // If not cancelled, GrabbedMouse event fires
     App.Mouse.GrabMouse(this);
+}
 if (!HasFocus && CanFocus) SetFocus();
 
 if (mouse.Position in Viewport)
@@ -513,8 +555,13 @@ MouseState &= ~MouseState.PressedOutside;
 
 **On Clicked:**
 ```csharp
-if (App.Mouse.MouseGrabView == this)
+if (App.Mouse.IsGrabbed(this))
+{
+    // UnGrabbingMouse event fires first (can be cancelled)
+    // If not cancelled, UnGrabbedMouse event fires
+    // MouseEnter/Leave events update for views under current mouse position
     App.Mouse.UngrabMouse();
+}
 ```
 
 #### 5.4: Invoke Commands via MouseBindings
@@ -561,7 +608,7 @@ This ensures consistent mouse behavior across platforms while maintaining platfo
 * **Use `Activating` event** to handle clicks - provides mouse position via CommandContext
 * **Access mouse details via CommandContext:**
   ```csharp
-  if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+  if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
   {
       Point pos = mouse.Position;  // Viewport-relative
       MouseFlags flags = mouse.Flags;
@@ -693,3 +740,5 @@ These events work with `MouseState` to enable hover effects and visual feedback.
 - [Input Injection](input-injection.md) - Complete testing documentation
 - [View Layout](layout.md) - Understanding coordinate systems and layout
 - [Cancellable Work Pattern](cancellable-work-pattern.md) - Event processing pattern
+- @Terminal.Gui.IMouseGrabHandler - API reference for mouse grab handling
+- @Terminal.Gui.IMouse - API reference for the mouse interface

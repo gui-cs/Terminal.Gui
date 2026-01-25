@@ -3,45 +3,44 @@ using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace UnitTests.ApplicationTests;
+
 public class MainLoopCoordinatorTests
 {
     [Fact]
     public async Task TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
     {
+        Mock<ILogger> mockLogger = new ();
 
-        var mockLogger = new Mock<ILogger> ();
-
-        var beforeLogger = Logging.Logger;
+        ILogger beforeLogger = Logging.Logger;
         Logging.Logger = mockLogger.Object;
 
-        var m = new Mock<IComponentFactory<char>> ();
+        Mock<IComponentFactory<char>> m = new ();
+
         // Runs on a separate thread (input thread)
         m.Setup (f => f.CreateInput ()).Throws (new Exception ("Crash on boot"));
 
-        var c = new MainLoopCoordinator<char> (new TimedEvents (),
-                                               // Rest runs on main thread
-                                               new ConcurrentQueue<char> (),
-                                               Mock.Of<IApplicationMainLoop<char>>(),
-                                               m.Object);
+        MainLoopCoordinator<char> c = new (new TimedEvents (),
+
+                                           // Rest runs on main thread
+                                           new ConcurrentQueue<char> (),
+                                           Mock.Of<IApplicationMainLoop<char>> (),
+                                           m.Object);
 
         // StartAsync boots the main loop and the input thread. But if the input class bombs
         // on startup it is important that the exception surface at the call site and not lost
-        var ex = await Assert.ThrowsAsync<AggregateException>(() => c.StartInputTaskAsync (null));
+        var ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
         Assert.Equal ("Crash on boot", ex.InnerExceptions [0].Message);
-
 
         // Restore the original null logger to be polite to other tests
         Logging.Logger = beforeLogger;
 
-
         // Logs should explicitly call out that input loop crashed.
-        mockLogger.Verify (
-                           l => l.Log (LogLevel.Critical,
+        mockLogger.Verify (l => l.Log (LogLevel.Critical,
                                        It.IsAny<EventId> (),
-                                       It.Is<It.IsAnyType> ((v, t) => v.ToString ().Contains("Input loop crashed")),
+                                       It.Is<It.IsAnyType> ((v, t) => v.ToString ().Contains ("Input loop crashed")),
                                        It.IsAny<Exception> (),
-                                       It.IsAny<Func<It.IsAnyType, Exception, string>> ())
-                         , Times.Once);
+                                       It.IsAny<Func<It.IsAnyType, Exception, string>> ()),
+                           Times.Once);
     }
     /*
     [Fact]

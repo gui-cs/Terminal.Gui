@@ -80,29 +80,29 @@ public sealed class PosAlignDemo : Scenario
 
         if (dimension == Dimension.Width)
         {
-            endToStartCheckBox.CheckedState = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
+            endToStartCheckBox.Value = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
             endToStartCheckBox.X = Pos.Align (_horizAligner.Alignment);
             endToStartCheckBox.Y = Pos.Top (alignOptionSelector);
         }
         else
         {
-            endToStartCheckBox.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
+            endToStartCheckBox.Value = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.Checked : CheckState.UnChecked;
             endToStartCheckBox.X = Pos.Left (alignOptionSelector);
             endToStartCheckBox.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        endToStartCheckBox.CheckedStateChanging += (_, e) =>
+        endToStartCheckBox.ValueChanging += (_, e) =>
                                                    {
                                                        if (dimension == Dimension.Width)
                                                        {
-                                                           _horizAligner.AlignmentModes = e.Result == CheckState.Checked
+                                                           _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
                                                                                               ? _horizAligner.AlignmentModes | AlignmentModes.EndToStart
                                                                                               : _horizAligner.AlignmentModes & ~AlignmentModes.EndToStart;
                                                            UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
                                                        }
                                                        else
                                                        {
-                                                           _vertAligner.AlignmentModes = e.Result == CheckState.Checked
+                                                           _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
                                                                                              ? _vertAligner.AlignmentModes | AlignmentModes.EndToStart
                                                                                              : _vertAligner.AlignmentModes & ~AlignmentModes.EndToStart;
                                                            UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
@@ -118,30 +118,30 @@ public sealed class PosAlignDemo : Scenario
 
         if (dimension == Dimension.Width)
         {
-            ignoreFirstOrLast.CheckedState =
+            ignoreFirstOrLast.Value =
                 _horizAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
             ignoreFirstOrLast.X = Pos.Align (_horizAligner.Alignment);
             ignoreFirstOrLast.Y = Pos.Top (alignOptionSelector);
         }
         else
         {
-            ignoreFirstOrLast.CheckedState = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
+            ignoreFirstOrLast.Value = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
             ignoreFirstOrLast.X = Pos.Left (alignOptionSelector);
             ignoreFirstOrLast.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        ignoreFirstOrLast.CheckedStateChanging += (_, e) =>
+        ignoreFirstOrLast.ValueChanging += (_, e) =>
                                                   {
                                                       if (dimension == Dimension.Width)
                                                       {
-                                                          _horizAligner.AlignmentModes = e.Result == CheckState.Checked
+                                                          _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
                                                                                              ? _horizAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
                                                                                              : _horizAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
                                                           UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
                                                       }
                                                       else
                                                       {
-                                                          _vertAligner.AlignmentModes = e.Result == CheckState.Checked
+                                                          _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
                                                                                             ? _vertAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
                                                                                             : _vertAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
                                                           UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
@@ -157,24 +157,24 @@ public sealed class PosAlignDemo : Scenario
 
         if (dimension == Dimension.Width)
         {
-            addSpacesBetweenItems.CheckedState =
+            addSpacesBetweenItems.Value =
                 _horizAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
             addSpacesBetweenItems.X = Pos.Align (_horizAligner.Alignment);
             addSpacesBetweenItems.Y = Pos.Top (alignOptionSelector);
         }
         else
         {
-            addSpacesBetweenItems.CheckedState =
+            addSpacesBetweenItems.Value =
                 _vertAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
             addSpacesBetweenItems.X = Pos.Left (alignOptionSelector);
             addSpacesBetweenItems.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        addSpacesBetweenItems.CheckedStateChanging += (_, e) =>
+        addSpacesBetweenItems.ValueChanging += (_, e) =>
                                                       {
                                                           if (dimension == Dimension.Width)
                                                           {
-                                                              _horizAligner.AlignmentModes = e.Result == CheckState.Checked
+                                                              _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
                                                                                                  ? _horizAligner.AlignmentModes
                                                                                                    | AlignmentModes.AddSpaceBetweenItems
                                                                                                  : _horizAligner.AlignmentModes
@@ -183,7 +183,7 @@ public sealed class PosAlignDemo : Scenario
                                                           }
                                                           else
                                                           {
-                                                              _vertAligner.AlignmentModes = e.Result == CheckState.Checked
+                                                              _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
                                                                                                 ? _vertAligner.AlignmentModes
                                                                                                   | AlignmentModes.AddSpaceBetweenItems
                                                                                                 : _vertAligner.AlignmentModes
@@ -211,16 +211,16 @@ public sealed class PosAlignDemo : Scenario
             margin.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        margin.CheckedStateChanging += (_, e) =>
+        margin.ValueChanging += (_, e) =>
                                        {
                                            if (dimension == Dimension.Width)
                                            {
-                                               _leftMargin = e.Result == CheckState.Checked ? 1 : 0;
+                                               _leftMargin = e.NewValue == CheckState.Checked ? 1 : 0;
                                                UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
                                            }
                                            else
                                            {
-                                               _topMargin = e.Result == CheckState.Checked ? 1 : 0;
+                                               _topMargin = e.NewValue == CheckState.Checked ? 1 : 0;
                                                UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
                                            }
                                        };
@@ -262,16 +262,19 @@ public sealed class PosAlignDemo : Scenario
                                           {
                                               if (e.NewValue < 0)
                                               {
-                                                  e.Cancel = true;
+                                                  e.Handled = true;
 
                                                   return;
                                               }
 
+                                              int newValue = e.NewValue;
+                                              int currentValue = e.CurrentValue;
+
                                               // Add or remove buttons
-                                              if (e.NewValue < e.CurrentValue)
+                                              if (newValue < currentValue)
                                               {
                                                   // Remove buttons
-                                                  for (int i = e.CurrentValue - 1; i >= e.NewValue; i--)
+                                                  for (int i = currentValue - 1; i >= newValue; i--)
                                                   {
                                                       Button button = addedViews [i];
                                                       appWindow.Remove (button);
@@ -280,12 +283,12 @@ public sealed class PosAlignDemo : Scenario
                                                   }
                                               }
 
-                                              if (e.NewValue > e.CurrentValue)
+                                              if (newValue > currentValue)
                                               {
                                                   // Add buttons
-                                                  for (int i = e.CurrentValue; i < e.NewValue; i++)
+                                                  for (int i = currentValue; i < newValue; i++)
                                                   {
-                                                      var button = new Button
+                                                      Button button = new ()
                                                       {
                                                           X = dimension == Dimension.Width
                                                                   ? Pos.Align (_horizAligner.Alignment)

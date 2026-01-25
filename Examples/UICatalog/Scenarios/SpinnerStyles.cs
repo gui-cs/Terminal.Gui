@@ -54,7 +54,7 @@ public class SpinnerViewStyles : Scenario
             X = Pos.Center () - 7,
             Y = Pos.Bottom (preview),
             Enabled = false,
-            CheckedState = CheckState.Checked,
+            Value = CheckState.Checked,
             Text = "Ascii Only"
         };
         win.Add (ckbAscii);
@@ -64,20 +64,20 @@ public class SpinnerViewStyles : Scenario
             X = Pos.Center () + 7,
             Y = Pos.Bottom (preview),
             Enabled = false,
-            CheckedState = CheckState.Checked,
+            Value = CheckState.Checked,
             Text = "No Special"
         };
         win.Add (ckbNoSpecial);
 
         var ckbReverse = new CheckBox
         {
-            X = Pos.Center () - 22, Y = Pos.Bottom (preview) + 1, CheckedState = CheckState.UnChecked, Text = "Reverse"
+            X = Pos.Center () - 22, Y = Pos.Bottom (preview) + 1, Value = CheckState.UnChecked, Text = "Reverse"
         };
         win.Add (ckbReverse);
 
         var ckbBounce = new CheckBox
         {
-            X = Pos.Right (ckbReverse) + 2, Y = Pos.Bottom (preview) + 1, CheckedState = CheckState.UnChecked, Text = "Bounce"
+            X = Pos.Right (ckbReverse) + 2, Y = Pos.Bottom (preview) + 1, Value = CheckState.UnChecked, Text = "Bounce"
         };
         win.Add (ckbBounce);
 
@@ -136,38 +136,38 @@ public class SpinnerViewStyles : Scenario
                                        }
                                    };
 
-        styles.SelectedItemChanged += (s, e) =>
-                                      {
-                                          if (e.Item == 0)
-                                          {
-                                              // SpinnerStyle.Custom
-                                              if (customField.Text.Length < 1)
-                                              {
-                                                  customField.Text = DEFAULT_CUSTOM;
-                                              }
+        styles.ValueChanged += (_, e) =>
+                               {
+                                   if (e.NewValue == 0)
+                                   {
+                                       // SpinnerStyle.Custom
+                                       if (customField.Text.Length < 1)
+                                       {
+                                           customField.Text = DEFAULT_CUSTOM;
+                                       }
 
-                                              if (delayField.Text.Length < 1)
-                                              {
-                                                  delayField.Text = DEFAULT_DELAY.ToString ();
-                                              }
+                                       if (delayField.Text.Length < 1)
+                                       {
+                                           delayField.Text = DEFAULT_DELAY.ToString ();
+                                       }
 
-                                              SetCustom ();
-                                          }
-                                          else
-                                          {
-                                              spinner.Visible = true;
-                                              spinner.Style = (SpinnerStyle)Activator.CreateInstance (styleDict [e.Item.Value].Value);
-                                              delayField.Text = spinner.SpinDelay.ToString ();
-                                              ckbBounce.CheckedState = spinner.SpinBounce ? CheckState.Checked : CheckState.UnChecked;
-                                              ckbNoSpecial.CheckedState = !spinner.HasSpecialCharacters ? CheckState.Checked : CheckState.UnChecked;
-                                              ckbAscii.CheckedState = spinner.IsAsciiOnly ? CheckState.Checked : CheckState.UnChecked;
-                                              ckbReverse.CheckedState = CheckState.UnChecked;
-                                          }
-                                      };
+                                       SetCustom ();
+                                   }
+                                   else
+                                   {
+                                       spinner.Visible = true;
+                                       spinner.Style = (SpinnerStyle)Activator.CreateInstance (styleDict [e.NewValue!.Value].Value)!;
+                                       delayField.Text = spinner.SpinDelay.ToString ();
+                                       ckbBounce.Value = spinner.SpinBounce ? CheckState.Checked : CheckState.UnChecked;
+                                       ckbNoSpecial.Value = !spinner.HasSpecialCharacters ? CheckState.Checked : CheckState.UnChecked;
+                                       ckbAscii.Value = spinner.IsAsciiOnly ? CheckState.Checked : CheckState.UnChecked;
+                                       ckbReverse.Value = CheckState.UnChecked;
+                                   }
+                               };
 
-        ckbReverse.CheckedStateChanging += (s, e) => { spinner.SpinReverse = e.Result == CheckState.Checked; };
+        ckbReverse.ValueChanging += (s, e) => { spinner.SpinReverse = e.NewValue == CheckState.Checked; };
 
-        ckbBounce.CheckedStateChanging += (s, e) => { spinner.SpinBounce = e.Result == CheckState.Checked; };
+        ckbBounce.ValueChanging += (s, e) => { spinner.SpinBounce = e.NewValue == CheckState.Checked; };
 
         win.IsRunningChanged += WinIsRunningChanged;
 

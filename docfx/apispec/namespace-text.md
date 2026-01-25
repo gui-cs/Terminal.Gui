@@ -1,35 +1,42 @@
 ---
 uid: Terminal.Gui.Text
-summary: The `Text` namespace provides advanced text processing, formatting, and Unicode handling capabilities.
+summary: Text processing, formatting, Unicode handling, and autocomplete.
 ---
 
-@Terminal.Gui.Text contains the text processing and formatting system for Terminal.Gui applications. This namespace handles Unicode text rendering, text measurement, formatting with alignment and wrapping, and hot key processing for accessible user interfaces.
+The `Text` namespace provides text processing, formatting, and Unicode support for Terminal.Gui.
 
-The text system supports complex text scenarios including bidirectional text, combining characters, wide characters, and sophisticated formatting options with both horizontal and vertical alignment capabilities.
+## Key Types
 
-## Key Components
+- **TextFormatter** - Text formatting with alignment, wrapping, and hotkey processing
+- **Rune** - Unicode character representation
+- **TextDirection** - Left-to-right and right-to-left text support
+- **Autocomplete** - Text completion suggestions
+- **CollectionNavigator** - Keyboard navigation through collections by typing
 
-- **TextFormatter**: Advanced text formatting with alignment and wrapping
-- **Rune**: Unicode character representation and processing
-- **TextDirection**: Support for left-to-right and right-to-left text
-- **TextAlignment**: Horizontal and vertical text positioning
+## Text Features
 
-## Text Processing Features
+- **Unicode Support** - Full Unicode including combining characters and wide glyphs
+- **Text Alignment** - Horizontal (Left, Center, Right, Fill) and vertical alignment
+- **Word Wrapping** - Automatic text wrapping with configurable behavior
+- **Hotkey Processing** - Underlined hotkey characters (`_` prefix)
+- **Measurement** - Accurate text width calculation for layout
 
-- **Unicode Support**: Full Unicode character set including combining characters
-- **Text Formatting**: Word wrapping, alignment, and hot key processing
-- **Accessibility**: Hot key support for keyboard navigation
-
-## Example Usage 
+## Example
 
 ```csharp
-// Create a text formatter with default settings
-var formatter = new TextFormatter();
+TextFormatter formatter = new ()
+{
+    Text = "_Save File",
+    Alignment = Alignment.Center,
+    VerticalAlignment = Alignment.Center,
+    WordWrap = true,
+    HotKeySpecifier = (Rune)'_'
+};
 
-// Format a string with alignment
-var formatted = formatter.Format("Hello, World!", 10, 10, TextAlignment.Center);
+// Get formatted lines for a given width
+List<string> lines = formatter.GetLines (20);
 ```
 
-## Deep Dive
+## See Also
 
-- [Text Formatting](~/docs/drawing.md) - Comprehensive text formatting documentation
+- [Drawing Deep Dive](~/docs/drawing.md)

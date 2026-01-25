@@ -158,7 +158,6 @@ public class InitTests (ITestOutputHelper output)
 
             // Public Properties
             Assert.Null (application.TopRunnableView);
-            Assert.Null (application.Mouse.MouseGrabView);
             Assert.Null (application.Driver);
             Assert.False (application.StopAfterFirstIteration);
 

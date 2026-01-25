@@ -58,12 +58,7 @@ public partial class TextField
         int selStart = SelectedStart > -1 ? _selectionStart : InsertionPoint;
 
         string newText = StringExtensions.ToString (_text.GetRange (0, selStart))
-                         + StringExtensions.ToString (
-                                                      _text.GetRange (
-                                                                      selStart + SelectedLength,
-                                                                      _text.Count - (selStart + SelectedLength)
-                                                                     )
-                                                     );
+                         + StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
 
         ClearAllSelection ();
         InsertionPoint = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
@@ -73,10 +68,7 @@ public partial class TextField
 
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
-        _historyText.Add (
-                          [Cell.ToCells (_text)],
-                          new (InsertionPoint, 0)
-                         );
+        _historyText.Add ([Cell.ToCells (_text)], new Point (InsertionPoint, 0));
 
         List<string> newText = _text;
 
@@ -108,33 +100,17 @@ public partial class TextField
                     _preChangeInsertionPoint = newText.Count;
                 }
 
-                SetText (
-                         newText.GetRange (0, _preChangeInsertionPoint)
+                SetText (newText.GetRange (0, _preChangeInsertionPoint)
                                 .Concat (enumeratedRunes.Select (r => r.ToString ()))
-                                .Concat (
-                                         newText.GetRange (
-                                                           _preChangeInsertionPoint,
-                                                           Math.Min (
-                                                                     newText.Count - _preChangeInsertionPoint,
-                                                                     newText.Count
-                                                                    )
-                                                          )
-                                        )
-                        );
+                                .Concat (newText.GetRange (_preChangeInsertionPoint, Math.Min (newText.Count - _preChangeInsertionPoint, newText.Count))));
             }
         }
         else
         {
-            SetText (
-                     newText.GetRange (0, _preChangeInsertionPoint)
+            SetText (newText.GetRange (0, _preChangeInsertionPoint)
                             .Concat (enumeratedRunes.Select (r => r.ToString ()))
-                            .Concat (
-                                     newText.GetRange (
-                                                       Math.Min (_preChangeInsertionPoint + 1, newText.Count),
-                                                       Math.Max (newText.Count - _preChangeInsertionPoint - 1, 0)
-                                                      )
-                                    )
-                    );
+                            .Concat (newText.GetRange (Math.Min (_preChangeInsertionPoint + 1, newText.Count),
+                                                       Math.Max (newText.Count - _preChangeInsertionPoint - 1, 0))));
             InsertionPoint++;
         }
 
@@ -153,15 +129,21 @@ public partial class TextField
     /// </summary>
     private List<string> _text;
 
-    private void SetText (List<string> newText) { Text = StringExtensions.ToString (newText); }
-    private void SetText (IEnumerable<string> newText) { SetText (newText.ToList ()); }
+    private void SetText (List<string> newText) => Text = StringExtensions.ToString (newText);
+    private void SetText (IEnumerable<string> newText) => SetText (newText.ToList ());
 
     /// <summary>Sets or gets the text held by the view.</summary>
-    public new string Text
+    public override string Text
     {
         get => StringExtensions.ToString (_text);
         set
         {
+            // Guard against base constructor calling before _text is initialized
+            if (_text is null)
+            {
+                return;
+            }
+
             var oldText = StringExtensions.ToString (_text);
 
             if (oldText == value)
@@ -170,6 +152,13 @@ public partial class TextField
             }
 
             string newText = value.Replace ("\t", "").Split ("\n") [0];
+
+            // Raise IValue<string>.ValueChanging
+            if (RaiseValueChanging (oldText, newText))
+            {
+                return;
+            }
+
             ResultEventArgs<string> args = new (newText);
             RaiseTextChanging (args);
 
@@ -190,19 +179,15 @@ public partial class TextField
 
             if (!Secret && !_historyText.IsFromHistory)
             {
-                _historyText.Add (
-                                  [Cell.ToCellList (oldText)],
-                                  new (InsertionPoint, 0)
-                                 );
+                _historyText.Add ([Cell.ToCellList (oldText)], new Point (InsertionPoint, 0));
 
-                _historyText.Add (
-                                  [Cell.ToCells (_text)],
-                                  new (InsertionPoint, 0),
-                                  TextEditingLineStatus.Replaced
-                                 );
+                _historyText.Add ([Cell.ToCells (_text)], new Point (InsertionPoint, 0), TextEditingLineStatus.Replaced);
             }
 
             OnTextChanged ();
+
+            // Raise IValue<string>.ValueChanged
+            RaiseValueChanged (oldText, StringExtensions.ToString (_text));
 
             ProcessAutocomplete ();
 
@@ -262,18 +247,9 @@ public partial class TextField
 
         // If cursor is beyond the visible area, scroll right to show it
         else if (Viewport.Width > 0
-                 && (ScrollOffset + InsertionPoint - Viewport.Width == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, InsertionPoint).size >= Viewport.Width))
+                 && (ScrollOffset + InsertionPoint - Viewport.Width == 0 || TextModel.DisplaySize (_text, ScrollOffset, InsertionPoint).size >= Viewport.Width))
         {
-            ScrollOffset = Math.Max (
-                                     TextModel.CalculateLeftColumn (
-                                                                    _text,
-                                                                    ScrollOffset,
-                                                                    InsertionPoint,
-                                                                    Viewport.Width
-                                                                   ),
-                                     0
-                                    );
+            ScrollOffset = Math.Max (TextModel.CalculateLeftColumn (_text, ScrollOffset, InsertionPoint, Viewport.Width), 0);
             need = true;
         }
 
@@ -397,6 +373,7 @@ public partial class TextField
         set
         {
             int previousInsertionPoint = _insertionPoint;
+
             if (value < 0)
             {
                 _insertionPoint = 0;
@@ -450,10 +427,7 @@ public partial class TextField
 
         int pos = col + Math.Min (Viewport.X, 0);
 
-        Cursor = Cursor with
-        {
-            Position = ViewportToScreen (new Point (pos, 0)),
-        };
+        Cursor = Cursor with { Position = ViewportToScreen (new Point (pos, 0)) };
     }
 
     /// <summary>

@@ -259,7 +259,7 @@ public class ScenarioTests : TestsAllViews
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            AllowsMarking = false,
+            ShowMarks = false,
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (new ObservableCollection<string> (viewClasses.Keys.ToList ()))
         };
@@ -341,22 +341,26 @@ public class ScenarioTests : TestsAllViews
             SchemeName = "Dialog"
         };
 
-        classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
+        classListView.Accepting += (s, a) =>
+                                   {
+                                       settingsPane.SetFocus ();
+                                       a.Handled = true;
+                                   };
 
-        classListView.SelectedItemChanged += (s, args) =>
-                                             {
-                                                 // Remove existing class, if any
-                                                 if (curView is { })
-                                                 {
-                                                     curView.SubViewsLaidOut -= LayoutCompleteHandler;
-                                                     hostPane.Remove (curView);
-                                                     curView.Dispose ();
-                                                     curView = null;
-                                                     hostPane.FillRect (hostPane.Viewport);
-                                                 }
+        classListView.ValueChanged += (_, _) =>
+                                      {
+                                          // Remove existing class, if any
+                                          if (curView is { })
+                                          {
+                                              curView.SubViewsLaidOut -= LayoutCompleteHandler;
+                                              hostPane.Remove (curView);
+                                              curView.Dispose ();
+                                              curView = null;
+                                              hostPane.FillRect (hostPane.Viewport);
+                                          }
 
-                                                 curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem!.Value]);
-                                             };
+                                          curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem!.Value]);
+                                      };
 
         xOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
 
