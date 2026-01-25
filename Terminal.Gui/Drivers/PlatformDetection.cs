@@ -13,10 +13,17 @@ public static class PlatformDetection
     /// <returns>True if running on WSL, false otherwise.</returns>
     public static bool IsWSL ()
     {
-        // xclip does not work on WSL, so we need to use the Windows clipboard via Powershell
-        (int exitCode, string result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
+        try
+        {
+            // xclip does not work on WSL, so we need to use the Windows clipboard via Powershell
+            (int exitCode, string result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
 
-        return exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL");
+            return exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL");
+        }
+        catch
+        {
+            return false; // If Bash is unavailable (e.g., running on Windows)
+        }
     }
 
     /// <summary>

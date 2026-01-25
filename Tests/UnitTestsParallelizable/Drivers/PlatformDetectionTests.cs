@@ -9,60 +9,49 @@ public class PlatformDetectionTests (ITestOutputHelper output)
     [Fact]
     public void DetectPlatform_BasedOnOSDescription ()
     {
-        string osDesc = RuntimeInformation.OSDescription.ToLowerInvariant ();
-        bool isWSLExpected = false;
+        bool isWSLExpected = PlatformDetection.IsWSL ();
 
-        if (osDesc.Contains ("linux"))
+        if (OperatingSystem.IsWindows ())
         {
-            // Simple heuristic for WSL
-            // Many WSL distributions include "microsoft" in uname -a
-            // Since we cannot execute Bash in a unit test reliably, we simulate here
-            isWSLExpected = osDesc.Contains ("microsoft") || PlatformDetection.IsWSL ();
+            Assert.False (isWSLExpected);
+            Assert.True (PlatformDetection.IsWindows ());
+            Assert.False (PlatformDetection.IsUnixLike ());
+            Assert.False (PlatformDetection.IsLinux ());
+            Assert.False (PlatformDetection.IsMac ());
         }
-
-        switch (osDesc)
+        else if (OperatingSystem.IsLinux ())
         {
-            case var desc when desc.Contains ("windows"):
-                Assert.True (PlatformDetection.IsWindows ());
-                Assert.False (PlatformDetection.IsUnixLike ());
-                Assert.False (PlatformDetection.IsLinux ());
-                Assert.False (PlatformDetection.IsMac ());
-                Assert.False (PlatformDetection.IsWSL ());
-                break;
-
-            case var desc when desc.Contains ("linux"):
-                Assert.False (PlatformDetection.IsWindows ());
-                Assert.True (PlatformDetection.IsUnixLike ());
-                Assert.True (PlatformDetection.IsLinux ());
-                Assert.False (PlatformDetection.IsMac ());
-                Assert.Equal (isWSLExpected, PlatformDetection.IsWSL ());
-                break;
-
-            case var desc when desc.Contains ("darwin") || desc.Contains ("macos"):
-                Assert.False (PlatformDetection.IsWindows ());
-                Assert.True (PlatformDetection.IsUnixLike ());
-                Assert.False (PlatformDetection.IsLinux ());
-                Assert.True (PlatformDetection.IsMac ());
-                Assert.False (PlatformDetection.IsWSL ());
-                break;
-
-            case var desc when desc.Contains ("freebsd"):
-                Assert.False (PlatformDetection.IsWindows ());
-                Assert.True (PlatformDetection.IsUnixLike ());
-                Assert.False (PlatformDetection.IsLinux ());
-                Assert.True (PlatformDetection.IsMac ());
-                Assert.False (PlatformDetection.IsWSL ());
-                break;
-
-            default:
-                // Fallback for other Unix-like or unknown systems
-                Assert.False (PlatformDetection.IsWindows ());
-                Assert.True (PlatformDetection.IsUnixLike ());
-                Assert.False (PlatformDetection.IsLinux ());
-                Assert.True (PlatformDetection.IsMac ());
-                Assert.False (PlatformDetection.IsWSL ());
-                output.WriteLine ($"Unknown OS Description: {osDesc}");
-                break;
+            Assert.Equal (isWSLExpected, PlatformDetection.IsWSL ());
+            Assert.False (PlatformDetection.IsWindows ());
+            Assert.True (PlatformDetection.IsUnixLike ());
+            Assert.True (PlatformDetection.IsLinux ());
+            Assert.False (PlatformDetection.IsMac ());
+        }
+        else if (OperatingSystem.IsMacOS ())
+        {
+            Assert.False (isWSLExpected);
+            Assert.False (PlatformDetection.IsWindows ());
+            Assert.True (PlatformDetection.IsUnixLike ());
+            Assert.False (PlatformDetection.IsLinux ());
+            Assert.True (PlatformDetection.IsMac ());
+        }
+        else if (OperatingSystem.IsFreeBSD ())
+        {
+            Assert.False (isWSLExpected);
+            Assert.False (PlatformDetection.IsWindows ());
+            Assert.True (PlatformDetection.IsUnixLike ());
+            Assert.False (PlatformDetection.IsLinux ());
+            Assert.True (PlatformDetection.IsMac ());
+        }
+        else
+        {
+            // Fallback for other Unix-like or unknown systems
+            Assert.False (isWSLExpected);
+            Assert.False (PlatformDetection.IsWindows ());
+            Assert.True (PlatformDetection.IsUnixLike ());
+            Assert.False (PlatformDetection.IsLinux ());
+            Assert.True (PlatformDetection.IsMac ());
+            output.WriteLine ($"Unknown OS Description: {RuntimeInformation.OSDescription}");
         }
     }
 }
