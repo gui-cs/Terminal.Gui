@@ -146,8 +146,6 @@ public partial class View // Mouse APIs
 
         MouseState &= ~MouseState.In;
 
-        // TODO: Should we also MouseState &= ~MouseState.Pressed; ??
-
         if (MouseHighlightStates != MouseState.None)
         {
             SetNeedsDraw ();
@@ -184,8 +182,6 @@ public partial class View // Mouse APIs
 
     #region Low Level Mouse Events
 
-    private MouseFlags? _mouseHoldRepeat;
-
     /// <summary>
     ///     Gets or sets which mouse event triggers command invocation during continuous button press.
     ///     When set to a non-null value and the user presses and holds the mouse button,
@@ -209,7 +205,7 @@ public partial class View // Mouse APIs
     /// </remarks>
     public MouseFlags? MouseHoldRepeat
     {
-        get => _mouseHoldRepeat;
+        get;
         set
         {
             // Validate that only null, Pressed, or Clicked flags are allowed
@@ -236,7 +232,7 @@ public partial class View // Mouse APIs
             }
 
             CWPPropertyHelper.ChangeProperty (this,
-                                              ref _mouseHoldRepeat,
+                                              ref field,
                                               value,
                                               OnMouseHoldRepeatChanging,
                                               MouseHoldRepeatChanging,
@@ -272,7 +268,7 @@ public partial class View // Mouse APIs
                     MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed, Command.Activate);
                 }
 
-                _mouseHoldRepeat = newValue;
+                field = newValue;
             }
         }
     }
@@ -577,7 +573,7 @@ public partial class View // Mouse APIs
         }
 
         // If the user has just pressed the mouse, grab the mouse and set focus
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             App?.Mouse.GrabMouse (this);
 
@@ -611,7 +607,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             return false;
         }
@@ -637,7 +633,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             return false;
         }
@@ -716,7 +712,6 @@ public partial class View // Mouse APIs
         // Pre-conditions
         if (!Enabled)
         {
-            // QUESTION: Is this right? Should a disabled view eat mouse clicks?
             return args.Handled = false;
         }
 
@@ -749,7 +744,6 @@ public partial class View // Mouse APIs
         // Pre-conditions
         if (!Enabled)
         {
-            // QUESTION: Is this right? Should a disabled view eat mouse wheel?
             return args.Handled = false;
         }
 
@@ -786,8 +780,6 @@ public partial class View // Mouse APIs
 
     #region MouseState Handling
 
-    private MouseState _mouseState;
-
     /// <summary>
     ///     Gets the state of the mouse relative to the View. When changed, the <see cref="MouseStateChanged"/>/
     ///     <see cref="OnMouseStateChanged"/>
@@ -795,10 +787,10 @@ public partial class View // Mouse APIs
     /// </summary>
     public MouseState MouseState
     {
-        get => _mouseState;
+        get;
         internal set
         {
-            if (_mouseState == value)
+            if (field == value)
             {
                 return;
             }
@@ -807,7 +799,7 @@ public partial class View // Mouse APIs
 
             RaiseMouseStateChanged (args);
 
-            _mouseState = value;
+            field = value;
         }
     }
 
@@ -870,7 +862,7 @@ public partial class View // Mouse APIs
             MouseHoldRepeater.Dispose ();
         }
 
-        if (App?.Mouse.MouseGrabView == this)
+        if (App is { } && App.Mouse.IsGrabbed (this))
         {
             App.Mouse.UngrabMouse ();
         }

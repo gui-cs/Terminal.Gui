@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using Timeout = Terminal.Gui.App.Timeout;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -24,7 +24,7 @@ public interface IMouseHoldRepeater : IDisposable
     ///     Setting a custom timeout allows tests to use simpler, more predictable timing behavior.
     ///     The timeout's callback will be set automatically by the repeater.
     /// </remarks>
-    App.Timeout? Timeout { get; set; }
+    Timeout? Timeout { get; set; }
 
     /// <summary>
     ///     Periodically raised when the mouse is pressed down inside the view <see cref="View"/>.

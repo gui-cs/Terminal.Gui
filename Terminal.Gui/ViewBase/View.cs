@@ -84,7 +84,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
         DisposeAdornments ();
         DisposeScrollBars ();
 
-        if (App?.Mouse.MouseGrabView == this)
+        if (App is { } && App.Mouse.IsGrabbed (this))
         {
             App.Mouse.UngrabMouse ();
         }

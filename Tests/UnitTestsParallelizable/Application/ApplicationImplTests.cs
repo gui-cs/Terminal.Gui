@@ -17,7 +17,7 @@ public class ApplicationImplTests
         Assert.Null (app.TopRunnableView);
         SessionToken? rs = app.Begin (new Runnable<bool> ());
         Assert.Equal (app.TopRunnable, rs!.Runnable);
-        Assert.Null (app.Mouse.MouseGrabView); // public
+        Assert.False (app.Mouse.IsGrabbed (rs!.Runnable as View)); // public
 
         app.Dispose ();
     }
