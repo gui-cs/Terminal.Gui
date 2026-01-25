@@ -7,6 +7,12 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public partial class TableView
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether to use scrollbars.
+    /// This will change the behavior of the TableView to use the Viewport and ContentSize
+    /// The tableview takes care of showing and hiding the scrollbars as needed.
+    /// It takes as much space as needed to render the content, in case you can use the scrollbars.
+    /// </summary>
     public bool UseScrollbars
     {
         get => field;
@@ -21,7 +27,11 @@ public partial class TableView
         }
     }
 
-    //calculates the current header height based on what is visible
+    /// <summary>
+    /// calculates the current header height based on what is visible
+    /// This respects the viewport Y position and the AlwaysShowHeaders style
+    /// </summary>
+    /// <returns>height</returns>
     protected int CurrentHeaderHeightVisible ()
     {
         if (!ShouldRenderHeaders ())

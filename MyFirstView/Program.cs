@@ -122,12 +122,12 @@ class Program
             Text = "Always Show Header",
             X = Pos.Left (tableView),
             Y = Pos.Top (tableView) - 1,
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
 
-        checkBoxHeaderAlwaysVisible.CheckedStateChanged += (sender, args) =>
+        checkBoxHeaderAlwaysVisible.ValueChanged += (sender, args) =>
         {
-            tableView.Style.AlwaysShowHeaders = checkBoxHeaderAlwaysVisible.CheckedState == CheckState.Checked;
+            tableView.Style.AlwaysShowHeaders = checkBoxHeaderAlwaysVisible.Value == CheckState.Checked;
         };
         exampleWindow.Add (firstView, tableView, buttonCellToScreen, buttonEnsureSelectedCellIsVisible, checkBoxHeaderAlwaysVisible);
 
