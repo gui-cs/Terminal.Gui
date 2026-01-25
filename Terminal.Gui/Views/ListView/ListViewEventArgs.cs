@@ -24,7 +24,7 @@ public class ListViewRowEventArgs : EventArgs
 {
     /// <summary>Initializes with the current row.</summary>
     /// <param name="row"></param>
-    public ListViewRowEventArgs (int row) { Row = row; }
+    public ListViewRowEventArgs (int row) => Row = row;
 
     /// <summary>The current row being rendered.</summary>
     public int Row { get; }

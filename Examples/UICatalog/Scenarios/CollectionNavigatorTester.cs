@@ -99,16 +99,16 @@ public class CollectionNavigatorTester : Scenario
             Title = "Allow _Marking"
         };
 
-        _allowMarkingCheckBox.CheckedStateChanged += (_, _) =>
+        _allowMarkingCheckBox.ValueChanged += (_, _) =>
                                                      {
                                                          if (_listView is not null)
                                                          {
-                                                             _listView.AllowsMarking = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
+                                                             _listView.ShowMarks = _allowMarkingCheckBox.Value == CheckState.Checked;
                                                          }
 
                                                          if (_allowMultiSelectionCheckBox is not null)
                                                          {
-                                                             _allowMultiSelectionCheckBox.Enabled = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
+                                                             _allowMultiSelectionCheckBox.Enabled = _allowMarkingCheckBox.Value == CheckState.Checked;
                                                          }
                                                      };
 
@@ -118,12 +118,12 @@ public class CollectionNavigatorTester : Scenario
             Enabled = false
         };
 
-        _allowMultiSelectionCheckBox.CheckedStateChanged += (_, _) =>
+        _allowMultiSelectionCheckBox.ValueChanged += (_, _) =>
                                                             {
                                                                 if (_listView is not null)
                                                                 {
-                                                                    _listView.AllowsMultipleSelection =
-                                                                        _allowMultiSelectionCheckBox.CheckedState == CheckState.Checked;
+                                                                    _listView.MarkMultiple =
+                                                                        _allowMultiSelectionCheckBox.Value == CheckState.Checked;
                                                                 }
                                                             };
 
@@ -207,8 +207,8 @@ public class CollectionNavigatorTester : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50) - 1,
             Height = Dim.Fill (),
-            AllowsMarking = false,
-            AllowsMultipleSelection = false
+            ShowMarks = false,
+            MarkMultiple = false
         };
         _top.Add (_listView);
 

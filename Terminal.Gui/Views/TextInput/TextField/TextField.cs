@@ -2,7 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
 /// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
-public partial class TextField : View, IDesignable
+public partial class TextField : View, IDesignable, IValue<string>
 {
     /// <summary>
     ///     Gets or sets the default cursor style.
@@ -15,7 +15,7 @@ public partial class TextField : View, IDesignable
     /// </summary>
     public TextField ()
     {
-        _historyText = new ();
+        _historyText = new HistoryText ();
         _isButtonReleased = true;
         _selectionAnchor = -1;
         _text = [];
@@ -36,7 +36,7 @@ public partial class TextField : View, IDesignable
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        Cursor = new () { Style = DefaultCursorStyle };
+        Cursor = new Cursor { Style = DefaultCursorStyle };
     }
 
     private void TextField_Initialized (object? sender, EventArgs e)
@@ -74,9 +74,9 @@ public partial class TextField : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        if (App?.Mouse.MouseGrabView is { } && App?.Mouse.MouseGrabView == this)
+        if (App is { } && App.Mouse.IsGrabbed (this))
         {
-            App?.Mouse.UngrabMouse ();
+            App.Mouse.UngrabMouse ();
         }
 
         // If gaining focus via keyboard (not mouse), select all text
@@ -91,7 +91,7 @@ public partial class TextField : View, IDesignable
         UpdateCursor ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         base.OnSubViewsLaidOut (args);
@@ -101,23 +101,22 @@ public partial class TextField : View, IDesignable
     /// <summary>Get the Context Menu for this view.</summary>
     public PopoverMenu? ContextMenu { get; private set; }
 
-    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) => KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
 
     private void CreateContextMenu ()
     {
         DisposeContextMenu ();
 
-        PopoverMenu menu = new (
-                                new List<MenuItem>
-                                {
-                                    new (this, Command.SelectAll, Strings.ctxSelectAll),
-                                    new (this, Command.DeleteAll, Strings.ctxDeleteAll),
-                                    new (this, Command.Copy, Strings.ctxCopy),
-                                    new (this, Command.Cut, Strings.ctxCut),
-                                    new (this, Command.Paste, Strings.ctxPaste),
-                                    new (this, Command.Undo, Strings.ctxUndo),
-                                    new (this, Command.Redo, Strings.ctxRedo)
-                                });
+        PopoverMenu menu = new (new List<MenuItem>
+        {
+            new (this, Command.SelectAll, Strings.ctxSelectAll),
+            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
+            new (this, Command.Copy, Strings.ctxCopy),
+            new (this, Command.Cut, Strings.ctxCut),
+            new (this, Command.Paste, Strings.ctxPaste),
+            new (this, Command.Undo, Strings.ctxUndo),
+            new (this, Command.Redo, Strings.ctxRedo)
+        });
 
         HotKeyBindings.Remove (menu.Key);
         HotKeyBindings.Add (menu.Key, Command.Context);
@@ -147,6 +146,45 @@ public partial class TextField : View, IDesignable
         return true;
     }
 
+    #region IValue<string> Implementation
+
+    /// <summary>
+    ///     Gets or sets the value of the <see cref="TextField"/>. This is an alias for <see cref="Text"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property enables <see cref="TextField"/> to be used with the <see cref="IValue{TValue}"/> pattern
+    ///     for generic value access and command propagation.
+    /// </remarks>
+    public string? Value { get => Text; set => Text = value ?? string.Empty; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<string?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanging"/> event.
+    /// </summary>
+    private bool RaiseValueChanging (string? currentValue, string? newValue)
+    {
+        ValueChangingEventArgs<string?> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event.
+    /// </summary>
+    private void RaiseValueChanged (string? oldValue, string? newValue)
+    {
+        ValueChangedEventArgs<string?> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
+
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
@@ -157,5 +195,4 @@ public partial class TextField : View, IDesignable
 
         base.Dispose (disposing);
     }
-
 }

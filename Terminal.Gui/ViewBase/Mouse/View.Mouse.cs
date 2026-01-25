@@ -12,7 +12,7 @@ public partial class View // Mouse APIs
 
     private void SetupMouse ()
     {
-        MouseBindings = new ();
+        MouseBindings = new MouseBindings ();
 
         // By default, left click activates. No binding to Accept by default.
         MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
@@ -93,7 +93,7 @@ public partial class View // Mouse APIs
     ///     <see langword="true"/> if the event was canceled, <see langword="false"/> if not. Cancelling the event
     ///     prevents Views higher in the visible hierarchy from receiving Enter/Leave events.
     /// </returns>
-    protected virtual bool OnMouseEnter (CancelEventArgs eventArgs) { return false; }
+    protected virtual bool OnMouseEnter (CancelEventArgs eventArgs) => false;
 
     /// <summary>
     ///     Raised when the mouse moves over the View's <see cref="Frame"/>. <see cref="MouseLeave"/> will
@@ -146,8 +146,6 @@ public partial class View // Mouse APIs
 
         MouseState &= ~MouseState.In;
 
-        // TODO: Should we also MouseState &= ~MouseState.Pressed; ??
-
         if (MouseHighlightStates != MouseState.None)
         {
             SetNeedsDraw ();
@@ -184,8 +182,6 @@ public partial class View // Mouse APIs
 
     #region Low Level Mouse Events
 
-    private MouseFlags? _mouseHoldRepeat;
-
     /// <summary>
     ///     Gets or sets which mouse event triggers command invocation during continuous button press.
     ///     When set to a non-null value and the user presses and holds the mouse button,
@@ -209,7 +205,7 @@ public partial class View // Mouse APIs
     /// </remarks>
     public MouseFlags? MouseHoldRepeat
     {
-        get => _mouseHoldRepeat;
+        get;
         set
         {
             // Validate that only null, Pressed, or Clicked flags are allowed
@@ -235,17 +231,15 @@ public partial class View // Mouse APIs
                 }
             }
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
-                                              ref _mouseHoldRepeat,
+            CWPPropertyHelper.ChangeProperty (this,
+                                              ref field,
                                               value,
                                               OnMouseHoldRepeatChanging,
                                               MouseHoldRepeatChanging,
                                               DoWork,
                                               OnMouseHoldRepeatChanged,
                                               MouseHoldRepeatChanged,
-                                              out _
-                                             );
+                                              out _);
 
             return;
 
@@ -274,7 +268,7 @@ public partial class View // Mouse APIs
                     MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed, Command.Activate);
                 }
 
-                _mouseHoldRepeat = newValue;
+                field = newValue;
             }
         }
     }
@@ -282,7 +276,7 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     Called before <see cref="MouseHoldRepeat"/> changes. Return <see langword="true"/> to cancel the change.
     /// </summary>
-    protected virtual bool OnMouseHoldRepeatChanging (ValueChangingEventArgs<MouseFlags?> args) { return false; }
+    protected virtual bool OnMouseHoldRepeatChanging (ValueChangingEventArgs<MouseFlags?> args) => false;
 
     /// <summary>
     ///     Raised before <see cref="MouseHoldRepeat"/> changes. Set <see cref="CancelEventArgs.Cancel"/> to
@@ -551,7 +545,7 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool OnMouseEvent (Mouse mouse) { return false; }
+    protected virtual bool OnMouseEvent (Mouse mouse) => false;
 
     /// <summary>Raised when a mouse event occurs.</summary>
     /// <remarks>
@@ -579,7 +573,7 @@ public partial class View // Mouse APIs
         }
 
         // If the user has just pressed the mouse, grab the mouse and set focus
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             App?.Mouse.GrabMouse (this);
 
@@ -613,7 +607,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             return false;
         }
@@ -639,7 +633,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (App is null || App.Mouse.MouseGrabView != this)
+        if (App is null || !App.Mouse.IsGrabbed (this))
         {
             return false;
         }
@@ -718,7 +712,6 @@ public partial class View // Mouse APIs
         // Pre-conditions
         if (!Enabled)
         {
-            // QUESTION: Is this right? Should a disabled view eat mouse clicks?
             return args.Handled = false;
         }
 
@@ -751,7 +744,6 @@ public partial class View // Mouse APIs
         // Pre-conditions
         if (!Enabled)
         {
-            // QUESTION: Is this right? Should a disabled view eat mouse wheel?
             return args.Handled = false;
         }
 
@@ -779,7 +771,7 @@ public partial class View // Mouse APIs
             return null;
         }
 
-        binding.MouseEventArgs = mouseEventArgs;
+        binding.MouseEvent = mouseEventArgs;
 
         return InvokeCommands (binding.Commands, binding);
     }
@@ -788,8 +780,6 @@ public partial class View // Mouse APIs
 
     #region MouseState Handling
 
-    private MouseState _mouseState;
-
     /// <summary>
     ///     Gets the state of the mouse relative to the View. When changed, the <see cref="MouseStateChanged"/>/
     ///     <see cref="OnMouseStateChanged"/>
@@ -797,10 +787,10 @@ public partial class View // Mouse APIs
     /// </summary>
     public MouseState MouseState
     {
-        get => _mouseState;
+        get;
         internal set
         {
-            if (_mouseState == value)
+            if (field == value)
             {
                 return;
             }
@@ -809,7 +799,7 @@ public partial class View // Mouse APIs
 
             RaiseMouseStateChanged (args);
 
-            _mouseState = value;
+            field = value;
         }
     }
 
@@ -872,7 +862,7 @@ public partial class View // Mouse APIs
             MouseHoldRepeater.Dispose ();
         }
 
-        if (App?.Mouse.MouseGrabView == this)
+        if (App is { } && App.Mouse.IsGrabbed (this))
         {
             App.Mouse.UngrabMouse ();
         }

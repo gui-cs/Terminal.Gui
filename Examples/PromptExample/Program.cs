@@ -1,6 +1,5 @@
 // Example demonstrating the Prompt API for getting typed input from users
 
-using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
@@ -51,29 +50,30 @@ Button textViewButton = new () { Title = "TextView (Auto-Text)", X = Pos.Center 
 textViewButton.Accepting += (_, _) =>
                             {
                                 string? result = mainWindow.Prompt<TextView, string> (beginInitHandler: prompt =>
-                                                                                                         {
-                                                                                                             prompt.Title = textViewButton.Title;
-                                                                                                             prompt.GetWrappedView ().Text = "Some text\nis nice.";
-                                                                                                             prompt.GetWrappedView ().Width = Dim.Fill (0, 40);
-                                                                                                             prompt.GetWrappedView ().Height = Dim.Fill (0, 8);
-                                                                                                         });
+                                                                                                        {
+                                                                                                            prompt.Title = textViewButton.Title;
+
+                                                                                                            prompt.GetWrappedView ().Text =
+                                                                                                                "Some text\nis nice.";
+                                                                                                            prompt.GetWrappedView ().Width = Dim.Fill (0, 40);
+                                                                                                            prompt.GetWrappedView ().Height = Dim.Fill (0, 8);
+                                                                                                        });
 
                                 MessageBox.Query (app, textViewButton.Title, result is { } ? $"You entered: {result}" : "Canceled", Strings.btnOk);
                             };
 
 mainWindow.Add (textViewButton);
 
-
 // Example 2: DatePicker with DateTime result
 Button datePickerButton = new () { Title = "DatePicker (Typed Result)", X = Pos.Center (), Y = buttonY++ };
 
 datePickerButton.Accepting += (_, _) =>
                               {
-                                  DateTime? result = mainWindow.Prompt<DatePicker, DateTime> (resultExtractor: dp => dp.Date,
+                                  DateTime? result = mainWindow.Prompt<DatePicker, DateTime> (resultExtractor: dp => dp.Value,
                                                                                               beginInitHandler: prompt =>
                                                                                               {
                                                                                                   prompt.Title = "Select a Date";
-                                                                                                  prompt.GetWrappedView ().Date = DateTime.Now;
+                                                                                                  prompt.GetWrappedView ().Value = DateTime.Now;
                                                                                               });
 
                                   if (result is { } selectedDate)
@@ -94,10 +94,7 @@ Button colorPickerButton = new () { Title = "ColorPicker (Typed Result)", X = Po
 colorPickerButton.Accepting += (_, _) =>
                                {
                                    Color? result = mainWindow.Prompt<ColorPicker, Color?> (input: null,
-                                                                                          beginInitHandler: prompt =>
-                                                                                          {
-                                                                                              prompt.Title = "Pick a Color";
-                                                                                          });
+                                                                                           beginInitHandler: prompt => { prompt.Title = "Pick a Color"; });
 
                                    if (result is { } selectedColor)
                                    {
@@ -242,7 +239,7 @@ FormData ExtractFormData (View form)
     {
         Name = nameField?.Text ?? string.Empty,
         Age = int.TryParse (ageField?.Text, out int age) ? age : 0,
-        Agreed = agreeCheckbox?.CheckedState == CheckState.Checked
+        Agreed = agreeCheckbox?.Value == CheckState.Checked
     };
 }
 

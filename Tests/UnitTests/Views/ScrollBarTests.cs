@@ -520,7 +520,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         }
         super.Add (scrollBar);
 
-        scrollBar.Position = contentPosition;
+        scrollBar.Value = contentPosition;
 
         super.Layout ();
         super.Draw ();
@@ -554,13 +554,13 @@ public class ScrollBarTests (ITestOutputHelper output)
         SessionToken rs = Application.Begin (top);
 
         // Scroll to end
-        scrollBar.Position = 19;
-        Assert.Equal (10, scrollBar.Position);
+        scrollBar.Value = 19;
+        Assert.Equal (10, scrollBar.Value);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (4, scrollBar.GetSliderPosition ());
-        Assert.Equal (10, scrollBar.Position);
-        int initialPos = scrollBar.Position;
+        Assert.Equal (10, scrollBar.Value);
+        int initialPos = scrollBar.Value;
 
         Point btnPoint = orientation == Orientation.Vertical
                              ? new (0, 0)
@@ -574,7 +574,7 @@ public class ScrollBarTests (ITestOutputHelper output)
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.Equal (initialPos - increment, scrollBar.Position);
+        Assert.Equal (initialPos - increment, scrollBar.Value);
 
         Application.ResetState (true);
     }
@@ -603,12 +603,12 @@ public class ScrollBarTests (ITestOutputHelper output)
         SessionToken rs = Application.Begin (top);
 
         // Scroll to top
-        scrollBar.Position = 0;
+        scrollBar.Value = 0;
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (0, scrollBar.GetSliderPosition ());
-        Assert.Equal (0, scrollBar.Position);
-        int initialPos = scrollBar.Position;
+        Assert.Equal (0, scrollBar.Value);
+        int initialPos = scrollBar.Value;
 
         Point btnPoint = orientation == Orientation.Vertical
                              ? new (scrollBar.Frame.X, scrollBar.Frame.Height - 1)
@@ -621,7 +621,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         });
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.Equal (initialPos + increment, scrollBar.Position);
+        Assert.Equal (initialPos + increment, scrollBar.Value);
 
         Application.ResetState (true);
     }

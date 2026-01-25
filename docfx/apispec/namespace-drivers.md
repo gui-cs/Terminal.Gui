@@ -1,52 +1,47 @@
 ---
 uid: Terminal.Gui.Drivers
-summary: The `Drivers` namespace provides cross-platform terminal abstraction and console driver implementations.
+summary: Cross-platform terminal abstraction, console drivers, and ANSI handling.
 ---
 
-@Terminal.Gui.Drivers contains the platform abstraction layer that enables Terminal.Gui to run consistently across Windows, macOS, and Linux/Unix systems. This namespace includes console drivers, component factories, input/output processors, and platform-specific optimizations.
+The `Drivers` namespace provides the platform abstraction layer enabling Terminal.Gui to run consistently across Windows, macOS, and Linux/Unix.
 
-The driver system handles low-level terminal operations including cursor management, color support detection, input processing, screen buffer management, and terminal size monitoring. It provides a unified API through `IConsoleDriver` while accommodating the unique characteristics of different terminal environments.
+## Key Types
 
-## Architecture Overview
-
-Terminal.Gui v2 uses a modular driver architecture based on the **Component Factory** pattern:
-
-- **IComponentFactory<T>**: Factory interface that creates driver-specific components
-- **ConsoleDriverFacade<T>**: Unified facade implementing `IConsoleDriver` and `IConsoleDriverFacade`
-- **IConsoleInput<T>**: Reads raw console input events on a separate thread
-- **IConsoleOutput**: Renders the output buffer to the terminal
-- **IInputProcessor**: Translates raw input into Terminal.Gui events (`Key`, `MouseEventArgs`)
-- **IOutputBuffer**: Manages the screen buffer and drawing operations
-- **IWindowSizeMonitor**: Detects and reports terminal size changes
+- **IDriver** - Main driver interface for terminal operations
+- **DriverRegistry** - Registry of available drivers with metadata
+- **AnsiResponseParser** - ANSI escape sequence parsing for input
+- **AnsiKeyboardParser** / **AnsiMouseParser** - Keyboard and mouse input parsing
+- **EscSeqUtils** - ANSI escape sequence constants and utilities
+- **Cursor** / **CursorStyle** - Terminal cursor management
 
 ## Available Drivers
 
-Terminal.Gui provides three console driver implementations optimized for different platforms:
+| Driver | Platform | Description |
+|--------|----------|-------------|
+| `windows` | Windows | Native Win32 Console API with highest performance |
+| `unix` | Unix/Linux/macOS | Direct syscalls with ANSI sequences |
+| `dotnet` | All | Cross-platform using `System.Console` |
+| `ansi` | All | Pure ANSI implementation, ideal for testing |
 
-- **DotNetDriver** (`dotnet`, `NetComponentFactory`) - Cross-platform driver using .NET `System.Console` API. Works on all platforms.
-- **WindowsDriver** (`windows`, `WindowsComponentFactory`) - Windows-optimized driver using Windows Console APIs for enhanced performance and features.
-- **UnixDriver** (`unix`, `UnixComponentFactory`) - Unix/Linux/macOS-optimized driver using platform-specific APIs.
-- **FakeDriver** (`fake`, `FakeComponentFactory`) - Mock driver for unit testing.
-
-The appropriate driver is automatically selected based on the platform. Windows defaults to `WindowsDriver`, while Unix-based systems default to `UnixDriver`.
-
-## Example Usage
+## Driver Selection
 
 ```csharp
-// Driver selection is typically automatic
-Application.Init();
+// Automatic (recommended)
+app.Init ();  // Selects best driver for platform
 
-// Access current driver
-IConsoleDriver driver = Application.Driver;
-bool supportsColors = driver.SupportsTrueColor;
+// Explicit selection
+app.Init (DriverRegistry.Names.ANSI);
 
-// Explicitly specify a driver
-Application.ForceDriver = "dotnet";
-Application.Init();
-
-// Or pass driver name to Init
-Application.Init(driverName: "unix");
+// Via configuration
+app.ForceDriver = DriverRegistry.Names.UNIX;
+app.Init ();
 ```
+
+## See Also
+
+- [Drivers Deep Dive](~/docs/drivers.md)
+- [ANSI Handling Deep Dive](~/docs/ansihandling.md)
+- [Cursor Management](~/docs/cursor.md)
 
 ## Threading Model
 

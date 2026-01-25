@@ -5,7 +5,7 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     The abstract base class for <see cref="OptionSelector{TEnum}"/> and <see cref="FlagSelector{TFlagsEnum}"/>.
 /// </summary>
-public abstract class SelectorBase : View, IOrientation
+public abstract class SelectorBase : View, IOrientation, IValue<int?>
 {
     /// <summary>
     ///     Gets or sets the default Highlight Style.
@@ -24,7 +24,7 @@ public abstract class SelectorBase : View, IOrientation
         Height = Dim.Auto (DimAutoStyle.Content);
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new (this);
+        _orientationHelper = new OrientationHelper (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
         AddCommand (Command.Accept, HandleAcceptCommand);
@@ -57,8 +57,8 @@ public abstract class SelectorBase : View, IOrientation
     private bool? HandleAcceptCommand (ICommandContext? ctx)
     {
         if (!DoubleClickAccepts
-            && ctx is CommandContext<MouseBinding> mouseCommandContext
-            && mouseCommandContext.Binding.MouseEventArgs!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
+            && ctx?.Binding is MouseBinding mouseBinding
+            && mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
             return false;
         }
@@ -70,12 +70,12 @@ public abstract class SelectorBase : View, IOrientation
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         // If the command did not come from a keyboard event, ignore it
-        if (args.Context is not CommandContext<KeyBinding> keyCommandContext)
+        if (args.Context?.Binding is not KeyBinding keyBinding)
         {
             return base.OnHandlingHotKey (args);
         }
 
-        if ((HasFocus || !CanFocus) && HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
+        if ((HasFocus || !CanFocus) && HotKey == keyBinding.Key?.NoAlt.NoCtrl.NoShift!)
         {
             // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
             return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
@@ -105,30 +105,49 @@ public abstract class SelectorBase : View, IOrientation
             }
 
             int? previousValue = _value;
+
+            // Raise IValue<int?>.ValueChanging (cancellable)
+            if (RaiseValueChanging (previousValue, value))
+            {
+                return;
+            }
+
             _value = value;
 
             UpdateChecked ();
-            RaiseValueChanged (previousValue);
+            RaiseValueChanged (previousValue, _value);
         }
     }
 
+    #region IValue<int?> Implementation
+
     /// <summary>
-    ///     Raised the <see cref="ValueChanged"/> event.
+    ///     Raises the <see cref="ValueChanging"/> event.
     /// </summary>
-    /// <param name="previousValue"></param>
-    protected void RaiseValueChanged (int? previousValue)
+    /// <returns><see langword="true"/> if the change was cancelled.</returns>
+    protected bool RaiseValueChanging (int? currentValue, int? newValue)
+    {
+        ValueChangingEventArgs<int?> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event.
+    /// </summary>
+    /// <param name="previousValue">The value before the change.</param>
+    /// <param name="newValue">The value after the change.</param>
+    protected void RaiseValueChanged (int? previousValue, int? newValue)
     {
         if (_valueField is { })
         {
             _valueField.Text = Value.ToString ()!;
         }
 
-        OnValueChanged (Value, previousValue);
+        OnValueChanged (newValue, previousValue);
 
-        if (Value.HasValue)
-        {
-            ValueChanged?.Invoke (this, new (Value.Value));
-        }
+        ValueChanged?.Invoke (this, new ValueChangedEventArgs<int?> (previousValue, newValue));
     }
 
     /// <summary>
@@ -136,10 +155,13 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     protected virtual void OnValueChanged (int? value, int? previousValue) { }
 
-    /// <summary>
-    ///     Raised when <see cref="Value"/> has changed.
-    /// </summary>
-    public event EventHandler<EventArgs<int?>>? ValueChanged;
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+    #endregion
 
     private IReadOnlyList<int>? _values;
 
@@ -157,9 +179,7 @@ public abstract class SelectorBase : View, IOrientation
             }
 
             // Use Labels and assume 0..Labels.Count - 1
-            return Labels is { }
-                       ? Enumerable.Range (0, Labels.Count).ToList ()
-                       : null;
+            return Labels is { } ? Enumerable.Range (0, Labels.Count).ToList () : null;
         }
         set
         {
@@ -243,7 +263,7 @@ public abstract class SelectorBase : View, IOrientation
 
         if (Styles.HasFlag (SelectorStyles.ShowValue))
         {
-            _valueField = new ()
+            _valueField = new TextField
             {
                 Id = "valueField",
                 Text = Value.ToString ()!,
@@ -339,14 +359,14 @@ public abstract class SelectorBase : View, IOrientation
             {
                 SubViews.ElementAt (i).X = 0;
                 SubViews.ElementAt (i).Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
-                SubViews.ElementAt (i).Margin!.Thickness = new (0);
+                SubViews.ElementAt (i).Margin!.Thickness = new Thickness (0);
                 SubViews.ElementAt (i).Width = Dim.Func (_ => Math.Max (Viewport.Width, maxNaturalCheckBoxWidth));
             }
             else
             {
                 SubViews.ElementAt (i).X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 SubViews.ElementAt (i).Y = 0;
-                SubViews.ElementAt (i).Margin!.Thickness = new (0, 0, i < SubViews.Count - 1 ? _horizontalSpace : 0, 0);
+                SubViews.ElementAt (i).Margin!.Thickness = new Thickness (0, 0, i < SubViews.Count - 1 ? _horizontalSpace : 0, 0);
                 SubViews.ElementAt (i).Width = Dim.Auto ();
             }
         }
@@ -377,11 +397,7 @@ public abstract class SelectorBase : View, IOrientation
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="SelectorBase"/>. The default is
     ///     <see cref="Orientation.Vertical"/>.
     /// </summary>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
     private readonly OrientationHelper _orientationHelper;
 

@@ -1,13 +1,15 @@
 using System.Runtime.InteropServices;
+using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Helper class for enabling Windows Virtual Terminal Input mode.
+///     Helper class for getting input from the Windows Console in Virtual Terminal Sequence (VTS) mode using only
+///     low-level Windows APIs.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         When Virtual Terminal (VT) Input mode is enabled via <c>ENABLE_VIRTUAL_TERMINAL_INPUT</c>,
+///         When Virtual Terminal Sequences (VTS) Input mode is enabled via <c>ENABLE_VIRTUAL_TERMINAL_INPUT</c>,
 ///         the Windows Console converts user input (keyboard, mouse) into ANSI escape sequences that
 ///         can be read via standard input APIs like <c>ReadFile</c> or <c>Console.OpenStandardInput()</c>.
 ///     </para>
@@ -16,7 +18,7 @@ namespace Terminal.Gui.Drivers;
 ///         <list type="bullet">
 ///             <item>Keyboard input becomes ANSI sequences (e.g., Arrow Up = ESC[A)</item>
 ///             <item>Mouse input becomes SGR format sequences (e.g., ESC[&lt;0;10;5M)</item>
-///             <item>All input can be parsed uniformly with <see cref="AnsiResponseParser{TInputRecord}"/></item>
+///             <item>All input can be parsed uniformly with <see cref="AnsiResponseParser"/></item>
 ///         </list>
 ///     </para>
 /// </remarks>
@@ -33,23 +35,20 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool ReadFile (
-        nint hFile,
-        byte [] lpBuffer,
-        uint nNumberOfBytesToRead,
-        out uint lpNumberOfBytesRead,
-        nint lpOverlapped
-    );
+    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
+    public static extern bool PeekConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool GetNumberOfConsoleInputEvents (
-        nint hConsoleInput,
-        out uint lpcNumberOfEvents
-    );
+    private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool GetNumberOfConsoleInputEvents (nint hConsoleInput, out uint lpcNumberOfEvents);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
+
+    [DllImport ("kernel32.dll")]
+    internal static extern uint GetConsoleCP ();
 
     // Console mode flags
     private const int STD_INPUT_HANDLE = -10;
@@ -67,9 +66,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
     private bool _disposed;
 
     /// <summary>
-    ///     Gets whether VT input mode was successfully enabled.
+    ///     Gets whether VTS input mode was successfully enabled.
     /// </summary>
-    public bool IsVTModeEnabled { get; private set; }
+    public bool IsEnabled { get; private set; }
 
     /// <summary>
     ///     Gets the Windows console input handle.
@@ -79,10 +78,10 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// <summary>
     ///     Attempts to enable Windows Virtual Terminal Input mode.
     /// </summary>
-    /// <returns>True if VT mode was enabled successfully; false otherwise.</returns>
+    /// <returns>True if VTS mode was enabled successfully; false otherwise.</returns>
     public bool TryEnable ()
     {
-        if (IsVTModeEnabled)
+        if (IsEnabled)
         {
             return true;
         }
@@ -111,8 +110,8 @@ internal sealed class WindowsVTInputHelper : IDisposable
                 return false;
             }
 
-            // Configure VT input mode:
-            // - Enable: VT input, mouse input, extended flags
+            // Configure VTS input mode:
+            // - Enable: VTS input, mouse input, extended flags
             // - Disable: processed input, line input, echo, quick edit
             // This allows raw ANSI sequence reading
             uint newMode = _originalConsoleMode;
@@ -121,53 +120,21 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (!SetConsoleMode (InputHandle, newMode))
             {
-                Logging.Warning ("Failed to set Windows VT console mode.");
+                Logging.Warning ("Failed to set Windows VTS console mode.");
 
                 return false;
             }
 
-            IsVTModeEnabled = true;
-            Logging.Information ($"Windows VT input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
+            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+            IsEnabled = true;
+            //Logging.Information ($"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to enable Windows VT mode: {ex.Message}");
-
-            return false;
-        }
-    }
-
-    /// <summary>
-    ///     Checks if console input events are available.
-    /// </summary>
-    /// <param name="eventCount">Number of events available, if successful.</param>
-    /// <returns>True if check succeeded; false otherwise.</returns>
-    public bool TryGetInputEventCount (out uint eventCount)
-    {
-        eventCount = 0;
-
-        if (!IsVTModeEnabled || InputHandle == nint.Zero)
-        {
-            return false;
-        }
-
-        try
-        {
-            if (GetNumberOfConsoleInputEvents (InputHandle, out eventCount))
-            {
-                return true;
-            }
-
-            int error = Marshal.GetLastWin32Error ();
-            Logging.Warning ($"GetNumberOfConsoleInputEvents failed with error: {error}");
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Logging.Warning ($"Exception checking console input events: {ex.Message}");
+            Logging.Warning ($"Failed to enable Windows VTS mode: {ex.Message}");
 
             return false;
         }
@@ -183,14 +150,19 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         bytesRead = 0;
 
-        if (!IsVTModeEnabled || InputHandle == nint.Zero)
+        if (!IsEnabled || InputHandle == nint.Zero || !Console.KeyAvailable)
         {
             return false;
         }
 
         try
         {
+            //Logging.Trace ("ReadFile...");
             bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
+#pragma warning disable IL3050
+
+            //Logging.Trace ($"...{JsonSerializer.Serialize (Encoding.UTF8.GetString (buffer, 0, (int)numBytesRead))}");
+#pragma warning restore IL3050
 
             if (!success)
             {
@@ -217,7 +189,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// </summary>
     public void Restore ()
     {
-        if (!IsVTModeEnabled || _disposed || InputHandle == nint.Zero)
+        if (!IsEnabled || _disposed || InputHandle == nint.Zero)
         {
             return;
         }
@@ -233,8 +205,8 @@ internal sealed class WindowsVTInputHelper : IDisposable
             }
 
             SetConsoleMode (InputHandle, _originalConsoleMode);
-            IsVTModeEnabled = false;
-            Logging.Information ("Windows console mode restored.");
+            IsEnabled = false;
+            //Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)
         {
@@ -252,5 +224,38 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         Restore ();
         _disposed = true;
+    }
+
+    public bool Peek ()
+    {
+        const int BUFFER_SIZE = 1; // We only need to check if there's at least one event
+        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);
+
+        try
+        {
+            // Use PeekConsoleInput to inspect the input buffer without removing events
+            if (PeekConsoleInput (InputHandle, pRecord, BUFFER_SIZE, out uint numberOfEventsRead))
+            {
+                // Return true if there's at least one event in the buffer
+                return numberOfEventsRead > 0;
+            }
+            else
+            {
+                // Handle the failure of PeekConsoleInput
+                throw new InvalidOperationException ("Failed to peek console input.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Optionally log the exception
+            Logging.Error (@$"Error in Peek: {ex.Message}");
+
+            return false;
+        }
+        finally
+        {
+            // Free the allocated memory
+            Marshal.FreeHGlobal (pRecord);
+        }
     }
 }

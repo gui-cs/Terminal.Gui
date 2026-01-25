@@ -121,6 +121,149 @@ public class InputInjectorTests (ITestOutputHelper output)
 
     #endregion
 
+    #region InjectKey Tests - Pipeline Mode
+
+    // BUGBUG: This test is bogus as it doesn't actually test what happens
+    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
+    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
+
+    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
+    public async Task InjectKey_Pipeline_AccentedKeys_RaisesAllEvents ()
+    {
+        // Arrange
+        VirtualTimeProvider timeProvider = new ();
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
+
+        using IApplication app = Application.Create (timeProvider);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        List<Key> receivedKeys = [];
+        app.Keyboard.KeyDown += (_, key) => receivedKeys.Add (key);
+
+        // Explicit Pipeline mode
+        TestInputSource testSource = new (timeProvider);
+        InputInjector injector = new (app.Driver?.GetInputProcessor ()!, timeProvider, testSource);
+
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Pipeline, AutoProcess = false, TimeProvider = timeProvider };
+
+        // Act
+        injector.InjectKey (new Key ('á'), options);
+        injector.InjectKey (new Key ('é'), options);
+        injector.InjectKey (new Key ('í'), options);
+        injector.InjectKey (new Key ('ó'), options);
+        injector.InjectKey (new Key ('ú'), options);
+        injector.InjectKey (new Key ('à'), options);
+        injector.InjectKey (new Key ('è'), options);
+        injector.InjectKey (new Key ('ì'), options);
+        injector.InjectKey (new Key ('ò'), options);
+        injector.InjectKey (new Key ('ù'), options);
+        injector.InjectKey (new Key ('â'), options);
+        injector.InjectKey (new Key ('ê'), options);
+        injector.InjectKey (new Key ('î'), options);
+        injector.InjectKey (new Key ('ô'), options);
+        injector.InjectKey (new Key ('û'), options);
+        injector.InjectKey (new Key ('ã'), options);
+        injector.InjectKey (new Key ('õ'), options);
+        injector.InjectKey (new Key ('Á'), options);
+        injector.InjectKey (new Key ('É'), options);
+        injector.InjectKey (new Key ('Í'), options);
+        injector.InjectKey (new Key ('Ó'), options);
+        injector.InjectKey (new Key ('Ú'), options);
+        injector.InjectKey (new Key ('À'), options);
+        injector.InjectKey (new Key ('È'), options);
+        injector.InjectKey (new Key ('Ì'), options);
+        injector.InjectKey (new Key ('Ò'), options);
+        injector.InjectKey (new Key ('Ù'), options);
+        injector.InjectKey (new Key ('Â'), options);
+        injector.InjectKey (new Key ('Ê'), options);
+        injector.InjectKey (new Key ('Î'), options);
+        injector.InjectKey (new Key ('Ô'), options);
+        injector.InjectKey (new Key ('Û'), options);
+        injector.InjectKey (new Key ('Ã'), options);
+        injector.InjectKey (new Key ('Õ'), options);
+
+        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
+        await Task.Delay (50); // Allow some time for processing
+        injector.ProcessQueue ();
+
+        // Assert - Should raise exactly 3 KeyDown events
+        Assert.Equal (34, receivedKeys.Count);
+        Assert.Equal (new Key ('á'), receivedKeys [0]);
+        Assert.Equal (new Key ('é'), receivedKeys [1]);
+        Assert.Equal (new Key ('í'), receivedKeys [2]);
+        Assert.Equal (new Key ('ó'), receivedKeys [3]);
+        Assert.Equal (new Key ('ú'), receivedKeys [4]);
+        Assert.Equal (new Key ('à'), receivedKeys [5]);
+        Assert.Equal (new Key ('è'), receivedKeys [6]);
+        Assert.Equal (new Key ('ì'), receivedKeys [7]);
+        Assert.Equal (new Key ('ò'), receivedKeys [8]);
+        Assert.Equal (new Key ('ù'), receivedKeys [9]);
+        Assert.Equal (new Key ('â'), receivedKeys [10]);
+        Assert.Equal (new Key ('ê'), receivedKeys [11]);
+        Assert.Equal (new Key ('î'), receivedKeys [12]);
+        Assert.Equal (new Key ('ô'), receivedKeys [13]);
+        Assert.Equal (new Key ('û'), receivedKeys [14]);
+        Assert.Equal (new Key ('ã'), receivedKeys [15]);
+        Assert.Equal (new Key ('õ'), receivedKeys [16]);
+        Assert.Equal (new Key ('Á'), receivedKeys [17]);
+        Assert.Equal (new Key ('É'), receivedKeys [18]);
+        Assert.Equal (new Key ('Í'), receivedKeys [19]);
+        Assert.Equal (new Key ('Ó'), receivedKeys [20]);
+        Assert.Equal (new Key ('Ú'), receivedKeys [21]);
+        Assert.Equal (new Key ('À'), receivedKeys [22]);
+        Assert.Equal (new Key ('È'), receivedKeys [23]);
+        Assert.Equal (new Key ('Ì'), receivedKeys [24]);
+        Assert.Equal (new Key ('Ò'), receivedKeys [25]);
+        Assert.Equal (new Key ('Ù'), receivedKeys [26]);
+        Assert.Equal (new Key ('Â'), receivedKeys [27]);
+        Assert.Equal (new Key ('Ê'), receivedKeys [28]);
+        Assert.Equal (new Key ('Î'), receivedKeys [29]);
+        Assert.Equal (new Key ('Ô'), receivedKeys [30]);
+        Assert.Equal (new Key ('Û'), receivedKeys [31]);
+        Assert.Equal (new Key ('Ã'), receivedKeys [32]);
+        Assert.Equal (new Key ('Õ'), receivedKeys [33]);
+    }
+
+    // BUGBUG: This test is bogus as it doesn't actually test what happens
+    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
+    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
+    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
+    public async Task InjectKey_PipelineMode_MultipleKeys_RaisesAllEvents ()
+    {
+        // Arrange
+        VirtualTimeProvider timeProvider = new ();
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
+
+        using IApplication app = Application.Create (timeProvider);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        List<Key> receivedKeys = [];
+        app.Keyboard.KeyDown += (_, key) => receivedKeys.Add (key);
+
+        // Explicit Pipeline mode
+        TestInputSource testSource = new (timeProvider);
+        InputInjector injector = new (app.Driver?.GetInputProcessor ()!, timeProvider, testSource);
+
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Pipeline, AutoProcess = true, TimeProvider = timeProvider };
+
+        // Act
+        injector.InjectKey (Key.A, options);
+        injector.InjectKey (Key.B, options);
+        injector.InjectKey (Key.C, options);
+
+        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
+        await Task.Delay (50); // Allow some time for processing
+        injector.ProcessQueue ();
+
+        // Assert - Should raise exactly 3 KeyDown events
+        Assert.Equal (3, receivedKeys.Count);
+        Assert.Equal (Key.A, receivedKeys [0]);
+        Assert.Equal (Key.B, receivedKeys [1]);
+        Assert.Equal (Key.C, receivedKeys [2]);
+    }
+
+    #endregion
+
     #region InjectMouse Tests - Direct Mode
 
     [Fact]
@@ -135,11 +278,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Mouse> receivedEvents = [];
         processor.MouseEventParsed += (_, mouse) => receivedEvents.Add (mouse);
 
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
 
@@ -164,11 +303,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, mouse) => receivedEvents.Add (mouse);
 
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
 
@@ -193,17 +328,9 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Mouse> syntheticEvents = [];
         processor.SyntheticMouseEvent += (_, mouse) => syntheticEvents.Add (mouse);
 
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
-        Mouse releaseEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        Mouse releaseEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
 
@@ -225,14 +352,10 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        timeProvider.SetTime (new (2025, 1, 1, 12, 0, 0));
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
         InputInjector injector = new (processor, timeProvider);
 
-        Mouse mouseWithoutTimestamp = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse mouseWithoutTimestamp = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         Assert.Null (mouseWithoutTimestamp.Timestamp);
 
@@ -243,7 +366,7 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         // Assert - Timestamp should be set to virtual time
         Assert.NotNull (mouseWithoutTimestamp.Timestamp);
-        Assert.Equal (new (2025, 1, 1, 12, 0, 0), mouseWithoutTimestamp.Timestamp);
+        Assert.Equal (new DateTime (2025, 1, 1, 12, 0, 0), mouseWithoutTimestamp.Timestamp);
     }
 
     [Fact]
@@ -257,12 +380,7 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         DateTime specificTime = new (2025, 1, 1, 12, 30, 0);
 
-        Mouse mouseWithTimestamp = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed,
-            Timestamp = specificTime
-        };
+        Mouse mouseWithTimestamp = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = specificTime };
 
         InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
 
@@ -289,11 +407,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
-        InputInjectionOptions options = new ()
-        {
-            Mode = InputInjectionMode.Direct,
-            AutoProcess = true
-        };
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct, AutoProcess = true };
 
         // Act
         injector.InjectKey (Key.A, options);
@@ -314,11 +428,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
-        InputInjectionOptions options = new ()
-        {
-            Mode = InputInjectionMode.Direct,
-            AutoProcess = false
-        };
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct, AutoProcess = false };
 
         // Act
         injector.InjectKey (Key.A, options);
@@ -378,12 +488,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
-        InputInjectionEvent [] sequence =
-        [
-            new KeyInjectionEvent (Key.A),
-            new KeyInjectionEvent (Key.B),
-            new KeyInjectionEvent (Key.C)
-        ];
+        InputInjectionEvent [] sequence = [new KeyInjectionEvent (Key.A), new KeyInjectionEvent (Key.B), new KeyInjectionEvent (Key.C)];
 
         // Act
         injector.InjectSequence (sequence);
@@ -400,7 +505,7 @@ public class InputInjectorTests (ITestOutputHelper output)
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
-        timeProvider.SetTime (new (2025, 1, 1, 12, 0, 0));
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
 
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
@@ -427,9 +532,9 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         // Assert - Time should advance according to delays
         Assert.Equal (3, receivedKeys.Count);
-        Assert.Equal (new (2025, 1, 1, 12, 0, 0, 0), timestamps [0]);
-        Assert.Equal (new (2025, 1, 1, 12, 0, 0, 100), timestamps [1]);
-        Assert.Equal (new (2025, 1, 1, 12, 0, 0, 300), timestamps [2]);
+        Assert.Equal (new DateTime (2025, 1, 1, 12, 0, 0, 0), timestamps [0]);
+        Assert.Equal (new DateTime (2025, 1, 1, 12, 0, 0, 100), timestamps [1]);
+        Assert.Equal (new DateTime (2025, 1, 1, 12, 0, 0, 300), timestamps [2]);
     }
 
     [Fact]
@@ -449,7 +554,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         InputInjectionEvent [] sequence =
         [
             new KeyInjectionEvent (Key.A),
-            new MouseInjectionEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed }),
+            new MouseInjectionEvent (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed }),
             new KeyInjectionEvent (Key.B)
         ];
 
@@ -461,7 +566,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         Assert.Equal (Key.A, receivedKeys [0]);
         Assert.Equal (Key.B, receivedKeys [1]);
         Assert.Single (receivedMouse);
-        Assert.Equal (new (5, 5), receivedMouse [0].ScreenPosition);
+        Assert.Equal (new Point (5, 5), receivedMouse [0].ScreenPosition);
     }
 
     #endregion
@@ -473,7 +578,7 @@ public class InputInjectorTests (ITestOutputHelper output)
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
-        timeProvider.SetTime (new (2025, 1, 1, 12, 0, 0));
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
 
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
@@ -483,7 +588,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         timeProvider.Advance (TimeSpan.FromMinutes (5));
 
         // Assert - Virtual time should be advanced
-        Assert.Equal (new (2025, 1, 1, 12, 5, 0), timeProvider.Now);
+        Assert.Equal (new DateTime (2025, 1, 1, 12, 5, 0), timeProvider.Now);
     }
 
     [Fact]
@@ -491,17 +596,13 @@ public class InputInjectorTests (ITestOutputHelper output)
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
-        timeProvider.SetTime (new (2025, 1, 1, 12, 0, 0));
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
 
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         IInputInjector injector = new InputInjector (processor, timeProvider);
 
-        Mouse mouseEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse mouseEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
 
@@ -510,7 +611,7 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         // Assert - Timestamp should match virtual time
         Assert.NotNull (mouseEvent.Timestamp);
-        Assert.Equal (new (2025, 1, 1, 12, 0, 0), mouseEvent.Timestamp);
+        Assert.Equal (new DateTime (2025, 1, 1, 12, 0, 0), mouseEvent.Timestamp);
     }
 
     #endregion
@@ -548,11 +649,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Mouse> receivedEvents = [];
         processor.MouseEventParsed += (_, mouse) => receivedEvents.Add (mouse);
 
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act - Pass null options
         injector.InjectMouse (testMouse);
