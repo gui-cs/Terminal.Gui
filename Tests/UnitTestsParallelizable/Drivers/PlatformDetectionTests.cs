@@ -35,14 +35,6 @@ public class PlatformDetectionTests (ITestOutputHelper output)
             Assert.False (PlatformDetection.IsLinux ());
             Assert.True (PlatformDetection.IsMac ());
         }
-        else if (OperatingSystem.IsFreeBSD ())
-        {
-            Assert.False (isWSLExpected);
-            Assert.False (PlatformDetection.IsWindows ());
-            Assert.True (PlatformDetection.IsUnixLike ());
-            Assert.False (PlatformDetection.IsLinux ());
-            Assert.True (PlatformDetection.IsMac ());
-        }
         else
         {
             // Fallback for other Unix-like or unknown systems

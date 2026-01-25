@@ -67,5 +67,5 @@ public static class PlatformDetection
     ///     Determines whether the current operating system is macOS.
     /// </summary>
     /// <returns>true if the current operating system is macOS; otherwise, false.</returns>
-    public static bool IsMac () => RuntimeInformation.IsOSPlatform (OSPlatform.OSX) || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD);
+    public static bool IsMac () => RuntimeInformation.IsOSPlatform (OSPlatform.OSX);
 }
