@@ -303,14 +303,11 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                         // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
                         while (viewToArrange is { Arrangement: ViewArrangement.Fixed })
                         {
-                            if (viewToArrange is Adornment adornmentView)
+                            viewToArrange = viewToArrange switch
                             {
-                                viewToArrange = adornmentView.Parent;
-                            }
-                            else
-                            {
-                                viewToArrange = viewToArrange.SuperView;
-                            }
+                                Adornment adornmentView => adornmentView.Parent,
+                                _ => viewToArrange.SuperView
+                            };
                         }
 
                         if (viewToArrange is { })
