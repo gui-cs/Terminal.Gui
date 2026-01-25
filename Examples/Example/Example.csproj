@@ -8,6 +8,8 @@
     <FileVersion>2.0</FileVersion>
     <Version>2.0</Version>
     <InformationalVersion>2.0</InformationalVersion>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
