@@ -1,5 +1,3 @@
-#nullable enable
-using System.Collections.Immutable;
 using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
@@ -13,8 +11,8 @@ namespace Terminal.Gui.Views;
 //  HotKey - Do NOT Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Do NOT Focus item. If item is not active, make Active. Do NOT Accept.
 // Focused:
-//  Space key - If focused item is Active, move focus to and Acivate next. Else, Select current. Do NOT Accept.
-//  Enter key - Select and Accept the focused item.
+//  Space key - If focused item is Active, move focus to and Acivate next. Else, Activate current. Do NOT Accept.
+//  Enter key - Activate and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - If item is not active, make Active. Do NOT Accept.
 
@@ -26,7 +24,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class OptionSelector : SelectorBase, IDesignable
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public OptionSelector ()
     {
         // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
@@ -34,39 +32,41 @@ public class OptionSelector : SelectorBase, IDesignable
         base.Value = 0;
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         if (base.OnHandlingHotKey (args) is true)
         {
             return true;
         }
+
         if (!CanFocus)
         {
-            if (RaiseSelecting (args.Context) is true)
+            if (RaiseActivating (args.Context) is true)
             {
                 return true;
             }
         }
         else if (!HasFocus && Value is null)
         {
-            if (RaiseSelecting (args.Context) is true)
+            if (RaiseActivating (args.Context) is true)
             {
                 return true;
             }
+
             SetFocus ();
             Value = Values? [0];
+
             return true;
         }
 
         return false;
     }
 
-    /// <inheritdoc />
-    protected override bool OnSelecting (CommandEventArgs args)
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        if (base.OnSelecting (args) is true)
+        if (base.OnActivating (args) is true)
         {
             return true;
         }
@@ -101,11 +101,11 @@ public class OptionSelector : SelectorBase, IDesignable
         return false;
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
+
         if (view is not CheckBox checkbox)
         {
             return;
@@ -113,12 +113,11 @@ public class OptionSelector : SelectorBase, IDesignable
 
         checkbox.RadioStyle = true;
 
-        checkbox.Selecting += OnCheckboxOnSelecting;
+        checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
-
-    private void OnCheckboxOnSelecting (object? sender, CommandEventArgs args)
+    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -132,6 +131,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             // If user clicks with mouse and item is already checked, do nothing
             args.Handled = true;
+
             return;
         }
 
@@ -139,6 +139,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             // If user uses an item hotkey and the item is already checked, do nothing
             args.Handled = true;
+
             return;
         }
 
@@ -149,8 +150,8 @@ public class OptionSelector : SelectorBase, IDesignable
             checkbox.SetFocus ();
         }
 
-        // Selecting doesn't normally propogate, so we do it here
-        if (InvokeCommand (Command.Select, args.Context) is true)
+        // Selecting doesn't normally propagate, so we do it here
+        if (InvokeCommand (Command.Activate, args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
             args.Handled = true;
@@ -167,6 +168,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             return;
         }
+
         Value = (int)checkbox.Data!;
         args.Handled = false; // Do not set to false; let Accepting propagate
     }
@@ -174,9 +176,10 @@ public class OptionSelector : SelectorBase, IDesignable
     private void Cycle ()
     {
         int valueIndex = Values.IndexOf (v => v == Value);
+
         Value = valueIndex == Values?.Count () - 1
-            ? Values! [0]
-            : Values! [valueIndex + 1];
+                    ? Values! [0]
+                    : Values! [valueIndex + 1];
 
         if (HasFocus)
         {
@@ -188,7 +191,6 @@ public class OptionSelector : SelectorBase, IDesignable
         Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
     }
 
-
     /// <summary>
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
     ///     to the current <see cref="SelectorBase.Value"/> is checked. Throws <see cref="InvalidOperationException"/>
@@ -199,7 +201,7 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            int value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            var value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
 
             cb.CheckedState = value == Value ? CheckState.Checked : CheckState.UnChecked;
         }
@@ -217,7 +219,7 @@ public class OptionSelector : SelectorBase, IDesignable
     ///         Maps to either the X or Y position within <see cref="View.Viewport"/> depending on <see cref="Orientation"/>.
     ///     </para>
     /// </remarks>
-    public int Cursor
+    public new int Cursor
     {
         get => !CanFocus ? 0 : SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
         set

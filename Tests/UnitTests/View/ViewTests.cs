@@ -1,7 +1,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class ViewTests
 {
@@ -219,8 +219,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -245,8 +245,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -271,8 +271,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -302,8 +302,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Equal (string.Empty, r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
@@ -318,8 +318,6 @@ public class ViewTests
 
         Assert.False (r.NewKeyDownEvent (Key.Empty));
 
-        //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-        Assert.False (r.NewKeyUpEvent (Key.Empty));
         Assert.False (r.NewMouseEvent (new () { Flags = MouseFlags.AllEvents }));
 
         r.Dispose ();
@@ -332,6 +330,7 @@ public class ViewTests
     public void Test_Nested_Views_With_Height_Equal_To_One ()
     {
         var v = new View { Width = 11, Height = 3 };
+        v.App = ApplicationImpl.Instance;
 
         var top = new View { Width = Dim.Fill (), Height = 1 };
         var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };
@@ -447,7 +446,7 @@ public class ViewTests
         Assert.Equal (0, view.Height);
         var win = new Window ();
         win.Add (view);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
 
@@ -457,6 +456,7 @@ public class ViewTests
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
         Application.Driver!.SetScreenSize (30, 5);
+        Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -494,7 +494,7 @@ public class ViewTests
         var button = new Button { Text = "Click Me" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         var iterations = 0;
@@ -508,7 +508,7 @@ public class ViewTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             iterations++;
 

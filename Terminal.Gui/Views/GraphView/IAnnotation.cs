@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <para>Describes an overlay element that is rendered either before or after a series.</para>
@@ -18,7 +18,8 @@ public interface IAnnotation
 
     /// <summary>
     ///     Called once after series have been rendered (or before if <see cref="BeforeSeries"/> is true). Use
-    ///     methods like <see cref="View.AddStr(string)"/> and <see cref="View.AddRune(Rune)"/> to draw. Use <see cref="View.Viewport"/> to avoid drawing outside of graph.
+    ///     methods like <see cref="View.AddStr(string)"/> and <see cref="View.AddRune(Rune)"/> to draw. Use
+    ///     <see cref="View.Viewport"/> to avoid drawing outside of graph.
     /// </summary>
     /// <param name="graph"></param>
     void Render (GraphView graph);

@@ -1,6 +1,8 @@
-namespace UnitTests_Parallelizable.ViewsTests;
+using UnitTests;
 
-public class LineTests
+namespace ViewsTests;
+
+public class LineTests : TestDriverBase
 {
     [Fact]
     public void Line_DefaultConstructor_Horizontal ()
@@ -87,7 +89,7 @@ public class LineTests
     [Fact]
     public void Line_DrawsCalled_Successfully ()
     {
-        var app = new Window ();
+        var app = new Window () { Driver = CreateTestDriver () };
         var line = new Line { Y = 1, Width = 10 };
         app.Add (line);
 
@@ -103,7 +105,7 @@ public class LineTests
     [Fact]
     public void Line_WithBorder_DrawsSuccessfully ()
     {
-        var app = new Window { Width = 20, Height = 10, BorderStyle = LineStyle.Single };
+        var app = new Window { Driver = CreateTestDriver (), Width = 20, Height = 10, BorderStyle = LineStyle.Single };
 
         // Add a line that intersects with the window border
         var line = new Line { X = 5, Y = 0, Height = Dim.Fill (), Orientation = Orientation.Vertical };
@@ -121,7 +123,7 @@ public class LineTests
     [Fact]
     public void Line_MultipleIntersecting_DrawsSuccessfully ()
     {
-        var app = new Window { Width = 30, Height = 15 };
+        var app = new Window { Driver = CreateTestDriver (), Width = 30, Height = 15 };
 
         // Create intersecting lines
         var hLine = new Line { X = 5, Y = 5, Width = 15, Style = LineStyle.Single };
@@ -258,7 +260,7 @@ public class LineTests
 
         // Test: new Line { Height = 9, Orientation = Orientation.Vertical }
         // Expected: Width=1, Height=9
-        line = new() { Height = 9, Orientation = Orientation.Vertical };
+        line = new () { Height = 9, Orientation = Orientation.Vertical };
 
         Assert.Equal (1, line.Width.GetAnchor (0));
         Assert.Equal (9, line.Height.GetAnchor (0));

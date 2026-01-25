@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Timers;
+// ReSharper disable AccessToModifiedClosure
 
 namespace UICatalog.Scenarios;
 
@@ -13,15 +14,17 @@ public class Navigation : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        Window app = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
         };
 
-        var adornmentsEditor = new AdornmentsEditor
+        AdornmentsEditor adornmentsEditor = new ()
         {
             X = 0,
             Y = 0,
@@ -29,9 +32,9 @@ public class Navigation : Scenario
             ShowViewIdentifier = true,
             TabStop = TabBehavior.NoStop
         };
-        app.Add (adornmentsEditor);
+        window.Add (adornmentsEditor);
 
-        var arrangementEditor = new ArrangementEditor ()
+        ArrangementEditor arrangementEditor = new ()
         {
             X = Pos.Right (adornmentsEditor),
             Y = 0,
@@ -39,7 +42,7 @@ public class Navigation : Scenario
             AutoSelectViewToEdit = true,
             TabStop = TabBehavior.NoStop
         };
-        app.Add (arrangementEditor);
+        window.Add (arrangementEditor);
 
         FrameView testFrame = new ()
         {
@@ -51,7 +54,7 @@ public class Navigation : Scenario
         };
 
 
-        app.Add (testFrame);
+        window.Add (testFrame);
 
         Button button = new ()
         {
@@ -59,7 +62,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
-        button.Accepting += (sender, args) => MessageBox.Query ("hi", button.Title, "_Ok");
+        button.Accepting += (_, _) => MessageBox.Query (app, "hi", button.Title, Strings.btnOk);
 
         testFrame.Add (button);
 
@@ -107,7 +110,7 @@ public class Navigation : Scenario
         //                 };
         //timer.Start ();
 
-        Application.Iteration += OnApplicationIteration;
+        app.Iteration += OnApplicationIteration;
 
         View overlappedView2 = CreateOverlappedView (3, 8, 10);
 
@@ -167,8 +170,8 @@ public class Navigation : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
-        colorPicker.ColorChanged += ColorPicker_ColorChanged;
+        colorPicker.Value = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
+        colorPicker.ColorChanged += ColorPickerColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
 
@@ -180,7 +183,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -202,15 +205,13 @@ public class Navigation : Scenario
         arrangementEditor.AutoSelectSuperView = testFrame;
 
         testFrame.SetFocus ();
-        Application.Run (app);
-        Application.Iteration -= OnApplicationIteration;
+        app.Run (window);
+        app.Iteration -= OnApplicationIteration;
         // timer.Close ();
-        app.Dispose ();
-        Application.Shutdown ();
 
         return;
 
-        void OnApplicationIteration (object sender, IterationEventArgs args)
+        void OnApplicationIteration (object sender, EventArgs<IApplication> args)
         {
             if (progressBar.Fraction == 1.0)
             {
@@ -219,10 +220,10 @@ public class Navigation : Scenario
 
             progressBar.Fraction += 0.01f;
 
-            Application.Invoke (() => { });
+            app.Invoke (_ => { });
         }
 
-        void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
+        void ColorPickerColorChanged (object sender, ResultEventArgs<Color> e)
         {
             testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
         }
@@ -230,14 +231,14 @@ public class Navigation : Scenario
 
     private View CreateOverlappedView (int id, Pos x, Pos y)
     {
-        var overlapped = new View
+        View overlapped = new ()
         {
             X = x,
             Y = y,
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
@@ -264,7 +265,7 @@ public class Navigation : Scenario
 
     private View CreateTiledView (int id, Pos x, Pos y)
     {
-        var overlapped = new View
+        View overlapped = new ()
         {
             X = x,
             Y = y,

@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class ShadowStyleTests (ITestOutputHelper output)
 {
@@ -46,8 +46,9 @@ public class ShadowStyleTests (ITestOutputHelper output)
             new (fg.GetDimColor (), bg.GetDimColor ())
         };
 
-        var superView = new Toplevel
+        var superView = new Runnable
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Height = 3,
             Width = 3,
             Text = "012ABC!@#",
@@ -65,9 +66,10 @@ public class ShadowStyleTests (ITestOutputHelper output)
         view.SetScheme (new (Attribute.Default));
 
         superView.Add (view);
-        Application.TopLevels.Push (superView);
+        Application.Begin (superView);
         Application.LayoutAndDraw (true);
         DriverAssert.AssertDriverAttributesAre (expectedAttrs, output, Application.Driver, attributes);
+        superView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -102,8 +104,9 @@ public class ShadowStyleTests (ITestOutputHelper output)
     {
         Application.Driver!.SetScreenSize (5, 5);
 
-        var superView = new Toplevel
+        var superView = new Runnable
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Width = 4,
             Height = 4,
             Text = "!@#$".Repeat (4)!
@@ -118,11 +121,11 @@ public class ShadowStyleTests (ITestOutputHelper output)
         };
         view.ShadowStyle = style;
         superView.Add (view);
-        Application.TopLevels.Push (superView);
+        Application.Begin (superView);
         Application.LayoutAndDraw (true);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
-        view.Dispose ();
+        superView.Dispose ();
         Application.ResetState (true);
     }
 
@@ -132,11 +135,12 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
     [AutoInitShutdown]
-    public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
+    public void ShadowStyle_LeftButtonPressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
         var superView = new View
         {
-            Height = 10, Width = 10
+            Height = 10, Width = 10,
+            App = ApplicationImpl.Instance
         };
 
         View view = new ()
@@ -144,7 +148,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             Text = "0123",
-            HighlightStates = MouseState.Pressed,
+            MouseHighlightStates = MouseState.Pressed,
             ShadowStyle = style,
             CanFocus = true
         };
@@ -154,13 +158,13 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.EndInit ();
 
         Thickness origThickness = view.Margin!.Thickness;
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (0, 0) });
+        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonPressed, Position = new (0, 0) });
         Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
 
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (0, 0) });
+        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonReleased, Position = new (0, 0) });
         Assert.Equal (origThickness, view.Margin.Thickness);
 
-        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 }

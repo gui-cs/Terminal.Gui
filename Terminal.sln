@@ -20,13 +20,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{B8
 		.editorconfig = .editorconfig
 		.filenesting.json = .filenesting.json
 		.gitignore = .gitignore
+		AGENTS.md = AGENTS.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		GitVersion.yml = GitVersion.yml
 		global.json = global.json
 		nuget.config = nuget.config
+		.claude\REFRESH.md = .claude\REFRESH.md
+		.claude\settings.json = .claude\settings.json
 		Terminal.sln.DotSettings = Terminal.sln.DotSettings
 		testenvironments.json = testenvironments.json
+		docfx\schemas\tui-config-schema.json = docfx\schemas\tui-config-schema.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C46-B324-4B9C-92EB-CE6184D4736E}"
@@ -39,17 +43,52 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C
 		.github\workflows\integration-tests.yml = .github\workflows\integration-tests.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		.github\workflows\quick-build.yml = .github\workflows\quick-build.yml
+		.github\workflows\README.md = .github\workflows\README.md
+		.github\workflows\release.yml = .github\workflows\release.yml
 		.github\workflows\stress-tests.yml = .github\workflows\stress-tests.yml
 		.github\workflows\unit-tests.yml = .github\workflows\unit-tests.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5E0F-4986-AB37-A6BF89966C12}"
 	ProjectSection(SolutionItems) = preProject
+		docfx\docs\ansiparser.md = docfx\docs\ansiparser.md
+		docfx\docs\application.md = docfx\docs\application.md
+		docfx\docs\arrangement.md = docfx\docs\arrangement.md
+		docfx\docs\cancellable-work-pattern.md = docfx\docs\cancellable-work-pattern.md
+		docfx\docs\CharacterMap.md = docfx\docs\CharacterMap.md
 		.github\CODEOWNERS = .github\CODEOWNERS
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		docfx\docs\command.md = docfx\docs\command.md
+		docfx\docs\config.md = docfx\docs\config.md
 		CONTRIBUTING.md = CONTRIBUTING.md
 		.github\copilot-instructions.md = .github\copilot-instructions.md
+		docfx\docs\cursor.md = docfx\docs\cursor.md
+		docfx\docs\dimauto.md = docfx\docs\dimauto.md
+		docfx\docs\drawing.md = docfx\docs\drawing.md
+		docfx\docs\drivers.md = docfx\docs\drivers.md
+		docfx\docs\events.md = docfx\docs\events.md
+		docfx\docs\getting-started.md = docfx\docs\getting-started.md
+		docfx\docs\index.md = docfx\docs\index.md
+		docfx\docs\keyboard.md = docfx\docs\keyboard.md
+		docfx\docs\layout.md = docfx\docs\layout.md
+		docfx\docs\lexicon.md = docfx\docs\lexicon.md
+		docfx\docs\logging.md = docfx\docs\logging.md
+		docfx\docs\migratingfromv1.md = docfx\docs\migratingfromv1.md
+		docfx\docs\mouse.md = docfx\docs\mouse.md
+		docfx\docs\multitasking.md = docfx\docs\multitasking.md
+		docfx\docs\navigation.md = docfx\docs\navigation.md
+		docfx\docs\newinv2.md = docfx\docs\newinv2.md
+		docfx\docs\Popovers.md = docfx\docs\Popovers.md
+		docfx\docs\prompt.md = docfx\docs\prompt.md
 		README.md = README.md
+		docfx\docs\scheme.md = docfx\docs\scheme.md
+		docfx\docs\scrolling.md = docfx\docs\scrolling.md
+		docfx\docs\showcase.md = docfx\docs\showcase.md
+		docfx\docs\tableview.md = docfx\docs\tableview.md
+		docfx\docs\toc.yml = docfx\docs\toc.yml
+		docfx\docs\treeview.md = docfx\docs\treeview.md
+		docfx\docs\View.md = docfx\docs\View.md
+		docfx\docs\views.md = docfx\docs\views.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelfContained", "Examples\SelfContained\SelfContained.csproj", "{524DEA78-7E7C-474D-B42D-52ED4C04FF14}"
@@ -88,6 +127,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1A3C
 		Scripts\Run-LocalCoverage.ps1 = Scripts\Run-LocalCoverage.ps1
 		Tests\UnitTests\runsettings.xml = Tests\UnitTests\runsettings.xml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentExample", "Examples\FluentExample\FluentExample.csproj", "{8C05292F-86C9-C29A-635B-A4DFC5955D1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromptExample", "Examples\PromptExample\PromptExample.csproj", "{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputView", "docfx\scripts\OutputView\OutputView.csproj", "{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{3DD033C0-E023-47BF-A808-9CCE30873C3E}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\PowershellExample.ps1 = Examples\PowershellExample.ps1
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScenarioRunner", "Examples\ScenarioRunner\ScenarioRunner.csproj", "{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -163,19 +217,49 @@ Global
 		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C643A64-2A77-4432-987A-2E72BD9708E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{88979F89-9A42-448F-AE3E-3060145F6375} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{44E15B48-0DB2-4560-82BD-D3B7989811C3} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{B0A602CD-E176-449D-8663-64238D54F857} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
 		{B8F48EE8-34A6-43B7-B00E-CD91CDD93962} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
 		{13BB2C46-B324-4B9C-92EB-CE6184D4736E} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
-		{C7A51224-5E0F-4986-AB37-A6BF89966C12} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
+		{524DEA78-7E7C-474D-B42D-52ED4C04FF14} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{E6D716C6-AC94-4150-B10A-44AE13F79344} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{242FBD3E-2EC6-4274-BD40-8E62AF9327B2} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{038B09F5-EF3A-F21E-7C10-A6551866ECE2} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{F74EC349-B988-FCFA-A1E5-967F70FB75B5} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{96ACE8BA-2E07-7537-FBF2-E8176CCB8080} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{DE780834-190A-8277-51FD-750CC666E82D} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{2DBA7BDC-17AE-474B-A507-00807D087607} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{F56BAFFD-F227-4B0A-96F0-C800FAEF2036} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{199F27D8-A905-4DDC-82CA-1FE1A90B1788} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
+		{8C643A64-2A77-4432-987A-2E72BD9708E3} = {A589126F-C71A-4FEE-B7EA-2DCA1ADF6A46}
 		{1A3CBA89-EDAB-4F75-811E-FE81B13A4836} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
+		{8C05292F-86C9-C29A-635B-A4DFC5955D1C} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F8F8A4D-7B8D-4C2A-AC5E-CD7117F74C03}

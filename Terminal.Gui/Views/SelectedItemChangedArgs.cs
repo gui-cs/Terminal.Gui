@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Event arguments for the SelectedItemChanged event.</summary>

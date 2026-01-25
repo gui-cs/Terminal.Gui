@@ -1,6 +1,6 @@
 ﻿using Xunit.Sdk;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests.RegionTests;
 
 public class DifferenceTests
 {

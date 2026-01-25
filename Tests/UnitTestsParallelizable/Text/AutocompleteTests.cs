@@ -1,13 +1,13 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.TextTests;
+namespace TextTests;
 
 /// <summary>
 /// Pure unit tests for Autocomplete functionality that don't require Application or Driver.
 /// Integration tests for Autocomplete (popup behavior, rendering) remain in UnitTests.
 /// </summary>
-public class AutocompleteTests (ITestOutputHelper output) : FakeDriverBase
+public class AutocompleteTests (ITestOutputHelper output) : TestDriverBase
 {
     private readonly ITestOutputHelper _output = output;
 

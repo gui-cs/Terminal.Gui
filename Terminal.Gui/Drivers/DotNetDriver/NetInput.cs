@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
+#nullable disable
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -16,7 +15,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// </summary>
     public NetInput ()
     {
-        Logging.Information ($"Creating {nameof (NetInput)}");
+        //Logging.Information ($"Creating {nameof (NetInput)}");
 
         PlatformID p = Environment.OSVersion.Platform;
 
@@ -43,6 +42,10 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
             //Set cursor key to application.
             Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
+            // CSI_EnableMouseEvents enables
+            // Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons
+            // Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)
+            // Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
             Console.TreatControlCAsInput = true;
         }
@@ -82,7 +85,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     }
 
     /// <inheritdoc />
-    public void AddInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
+    public void InjectInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
 
     /// <inheritdoc/>
     public override bool Peek ()

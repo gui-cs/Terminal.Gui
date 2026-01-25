@@ -93,27 +93,26 @@ public class TreeViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void CursorVisibility_MultiSelect ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("normal");
         var n2 = new TreeNode ("pink");
         tv.AddObject (n1);
         tv.AddObject (n2);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
         Assert.True (tv.MultiSelect);
         Assert.True (tv.HasFocus);
-        Assert.Equal (CursorVisibility.Invisible, tv.CursorVisibility);
+        Assert.False (tv.Cursor.IsVisible);
 
         tv.SelectAll ();
-        tv.CursorVisibility = CursorVisibility.Default;
-        Application.PositionCursor ();
-        Application.Driver!.GetCursorVisibility (out CursorVisibility visibility);
-        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
-        Assert.Equal (CursorVisibility.Default, visibility);
+        tv.Cursor = tv.Cursor with { Position = new Point (0, 0), Style = CursorStyle.BlinkingBlock };
+        Assert.True (tv.Cursor.IsVisible);
+        Application.Navigation.UpdateCursor ();
+        Assert.True (Application.Driver!.GetCursor ().IsVisible);
         top.Dispose ();
     }
 
@@ -435,7 +434,7 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.False (called);
 
         // double click triggers activation
-        tree.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.True (called);
         Assert.Same (f, activated);
@@ -448,7 +447,7 @@ public class TreeViewTests (ITestOutputHelper output)
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        tree.ObjectActivationButton = MouseFlags.Button2Clicked;
+        tree.ObjectActivationButton = MouseFlags.MiddleButtonClicked;
         tree.ExpandAll ();
 
         object activated = null;
@@ -464,12 +463,12 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.False (called);
 
         // double click does nothing because we changed button binding to right click
-        tree.NewMouseEvent (new MouseEventArgs { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new Mouse { Position = new (0, 1), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Null (activated);
         Assert.False (called);
 
-        tree.NewMouseEvent (new MouseEventArgs { Position = new (0, 1), Flags = MouseFlags.Button2Clicked });
+        tree.NewMouseEvent (new Mouse { Position = new (0, 1), Flags = MouseFlags.MiddleButtonClicked });
 
         Assert.True (called);
         Assert.Same (car1, activated);
@@ -503,7 +502,7 @@ public class TreeViewTests (ITestOutputHelper output)
 
 
         // double click does nothing because we changed button to null
-        tree.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.False (called);
         Assert.Null (activated);
@@ -698,7 +697,11 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestBottomlessTreeView_MaxDepth_3 ()
     {
-        TreeView<string> tv = new () { Width = 20, Height = 10 };
+        TreeView<string> tv = new ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 20, Height = 10
+        };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
                                                           s => new [] { (int.Parse (s) + 1).ToString () }
@@ -718,7 +721,7 @@ public class TreeViewTests (ITestOutputHelper output)
                                             );
         tv.MaxDepth = 3;
         tv.ExpandAll ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -737,7 +740,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestBottomlessTreeView_MaxDepth_5 ()
     {
-        TreeView<string> tv = new () { Width = 20, Height = 10 };
+        TreeView<string> tv = new () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         tv.TreeBuilder = new DelegateTreeBuilder<string> (
                                                           s => new [] { (int.Parse (s) + 1).ToString () }
@@ -757,7 +760,7 @@ public class TreeViewTests (ITestOutputHelper output)
                                             );
         tv.MaxDepth = 5;
         tv.ExpandAll ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
 
         tv.Draw ();
 
@@ -785,7 +788,7 @@ public class TreeViewTests (ITestOutputHelper output)
 
         Assert.True (tv.CanExpand ("5"));
         Assert.False (tv.IsExpanded ("5"));
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
 
         tv.Draw ();
 
@@ -806,7 +809,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestGetObjectOnRow ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
         tv.BeginInit ();
         tv.EndInit ();
         var n1 = new TreeNode ("normal");
@@ -840,7 +843,7 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.Null (tv.GetObjectOnRow (4));
 
         tv.Collapse (n1);
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
 
         tv.Draw ();
 
@@ -862,7 +865,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestGetObjectRow ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("normal");
         var n1_1 = new TreeNode ("pink");
@@ -877,7 +880,7 @@ public class TreeViewTests (ITestOutputHelper output)
 
         tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -897,7 +900,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.Collapse (n1);
 
         tv.LayoutSubViews ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -915,7 +918,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.ScrollOffsetVertical = 1;
 
         tv.LayoutSubViews ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -933,7 +936,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
 
@@ -952,7 +955,7 @@ public class TreeViewTests (ITestOutputHelper output)
 
         tv.SetScheme (new Scheme ());
         tv.LayoutSubViews ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -975,10 +978,10 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("├-root one", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ ├─leaf 1", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ └─leaf 2", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("└─root two", eventArgs [3].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("├-root one", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("│ ├─leaf 1", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("│ └─leaf 2", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("└─root two", eventArgs [3].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
 
         Assert.Equal (1, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
@@ -1000,7 +1003,7 @@ public class TreeViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent_Handled ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         tv.DrawLine += (s, e) =>
                        {
@@ -1046,7 +1049,7 @@ FFFFFFFFFF
     [SetupFakeApplication]
     public void TestTreeView_DrawLineEvent_WithScrolling ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         List<DrawTreeViewLineEventArgs<ITreeNode>> eventArgs = new ();
 
@@ -1088,9 +1091,9 @@ oot two
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("─leaf 1", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("─leaf 2", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("oot two", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 1", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("─leaf 2", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("oot two", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
 
         Assert.Equal (0, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (0, eventArgs [1].IndexOfExpandCollapseSymbol);
@@ -1109,7 +1112,7 @@ oot two
     [SetupFakeApplication]
     public void TestTreeView_Filter ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
 
         var n1 = new TreeNode ("root one");
         var n1_1 = new TreeNode ("leaf 1");
@@ -1141,7 +1144,7 @@ oot two
 
         // matches nothing
         filter.Text = "asdfjhasdf";
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -1152,7 +1155,7 @@ oot two
 
         // Matches everything
         filter.Text = "root";
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -1167,7 +1170,7 @@ oot two
 
         // Matches 2 leaf nodes
         filter.Text = "leaf";
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -1181,7 +1184,7 @@ oot two
 
         // Matches 1 leaf nodes
         filter.Text = "leaf 1";
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -1197,7 +1200,7 @@ oot two
     [SetupFakeApplication]
     public void TestTreeViewColor ()
     {
-        var tv = new TreeView { Width = 20, Height = 10 };
+        var tv = new TreeView () { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
         tv.BeginInit ();
         tv.EndInit ();
         var n1 = new TreeNode ("normal");
@@ -1253,7 +1256,7 @@ oot two
         // redraw now that the custom color
         // delegate is registered
         tv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         // Same text

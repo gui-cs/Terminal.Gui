@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#nullable enable
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -9,30 +7,37 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public sealed class AnsiEscapeSequenceRequests : Scenario
 {
-    private GraphView _graphView;
+    private GraphView? _graphView;
 
-    private ScatterSeries _sentSeries;
-    private ScatterSeries _answeredSeries;
+    private ScatterSeries? _sentSeries;
+    private ScatterSeries? _answeredSeries;
 
-    private readonly List<DateTime> _sends = new ();
+    private readonly List<DateTime> _sends = [];
 
-    private readonly object _lockAnswers = new object ();
+    private readonly object _lockAnswers = new ();
     private readonly Dictionary<DateTime, string> _answers = new ();
-    private Label _lblSummary;
+    private Label? _lblSummary;
+
+    private object? _updateTimeoutToken;
+    private object? _sendDarTimeoutToken;
+    private IApplication? _app;
 
     public override void Main ()
     {
         // Init
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
-        TabView tv = new TabView
+        TabView tv = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             CanFocus = true
         };
 
-        Tab single = new Tab ();
+        Tab single = new ();
         single.DisplayText = "Single";
         single.View = BuildSingleTab ();
 
@@ -44,7 +49,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         tv.AddTab (bulk, false);
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
         };
@@ -52,13 +57,12 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         appWindow.Add (tv);
 
         // Run - Start the application.
-        Application.Run (appWindow);
+        app.Run (appWindow);
         bulk.View.Dispose ();
         single.View.Dispose ();
-        appWindow.Dispose ();
 
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        _app.RemoveTimeout (_updateTimeoutToken!);
+        _app.RemoveTimeout (_sendDarTimeoutToken!);
     }
 
     private View BuildSingleTab ()
@@ -70,7 +74,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             CanFocus = true
         };
 
-        w.Padding.Thickness = new (1);
+        w.Padding!.Thickness = new (1);
 
         var scrRequests = new List<string>
         {
@@ -95,7 +99,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         var tfTerminator = new TextField { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 4 };
         w.Add (label, tfTerminator);
 
-        cbRequests.SelectedItemChanged += (s, e) =>
+        cbRequests.SelectedItemChanged += (_, _) =>
                                           {
                                               if (cbRequests.SelectedItem == -1)
                                               {
@@ -103,7 +107,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                               }
 
                                               var selAnsiEscapeSequenceRequestName = scrRequests [cbRequests.SelectedItem];
-                                              AnsiEscapeSequence selAnsiEscapeSequenceRequest = null;
+                                              AnsiEscapeSequence? selAnsiEscapeSequenceRequest = null;
 
                                               switch (selAnsiEscapeSequenceRequestName)
                                               {
@@ -125,9 +129,9 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                                       break;
                                               }
 
-                                              tfRequest.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Request : "";
-                                              tfValue.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Value ?? "" : "";
-                                              tfTerminator.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Terminator : "";
+                                              tfRequest.Text = selAnsiEscapeSequenceRequest is not null ? selAnsiEscapeSequenceRequest.Request : "";
+                                              tfValue.Text = selAnsiEscapeSequenceRequest is not null ? selAnsiEscapeSequenceRequest.Value ?? "" : "";
+                                              tfTerminator.Text = (selAnsiEscapeSequenceRequest is not null ? selAnsiEscapeSequenceRequest.Terminator : "")!;
                                           };
 
         // Forces raise cbRequests.SelectedItemChanged to update TextFields
@@ -154,7 +158,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         var lblSuccess = new Label { X = Pos.Center (), Y = Pos.Bottom (btnResponse) + 1 };
         w.Add (lblSuccess);
 
-        btnResponse.Accepting += (s, e) =>
+        btnResponse.Accepting += (_, _) =>
                                  {
                                      var ansiEscapeSequenceRequest = new AnsiEscapeSequence
                                      {
@@ -163,12 +167,12 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                          Value = string.IsNullOrEmpty (tfValue.Text) ? null : tfValue.Text
                                      };
 
-                                     Application.Driver.QueueAnsiRequest (
+                                     _app?.Driver?.QueueAnsiRequest (
                                                                           new ()
                                                                           {
                                                                               Request = ansiEscapeSequenceRequest.Request,
                                                                               Terminator = ansiEscapeSequenceRequest.Terminator,
-                                                                              ResponseReceived = (s) => OnSuccess (s, tvResponse, tvError, tvValue, tvTerminator, lblSuccess),
+                                                                              ResponseReceived = (s) => OnSuccess (s!, tvResponse, tvError, tvValue, tvTerminator, lblSuccess),
                                                                               Abandoned = () => OnFail (tvResponse, tvError, tvValue, tvTerminator, lblSuccess)
                                                                           });
                                  };
@@ -218,21 +222,21 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             Width = Dim.Fill ()
         };
 
-        Application.AddTimeout (
-                                TimeSpan.FromMilliseconds (1000),
-                                () =>
-                                {
-                                    lock (_lockAnswers)
-                                    {
-                                        UpdateGraph ();
+        _updateTimeoutToken = _app!.AddTimeout (
+                                                      TimeSpan.FromMilliseconds (1000),
+                                                      () =>
+                                                      {
+                                                          lock (_lockAnswers)
+                                                          {
+                                                              UpdateGraph ();
 
-                                        UpdateResponses ();
-                                    }
+                                                              UpdateResponses ();
+                                                          }
 
 
 
-                                    return true;
-                                });
+                                                          return true;
+                                                      });
 
         var tv = new TextView ()
         {
@@ -255,9 +259,9 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             Value = 0,
         };
 
-        cbDar.ValueChanging += (s, e) =>
+        cbDar.ValueChanging += (_, e) =>
         {
-            if (e.NewValue < 0 || e.NewValue > 20)
+            if (e.NewValue is < 0 or > 20)
             {
                 e.Cancel = true;
             }
@@ -266,28 +270,28 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
         int lastSendTime = Environment.TickCount;
         object lockObj = new object ();
-        Application.AddTimeout (
-                                TimeSpan.FromMilliseconds (50),
-                                () =>
-                                {
-                                    lock (lockObj)
-                                    {
-                                        if (cbDar.Value > 0)
-                                        {
-                                            int interval = 1000 / cbDar.Value; // Calculate the desired interval in milliseconds
-                                            int currentTime = Environment.TickCount; // Current system time in milliseconds
+        _sendDarTimeoutToken = _app.AddTimeout (
+                                                          TimeSpan.FromMilliseconds (50),
+                                                          () =>
+                                                          {
+                                                              lock (lockObj)
+                                                              {
+                                                                  if (cbDar.Value > 0)
+                                                                  {
+                                                                      int interval = 1000 / cbDar.Value; // Calculate the desired interval in milliseconds
+                                                                      int currentTime = Environment.TickCount; // Current system time in milliseconds
 
-                                            // Check if the time elapsed since the last send is greater than the interval
-                                            if (currentTime - lastSendTime >= interval)
-                                            {
-                                                SendDar (); // Send the request
-                                                lastSendTime = currentTime; // Update the last send time
-                                            }
-                                        }
-                                    }
+                                                                      // Check if the time elapsed since the last send is greater than the interval
+                                                                      if (currentTime - lastSendTime >= interval)
+                                                                      {
+                                                                          SendDar (); // Send the request
+                                                                          lastSendTime = currentTime; // Update the last send time
+                                                                      }
+                                                                  }
+                                                              }
 
-                                    return true;
-                                });
+                                                              return true;
+                                                          });
 
 
         _graphView = new GraphView ()
@@ -318,7 +322,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
     }
     private void UpdateResponses ()
     {
-        _lblSummary.Text = GetSummary ();
+        _lblSummary!.Text = GetSummary ();
         _lblSummary.SetNeedsDraw ();
     }
 
@@ -340,8 +344,8 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
     private void SetupGraph ()
     {
 
-        _graphView.Series.Add (_sentSeries = new ScatterSeries ());
-        _graphView.Series.Add (_answeredSeries = new ScatterSeries ());
+        _graphView!.Series.Add (_sentSeries = new ScatterSeries ());
+        _graphView!.Series.Add (_answeredSeries = new ScatterSeries ());
 
         _sentSeries.Fill = new GraphCellToRender (new Rune ('.'), new Attribute (ColorName16.BrightGreen, ColorName16.Black));
         _answeredSeries.Fill = new GraphCellToRender (new Rune ('.'), new Attribute (ColorName16.BrightRed, ColorName16.Black));
@@ -358,17 +362,17 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
     private void UpdateGraph ()
     {
-        _sentSeries.Points = _sends
+        _sentSeries!.Points = _sends
                              .GroupBy (ToSeconds)
                              .Select (g => new PointF (g.Key, g.Count ()))
                              .ToList ();
 
-        _answeredSeries.Points = _answers.Keys
+        _answeredSeries!.Points = _answers.Keys
                                         .GroupBy (ToSeconds)
                                         .Select (g => new PointF (g.Key, g.Count ()))
                                         .ToList ();
         //  _graphView.ScrollOffset  = new PointF(,0);
-        _graphView.SetNeedsDraw ();
+        _graphView!.SetNeedsDraw ();
 
     }
 
@@ -379,13 +383,13 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
     private void SendDar ()
     {
-        Application.Driver.QueueAnsiRequest (
-                                             new ()
-                                             {
-                                                 Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
-                                                 Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
-                                                 ResponseReceived = HandleResponse
-                                             });
+        _app?.Driver?.QueueAnsiRequest (
+                                              new ()
+                                              {
+                                                  Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
+                                                  Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
+                                                  ResponseReceived = HandleResponse!
+                                              });
         _sends.Add (DateTime.Now);
     }
 

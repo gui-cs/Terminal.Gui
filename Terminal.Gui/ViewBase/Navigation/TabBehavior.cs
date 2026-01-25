@@ -22,7 +22,7 @@ public enum TabBehavior
 
     /// <summary>
     ///     The View will be a stop-point for keyboard-based navigation across groups. (e.g. if the user presses
-    ///     <see cref="Application.NextTabGroupKey"/> (`Ctrl+PageDown`)).
+    ///     <see cref="IKeyboard.NextTabGroupKey"/> (`Ctrl+PageDown`)).
     /// </summary>
     TabGroup = 2
 }

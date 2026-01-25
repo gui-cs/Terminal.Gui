@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
@@ -49,10 +48,6 @@ public partial class Border : Adornment
         Parent = parent;
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
-
-        Application.Mouse.GrabbingMouse += Application_GrabbingMouse;
-        Application.Mouse.UnGrabbingMouse += Application_UnGrabbingMouse;
-
         ThicknessChanged += OnThicknessChanged;
     }
 
@@ -73,7 +68,9 @@ public partial class Border : Adornment
             {
                 DrawIndicator = new ()
                 {
+#if DEBUG
                     Id = "DrawIndicator",
+#endif
                     X = 1,
                     Style = new SpinnerStyle.Dots2 (),
                     SpinDelay = 0,
@@ -120,7 +117,7 @@ public partial class Border : Adornment
 
         ShowHideDrawIndicator ();
 
-        HighlightStates |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
+        MouseHighlightStates |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
 
 #if SUBVIEW_BASED_BORDER
         if (Parent is { })
@@ -140,7 +137,7 @@ public partial class Border : Adornment
             };
             CloseButton.Accept += (s, e) =>
             {
-                e.Handled = Parent.InvokeCommand (Command.QuitToplevel) == true;
+                e.Handled = Parent.InvokeCommand (Command.Quit) == true;
             };
             Add (CloseButton);
 
@@ -214,6 +211,7 @@ public partial class Border : Adornment
             // TODO: all this.
             return Parent?.SuperView?.BorderStyle ?? LineStyle.None;
         }
+        // BUGBUG: Setting LineStyle should SetNeedsDraw
         set => _lineStyle = value;
     }
 
@@ -240,7 +238,7 @@ public partial class Border : Adornment
 
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Thickness == Thickness.Empty)
         {
@@ -312,7 +310,8 @@ public partial class Border : Adornment
             }
         }
 
-        if (Parent is { }
+        if (Driver is { }
+            && Parent is { }
             && canDrawBorder
             && Thickness.Top > 0
             && maxTitleWidth > 0
@@ -321,10 +320,7 @@ public partial class Border : Adornment
         {
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
-            Parent.TitleTextFormatter.Draw (
-                                            titleRect,
-                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
-                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+            Parent.TitleTextFormatter.Draw (driver: Driver, screen: titleRect, normalColor: GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal), hotColor: GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
             Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
@@ -498,16 +494,13 @@ public partial class Border : Adornment
 
                 if (drawTop)
                 {
-                    hruler.Draw (new (screenBounds.X, screenBounds.Y));
+                    hruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y));
                 }
 
                 // Redraw title 
                 if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
                 {
-                    Parent!.TitleTextFormatter.Draw (
-                                                     new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal),
-                                                     Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal));
+                    Parent!.TitleTextFormatter.Draw (driver: Driver, screen: new (borderBounds.X + 2, titleY, maxTitleWidth, 1), normalColor: Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal), hotColor: Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal));
                 }
 
                 //Left
@@ -515,19 +508,19 @@ public partial class Border : Adornment
 
                 if (drawLeft)
                 {
-                    vruler.Draw (new (screenBounds.X, screenBounds.Y + 1), 1);
+                    vruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y + 1), start: 1);
                 }
 
                 // Bottom
                 if (drawBottom)
                 {
-                    hruler.Draw (new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+                    hruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
                 }
 
                 // Right
                 if (drawRight)
                 {
-                    vruler.Draw (new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+                    vruler.Draw (driver: Driver, location: new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), start: 1);
                 }
             }
 
@@ -543,8 +536,6 @@ public partial class Border : Adornment
         }
 
         return true;
-
-        ;
     }
 
     /// <summary>

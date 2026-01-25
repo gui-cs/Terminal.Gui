@@ -4,9 +4,9 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests.TextTests;
+namespace TextTests;
 
-public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDriverBase
+public class TextFormatterJustificationTests (ITestOutputHelper output) : TestDriverBase
 {
     [Theory]
 
@@ -3411,7 +3411,7 @@ public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDr
 0******")]
     public void Draw_Text_Justification (string text, Alignment horizontalTextAlignment, Alignment alignment, TextDirection textDirection, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -3423,7 +3423,7 @@ public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDr
         };
 
         driver.FillRect (new (0, 0, 7, 7), (Rune)'*');
-        tf.Draw (new (0, 0, 7, 7), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, 7, 7), normalColor: Attribute.Default, hotColor: Attribute.Default);
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 }

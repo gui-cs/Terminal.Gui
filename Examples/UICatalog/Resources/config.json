@@ -9,9 +9,10 @@
   "Themes": [
     {
       "Hot Dog Stand": {
+        "Glyphs.WideGlyphReplacement": "①",
         "Schemes": [
           {
-            "Toplevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "Black",
                 "Background": "#FFFF00"
@@ -86,7 +87,7 @@
             "Menu": {
               "Normal": {
                 "Foreground": "Black",
-                "Background": "WHite"
+                "Background": "White"
               },
               "Focus": {
                 "Foreground": "White",
@@ -134,24 +135,20 @@
       }
     },
     {
-      "UI Catalog Theme": {
+      "UI Catalog": {
         "Window.DefaultShadow": "Transparent",
-        "CheckBox.DefaultHighlightStates": "In, Pressed, PressedOutside",
+        "Button.DefaultShadow": "None",
+        "CheckBox.DefaultMouseHighlightStates": "In, Pressed, PressedOutside",
         "MessageBox.DefaultButtonAlignment": "Start",
         "StatusBar.DefaultSeparatorLineStyle": "Single",
-        "Dialog.DefaultMinimumWidth": 80,
-        "MessageBox.DefaultBorderStyle": "Dotted",
         "NerdFonts.Enable": false,
-        "MessageBox.DefaultMinimumWidth": 0,
         "Window.DefaultBorderStyle": "Double",
         "Dialog.DefaultShadow": "Opaque",
         "Dialog.DefaultButtonAlignment": "Start",
-        "Button.DefaultShadow": "Transparent",
         "FrameView.DefaultBorderStyle": "Double",
-        "MessageBox.DefaultMinimumHeight": 0,
-        "Button.DefaultHighlightStates": "In, Pressed",
-        "Menuv2.DefaultBorderStyle": "Heavy",
-        "MenuBarv2.DefaultBorderStyle": "Heavy",
+        "Button.DefaultMouseHighlightStates": "In, Pressed",
+        "Menu.DefaultBorderStyle": "Heavy",
+        "MenuBar.DefaultBorderStyle": "Heavy",
         "Schemes": [
           {
             "UI Catalog Scheme": {
@@ -178,7 +175,7 @@
             }
           },
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "DarkGray",
                 "Background": "White"

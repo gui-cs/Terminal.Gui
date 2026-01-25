@@ -1,4 +1,3 @@
-#nullable enable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -13,7 +12,7 @@ public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct,
     /// </summary>
     public OptionSelector ()
     {
-        base.Labels = Enum.GetValues<TEnum> ().Select (f => f.ToString ()).ToArray (); ;
+        Labels = Enum.GetValues<TEnum> ().Select (f => f.ToString ()).ToArray ();
     }
 
     /// <summary>
@@ -21,7 +20,7 @@ public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct,
     /// </summary>
     public new TEnum? Value
     {
-        get => base.Value.HasValue ? (TEnum)Enum.ToObject (typeof (TEnum), base.Value.Value) : (TEnum?)null;
+        get => base.Value.HasValue ? (TEnum)Enum.ToObject (typeof (TEnum), base.Value.Value) : null;
         set => base.Value = value.HasValue ? Convert.ToInt32 (value.Value) : null;
     }
 

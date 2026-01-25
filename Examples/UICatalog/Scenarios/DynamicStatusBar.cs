@@ -14,9 +14,10 @@ public class DynamicStatusBar : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
-        Application.Run<DynamicStatusBarSample> ().Dispose ();
-        Application.Shutdown ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        app.Run<DynamicStatusBarSample> ();
     }
 
     public class Binding
@@ -79,7 +80,7 @@ public class DynamicStatusBar : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery ("Binding Error", $"Binding failed: {ex}.", "Ok");
+                MessageBox.ErrorQuery (Source.App!, "Binding Error", $"Binding failed: {ex}.", "Ok");
             }
         }
     }
@@ -140,7 +141,7 @@ public class DynamicStatusBar : Scenario
         public TextView TextAction { get; }
         public TextField TextShortcut { get; }
         public TextField TextTitle { get; }
-        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (item.Title, item.Action, "Ok"); }
+        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (App!, item.Title, item.Action, "Ok"); }
 
         public void EditStatusItem (Shortcut statusItem)
         {
@@ -180,17 +181,18 @@ public class DynamicStatusBar : Scenario
 
             var btnOk = new Button { IsDefault = true, Text = "OK" };
 
+            Dialog dialog = new () { Title = "Enter the menu details." };
             btnOk.Accepting += (s, e) =>
                               {
                                   if (string.IsNullOrEmpty (TextTitle.Text))
                                   {
-                                      MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
+                                      MessageBox.ErrorQuery (App, "Invalid title", "Must enter a valid title!.", "Ok");
                                   }
                                   else
                                   {
 
                                       valid = true;
-                                      Application.RequestStop ();
+                                      dialog.App?.RequestStop ();
                                   }
                               };
             var btnCancel = new Button { Text = "Cancel" };
@@ -198,16 +200,16 @@ public class DynamicStatusBar : Scenario
             btnCancel.Accepting += (s, e) =>
                                   {
                                       TextTitle.Text = string.Empty;
-                                      Application.RequestStop ();
+                                      dialog.App?.RequestStop ();
                                   };
-            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 17, Application.Screen.Height) };
+            dialog.Buttons = [btnOk, btnCancel];
 
-            Width = Dim.Fill ();
-            Height = Dim.Fill () - 2;
+            Width = Dim.Fill (0, minimumContentDim: 50);
+            Height = Dim.Fill (0, minimumContentDim: 10) - 2;
             dialog.Add (this);
             TextTitle.SetFocus ();
-            TextTitle.CursorPosition = TextTitle.Text.Length;
-            Application.Run (dialog);
+            TextTitle.InsertionPoint = TextTitle.Text.Length;
+            App?.Run (dialog);
             dialog.Dispose ();
 
             return valid
@@ -312,7 +314,12 @@ public class DynamicStatusBar : Scenario
 
             btnUp.Accepting += (s, e) =>
                               {
-                                  int i = _lstItems.SelectedItem;
+                                  if (_lstItems.SelectedItem is null)
+                                  {
+                                      return;
+                                  }
+                                  int i = _lstItems.SelectedItem.Value;
+
                                   Shortcut statusItem = DataContext.Items.Count > 0 ? DataContext.Items [i].Shortcut : null;
 
                                   if (statusItem != null)
@@ -335,7 +342,12 @@ public class DynamicStatusBar : Scenario
 
             btnDown.Accepting += (s, e) =>
                                 {
-                                    int i = _lstItems.SelectedItem;
+                                    if (_lstItems.SelectedItem is null)
+                                    {
+                                        return;
+                                    }
+                                    int i = _lstItems.SelectedItem.Value;
+
                                     Shortcut statusItem = DataContext.Items.Count > 0 ? DataContext.Items [i].Shortcut : null;
 
                                     if (statusItem != null)
@@ -372,18 +384,21 @@ public class DynamicStatusBar : Scenario
                               {
                                   if (string.IsNullOrEmpty (frmStatusBarDetails.TextTitle.Text) && _currentEditStatusItem != null)
                                   {
-                                      MessageBox.ErrorQuery ("Invalid title", "Must enter a valid title!.", "Ok");
+                                      MessageBox.ErrorQuery (App, "Invalid title", "Must enter a valid title!.", "Ok");
                                   }
                                   else if (_currentEditStatusItem != null)
                                   {
-
                                       var statusItem = new DynamicStatusItem
                                       {
                                           Title = frmStatusBarDetails.TextTitle.Text,
                                           Action = frmStatusBarDetails.TextAction.Text,
                                           Shortcut = frmStatusBarDetails.TextShortcut.Text
                                       };
-                                      UpdateStatusItem (_currentEditStatusItem, statusItem, _lstItems.SelectedItem);
+
+                                      if (_lstItems.SelectedItem is { } selectedItem)
+                                      {
+                                          UpdateStatusItem (_currentEditStatusItem, statusItem, selectedItem);
+                                      }
                                   }
                               };
 
@@ -420,14 +435,14 @@ public class DynamicStatusBar : Scenario
             btnRemove.Accepting += (s, e) =>
                                   {
                                       Shortcut statusItem = DataContext.Items.Count > 0
-                                                                  ? DataContext.Items [_lstItems.SelectedItem].Shortcut
+                                                                  ? DataContext.Items [_lstItems.SelectedItem.Value].Shortcut
                                                                   : null;
 
                                       if (statusItem != null)
                                       {
                                           _statusBar.RemoveShortcut (_currentSelectedStatusBar);
                                           statusItem.Dispose ();
-                                          DataContext.Items.RemoveAt (_lstItems.SelectedItem);
+                                          DataContext.Items.RemoveAt (_lstItems.SelectedItem.Value);
 
                                           if (_lstItems.Source.Count > 0 && _lstItems.SelectedItem > _lstItems.Source.Count - 1)
                                           {
@@ -442,7 +457,7 @@ public class DynamicStatusBar : Scenario
             _lstItems.HasFocusChanging += (s, e) =>
                                {
                                    Shortcut statusItem = DataContext.Items.Count > 0
-                                                               ? DataContext.Items [_lstItems.SelectedItem].Shortcut
+                                                               ? DataContext.Items [_lstItems.SelectedItem.Value].Shortcut
                                                                : null;
                                    SetFrameDetails (statusItem);
                                };
@@ -489,7 +504,7 @@ public class DynamicStatusBar : Scenario
                 if (statusItem == null)
                 {
                     newStatusItem = DataContext.Items.Count > 0
-                                        ? DataContext.Items [_lstItems.SelectedItem].Shortcut
+                                        ? DataContext.Items [_lstItems.SelectedItem.Value].Shortcut
                                         : null;
                 }
                 else

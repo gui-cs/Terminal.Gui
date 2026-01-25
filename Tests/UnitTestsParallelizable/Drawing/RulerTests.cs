@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestPlatform.Utilities;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Ruler"/> that don't require Application.Driver or View context.
@@ -10,7 +10,7 @@ namespace UnitTests_Parallelizable.DrawingTests;
 ///
 /// Note: Tests that verify rendered output (Draw methods) require Application.Driver and remain in UnitTests as integration tests.
 /// </summary>
-public class RulerTests (ITestOutputHelper output) : FakeDriverBase
+public class RulerTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -51,17 +51,17 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Draw_Default ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var r = new Ruler ();
-        r.Draw (Point.Empty, driver: driver);
+        r.Draw (driver: driver, location: Point.Empty);
         DriverAssert.AssertDriverContentsWithFrameAre (@"", output, driver);
     }
 
     [Fact]
     public void Draw_Horizontal ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var len = 15;
 
@@ -69,7 +69,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal (Orientation.Horizontal, r.Orientation);
 
         r.Length = len;
-        r.Draw (Point.Empty, driver: driver);
+        r.Draw (driver: driver, location: Point.Empty);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -79,7 +79,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
                                                       );
 
         // Postive offset
-        r.Draw (new (1, 1), driver: driver);
+        r.Draw (driver: driver, location: new (1, 1));
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -91,7 +91,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
                                              );
 
         // Negative offset
-        r.Draw (new (-1, 3), driver: driver);
+        r.Draw (driver: driver, location: new (-1, 3));
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -107,14 +107,14 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Draw_Vertical ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var len = 15;
 
         var r = new Ruler ();
         r.Orientation = Orientation.Vertical;
         r.Length = len;
-        r.Draw (Point.Empty, driver: driver);
+        r.Draw (driver: driver, location: Point.Empty);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -137,7 +137,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
                                                        driver
                                                       );
 
-        r.Draw (new (1, 1), driver: driver);
+        r.Draw (driver: driver, location: new (1, 1));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -162,7 +162,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
                                                       );
 
         // Negative offset
-        r.Draw (new (2, -1), driver: driver);
+        r.Draw (driver: driver, location: new (2, -1));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"

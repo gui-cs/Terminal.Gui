@@ -1,3 +1,4 @@
+#nullable disable
 ﻿// 
 // FileDialog.cs: File system dialogs for open and save
 //
@@ -17,15 +18,15 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         The open dialog can be used to select files for opening, it can be configured to allow multiple items to be
-///         selected (based on the AllowsMultipleSelection) variable and you can control whether this should allow files or
+///         selected (based on the AllowsMultipleSelection) variable, and you can control whether this should allow files or
 ///         directories to be selected.
 ///     </para>
 ///     <para>
 ///         To use, create an instance of <see cref="OpenDialog"/>, and pass it to
-///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
+///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
 ///         the list of files will be available on the <see cref="FilePaths"/> property.
 ///     </para>
-///     <para>To select more than one file, users can use the spacebar, or control-t.</para>
+///     <para>To select more than one file, users can use the space key, or CTRL-T.</para>
 /// </remarks>
 public class OpenDialog : FileDialog
 {
@@ -35,8 +36,8 @@ public class OpenDialog : FileDialog
     /// <summary>Returns the selected files, or an empty list if nothing has been selected</summary>
     /// <value>The file paths.</value>
     public IReadOnlyList<string> FilePaths =>
-        Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
-        AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new [] { Path });
+        ((IRunnable)this).Result is null || Result == 1 ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
+        AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> ([Path]);
 
     /// <inheritdoc/>
     public override OpenMode OpenMode

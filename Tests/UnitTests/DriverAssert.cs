@@ -8,7 +8,7 @@ namespace UnitTests;
 /// <summary>
 ///     Provides xUnit-style assertions for <see cref="IDriver"/> contents.
 /// </summary>
-internal partial class DriverAssert
+public partial class DriverAssert
 {
     private const char SPACE_CHAR = ' ';
     private static readonly Rune _spaceRune = (Rune)SPACE_CHAR;
@@ -42,7 +42,12 @@ internal partial class DriverAssert
         }
 
         expectedLook = expectedLook.Trim ();
-        driver ??= Application.Driver;
+
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver);
 
         Cell [,] contents = driver!.Contents!;
 
@@ -60,7 +65,7 @@ internal partial class DriverAssert
                 {
                     case 0:
                         output.WriteLine (
-                                          $"{Application.ToString (driver)}\n"
+                                          $"{driver.ToString ()}\n"
                                           + $"Expected Attribute {val} at Contents[{line},{c}] {contents [line, c]} was not found.\n"
                                           + $" Expected: {string.Join (",", expectedAttributes.Select (attr => attr))}\n"
                                           + $" But Was: <not found>"
@@ -79,7 +84,7 @@ internal partial class DriverAssert
 
                 if (colorUsed != userExpected)
                 {
-                    output.WriteLine ($"{Application.ToString (driver)}");
+                    output.WriteLine ($"{driver.ToString ()}");
                     output.WriteLine ($"Unexpected Attribute at Contents[{line},{c}] = {contents [line, c]}.");
                     output.WriteLine ($" Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})");
                     output.WriteLine ($"  But Was: {colorUsed} ({val})");
@@ -152,7 +157,12 @@ internal partial class DriverAssert
     )
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
-        var actualLook = Application.ToString (driver ?? Application.Driver);
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver);
+        var actualLook = driver.ToString ();
 
         if (string.Equals (expectedLook, actualLook))
         {
@@ -183,6 +193,134 @@ internal partial class DriverAssert
         Assert.Equal (expectedLook, actualLook);
     }
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
+    /// <summary>Asserts that the driver raw ANSI output matches the expected output.</summary>
+    /// <param name="expectedLook">Expected output with C# escape sequences (e.g., \x1b for ESC)</param>
+    /// <param name="output"></param>
+    /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    public static void AssertDriverOutputIs (
+        string expectedLook,
+        ITestOutputHelper output,
+        IDriver? driver = null
+    )
+    {
+#pragma warning restore xUnit1013 // Public method should be marked as test
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver);
+
+        string? actualLook = driver.GetOutput().GetLastOutput ();
+
+        // Unescape the expected string to convert C# escape sequences like \x1b to actual characters
+        string unescapedExpected = UnescapeString (expectedLook);
+
+        // Trim trailing whitespace from actual (screen padding)
+        actualLook = actualLook.TrimEnd ();
+        unescapedExpected = unescapedExpected.TrimEnd ();
+
+        if (string.Equals (unescapedExpected, actualLook))
+        {
+            return;
+        }
+
+        // If test is about to fail show user what things looked like
+        if (!string.Equals (unescapedExpected, actualLook))
+        {
+            output?.WriteLine ($"Expected (length={unescapedExpected.Length}):" + Environment.NewLine + unescapedExpected);
+            output?.WriteLine ($" But Was (length={actualLook.Length}):" + Environment.NewLine + actualLook);
+
+            // Show the difference at the end
+            int minLen = Math.Min (unescapedExpected.Length, actualLook.Length);
+            output?.WriteLine ($"Lengths: Expected={unescapedExpected.Length}, Actual={actualLook.Length}, MinLen={minLen}");
+            if (actualLook.Length > unescapedExpected.Length)
+            {
+                output?.WriteLine ($"Actual has {actualLook.Length - unescapedExpected.Length} extra characters at the end");
+            }
+        }
+
+        Assert.Equal (unescapedExpected, actualLook);
+    }
+
+    /// <summary>
+    ///     Unescapes a C# string literal by processing escape sequences like \x1b, \n, \r, \t, etc.
+    /// </summary>
+    /// <param name="input">String with C# escape sequences</param>
+    /// <returns>String with escape sequences converted to actual characters</returns>
+    private static string UnescapeString (string input)
+    {
+        if (string.IsNullOrEmpty (input))
+        {
+            return input;
+        }
+
+        var result = new StringBuilder (input.Length);
+        int i = 0;
+
+        while (i < input.Length)
+        {
+            if (input [i] == '\\' && i + 1 < input.Length)
+            {
+                char next = input [i + 1];
+
+                switch (next)
+                {
+                    case 'x' when i + 3 < input.Length:
+                        // Handle \xHH (2-digit hex)
+                        string hex = input.Substring (i + 2, 2);
+                        if (int.TryParse (hex, System.Globalization.NumberStyles.HexNumber, null, out int hexValue))
+                        {
+                            result.Append ((char)hexValue);
+                            i += 4; // Skip \xHH
+                            continue;
+                        }
+                        break;
+
+                    case 'n':
+                        result.Append ('\n');
+                        i += 2;
+                        continue;
+
+                    case 'r':
+                        result.Append ('\r');
+                        i += 2;
+                        continue;
+
+                    case 't':
+                        result.Append ('\t');
+                        i += 2;
+                        continue;
+
+                    case '\\':
+                        result.Append ('\\');
+                        i += 2;
+                        continue;
+
+                    case '"':
+                        result.Append ('"');
+                        i += 2;
+                        continue;
+
+                    case '\'':
+                        result.Append ('\'');
+                        i += 2;
+                        continue;
+
+                    case '0':
+                        result.Append ('\0');
+                        i += 2;
+                        continue;
+                }
+            }
+
+            // Not an escape sequence, add the character as-is
+            result.Append (input [i]);
+            i++;
+        }
+
+        return result.ToString ();
+    }
     /// <summary>
     ///     Asserts that the driver contents are equal to the provided string.
     /// </summary>
@@ -196,10 +334,13 @@ internal partial class DriverAssert
         IDriver? driver = null
     )
     {
-        List<List<Rune>> lines = [];
+        List<List<string>> lines = [];
         var sb = new StringBuilder ();
-        driver ??= Application.Driver;
-
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver);
         int x = -1;
         int y = -1;
         int w = -1;
@@ -209,13 +350,13 @@ internal partial class DriverAssert
 
         for (var rowIndex = 0; rowIndex < driver.Rows; rowIndex++)
         {
-            List<Rune> runes = [];
+            List<string> strings = [];
 
             for (var colIndex = 0; colIndex < driver.Cols; colIndex++)
             {
-                Rune runeAtCurrentLocation = contents! [rowIndex, colIndex].Rune;
+                string textAtCurrentLocation = contents! [rowIndex, colIndex].Grapheme;
 
-                if (runeAtCurrentLocation != _spaceRune)
+                if (textAtCurrentLocation != _spaceRune.ToString ())
                 {
                     if (x == -1)
                     {
@@ -224,11 +365,11 @@ internal partial class DriverAssert
 
                         for (var i = 0; i < colIndex; i++)
                         {
-                            runes.InsertRange (i, [_spaceRune]);
+                            strings.InsertRange (i, [_spaceRune.ToString ()]);
                         }
                     }
 
-                    if (runeAtCurrentLocation.GetColumns () > 1)
+                    if (textAtCurrentLocation.GetColumns () > 1)
                     {
                         colIndex++;
                     }
@@ -243,18 +384,13 @@ internal partial class DriverAssert
 
                 if (x > -1)
                 {
-                    runes.Add (runeAtCurrentLocation);
+                    strings.Add (textAtCurrentLocation);
                 }
-
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	runes.Add (combMark);
-                //}
             }
 
-            if (runes.Count > 0)
+            if (strings.Count > 0)
             {
-                lines.Add (runes);
+                lines.Add (strings);
             }
         }
 
@@ -268,13 +404,13 @@ internal partial class DriverAssert
         }
 
         // Remove trailing whitespace on each line
-        foreach (List<Rune> row in lines)
+        foreach (List<string> row in lines)
         {
             for (int c = row.Count - 1; c >= 0; c--)
             {
-                Rune rune = row [c];
+                string text = row [c];
 
-                if (rune != (Rune)' ' || row.Sum (x => x.GetColumns ()) == w)
+                if (text != " " || row.Sum (x => x.GetColumns ()) == w)
                 {
                     break;
                 }
@@ -283,7 +419,7 @@ internal partial class DriverAssert
             }
         }
 
-        // Convert Rune list to string
+        // Convert Text list to string
         for (var r = 0; r < lines.Count; r++)
         {
             var line = StringExtensions.ToString (lines [r]);
@@ -341,8 +477,11 @@ internal partial class DriverAssert
     /// <param name="expectedColors"></param>
     internal static void AssertDriverUsedColors (IDriver? driver = null, params Attribute [] expectedColors)
     {
-        driver ??= Application.Driver;
-        Cell [,] contents = driver?.Contents!;
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver); Cell [,] contents = driver?.Contents!;
 
         List<Attribute> toFind = expectedColors.ToList ();
 

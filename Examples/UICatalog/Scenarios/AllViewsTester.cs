@@ -28,17 +28,19 @@ public class AllViewsTester : Scenario
 
     public override void Main ()
     {
-        // Don't create a sub-win (Scenario.Win); just use Application.Top
-        Application.Init ();
+        // Don't create a sub-win (Scenario.Win); just use Application.TopRunnable
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var app = new Window
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
         };
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
-        app.Border!.LineStyle = LineStyle.Heavy;
-        app.Border!.Thickness = new (0);
+        window.Border!.LineStyle = LineStyle.Heavy;
+        window.Border!.Thickness = new (0);
 
 
         _viewClasses = GetAllViewClassesCollection ()
@@ -60,15 +62,15 @@ public class AllViewsTester : Scenario
         };
         _classListView.Border!.Thickness = new (1);
 
-        _classListView.SelectedItemChanged += (s, args) =>
+        _classListView.SelectedItemChanged += (_, _) =>
                                               {
                                                   // Dispose existing current View, if any
                                                   DisposeCurrentView ();
 
-                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
+                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem.Value]);
 
                                                   // Force ViewToEdit to be the view and not a subview
-                                                  if (_adornmentsEditor is { })
+                                                  if (_adornmentsEditor is not null)
                                                   {
                                                       _adornmentsEditor.AutoSelectSuperView = _curView;
 
@@ -76,7 +78,7 @@ public class AllViewsTester : Scenario
                                                   }
                                               };
 
-        _classListView.Accepting += (sender, args) =>
+        _classListView.Accepting += (_, args) =>
                                     {
                                         _curView?.SetFocus ();
                                         args.Handled = true;
@@ -110,7 +112,7 @@ public class AllViewsTester : Scenario
         };
         _arrangementEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
 
-        _arrangementEditor.ExpanderButton.CollapsedChanging += (sender, args) =>
+        _arrangementEditor.ExpanderButton.CollapsedChanging += (_, args) =>
                                                                {
                                                                    _adornmentsEditor.ExpanderButton.Collapsed = args.NewValue;
                                                                };
@@ -175,6 +177,8 @@ public class AllViewsTester : Scenario
                                                           // We have two choices:
                                                           // 1) Call Layout explicitly
                                                           // 2) Throw LayoutException so Layout tries again
+                                                          // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+                                                          // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
                                                           _eventLog.Layout ();
                                                           //throw new LayoutException ("_eventLog");
                                                       }
@@ -195,18 +199,16 @@ public class AllViewsTester : Scenario
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border!.SetScheme (app.GetScheme ());
+        _hostPane.Border!.SetScheme (window.GetScheme ());
         _hostPane.Padding!.Thickness = new (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.SetScheme (app.GetScheme ());
+        _hostPane.Padding.SetScheme (window.GetScheme ());
 
-        app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _propertiesEditor, _eventLog, _hostPane);
+        window.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _propertiesEditor, _eventLog, _hostPane);
 
-        app.Initialized += App_Initialized;
+        window.Initialized += App_Initialized;
 
-        Application.Run (app);
-        app.Dispose ();
-        Application.Shutdown ();
+        app.Run (window);
     }
 
     private void App_Initialized (object? sender, EventArgs e)
@@ -219,6 +221,13 @@ public class AllViewsTester : Scenario
     private void CreateCurrentView (Type type)
     {
         Debug.Assert (_curView is null);
+
+        // Skip RunnableWrapper types as they have generic constraints that cannot be satisfied
+        if (type.IsGenericType && type.GetGenericTypeDefinition().Name.StartsWith("RunnableWrapper"))
+        {
+            Logging.Warning ($"Cannot create an instance of {type.Name} because it is a RunnableWrapper with unsatisfiable generic constraints.");
+            return;
+        }
 
         // If we are to create a generic Type
         if (type.IsGenericType)
@@ -323,12 +332,12 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width == Dim.Absolute (0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == Dim.Absolute (0) || view.Height is null)
+        if (view.Height == Dim.Absolute (0))
         {
             view.Height = Dim.Fill ();
         }
@@ -336,7 +345,7 @@ public class AllViewsTester : Scenario
         UpdateHostTitle (view);
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         var keys = new List<Key> ();
 

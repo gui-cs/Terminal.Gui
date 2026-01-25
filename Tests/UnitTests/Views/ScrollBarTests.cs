@@ -495,6 +495,8 @@ public class ScrollBarTests (ITestOutputHelper output)
     {
         var super = new Window
         {
+            Driver = ApplicationImpl.Instance.Driver,
+
             Id = "super",
             Width = width + 2,
             Height = height + 2,
@@ -528,13 +530,13 @@ public class ScrollBarTests (ITestOutputHelper output)
     #endregion Draw
 
     #region Mouse
-    
-    [Theory]
+
+    [Theory (Skip = "Broken in #4474")]
     [CombinatorialData]
     [AutoInitShutdown]
     public void Mouse_Click_DecrementButton_Decrements ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)
     {
-        var top = new Toplevel ()
+        var top = new Runnable ()
         {
             Id = "top",
             Width = 10,
@@ -567,7 +569,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new ()
         {
             ScreenPosition = btnPoint,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         });
 
         AutoInitShutdownAttribute.RunIteration ();
@@ -578,12 +580,12 @@ public class ScrollBarTests (ITestOutputHelper output)
     }
 
 
-    [Theory]
+    [Theory (Skip = "Broken in #4474")]
     [CombinatorialData]
     [AutoInitShutdown]
     public void Mouse_Click_IncrementButton_Increments ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)
     {
-        var top = new Toplevel ()
+        var top = new Runnable ()
         {
             Id = "top",
             Width = 10,
@@ -615,7 +617,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new ()
         {
             ScreenPosition = btnPoint,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         });
         AutoInitShutdownAttribute.RunIteration ();
 

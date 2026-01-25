@@ -1,4 +1,3 @@
-#nullable enable
 using System.ComponentModel;
 using System.Numerics;
 
@@ -38,7 +37,7 @@ public class NumericUpDown<T> : View where T : notnull
             if (NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
             {
                 Increment = (T)helper!.One;
-                Value = (T)helper!.Zero;
+                Value = (T)helper.Zero;
             }
         }
 
@@ -52,7 +51,7 @@ public class NumericUpDown<T> : View where T : notnull
             NoPadding = true,
             NoDecorations = true,
             Title = $"{Glyphs.DownArrow}",
-            WantContinuousButtonPressed = true,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
             ShadowStyle = ShadowStyle.None,
         };
@@ -62,7 +61,7 @@ public class NumericUpDown<T> : View where T : notnull
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
             Y = Pos.Top (_down),
-            Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns())),
+            Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns ())),
             Height = 1,
             TextAlignment = Alignment.Center,
             CanFocus = true,
@@ -77,7 +76,7 @@ public class NumericUpDown<T> : View where T : notnull
             NoPadding = true,
             NoDecorations = true,
             Title = $"{Glyphs.UpArrow}",
-            WantContinuousButtonPressed = true,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
             ShadowStyle = ShadowStyle.None,
         };
@@ -99,7 +98,7 @@ public class NumericUpDown<T> : View where T : notnull
                         }
 
                         // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseSelecting (ctx) is true)
+                        //if (RaiseActivating (ctx) is true)
                         //{
                         //    return true;
                         //}
@@ -121,7 +120,7 @@ public class NumericUpDown<T> : View where T : notnull
                         }
 
                         // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseSelecting (ctx) is true)
+                        //if (RaiseActivating (ctx) is true)
                         //{
                         //    return true;
                         //}

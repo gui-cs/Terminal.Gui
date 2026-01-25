@@ -1,3 +1,4 @@
+#nullable disable
 ﻿
 namespace Terminal.Gui.Views;
 
@@ -40,12 +41,12 @@ public class ColumnStyle
 
     /// <summary>
     ///     Set the maximum width of the column in characters. This value will be ignored if more than the tables
-    ///     <see cref="TableView.MaxCellWidth"/>. Defaults to <see cref="TableView.DefaultMaxCellWidth"/>
+    ///     <see cref="TableView.MaxCellWidth"/>. Defaults to <see cref="TableView.DEFAULT_MAX_CELL_WIDTH"/>
     /// </summary>
-    public int MaxWidth { get; set; } = TableView.DefaultMaxCellWidth;
+    public int MaxWidth { get; set; } = TableView.DEFAULT_MAX_CELL_WIDTH;
 
     /// <summary>Enables flexible sizing of this column based on available screen space to render into.</summary>
-    public int MinAcceptableWidth { get; set; } = TableView.DefaultMinAcceptableWidth;
+    public int MinAcceptableWidth { get; set; } = TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH;
 
     /// <summary>
     ///     Set the minimum width of the column in characters. Setting this will ensure that even when a column has short

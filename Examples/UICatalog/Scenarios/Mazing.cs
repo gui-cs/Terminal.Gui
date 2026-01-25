@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Games")]
 public class Mazing : Scenario
 {
-    private Toplevel? _top;
+    private Window? _top;
     private MazeGenerator? _m;
 
     private List<Point>? _potions;
@@ -19,7 +19,10 @@ public class Mazing : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+
         _top = new ();
 
         _m = new ();
@@ -33,23 +36,23 @@ public class Mazing : Scenario
         _top.KeyBindings.Add (Key.CursorDown, Command.Down);
 
         // Changing the key-bindings of a View is not allowed, however,
-        // by default, Toplevel doesn't bind any of our movement keys, so
+        // by default, Runnable doesn't bind any of our movement keys, so
         // we can take advantage of the CommandNotBound event to handle them
         // 
-        // An alternative implementation would be to create a TopLevel subclass that
+        // An alternative implementation would be to create a Runnable subclass that
         // calls AddCommand/KeyBindings.Add in the constructor. See the Snake game scenario
         // for an example.
         _top.CommandNotBound += TopCommandNotBound;
 
-        _top.DrawingContent += (s, _) =>
+        _top.DrawingContent += (sender, _) =>
                                {
-                                   if (s is not Toplevel top)
+                                   if (sender is not Runnable top)
                                    {
                                        return;
                                    }
 
                                    // Build maze
-                                   var lc = new LineCanvas (_m.BuildWallLinesFromMaze ());
+                                   LineCanvas lc = new (_m.BuildWallLinesFromMaze ());
 
                                    // Print maze
                                    foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
@@ -88,7 +91,7 @@ public class Mazing : Scenario
                                    // Draw UI
                                    top.SetAttribute (top.GetAttributeForRole (VisualRole.Normal));
 
-                                   var g = new Gradient ([new (Color.Red), new (Color.BrightGreen)], [10]);
+                                   Gradient g = new ([new (Color.Red), new (Color.BrightGreen)], [10]);
                                    top.Move (_m.MazeWidth + 1, 0);
                                    top.AddStr ("Name: Sir Flibble");
                                    top.Move (_m.MazeWidth + 1, 1);
@@ -110,10 +113,8 @@ public class Mazing : Scenario
                                    }
                                };
 
-        Application.Run (_top);
-
+        app.Run (_top);
         _top.Dispose ();
-        Application.Shutdown ();
     }
 
     private void GenerateNpcs ()
@@ -171,7 +172,7 @@ public class Mazing : Scenario
                 if (_m.PlayerHp <= 0)
                 {
                     _message = "You died!";
-                    Application.Top!.SetNeedsDraw (); // trigger redraw
+                    _top?.SetNeedsDraw (); // trigger redraw
                     _dead = true;
 
                     return; // Stop further action if dead
@@ -190,17 +191,17 @@ public class Mazing : Scenario
                 _message = string.Empty;
             }
 
-            Application.Top!.SetNeedsDraw (); // trigger redraw
+            _top?.SetNeedsDraw (); // trigger redraw
         }
 
         // Optional win condition:
         if (_m.Player == _m.End)
         {
-            var hp = _m.PlayerHp;
+            int hp = _m.PlayerHp;
             _m = new (); // Generate a new maze
             _m.PlayerHp = hp;
             GenerateNpcs ();
-            Application.Top!.SetNeedsDraw (); // trigger redraw
+            _top?.SetNeedsDraw (); // trigger redraw
         }
     }
 }

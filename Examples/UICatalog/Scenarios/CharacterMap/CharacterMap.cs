@@ -23,9 +23,9 @@ public class CharacterMap : Scenario
     private CharMap? _charMap;
     private OptionSelector? _unicodeCategorySelector;
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         for (var i = 0; i < 200; i++)
         {
@@ -52,9 +52,11 @@ public class CharacterMap : Scenario
     // Don't create a Window, just return the top-level view
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var top = new Window
+        using Window top = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -91,7 +93,7 @@ public class CharacterMap : Scenario
         };
         top.Add (jumpEdit);
 
-        _charMap.SelectedCodePointChanged += (sender, args) =>
+        _charMap.SelectedCodePointChanged += (_, args) =>
                                              {
                                                  if (Rune.IsValid (args.Value))
                                                  {
@@ -134,27 +136,33 @@ public class CharacterMap : Scenario
         _categoryList.Table = CreateCategoryTable (0, isDescending);
 
         // if user clicks the mouse in TableView
-        _categoryList.MouseClick += (s, e) =>
-                                    {
-                                        _categoryList.ScreenToCell (e.Position, out int? clickedCol);
+        _categoryList.Activating += (_, e) =>
+                                   {
+                                       // Only handle mouse clicks
+                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+                                       {
+                                           return;
+                                       }
 
-                                        if (clickedCol != null && e.Flags.HasFlag (MouseFlags.Button1Clicked))
-                                        {
-                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
-                                            isDescending = !isDescending;
+                                       _categoryList.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                            _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+                                       if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                       {
+                                           EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                           string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                                           isDescending = !isDescending;
 
-                                            table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                           _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
-                                            _categoryList.SelectedRow = table.Data
-                                                                             .Select ((item, index) => new { item, index })
-                                                                             .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                                             ?.index
-                                                                        ?? -1;
-                                        }
-                                    };
+                                           table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+
+                                           _categoryList.SelectedRow = table.Data
+                                                                            .Select ((item, index) => new { item, index })
+                                                                            .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                                            ?.index
+                                                                       ?? -1;
+                                       }
+                                   };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 
@@ -167,7 +175,7 @@ public class CharacterMap : Scenario
 
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
-        _categoryList.SelectedCellChanged += (s, args) =>
+        _categoryList.SelectedCellChanged += (_, args) =>
                                              {
                                                  EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                                                  _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
@@ -176,18 +184,18 @@ public class CharacterMap : Scenario
 
         top.Add (_categoryList);
 
-        var menu = new MenuBarv2
+        var menu = new MenuBar
         {
             Menus =
             [
                 new (
-                     "_File",
-                     new MenuItemv2 []
+                     Strings.menuFile,
+                     new MenuItem []
                      {
                          new (
-                              "_Quit",
+                              Strings.cmdQuit,
                               $"{Application.QuitKey}",
-                              () => Application.RequestStop ()
+                              () => _charMap?.App?.RequestStop ()
                              )
                      }
                     ),
@@ -204,9 +212,7 @@ public class CharacterMap : Scenario
         _charMap.SelectedCodePoint = 0;
         _charMap.SetFocus ();
 
-        Application.Run (top);
-        top.Dispose ();
-        Application.Shutdown ();
+        app.Run (top);
 
         return;
 
@@ -219,7 +225,7 @@ public class CharacterMap : Scenario
 
             _errorLabel.Visible = true;
 
-            uint result = 0;
+            uint result;
 
             if (jumpEdit.Text.Length == 1)
             {
@@ -283,7 +289,7 @@ public class CharacterMap : Scenario
                                         ?? -1;
             _categoryList.EnsureSelectedCellIsVisible ();
 
-            // Ensure the typed glyph is selected 
+            // Ensure the typed glyph is selected
             _charMap.SelectedCodePoint = (int)result;
             _charMap.SetFocus ();
 
@@ -337,18 +343,18 @@ public class CharacterMap : Scenario
                    );
     }
 
-    private MenuItemv2 CreateMenuShowWidth ()
+    private MenuItem CreateMenuShowWidth ()
     {
         CheckBox cb = new ()
         {
             Title = "_Show Glyph Width",
             CheckedState = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
         };
-        var item = new MenuItemv2 { CommandView = cb };
+        var item = new MenuItem { CommandView = cb };
 
         item.Action += () =>
                        {
-                           if (_charMap is { })
+                           if (_charMap is not null)
                            {
                                _charMap.ShowGlyphWidths = cb.CheckedState == CheckState.Checked;
                            }
@@ -357,7 +363,7 @@ public class CharacterMap : Scenario
         return item;
     }
 
-    private MenuItemv2 CreateMenuUnicodeCategorySelector ()
+    private MenuItem CreateMenuUnicodeCategorySelector ()
     {
         // First option is "All" (no filter), followed by all UnicodeCategory names
         string [] allCategoryNames = Enum.GetNames<UnicodeCategory> ();

@@ -1,68 +1,133 @@
-#nullable enable
+using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
-/// <remarks>
-///     There are currently four implementations: UnixDriver, WindowsDriver, DotNetDriver, and FakeDriver
-/// </remarks>
-public interface IDriver
+public interface IDriver : IDisposable
 {
+    #region Driver Lifecycle
+
+    /// <summary>Initializes the driver</summary>
+    void Init ();
+
+    /// <summary>
+    ///     INTERNAL: Updates the terminal with the current output buffer. Should not be used by applications. Drawing occurs
+    ///     once each Application main loop iteration.
+    /// </summary>
+    void Refresh ();
+
     /// <summary>
     ///     Gets the name of the driver implementation.
     /// </summary>
     string? GetName ();
+
+    /// <summary>Returns the name of the driver and relevant library version information.</summary>
+    /// <returns></returns>
+    string GetVersionInfo ();
+
+    /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
+    /// <remarks>This is only implemented in UnixDriver.</remarks>
+    void Suspend ();
+
+    /// <summary>
+    ///     Gets whether the driver has detected the console requires legacy console API (Windows Console API without ANSI/VT
+    ///     support).
+    ///     Returns <see langword="true"/> for legacy consoles that don't support modern ANSI escape sequences (e.g. Windows
+    ///     conhost);
+    ///     <see langword="false"/> for modern terminals with ANSI/VT support.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property indicates whether the terminal supports modern ANSI escape sequences for input/output.
+    ///         On Windows, this maps to whether Virtual Terminal processing is enabled.
+    ///         On Unix-like systems, this is typically <see langword="false"/> as they support ANSI by default.
+    ///     </para>
+    ///     <para>
+    ///         When <see langword="true"/>, the driver must use legacy Windows Console API functions
+    ///         (e.g., WriteConsoleW, SetConsoleTextAttribute) instead of ANSI escape sequences.
+    ///     </para>
+    /// </remarks>
+    bool IsLegacyConsole { get; internal set; }
+
+    #endregion Driver Lifecycle
+
+    #region Driver Components
 
     /// <summary>
     ///     Class responsible for processing native driver input objects
     ///     e.g. <see cref="ConsoleKeyInfo"/> into <see cref="Key"/> events
     ///     and detecting and processing ansi escape sequences.
     /// </summary>
-    IInputProcessor InputProcessor { get; }
+    IInputProcessor GetInputProcessor ();
 
     /// <summary>
-    ///     Describes the desired screen state. Data source for <see cref="IOutput"/>.
+    ///     Gets the <see cref="IOutputBuffer"/> containing the buffered screen contents.
     /// </summary>
-    IOutputBuffer OutputBuffer { get; }
+    /// <returns></returns>
+    IOutputBuffer GetOutputBuffer ();
 
     /// <summary>
-    ///     Interface for classes responsible for reporting the current
-    ///     size of the terminal window.
+    ///     Gets the <see cref="IOutput"/> responsible for writing to the terminal.
     /// </summary>
-    ISizeMonitor SizeMonitor { get; }
+    IOutput GetOutput ();
 
-    /// <summary>Get the operating system clipboard.</summary>
-    /// 
-    IClipboard? Clipboard { get; }
+    /// <summary>Gets or sets the clipboard.</summary>
+    IClipboard? Clipboard { get; set; }
+
+    #endregion Driver Components
+
+    #region Screen and Display
 
     /// <summary>Gets the location and size of the terminal screen.</summary>
     Rectangle Screen { get; }
 
     /// <summary>
-    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
-    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    ///     Sets the screen size. <see cref="Screen"/> is the source of truth for screen dimensions.
     /// </summary>
     /// <param name="width">The new width in columns.</param>
     /// <param name="height">The new height in rows.</param>
-    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
     void SetScreenSize (int width, int height);
 
     /// <summary>
-    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
-    ///     to.
+    ///     The event fired when the screen changes (size, position, etc.).
+    ///     <see cref="Screen"/> is the source of truth for screen dimensions.
     /// </summary>
-    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
-    Region? Clip { get; set; }
-
-
-    /// <summary>
-    ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
-    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
-    /// </summary>
-    int Col { get; }
+    event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <summary>The number of columns visible in the terminal.</summary>
     int Cols { get; set; }
+
+    /// <summary>The number of rows visible in the terminal.</summary>
+    int Rows { get; set; }
+
+    /// <summary>The leftmost column in the terminal.</summary>
+    int Left { get; set; }
+
+    /// <summary>The topmost row in the terminal.</summary>
+    int Top { get; set; }
+
+    #endregion Screen and Display
+
+    #region Color Support
+
+    /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
+    bool SupportsTrueColor { get; }
+
+    /// <summary>
+    ///     Gets or sets whether the <see cref="IDriver"/> should use 16 colors instead of the default TrueColors.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Will be forced to <see langword="true"/> if <see cref="IDriver.SupportsTrueColor"/> is
+    ///         <see langword="false"/>, indicating that the <see cref="IDriver"/> cannot support TrueColor.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="Driver.Force16Colors"/>
+    bool Force16Colors { get; set; }
+
+    #endregion Color Support
+
+    #region Content Buffer
 
     // BUGBUG: This should not be publicly settable.
     /// <summary>
@@ -71,8 +136,30 @@ public interface IDriver
     /// </summary>
     Cell [,]? Contents { get; set; }
 
-    /// <summary>The leftmost column in the terminal.</summary>
-    int Left { get; set; }
+    /// <summary>
+    ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
+    ///     to.
+    /// </summary>
+    /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
+    Region? Clip { get; set; }
+
+    /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
+    void ClearContents ();
+
+    /// <summary>
+    ///     Fills the specified rectangle with the specified rune, using <see cref="IDriver.CurrentAttribute"/>
+    /// </summary>
+    event EventHandler<EventArgs> ClearedContents;
+
+    #endregion Content Buffer
+
+    #region Drawing and Rendering
+
+    /// <summary>
+    ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
+    ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
+    /// </summary>
+    int Col { get; }
 
     /// <summary>
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
@@ -80,61 +167,12 @@ public interface IDriver
     /// </summary>
     int Row { get; }
 
-    /// <summary>The number of rows visible in the terminal.</summary>
-    int Rows { get; set; }
-
-    /// <summary>The topmost row in the terminal.</summary>
-    int Top { get; set; }
-
-    /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
-    bool SupportsTrueColor { get; }
-
     /// <summary>
-    ///     Gets or sets whether the <see cref="IDriver"/> should use 16 colors instead of the default TrueColors.
-    ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Will be forced to <see langword="true"/> if <see cref="IDriver.SupportsTrueColor"/> is
-    ///         <see langword="false"/>, indicating that the <see cref="IDriver"/> cannot support TrueColor.
-    ///     </para>
-    /// </remarks>
-    bool Force16Colors { get; set; }
-
-    /// <summary>
-    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
+    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or
+    ///     <see cref="AddStr"/>
     ///     call.
     /// </summary>
     Attribute CurrentAttribute { get; set; }
-
-    /// <summary>Returns the name of the driver and relevant library version information.</summary>
-    /// <returns></returns>
-    string GetVersionInfo ();
-
-    /// <summary>
-    ///     Provide proper writing to send escape sequence recognized by the <see cref="IDriver"/>.
-    /// </summary>
-    /// <param name="ansi"></param>
-    void WriteRaw (string ansi);
-
-    /// <summary>Tests if the specified rune is supported by the driver.</summary>
-    /// <param name="rune"></param>
-    /// <returns>
-    ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
-    ///     support displaying this rune.
-    /// </returns>
-    bool IsRuneSupported (Rune rune);
-
-    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Rune.</summary>
-    /// <param name="rune">Used to determine if one or two columns are required.</param>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
-    ///     <see cref="IDriver.Clip"/>.
-    ///     <see langword="true"/> otherwise.
-    /// </returns>
-    bool IsValidLocation (Rune rune, int col, int row);
 
     /// <summary>
     ///     Updates <see cref="IDriver.Col"/> and <see cref="IDriver.Row"/> to the specified column and row in
@@ -153,6 +191,25 @@ public interface IDriver
     /// <param name="col">Column to move to.</param>
     /// <param name="row">Row to move to.</param>
     void Move (int col, int row);
+
+    /// <summary>Tests if the specified rune is supported by the driver.</summary>
+    /// <param name="rune"></param>
+    /// <returns>
+    ///     <see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver does not
+    ///     support displaying this rune.
+    /// </returns>
+    bool IsRuneSupported (Rune rune);
+
+    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
+    /// <param name="text">Used to determine if one or two columns are required.</param>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <returns>
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
+    ///     <see cref="IDriver.Clip"/>.
+    ///     <see langword="true"/> otherwise.
+    /// </returns>
+    bool IsValidLocation (string text, int col, int row);
 
     /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
     /// <remarks>
@@ -194,14 +251,6 @@ public interface IDriver
     /// <param name="str">String.</param>
     void AddStr (string str);
 
-    /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
-    void ClearContents ();
-
-    /// <summary>
-    ///     Fills the specified rectangle with the specified rune, using <see cref="IDriver.CurrentAttribute"/>
-    /// </summary>
-    event EventHandler<EventArgs> ClearedContents;
-
     /// <summary>Fills the specified rectangle with the specified rune, using <see cref="IDriver.CurrentAttribute"/></summary>
     /// <remarks>
     ///     The value of <see cref="IDriver.Clip"/> is honored. Any parts of the rectangle not in the clip will not be
@@ -210,50 +259,6 @@ public interface IDriver
     /// <param name="rect">The Screen-relative rectangle.</param>
     /// <param name="rune">The Rune used to fill the rectangle</param>
     void FillRect (Rectangle rect, Rune rune = default);
-
-    /// <summary>
-    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
-    ///     that calls <see cref="IDriver.FillRect(System.Drawing.Rectangle,System.Text.Rune)"/>.
-    /// </summary>
-    /// <param name="rect"></param>
-    /// <param name="c"></param>
-    void FillRect (Rectangle rect, char c);
-
-
-    /// <summary>Gets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool GetCursorVisibility (out CursorVisibility visibility);
-
-    /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
-    void Refresh ();
-
-    /// <summary>Sets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool SetCursorVisibility (CursorVisibility visibility);
-
-    /// <summary>
-    /// The event fired when the screen changes (size, position, etc.).
-    /// <see cref="Screen"/> is the source of truth for screen dimensions.
-    /// </summary>
-    event EventHandler<SizeChangedEventArgs>? SizeChanged;
-
-    /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
-    /// <remarks>This is only implemented in UnixDriver.</remarks>
-    void Suspend ();
-
-    /// <summary>
-    ///     Sets the position of the terminal cursor to <see cref="IDriver.Col"/> and
-    ///     <see cref="IDriver.Row"/>.
-    /// </summary>
-    void UpdateCursor ();
-
-    /// <summary>Initializes the driver</summary>
-    void Init ();
-
-    /// <summary>Ends the execution of the console driver.</summary>
-    void End ();
 
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
@@ -264,25 +269,88 @@ public interface IDriver
     /// <returns>The current attribute.</returns>
     Attribute GetAttribute ();
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    event EventHandler<MouseEventArgs>? MouseEvent;
-
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
-    event EventHandler<Key>? KeyDown;
-
-    /// <summary>Event fired when a key is released.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="IDriver.KeyDown"/>
-    ///     processing is
-    ///     complete.
-    /// </remarks>
-    event EventHandler<Key>? KeyUp;
+    /// <summary>
+    ///     Provide proper writing to send escape sequence recognized by the <see cref="IDriver"/>.
+    /// </summary>
+    /// <param name="ansi"></param>
+    void WriteRaw (string ansi);
 
     /// <summary>
-    ///     Enqueues a key input event to the driver. For unit tests.
+    ///     Gets the queue of sixel images to write out to screen when updating.
+    ///     If the terminal does not support Sixel, adding to this queue has no effect.
     /// </summary>
-    /// <param name="key"></param>
-    void EnqueueKeyEvent (Key key);
+    ConcurrentQueue<SixelToRender> GetSixels ();
+
+    /// <summary>
+    ///     Gets a string representation of <see cref="Contents"/>.
+    /// </summary>
+    /// <returns></returns>
+    public string ToString ();
+
+    /// <summary>
+    ///     Gets an ANSI escape sequence representation of <see cref="Contents"/>. This is the
+    ///     same output as would be written to the terminal to recreate the current screen contents.
+    /// </summary>
+    /// <returns></returns>
+    public string ToAnsi ();
+
+    #endregion Drawing and Rendering
+
+    #region Cursor
+
+    /// <summary>
+    ///     Sets the cursor for this driver.
+    /// </summary>
+    /// <param name="cursor">
+    ///     The cursor to set. Position must be in screen-absolute coordinates.
+    ///     Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     Set Position to null to hide the cursor.
+    /// </param>
+    public void SetCursor (Cursor cursor);
+
+    /// <summary>
+    ///     Gets the current cursor for this driver.
+    /// </summary>
+    /// <returns></returns>
+    public Cursor GetCursor ();
+
+    /// <summary>
+    ///     Gets whether the terminal cursor needs to be updated.
+    /// </summary>
+    /// <returns></returns>
+    bool GetCursorNeedsUpdate ();
+
+    /// <summary>
+    ///     Signals that the cursor needs to be updated without requiring a full redraw.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
+    ///         or shape changes but the view content does not need to be redrawn.
+    ///     </para>
+    /// </remarks>
+    /// <param name="needsUpdate">Indicates whether the cursor needs to be updated.</param>
+    public void SetCursorNeedsUpdate (bool needsUpdate);
+
+    #endregion Cursor
+
+    #region Input Events
+
+    /// <summary>Event fired when a key is pressed down.</summary>
+    event EventHandler<Key>? KeyDown;
+
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    event EventHandler<Mouse>? MouseEvent;
+
+    /// <summary>
+    ///     Injects a mouse event. For unit tests.
+    /// </summary>
+    /// <param name="mouse">The mouse event to enqueue.</param>
+    void InjectMouseEvent (Mouse mouse);
+
+    #endregion Input Events
+
+    #region ANSI Escape Sequences
 
     /// <summary>
     ///     Queues the given <paramref name="request"/> for execution
@@ -290,9 +358,5 @@ public interface IDriver
     /// <param name="request"></param>
     public void QueueAnsiRequest (AnsiEscapeSequenceRequest request);
 
-    /// <summary>
-    ///     Gets the <see cref="AnsiRequestScheduler"/> for the driver
-    /// </summary>
-    /// <returns></returns>
-    public AnsiRequestScheduler GetRequestScheduler ();
+    #endregion ANSI Escape Sequences
 }

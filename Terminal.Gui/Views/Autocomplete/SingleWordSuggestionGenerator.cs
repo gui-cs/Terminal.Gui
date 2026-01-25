@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -17,10 +18,10 @@ public class SingleWordSuggestionGenerator : ISuggestionGenerator
         // if there is nothing to pick from
         if (AllSuggestions.Count == 0)
         {
-            return Enumerable.Empty<Suggestion> ();
+            return [];
         }
 
-        List<Rune> line = context.CurrentLine.Select (c => c.Rune).ToList ();
+        List<string> line = context.CurrentLine.Select (c => c.Grapheme).ToList ();
         string currentWord = IdxToWord (line, context.CursorPosition, out int startIdx);
         context.CursorPosition = startIdx < 1 ? startIdx : Math.Min (startIdx + 1, line.Count);
 
@@ -43,9 +44,13 @@ public class SingleWordSuggestionGenerator : ISuggestionGenerator
     ///     Return true if the given symbol should be considered part of a word and can be contained in matches. Base
     ///     behavior is to use <see cref="char.IsLetterOrDigit(char)"/>
     /// </summary>
-    /// <param name="rune">The rune.</param>
+    /// <param name="text">The text.</param>
     /// <returns></returns>
-    public virtual bool IsWordChar (Rune rune) { return char.IsLetterOrDigit ((char)rune.Value); }
+    public virtual bool IsWordChar (string text)
+    {
+        return !string.IsNullOrEmpty (text)
+               && Rune.IsLetterOrDigit (text.EnumerateRunes ().First ());
+    }
 
     /// <summary>
     ///     <para>
@@ -64,7 +69,7 @@ public class SingleWordSuggestionGenerator : ISuggestionGenerator
     /// <param name="startIdx">The start index of the word.</param>
     /// <param name="columnOffset"></param>
     /// <returns></returns>
-    protected virtual string IdxToWord (List<Rune> line, int idx, out int startIdx, int columnOffset = 0)
+    protected virtual string IdxToWord (List<string> line, int idx, out int startIdx, int columnOffset = 0)
     {
         var sb = new StringBuilder ();
         startIdx = idx;
@@ -93,7 +98,7 @@ public class SingleWordSuggestionGenerator : ISuggestionGenerator
         {
             if (IsWordChar (line [startIdx]))
             {
-                sb.Insert (0, (char)line [startIdx].Value);
+                sb.Insert (0, line [startIdx]);
             }
             else
             {

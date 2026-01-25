@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -12,7 +10,7 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 internal class TextModel
 {
-    private List<List<Cell>> _lines = new ();
+    private List<List<Cell>> _lines = [];
     private (Point startPointToFind, Point currentPointToFind, bool found) _toFind;
 
     /// <summary>The number of text lines in the model</summary>
@@ -33,7 +31,7 @@ internal class TextModel
         }
 
         FilePath = null;
-        _lines = new ();
+        _lines = [];
 
         return true;
     }
@@ -55,7 +53,7 @@ internal class TextModel
             return _lines [Count - 1];
         }
 
-        _lines.Add (new ());
+        _lines.Add ([]);
 
         return _lines [0];
     }
@@ -72,7 +70,7 @@ internal class TextModel
         for (int i = first; i < last; i++)
         {
             List<Cell> line = GetLine (i);
-            int tabSum = line.Sum (c => c.Rune.Value == '\t' ? Math.Max (tabWidth - 1, 0) : 0);
+            int tabSum = line.Sum (c => c.Grapheme == "\t" ? Math.Max (tabWidth - 1, 0) : 0);
             int l = line.Count + tabSum;
 
             if (l > maxLength)
@@ -90,12 +88,11 @@ internal class TextModel
     {
         FilePath = file ?? throw new ArgumentNullException (nameof (file));
 
-        using (FileStream stream = File.OpenRead (file))
-        {
-            LoadStream (stream);
+        using FileStream stream = File.OpenRead (file);
 
-            return true;
-        }
+        LoadStream (stream);
+
+        return true;
     }
 
     public void LoadListCells (List<List<Cell>> cellsList, Attribute? attribute)
@@ -114,15 +111,12 @@ internal class TextModel
 
     public void LoadStream (Stream input)
     {
-        if (input is null)
-        {
-            throw new ArgumentNullException (nameof (input));
-        }
+        ArgumentNullException.ThrowIfNull (input);
 
-        _lines = new ();
+        _lines = [];
         var buff = new BufferedStream (input);
         int v;
-        List<byte> line = new ();
+        List<byte> line = [];
         var wasNewLine = false;
 
         while ((v = buff.ReadByte ()) != -1)
@@ -168,7 +162,7 @@ internal class TextModel
     {
         if (_lines.Count > 0)
         {
-            if (_lines.Count == 1 && _lines [0].Count == 0)
+            if (_lines is [{ Count: 0 }])
             {
                 return;
             }
@@ -223,7 +217,7 @@ internal class TextModel
 
             if (cell is { })
             {
-                rune = cell.Value.Rune;
+                rune = Rune.GetRuneAt (cell.Value.Grapheme, 0);
             }
             else
             {
@@ -232,22 +226,41 @@ internal class TextModel
                     return (col, row);
                 }
 
-                if (col == 0 && row > 0)
+                if (row <= 0)
                 {
-                    row--;
-                    List<Cell> line = GetLine (row);
-
-                    return (line.Count, row);
+                    return null;
                 }
 
-                return null;
+                row--;
+                List<Cell> line = GetLine (row);
+
+                return (line.Count, row);
             }
 
             RuneType runeType = GetRuneType (rune);
 
-            int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
+            int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType)
+                               && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
                                    ? col
                                    : -1;
+
+            ProcMovePrev (ref col, ref row, rune);
+
+            if (fromCol != col || fromRow != row)
+            {
+                return (col, row);
+            }
+
+            if (fromCol == col && fromRow == row && row > 0)
+            {
+                row--;
+                List<Cell> line = GetLine (row);
+                col = line.Count;
+
+                return (col, row);
+            }
+
+            return null;
 
             void ProcMovePrev (ref int nCol, ref int nRow, Rune nRune)
             {
@@ -276,14 +289,16 @@ internal class TextModel
                         return;
                     }
 
-                    if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)))
+                    if (nRow == fromRow || (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune)))
                     {
-                        List<Cell> line = GetLine (nRow);
+                        return;
+                    }
 
-                        if (lastValidCol > -1)
-                        {
-                            nCol = lastValidCol + Math.Max (lastValidCol, line.Count);
-                        }
+                    List<Cell> line = GetLine (nRow);
+
+                    if (lastValidCol > -1)
+                    {
+                        nCol = lastValidCol + Math.Max (lastValidCol, line.Count);
                     }
                 }
                 else
@@ -300,16 +315,19 @@ internal class TextModel
                     }
 
                     List<Cell> line = GetLine (nRow);
+                    var firstRune = Rune.GetRuneAt (line [0].Grapheme, 0);
 
                     if (nCol == 0
                         && nRow == fromRow
-                        && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune)))
+                        && (Rune.IsLetterOrDigit (firstRune) || Rune.IsPunctuation (firstRune) || Rune.IsSymbol (firstRune)))
                     {
                         return;
                     }
 
                     lastValidCol =
-                        (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+                        (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune))
+                        || Rune.IsPunctuation (nRune)
+                        || Rune.IsSymbol (nRune)
                             ? nCol
                             : lastValidCol;
 
@@ -330,24 +348,6 @@ internal class TextModel
                     ProcMovePrev (ref nCol, ref nRow, nRune);
                 }
             }
-
-            ProcMovePrev (ref col, ref row, rune);
-
-            if (fromCol != col || fromRow != row)
-            {
-                return (col, row);
-            }
-
-            if (fromCol == col && fromRow == row && row > 0)
-            {
-                row--;
-                List<Cell> line = GetLine (row);
-                col = line.Count;
-
-                return (col, row);
-            }
-
-            return null;
         }
         catch (Exception)
         {
@@ -367,12 +367,19 @@ internal class TextModel
 
         try
         {
-            Rune rune = _lines [row].Count > 0 ? RuneAt (col, row)!.Value.Rune : default (Rune);
+            Rune rune = _lines [row].Count > 0 ? Rune.GetRuneAt (RuneAt (col, row)!.Value.Grapheme, 0) : default (Rune);
             RuneType runeType = GetRuneType (rune);
 
-            int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
-                                   ? col
-                                   : -1;
+            int lastValidCol;
+
+            ProcMoveNext (ref col, ref row, rune);
+
+            if (fromCol != col || fromRow != row)
+            {
+                return (col, row);
+            }
+
+            return null;
 
             void ProcMoveNext (ref int nCol, ref int nRow, Rune nRune)
             {
@@ -426,10 +433,11 @@ internal class TextModel
                     }
 
                     List<Cell> line = GetLine (nRow);
+                    var firstRune = Rune.GetRuneAt (line [0].Grapheme, 0);
 
                     if (nCol == line.Count
                         && nRow == fromRow
-                        && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune)))
+                        && (Rune.IsLetterOrDigit (firstRune) || Rune.IsPunctuation (firstRune) || Rune.IsSymbol (firstRune)))
                     {
                         return;
                     }
@@ -444,15 +452,6 @@ internal class TextModel
                     ProcMoveNext (ref nCol, ref nRow, nRune);
                 }
             }
-
-            ProcMoveNext (ref col, ref row, rune);
-
-            if (fromCol != col || fromRow != row)
-            {
-                return (col, row);
-            }
-
-            return null;
         }
         catch (Exception)
         {
@@ -476,10 +475,10 @@ internal class TextModel
         }
 
         if (startCol > 0
-            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ()).Trim () == ""
-            && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Rune == (Rune)' ')))
+            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Grapheme).ToList ()).Trim () == ""
+            && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Grapheme == " ")))
         {
-            while (startCol > 0 && line [startCol - 1].Rune == (Rune)' ')
+            while (startCol > 0 && line [startCol - 1].Grapheme == " ")
             {
                 startCol--;
             }
@@ -496,13 +495,13 @@ internal class TextModel
 
         if (selectWordOnly)
         {
-            List<Rune> selRunes = line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ();
+            List<string> selText = line.GetRange (startCol, col - startCol).Select (c => c.Grapheme).ToList ();
 
-            if (StringExtensions.ToString (selRunes).Trim () != "")
+            if (StringExtensions.ToString (selText).Trim () != "")
             {
-                for (int i = selRunes.Count - 1; i > -1; i--)
+                for (int i = selText.Count - 1; i > -1; i--)
                 {
-                    if (selRunes [i] == (Rune)' ')
+                    if (selText [i] == " ")
                     {
                         col--;
                     }
@@ -520,34 +519,34 @@ internal class TextModel
 
     internal static int CalculateLeftColumn (List<Cell> t, int start, int end, int width, int tabWidth = 0)
     {
-        List<Rune> runes = new ();
+        List<string> strings = [];
 
         foreach (Cell cell in t)
         {
-            runes.Add (cell.Rune);
+            strings.Add (cell.Grapheme);
         }
 
-        return CalculateLeftColumn (runes, start, end, width, tabWidth);
+        return CalculateLeftColumn (strings, start, end, width, tabWidth);
     }
 
     // Returns the left column in a range of the string.
-    internal static int CalculateLeftColumn (List<Rune> t, int start, int end, int width, int tabWidth = 0)
+    internal static int CalculateLeftColumn (List<string> t, int start, int end, int width, int tabWidth = 0)
     {
-        if (t is null || t.Count == 0)
+        if (t.Count == 0)
         {
             return 0;
         }
 
         var size = 0;
-        int tcount = end > t.Count - 1 ? t.Count - 1 : end;
+        int tCount = end > t.Count - 1 ? t.Count - 1 : end;
         var col = 0;
 
-        for (int i = tcount; i >= 0; i--)
+        for (int i = tCount; i >= 0; i--)
         {
-            Rune rune = t [i];
-            size += rune.GetColumns ();
+            string text = t [i];
+            size += text.GetColumns (false);
 
-            if (rune.Value == '\t')
+            if (text == "\t")
             {
                 size += tabWidth + 1;
             }
@@ -577,30 +576,30 @@ internal class TextModel
         List<Cell> t,
         int start = -1,
         int end = -1,
-        bool checkNextRune = true,
+        bool checkNextText = true,
         int tabWidth = 0
     )
     {
-        List<Rune> runes = new ();
+        List<string> strings = new ();
 
         foreach (Cell cell in t)
         {
-            runes.Add (cell.Rune);
+            strings.Add (cell.Grapheme);
         }
 
-        return DisplaySize (runes, start, end, checkNextRune, tabWidth);
+        return DisplaySize (strings, start, end, checkNextText, tabWidth);
     }
 
     // Returns the size and length in a range of the string.
     internal static (int size, int length) DisplaySize (
-        List<Rune> t,
+        List<string> t,
         int start = -1,
         int end = -1,
         bool checkNextRune = true,
         int tabWidth = 0
     )
     {
-        if (t is null || t.Count == 0)
+        if (t.Count == 0)
         {
             return (0, 0);
         }
@@ -608,35 +607,40 @@ internal class TextModel
         var size = 0;
         var len = 0;
 
-        int tcount = end == -1 ? t.Count :
+        int tCount = end == -1 ? t.Count :
                      end > t.Count ? t.Count : end;
         int i = start == -1 ? 0 : start;
 
-        for (; i < tcount; i++)
+        for (; i < tCount; i++)
         {
-            Rune rune = t [i];
-            size += rune.GetColumns ();
-            len += rune.GetEncodingLength (Encoding.Unicode);
+            string text = t [i];
+            int colWidth = text.GetColumns (false);
+            size += colWidth;
+            len += text.Length;
 
-            if (rune.Value == '\t')
+            if (text == "\t")
             {
                 size += tabWidth + 1;
                 len += tabWidth - 1;
             }
+            else if (colWidth == -1)
+            {
+                size += 2; // -1+2=1
+            }
 
-            if (checkNextRune && i == tcount - 1 && t.Count > tcount && IsWideRune (t [i + 1], tabWidth, out int s, out int l))
+            if (checkNextRune && i == tCount - 1 && t.Count > tCount && IsWideText (t [i + 1], tabWidth, out int s, out int l))
             {
                 size += s;
                 len += l;
             }
         }
 
-        bool IsWideRune (Rune r, int tWidth, out int s, out int l)
+        bool IsWideText (string s1, int tWidth, out int s, out int l)
         {
-            s = r.GetColumns ();
-            l = r.GetEncodingLength ();
+            s = s1.GetColumns ();
+            l = Encoding.Unicode.GetByteCount (s1);
 
-            if (r.Value == '\t')
+            if (s1 == "\t")
             {
                 s += tWidth + 1;
                 l += tWidth - 1;
@@ -662,7 +666,7 @@ internal class TextModel
         bool matchWholeWord = false
     )
     {
-        if (text is null || _lines.Count == 0)
+        if (string.IsNullOrEmpty (text) || _lines.Count == 0)
         {
             gaveFullTurn = false;
 
@@ -705,7 +709,7 @@ internal class TextModel
         bool matchWholeWord = false
     )
     {
-        if (text is null || _lines.Count == 0)
+        if (string.IsNullOrEmpty (text) || _lines.Count == 0)
         {
             gaveFullTurn = false;
 
@@ -734,7 +738,7 @@ internal class TextModel
                                                   _lines.Count - 1,
                                                   matchCase,
                                                   matchWholeWord,
-                                                  new (_lines [_lines.Count - 1].Count, _lines.Count)
+                                                  new (_lines [^1].Count, _lines.Count)
                                                  );
         }
 
@@ -745,17 +749,17 @@ internal class TextModel
 
     internal static int GetColFromX (List<Cell> t, int start, int x, int tabWidth = 0)
     {
-        List<Rune> runes = new ();
+        List<string> strings = new ();
 
         foreach (Cell cell in t)
         {
-            runes.Add (cell.Rune);
+            strings.Add (cell.Grapheme);
         }
 
-        return GetColFromX (runes, start, x, tabWidth);
+        return GetColFromX (strings, start, x, tabWidth);
     }
 
-    internal static int GetColFromX (List<Rune> t, int start, int x, int tabWidth = 0)
+    internal static int GetColFromX (List<string> t, int start, int x, int tabWidth = 0)
     {
         if (x < 0)
         {
@@ -767,10 +771,10 @@ internal class TextModel
 
         for (int i = start; i < t.Count; i++)
         {
-            Rune r = t [i];
-            size += r.GetColumns ();
+            string s = t [i];
+            size += s.GetColumns ();
 
-            if (r.Value == '\t')
+            if (s == "\t")
             {
                 size += tabWidth + 1;
             }
@@ -799,7 +803,7 @@ internal class TextModel
             List<Cell> x = _lines [i];
             string txt = GetText (x);
             string matchText = !matchCase ? text.ToUpper () : text;
-            int col = txt.IndexOf (matchText);
+            int col = txt.IndexOf (matchText, StringComparison.Ordinal);
 
             while (col > -1)
             {
@@ -810,33 +814,32 @@ internal class TextModel
                         break;
                     }
 
-                    col = txt.IndexOf (matchText, col + 1);
+                    col = txt.IndexOf (matchText, col + 1, StringComparison.Ordinal);
 
                     continue;
                 }
 
-                if (col > -1)
+                if (!found)
                 {
-                    if (!found)
-                    {
-                        found = true;
-                    }
-
-                    _lines [i] = Cell.ToCellList (ReplaceText (x, textToReplace!, matchText, col));
-                    x = _lines [i];
-                    txt = GetText (x);
-                    pos = new (col, i);
-                    col += textToReplace!.Length - matchText.Length;
+                    found = true;
                 }
+
+                _lines [i] = Cell.ToCellList (ReplaceText (x, textToReplace!, matchText, col));
+                x = _lines [i];
+                txt = GetText (x);
+                pos = new (col, i);
+                col += textToReplace!.Length - matchText.Length;
 
                 if (col < 0 || col + 1 > txt.Length)
                 {
                     break;
                 }
 
-                col = txt.IndexOf (matchText, col + 1);
+                col = txt.IndexOf (matchText, col + 1, StringComparison.Ordinal);
             }
         }
+
+        return (pos, found);
 
         string GetText (List<Cell> x)
         {
@@ -849,8 +852,6 @@ internal class TextModel
 
             return txt;
         }
-
-        return (pos, found);
     }
 
     /// <summary>Redefine column and line tracking.</summary>
@@ -863,46 +864,50 @@ internal class TextModel
 
     internal static bool SetCol (ref int col, int width, int cols)
     {
-        if (col + cols <= width)
+        if (col + cols > width)
         {
-            col += cols;
-
-            return true;
+            return false;
         }
 
-        return false;
+        col += cols;
+
+        return true;
     }
 
-    private void Append (List<byte> line)
+    internal void Append (List<byte> line)
     {
         var str = StringExtensions.ToString (line.ToArray ());
         _lines.Add (Cell.StringToCells (str));
     }
 
-    private bool ApplyToFind ((Point current, bool found) foundPos)
+    internal bool ApplyToFind ((Point current, bool found) foundPos)
     {
         var gaveFullTurn = false;
 
-        if (foundPos.found)
+        if (!foundPos.found)
         {
-            _toFind.currentPointToFind = foundPos.current;
+            return gaveFullTurn;
+        }
 
-            if (_toFind.found && _toFind.currentPointToFind == _toFind.startPointToFind)
-            {
+        _toFind.currentPointToFind = foundPos.current;
+
+        switch (_toFind.found)
+        {
+            case true when _toFind.currentPointToFind == _toFind.startPointToFind:
                 gaveFullTurn = true;
-            }
 
-            if (!_toFind.found)
-            {
+                break;
+            case false:
                 _toFind.startPointToFind = _toFind.currentPointToFind = foundPos.current;
                 _toFind.found = foundPos.found;
-            }
+
+                break;
         }
 
         return gaveFullTurn;
     }
 
-    private (Point current, bool found) GetFoundNextTextPoint (
+    internal (Point current, bool found) GetFoundNextTextPoint (
         string text,
         int linesCount,
         bool matchCase,
@@ -921,7 +926,7 @@ internal class TextModel
             }
 
             string matchText = !matchCase ? text.ToUpper () : text;
-            int col = txt.IndexOf (matchText, Math.Min (start.X, txt.Length));
+            int col = txt.IndexOf (matchText, Math.Min (start.X, txt.Length), StringComparison.Ordinal);
 
             if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col))
             {
@@ -942,7 +947,7 @@ internal class TextModel
         return (Point.Empty, false);
     }
 
-    private (Point current, bool found) GetFoundPreviousTextPoint (
+    internal (Point current, bool found) GetFoundPreviousTextPoint (
         string text,
         int linesCount,
         bool matchCase,
@@ -966,23 +971,21 @@ internal class TextModel
             }
 
             string matchText = !matchCase ? text.ToUpper () : text;
-            int col = txt.LastIndexOf (matchText, _toFind.found ? start.X - 1 : start.X);
+            int col = txt.LastIndexOf (matchText, _toFind.found ? start.X - 1 : start.X, StringComparison.Ordinal);
 
-            if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col))
+            switch (col)
             {
-                continue;
-            }
-
-            if (col > -1 && ((i <= linesCount && col <= start.X) || i < start.Y) && txt.Contains (matchText))
-            {
-                return (new (col, i), true);
+                case > -1 when matchWholeWord && !MatchWholeWord (txt, matchText, col):
+                    continue;
+                case > -1 when ((i <= linesCount && col <= start.X) || i < start.Y) && txt.Contains (matchText):
+                    return (new (col, i), true);
             }
         }
 
         return (Point.Empty, false);
     }
 
-    private RuneType GetRuneType (Rune rune)
+    internal static RuneType GetRuneType (Rune rune)
     {
         if (Rune.IsSymbol (rune))
         {
@@ -1007,7 +1010,7 @@ internal class TextModel
         return RuneType.IsUnknown;
     }
 
-    private bool IsSameRuneType (Rune newRune, RuneType runeType, bool useSameRuneType)
+    internal static bool IsSameRuneType (Rune newRune, RuneType runeType, bool useSameRuneType)
     {
         RuneType rt = GetRuneType (newRune);
 
@@ -1016,21 +1019,15 @@ internal class TextModel
             return rt == runeType;
         }
 
-        switch (runeType)
+        return runeType switch
         {
-            case RuneType.IsSymbol:
-            case RuneType.IsPunctuation:
-                return rt is RuneType.IsSymbol or RuneType.IsPunctuation;
-            case RuneType.IsWhiteSpace:
-            case RuneType.IsLetterOrDigit:
-            case RuneType.IsUnknown:
-                return rt == runeType;
-            default:
-                throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null);
-        }
+            RuneType.IsSymbol or RuneType.IsPunctuation => rt is RuneType.IsSymbol or RuneType.IsPunctuation,
+            RuneType.IsWhiteSpace or RuneType.IsLetterOrDigit or RuneType.IsUnknown => rt == runeType,
+            _ => throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null)
+        };
     }
 
-    private bool MatchWholeWord (string source, string matchText, int index = 0)
+    internal static bool MatchWholeWord (string source, string matchText, int index = 0)
     {
         if (string.IsNullOrEmpty (source) || string.IsNullOrEmpty (matchText))
         {
@@ -1041,33 +1038,31 @@ internal class TextModel
         int start = index > 0 ? index - 1 : 0;
         int end = index + txt.Length;
 
-        if ((start == 0 || Rune.IsWhiteSpace ((Rune)source [start])) && (end == source.Length || Rune.IsWhiteSpace ((Rune)source [end])))
-        {
-            return true;
-        }
-
-        return false;
+        return (start == 0 || Rune.IsWhiteSpace ((Rune)source [start])) && (end == source.Length || Rune.IsWhiteSpace ((Rune)source [end]));
     }
 
-    private bool MoveNext (ref int col, ref int row, out Rune rune, bool useSameRuneType)
+    internal bool MoveNext (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
         if (col + 1 < line.Count)
         {
             col++;
-            rune = line [col].Rune;
+            rune = Rune.GetRuneAt (line [col].Grapheme, 0);
+            var prevRune = Rune.GetRuneAt (line [col - 1].Grapheme, 0);
 
             if (col + 1 == line.Count
                 && !Rune.IsLetterOrDigit (rune)
-                && !Rune.IsWhiteSpace (line [col - 1].Rune)
-                && IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType))
+                && !Rune.IsWhiteSpace (prevRune)
+                && IsSameRuneType (prevRune, GetRuneType (rune), useSameRuneType))
             {
                 col++;
             }
 
+            prevRune = Rune.GetRuneAt (line [col - 1].Grapheme, 0);
+
             if (!Rune.IsWhiteSpace (rune)
-                && (Rune.IsWhiteSpace (line [col - 1].Rune) || !IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType)))
+                && (Rune.IsWhiteSpace (prevRune) || !IsSameRuneType (prevRune, GetRuneType (rune), useSameRuneType)))
             {
                 return false;
             }
@@ -1091,24 +1086,20 @@ internal class TextModel
         return false;
     }
 
-    private bool MovePrev (ref int col, ref int row, out Rune rune, bool useSameRuneType)
+    internal bool MovePrev (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
         if (col > 0)
         {
             col--;
-            rune = line [col].Rune;
+            rune = Rune.GetRuneAt (line [col].Grapheme, 0);
+            var nextRune = Rune.GetRuneAt (line [col + 1].Grapheme, 0);
 
-            if ((!Rune.IsWhiteSpace (rune)
-                 && !Rune.IsWhiteSpace (line [col + 1].Rune)
-                 && !IsSameRuneType (line [col + 1].Rune, GetRuneType (rune), useSameRuneType))
-                || (Rune.IsWhiteSpace (rune) && !Rune.IsWhiteSpace (line [col + 1].Rune)))
-            {
-                return false;
-            }
-
-            return true;
+            return (Rune.IsWhiteSpace (rune)
+                    || Rune.IsWhiteSpace (nextRune)
+                    || IsSameRuneType (nextRune, GetRuneType (rune), useSameRuneType))
+                   && (!Rune.IsWhiteSpace (rune) || Rune.IsWhiteSpace (nextRune));
         }
 
         rune = default (Rune);
@@ -1116,19 +1107,19 @@ internal class TextModel
         return false;
     }
 
-    private void OnLinesLoaded () { LinesLoaded?.Invoke (this, EventArgs.Empty); }
+    internal void OnLinesLoaded () { LinesLoaded?.Invoke (this, EventArgs.Empty); }
 
-    private string ReplaceText (List<Cell> source, string textToReplace, string matchText, int col)
+    internal static string ReplaceText (List<Cell> source, string textToReplace, string matchText, int col)
     {
         var origTxt = Cell.ToString (source);
         (_, int len) = DisplaySize (source, 0, col, false);
         (_, int len2) = DisplaySize (source, col, col + matchText.Length, false);
         (_, int len3) = DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
 
-        return origTxt [..len] + textToReplace + origTxt.Substring (len + len2, len3);
+        return string.Concat (origTxt.AsSpan () [..len], textToReplace, origTxt.AsSpan (len + len2, len3));
     }
 
-    private Cell? RuneAt (int col, int row)
+    internal Cell? RuneAt (int col, int row)
     {
         List<Cell> line = GetLine (row);
 
@@ -1140,7 +1131,7 @@ internal class TextModel
         return null;
     }
 
-    private void SetAttributes (Attribute? attribute)
+    internal void SetAttributes (Attribute? attribute)
     {
         foreach (List<Cell> line in _lines)
         {
@@ -1153,7 +1144,7 @@ internal class TextModel
         }
     }
 
-    private enum RuneType
+    internal enum RuneType
     {
         IsSymbol,
         IsWhiteSpace,

@@ -17,7 +17,6 @@
 _ReSharper.**
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-.devcontainer/
 .vscode/
 .vs/
 
@@ -40,6 +39,7 @@ _ReSharper.**
 
 # API Docs
 docfx/api
+!docfx/api/index.md
 docfx/_site
 
 # Test Results
@@ -73,3 +73,10 @@ log.*
 !/Tests/coverage/.gitkeep   # keep folder in repo
 /Tests/report/
 *.cobertura.xml
+
+# Claude Code local settings
+.claude/settings.json
+.claude/settings.local.json
+.mcp.json
+.env
+tmpclaude-*-cwd

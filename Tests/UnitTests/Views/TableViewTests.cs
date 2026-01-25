@@ -25,39 +25,43 @@ public class TableViewTests (ITestOutputHelper output)
 
     public static DataTableSource BuildTable (int cols, int rows) { return BuildTable (cols, rows, out _); }
 
-    /// <summary>Builds a simple table of string columns with the requested number of columns and rows</summary>
-    /// <param name="cols"></param>
-    /// <param name="rows"></param>
-    /// <returns></returns>
-    public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
-    {
-        dt = new ();
-
-        for (var c = 0; c < cols; c++)
+        /// <summary>Builds a simple table of string columns with the requested number of columns and rows</summary>
+        /// <param name="cols"></param>
+        /// <param name="rows"></param>
+        /// <returns></returns>
+        public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
         {
-            dt.Columns.Add ("Col" + c);
-        }
-
-        for (var r = 0; r < rows; r++)
-        {
-            DataRow newRow = dt.NewRow ();
+            dt = new ();
 
             for (var c = 0; c < cols; c++)
             {
-                newRow [c] = $"R{r}C{c}";
+                dt.Columns.Add ("Col" + c);
             }
 
-            dt.Rows.Add (newRow);
-        }
+            for (var r = 0; r < rows; r++)
+            {
+                DataRow newRow = dt.NewRow ();
 
-        return new (dt);
-    }
+                for (var c = 0; c < cols; c++)
+                {
+                    newRow [c] = $"R{r}C{c}";
+                }
+
+                dt.Rows.Add (newRow);
+            }
+
+            return new (dt);
+        }
 
     [Fact]
     [AutoInitShutdown]
     public void CellEventsBackgroundFill ()
     {
-        var tv = new TableView { Width = 20, Height = 4 };
+        var tv = new TableView
+        {
+            App = ApplicationImpl.Instance,
+            Width = 20, Height = 4
+        };
 
         var dt = new DataTable ();
         dt.Columns.Add ("C1");
@@ -415,11 +419,11 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tableView = new TableView ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         SessionToken rs = Application.Begin (top);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 25 characters can be printed into table
         tableView.Viewport = new (0, 0, 25, 5);
@@ -471,7 +475,7 @@ public class TableViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (expected, output);
 
         // revert the style change
-        style.MaxWidth = TableView.DefaultMaxCellWidth;
+        style.MaxWidth = TableView.DEFAULT_MAX_CELL_WIDTH;
 
         // another way API user can fix problem is to implement
         // RepresentationGetter and apply max length there
@@ -552,7 +556,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Viewport = new (0, 0, 25, 5);
 
         // revert style change
-        style.MinAcceptableWidth = TableView.DefaultMinAcceptableWidth;
+        style.MinAcceptableWidth = TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH;
 
         // Now let's test the global MaxCellWidth and MinCellWidth
         tableView.Style.ExpandLastColumn = false;
@@ -606,7 +610,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.AlwaysShowHeaders = false;
 
         // ensure that TableView has the input focus
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         Application.Begin (top);
 
@@ -677,11 +681,14 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void ScrollIndicators ()
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -722,7 +729,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // since A is now pushed off screen we get indicator showing
         // that user can scroll left to see first column
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         expected =
@@ -737,7 +744,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         expected =
@@ -756,11 +763,14 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void ScrollRight_SmoothScrolling ()
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
         tableView.LayoutSubViews ();
 
         // 3 columns are visibile
@@ -796,7 +806,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Scroll right
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         // Note that with SmoothHorizontalScrolling only a single new column
@@ -818,10 +828,14 @@ public class TableViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void ScrollRight_WithoutSmoothScrolling ()
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
+
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -844,7 +858,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // select last visible column
         tableView.SelectedColumn = 2; // column C
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         var expected =
@@ -856,7 +870,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Scroll right
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         // notice that without smooth scrolling we just update the first column
@@ -935,7 +949,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -966,7 +980,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -998,7 +1012,7 @@ public class TableViewTests (ITestOutputHelper output)
         var tv = new TableView (BuildTable (1, 1));
         tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row, c.Col].ToString ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1059,7 +1073,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         bStyle.ColorGetter = a => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         SessionToken rs = Application.Begin (top);
 
@@ -1155,7 +1169,7 @@ public class TableViewTests (ITestOutputHelper output)
         // when B is 2 use the custom highlight color for the row
         tv.Style.RowColorGetter += e => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         SessionToken rs = Application.Begin (top);
 
@@ -1236,7 +1250,7 @@ public class TableViewTests (ITestOutputHelper output)
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1563,8 +1577,11 @@ public class TableViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Test_CollectionNavigator ()
     {
-        var tv = new TableView ();
-        tv.SchemeName = "TopLevel";
+        var tv = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
@@ -1602,7 +1619,7 @@ public class TableViewTests (ITestOutputHelper output)
         Assert.Equal (0, tv.SelectedRow);
 
         // ensure that TableView has the input focus
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1974,7 +1991,7 @@ public class TableViewTests (ITestOutputHelper output)
 ◄─┼─┼─┤
 │2│3│4│";
         tableView.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -1988,7 +2005,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┼─┤
 │2│3│4│";
         tableView.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -2004,7 +2021,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.LayoutSubViews ();
         tableView.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
 
         // normally we should have scroll indicators because DEF are of screen
@@ -2027,7 +2044,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┼─┤
 │1│2│3│";
         tableView.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        tableView.SetClipToScreen ();
         tableView.Draw ();
         DriverAssert.AssertDriverContentsAre (expected, output);
     }
@@ -2180,7 +2197,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2188,7 +2205,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
+                          new () { Position = new (1, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl }
                          );
 
         // should extend the selection
@@ -2198,17 +2215,20 @@ public class TableViewTests (ITestOutputHelper output)
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.DoesNotContain (new (0, 1), selected);
-        Assert.Contains (new (0, 2), selected);
+        Assert.DoesNotContain (new Point (0, 1), selected);
+        Assert.Contains (new Point (0, 2), selected);
     }
 
     [Fact]
     [SetupFakeApplication]
     public void TestEnumerableDataSource_BasicTypes ()
     {
-        Application.Driver!.SetScreenSize (100, 100);
-        var tv = new TableView ();
-        tv.SchemeName = "TopLevel";
+        ApplicationImpl.Instance.Driver!.SetScreenSize (100, 100);
+        var tv = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
@@ -2253,7 +2273,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2308,7 +2328,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2361,7 +2381,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2411,10 +2431,13 @@ A B C
     {
         IList list = BuildList (16);
 
-        var tv = new TableView ();
+        var tv = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
 
         //tv.BeginInit (); tv.EndInit ();
-        tv.SchemeName = "TopLevel";
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 25, 4);
 
         tv.Style = new ()
@@ -2542,7 +2565,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 3), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2550,7 +2573,7 @@ A B C
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
+                          new () { Position = new (1, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift }
                          );
 
         // should extend the selection
@@ -2559,7 +2582,7 @@ A B C
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.Contains (new (0, 1), selected);
+        Assert.Contains (new Point (0, 1), selected);
     }
 
     [Fact]
@@ -2600,7 +2623,7 @@ A B C
 
         Assert.True (pets.First ().IsPicked);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2620,7 +2643,7 @@ A B C
         Assert.True (pets.ElementAt (0).IsPicked);
         Assert.True (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2640,7 +2663,7 @@ A B C
         Assert.False (pets.ElementAt (0).IsPicked);
         Assert.True (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2668,7 +2691,7 @@ A B C
         wrapper.CheckedRows.Add (0);
         wrapper.CheckedRows.Add (2);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2692,7 +2715,7 @@ A B C
         Assert.Contains (2, wrapper.CheckedRows);
         Assert.Equal (3, wrapper.CheckedRows.Count);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2708,7 +2731,7 @@ A B C
         // Untoggle the top 2
         tv.NewKeyDownEvent (Key.Space);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2737,7 +2760,7 @@ A B C
         tv.NewKeyDownEvent (Key.A.WithCtrl);
         tv.NewKeyDownEvent (Key.Space);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2757,7 +2780,7 @@ A B C
         // Untoggle all again
         tv.NewKeyDownEvent (Key.Space);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2798,7 +2821,7 @@ A B C
 
         Assert.True (pets.All (p => p.IsPicked));
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2818,7 +2841,7 @@ A B C
         Assert.Empty (pets.Where (p => p.IsPicked));
 #pragma warning restore xUnit2029
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2845,7 +2868,7 @@ A B C
         var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
         tv.Table = wrapper;
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2865,7 +2888,7 @@ A B C
 
         Assert.Single (wrapper.CheckedRows, 0);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2885,7 +2908,7 @@ A B C
         Assert.Contains (1, wrapper.CheckedRows);
         Assert.Equal (2, wrapper.CheckedRows.Count);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2904,7 +2927,7 @@ A B C
 
         Assert.Single (wrapper.CheckedRows, 1);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2936,7 +2959,7 @@ A B C
         wrapper.UseRadioButtons = true;
 
         tv.Table = wrapper;
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2959,7 +2982,7 @@ A B C
 
         Assert.True (pets.First ().IsPicked);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2980,7 +3003,7 @@ A B C
         Assert.True (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -3001,7 +3024,7 @@ A B C
         Assert.False (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -3025,7 +3048,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
 
         Point selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
@@ -3097,7 +3120,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.FullRowSelect = true;
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
 
         // Toggle Select Cell 0,0
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
@@ -3137,7 +3160,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
 
         // Make a square selection
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
@@ -3178,7 +3201,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
 
         // Make first square selection (0,0 to 1,1)
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
@@ -3224,141 +3247,6 @@ A B C
         Assert.Equal ("Column Name 2", cn [1]);
     }
 
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Left ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in
-        tableView.SelectedColumn = 1;
-
-        // Pressing left should move us to the first column without changing focus
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-        Assert.Same (tableView, Application.Top!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the leftmost cell a further left press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-
-        Assert.NotSame (tableView, Application.Top.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf1, Application.Top.MostFocused);
-        Assert.True (tf1.HasFocus);
-
-        Application.Top.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Up ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in
-        tableView.SelectedRow = 1;
-
-        // First press should move us up
-        Application.RaiseKeyDownEvent (Key.CursorUp);
-        Assert.Same (tableView, Application.Top!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the top row a further press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorUp);
-
-        Assert.NotSame (tableView, Application.Top.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf1, Application.Top.MostFocused);
-        Assert.True (tf1.HasFocus);
-
-        Application.Top.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Right ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in from the rightmost column
-        tableView.SelectedColumn = tableView.Table.Columns - 2;
-
-        // First press should move us to the rightmost column without changing focus
-        Application.RaiseKeyDownEvent (Key.CursorRight);
-        Assert.Same (tableView, Application.Top!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the rightmost cell, a further right press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorRight);
-
-        Assert.NotSame (tableView, Application.Top.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf2, Application.Top.MostFocused);
-        Assert.True (tf2.HasFocus);
-
-        Application.Top.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Down ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in from the bottommost row
-        tableView.SelectedRow = tableView.Table.Rows - 2;
-
-        // First press should move us to the bottommost row without changing focus
-        Application.RaiseKeyDownEvent (Key.CursorDown);
-        Assert.Same (tableView, Application.Top!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the bottommost cell, a further down press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorDown);
-
-        Assert.NotSame (tableView, Application.Top.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf2, Application.Top.MostFocused);
-        Assert.True (tf2.HasFocus);
-
-        Application.Top.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Left_ClearsSelectionFirst ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in
-        tableView.SelectedColumn = 1;
-
-        // Pressing shift-left should give us a multi selection
-        Application.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
-        Assert.Same (tableView, Application.Top!.MostFocused);
-        Assert.True (tableView.HasFocus);
-        Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
-
-        // Because we are now on the leftmost cell a further left press would normally move focus
-        // However there is an ongoing selection so instead the operation clears the selection and
-        // gets swallowed (not resulting in a focus change)
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-
-        // Selection 'clears' just to the single cell and we remain focused
-        Assert.Single (tableView.GetAllSelectedCells ());
-        Assert.Same (tableView, Application.Top.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // A further left will switch focus
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-
-        Assert.NotSame (tableView, Application.Top.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf1, Application.Top.MostFocused);
-        Assert.True (tf1.HasFocus);
-
-        Application.Top.Dispose ();
-    }
 
     [Theory]
     [InlineData (true, 0, 1)]
@@ -3383,44 +3271,16 @@ A B C
         Assert.Equal (expectedRow, tableView.CollectionNavigator.GetNextMatchingItem (0, "3".ToCharArray () [0]));
     }
 
-    /// <summary>
-    ///     Creates 3 views on <see cref="Application.Current"/> with the focus in the
-    ///     <see cref="TableView"/>.  This is a helper method to setup tests that want to
-    ///     explore moving input focus out of a tableview.
-    /// </summary>
-    /// <param name="tv"></param>
-    /// <param name="tf1"></param>
-    /// <param name="tf2"></param>
-    private void GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2)
-    {
-        tableView = new ();
-        tableView.BeginInit ();
-        tableView.EndInit ();
-
-        Application.Navigation = new ();
-        Application.Top = new ();
-        tf1 = new ();
-        tf2 = new ();
-        Application.Top.Add (tf1);
-        Application.Top.Add (tableView);
-        Application.Top.Add (tf2);
-
-        tableView.SetFocus ();
-
-        Assert.Same (tableView, Application.Top.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Set big table
-        tableView.Table = BuildTable (25, 50);
-    }
-
     private TableView GetABCDEFTableView (out DataTable dt)
     {
-        var tableView = new TableView ();
+        var tableView = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3445,9 +3305,12 @@ A B C
 
     private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
     {
-        var tv = new TableView ();
-        tv.SchemeName = "TopLevel";
-        tv.Viewport = new (0, 0, 25, 6);
+        var tv = new TableView ()
+        {
+            App = ApplicationImpl.Instance,
+            SchemeName = "Runnable",
+            Viewport = new (0, 0, 25, 6)
+        };
 
         List<PickablePet> pets = new ()
         {
@@ -3473,8 +3336,11 @@ A B C
 
     private TableView GetTwoRowSixColumnTable (out DataTable dt)
     {
-        var tableView = new TableView ();
-        tableView.SchemeName = "TopLevel";
+        var tableView = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3503,7 +3369,10 @@ A B C
 
     private TableView SetUpMiniTable (out DataTable dt)
     {
-        var tv = new TableView ();
+        var tv = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
         tv.BeginInit ();
         tv.EndInit ();
         tv.Viewport = new (0, 0, 10, 4);

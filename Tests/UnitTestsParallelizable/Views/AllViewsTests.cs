@@ -3,7 +3,7 @@ using System.Reflection;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
@@ -11,7 +11,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Layout_Does_Not_Draw (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
@@ -49,7 +49,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Center_Properly (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
@@ -146,15 +146,15 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             designable.EnableForDesign ();
         }
 
-        var selectingCount = 0;
-        view.Selecting += (s, e) => selectingCount++;
+        var activatingCount = 0;
+        view.Activating += (s, e) => activatingCount++;
 
         var acceptedCount = 0;
         view.Accepting += (s, e) => { acceptedCount++; };
 
-        if (view.InvokeCommand (Command.Select) == true)
+        if (view.InvokeCommand (Command.Activate) == true)
         {
-            Assert.Equal (1, selectingCount);
+            Assert.Equal (1, activatingCount);
             Assert.Equal (0, acceptedCount);
         }
         view?.Dispose ();
@@ -173,20 +173,20 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
-        if (view is IDesignable designable)
-        {
-            designable.EnableForDesign ();
-        }
+        //if (view is IDesignable designable)
+        //{
+        //    designable.EnableForDesign ();
+        //}
 
-        var selectingCount = 0;
-        view.Selecting += (s, e) => selectingCount++;
+        var activatingCount = 0;
+        view.Activating += (s, e) => activatingCount++;
 
         var acceptingCount = 0;
         view.Accepting += (s, e) => { acceptingCount++; };
 
         if (view.InvokeCommand (Command.Accept) == true)
         {
-            Assert.Equal (0, selectingCount);
+            Assert.Equal (0, activatingCount);
             Assert.Equal (1, acceptingCount);
         }
         view?.Dispose ();
@@ -246,7 +246,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     //        designable.EnableForDesign ();
     //    }
 
-    //    var driver = CreateFakeDriver ();
+    //    var driver = CreateTestDriver ();
     //    driver.AttributeSet += (_, args) =>
     //                           {
     //                               if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)

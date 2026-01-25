@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Terminal.Gui.Input;
+﻿namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Describes an input binding. Used to bind a set of <see cref="Command"/> objects to a specific input event.

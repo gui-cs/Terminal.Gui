@@ -1,5 +1,3 @@
-﻿// TextView.cs: multi-line text editing
-
 namespace Terminal.Gui.Views;
 
 /// <summary>

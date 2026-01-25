@@ -1,4 +1,5 @@
-﻿using System.Collections;
+#nullable disable
+using System.Collections;
 
 namespace Terminal.Gui.Views;
 
@@ -6,6 +7,9 @@ namespace Terminal.Gui.Views;
 /// <remarks>This implementation is based on a static <see cref="Collection"/> of objects.</remarks>
 internal class CollectionNavigator : CollectionNavigatorBase, IListCollectionNavigator
 {
+    private readonly object _collectionLock = new ();
+    private IList _collection;
+
     /// <summary>Constructs a new CollectionNavigator.</summary>
     public CollectionNavigator () { }
 
@@ -14,11 +18,39 @@ internal class CollectionNavigator : CollectionNavigatorBase, IListCollectionNav
     public CollectionNavigator (IList collection) { Collection = collection; }
 
     /// <inheritdoc/>
-    public IList Collection { get; set; }
+    public IList Collection
+    {
+        get
+        {
+            lock (_collectionLock)
+            {
+                return _collection;
+            }
+        }
+        set
+        {
+            lock (_collectionLock)
+            {
+                _collection = value;
+            }
+        }
+    }
 
     /// <inheritdoc/>
-    protected override object ElementAt (int idx) { return Collection [idx]; }
+    protected override object ElementAt (int idx)
+    {
+        lock (_collectionLock)
+        {
+            return Collection [idx];
+        }
+    }
 
     /// <inheritdoc/>
-    protected override int GetCollectionLength () { return Collection.Count; }
+    protected override int GetCollectionLength ()
+    {
+        lock (_collectionLock)
+        {
+            return Collection.Count;
+        }
+    }
 }

@@ -1,4 +1,5 @@
-namespace UnitTests_Parallelizable.ViewsTests;
+#nullable disable
+namespace ViewsTests;
 
 public class OptionSelectorTests
 {
@@ -164,7 +165,7 @@ public class OptionSelectorTests
     }
 
     [Fact]
-    public void Mouse_Click_On_Activated_Does_Nothing ()
+    public void LeftButtonClicked_On_Activated_Does_Nothing ()
     {
         OptionSelector optionSelector = new OptionSelector ();
         List<string> options = ["Option1", "Option2"];
@@ -176,13 +177,13 @@ public class OptionSelectorTests
         Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        var mouseEvent = new MouseEventArgs
+        var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
-        checkBox.NewMouseEvent (mouseEvent);
+        checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
@@ -191,7 +192,7 @@ public class OptionSelectorTests
 
 
     [Fact]
-    public void Mouse_Click_On_NotActivated_Activates ()
+    public void LeftButtonPressed_On_NotActivated_Activates ()
     {
         OptionSelector optionSelector = new OptionSelector ();
         List<string> options = ["Option1", "Option2"];
@@ -204,13 +205,13 @@ public class OptionSelectorTests
         Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
 
-        var mouseEvent = new MouseEventArgs
+        var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonPressed
         };
 
-        checkBox.NewMouseEvent (mouseEvent);
+        checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (1, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);

@@ -21,9 +21,10 @@
     <!-- =================================================================== -->
     <PropertyGroup>
         <!--Note - These three SHOULD be picked up from Directory.Build.props, but they are not. Not sure why. -->
-        <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>12</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>14</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
         <!-- -->
         <RootNamespace>$(AssemblyName)</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -35,6 +36,8 @@
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <IsTrimmable>true</IsTrimmable>
         <IsAotCompatible>true</IsAotCompatible>
+        <!-- Suppress IL2026 warnings - all JSON converters are AOT-compatible via source generation -->
+        <NoWarn>$(NoWarn);IL2026</NoWarn>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <DefineDebug>true</DefineDebug>
@@ -115,7 +118,7 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Update="Resources\Strings.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
+            <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>Strings.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
@@ -151,6 +154,10 @@
         <EnableSourceLink>true</EnableSourceLink>
         <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(VersionSuffix)' != '' ">
+    <!-- When there's a version suffix (prerelease), set the PRERELEASE flag -->
+    <FILEFLAGS>VS_FF_PRERELEASE</FILEFLAGS>
+</PropertyGroup>
     <ProjectExtensions>
         <VisualStudio>
             <UserProperties resources_4config_1json__JsonSchema="../../docfx/schemas/tui-config-schema.json" />
@@ -163,6 +170,16 @@
 		    <AnalyzerFiles Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" />
 	    </ItemGroup>
     </Target>
+
+
+    <ItemGroup>
+      <None Remove="..\Terminal.Gui.Analyzers\bin\Debug\netstandard2.0\Terminal.Gui.Analyzers.dll" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <None Remove="..\Terminal.Gui.Analyzers\bin\Debug\netstandard2.0\Terminal.Gui.Analyzers.dll" />
+    </ItemGroup>
     <ItemGroup>
 	    <None Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>

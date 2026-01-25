@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 
 namespace Terminal.Gui.Views;
@@ -13,10 +12,7 @@ public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : s
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector{TFlagsEnum}"/> class.
     /// </summary>
-    public FlagSelector ()
-    {
-        SetValuesAndLabels<TFlagsEnum> ();
-    }
+    public FlagSelector () => SetValuesAndLabels<TFlagsEnum> ();
 
     /// <summary>
     ///     Gets or sets the value of the selected flags.

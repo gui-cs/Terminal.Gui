@@ -9,7 +9,7 @@ public class SyncrhonizationContextTests
     [Fact]
     public void SynchronizationContext_CreateCopy ()
     {
-        Application.Init (null, "fake");
+        Application.Init (DriverRegistry.Names.ANSI);
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 
@@ -23,15 +23,15 @@ public class SyncrhonizationContextTests
     private readonly object _lockPost = new ();
 
     [Theory]
-    [InlineData ("fake")]
-    [InlineData ("windows")]
-    [InlineData ("dotnet")]
-   // [InlineData ("unix")]
+    [InlineData (DriverRegistry.Names.ANSI)]
+    [InlineData (DriverRegistry.Names.WINDOWS)]
+    [InlineData (DriverRegistry.Names.DOTNET)]
+    [InlineData (DriverRegistry.Names.UNIX)]
     public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)
         {
-            Application.Init (null, driverName: driverName);
+            Application.Init (driverName);
 
             SynchronizationContext context = SynchronizationContext.Current;
 
@@ -39,7 +39,7 @@ public class SyncrhonizationContextTests
 
             Task.Run (() =>
                       {
-                          while (Application.Top is null || Application.Top is { Running: false })
+                          while (Application.TopRunnable is { IsRunning: false })
                           {
                               Thread.Sleep (500);
                           }
@@ -56,7 +56,7 @@ public class SyncrhonizationContextTests
                                         null
                                        );
 
-                          if (Application.Top is { Running: true })
+                          if (Application.TopRunnable is { IsRunning: true })
                           {
                               Assert.False (success);
                           }
@@ -64,7 +64,7 @@ public class SyncrhonizationContextTests
                      );
 
             // blocks here until the RequestStop is processed at the end of the test
-            Application.Run ().Dispose ();
+            Application.Run<Runnable> ();
             Assert.True (success);
 
             Application.Shutdown ();
@@ -100,7 +100,7 @@ public class SyncrhonizationContextTests
                  );
 
         // blocks here until the RequestStop is processed at the end of the test
-        Application.Run ().Dispose ();
+        Application.Run<Runnable> ();
         Assert.True (success);
         Application.Shutdown ();
     }

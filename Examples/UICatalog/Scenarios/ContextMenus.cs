@@ -1,5 +1,7 @@
-﻿using System.Globalization;
-using JetBrains.Annotations;
+﻿#nullable enable
+using System.Globalization;
+
+// ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
 
@@ -7,119 +9,136 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Menus")]
 public class ContextMenus : Scenario
 {
-    [CanBeNull]
-    private PopoverMenu _winContextMenu;
-    private TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
-    private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
+    private PopoverMenu? _winContextMenu;
+    private TextField? _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
+    private List<CultureInfo>? _cultureInfos;
     private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
+
+    private Window? _appWindow;
 
     public override void Main ()
     {
         // Init
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+
+        // Prepping for modern app model
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _cultureInfos = Application.SupportedCultures;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
-            SchemeName = "Toplevel"
+            SchemeName = "Runnable"
         };
+        _appWindow = appWindow;
 
-        var text = "Context Menu";
-        var width = 20;
+        // Changing the key-bindings of a View is not allowed, however,
+        // by default, Runnable doesn't bind to Command.Context, so
+        // we can take advantage of the CommandNotBound event to handle it
+        //
+        // An alternative implementation would be to create a Runnable subclass that
+        // calls AddCommand/KeyBindings.Add in the constructor. See the Snake game scenario
+        // for an example.
+        _appWindow.CommandNotBound += HandleCommandNotBound;
 
-        CreateWinContextMenu ();
+        _appWindow.KeyBindings.Add (_winContextMenuKey, Command.Context);
+        _appWindow.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
 
-        var label = new Label
-        {
-            X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenuKey}' to open the Window context menu."
-        };
-        appWindow.Add (label);
-
-        label = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (label),
-            Text = $"Press '{PopoverMenu.DefaultKey}' to open the TextField context menu."
-        };
-        appWindow.Add (label);
-
-        _tfTopLeft = new () { Id = "_tfTopLeft", Width = width, Text = text };
-        appWindow.Add (_tfTopLeft);
-
-        _tfTopRight = new () { Id = "_tfTopRight", X = Pos.AnchorEnd (width), Width = width, Text = text };
-        appWindow.Add (_tfTopRight);
-
-        _tfMiddle = new () { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
-        appWindow.Add (_tfMiddle);
-
-        _tfBottomLeft = new () { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = width, Text = text };
-        appWindow.Add (_tfBottomLeft);
-
-        _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
-        appWindow.Add (_tfBottomRight);
-
-        appWindow.KeyDown += OnAppWindowOnKeyDown;
-        appWindow.MouseClick += OnAppWindowOnMouseClick;
-
-        CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
-        appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
+        _appWindow.Initialized += AppWindowOnInitialized;
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        appWindow.KeyDown -= OnAppWindowOnKeyDown;
-        appWindow.MouseClick -= OnAppWindowOnMouseClick;
+        app.Run (_appWindow);
+        _appWindow.Dispose ();
         _winContextMenu?.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
 
         return;
 
-        void OnAppWindowOnMouseClick (object s, MouseEventArgs e)
+        void AppWindowOnInitialized (object? sender, EventArgs e)
         {
-            if (e.Flags == MouseFlags.Button3Clicked)
-            {
-                // ReSharper disable once AccessToDisposedClosure
-                _winContextMenu?.MakeVisible (e.ScreenPosition);
-                e.Handled = true;
-            }
-        }
+            const string TEXT = "Context Menu";
+            const int WIDTH = 20;
 
-        void OnAppWindowOnKeyDown (object s, Key e)
-        {
-            if (e == _winContextMenuKey)
+            CreateWinContextMenu ((sender as Window)!.App);
+
+            Label label = new ()
             {
-                // ReSharper disable once AccessToDisposedClosure
-                _winContextMenu?.MakeVisible ();
-                e.Handled = true;
-            }
+                X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenuKey}' to open the Window context menu."
+            };
+            _appWindow.Add (label);
+
+            label = new ()
+            {
+                X = Pos.Center (),
+                Y = Pos.Bottom (label),
+                Text = $"Press '{PopoverMenu.DefaultKey}' to open the TextField context menu."
+            };
+            _appWindow.Add (label);
+
+            _tfTopLeft = new () { Id = "_tfTopLeft", Width = WIDTH, Text = TEXT };
+            _appWindow.Add (_tfTopLeft);
+
+            _tfTopRight = new () { Id = "_tfTopRight", X = Pos.AnchorEnd (WIDTH), Width = WIDTH, Text = TEXT };
+            _appWindow.Add (_tfTopRight);
+
+            _tfMiddle = new () { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = WIDTH, Text = TEXT };
+            _appWindow.Add (_tfMiddle);
+
+            _tfBottomLeft = new () { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = WIDTH, Text = TEXT };
+            _appWindow.Add (_tfBottomLeft);
+
+            _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (WIDTH), Y = Pos.AnchorEnd (1), Width = WIDTH, Text = TEXT };
+            _appWindow.Add (_tfBottomRight);
+
+            CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
+
+            _appWindow.IsRunningChanged += (_, args) =>
+                                           {
+                                               if (!args.Value)
+                                               {
+                                                   Thread.CurrentThread.CurrentUICulture = originalCulture;
+                                               }
+                                           };
         }
     }
 
-    private void CreateWinContextMenu ()
+    private void HandleCommandNotBound (object? sender, CommandEventArgs e)
     {
-        if (_winContextMenu is { })
+        switch (e.Context)
         {
-            _winContextMenu.Dispose ();
-            _winContextMenu = null;
-        }
+            case CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs }:
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
+                e.Handled = true;
 
+                break;
+            case CommandContext<KeyBinding> { Binding.Key: { } key } when key == _winContextMenuKey:
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible ();
+                e.Handled = true;
+
+                break;
+        }
+    }
+
+    private void CreateWinContextMenu (IApplication? app)
+    {
         _winContextMenu = new (
                                [
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
                                        Title = "C_ultures",
-                                       SubMenu = GetSupportedCultureMenu (),
+                                       SubMenu = GetSupportedCultureMenu ()
                                    },
                                    new Line (),
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
                                        Title = "_Configuration...",
                                        HelpText = "Show configuration",
                                        Action = () => MessageBox.Query (
+                                                                        app!,
                                                                         50,
                                                                         10,
                                                                         "Configuration",
@@ -127,17 +146,18 @@ public class ContextMenus : Scenario
                                                                         "Ok"
                                                                        )
                                    },
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
                                        Title = "M_ore options",
                                        SubMenu = new (
                                                       [
-                                                          new MenuItemv2
+                                                          new ()
                                                           {
                                                               Title = "_Setup...",
                                                               HelpText = "Perform setup",
                                                               Action = () => MessageBox
                                                                            .Query (
+                                                                                   app!,
                                                                                    50,
                                                                                    10,
                                                                                    "Setup",
@@ -146,12 +166,13 @@ public class ContextMenus : Scenario
                                                                                   ),
                                                               Key = Key.T.WithCtrl
                                                           },
-                                                          new MenuItemv2
+                                                          new ()
                                                           {
                                                               Title = "_Maintenance...",
                                                               HelpText = "Maintenance mode",
                                                               Action = () => MessageBox
                                                                            .Query (
+                                                                                   app!,
                                                                                    50,
                                                                                    10,
                                                                                    "Maintenance",
@@ -162,31 +183,32 @@ public class ContextMenus : Scenario
                                                       ])
                                    },
                                    new Line (),
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
-                                       Title = "_Quit",
-                                       Action = () => Application.RequestStop ()
+                                       Title = Strings.cmdQuit,
+                                       Action = () => app!.RequestStop ()
                                    }
                                ])
         {
             Key = _winContextMenuKey
         };
+        app!.Popover?.Register (_winContextMenu);
     }
 
-    private Menuv2 GetSupportedCultureMenu ()
+    private Menu GetSupportedCultureMenu ()
     {
-        List<MenuItemv2> supportedCultures = [];
+        List<MenuItem> supportedCultures = [];
         int index = -1;
 
-        foreach (CultureInfo c in _cultureInfos)
+        foreach (CultureInfo c in _cultureInfos!)
         {
-            MenuItemv2 culture = new ();
+            MenuItem culture = new ();
 
             culture.CommandView = new CheckBox { CanFocus = false };
 
             if (index == -1)
             {
-                // Create English because GetSupportedCutures doesn't include it
+                // Create English because GetSupportedCultures doesn't include it
                 culture.Id = "_English";
                 culture.Title = "_English";
                 culture.HelpText = "en-US";
@@ -211,17 +233,15 @@ public class ContextMenus : Scenario
             supportedCultures.Add (culture);
         }
 
-        Menuv2 menu = new (supportedCultures.ToArray ());
+        return new (supportedCultures.ToArray ());
 
-        return menu;
-
-        void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
+        void CreateAction (List<MenuItem> cultures, MenuItem culture)
         {
             culture.Action += () =>
                               {
                                   Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
 
-                                  foreach (MenuItemv2 item in cultures)
+                                  foreach (MenuItem item in cultures)
                                   {
                                       ((CheckBox)item.CommandView).CheckedState =
                                           Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
@@ -230,41 +250,29 @@ public class ContextMenus : Scenario
         }
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
-    {
-        List<Key> keys = new ();
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.Space.WithCtrl);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.Tab);
-
-        keys.Add (Key.Space.WithCtrl);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.Tab);
-
-        keys.Add (Key.Space.WithCtrl);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
-
-        return keys;
-    }
+    public override List<Key> GetDemoKeyStrokes (IApplication? app) =>
+    [
+        Key.F10.WithShift,
+        Key.Esc,
+        Key.Space.WithCtrl,
+        Key.CursorDown,
+        Key.Enter,
+        Key.F10.WithShift,
+        Key.Esc,
+        Key.Tab,
+        Key.Space.WithCtrl,
+        Key.CursorDown,
+        Key.CursorDown,
+        Key.Enter,
+        Key.F10.WithShift,
+        Key.Esc,
+        Key.Tab,
+        Key.Space.WithCtrl,
+        Key.CursorDown,
+        Key.CursorDown,
+        Key.CursorDown,
+        Key.Enter,
+        Key.F10.WithShift,
+        Key.Esc
+    ];
 }

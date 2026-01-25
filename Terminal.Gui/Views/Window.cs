@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -16,8 +14,11 @@ namespace Terminal.Gui.Views;
 ///     </para>
 /// </remarks>
 /// <seealso cref="FrameView"/>
-public class Window : Toplevel
+public class Window : Runnable
 {
+    private static ShadowStyle _defaultShadow = ShadowStyle.None; // Resources/config.json overrides
+    private static LineStyle _defaultBorderStyle = LineStyle.Single; // Resources/config.json overrides
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
@@ -35,14 +36,18 @@ public class Window : Toplevel
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.None;
+    public static ShadowStyle DefaultShadow
+    {
+        get => _defaultShadow;
+        set => _defaultShadow = value;
+    }
 
     // TODO: enable this
     ///// <summary>
     ///// The default <see cref="LineStyle"/> for <see cref="Window"/>'s border. The default is <see cref="LineStyle.Single"/>.
     ///// </summary>
     ///// <remarks>
-    ///// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s. 
+    ///// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s.
     ///// </remarks>
     /////[ConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
     ////public static Scheme DefaultScheme { get; set; } = Colors.Schemes ["Base"];
@@ -56,5 +61,9 @@ public class Window : Toplevel
     ///     s.
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultBorderStyle
+    {
+        get => _defaultBorderStyle;
+        set => _defaultBorderStyle = value;
+    }
 }

@@ -36,37 +36,36 @@
       ],
       "enum": [
         "",
-        "fake",
         "ansi",
-        "curses",
-        "net",
+        "dotent",
+        "unix",
         "windows",
         null
       ],
       "default": "",
-      "description": "Forces the use of a specific console driver. If empty or null, Terminal.Gui will attempt to auto-detect the best driver. Options: 'fake', 'ansi', 'curses', 'net', 'windows'."
+      "description": "Forces the use of a specific console driver. If empty or null, Terminal.Gui will attempt to auto-detect the best driver. Options: 'ansi', 'unix', 'dotnet', 'windows'."
     },
     "Application.IsMouseDisabled": {
       "type": "boolean",
       "default": false,
       "description": "Disables or enables mouse support for the application. If true, mouse events will be ignored."
     },
-    "Application.NextTabGroupKey": {
+    "IKeyboard.NextTabGroupKey": {
       "type": "string",
       "default": "F6",
       "description": "The key combination to navigate to the next logical group of controls or container (e.g., 'F6', 'Ctrl+PageDown')."
     },
-    "Application.NextTabKey": {
+    "IKeyboard.NextTabKey": {
       "type": "string",
       "default": "Tab",
       "description": "The key combination to navigate to the next focusable view or tab stop (e.g., 'Tab')."
     },
-    "Application.PrevTabGroupKey": {
+    "IKeyboard.PrevTabGroupKey": {
       "type": "string",
       "default": "Shift+F6",
       "description": "The key combination to navigate to the previous logical group of controls or container (e.g., 'Shift+F6', 'Ctrl+PageUp')."
     },
-    "Application.PrevTabKey": {
+    "IKeyboard.PrevTabKey": {
       "type": "string",
       "default": "Shift+Tab",
       "description": "The key combination to navigate to the previous focusable view or tab stop (e.g., 'Shift+Tab')."
@@ -75,18 +74,6 @@
       "type": "string",
       "default": "Esc",
       "description": "The primary key combination used to request the application to quit (e.g., 'Esc', 'Ctrl+Q')."
-    },
-    "Application.AlternateForwardKey": {
-      "type": "string",
-      "description": "An alternative key combination for forward navigation or cycling through elements, often used in specific contexts (e.g., 'Ctrl+CursorRight')."
-    },
-    "Application.AlternateBackwardKey": {
-      "type": "string",
-      "description": "An alternative key combination for backward navigation or cycling through elements (e.g., 'Ctrl+CursorLeft')."
-    },
-    "Application.ShortCutKey": {
-      "type": "string",
-      "description": "The key used to activate shortcuts or hotkeys within views (e.g., 'AltMask', 'F9'). Typically used for menu shortcuts."
     },
     "PopoverMenu.DefaultKey": {
       "type": "string",
@@ -220,7 +207,7 @@
   "additionalProperties": true,
   "definitions": {
     "Color": {
-      "description": "One be either one of the W3C standard color names (parsed case-insensitively), a ColorName16 (e.g. 'BrightBlue', parsed case-insensitively), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
+      "description": "One of the standard color names (parsed case-insensitively; (e.g. 'BrightBlue'), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "string",
       "oneOf": [
@@ -572,7 +559,7 @@
           ],
           "description": "Default shadow style for Button controls, often used for 3D effect."
         },
-        "Menuv2.DefaultBorderStyle": {
+        "Menu.DefaultBorderStyle": {
           "type": "string",
           "enum": [
             "None",
@@ -581,9 +568,9 @@
             "Heavy",
             "Rounded"
           ],
-          "description": "Default border style for the newer Menuv2 control and its sub-menus."
+          "description": "Default border style for the newer Menu control and its sub-menus."
         },
-        "MenuBarv2.DefaultBorderStyle": {
+        "MenuBar.DefaultBorderStyle": {
           "type": "string",
           "enum": [
             "None",
@@ -592,7 +579,7 @@
             "Heavy",
             "Rounded"
           ],
-          "description": "Default border style for the MenuBarv2 control."
+          "description": "Default border style for the MenuBar control."
         },
         "StatusBar.DefaultSeparatorLineStyle": {
           "type": "string",
@@ -606,7 +593,7 @@
         },
         "Schemes": {
           "type": "array",
-          "description": "A list of scheme definitions for this theme. Each item in the array is an object containing one or more named schemes (e.g., 'TopLevel', 'Base', 'Menu').",
+          "description": "A list of scheme definitions for this theme. Each item in the array is an object containing one or more named schemes (e.g., 'Runnable', 'Base', 'Menu').",
           "items": {
             "type": "object",
             "description": "An object where each key is a scheme name (e.g., 'Base', 'Error') and its value is the scheme definition.",

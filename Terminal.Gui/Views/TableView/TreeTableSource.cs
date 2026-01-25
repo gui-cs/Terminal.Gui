@@ -1,4 +1,5 @@
 
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>An <see cref="ITableSource"/> with expandable rows.</summary>
@@ -41,7 +42,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         _tableView = table;
         _tree = tree;
         _tableView.KeyDown += Table_KeyPress;
-        _tableView.MouseClick += Table_MouseClick;
+        _tableView.Activating += Table_Activating;
 
         List<string> colList = subsequentColumns.Keys.ToList ();
         colList.Insert (0, firstColumnName);
@@ -55,7 +56,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     public void Dispose ()
     {
         _tableView.KeyDown -= Table_KeyPress;
-        _tableView.MouseClick -= Table_MouseClick;
+        _tableView.Activating -= Table_Activating;
         _tree.Dispose ();
     }
 
@@ -87,14 +88,14 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     {
         Branch<T> branch = RowToBranch (row);
 
-        // Everything on line before the expansion run and branch text
-        Rune [] prefix = branch.GetLinePrefix ().ToArray ();
-        Rune expansion = branch.GetExpandableSymbol ();
+        // Everything on the line before the expansion run and branch text
+        string [] prefix = branch.GetLinePrefix ().ToArray ();
+        string expansion = branch.GetExpandableSymbol ();
         string lineBody = _tree.AspectGetter (branch.Model) ?? "";
 
         var sb = new StringBuilder ();
 
-        foreach (Rune p in prefix)
+        foreach (string p in prefix)
         {
             sb.Append (p);
         }
@@ -167,9 +168,16 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         }
     }
 
-    private void Table_MouseClick (object sender, MouseEventArgs e)
+#nullable enable
+    private void Table_Activating (object? sender, CommandEventArgs e)
     {
-        Point? hit = _tableView.ScreenToCell (e.Position.X, e.Position.Y, out int? headerIfAny, out int? offsetX);
+        // Only handle mouse clicks, not keyboard selections
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+        {
+            return;
+        }
+
+        Point? hit = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? headerIfAny, out int? offsetX);
 
         if (hit is null || headerIfAny is { } || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)
         {
@@ -201,4 +209,5 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             _tableView.SetNeedsDraw ();
         }
     }
+#nullable restore
 }

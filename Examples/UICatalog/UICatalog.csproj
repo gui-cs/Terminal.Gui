@@ -49,4 +49,5 @@
         <Using Include="System.Drawing.Size" Alias="Size" />
         <Using Include="System.Drawing.SizeF" Alias="SizeF" />
     </ItemGroup>
+    <ProjectExtensions><VisualStudio><UserProperties resources_4config_1json__JsonSchema="..\..\..\docfx\schemas\tui-config-schema.json" /></VisualStudio></ProjectExtensions>
 </Project>

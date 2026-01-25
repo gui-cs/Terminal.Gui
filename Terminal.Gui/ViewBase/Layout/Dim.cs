@@ -1,4 +1,3 @@
-#nullable enable
 namespace Terminal.Gui.ViewBase;
 
 using System.Numerics;
@@ -130,15 +129,56 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving no margin.
     /// </summary>
+    /// <remarks>
+    ///     The view will fill from its position to the end of the SuperView's content area.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var view = new View { X = 5, Y = 0, Width = Dim.Fill(), Height = 1 };
+    /// // If SuperView width is 80, view width will be 75 (80 - 5)
+    /// </code>
+    /// </example>
     /// <returns>The Fill dimension.</returns>
     public static Dim Fill () { return new DimFill (0); }
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified margin.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// var view = new View { X = 0, Y = 0, Width = Dim.Fill(2), Height = 1 };
+    /// // If SuperView width is 80, view width will be 78 (80 - 2)
+    /// </code>
+    /// </example>
     /// <returns>The Fill dimension.</returns>
     /// <param name="margin">Margin to use.</param>
-    public static Dim Fill (Dim margin) { return new DimFill (margin); }
+    public static Dim Fill (Dim margin) => new DimFill (margin);
+
+    /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified margin and respecting
+    ///     the specified minimum dimension.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When the SuperView uses <see cref="Dim.Auto"/>, the <paramref name="minimumContentDim"/> will contribute
+    ///         to the auto-sizing calculation, ensuring the SuperView is at least large enough to accommodate the minimum.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Fill with minimum width of 40
+    /// var view = new View { X = 0, Y = 0, Width = Dim.Fill(margin: 0, minimumContentDim: 40), Height = 1 };
+    /// // If SuperView has Dim.Auto() width, it will be at least 40 wide
+    /// // If SuperView is 80 wide, view will be 80 wide
+    /// // If SuperView is 30 wide, view will still be 40 wide (minimum)
+    /// </code>
+    /// </example>
+    /// <returns>The Fill dimension.</returns>
+    /// <param name="margin">Margin to use.</param>
+    /// <param name="minimumContentDim">
+    ///     The minimum dimension. If <see langword="null"/>, no minimum is enforced.
+    /// </param>
+    public static Dim Fill (Dim margin, Dim? minimumContentDim) { return new DimFill (margin, minimumContentDim); }
 
     /// <summary>
     ///     Creates a function <see cref="Dim"/> object that computes the dimension based on the passed view and by executing
@@ -174,7 +214,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </example>
     public static Dim Percent (int percent, DimPercentMode mode = DimPercentMode.ContentSize)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative (percent, nameof (percent));
+        ArgumentOutOfRangeException.ThrowIfNegative (percent);
 
         return new DimPercent (percent, mode);
     }
@@ -188,20 +228,20 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
 
 
     /// <summary>
-    ///     Indicates whether the specified type <typeparamref name="T"/> is in the hierarchy of this Dim object.
+    ///     Indicates whether the specified type <typeparamref name="TDim"/> is in the hierarchy of this Dim object.
     /// </summary>
     /// <param name="dim">A reference to this <see cref="Dim"/> instance.</param>
     /// <returns></returns>
-    public bool Has<T> (out T dim) where T : Dim
+    public bool Has<TDim> (out TDim dim) where TDim : Dim
     {
-        dim = (this as T)!;
+        dim = (this as TDim)!;
 
         return this switch
-               {
-                   DimCombine combine => combine.Left.Has<T> (out dim) || combine.Right.Has<T> (out dim),
-                   T => true,
-                   _ => false
-               };
+        {
+            DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),
+            TDim => true,
+            _ => false
+        };
     }
 
     #region virtual methods

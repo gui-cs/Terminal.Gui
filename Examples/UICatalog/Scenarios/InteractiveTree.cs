@@ -1,4 +1,4 @@
-﻿using System.Linq;
+#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -7,57 +7,74 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TreeView")]
 public class InteractiveTree : Scenario
 {
-    private TreeView _treeView;
+    private IApplication? _app;
+    private TreeView? _treeView;
+    private Window? _appWindow;
 
     public override void Main ()
     {
-        Application.Init ();
-        var appWindow = new Toplevel ()
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
+
+        _appWindow = new ()
         {
             Title = GetName (),
+            BorderStyle = LineStyle.None
         };
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new ("_File", new MenuItem [] { new ("_Quit", "", Quit) })
-            ]
-        };
-        appWindow.Add (menu);
+        // MenuBar
+        MenuBar menu = new ();
+
+        menu.Add (
+                  new MenuBarItem (
+                                   Strings.menuFile,
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = Strings.cmdQuit,
+                                           Action = Quit
+                                       }
+                                   ]
+                                  )
+                 );
 
         _treeView = new ()
         {
             X = 0,
-            Y = 1,
+            Y = Pos.Bottom (menu),
             Width = Dim.Fill (),
             Height = Dim.Fill (1)
         };
-        _treeView.KeyDown += TreeView_KeyPress;
+        _treeView.KeyDown += treeView_KeyPress;
 
-        appWindow.Add (_treeView);
+        // StatusBar
+        StatusBar statusBar = new (
+                                   [
+                                       new (Application.QuitKey, "Quit", Quit),
+                                       new (Key.C.WithCtrl, "Add Child", AddChildNode),
+                                       new (Key.T.WithCtrl, "Add Root", AddRootNode),
+                                       new (Key.R.WithCtrl, "Rename Node", RenameNode)
+                                   ]
+                                  );
 
-        var statusBar = new StatusBar (
-                                       new Shortcut []
-                                       {
-                                           new (Application.QuitKey, "Quit", Quit),
-                                           new (Key.C.WithCtrl, "Add Child", AddChildNode),
-                                           new (Key.T.WithCtrl, "Add Root", AddRootNode),
-                                           new (Key.R.WithCtrl, "Rename Node", RenameNode)
-                                       }
-                                      );
-        appWindow.Add (statusBar);
+        _appWindow.Add (menu, _treeView, statusBar);
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (_appWindow);
+        _appWindow.Dispose ();
     }
 
     private void AddChildNode ()
     {
-        ITreeNode node = _treeView.SelectedObject;
+        if (_treeView is null)
+        {
+            return;
+        }
 
-        if (node != null)
+        ITreeNode? node = _treeView.SelectedObject;
+
+        if (node is not null)
         {
             if (GetText ("Text", "Enter text for node:", "", out string entered))
             {
@@ -69,6 +86,11 @@ public class InteractiveTree : Scenario
 
     private void AddRootNode ()
     {
+        if (_treeView is null)
+        {
+            return;
+        }
+
         if (GetText ("Text", "Enter text for node:", "", out string entered))
         {
             _treeView.AddObject (new TreeNode (entered));
@@ -77,41 +99,43 @@ public class InteractiveTree : Scenario
 
     private bool GetText (string title, string label, string initialText, out string enteredText)
     {
-        var okPressed = false;
+        bool okPressed = false;
 
-        var ok = new Button { Text = "Ok", IsDefault = true };
+        Dialog d = new ()
+        {
+            Title = title,
+            Buttons = [new () { Title = Strings.btnCancel }, new () { Title = Strings.btnOk }]
+        };
 
-        ok.Accepting += (s, e) =>
-                     {
-                         okPressed = true;
-                         Application.RequestStop ();
-                     };
-        var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => Application.RequestStop ();
-        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
+        Label lbl = new () { X = 0, Y = 1, Text = label };
 
-        var lbl = new Label { X = 0, Y = 1, Text = label };
-
-        var tf = new TextField { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
+        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _app?.Run (d);
+        okPressed = d.Result is 1;
+
         d.Dispose ();
 
-        enteredText = okPressed ? tf.Text : null;
+        enteredText = okPressed ? tf.Text : string.Empty;
 
         return okPressed;
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _appWindow?.RequestStop (); }
 
     private void RenameNode ()
     {
-        ITreeNode node = _treeView.SelectedObject;
+        if (_treeView is null)
+        {
+            return;
+        }
 
-        if (node != null)
+        ITreeNode? node = _treeView.SelectedObject;
+
+        if (node is not null)
         {
             if (GetText ("Text", "Enter text for node:", node.Text, out string entered))
             {
@@ -121,13 +145,18 @@ public class InteractiveTree : Scenario
         }
     }
 
-    private void TreeView_KeyPress (object sender, Key obj)
+    private void treeView_KeyPress (object? sender, Key obj)
     {
+        if (_treeView is null)
+        {
+            return;
+        }
+
         if (obj.KeyCode == Key.Delete)
         {
-            ITreeNode toDelete = _treeView.SelectedObject;
+            ITreeNode? toDelete = _treeView.SelectedObject;
 
-            if (toDelete == null)
+            if (toDelete is null)
             {
                 return;
             }
@@ -141,11 +170,11 @@ public class InteractiveTree : Scenario
             }
             else
             {
-                ITreeNode parent = _treeView.GetParent (toDelete);
+                ITreeNode? parent = _treeView.GetParent (toDelete);
 
-                if (parent == null)
+                if (parent is null)
                 {
-                    MessageBox.ErrorQuery (
+                    MessageBox.ErrorQuery (_app!,
                                            "Could not delete",
                                            $"Parent of '{toDelete}' was unexpectedly null",
                                            "Ok"

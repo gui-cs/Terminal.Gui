@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.Drawing;
 
 /// <summary>Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...</summary>
@@ -26,6 +25,11 @@ public class Glyphs
     // IMPORTANT: it is the source of truth for the default glyphs at runtime.
     // IMPORTANT: Configuration Manager test SaveDefaults uses this class to generate the default config file
     // IMPORTANT: in ./UnitTests/bin/Debug/netX.0/config.json
+
+    /// <summary>Unicode replacement character; used by Drivers when rendering in cases where a wide glyph can't
+    /// be output because it would be clipped. Defaults to ' ' (Space).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Rune WideGlyphReplacement { get; set; } = (Rune)' ';
 
     /// <summary>File icon.  Defaults to ☰ (Trigram For Heaven)</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]

@@ -19,8 +19,8 @@
   // --------------- Application Settings ---------------
   "Key.Separator": "+",
 
+  "Driver.Force16Colors": false,
   "Application.ArrangeKey": "Ctrl+F5",
-  "Application.Force16Colors": false,
   //"Application.ForceDriver": "", // TODO: ForceDriver should be nullable
   "Application.IsMouseDisabled": false,
   "Application.NextTabGroupKey": "F6",
@@ -50,7 +50,7 @@
       "TurboPascal 5": {
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "White",
                 "Background": "Blue"
@@ -123,7 +123,7 @@
       "Anders": {
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "WhiteSmoke",
                 "Background": "DimGray"
@@ -136,14 +136,14 @@
                 "Foreground": "White",
                 "Background": "DarkBlue"
               }
-            },
+            }
           },
           {
             "Dialog": {
               "Normal": {
                 "Foreground": "BrightBlue",
                 "Background": "LightGray"
-              },
+              }
             }
           },
           {
@@ -152,7 +152,7 @@
                 "Foreground": "White",
                 "Background": "Blue",
                 "Style": "Bold"
-              },
+              }
             }
           },
           {
@@ -161,7 +161,7 @@
                 "Foreground": "Red",
                 "Background": "WhiteSmoke",
                 "Style": "Italic"
-              },
+              }
             }
           }
         ],
@@ -185,7 +185,7 @@
         "Button.DefaultShadow": "Opaque",
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "LightGray",
                 "Background": "Black",
@@ -469,7 +469,7 @@
         "Button.DefaultShadow": "Opaque",
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "DimGray",
                 "Background": "WhiteSmoke",
@@ -748,10 +748,10 @@
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "Single",
+        "Menu.DefaultBorderStyle": "Single",
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
                 "Background": "Black",
@@ -885,10 +885,10 @@
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "Single",
+        "Menu.DefaultBorderStyle": "Single",
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "AmberPhosphor",
                 "Background": "Black",
@@ -1022,7 +1022,7 @@
         "Window.DefaultBorderStyle": "Single",
         "MessageBox.DefaultBorderStyle": "Single",
         "Button.DefaultShadow": "None",
-        "Menuv2.DefaultBorderStyle": "None",
+        "Menu.DefaultBorderStyle": "None",
         "Glyphs.LeftBracket": "[",
         "Glyphs.RightBracket": "]",
         "Glyphs.CheckStateChecked": "X",
@@ -1162,7 +1162,7 @@
         "Glyphs.ShadowHorizontalEnd": "-",
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "White",
                 "Background": "Black"

@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.ViewBase;
 
@@ -20,7 +20,7 @@ internal class ShadowView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         switch (ShadowStyle)
         {
@@ -100,7 +100,13 @@ internal class ShadowView : View
 
                 if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
                 {
-                    AddRune (ScreenContents [r, c].Rune);
+                    string grapheme = ScreenContents [r, c].Grapheme;
+                    AddStr (grapheme);
+
+                    if (grapheme.GetColumns () > 1)
+                    {
+                        c++;
+                    }
                 }
             }
         }
@@ -125,28 +131,38 @@ internal class ShadowView : View
         Rectangle screen = ViewportToScreen (Viewport);
 
         // Fill in the rest of the rectangle
-        for (int c = Math.Max (0, screen.X); c < screen.X + screen.Width; c++)
+        for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
         {
-            for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
+            for (int c = Math.Max (0, screen.X); c < screen.X + screen.Width; c++)
             {
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
-                if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
+                if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0)
+                    && c < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
                 {
-                    AddRune (ScreenContents [r, c].Rune);
+                    string grapheme = ScreenContents [r, c].Grapheme;
+                    AddStr (grapheme);
+
+                    if (grapheme.GetColumns () > 1)
+                    {
+                        c++;
+                    }
                 }
             }
         }
     }
 
+    // BUGBUG: This will never really work completely right by looking at an underlying cell and trying
+    // BUGBUG: to do transparency by adjusting colors. Instead, it might be possible to use the A in argb for this.
+    // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4491
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not Adornment adornment
+        if (SuperView is not Adornment
             || location.X < 0
-            || location.X >= Application.Screen.Width
+            || location.X >= App?.Screen.Width
             || location.Y < 0
-            || location.Y >= Application.Screen.Height)
+            || location.Y >= App?.Screen.Height)
         {
             return Attribute.Default;
         }
@@ -170,8 +186,8 @@ internal class ShadowView : View
         // use the Normal attribute from the View under the shadow.
         if (newAttribute.Background == Color.DarkGray)
         {
-            List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
-            View? underView = currentViewsUnderMouse!.LastOrDefault ();
+            List<View?> currentViewsUnderMouse = GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
+            View? underView = currentViewsUnderMouse.LastOrDefault ();
             attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 
             newAttribute = new (

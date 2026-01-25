@@ -1,4 +1,5 @@
-﻿//
+#nullable disable
+//
 // ComboBox.cs: ComboBox control
 //
 // Authors:
@@ -46,9 +47,9 @@ public class ComboBox : View, IDesignable
                               };
         _listview.SelectedItemChanged += (sender, e) =>
                                          {
-                                             if (!HideDropdownListOnClick && _searchSet.Count > 0)
+                                             if (e.Item >= 0 && !HideDropdownListOnClick && _searchSet.Count > 0)
                                              {
-                                                 SetValue (_searchSet [_listview.SelectedItem]);
+                                                 SetValue (_searchSet [e.Item.Value]);
                                              }
                                          };
         Add (_search, _listview);
@@ -113,7 +114,7 @@ public class ComboBox : View, IDesignable
     /// <inheritdoc />
     protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme> args)
     {
-        _listview.SetScheme(args.NewValue);
+        _listview.SetScheme (args.NewValue);
         return base.OnSettingScheme (args);
     }
 
@@ -245,11 +246,11 @@ public class ComboBox : View, IDesignable
     public event EventHandler Expanded;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
-        if (me.Position.X == Viewport.Right - 1
-            && me.Position.Y == Viewport.Top
-            && me.Flags == MouseFlags.Button1Pressed
+        if (me.Position!.Value.X == Viewport.Right - 1
+            && me.Position!.Value.Y == Viewport.Top
+            && me.Flags == MouseFlags.LeftButtonPressed
             && _autoHide)
         {
             if (IsShow)
@@ -269,7 +270,7 @@ public class ComboBox : View, IDesignable
             return me.Handled = true;
         }
 
-        if (me.Flags == MouseFlags.Button1Pressed)
+        if (me.Flags == MouseFlags.LeftButtonPressed)
         {
             if (!_search.HasFocus)
             {
@@ -286,7 +287,7 @@ public class ComboBox : View, IDesignable
     public virtual void OnCollapsed () { Collapsed?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
 
         if (!_autoHide)
@@ -313,7 +314,7 @@ public class ComboBox : View, IDesignable
             {
                 _search.SetFocus ();
             }
-            _search.CursorPosition = _search.Text.GetRuneCount ();
+            _search.InsertionPoint = _search.Text.GetRuneCount ();
         }
         else
         {
@@ -460,7 +461,10 @@ public class ComboBox : View, IDesignable
 
     private void FocusSelectedItem ()
     {
-        _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
+        if (_listview.Source?.Count > 0)
+        {
+            _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
+        }
         _listview.TabStop = TabBehavior.TabStop;
         _listview.SetFocus ();
         OnExpanded ();
@@ -516,9 +520,9 @@ public class ComboBox : View, IDesignable
                 _listview.TabStop = TabBehavior.TabStop;
                 _listview.SetFocus ();
 
-                if (_listview.SelectedItem > -1)
+                if (_listview.SelectedItem is { })
                 {
-                    SetValue (_searchSet [_listview.SelectedItem]);
+                    SetValue (_searchSet [_listview.SelectedItem.Value]);
                 }
                 else
                 {
@@ -580,7 +584,7 @@ public class ComboBox : View, IDesignable
     {
         if (_listview.HasFocus && _listview.SelectedItem == 0 && _searchSet?.Count > 0) // jump back to search
         {
-            _search.CursorPosition = _search.Text.GetRuneCount ();
+            _search.InsertionPoint = _search.Text.GetRuneCount ();
             _search.SetFocus ();
         }
         else
@@ -727,7 +731,7 @@ public class ComboBox : View, IDesignable
         IsShow = false;
         _listview.TabStop = TabBehavior.NoStop;
 
-        if (_listview.Source.Count == 0 || (_searchSet?.Count ?? 0) == 0)
+        if (_listview.Source!.Count == 0 || (_searchSet?.Count ?? 0) == 0)
         {
             _text = "";
             HideList ();
@@ -736,8 +740,8 @@ public class ComboBox : View, IDesignable
             return false;
         }
 
-        SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
-        _search.CursorPosition = _search.Text.GetColumns ();
+        SetValue (_listview.SelectedItem is { } ? _searchSet [_listview.SelectedItem.Value] : _text);
+        _search.InsertionPoint = _search.Text.GetColumns ();
         ShowHideList (Text);
         OnOpenSelectedItem ();
         Reset (true);
@@ -779,7 +783,7 @@ public class ComboBox : View, IDesignable
         _search.TextChanged -= Search_Changed;
         // Note we set _text, to avoid set_Text from setting _search.Text again
         _text = _search.Text = text.ToString ();
-        _search.CursorPosition = 0;
+        _search.InsertionPoint = 0;
         _search.TextChanged += Search_Changed;
 
         if (!isFromSelectedItem)
@@ -827,10 +831,14 @@ public class ComboBox : View, IDesignable
         public bool HideDropdownListOnClick
         {
             get => _hideDropdownListOnClick;
-            set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
+            set
+            {
+                _hideDropdownListOnClick = value;
+                MouseHoldRepeat = value ? MouseFlags.LeftButtonReleased : null;
+            }
         }
 
-        protected override bool OnMouseEvent (MouseEventArgs me)
+        protected override bool OnMouseEvent (Mouse me)
         {
             bool isMousePositionValid = IsMousePositionValid (me);
 
@@ -842,7 +850,7 @@ public class ComboBox : View, IDesignable
                 res = base.OnMouseEvent (me);
             }
 
-            if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked)
+            if (HideDropdownListOnClick && me.Flags == MouseFlags.LeftButtonClicked)
             {
                 if (!isMousePositionValid && !_isFocusing)
                 {
@@ -861,11 +869,11 @@ public class ComboBox : View, IDesignable
                 return true;
             }
 
-            if (me.Flags == MouseFlags.ReportMousePosition && HideDropdownListOnClick)
+            if (me.Flags == MouseFlags.PositionReport && HideDropdownListOnClick)
             {
                 if (isMousePositionValid)
                 {
-                    _highlighted = Math.Min (TopItem + me.Position.Y, Source.Count);
+                    _highlighted = Math.Min (TopItem + me.Position!.Value.Y, Source.Count);
                     SetNeedsDraw ();
                 }
 
@@ -877,7 +885,7 @@ public class ComboBox : View, IDesignable
             return res;
         }
 
-        protected override bool OnDrawingContent ()
+        protected override bool OnDrawingContent (DrawContext context)
         {
             Attribute current = GetAttributeForRole (VisualRole.Focus);
             SetAttribute (current);
@@ -976,14 +984,18 @@ public class ComboBox : View, IDesignable
         {
             bool res = base.OnSelectedChanged ();
 
-            _highlighted = SelectedItem;
+            if (SelectedItem is null)
+            {
+                return res;
+            }
+            _highlighted = SelectedItem.Value;
 
             return res;
         }
 
-        private bool IsMousePositionValid (MouseEventArgs me)
+        private bool IsMousePositionValid (Mouse me)
         {
-            if (me.Position.X >= 0 && me.Position.X < Frame.Width && me.Position.Y >= 0 && me.Position.Y < Frame.Height)
+            if (me.Position!.Value.X >= 0 && me.Position!.Value.X < Frame.Width && me.Position!.Value.Y >= 0 && me.Position!.Value.Y < Frame.Height)
             {
                 return true;
             }
@@ -996,7 +1008,7 @@ public class ComboBox : View, IDesignable
             _container = container
                          ?? throw new ArgumentNullException (
                                                              nameof (container),
-                                                             "ComboBox container cannot be null."
+                                                             @"ComboBox container cannot be null."
                                                             );
             HideDropdownListOnClick = hideDropdownListOnClick;
             AddCommand (Command.Up, () => _container.MoveUpList ());

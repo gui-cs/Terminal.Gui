@@ -1,333 +1,65 @@
-#nullable enable
-using System.Diagnostics;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
-    /// <summary>
-    ///     INTERNAL: Gets or sets the managed thread ID of the application's main UI thread, which is set during
-    ///     <see cref="Init"/> and used to determine if code is executing on the main thread.
-    /// </summary>
-    /// <value>
-    ///     The managed thread ID of the main UI thread, or <see langword="null"/> if the application is not initialized.
-    /// </value>
-    internal int? MainThreadId { get; set; }
+    // Lock object to protect session stack operations and cached state updates
+    private readonly object _sessionStackLock = new ();
 
-    #region Begin->Run->Stop->End
+    #region Session State - Stack and TopRunnable
+
+    /// <inheritdoc/>
+    public ConcurrentStack<SessionToken>? SessionStack { get; } = new ();
+
+    /// <inheritdoc/>
+    public IRunnable? TopRunnable { get; private set; }
+
+    /// <inheritdoc/>
+    public View? TopRunnableView => TopRunnable as View;
 
     /// <inheritdoc/>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
 
     /// <inheritdoc/>
-    public event EventHandler<ToplevelEventArgs>? SessionEnded;
+    public event EventHandler<SessionTokenEventArgs>? SessionEnded;
 
-    /// <inheritdoc/>
-    public SessionToken Begin (Toplevel toplevel)
-    {
-        ArgumentNullException.ThrowIfNull (toplevel);
+    #endregion Session State - Stack and TopRunnable
 
-        // Ensure the mouse is ungrabbed.
-        if (Mouse.MouseGrabView is { })
-        {
-            Mouse.UngrabMouse ();
-        }
-
-        var rs = new SessionToken (toplevel);
-
-#if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts && Top is { } && toplevel != Top && !TopLevels.Contains (Top))
-        {
-            // This assertion confirm if the Top was already disposed
-            Debug.Assert (Top.WasDisposed);
-            Debug.Assert (Top == CachedSessionTokenToplevel);
-        }
-#endif
-
-        lock (TopLevels)
-        {
-            if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
-            {
-                // If Top was already disposed and isn't on the Toplevels Stack,
-                // clean it up here if is the same as _CachedSessionTokenToplevel
-                if (Top == CachedSessionTokenToplevel)
-                {
-                    Top = null;
-                }
-                else
-                {
-                    // Probably this will never hit
-                    throw new ObjectDisposedException (Top.GetType ().FullName);
-                }
-            }
-
-            // BUGBUG: We should not depend on `Id` internally.
-            // BUGBUG: It is super unclear what this code does anyway.
-            if (string.IsNullOrEmpty (toplevel.Id))
-            {
-                var count = 1;
-                var id = (TopLevels.Count + count).ToString ();
-
-                while (TopLevels.Count > 0 && TopLevels.FirstOrDefault (x => x.Id == id) is { })
-                {
-                    count++;
-                    id = (TopLevels.Count + count).ToString ();
-                }
-
-                toplevel.Id = (TopLevels.Count + count).ToString ();
-
-                TopLevels.Push (toplevel);
-            }
-            else
-            {
-                Toplevel? dup = TopLevels.FirstOrDefault (x => x.Id == toplevel.Id);
-
-                if (dup is null)
-                {
-                    TopLevels.Push (toplevel);
-                }
-            }
-        }
-
-        if (Top is null)
-        {
-            Top = toplevel;
-        }
-
-        if ((Top?.Modal == false && toplevel.Modal)
-            || (Top?.Modal == false && !toplevel.Modal)
-            || (Top?.Modal == true && toplevel.Modal))
-        {
-            if (toplevel.Visible)
-            {
-                if (Top is { HasFocus: true })
-                {
-                    Top.HasFocus = false;
-                }
-
-                // Force leave events for any entered views in the old Top
-                if (Mouse.GetLastMousePosition () is { })
-                {
-                    Mouse.RaiseMouseEnterLeaveEvents (Mouse.GetLastMousePosition ()!.Value, new ());
-                }
-
-                Top?.OnDeactivate (toplevel);
-                Toplevel previousTop = Top!;
-
-                Top = toplevel;
-                Top.OnActivate (previousTop);
-            }
-        }
-
-        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
-        if (!toplevel.IsInitialized)
-        {
-            toplevel.BeginInit ();
-            toplevel.EndInit (); // Calls Layout
-        }
-
-        // Try to set initial focus to any TabStop
-        if (!toplevel.HasFocus)
-        {
-            toplevel.SetFocus ();
-        }
-
-        toplevel.OnLoaded ();
-
-        Instance.LayoutAndDraw (true);
-
-        if (PositionCursor ())
-        {
-            Driver?.UpdateCursor ();
-        }
-
-        SessionBegun?.Invoke (this, new (rs));
-
-        return rs;
-    }
+    #region Main Loop Iteration
 
     /// <inheritdoc/>
     public bool StopAfterFirstIteration { get; set; }
 
     /// <inheritdoc/>
-    public event EventHandler<IterationEventArgs>? Iteration;
+    public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
     /// <inheritdoc/>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, string? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    public void RaiseIteration () { Iteration?.Invoke (this, new (this)); }
 
-    /// <inheritdoc/>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    public TView Run<TView> (Func<Exception, bool>? errorHandler = null, string? driver = null)
-        where TView : Toplevel, new ()
-    {
-        if (!Initialized)
-        {
-            // Init() has NOT been called. Auto-initialize as per interface contract.
-            Init (null, driver);
-        }
-
-        TView top = new ();
-        Run (top, errorHandler);
-
-        return top;
-    }
-
-
-    /// <inheritdoc/>
-    public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
-    {
-        Logging.Information ($"Run '{view}'");
-        ArgumentNullException.ThrowIfNull (view);
-
-        if (!Initialized)
-        {
-            throw new NotInitializedException (nameof (Run));
-        }
-
-        if (Driver == null)
-        {
-            throw new InvalidOperationException ("Driver was inexplicably null when trying to Run view");
-        }
-
-        Top = view;
-
-        SessionToken rs = Application.Begin (view);
-
-        Top.Running = true;
-
-        var firstIteration = true;
-
-        while (TopLevels.TryPeek (out Toplevel? found) && found == view && view.Running)
-        {
-            if (Coordinator is null)
-            {
-                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
-            }
-
-            Coordinator.RunIteration ();
-
-            if (StopAfterFirstIteration && firstIteration)
-            {
-                Logging.Information ("Run - Stopping after first iteration as requested");
-                view.RequestStop ();
-            }
-
-            firstIteration = false;
-        }
-
-        Logging.Information ("Run - Calling End");
-        Application.End (rs);
-    }
-
-    /// <inheritdoc/>
-    public void End (SessionToken sessionToken)
-    {
-        ArgumentNullException.ThrowIfNull (sessionToken);
-
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            ApplicationPopover.HideWithQuitCommand (visiblePopover);
-        }
-
-        sessionToken.Toplevel.OnUnloaded ();
-
-        // End the Session
-        // First, take it off the Toplevel Stack
-        if (TopLevels.TryPop (out Toplevel? topOfStack))
-        {
-            if (topOfStack != sessionToken.Toplevel)
-            {
-                // If the top of the stack is not the SessionToken.Toplevel then
-                // this call to End is not balanced with the call to Begin that started the Session
-                throw new ArgumentException ("End must be balanced with calls to Begin");
-            }
-        }
-
-        // Notify that it is closing
-        sessionToken.Toplevel?.OnClosed (sessionToken.Toplevel);
-
-        if (TopLevels.TryPeek (out Toplevel? newTop))
-        {
-            Top = newTop;
-            Top?.SetNeedsDraw ();
-        }
-
-        if (sessionToken.Toplevel is { HasFocus: true })
-        {
-            sessionToken.Toplevel.HasFocus = false;
-        }
-
-        if (Top is { HasFocus: false })
-        {
-            Top.SetFocus ();
-        }
-
-        CachedSessionTokenToplevel = sessionToken.Toplevel;
-
-        sessionToken.Toplevel = null;
-        sessionToken.Dispose ();
-
-        // BUGBUG: Why layout and draw here? This causes the screen to be cleared!
-        //LayoutAndDraw (true);
-
-        SessionEnded?.Invoke (this, new (CachedSessionTokenToplevel));
-    }
-
-    /// <inheritdoc/>
-    public void RequestStop () { RequestStop (null); }
-
-    /// <inheritdoc/>
-    public void RequestStop (Toplevel? top)
-    {
-        Logging.Trace ($"Top: '{(top is { } ? top : "null")}'");
-
-        top ??= Top;
-
-        if (top == null)
-        {
-            return;
-        }
-
-        ToplevelClosingEventArgs ev = new (top);
-        top.OnClosing (ev);
-
-        if (ev.Cancel)
-        {
-            return;
-        }
-
-        top.Running = false;
-    }
-
-    /// <inheritdoc/>
-    public void RaiseIteration () { Iteration?.Invoke (null, new ()); }
-
-    #endregion Begin->Run->Stop->End
+    #endregion Main Loop Iteration
 
     #region Timeouts and Invoke
 
-    private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    // _timedEvents is declared and initialized in ApplicationImpl.cs constructor
 
     /// <inheritdoc/>
     public ITimedEvents? TimedEvents => _timedEvents;
 
     /// <inheritdoc/>
-    public object AddTimeout (TimeSpan time, Func<bool> callback) { return _timedEvents.Add (time, callback); }
+    public object AddTimeout (TimeSpan time, Func<bool> callback) => _timedEvents.Add (time, callback);
 
     /// <inheritdoc/>
-    public bool RemoveTimeout (object token) { return _timedEvents.Remove (token); }
+    public bool RemoveTimeout (object token) => _timedEvents.Remove (token);
 
     /// <inheritdoc/>
-    public void Invoke (Action action)
+    public void Invoke (Action<IApplication>? action)
     {
         // If we are already on the main UI thread
-        if (Top is { Running: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
-            action ();
+            action?.Invoke (this);
 
             return;
         }
@@ -336,7 +68,29 @@ public partial class ApplicationImpl
                           TimeSpan.Zero,
                           () =>
                           {
-                              action ();
+                              action?.Invoke (this);
+
+                              return false;
+                          }
+                         );
+    }
+
+    /// <inheritdoc/>
+    public void Invoke (Action action)
+    {
+        // If we are already on the main UI thread
+        if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
+        {
+            action.Invoke ();
+
+            return;
+        }
+
+        _timedEvents.Add (
+                          TimeSpan.Zero,
+                          () =>
+                          {
+                              action.Invoke ();
 
                               return false;
                           }
@@ -344,4 +98,318 @@ public partial class ApplicationImpl
     }
 
     #endregion Timeouts and Invoke
+
+    #region Session Lifecycle - Begin
+
+    /// <inheritdoc/>
+    public SessionToken? Begin (IRunnable runnable)
+    {
+        ArgumentNullException.ThrowIfNull (runnable);
+
+        if (runnable.IsRunning)
+        {
+            throw new ArgumentException (@"The runnable is already running.", nameof (runnable));
+        }
+
+        // Create session token
+        SessionToken token = new (runnable);
+
+        // Get old IsRunning value BEFORE any stack changes (safe - cached value)
+        bool oldIsRunning = runnable.IsRunning;
+
+        // Raise IsRunningChanging OUTSIDE lock (false -> true) - can be canceled
+        if (runnable.RaiseIsRunningChanging (oldIsRunning, true))
+        {
+            // Starting was canceled
+            return null;
+        }
+
+        // Set the application reference in the runnable
+        runnable.SetApp (this);
+
+        // Ensure the mouse is ungrabbed
+        Mouse.UngrabMouse ();
+
+        IRunnable? previousTop = null;
+
+        // CRITICAL SECTION - Atomic stack + cached state update
+        lock (_sessionStackLock)
+        {
+            // Get the previous top BEFORE pushing new token
+            if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken.Runnable is { })
+            {
+                previousTop = previousToken.Runnable;
+            }
+
+            if (previousTop == runnable)
+            {
+                throw new ArgumentOutOfRangeException (nameof (runnable), runnable, @"Attempt to Run the runnable that's already the top runnable.");
+            }
+
+            // Push token onto SessionStack
+            SessionStack?.Push (token);
+
+            TopRunnable = runnable;
+
+            // Update cached state atomically - IsRunning and IsModal are now consistent
+            SessionBegun?.Invoke (this, new (token));
+            runnable.SetIsRunning (true);
+            runnable.SetIsModal (true);
+
+            // Previous top is no longer modal
+            if (previousTop != null)
+            {
+                previousTop.SetIsModal (false);
+            }
+        }
+
+        // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
+
+        // Fire events AFTER lock released (avoid deadlocks in event handlers)
+        if (previousTop != null)
+        {
+            previousTop.RaiseIsModalChangedEvent (false);
+        }
+
+        runnable.RaiseIsRunningChangedEvent (true);
+        runnable.RaiseIsModalChangedEvent (true);
+
+        LayoutAndDraw ();
+
+        return token;
+    }
+
+    #endregion Session Lifecycle - Begin
+
+    #region Session Lifecycle - Run
+
+    /// <inheritdoc/>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
+        where TRunnable : IRunnable, new ()
+    {
+        if (!Initialized)
+        {
+            // Init() has NOT been called. Auto-initialize as per interface contract.
+            Init (driverName);
+        }
+
+        if (Driver is null)
+        {
+            throw new InvalidOperationException (@"Driver is null after Init.");
+        }
+
+        TRunnable runnable = new ();
+        Run (runnable, errorHandler);
+
+        // We created the runnable, so dispose it if it's disposable
+        if (runnable is IDisposable disposable)
+        {
+            disposable.Dispose ();
+        }
+
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null)
+    {
+        ArgumentNullException.ThrowIfNull (runnable);
+
+        if (!Initialized)
+        {
+            throw new NotInitializedException (@"Init must be called before Run.");
+        }
+
+        // Begin the session (adds to stack, raises IsRunningChanging/IsRunningChanged)
+        SessionToken? token;
+
+        if (runnable.IsRunning)
+        {
+            // Find it on the stack
+            token = SessionStack?.FirstOrDefault (st => st.Runnable == runnable);
+        }
+        else
+        {
+            token = Begin (runnable);
+        }
+
+        if (token is null)
+        {
+            Logging.Warning (@"Run - Begin session failed or was cancelled.");
+
+            return null;
+        }
+
+        try
+        {
+            // All runnables block until RequestStop() is called
+            RunLoop (runnable, errorHandler);
+        }
+        finally
+        {
+            // End the session (raises IsRunningChanging/IsRunningChanged, pops from stack)
+            End (token);
+        }
+
+        return token.Result;
+    }
+
+    private void RunLoop (IRunnable runnable, Func<Exception, bool>? errorHandler)
+    {
+        runnable.StopRequested = false;
+
+        // Main loop - blocks until RequestStop() is called
+        // Note: IsRunning is now a cached property, safe to check each iteration
+        var firstIteration = true;
+
+        while (runnable is { StopRequested: false, IsRunning: true })
+        {
+            if (Coordinator is null)
+            {
+                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
+            }
+
+            try
+            {
+                // Process one iteration of the event loop
+                Coordinator.RunIteration ();
+            }
+            catch (Exception ex)
+            {
+                if (errorHandler is null || !errorHandler (ex))
+                {
+                    throw;
+                }
+            }
+
+            if (StopAfterFirstIteration && firstIteration)
+            {
+                Logging.Information ("Run - Stopping after first iteration as requested");
+                RequestStop (runnable);
+            }
+
+            firstIteration = false;
+        }
+    }
+
+    #endregion Session Lifecycle - Run
+
+    #region Session Lifecycle - End
+
+    /// <inheritdoc/>
+    public void End (SessionToken token)
+    {
+        ArgumentNullException.ThrowIfNull (token);
+
+        if (token.Runnable is null)
+        {
+            return; // Already ended
+        }
+
+        // TODO: Move Poppover to utilize IRunnable arch; Get all refs to anyting
+        // TODO: View-related out of ApplicationImpl.
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            ApplicationPopover.HideWithQuitCommand (visiblePopover);
+        }
+
+        IRunnable runnable = token.Runnable;
+
+        // Get old IsRunning value (safe - cached value)
+        bool oldIsRunning = runnable.IsRunning;
+
+        // Raise IsRunningChanging OUTSIDE lock (true -> false) - can be canceled
+        // This is where Result should be extracted!
+        if (runnable.RaiseIsRunningChanging (oldIsRunning, false))
+        {
+            // Stopping was canceled - do not proceed with End
+            return;
+        }
+
+        bool wasModal = runnable.IsModal;
+        IRunnable? previousRunnable = null;
+
+        // CRITICAL SECTION - Atomic stack + cached state update
+        lock (_sessionStackLock)
+        {
+            // Pop token from SessionStack
+            if (wasModal && SessionStack?.TryPop (out SessionToken? popped) == true && popped == token)
+            {
+                // Restore previous top runnable
+                if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken.Runnable is { })
+                {
+                    previousRunnable = previousToken.Runnable;
+
+                    // Previous runnable becomes modal again
+                    previousRunnable.SetIsModal (true);
+                }
+            }
+
+            // Update cached state atomically - IsRunning and IsModal are now consistent
+            runnable.SetIsRunning (false);
+            runnable.SetIsModal (false);
+        }
+
+        // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
+
+        // Fire events AFTER lock released
+        if (wasModal)
+        {
+            runnable.RaiseIsModalChangedEvent (false);
+        }
+
+        TopRunnable = null;
+
+        if (previousRunnable != null)
+        {
+            TopRunnable = previousRunnable;
+            previousRunnable.RaiseIsModalChangedEvent (true);
+        }
+
+        Mouse.UngrabMouse ();
+
+        runnable.RaiseIsRunningChangedEvent (false);
+
+        token.Result = runnable.Result;
+
+        _result = token.Result;
+
+        // Clear the Runnable from the token
+        token.Runnable = null;
+        SessionEnded?.Invoke (this, new (token));
+    }
+
+    #endregion Session Lifecycle - End
+
+    #region Session Lifecycle - RequestStop
+
+    /// <inheritdoc/>
+    public void RequestStop () { RequestStop (null); }
+
+    /// <inheritdoc/>
+    public void RequestStop (IRunnable? runnable)
+    {
+        // Get the runnable to stop
+        if (runnable is null)
+        {
+            // Try to get from TopRunnable
+            if (TopRunnableView is IRunnable r)
+            {
+                runnable = r;
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        runnable.StopRequested = true;
+
+        // Note: The End() method will be called from the finally block in Run()
+        // and that's where IsRunningChanging/IsRunningChanged will be raised
+    }
+
+    #endregion Session Lifecycle - RequestStop
 }

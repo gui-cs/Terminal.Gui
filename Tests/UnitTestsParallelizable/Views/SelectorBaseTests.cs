@@ -1,5 +1,5 @@
 #nullable enable
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 ///     Tests for <see cref="SelectorBase"/> functionality that applies to all selector implementations.
@@ -485,8 +485,7 @@ public class SelectorBaseTests
         selector.Accepting += (s, e) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal (1, acceptCount);
     }
@@ -502,8 +501,7 @@ public class SelectorBaseTests
         selector.Accepting += (s, e) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal (0, acceptCount);
     }

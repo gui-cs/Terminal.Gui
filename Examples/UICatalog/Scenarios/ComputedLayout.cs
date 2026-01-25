@@ -13,9 +13,11 @@ public class ComputedLayout : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        Window app = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -23,7 +25,7 @@ public class ComputedLayout : Scenario
         // Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
         const string rule = "|123456789";
 
-        var horizontalRuler = new Label
+        Label horizontalRuler = new ()
         {
             X = 0,
             Y = 0,
@@ -33,12 +35,12 @@ public class ComputedLayout : Scenario
             Text = rule
         };
 
-        app.Add (horizontalRuler);
+        window.Add (horizontalRuler);
 
         // Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
         const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-        var verticalRuler = new Label
+        Label verticalRuler = new ()
         {
             X = 0,
             Y = 0,
@@ -48,7 +50,7 @@ public class ComputedLayout : Scenario
             Text = vrule
         };
 
-        app.SubViewsLaidOut += (s, a) =>
+        window.SubViewsLaidOut += (_, _) =>
                                {
                                    if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
                                    {
@@ -64,31 +66,31 @@ public class ComputedLayout : Scenario
                                            [..(verticalRuler.Viewport.Height * 2)];
                                };
 
-        app.Add (verticalRuler);
+        window.Add (verticalRuler);
 
         // Demonstrate At - Using Pos.At to locate a view in an absolute location
         var atButton = new Button { Text = "Absolute(2,1)", X = Pos.Absolute (2), Y = Pos.Absolute (1) };
-        app.Add (atButton);
+        window.Add (atButton);
 
         // Throw in a literal absolute - Should function identically to above
         var absoluteButton = new Button { Text = "X = 30, Y = 1", X = 30, Y = 1 };
-        app.Add (absoluteButton);
+        window.Add (absoluteButton);
 
         // Demonstrate using Dim to create a window that fills the parent with a margin
         var margin = 10;
 
-        var subWin = new Window
+        Window subWin = new ()
         {
             X = Pos.Center (), Y = 2, Width = Dim.Fill (margin), Height = 7,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
         };
 
-        subWin.Initialized += (s, a) =>
+        subWin.Initialized += (_, _) =>
                               {
                                   subWin.Title =
                                       $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
                               };
-        app.Add (subWin);
+        window.Add (subWin);
 
         var i = 1;
         var txt = "Resize the terminal to see computed layout in action.";
@@ -144,11 +146,11 @@ public class ComputedLayout : Scenario
                       );
         subWin.Add (labelList.ToArray ());
 
-        var frameView = new FrameView { X = 2, Y = Pos.Bottom (subWin), Width = 30, Height = 7 };
+        FrameView frameView = new () { X = 2, Y = Pos.Bottom (subWin), Width = 30, Height = 7 };
 
-        frameView.Initialized += (sender, args) =>
+        frameView.Initialized += (sender, _) =>
                                  {
-                                     var fv = sender as FrameView;
+                                     FrameView fv = (FrameView)sender!;
 
                                      fv.Title =
                                          $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
@@ -205,16 +207,16 @@ public class ComputedLayout : Scenario
                        }
                       );
         frameView.Add (labelList.ToArray ());
-        app.Add (frameView);
+        window.Add (frameView);
 
         frameView = new()
         {
             X = Pos.Right (frameView), Y = Pos.Top (frameView), Width = Dim.Fill (), Height = 7
         };
 
-        frameView.Initialized += (sender, args) =>
+        frameView.Initialized += (sender, _) =>
                                  {
-                                     var fv = sender as FrameView;
+                                     FrameView fv = (FrameView)sender!;
 
                                      fv.Title =
                                          $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
@@ -271,7 +273,7 @@ public class ComputedLayout : Scenario
                        }
                       );
         frameView.Add (labelList.ToArray ());
-        app.Add (frameView);
+        window.Add (frameView);
 
         // Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
         var textView = new TextView
@@ -280,12 +282,12 @@ public class ComputedLayout : Scenario
             Y = Pos.Percent (50),
             Width = Dim.Percent (80),
             Height = Dim.Percent (10),
-            SchemeName = "TopLevel"
+            SchemeName = "Runnable"
         };
 
         textView.Text =
             "This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
-        app.Add (textView);
+        window.Add (textView);
 
         var oddballButton = new Button
         {
@@ -293,7 +295,7 @@ public class ComputedLayout : Scenario
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1
         };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         #region Issue2358
 
@@ -301,19 +303,19 @@ public class ComputedLayout : Scenario
         // Until https://github.com/gui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
 
         oddballButton = new() { Text = "Center + 0", X = Pos.Center () + 0, Y = Pos.Bottom (oddballButton) };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         oddballButton = new() { Text = "Center + 1", X = Pos.Center () + 1, Y = Pos.Bottom (oddballButton) };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         oddballButton = new() { Text = "0 + Center", X = 0 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         oddballButton = new() { Text = "1 + Center", X = 1 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         oddballButton = new() { Text = "Center - 1", X = Pos.Center () - 1, Y = Pos.Bottom (oddballButton) };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
@@ -323,7 +325,7 @@ public class ComputedLayout : Scenario
             X = Pos.Center () + Pos.Center () - Pos.Percent (50),
             Y = Pos.Bottom (oddballButton)
         };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
@@ -333,7 +335,7 @@ public class ComputedLayout : Scenario
             X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50),
             Y = Pos.Bottom (oddballButton)
         };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
@@ -343,7 +345,7 @@ public class ComputedLayout : Scenario
             X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50),
             Y = Pos.Bottom (oddballButton)
         };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         #endregion
 
@@ -354,28 +356,28 @@ public class ComputedLayout : Scenario
             X = Pos.Center () + Pos.Center () - Pos.Percent (50),
             Y = Pos.Bottom (oddballButton)
         };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         // This demonstrates combining Percents)
         oddballButton = new()
         {
             Text = "Percent(40) + Percent(10)", X = Pos.Percent (40) + Pos.Percent (10), Y = Pos.Bottom (oddballButton)
         };
-        app.Add (oddballButton);
+        window.Add (oddballButton);
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
         var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd () };
         anchorButton.X = Pos.AnchorEnd ();
 
-        anchorButton.Accepting += (s, e) =>
+        anchorButton.Accepting += (_, _) =>
                                   {
                                       // This demonstrates how to have a dynamically sized button
                                       // Each time the button is clicked the button's text gets longer
                                       // The call to app.LayoutSubViews causes the Computed layout to
-                                      // get updated. 
+                                      // get updated.
                                       anchorButton.Text += "!";
                                   };
-        app.Add (anchorButton);
+        window.Add (anchorButton);
 
         // Demonstrate AnchorEnd(n) 
         // This is intentionally convoluted to illustrate potential bugs.
@@ -388,7 +390,7 @@ public class ComputedLayout : Scenario
             X = 5,
             Y = Pos.AnchorEnd (3)
         };
-        app.Add (anchorEndLabel1);
+        window.Add (anchorEndLabel1);
 
         // Demonstrate DimCombine (via AnchorEnd(n) - 1)
         // This is intentionally convoluted to illustrate potential bugs.
@@ -402,7 +404,7 @@ public class ComputedLayout : Scenario
             X = 5,
             Y = Pos.AnchorEnd (3) - 1 // Pos.Combine
         };
-        app.Add (anchorEndLabel2);
+        window.Add (anchorEndLabel2);
 
         // Demonstrate AnchorEnd() in combination with Pos.Align to align a set of buttons centered across the
         // bottom - 1
@@ -414,7 +416,7 @@ public class ComputedLayout : Scenario
             Y = Pos.AnchorEnd () - 1
         };
 
-        leftButton.Accepting += (s, e) =>
+        leftButton.Accepting += (_, _) =>
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer
@@ -429,7 +431,7 @@ public class ComputedLayout : Scenario
             Y = Pos.AnchorEnd (2)
         };
 
-        centerButton.Accepting += (s, e) =>
+        centerButton.Accepting += (_, _) =>
                                   {
                                       // This demonstrates how to have a dynamically sized button
                                       // Each time the button is clicked the button's text gets longer
@@ -444,7 +446,7 @@ public class ComputedLayout : Scenario
             Y = Pos.Y (centerButton)
         };
 
-        rightButton.Accepting += (s, e) =>
+        rightButton.Accepting += (_, _) =>
                                  {
                                      // This demonstrates how to have a dynamically sized button
                                      // Each time the button is clicked the button's text gets longer
@@ -452,12 +454,10 @@ public class ComputedLayout : Scenario
                                  };
 
         View [] buttons = { leftButton, centerButton, rightButton };
-        app.Add (leftButton);
-        app.Add (centerButton);
-        app.Add (rightButton);
+        window.Add (leftButton);
+        window.Add (centerButton);
+        window.Add (rightButton);
 
-        Application.Run (app);
-        app.Dispose ();
-        Application.Shutdown ();
+        app.Run (window);
     }
 }

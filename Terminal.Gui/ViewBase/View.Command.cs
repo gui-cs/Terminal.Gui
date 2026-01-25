@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Command APIs
@@ -36,19 +35,19 @@ public partial class View // Command APIs
                         return true;
                     });
 
-        // Space or single-click - Raise Selecting
+        // Space or single-click - Raise Activating
         AddCommand (
-                    Command.Select,
+                    Command.Activate,
                     ctx =>
                     {
-                        if (RaiseSelecting (ctx) is true)
+                        if (RaiseActivating (ctx) is true)
                         {
                             return true;
                         }
 
                         if (CanFocus)
                         {
-                            // For Select, if the view is focusable and SetFocus succeeds, by defition,
+                            // For Activate, if the view is focusable and SetFocus succeeds, by defition,
                             // the event is handled. So return what SetFocus returns.
                             return SetFocus ();
                         }
@@ -70,7 +69,7 @@ public partial class View // Command APIs
     {
         CommandEventArgs args = new () { Context = ctx };
 
-        // For robustness' sake, even if the virtual method returns true, if the args 
+        // For robustness' sake, even if the virtual method returns true, if the args
         // indicate the event should be cancelled, we honor that.
         if (OnCommandNotBound (args) || args.Handled)
         {
@@ -107,7 +106,7 @@ public partial class View // Command APIs
     /// <remarks>
     ///     <para>
     ///         The <see cref="Accepting"/> event should be raised after the state of the View has changed (after
-    ///         <see cref="Selecting"/> is raised).
+    ///         <see cref="Activating"/> is raised).
     ///     </para>
     ///     <para>
     ///         If the Accepting event is not handled, <see cref="Command.Accept"/> will be invoked on the SuperView, enabling
@@ -127,19 +126,26 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-        Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
+        //Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
+        //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
         args.Handled = OnAccepting (args) || args.Handled;
 
         if (!args.Handled && Accepting is { })
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
+            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
             Accepting?.Invoke (this, args);
+        }
+
+        // If Accepting was handled, raise Accepted (non-cancelable event)
+        if (args.Handled)
+        {
+            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling RaiseAccepted");
+            RaiseAccepted (ctx);
         }
 
         // Accept is a special case where if the event is not canceled, the event is
@@ -148,14 +154,14 @@ public partial class View // Command APIs
         if (!args.Handled)
         {
             // If there's an IsDefault peer view in SubViews, try it
-            View? isDefaultView = SuperView?.InternalSubViews.FirstOrDefault (v => v is Button { IsDefault: true });
+            View? isDefaultView = SuperView?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {
                 // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
                 // TODO: is generic?
 
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
+                //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
                 bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
 
                 if (handled == true)
@@ -166,7 +172,7 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
+                //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
 
                 return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
@@ -203,12 +209,54 @@ public partial class View // Command APIs
     public event EventHandler<CommandEventArgs>? Accepting;
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
-    ///     Calls <see cref="OnSelecting"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
-    ///     event. The default <see cref="Command.Select"/> handler calls this method.
+    ///     Raises the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating the View has been accepted.
+    ///     This is called after <see cref="Accepting"/> has been raised and not cancelled.
     /// </summary>
     /// <remarks>
-    ///     The <see cref="Selecting"/> event should be raised after the state of the View has been changed and before see
+    ///     <para>
+    ///         Unlike <see cref="Accepting"/>, this event cannot be cancelled. It is raised after the View has been accepted.
+    ///     </para>
+    /// </remarks>
+    /// <param name="ctx">The command context.</param>
+    protected void RaiseAccepted (ICommandContext? ctx)
+    {
+        CommandEventArgs args = new () { Context = ctx };
+
+        OnAccepted (args);
+        Accepted?.Invoke (this, args);
+    }
+
+    /// <summary>
+    ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="OnAccepting"/>, this method is called after the View has been accepted and cannot cancel the operation.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args">The event arguments.</param>
+    protected virtual void OnAccepted (CommandEventArgs args) { }
+
+    /// <summary>
+    ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="Accepting"/>, this event cannot be cancelled. It is raised after the View has been accepted.
+    ///     </para>
+    ///     <para>
+    ///         See <see cref="RaiseAccepted"/> for more information.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<CommandEventArgs>? Accepted;
+
+    /// <summary>
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state or preparing it for interaction.
+    ///     Calls <see cref="OnActivating"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
+    ///     event. The default <see cref="Command.Activate"/> handler calls this method.
+    /// </summary>
+    /// <remarks>
+    ///     The <see cref="Activating"/> event should be raised after the state of the View has been changed and before see
     ///     <see cref="Accepting"/>.
     /// </remarks>
     /// <returns>
@@ -217,40 +265,40 @@ public partial class View // Command APIs
     ///     continue.
     ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected bool? RaiseSelecting (ICommandContext? ctx)
+    protected virtual bool? RaiseActivating (ICommandContext? ctx)
     {
         //Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        if (OnSelecting (args) || args.Handled)
+        if (OnActivating (args) || args.Handled)
         {
             return true;
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        Selecting?.Invoke (this, args);
+        Activating?.Invoke (this, args);
 
-        return Selecting is null ? null : args.Handled;
+        return Activating is null ? null : args.Handled;
     }
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state or preparing it for interaction.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> and return <see langword="true"/> to indicate the event was
     ///     handled and processing should stop.
     /// </summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnSelecting (CommandEventArgs args) { return false; }
+    protected virtual bool OnActivating (CommandEventArgs args) { return false; }
 
     /// <summary>
-    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View
-    ///     to change state.
+    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View
+    ///     to change state or preparing it for interaction.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.
     /// </summary>
-    public event EventHandler<CommandEventArgs>? Selecting;
+    public event EventHandler<CommandEventArgs>? Activating;
 
     /// <summary>
     ///     Called when the View is handling the user pressing the View's <see cref="HotKey"/>s. Calls
@@ -355,7 +403,7 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, Func<bool?> impl) { _commandImplementations [command] = ctx => impl (); }
+    protected void AddCommand (Command command, Func<bool?> impl) { _commandImplementations [command] = _ => impl (); }
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>
     /// <returns></returns>

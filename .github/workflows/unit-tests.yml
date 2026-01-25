@@ -34,7 +34,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 10.x
         dotnet-quality: 'ga'
 
     - name: Download build artifacts
@@ -97,8 +97,12 @@ jobs:
       with:
         name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTests    
+          logs/UnitTests/
+          Tests/UnitTests/logs/
           TestResults/
+          **/*.dmp
+        if-no-files-found: ignore
+        retention-days: 7
   
     - name: Upload Non-Parallel UnitTests Coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && always()
@@ -120,7 +124,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
-    timeout-minutes: 15
+    timeout-minutes: 60
     steps:
 
     - name: Checkout code
@@ -129,7 +133,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 10.x
         dotnet-quality: 'ga'
 
     - name: Download build artifacts
@@ -157,8 +161,34 @@ jobs:
     - name: Run UnitTestsParallelizable
       shell: bash
       run: |
+        # Detect CPU count and calculate optimal thread count
         if [ "${{ runner.os }}" == "Linux" ]; then
-          # Run with coverage on Linux only
+          CPU_COUNT=$(nproc)
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          CPU_COUNT=$(sysctl -n hw.ncpu)
+        else  # Windows
+          CPU_COUNT=$NUMBER_OF_PROCESSORS
+        fi
+        
+        # Use 2x CPU count for I/O-bound tests, capped at reasonable max
+        # macOS uses lower cap (4) to prevent thread pool exhaustion
+        MAX_THREADS=$((CPU_COUNT * 2))
+        if [ "${{ runner.os }}" == "macOS" ]; then
+          if [ $MAX_THREADS -gt 4 ]; then
+            MAX_THREADS=2
+          fi
+          HANG_TIMEOUT="240s"
+        else
+          if [ $MAX_THREADS -gt 16 ]; then
+            MAX_THREADS=16
+          fi
+          HANG_TIMEOUT="60s"
+        fi
+        
+        echo "Detected $CPU_COUNT CPUs, using $MAX_THREADS parallel threads"
+        
+        # Run tests with dynamic thread count
+        if [ "${{ runner.os }}" == "Linux" ]; then
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
             --verbosity normal \
@@ -168,10 +198,11 @@ jobs:
             --blame \
             --blame-crash \
             --blame-hang \
-            --blame-hang-timeout 60s \
-            --blame-crash-collect-always
+            --blame-hang-timeout $HANG_TIMEOUT \
+            --blame-crash-collect-always \
+            -- xUnit.MaxParallelThreads=$MAX_THREADS \
+            -- xUnit.StopOnFail=true
         else
-          # Run without coverage on Windows/macOS for speed
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
             --verbosity normal \
@@ -180,9 +211,15 @@ jobs:
             --blame \
             --blame-crash \
             --blame-hang \
-            --blame-hang-timeout 60s \
-            --blame-crash-collect-always
+            --blame-hang-timeout $HANG_TIMEOUT \
+            --blame-crash-collect-always \
+            -- xUnit.MaxParallelThreads=$MAX_THREADS \
+            -- xUnit.StopOnFail=true
         fi
+        
+        echo "============================================"
+        echo "Parallel unit tests completed successfully!"
+        echo "============================================"
 
     - name: Upload UnitTestsParallelizable Logs
       if: always()
@@ -191,7 +228,11 @@ jobs:
         name: parallel_unittests-logs-${{ runner.os }}
         path: |
           logs/UnitTestsParallelizable/
+          Tests/UnitTestsParallelizable/logs/
           TestResults/
+          **/*.dmp
+        if-no-files-found: ignore
+        retention-days: 7
   
     - name: Upload Parallelizable UnitTests Coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && always()

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+#nullable enable
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -85,89 +82,70 @@ public class SyntaxHighlighting : Scenario
     };
 
     private readonly string _path = "Cells.rce";
+    private Runnable? _appWindow;
     private Attribute _blue;
     private Attribute _green;
     private Attribute _magenta;
-    private MenuItem _miWrap;
-    private TextView _textView;
+    private TextView? _textView;
     private Attribute _white;
 
     /// <summary>
-    ///     Reads an object instance from an Json file.
+    ///     Reads an object instance from a Json file.
     ///     <para>Object type must have a parameterless constructor.</para>
     /// </summary>
     /// <typeparam name="T">The type of object to read from the file.</typeparam>
     /// <param name="filePath">The file path to read the object instance from.</param>
     /// <returns>Returns a new instance of the object read from the Json file.</returns>
-    public static T ReadFromJsonFile<T> (string filePath) where T : new()
+    public static T ReadFromJsonFile<T> (string filePath) where T : new ()
     {
-        TextReader reader = null;
+        TextReader? reader = null;
 
         try
         {
             reader = new StreamReader (filePath);
             string fileContents = reader.ReadToEnd ();
 
-            return (T)JsonSerializer.Deserialize (fileContents, typeof (T));
+            return JsonSerializer.Deserialize<T> (fileContents) ?? new T ();
         }
         finally
         {
-            if (reader != null)
-            {
-                reader.Close ();
-            }
+            reader?.Close ();
         }
     }
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
-        Application.Init ();
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ();
+        using Runnable appWindow = new ();
+        _appWindow = appWindow;
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_TextView",
-                     new []
-                     {
-                         _miWrap = new (
-                                        "_Word Wrap",
-                                        "",
-                                        () => WordWrap ()
-                                       )
-                         {
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
-                         },
-                         null,
-                         new (
-                              "_Syntax Highlighting",
-                              "",
-                              () => ApplySyntaxHighlighting ()
-                             ),
-                         null,
-                         new (
-                              "_Load Rune Cells",
-                              "",
-                              () => ApplyLoadCells ()
-                             ),
-                         new (
-                              "_Save Rune Cells",
-                              "",
-                              () => SaveCells ()
-                             ),
-                         null,
-                         new ("_Quit", "", () => Quit ())
-                     }
-                    )
-            ]
-        };
-        appWindow.Add (menu);
+        MenuBar menu = new ();
+
+        MenuItem wrapMenuItem = CreateWordWrapMenuItem ();
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_TextView",
+                                   [
+                                       wrapMenuItem,
+                                       new Line (),
+                                       new MenuItem { Title = "_Syntax Highlighting", Action = ApplySyntaxHighlighting },
+                                       new Line (),
+                                       new MenuItem { Title = "_Load Text Cells", Action = ApplyLoadCells },
+                                       new MenuItem { Title = "_Save Text Cells", Action = SaveCells },
+                                       new Line (),
+                                       new MenuItem { Title = Strings.cmdQuit, Action = Quit }
+                                   ]
+                                  )
+                 );
+
+        _appWindow.Add (menu);
 
         _textView = new ()
         {
@@ -178,18 +156,41 @@ public class SyntaxHighlighting : Scenario
 
         ApplySyntaxHighlighting ();
 
-        appWindow.Add (_textView);
+        _appWindow.Add (_textView);
 
-        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
+        StatusBar statusBar = new ([new (Application.QuitKey, "Quit", Quit)]);
 
-        appWindow.Add (statusBar);
+        _appWindow.Add (statusBar);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
+        app.Run (_appWindow);
+    }
 
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+    private MenuItem CreateWordWrapMenuItem ()
+    {
+        CheckBox checkBox = new ()
+        {
+            Title = "_Word Wrap",
+            CheckedState = _textView?.WordWrap == true ? CheckState.Checked : CheckState.UnChecked
+        };
+
+        checkBox.CheckedStateChanged += (_, _) =>
+                                        {
+                                            if (_textView is not null)
+                                            {
+                                                _textView.WordWrap = checkBox.CheckedState == CheckState.Checked;
+                                            }
+                                        };
+
+        MenuItem item = new () { CommandView = checkBox };
+
+        item.Accepting += (_, e) =>
+                          {
+                              checkBox.AdvanceCheckState ();
+                              e.Handled = true;
+                          };
+
+        return item;
     }
 
     /// <summary>
@@ -211,9 +212,9 @@ public class SyntaxHighlighting : Scenario
     ///     If false the file will be overwritten if it already exists. If true the contents will be appended
     ///     to the file.
     /// </param>
-    public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new()
+    public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new ()
     {
-        TextWriter writer = null;
+        TextWriter? writer = null;
 
         try
         {
@@ -223,10 +224,7 @@ public class SyntaxHighlighting : Scenario
         }
         finally
         {
-            if (writer != null)
-            {
-                writer.Close ();
-            }
+            writer?.Close ();
         }
     }
 
@@ -236,16 +234,23 @@ public class SyntaxHighlighting : Scenario
 
         List<Cell> cells = new ();
 
-        foreach (KeyValuePair<string, Scheme> color in SchemeManager.GetSchemesForCurrentTheme ())
+        foreach (KeyValuePair<string, Scheme?> color in SchemeManager.GetSchemesForCurrentTheme ())
         {
-            string csName = color.Key;
-
-            foreach (Rune rune in csName.EnumerateRunes ())
+            if (color.Value is null)
             {
-                cells.Add (new () { Rune = rune, Attribute = color.Value.Normal });
+                continue;
             }
 
-            cells.Add (new () { Rune = (Rune)'\n', Attribute = color.Value.Focus });
+            string csName = color.Key;
+
+            cells.AddRange (Cell.ToCellList (csName, color.Value.Normal));
+
+            cells.Add (new () { Grapheme = "\n", Attribute = color.Value.Focus });
+        }
+
+        if (_textView is null)
+        {
+            return;
         }
 
         if (File.Exists (_path))
@@ -266,10 +271,15 @@ public class SyntaxHighlighting : Scenario
     {
         ClearAllEvents ();
 
-        _green = new Attribute (Color.Green, Color.Black);
-        _blue = new Attribute (Color.Blue, Color.Black);
-        _magenta = new Attribute (Color.Magenta, Color.Black);
-        _white = new Attribute (Color.White, Color.Black);
+        if (_textView is null)
+        {
+            return;
+        }
+
+        _green = new (Color.Green, Color.Black);
+        _blue = new (Color.Blue, Color.Black);
+        _magenta = new (Color.Magenta, Color.Black);
+        _white = new (Color.White, Color.Black);
         _textView.SetScheme (new () { Focus = _white });
 
         _textView.Text =
@@ -281,26 +291,36 @@ public class SyntaxHighlighting : Scenario
         };
 
         // DrawingText happens before DrawingContent so we use it to highlight
-        _textView.DrawingText += (s, e) => HighlightTextBasedOnKeywords ();
+        _textView.DrawingText += (_, _) => HighlightTextBasedOnKeywords ();
     }
 
     private void ClearAllEvents ()
     {
+        if (_textView is null)
+        {
+            return;
+        }
+
         _textView.ClearEventHandlers ("DrawingText");
         _textView.InheritsPreviousAttribute = false;
     }
 
-    private bool ContainsPosition (Match m, int pos) { return pos >= m.Index && pos < m.Index + m.Length; }
+    private bool ContainsPosition (Match m, int pos) => pos >= m.Index && pos < m.Index + m.Length;
 
     private void HighlightTextBasedOnKeywords ()
     {
+        if (_textView is null)
+        {
+            return;
+        }
+
         // Comment blocks, quote blocks etc
         Dictionary<Rune, Scheme> blocks = new ();
 
-        var comments = new Regex (@"/\*.*?\*/", RegexOptions.Singleline);
+        Regex comments = new (@"/\*.*?\*/", RegexOptions.Singleline);
         MatchCollection commentMatches = comments.Matches (_textView.Text);
 
-        var singleQuote = new Regex (@"'.*?'", RegexOptions.Singleline);
+        Regex singleQuote = new (@"'.*?'", RegexOptions.Singleline);
         MatchCollection singleQuoteMatches = singleQuote.Matches (_textView.Text);
 
         // Find all keywords (ignoring for now if they are in comments, quotes etc)
@@ -344,7 +364,7 @@ public class SyntaxHighlighting : Scenario
         }
     }
 
-    private string IdxToWord (List<Rune> line, int idx)
+    private string? IdxToWord (List<Rune> line, int idx)
     {
         string [] words = Regex.Split (
                                        new (line.Select (r => (char)r.Value).ToArray ()),
@@ -352,7 +372,7 @@ public class SyntaxHighlighting : Scenario
                                       );
 
         var count = 0;
-        string current = null;
+        string? current = null;
 
         foreach (string word in words)
         {
@@ -368,31 +388,18 @@ public class SyntaxHighlighting : Scenario
         return current?.Trim ();
     }
 
-    private bool IsKeyword (List<Rune> line, int idx)
-    {
-        string word = IdxToWord (line, idx);
-
-        if (string.IsNullOrWhiteSpace (word))
-        {
-            return false;
-        }
-
-        return _keywords.Contains (word, StringComparer.CurrentCultureIgnoreCase);
-    }
-
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _appWindow?.RequestStop (); }
 
     private void SaveCells ()
     {
-        //Writing to file  
+        if (_textView is null)
+        {
+            return;
+        }
+
+        //Writing to file
         List<List<Cell>> cells = _textView.GetAllLines ();
         WriteToJsonFile (_path, cells);
-    }
-
-    private void WordWrap ()
-    {
-        _miWrap.Checked = !_miWrap.Checked;
-        _textView.WordWrap = (bool)_miWrap.Checked;
     }
 }
 
@@ -406,7 +413,7 @@ public static class EventExtensions
         }
 
         Type objType = obj.GetType ();
-        EventInfo eventInfo = objType.GetEvent (eventName);
+        EventInfo? eventInfo = objType.GetEvent (eventName);
 
         if (eventInfo == null)
         {
@@ -414,8 +421,8 @@ public static class EventExtensions
         }
 
         var isEventProperty = false;
-        Type type = objType;
-        FieldInfo eventFieldInfo = null;
+        Type? type = objType;
+        FieldInfo? eventFieldInfo = null;
 
         while (type != null)
         {
@@ -478,22 +485,22 @@ public static class EventExtensions
     private static void RemoveHandler<T> (object obj, FieldInfo eventFieldInfo)
     {
         Type objType = obj.GetType ();
-        object eventPropertyValue = eventFieldInfo.GetValue (obj);
+        object? eventPropertyValue = eventFieldInfo.GetValue (obj);
 
         if (eventPropertyValue == null)
         {
             return;
         }
 
-        PropertyInfo propertyInfo = objType.GetProperties (BindingFlags.NonPublic | BindingFlags.Instance)
-                                           .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
+        PropertyInfo? propertyInfo = objType.GetProperties (BindingFlags.NonPublic | BindingFlags.Instance)
+                                            .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
 
         if (propertyInfo == null)
         {
             return;
         }
 
-        object eventList = propertyInfo?.GetValue (obj, null);
+        object? eventList = propertyInfo.GetValue (obj, null);
 
         switch (eventList)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -14,16 +14,23 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Progress")]
 public class Progress : Scenario
 {
-    private Window win;
-    private uint _mainLooopTimeoutTick = 100; // ms
+    private Window _win;
+    private uint _mainLoopTimeoutTick = 100; // ms
     private object _mainLoopTimeout;
     private Timer _systemTimer;
     private uint _systemTimerTick = 100; // ms
+    private IApplication _app;
 
     public override void Main ()
     {
-        Application.Init ();
-        win = new Window { Title = GetQuitKeyAndName () };
+        ConfigurationManager.Enable (ConfigLocations.All);
+
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
+
+        using Window win = new () { Title = GetQuitKeyAndName () };
+        _win = win;
         // Demo #1 - Use System.Timer (and threading)
         var systemTimerDemo = new ProgressDemo
         {
@@ -39,11 +46,11 @@ public class Progress : Scenario
                                             systemTimerDemo.PulseProgressBar.Fraction = 0F;
 
                                             _systemTimer = new Timer (
-                                                                      o =>
+                                                                      _ =>
                                                                       {
                                                                           // Note the check for Mainloop being valid. System.Timers can run after they are Disposed.
-                                                                          // This code must be defensive for that. 
-                                                                          Application.Invoke (() => systemTimerDemo.Pulse ());
+                                                                          // This code must be defensive for that.
+                                                                          _app?.Invoke (_ => systemTimerDemo.Pulse ());
                                                                       },
                                                                       null,
                                                                       0,
@@ -61,11 +68,9 @@ public class Progress : Scenario
                                        };
         systemTimerDemo.Speed.Text = $"{_systemTimerTick}";
 
-        systemTimerDemo.Speed.TextChanged += (s, a) =>
+        systemTimerDemo.Speed.TextChanged += (_, _) =>
                                              {
-                                                 uint result;
-
-                                                 if (uint.TryParse (systemTimerDemo.Speed.Text, out result))
+                                                 if (uint.TryParse (systemTimerDemo.Speed.Text, out uint result))
                                                  {
                                                      _systemTimerTick = result;
                                                      Debug.WriteLine ($"{_systemTimerTick}");
@@ -80,7 +85,7 @@ public class Progress : Scenario
                                                      Debug.WriteLine ("bad entry");
                                                  }
                                              };
-        win.Add (systemTimerDemo);
+        _win.Add (systemTimerDemo);
 
         // Demo #2 - Use Application.AddTimeout (no threads)
         var mainLoopTimeoutDemo = new ProgressDemo
@@ -98,8 +103,8 @@ public class Progress : Scenario
                                                 mainLoopTimeoutDemo.ActivityProgressBar.Fraction = 0F;
                                                 mainLoopTimeoutDemo.PulseProgressBar.Fraction = 0F;
 
-                                                _mainLoopTimeout = Application.AddTimeout (
-                                                                                           TimeSpan.FromMilliseconds (_mainLooopTimeoutTick),
+                                                _mainLoopTimeout = _app?.AddTimeout (
+                                                                                           TimeSpan.FromMilliseconds (_mainLoopTimeoutTick),
                                                                                            () =>
                                                                                            {
                                                                                                mainLoopTimeoutDemo.Pulse ();
@@ -113,7 +118,7 @@ public class Progress : Scenario
                                            {
                                                if (_mainLoopTimeout != null)
                                                {
-                                                   Application.RemoveTimeout (_mainLoopTimeout);
+                                                   _app?.RemoveTimeout (_mainLoopTimeout);
                                                    _mainLoopTimeout = null;
                                                }
 
@@ -121,15 +126,13 @@ public class Progress : Scenario
                                                mainLoopTimeoutDemo.PulseProgressBar.Fraction = 1F;
                                            };
 
-        mainLoopTimeoutDemo.Speed.Text = $"{_mainLooopTimeoutTick}";
+        mainLoopTimeoutDemo.Speed.Text = $"{_mainLoopTimeoutTick}";
 
-        mainLoopTimeoutDemo.Speed.TextChanged += (s, a) =>
+        mainLoopTimeoutDemo.Speed.TextChanged += (_, _) =>
                                                  {
-                                                     uint result;
-
-                                                     if (uint.TryParse (mainLoopTimeoutDemo.Speed.Text, out result))
+                                                     if (uint.TryParse (mainLoopTimeoutDemo.Speed.Text, out uint result))
                                                      {
-                                                         _mainLooopTimeoutTick = result;
+                                                         _mainLoopTimeoutTick = result;
 
                                                          if (mainLoopTimeoutDemo.Started)
                                                          {
@@ -137,27 +140,25 @@ public class Progress : Scenario
                                                          }
                                                      }
                                                  };
-        win.Add (mainLoopTimeoutDemo);
+        _win.Add (mainLoopTimeoutDemo);
 
         var startBoth = new Button { X = Pos.Center (), Y = Pos.Bottom (mainLoopTimeoutDemo) + 1, Text = "Start Both" };
 
-        startBoth.Accepting += (s, e) =>
+        startBoth.Accepting += (_, _) =>
                              {
                                  systemTimerDemo.Start ();
                                  mainLoopTimeoutDemo.Start ();
                              };
-        win.Add (startBoth);
+        _win.Add (startBoth);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (_win);
     }
 
     protected override void Dispose (bool disposing)
     {
-        foreach (ProgressDemo v in win.SubViews.OfType<ProgressDemo> ())
+        foreach (ProgressDemo v in _win.SubViews.OfType<ProgressDemo> ())
         {
-            v?.StopBtnClick ();
+            v.StopBtnClick ();
         }
 
         base.Dispose (disposing);
@@ -184,7 +185,7 @@ public class Progress : Scenario
                 Width = Dim.Percent (25),
                 Title = "Settings"
             };
-            var lbl = new Label { X = 1, Y = 1, Text = "Tick every (ms):" };
+            Label lbl = new () { X = 1, Y = 1, Text = "Tick every (ms):" };
             LeftFrame.Add (lbl);
             Speed = new TextField { X = Pos.X (lbl), Y = Pos.Bottom (lbl), Width = 7 };
             LeftFrame.Add (Speed);
@@ -298,7 +299,7 @@ public class Progress : Scenario
             Started = true;
             StartBtnClick?.Invoke ();
 
-            Application.Invoke (
+            App?.Invoke (
                                 () =>
                                 {
                                     Spinner.Visible = true;
@@ -312,7 +313,7 @@ public class Progress : Scenario
             Started = false;
             StopBtnClick?.Invoke ();
 
-            Application.Invoke (
+            App?.Invoke (
                                 () =>
                                 {
                                     Spinner.Visible = false;

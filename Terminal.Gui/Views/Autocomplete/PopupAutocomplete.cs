@@ -1,5 +1,4 @@
-using System.Diagnostics;
-
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -98,10 +97,10 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the
     ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
-    /// <param name="me">The mouse event.</param>
+    /// <param name="mouse">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    public override bool OnMouseEvent (MouseEventArgs me, bool fromHost = false)
+    public override bool OnMouseEvent (Mouse mouse, bool fromHost = false)
     {
         if (fromHost)
         {
@@ -125,7 +124,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             {
                 Visible = true;
                 HostControl?.SetNeedsDraw ();
-                Application.Mouse.UngrabMouse ();
+                HostControl?.App?.Mouse.UngrabMouse ();
 
                 return false;
             }
@@ -137,7 +136,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                 _closed = false;
             }
 
-            HostControl?.SetNeedsDraw ();
+            HostControl.SetNeedsDraw ();
 
             return false;
         }
@@ -150,28 +149,28 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (me.Flags == MouseFlags.ReportMousePosition)
+        if (mouse.Flags == MouseFlags.PositionReport)
         {
-            RenderSelectedIdxByMouse (me);
+            RenderSelectedIdxByMouse (mouse);
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.Button1Clicked)
+        if (mouse.Flags == MouseFlags.LeftButtonClicked)
         {
-            SelectedIdx = me.Position.Y - ScrollOffset;
+            SelectedIdx = mouse.Position!.Value.Y - ScrollOffset;
 
             return Select ();
         }
 
-        if (me.Flags == MouseFlags.WheeledDown)
+        if (mouse.Flags == MouseFlags.WheeledDown)
         {
             MoveDown ();
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledUp)
+        if (mouse.Flags == MouseFlags.WheeledUp)
         {
             MoveUp ();
 
@@ -189,7 +188,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
     public override bool ProcessKey (Key key)
     {
-        if (SuggestionGenerator.IsWordChar ((Rune)key))
+        if (SuggestionGenerator.IsWordChar (key.AsRune.ToString ()))
         {
             Visible = true;
             _closed = false;
@@ -389,6 +388,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                                );
         }
 
+        _popup.Visible = true;
         _popup.Move (0, 0);
 
         for (var i = 0; i < toRender.Length; i++)
@@ -406,7 +406,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
             string text = TextFormatter.ClipOrPad (toRender [i].Title, width);
 
-            Application.Driver?.AddStr (text);
+            _popup.App?.Driver?.AddStr (text);
         }
     }
 
@@ -490,11 +490,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
     /// <summary>Render the current selection in the Autocomplete context menu by the mouse reporting.</summary>
     /// <param name="me"></param>
-    protected void RenderSelectedIdxByMouse (MouseEventArgs me)
+    protected void RenderSelectedIdxByMouse (Mouse me)
     {
-        if (SelectedIdx != me.Position.Y - ScrollOffset)
+        if (SelectedIdx != me.Position!.Value.Y - ScrollOffset)
         {
-            SelectedIdx = me.Position.Y - ScrollOffset;
+            SelectedIdx = me.Position!.Value.Y - ScrollOffset;
 
             if (LastPopupPos is { })
             {
@@ -544,7 +544,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <param name="column"></param>
     protected abstract void SetCursorPosition (int column);
 
-#nullable enable
     private Point? LastPopupPos { get; set; }
 #nullable restore
 

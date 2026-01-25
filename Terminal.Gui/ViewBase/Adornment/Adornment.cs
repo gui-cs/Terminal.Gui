@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.ViewBase;
 
@@ -31,6 +31,10 @@ public class Adornment : View, IDesignable
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
         Parent = parent;
+
+        // By default, Adornments have no key bindings.
+        KeyBindings.Clear ();
+
     }
 
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
@@ -83,6 +87,18 @@ public class Adornment : View, IDesignable
     #endregion Thickness
 
     #region View Overrides
+
+    /// <inheritdoc />
+    public override string ToDebugString ()
+    {
+        return $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
+    }
+
+    /// <inheritdoc />
+    protected override IApplication? GetApp () => Parent?.App;
+
+    /// <inheritdoc />
+    protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver ();
 
     // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
     private Scheme? _scheme;
@@ -176,9 +192,12 @@ public class Adornment : View, IDesignable
         }
 
         // This just draws/clears the thickness, not the insides.
-        Thickness.Draw (ViewportToScreen (Viewport), Diagnostics, ToString ());
+        if (Driver is { })
+        {
+            Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
+        }
 
-        NeedsDraw = true;
+        SetNeedsDraw ();
 
         return true;
     }
@@ -235,37 +254,6 @@ public class Adornment : View, IDesignable
         outside.Offset (parentOrSuperView.Frame.Location);
 
         return Thickness.Contains (outside, location);
-    }
-
-    /// <summary>
-    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="Adornment"/> hierarchcy that are at <paramref name="screenLocation"/>,
-    ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="View.Visible"/> set to <see langword="false"/> will not be included.
-    ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
-    /// </summary>
-    /// <param name="adornment">The root Adornment from which the search for subviews begins.</param>
-    /// <param name="screenLocation">The screen-relative location where the search for views is focused.</param>
-    /// <returns>A list of views that are located under the specified point.</returns>
-    internal static List<View?> GetViewsAtLocation (Adornment? adornment, in Point screenLocation)
-    {
-        List<View?> result = [];
-
-        if (adornment is null || adornment.Thickness == Thickness.Empty)
-        {
-            return result;
-        }
-
-        Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToViewport (screenLocation) ?? screenLocation;
-
-        if (adornment.Contains (superViewRelativeLocation))
-        {
-            List<View?> adornmentResult = GetViewsAtLocation (adornment as View, screenLocation);
-            if (adornmentResult.Count > 0)
-            {
-                result.AddRange (adornmentResult);
-            }
-        }
-
-        return result;
     }
 
     #endregion View Overrides

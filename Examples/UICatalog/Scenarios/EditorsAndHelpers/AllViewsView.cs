@@ -4,6 +4,7 @@ namespace UICatalog.Scenarios;
 public class AllViewsView : View
 {
     private const int MAX_VIEW_FRAME_HEIGHT = 25;
+
     public AllViewsView ()
     {
         CanFocus = true;
@@ -16,7 +17,7 @@ public class AllViewsView : View
                            {
                                if (sender is View sendingView)
                                {
-                                   sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
+                                  sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
                                }
                            };
 
@@ -24,6 +25,7 @@ public class AllViewsView : View
         AddCommand (Command.Down, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => ScrollVertical (-SubViews.OfType<FrameView> ().First ().Frame.Height));
         AddCommand (Command.PageDown, () => ScrollVertical (SubViews.OfType<FrameView> ().First ().Frame.Height));
+
         AddCommand (
                     Command.Start,
                     () =>
@@ -32,6 +34,7 @@ public class AllViewsView : View
 
                         return true;
                     });
+
         AddCommand (
                     Command.End,
                     () =>
@@ -56,35 +59,35 @@ public class AllViewsView : View
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Context);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
         MouseBindings.Add (MouseFlags.WheeledRight, Command.ScrollRight);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();
 
-        var allClasses = GetAllViewClassesCollection ();
+        List<Type> allClasses = GetAllViewClassesCollection ();
 
         View? previousView = null;
 
-        foreach (Type? type in allClasses)
+        foreach (Type type in allClasses)
         {
             View? view = CreateView (type);
 
-            if (view is { })
+            if (view is not null)
             {
                 FrameView frame = new ()
                 {
                     CanFocus = true,
                     Title = type.Name,
-                    Y = previousView is { } ? Pos.Bottom (previousView) : 0,
+                    Y = previousView is not null ? Pos.Bottom (previousView) : 0,
                     Width = Dim.Fill (),
                     Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: MAX_VIEW_FRAME_HEIGHT)
                 };
@@ -93,19 +96,6 @@ public class AllViewsView : View
                 previousView = frame;
             }
         }
-    }
-
-    private static List<Type> GetAllViewClassesCollection ()
-    {
-        List<Type> types = typeof (View).Assembly.GetTypes ()
-                                        .Where (
-                                                myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
-                                                          && myType.IsSubclassOf (typeof (View)))
-                                        .ToList ();
-
-        types.Add (typeof (View));
-
-        return types;
     }
 
     private View? CreateView (Type type)
@@ -125,12 +115,25 @@ public class AllViewsView : View
                 }
                 else
                 {
-                    typeArguments.Add (typeof (object));
+                    // Check if the generic parameter has constraints
+                    Type [] constraints = arg.GetGenericParameterConstraints ();
+
+                    // Use the first constraint type to satisfy the constraint
+                    typeArguments.Add (constraints.Length > 0 ? constraints [0] : typeof (object));
                 }
             }
 
             // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
-            type = type.MakeGenericType (typeArguments.ToArray ());
+            try
+            {
+                type = type.MakeGenericType (typeArguments.ToArray ());
+            }
+            catch (ArgumentException ex)
+            {
+                Logging.Warning ($"Cannot create generic type {type} with arguments [{string.Join (", ", typeArguments.Select (t => t.Name))}]: {ex.Message}");
+
+                return null;
+            }
         }
 
         // Ensure the type does not contain any generic parameters
@@ -164,6 +167,18 @@ public class AllViewsView : View
         return view;
     }
 
+    private static List<Type> GetAllViewClassesCollection ()
+    {
+        List<Type> types = typeof (View).Assembly.GetTypes ()
+                                        .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
+                                                          && myType.IsSubclassOf (typeof (View)))
+                                        .ToList ();
+
+        types.Add (typeof (View));
+
+        return types;
+    }
+
     private void OnViewInitialized (object? sender, EventArgs e)
     {
         if (sender is not View view)
@@ -171,17 +186,17 @@ public class AllViewsView : View
             return;
         }
 
-        if (view.Width == Dim.Absolute (0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == Dim.Absolute (0) || view.Height is null)
+        if (view.Height == Dim.Absolute (0))
         {
             view.Height = MAX_VIEW_FRAME_HEIGHT - 2;
         }
 
-        if (!view.Width!.Has<DimAuto> (out _))
+        if (!view.Width.Has<DimAuto> (out _))
         {
             view.Width = Dim.Fill ();
         }

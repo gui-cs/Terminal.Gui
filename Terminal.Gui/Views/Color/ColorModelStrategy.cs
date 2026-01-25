@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 
@@ -7,39 +5,23 @@ namespace Terminal.Gui.Views;
 
 internal class ColorModelStrategy
 {
-    public IEnumerable<ColorBar> CreateBars (ColorModel model)
-    {
-        switch (model)
+    public IEnumerable<ColorBar> CreateBars (ColorModel model) =>
+        model switch
         {
-            case ColorModel.RGB:
-                return CreateRgbBars ();
-            case ColorModel.HSV:
-                return CreateHsvBars ();
-            case ColorModel.HSL:
-                return CreateHslBars ();
-            default:
-                throw new ArgumentOutOfRangeException (nameof (model), model, null);
-        }
-    }
+            ColorModel.RGB => CreateRgbBars (),
+            ColorModel.HSV => CreateHsvBars (),
+            ColorModel.HSL => CreateHslBars (),
+            _ => throw new ArgumentOutOfRangeException (nameof (model), model, null)
+        };
 
-    public Color GetColorFromBars (IList<IColorBar> bars, ColorModel model)
-    {
-        switch (model)
+    public Color GetColorFromBars (IList<IColorBar> bars, ColorModel model) =>
+        model switch
         {
-            case ColorModel.RGB:
-                return ToColor (new ((byte)bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value));
-            case ColorModel.HSV:
-                return ToColor (
-                                ColorConverter.HsvToRgb (new (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
-                               );
-            case ColorModel.HSL:
-                return ToColor (
-                                ColorConverter.HslToRgb (new (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))
-                               );
-            default:
-                throw new ArgumentOutOfRangeException (nameof (model), model, null);
-        }
-    }
+            ColorModel.RGB => ToColor (new ((byte)bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value)),
+            ColorModel.HSV => ToColor (ColorConverter.HsvToRgb (new (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))),
+            ColorModel.HSL => ToColor (ColorConverter.HslToRgb (new (bars [0].Value, (byte)bars [1].Value, (byte)bars [2].Value))),
+            _ => throw new ArgumentOutOfRangeException (nameof (model), model, null)
+        };
 
     public void SetBarsToColor (IList<IColorBar> bars, Color newValue, ColorModel model)
     {
@@ -47,6 +29,7 @@ internal class ColorModelStrategy
         {
             return;
         }
+
         switch (model)
         {
             case ColorModel.RGB:
@@ -75,21 +58,21 @@ internal class ColorModelStrategy
         }
     }
 
-    private IEnumerable<ColorBar> CreateHslBars ()
+    private static IEnumerable<ColorBar> CreateHslBars ()
     {
-        var h = new HueBar
+        HueBar h = new ()
         {
             Text = "H:"
         };
 
         yield return h;
 
-        var s = new SaturationBar
+        SaturationBar s = new ()
         {
             Text = "S:"
         };
 
-        var l = new LightnessBar
+        LightnessBar l = new ()
         {
             Text = "L:"
         };
@@ -104,21 +87,21 @@ internal class ColorModelStrategy
         yield return l;
     }
 
-    private IEnumerable<ColorBar> CreateHsvBars ()
+    private static IEnumerable<ColorBar> CreateHsvBars ()
     {
-        var h = new HueBar
+        HueBar h = new ()
         {
             Text = "H:"
         };
 
         yield return h;
 
-        var s = new SaturationBar
+        SaturationBar s = new ()
         {
             Text = "S:"
         };
 
-        var v = new ValueBar
+        ValueBar v = new ()
         {
             Text = "V:"
         };
@@ -133,19 +116,19 @@ internal class ColorModelStrategy
         yield return v;
     }
 
-    private IEnumerable<ColorBar> CreateRgbBars ()
+    private static IEnumerable<ColorBar> CreateRgbBars ()
     {
-        var r = new RBar
+        RBar r = new ()
         {
             Text = "R:"
         };
 
-        var g = new GBar
+        GBar g = new ()
         {
             Text = "G:"
         };
 
-        var b = new BBar
+        BBar b = new ()
         {
             Text = "B:"
         };
@@ -163,5 +146,5 @@ internal class ColorModelStrategy
         yield return b;
     }
 
-    private Color ToColor (RGB rgb) { return new (rgb.R, rgb.G, rgb.B); }
+    private static Color ToColor (RGB rgb) { return new (rgb.R, rgb.G, rgb.B); }
 }

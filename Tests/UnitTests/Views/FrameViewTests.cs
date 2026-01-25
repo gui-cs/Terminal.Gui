@@ -42,7 +42,7 @@ public class FrameViewTests (ITestOutputHelper output)
         var fv = new FrameView () { BorderStyle = LineStyle.Single };
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (fv);
         Application.Begin (top);
         Assert.Equal (new (0, 0, 0, 0), fv.Frame);

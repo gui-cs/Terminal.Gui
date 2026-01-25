@@ -9,6 +9,7 @@
 ///     line.
 /// </remarks>
 // ReSharper disable once CheckNamespace
+#nullable disable
 public enum TextEditingLineStatus
 {
     /// <summary>

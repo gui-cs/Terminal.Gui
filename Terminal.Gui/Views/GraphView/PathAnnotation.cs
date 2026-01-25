@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>Sequence of lines to connect points e.g. of a <see cref="ScatterSeries"/></summary>
 public class PathAnnotation : IAnnotation
@@ -10,7 +10,7 @@ public class PathAnnotation : IAnnotation
     public Rune LineRune { get; set; } = new ('.');
 
     /// <summary>Points that should be connected.  Lines will be drawn between points in the order they appear in the list</summary>
-    public List<PointF> Points { get; set; } = new ();
+    public List<PointF> Points { get; set; } = [];
 
     /// <summary>True to add line before plotting series.  Defaults to false</summary>
     public bool BeforeSeries { get; set; }
@@ -23,8 +23,8 @@ public class PathAnnotation : IAnnotation
 
         foreach (LineF line in PointsToLines ())
         {
-            Point start = graph.GraphSpaceToScreen (line.Start);
-            Point end = graph.GraphSpaceToScreen (line.End);
+            Point start = graph.GraphSpaceToViewport (line.Start);
+            Point end = graph.GraphSpaceToViewport (line.End);
             graph.DrawLine (start, end, LineRune);
         }
     }

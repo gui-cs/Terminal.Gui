@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable enable
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using Terminal.Gui.App;
@@ -7,8 +7,9 @@ namespace ReactiveExample;
 
 public class TerminalScheduler : LocalScheduler
 {
-    public static readonly TerminalScheduler Default = new ();
-    private TerminalScheduler () { }
+    public TerminalScheduler (IApplication? application) { _application = application; }
+
+    private readonly IApplication? _application = null;
 
     public override IDisposable Schedule<TState> (
         TState state,
@@ -21,15 +22,15 @@ public class TerminalScheduler : LocalScheduler
             var composite = new CompositeDisposable (2);
             var cancellation = new CancellationDisposable ();
 
-            Application.Invoke (
-                                () =>
-                                {
-                                    if (!cancellation.Token.IsCancellationRequested)
-                                    {
-                                        composite.Add (action (this, state));
-                                    }
-                                }
-                               );
+            _application?.Invoke (
+                                 (_) =>
+                                 {
+                                     if (!cancellation.Token.IsCancellationRequested)
+                                     {
+                                         composite.Add (action (this, state));
+                                     }
+                                 }
+                                );
             composite.Add (cancellation);
 
             return composite;
@@ -39,16 +40,22 @@ public class TerminalScheduler : LocalScheduler
         {
             var composite = new CompositeDisposable (2);
 
-            object timeout = Application.AddTimeout (
-                                                     dueTime,
-                                                     () =>
-                                                     {
-                                                         composite.Add (action (this, state));
+            object? timeout = _application?.AddTimeout (
+                                                      dueTime,
+                                                      () =>
+                                                      {
+                                                          composite.Add (action (this, state));
 
-                                                         return false;
-                                                     }
-                                                    );
-            composite.Add (Disposable.Create (() => Application.RemoveTimeout (timeout)));
+                                                          return false;
+                                                      }
+                                                     );
+            composite.Add (Disposable.Create (() =>
+                                              {
+                                                  if (timeout is { })
+                                                  {
+                                                      _application?.RemoveTimeout (timeout);
+                                                  }
+                                              }));
 
             return composite;
         }

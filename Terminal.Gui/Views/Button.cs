@@ -1,4 +1,4 @@
-
+﻿#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -16,13 +16,16 @@ namespace Terminal.Gui.Views;
 ///         <see cref="IsDefault"/>.
 ///     </para>
 ///     <para>
-///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
+///         Set <see cref="View.MouseHoldRepeat"/> to <see langword="true"/> to have the
 ///         <see cref="View.Accepting"/> event
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
 public class Button : View, IDesignable
 {
+    private static ShadowStyle _defaultShadow = ShadowStyle.Opaque; // Resources/config.json overrides
+    private static MouseState _defaultMouseHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides
+
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
@@ -33,13 +36,21 @@ public class Button : View, IDesignable
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Opaque;
+    public static ShadowStyle DefaultShadow
+    {
+        get => _defaultShadow;
+        set => _defaultShadow = value;
+    }
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStates { get; set; } = MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
+    public static MouseState DefaultMouseHighlightStates
+    {
+        get => _defaultMouseHighlightStates;
+        set => _defaultMouseHighlightStates = value;
+    }
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
@@ -59,20 +70,49 @@ public class Button : View, IDesignable
 
         AddCommand (Command.HotKey, HandleHotKeyCommand);
 
-        KeyBindings.Remove (Key.Space);
-        KeyBindings.Add (Key.Space, Command.HotKey);
-        KeyBindings.Remove (Key.Enter);
-        KeyBindings.Add (Key.Enter, Command.HotKey);
+        KeyBindings.ReplaceCommands (Key.Space, Command.HotKey);
+        KeyBindings.ReplaceCommands (Key.Enter, Command.HotKey);
+
+        // Replace default Accept binding with HotKey for mouse clicks
+        // These are managed dynamically when MouseHoldRepeat changes
+        SetMouseBindings (MouseHoldRepeat);
 
         TitleChanged += Button_TitleChanged;
-        MouseClick += Button_MouseClick;
 
         base.ShadowStyle = DefaultShadow;
-        HighlightStates = DefaultHighlightStates;
+        MouseHighlightStates = DefaultMouseHighlightStates;
+    }
 
-        if (MouseHeldDown != null)
+    /// <inheritdoc/>
+    protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<MouseFlags?> args)
+    {
+        SetMouseBindings (args.NewValue);
+    }
+
+    private void SetMouseBindings (MouseFlags? mouseHoldRepeat)
+    {
+        if (mouseHoldRepeat.HasValue)
         {
-            MouseHeldDown.MouseIsHeldDownTick += (_,_) => RaiseAccepting (null);
+            // MouseHoldRepeat enabled: Remove ALL Click/Release/Press bindings, add only configured event→HotKey
+            MouseBindings.Remove (MouseFlags.LeftButtonPressed);
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonDoubleClicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonTripleClicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+
+            // Add configured mouse event→HotKey binding
+            MouseBindings.Add (mouseHoldRepeat.Value, Command.HotKey);
+        }
+        else
+        {
+            // MouseHoldRepeat disabled: Remove ALL Click/Release/Press bindings, add only Clicked→HotKey
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+
+            // Add Clicked→HotKey bindings (default behavior)
+            MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.HotKey);
         }
     }
 
@@ -80,19 +120,20 @@ public class Button : View, IDesignable
     {
         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-        if (RaiseSelecting (commandContext) is true)
-        {
-            return true;
-        }
-
-        bool? handled = RaiseAccepting (commandContext);
+        bool? handled = RaiseActivating (commandContext);
 
         if (handled == true)
         {
             return true;
         }
-
         SetFocus ();
+
+        handled = RaiseAccepting (commandContext);
+
+        if (handled == true)
+        {
+            return true;
+        }
 
         // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
         // TODO: no use-case has been identified for any View other than Button to act like this.
@@ -103,16 +144,6 @@ public class Button : View, IDesignable
         }
 
         return false;
-    }
-    private void Button_MouseClick (object sender, MouseEventArgs e)
-    {
-        if (e.Handled)
-        {
-            return;
-        }
-
-        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
-        e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new KeyBinding ([Command.HotKey], this, data: null)) == true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
@@ -184,25 +215,6 @@ public class Button : View, IDesignable
     ///     Gets or sets whether the Button will include padding on each side of the Title.
     /// </summary>
     public bool NoPadding { get; set; }
-
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        if (HotKey.IsValid && Text != "")
-        {
-            for (var i = 0; i < TextFormatter.Text.GetRuneCount (); i++)
-            {
-                if (TextFormatter.Text [i] == Text [0])
-                {
-                    Move (i, 0);
-
-                    return null; // Don't show the cursor
-                }
-            }
-        }
-
-        return base.PositionCursor ();
-    }
 
     /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable enable
+
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata (
-                               "Collection Navigator",
-                               "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator)."
-                           )]
+                      "Collection Navigator",
+                      "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator)."
+                  )]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ListView")]
 [ScenarioCategory ("TreeView")]
@@ -16,131 +15,182 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class CollectionNavigatorTester : Scenario
 {
-    private ObservableCollection<string> _items = new ObservableCollection<string> (new ObservableCollection<string> ()
-    {
-        "a",
-        "b",
-        "bb",
-        "c",
-        "ccc",
-        "ccc",
-        "cccc",
-        "ddd",
-        "dddd",
-        "dddd",
-        "ddddd",
-        "dddddd",
-        "ddddddd",
-        "this",
-        "this is a test",
-        "this was a test",
-        "this and",
-        "that and that",
-        "the",
-        "think",
-        "thunk",
-        "thunks",
-        "zip",
-        "zap",
-        "zoo",
-        "@jack",
-        "@sign",
-        "@at",
-        "@ateme",
-        "n@",
-        "n@brown",
-        ".net",
-        "$100.00",
-        "$101.00",
-        "$101.10",
-        "$101.11",
-        "$200.00",
-        "$210.99",
-        "$$",
-        "apricot",
-        "arm",
-        "丗丙业丞",
-        "丗丙丛",
-        "text",
-        "egg",
-        "candle",
-        " <- space",
-        "\t<- tab",
-        "\n<- newline",
-        "\r<- formfeed",
-        "q",
-        "quit",
-        "quitter"
-    }.ToList ());
+    private ObservableCollection<string> _items = new (
+                                                       [
+                                                           "a",
+                                                           "b",
+                                                           "bb",
+                                                           "c",
+                                                           "ccc",
+                                                           "ccc",
+                                                           "cccc",
+                                                           "ddd",
+                                                           "dddd",
+                                                           "dddd",
+                                                           "ddddd",
+                                                           "dddddd",
+                                                           "ddddddd",
+                                                           "this",
+                                                           "this is a test",
+                                                           "this was a test",
+                                                           "this and",
+                                                           "that and that",
+                                                           "the",
+                                                           "think",
+                                                           "thunk",
+                                                           "thunks",
+                                                           "zip",
+                                                           "zap",
+                                                           "zoo",
+                                                           "@jack",
+                                                           "@sign",
+                                                           "@at",
+                                                           "@ateme",
+                                                           "n@",
+                                                           "n@brown",
+                                                           ".net",
+                                                           "$100.00",
+                                                           "$101.00",
+                                                           "$101.10",
+                                                           "$101.11",
+                                                           "$200.00",
+                                                           "$210.99",
+                                                           "$$",
+                                                           "apricot",
+                                                           "arm",
+                                                           "丗丙业丞",
+                                                           "丗丙丛",
+                                                           "text",
+                                                           "egg",
+                                                           "candle",
+                                                           " <- space",
+                                                           "\t<- tab",
+                                                           "\n<- newline",
+                                                           "\r<- formfeed",
+                                                           "q",
+                                                           "quit",
+                                                           "quitter"
+                                                       ]
+                                                      );
 
-    private Toplevel top;
-    private ListView _listView;
-    private TreeView _treeView;
+    private Window? _top;
+    private ListView? _listView;
+    private TreeView? _treeView;
+    private CheckBox? _allowMarkingCheckBox;
+    private CheckBox? _allowMultiSelectionCheckBox;
 
-    // Don't create a Window, just return the top-level view
     public override void Main ()
     {
-        Application.Init ();
-        top = new Toplevel { SchemeName = "Base" };
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var allowMarking = new MenuItem ("Allow _Marking", "", null)
+        using Window top = new ()
         {
-            CheckType = MenuItemCheckStyle.Checked, Checked = false
+            SchemeName = "Base"
         };
-        allowMarking.Action = () => allowMarking.Checked = _listView.AllowsMarking = !_listView.AllowsMarking;
+        _top = top;
 
-        var allowMultiSelection = new MenuItem ("Allow Multi _Selection", "", null)
+        // MenuBar
+        MenuBar menu = new ();
+
+        _allowMarkingCheckBox = new ()
         {
-            CheckType = MenuItemCheckStyle.Checked, Checked = false
+            Title = "Allow _Marking"
         };
 
-        allowMultiSelection.Action = () =>
-                                         allowMultiSelection.Checked =
-                                             _listView.AllowsMultipleSelection = !_listView.AllowsMultipleSelection;
-        allowMultiSelection.CanExecute = () => (bool)allowMarking.Checked;
+        _allowMarkingCheckBox.CheckedStateChanged += (_, _) =>
+                                                     {
+                                                         if (_listView is not null)
+                                                         {
+                                                             _listView.AllowsMarking = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
+                                                         }
 
-        var menu = new MenuBar
+                                                         if (_allowMultiSelectionCheckBox is not null)
+                                                         {
+                                                             _allowMultiSelectionCheckBox.Enabled = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
+                                                         }
+                                                     };
+
+        _allowMultiSelectionCheckBox = new ()
         {
-            Menus =
-            [
-                new MenuBarItem (
-                                 "_Configure",
-                                 new []
-                                 {
-                                     allowMarking,
-                                     allowMultiSelection,
-                                     null,
-                                     new (
-                                          "_Quit",
-                                          $"{Application.QuitKey}",
-                                          () => Quit (),
-                                          null,
-                                          null,
-                                          (KeyCode)Application.QuitKey
-                                         )
-                                 }
-                                ),
-                new MenuBarItem ("_Quit", $"{Application.QuitKey}", () => Quit ())
-            ]
+            Title = "Allow Multi _Selection",
+            Enabled = false
         };
+
+        _allowMultiSelectionCheckBox.CheckedStateChanged += (_, _) =>
+                                                            {
+                                                                if (_listView is not null)
+                                                                {
+                                                                    _listView.AllowsMultipleSelection =
+                                                                        _allowMultiSelectionCheckBox.CheckedState == CheckState.Checked;
+                                                                }
+                                                            };
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_Configure",
+                                   [
+                                       new MenuItem
+                                       {
+                                           CommandView = _allowMarkingCheckBox
+                                       },
+                                       new MenuItem
+                                       {
+                                           CommandView = _allowMultiSelectionCheckBox
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = Strings.cmdQuit,
+                                           Key = Application.QuitKey,
+                                           Action = Quit
+                                       }
+                                   ]
+                                  )
+                 );
+
+        menu.Add (
+                  new MenuBarItem (
+                                   Strings.cmdQuit,
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = Strings.cmdQuit,
+                                           Key = Application.QuitKey,
+                                           Action = Quit
+                                       }
+                                   ]
+                                  )
+                 );
 
         top.Add (menu);
 
         _items = new (_items.OrderBy (i => i, StringComparer.OrdinalIgnoreCase));
 
         CreateListView ();
-        var vsep = new Line { Orientation = Orientation.Vertical, X = Pos.Right (_listView), Y = 1, Height = Dim.Fill () };
+
+        Line vsep = new ()
+        {
+            Orientation = Orientation.Vertical,
+            X = Pos.Right (_listView!),
+            Y = 1,
+            Height = Dim.Fill ()
+        };
         top.Add (vsep);
         CreateTreeView ();
 
-        Application.Run (top);
+        app.Run (top);
         top.Dispose ();
-        Application.Shutdown ();
     }
 
     private void CreateListView ()
     {
-        var label = new Label
+        if (_top is null)
+        {
+            return;
+        }
+
+        Label label = new ()
         {
             Text = "ListView",
             TextAlignment = Alignment.Center,
@@ -149,9 +199,9 @@ public class CollectionNavigatorTester : Scenario
             Width = Dim.Percent (50),
             Height = 1
         };
-        top.Add (label);
+        _top.Add (label);
 
-        _listView = new ListView
+        _listView = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -160,16 +210,21 @@ public class CollectionNavigatorTester : Scenario
             AllowsMarking = false,
             AllowsMultipleSelection = false
         };
-        top.Add (_listView);
+        _top.Add (_listView);
 
         _listView.SetSource (_items);
 
-        _listView.KeystrokeNavigator.SearchStringChanged += (s, e) => { label.Text = $"ListView: {e.SearchString}"; };
+        _listView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"ListView: {e.SearchString}"; };
     }
 
     private void CreateTreeView ()
     {
-        var label = new Label
+        if (_top is null || _listView is null)
+        {
+            return;
+        }
+
+        Label label = new ()
         {
             Text = "TreeView",
             TextAlignment = Alignment.Center,
@@ -178,23 +233,26 @@ public class CollectionNavigatorTester : Scenario
             Width = Dim.Percent (50),
             Height = 1
         };
-        top.Add (label);
+        _top.Add (label);
 
-        _treeView = new TreeView
+        _treeView = new ()
         {
-            X = Pos.Right (_listView) + 1, Y = Pos.Bottom (label), Width = Dim.Fill (), Height = Dim.Fill ()
+            X = Pos.Right (_listView) + 1,
+            Y = Pos.Bottom (label),
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
         _treeView.Style.HighlightModelTextOnly = true;
-        top.Add (_treeView);
+        _top.Add (_treeView);
 
-        var root = new TreeNode ("IsLetterOrDigit examples");
+        TreeNode root = new ("IsLetterOrDigit examples");
 
         root.Children = _items.Where (i => char.IsLetterOrDigit (i [0]))
                               .Select (i => new TreeNode (i))
                               .Cast<ITreeNode> ()
                               .ToList ();
         _treeView.AddObject (root);
-        root = new TreeNode ("Non-IsLetterOrDigit examples");
+        root = new ("Non-IsLetterOrDigit examples");
 
         root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0]))
                               .Select (i => new TreeNode (i))
@@ -204,8 +262,8 @@ public class CollectionNavigatorTester : Scenario
         _treeView.ExpandAll ();
         _treeView.GoToFirst ();
 
-        _treeView.KeystrokeNavigator.SearchStringChanged += (s, e) => { label.Text = $"TreeView: {e.SearchString}"; };
+        _treeView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"TreeView: {e.SearchString}"; };
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _top?.RequestStop (); }
 }

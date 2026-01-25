@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Text Effects", "Text Effects.")]
@@ -14,33 +12,31 @@ public class TextEffectsScenario : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        var w = new Window
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window w = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Title = "Text Effects Scenario"
         };
 
-        w.Loaded += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
+        w.IsModalChanged += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
 
-        w.SizeChanging += (s, e) =>
-                          {
-                              if (e.Size.HasValue)
-                              {
-                                  SetupGradientLineCanvas (w, e.Size.Value);
-                              }
-                          };
+        w.ViewportChanged += (s, e) => { SetupGradientLineCanvas (w, e.NewViewport.Size); };
 
-        w.SetScheme (new ()
-        {
-            Normal = new (ColorName16.White, ColorName16.Black),
-            Focus = new (ColorName16.Black, ColorName16.White),
-            HotNormal = new (ColorName16.White, ColorName16.Black),
-            HotFocus = new (ColorName16.White, ColorName16.Black),
-            Disabled = new (ColorName16.Gray, ColorName16.Black)
-        });
+        w.SetScheme (
+                     new ()
+                     {
+                         Normal = new (ColorName16.White, ColorName16.Black),
+                         Focus = new (ColorName16.Black, ColorName16.White),
+                         HotNormal = new (ColorName16.White, ColorName16.Black),
+                         HotFocus = new (ColorName16.White, ColorName16.Black),
+                         Disabled = new (ColorName16.Gray, ColorName16.Black)
+                     });
 
         var gradientsView = new GradientsView
         {
@@ -54,20 +50,17 @@ public class TextEffectsScenario : Scenario
             Y = Pos.AnchorEnd (1)
         };
 
-        cbLooping.CheckedStateChanging += (s, e) =>
-                            {
-                                _loopingGradient = e.Result == CheckState.Checked;
-                                SetupGradientLineCanvas (w, w.Frame.Size);
-                            };
+        cbLooping.CheckedStateChanging += (_, e) =>
+                                          {
+                                              _loopingGradient = e.Result == CheckState.Checked;
+                                              SetupGradientLineCanvas (w, w.Frame.Size);
+                                          };
 
         gradientsView.Add (cbLooping);
 
         w.Add (gradientsView);
 
-        Application.Run (w);
-        w.Dispose ();
-
-        Application.Shutdown ();
+        app.Run (w);
     }
 
     private static void SetupGradientLineCanvas (View w, Size size)
@@ -112,7 +105,7 @@ internal class GradientsView : View
     private const int LABEL_HEIGHT = 1;
     private const int GRADIENT_WITH_LABEL_HEIGHT = GRADIENT_HEIGHT + LABEL_HEIGHT + 1; // +1 for spacing
 
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         DrawTopLineGradient (Viewport);
 

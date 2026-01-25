@@ -1,6 +1,5 @@
-﻿#nullable enable
-
 using ColorHelper;
+using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Views;
 
@@ -15,7 +14,7 @@ internal abstract class ColorBar : View, IColorBar
     /// </summary>
     protected ColorBar ()
     {
-        Height = 1;
+        Height = Dim.Auto (minimumContentDim: 1);
         Width = Dim.Fill ();
         CanFocus = true;
 
@@ -34,7 +33,9 @@ internal abstract class ColorBar : View, IColorBar
         KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
     }
+
 
     /// <summary>
     ///     X coordinate that the bar starts at excluding any label.
@@ -83,17 +84,14 @@ internal abstract class ColorBar : View, IColorBar
         SetNeedsDraw ();
     }
 
-    /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
+        base.OnSubViewsLaidOut (args);
         var xOffset = 0;
 
         if (!string.IsNullOrWhiteSpace (Text))
         {
-            Move (0, 0);
-            SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal));
-            AddStr (Text);
-
             // TODO: is there a better method than this? this is what it is in TableView
             xOffset = Text.EnumerateRunes ().Sum (c => c.GetColumns ());
         }
@@ -101,7 +99,21 @@ internal abstract class ColorBar : View, IColorBar
         _barWidth = Viewport.Width - xOffset;
         _barStartsAt = xOffset;
 
-        DrawBar (xOffset, 0, _barWidth);
+        // Each 1 unit of X in the bar corresponds to this much of Value
+        _cellValue = (double)MaxValue / (_barWidth - 1);
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnDrawingContent (DrawContext? context)
+    {
+        if (!string.IsNullOrWhiteSpace (Text))
+        {
+            Move (0, 0);
+            SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal));
+            AddStr (Text);
+        }
+
+        DrawBar (_barStartsAt, 0, _barWidth);
 
         return true;
     }
@@ -112,22 +124,20 @@ internal abstract class ColorBar : View, IColorBar
     public event EventHandler<EventArgs<int>>? ValueChanged;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            if (mouseEvent.Position.X >= _barStartsAt)
+            if (mouse.Position!.Value.X >= _barStartsAt)
             {
-                double v = MaxValue * ((double)mouseEvent.Position.X - _barStartsAt) / (_barWidth - 1);
+                double v = MaxValue * ((double)mouse.Position!.Value.X - _barStartsAt) / (_barWidth - 1);
                 Value = Math.Clamp ((int)v, 0, MaxValue);
             }
-
-            mouseEvent.Handled = true;
             SetFocus ();
-
+            // Do not mark as handled to allow Activating to be raised
         }
-
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     /// <summary>
@@ -168,9 +178,6 @@ internal abstract class ColorBar : View, IColorBar
 
     private void DrawBar (int xOffset, int yOffset, int width)
     {
-        // Each 1 unit of X in the bar corresponds to this much of Value
-        _cellValue = (double)MaxValue / (width - 1);
-
         for (var x = 0; x < width; x++)
         {
             double fraction = (double)x / (width - 1);
@@ -216,7 +223,7 @@ internal abstract class ColorBar : View, IColorBar
 
     private void OnValueChanged ()
     {
-        ValueChanged?.Invoke (this, new (in _value));
+       ValueChanged?.Invoke (this, new (in _value));
         SetNeedsDraw ();
     }
 

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
@@ -19,8 +18,7 @@ public class EventLog : ListView
         X = Pos.AnchorEnd ();
         Y = 0;
 
-        Width = Dim.Func (
-                          _ =>
+        Width = Dim.Func (_ =>
                           {
                               if (!IsInitialized)
                               {
@@ -71,19 +69,17 @@ public class EventLog : ListView
 
             _viewToLog = value;
 
-            if (_viewToLog is { })
+            if (_viewToLog is not null)
             {
-                _viewToLog.Initialized += (s, args) =>
+                _viewToLog.Initialized += (s, _) =>
                                           {
                                               var sender = s as View;
                                               Log ($"Initialized: {GetIdentifyingString (sender)}");
                                           };
 
-                _viewToLog.MouseClick += (s, args) => { Log ($"MouseClick: {args}"); };
-                _viewToLog.MouseWheel += (s, args) => { Log ($"MouseWheel: {args}"); };
-                _viewToLog.HandlingHotKey += (s, args) => { Log ($"HandlingHotKey: {args.Context}"); };
-                _viewToLog.Selecting += (s, args) => { Log ($"Selecting: {args.Context}"); };
-                _viewToLog.Accepting += (s, args) => { Log ($"Accepting: {args.Context}"); };
+                _viewToLog.HandlingHotKey += (_, args) => { Log ($"HandlingHotKey: {args.Context}"); };
+                _viewToLog.Activating += (_, args) => { Log ($"Activating: {args.Context}"); };
+                _viewToLog.Accepting += (_, args) => { Log ($"Accepting: {args.Context}"); };
             }
         }
     }

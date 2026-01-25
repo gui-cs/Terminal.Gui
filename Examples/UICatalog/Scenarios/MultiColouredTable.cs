@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+
 using System.Data;
 using System.Text;
 
@@ -10,40 +11,53 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TableView")]
 public class MultiColouredTable : Scenario
 {
-    private DataTable _table;
-    private TableViewColors _tableView;
+    private IApplication? _app;
+    private DataTable? _table;
+    private TableViewColors? _tableView;
 
     public override void Main ()
     {
-        // Init
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
-        // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ()
+        using Window appWindow = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetQuitKeyAndName (),
+            BorderStyle = LineStyle.None,
         };
 
-        _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        // MenuBar
+        MenuBar menu = new ();
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new ("_File", new MenuItem [] { new ("_Quit", "", Quit) })
-            ]
-        };
-        appWindow.Add (menu);
+        menu.Add (
+                  new MenuBarItem (
+                                   Strings.menuFile,
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = Strings.cmdQuit,
+                                           Action = Quit
+                                       }
+                                   ]
+                                  )
+                 );
 
-        var statusBar = new StatusBar (new Shortcut [] { new (Application.QuitKey, "Quit", Quit) });
+        _tableView = new () { X = 0, Y = Pos.Bottom (menu), Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        appWindow.Add (statusBar);
+        // StatusBar
+        StatusBar statusBar = new (
+                                       [
+                                           new (Application.QuitKey, "Quit", Quit)
+                                       ]
+                                      );
 
-        appWindow.Add (_tableView);
+        appWindow.Add (menu, _tableView, statusBar);
 
         _tableView.CellActivated += EditCurrentCell;
 
-        var dt = new DataTable ();
+        DataTable dt = new ();
         dt.Columns.Add ("Col1");
         dt.Columns.Add ("Col2");
 
@@ -54,34 +68,31 @@ public class MultiColouredTable : Scenario
         dt.Rows.Add (DBNull.Value, DBNull.Value);
         dt.Rows.Add (DBNull.Value, DBNull.Value);
 
-        _tableView.SetScheme (new ()
-        {
-            Disabled = appWindow.GetAttributeForRole (VisualRole.Disabled),
-            HotFocus = appWindow.GetAttributeForRole (VisualRole.HotFocus),
-            Focus = appWindow.GetAttributeForRole (VisualRole.Focus),
-            Normal = new (Color.DarkGray, Color.Black)
-        });
+        _tableView.SetScheme (
+                              new ()
+                              {
+                                  Disabled = appWindow.GetAttributeForRole (VisualRole.Disabled),
+                                  HotFocus = appWindow.GetAttributeForRole (VisualRole.HotFocus),
+                                  Focus = appWindow.GetAttributeForRole (VisualRole.Focus),
+                                  Normal = new (Color.DarkGray, Color.Black)
+                              }
+                             );
 
         _tableView.Table = new DataTableSource (_table = dt);
 
-        // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
-    private void EditCurrentCell (object sender, CellActivatedEventArgs e)
+    private void EditCurrentCell (object? sender, CellActivatedEventArgs e)
     {
-        if (e.Table == null)
+        if (e.Table is null || _table is null || _tableView is null)
         {
             return;
         }
 
-        var oldValue = e.Table [e.Row, e.Col].ToString ();
+        string? oldValue = e.Table [e.Row, e.Col].ToString ();
 
-        if (GetText ("Enter new value", e.Table.ColumnNames [e.Col], oldValue, out string newText))
+        if (GetText ("Enter new value", e.Table.ColumnNames [e.Col], oldValue ?? "", out string newText))
         {
             try
             {
@@ -90,7 +101,7 @@ public class MultiColouredTable : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView!.App!, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView.Update ();
@@ -99,35 +110,29 @@ public class MultiColouredTable : Scenario
 
     private bool GetText (string title, string label, string initialText, out string enteredText)
     {
-        var okPressed = false;
+        Dialog d = new ()
+        {
+            Title = title,
+            Buttons = [new () { Title = Strings.btnCancel }, new () { Title = Strings.btnOk }]
+        };
 
-        var ok = new Button { Text = "Ok", IsDefault = true };
+        Label lbl = new () { X = 0, Y = 1, Text = label };
 
-        ok.Accepting += (s, e) =>
-                     {
-                         okPressed = true;
-                         Application.RequestStop ();
-                     };
-        var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
-
-        var lbl = new Label { X = 0, Y = 1, Text = label };
-
-        var tf = new TextField { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
+        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _app?.Run (d);
+        bool okPressed = d.Result == 1;
         d.Dispose ();
 
-        enteredText = okPressed ? tf.Text : null;
+        enteredText = okPressed ? tf.Text : string.Empty;
 
         return okPressed;
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _tableView?.App?.RequestStop (); }
 
     private class TableViewColors : TableView
     {
@@ -155,20 +160,20 @@ public class MultiColouredTable : Scenario
                             break;
                         case 1:
                             SetAttribute (
-                                                 new (
-                                                      Color.BrightRed,
-                                                      cellColor.Background
-                                                     )
-                                                );
+                                          new (
+                                               Color.BrightRed,
+                                               cellColor.Background
+                                              )
+                                         );
 
                             break;
                         case 2:
                             SetAttribute (
-                                                 new (
-                                                      Color.BrightYellow,
-                                                      cellColor.Background
-                                                     )
-                                                );
+                                          new (
+                                               Color.BrightYellow,
+                                               cellColor.Background
+                                              )
+                                         );
 
                             break;
                         case 3:
@@ -177,29 +182,29 @@ public class MultiColouredTable : Scenario
                             break;
                         case 4:
                             SetAttribute (
-                                                 new (
-                                                      Color.BrightGreen,
-                                                      cellColor.Background
-                                                     )
-                                                );
+                                          new (
+                                               Color.BrightGreen,
+                                               cellColor.Background
+                                              )
+                                         );
 
                             break;
                         case 5:
                             SetAttribute (
-                                                 new (
-                                                      Color.BrightBlue,
-                                                      cellColor.Background
-                                                     )
-                                                );
+                                          new (
+                                               Color.BrightBlue,
+                                               cellColor.Background
+                                              )
+                                         );
 
                             break;
                         case 6:
                             SetAttribute (
-                                                 new (
-                                                      Color.BrightCyan,
-                                                      cellColor.Background
-                                                     )
-                                                );
+                                          new (
+                                               Color.BrightCyan,
+                                               cellColor.Background
+                                              )
+                                         );
 
                             break;
                         case 7:

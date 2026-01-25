@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Drawing;
@@ -90,14 +89,14 @@ public record struct Thickness
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
     /// <param name="driver">Optional driver. If not specified, <see cref="Application.Driver"/> will be used.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
-    public Rectangle Draw (Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null, IDriver? driver = null)
+    public Rectangle Draw (IDriver? driver, Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null)
     {
+        ArgumentNullException.ThrowIfNull (driver);
+
         if (rect.Size.Width < 1 || rect.Size.Height < 1)
         {
             return Rectangle.Empty;
         }
-
-        driver ??= Application.Driver;
 
         var clearChar = (Rune)' ';
         Rune leftChar = clearChar;
@@ -124,7 +123,6 @@ public record struct Thickness
             driver?.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
         }
 
-        // Draw the Left side
         // Draw the Left side
         if (Left > 0)
         {
@@ -165,7 +163,7 @@ public record struct Thickness
 
             if (Top > 0)
             {
-                hRuler.Draw (rect.Location, driver: driver);
+                hRuler.Draw (driver: driver, location: rect.Location);
             }
 
             //Left
@@ -173,19 +171,19 @@ public record struct Thickness
 
             if (Left > 0)
             {
-                vRuler.Draw (rect.Location with { Y = rect.Y + 1 }, 1, driver);
+                vRuler.Draw (driver, rect.Location with { Y = rect.Y + 1 }, 1);
             }
 
             // Bottom
             if (Bottom > 0)
             {
-                hRuler.Draw (rect.Location with { Y = rect.Y + rect.Height - 1 }, driver: driver);
+                hRuler.Draw (driver: driver, location: rect.Location with { Y = rect.Y + rect.Height - 1 });
             }
 
             // Right
             if (Right > 0)
             {
-                vRuler.Draw (new (rect.X + rect.Width - 1, rect.Y + 1), 1, driver);
+                vRuler.Draw (driver, new (rect.X + rect.Width - 1, rect.Y + 1), 1);
             }
         }
 
@@ -205,7 +203,7 @@ public record struct Thickness
 
             if (driver?.CurrentAttribute is { })
             {
-                tf.Draw (rect, driver!.CurrentAttribute, driver!.CurrentAttribute, rect, driver);
+                tf.Draw (driver, rect, driver!.CurrentAttribute, driver!.CurrentAttribute, rect);
             }
         }
 

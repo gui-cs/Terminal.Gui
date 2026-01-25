@@ -1,4 +1,3 @@
-﻿#nullable enable
 namespace Terminal.Gui.App;
 
 using System;
@@ -54,6 +53,7 @@ public static class CWPWorkflowHelper
             return true;
         }
 
+        // BUGBUG: This should pass this not null; need to test
         eventHandler?.Invoke (null, args);
         if (args.Handled)
         {
@@ -113,6 +113,7 @@ public static class CWPWorkflowHelper
             return args.Result!;
         }
 
+        // BUGBUG: This should pass this not null; need to test
         eventHandler?.Invoke (null, args);
 
         if (!args.Handled)

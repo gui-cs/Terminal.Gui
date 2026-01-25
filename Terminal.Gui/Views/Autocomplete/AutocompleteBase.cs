@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;
@@ -49,7 +50,7 @@ public abstract class AutocompleteBase : IAutocomplete
     public virtual AutocompleteContext Context { get; set; }
 
     /// <inheritdoc/>
-    public abstract bool OnMouseEvent (MouseEventArgs me, bool fromHost = false);
+    public abstract bool OnMouseEvent (Mouse me, bool fromHost = false);
 
     /// <inheritdoc/>
     public abstract bool ProcessKey (Key a);

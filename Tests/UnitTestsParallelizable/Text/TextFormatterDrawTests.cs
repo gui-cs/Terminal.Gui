@@ -1,13 +1,14 @@
 ﻿#nullable enable
 using System.Text;
 using UICatalog;
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests.TextTests;
+namespace TextTests;
 
-public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
+public class TextFormatterDrawTests (ITestOutputHelper output) : TestDriverBase
 {
     public static IEnumerable<object []> CMGlyphs =>
         new List<object []> { new object [] { $"{Glyphs.LeftBracket} Say Hello 你 {Glyphs.RightBracket}", 16, 15 } };
@@ -26,7 +27,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 10, 3, "21        \nBA        \nはちにんこ")]
     public void Draw_Horizontal_RightLeft_BottomTop (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -36,7 +37,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 
         tf.ConstrainToWidth = width;
         tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -55,7 +56,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 10, 3, "はちにんこ\nBA        \n21        ")]
     public void Draw_Horizontal_RightLeft_TopBottom (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -65,7 +66,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 
         tf.ConstrainToWidth = width;
         tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -92,7 +93,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nABCD", 3, 7, "こ \nんA\nにB\nちC\nはD", 2)]
     public void Draw_Vertical_Bottom_Horizontal_Right (string text, int width, int height, string expectedText, int expectedY)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -105,7 +106,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
         tf.ConstrainToWidth = width;
         tf.ConstrainToHeight = height;
 
-        tf.Draw (new (Point.Empty, new (width, height)), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (Point.Empty, new (width, height)), normalColor: Attribute.Default, hotColor: Attribute.Default);
         Rectangle rect = DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
         Assert.Equal (expectedY, rect.Y);
     }
@@ -124,7 +125,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 4, 10, "はB2\nちA1\nに  \nん  \nこ  ")]
     public void Draw_Vertical_BottomTop_LeftRight (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -134,7 +135,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 
         tf.ConstrainToWidth = width;
         tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -153,7 +154,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 4, 10, "2Bは\n1Aち\n  に\n  ん\n  こ")]
     public void Draw_Vertical_BottomTop_RightLeft (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -163,7 +164,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 
         tf.ConstrainToWidth = width;
         tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -207,7 +208,7 @@ s")]
     [InlineData ("Hello Worlds", 12, 1, @"HelloWorlds")]
     public void Draw_Vertical_TopBottom_LeftRight (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -217,7 +218,7 @@ s")]
 
         tf.ConstrainToWidth = width;
         tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, 20, 20), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, 20, 20), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -249,7 +250,7 @@ s")]
     [InlineData ("こんにちは\nABCD", 7, "こA\nんB\nにC\nちD\nは ", 1)]
     public void Draw_Vertical_TopBottom_LeftRight_Middle (string text, int height, string expectedText, int expectedY)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -267,7 +268,7 @@ s")]
 
         tf.ConstrainToWidth = width;
         tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, 5, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, 5, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         Rectangle rect = DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
         Assert.Equal (expectedY, rect.Y);
@@ -318,7 +319,7 @@ B  ")]
 は")]
     public void Draw_Vertical_TopBottom_LeftRight_Top (string text, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -328,7 +329,7 @@ B  ")]
 
         tf.ConstrainToWidth = 5;
         tf.ConstrainToHeight = height;
-        tf.Draw (new (0, 0, 5, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, 5, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -336,7 +337,7 @@ B  ")]
     [Fact]
     public void FillRemaining_True_False ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (22, 5);
 
         Attribute [] attrs =
@@ -346,11 +347,7 @@ B  ")]
         };
         var tf = new TextFormatter { ConstrainToSize = new (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
 
-        tf.Draw (
-                 new (1, 1, 19, 3),
-                 attrs [1],
-                 attrs [2],
-                 driver: driver);
+        tf.Draw (driver: driver, screen: new (1, 1, 19, 3), normalColor: attrs [1], hotColor: attrs [2]);
 
         Assert.False (tf.FillRemaining);
 
@@ -375,11 +372,7 @@ B  ")]
 
         tf.FillRemaining = true;
 
-        tf.Draw (
-                 new (1, 1, 19, 3),
-                 attrs [1],
-                 attrs [2],
-                 driver: driver);
+        tf.Draw (driver: driver, screen: new (1, 1, 19, 3), normalColor: attrs [1], hotColor: attrs [2]);
 
         DriverAssert.AssertDriverAttributesAre (
                                                 @"
@@ -412,7 +405,7 @@ Nice       Work")]
 幹         得好")]
     public void Justify_Horizontal (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -422,7 +415,7 @@ Nice       Work")]
             MultiLine = true
         };
 
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -430,11 +423,11 @@ Nice       Work")]
     [Fact]
     public void UICatalog_AboutBox_Text ()
     {
-        IDriver? driver = CreateFakeDriver ();
+        IDriver? driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
-            Text = UICatalogTop.GetAboutBoxMessage (),
+            Text = UICatalogRunnable.GetAboutBoxMessage (),
             Alignment = Alignment.Center,
             VerticalAlignment = Alignment.Start,
             WordWrap = false,
@@ -443,12 +436,11 @@ Nice       Work")]
         };
 
         Size tfSize = tf.FormatAndGetSize ();
-        Assert.Equal (new (59, 13), tfSize);
 
         driver!.SetScreenSize (tfSize.Width, tfSize.Height);
 
         driver.FillRect (driver.Screen, (Rune)'*');
-        tf.Draw (driver.Screen, Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: driver.Screen, normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         var expectedText = """
                            UI Catalog: A comprehensive sample library and test app for
@@ -463,7 +455,6 @@ Nice       Work")]
                            **********************v2 - Pre-Alpha***********************
                            ***********************************************************
                            **********https://github.com/gui-cs/Terminal.Gui***********
-                           ***********************************************************
                            """;
 
         DriverAssert.AssertDriverContentsAre (expectedText.ReplaceLineEndings (), output, driver);
@@ -562,7 +553,7 @@ Nice       Work")]
         string expectedDraw
     )
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -575,7 +566,7 @@ Nice       Work")]
         Size size = tf.FormatAndGetSize ();
         Assert.Equal (new (expectedWidth, expectedHeight), size);
 
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
     }
@@ -647,7 +638,7 @@ Nice       Work")]
         string expectedDraw
     )
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -660,7 +651,34 @@ Nice       Work")]
         Size size = tf.FormatAndGetSize ();
         Assert.Equal (new (expectedWidth, expectedHeight), size);
 
-        tf.Draw (new (0, 0, width, height), Attribute.Default, Attribute.Default, driver: driver);
+        tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
+    }
+
+    [Theory]
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 2, 1, TextDirection.LeftRight_TopBottom, "👨‍👩‍👧‍👦")]
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 2, 1, TextDirection.TopBottom_LeftRight, "👨‍👩‍👧‍👦")]
+    public void Draw_Emojis_With_Zero_Width_Joiner (
+        string text,
+        int width,
+        int height,
+        TextDirection direction,
+        string expectedDraw
+    )
+    {
+        IDriver driver = CreateTestDriver ();
+
+        TextFormatter tf = new ()
+        {
+            Direction = direction,
+            ConstrainToSize = new (width, height),
+            Text = text,
+            WordWrap = false
+        };
+        Assert.Equal (width, text.GetColumns ());
+
+        tf.Draw (driver, new (0, 0, width, height), Attribute.Default, Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
     }

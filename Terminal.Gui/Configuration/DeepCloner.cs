@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
@@ -37,9 +35,9 @@ public static class DeepCloner
     /// <typeparam name="T">The type of the object to clone.</typeparam>
     /// <param name="source">The object to clone.</param>
     /// <returns>A deep copy of the source object, or default if source is null.</returns>
-    [RequiresUnreferencedCode ("Deep cloning may use reflection which might be incompatible with AOT compilation if types aren't registered in SourceGenerationContext")]
+    [RequiresUnreferencedCode (
+                                  "Deep cloning may use reflection which might be incompatible with AOT compilation if types aren't registered in SourceGenerationContext")]
     [RequiresDynamicCode ("Deep cloning may use reflection that requires runtime code generation if source generation fails")]
-
     public static T? DeepClone<T> (T? source)
     {
         if (source is null)
@@ -70,7 +68,10 @@ public static class DeepCloner
     }
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.CreateInstance(Type)")]
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage (
+                                      "AOT",
+                                      "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                      Justification = "<Pending>")]
     private static object? DeepCloneInternal (object? source, ConcurrentDictionary<object, object> visited)
     {
         if (source is null)
@@ -196,7 +197,8 @@ public static class DeepCloner
         }
         catch (MissingMethodException)
         {
-            throw new InvalidOperationException ($"Cannot create instance of type {type.FullName} in AOT context. Consider adding this type to your SourceGenerationContext.");
+            throw new InvalidOperationException (
+                                                 $"Cannot create instance of type {type.FullName} in AOT context. Consider adding this type to your SourceGenerationContext.");
         }
     }
 
@@ -345,14 +347,17 @@ public static class DeepCloner
         return tempDict;
     }
 
-    private static IDictionary CreateDictionaryInstance ([DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicConstructors)] Type dictType, object? comparer)
+    private static IDictionary CreateDictionaryInstance (
+        [DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicConstructors)] Type dictType,
+        object? comparer
+    )
     {
         try
         {
             // Try to create the dictionary with the comparer
             return comparer != null
-                ? (IDictionary)Activator.CreateInstance (dictType, comparer)!
-                : (IDictionary)Activator.CreateInstance (dictType)!;
+                       ? (IDictionary)Activator.CreateInstance (dictType, comparer)!
+                       : (IDictionary)Activator.CreateInstance (dictType)!;
         }
         catch (MissingMethodException)
         {
@@ -371,9 +376,8 @@ public static class DeepCloner
             {
                 string? genericTypeName = currentType.GetGenericTypeDefinition ().FullName;
 
-                if (genericTypeName != null &&
-                    (genericTypeName.StartsWith ("System.Collections.Frozen") ||
-                     genericTypeName.StartsWith ("System.Collections.Immutable")))
+                if (genericTypeName != null
+                    && (genericTypeName.StartsWith ("System.Collections.Frozen") || genericTypeName.StartsWith ("System.Collections.Immutable")))
                 {
                     throw new NotSupportedException ($"Cloning of frozen or immutable dictionaries like {type.Name} is not supported.");
                 }
@@ -385,11 +389,17 @@ public static class DeepCloner
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
     private static object CreateFinalDictionary (
-        [DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.NonPublicConstructors | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties)] Type type,
+        [DynamicallyAccessedMembers (
+                                        DynamicallyAccessedMemberTypes.NonPublicConstructors
+                                        | DynamicallyAccessedMemberTypes.PublicConstructors
+                                        | DynamicallyAccessedMemberTypes.PublicProperties
+                                        | DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type type,
         object? comparer,
         IDictionary tempDict,
         object source,
-        ConcurrentDictionary<object, object> visited)
+        ConcurrentDictionary<object, object> visited
+    )
     {
         IDictionary newDict;
 
@@ -397,8 +407,8 @@ public static class DeepCloner
         {
             // Try to create the dictionary with the comparer
             newDict = comparer != null
-                ? (IDictionary)Activator.CreateInstance (type, comparer)!
-                : (IDictionary)Activator.CreateInstance (type)!;
+                          ? (IDictionary)Activator.CreateInstance (type, comparer)!
+                          : (IDictionary)Activator.CreateInstance (type)!;
         }
         catch (MissingMethodException)
         {
@@ -439,29 +449,29 @@ public static class DeepCloner
     #region AOT Support
 
     /// <summary>
-    /// Determines if a type can be serialized using System.Text.Json based on the types 
-    /// registered in the SourceGenerationContext.
+    ///     Determines if a type can be serialized using System.Text.Json based on the types
+    ///     registered in the SourceGenerationContext.
     /// </summary>
     /// <param name="type">The type to check</param>
     /// <returns>True if the type can be serialized using System.Text.Json; otherwise, false.</returns>
     private static bool CanSerializeWithJson (Type type)
     {
         // Check if the type or any of its base types is registered in SourceGenerationContext
-        return ConfigurationManager.SerializerContext.GetType ()
-                                   .GetProperties (BindingFlags.Public | BindingFlags.Static)
-                                   .Any (p => p.PropertyType.IsGenericType &&
-                                              p.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>) &&
-                                              (p.PropertyType.GetGenericArguments () [0] == type ||
-                                               p.PropertyType.GetGenericArguments () [0].IsAssignableFrom (type)));
+        return typeof (SourceGenerationContext)
+               .GetProperties (BindingFlags.Public | BindingFlags.Static)
+               .Any (p => p.PropertyType.IsGenericType
+                          && p.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>)
+                          && (p.PropertyType.GetGenericArguments () [0] == type || p.PropertyType.GetGenericArguments () [0].IsAssignableFrom (type)));
     }
 
     private static bool IsAotEnvironment () =>
+
         // Check if running in an AOT environment
-        Type.GetType ("System.Runtime.CompilerServices.RuntimeFeature")?.GetProperty ("IsDynamicCodeSupported")?.GetValue (null) is bool isDynamicCodeSupported && !isDynamicCodeSupported;
+        Type.GetType ("System.Runtime.CompilerServices.RuntimeFeature")?.GetProperty ("IsDynamicCodeSupported")?.GetValue (null) is bool and false;
 
     /// <summary>
-    /// Attempts to clone an object using source-generated serialization from System.Text.Json.
-    /// This provides an AOT-compatible alternative to reflection-based deep cloning.
+    ///     Attempts to clone an object using source-generated serialization from System.Text.Json.
+    ///     This provides an AOT-compatible alternative to reflection-based deep cloning.
     /// </summary>
     /// <typeparam name="T">The type of the object to clone</typeparam>
     /// <param name="source">The source object to clone</param>
@@ -469,7 +479,7 @@ public static class DeepCloner
     /// <returns>True if cloning succeeded using source generation; otherwise, false</returns>
     private static bool TryUseSourceGeneratedCloner<T> (T source, [NotNullWhen (true)] out T? result)
     {
-        result = default;
+        result = default (T);
 
         try
         {
@@ -480,8 +490,9 @@ public static class DeepCloner
             {
                 // Use JSON serialization for deep cloning
                 string json = JsonSerializer.Serialize (source, jsonTypeInfo);
-                result = JsonSerializer.Deserialize<T> (json, jsonTypeInfo);
-                return result != null;
+                result = JsonSerializer.Deserialize (json, jsonTypeInfo);
+
+                return result is { };
             }
 
             return false;
@@ -495,32 +506,32 @@ public static class DeepCloner
     }
 
     /// <summary>
-    /// Gets JsonTypeInfo for a type from the SourceGenerationContext, if available.
+    ///     Gets JsonTypeInfo for a type from the SourceGenerationContext, if available.
     /// </summary>
     /// <typeparam name="T">The type to get JsonTypeInfo for</typeparam>
     /// <returns>JsonTypeInfo if found; otherwise, null</returns>
     private static JsonTypeInfo<T>? GetJsonTypeInfo<T> ()
     {
         // Try to find a matching JsonTypeInfo property in the SourceGenerationContext
-        var contextType = ConfigurationManager.SerializerContext.GetType ();
+        Type contextType = typeof (SourceGenerationContext);
 
         // First try for an exact type match
-        var exactProperty = contextType.GetProperty (typeof (T).Name);
+        PropertyInfo? exactProperty = contextType.GetProperty (typeof (T).Name);
 
-        if (exactProperty != null &&
-            exactProperty.PropertyType.IsGenericType &&
-            exactProperty.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>) &&
-            exactProperty.PropertyType.GetGenericArguments () [0] == typeof (T))
+        if (exactProperty != null
+            && exactProperty.PropertyType.IsGenericType
+            && exactProperty.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>)
+            && exactProperty.PropertyType.GetGenericArguments () [0] == typeof (T))
         {
             return (JsonTypeInfo<T>?)exactProperty.GetValue (null);
         }
 
         // Then look for any compatible JsonTypeInfo
-        foreach (var prop in contextType.GetProperties (BindingFlags.Public | BindingFlags.Static))
+        foreach (PropertyInfo prop in contextType.GetProperties (BindingFlags.Public | BindingFlags.Static))
         {
-            if (prop.PropertyType.IsGenericType &&
-                prop.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>) &&
-                prop.PropertyType.GetGenericArguments () [0].IsAssignableFrom (typeof (T)))
+            if (prop.PropertyType.IsGenericType
+                && prop.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>)
+                && prop.PropertyType.GetGenericArguments () [0].IsAssignableFrom (typeof (T)))
             {
                 // This is a bit tricky - we've found a compatible type but need to cast it
                 // Warning: This might not work for all types and is a bit of a hack
@@ -530,7 +541,6 @@ public static class DeepCloner
 
         return null;
     }
-
 
     #endregion AOT Support
 }

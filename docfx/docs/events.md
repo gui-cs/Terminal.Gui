@@ -213,14 +213,14 @@ public class Aligner : INotifyPropertyChanged
 
 ### 4. Event Propagation
 
-Events in Terminal.Gui often propagate through the view hierarchy. For example, in `Button`, the `Selecting` and `Accepting` events are raised as part of the command handling process:
+Events in Terminal.Gui often propagate through the view hierarchy. For example, in `Button`, the `Activating` and `Accepting` events are raised as part of the command handling process:
 
 ```csharp
 private bool? HandleHotKeyCommand (ICommandContext commandContext)
 {
     bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-    if (RaiseSelecting (commandContext) is true)
+    if (RaiseActivating (commandContext) is true)
     {
         return true;
     }
@@ -244,7 +244,7 @@ private bool? HandleHotKeyCommand (ICommandContext commandContext)
 }
 ```
 
-This example shows how `Button` first raises the `Selecting` event, and if not canceled, proceeds to raise the `Accepting` event. If `Accepting` is not handled and the button is the default, it invokes the `Accept` command on the `SuperView`, demonstrating event propagation up the view hierarchy.
+This example shows how `Button` first raises the `Activating` event, and if not canceled, proceeds to raise the `Accepting` event. If `Accepting` is not handled and the button is the default, it invokes the `Accept` command on the `SuperView`, demonstrating event propagation up the view hierarchy.
 
 ## Event Context
 
@@ -350,7 +350,7 @@ TG follows the *naming* advice provided in [.NET Naming Guidelines - Names of Ev
 
 ### Proposed Enhancement: Command Propagation
 
-The *Cancellable Work Pattern* in `View.Command` currently supports local `Command.Activate` and propagating `Command.Accept`. To address hierarchical coordination needs (e.g., `MenuBarv2` popovers, `Dialog` closing), a `PropagatedCommands` property is proposed (Issue #4050):
+The *Cancellable Work Pattern* in `View.Command` currently supports local `Command.Activate` and propagating `Command.Accept`. To address hierarchical coordination needs (e.g., `MenuBar` popovers, `Dialog` closing), a `PropagatedCommands` property is proposed (Issue #4050):
 
 - **Change**: Add `IReadOnlyList<Command> PropagatedCommands` to `View`, defaulting to `[Command.Accept]`. `Raise*` methods propagate if the command is in `SuperView?.PropagatedCommands` and `args.Handled` is `false`.
 - **Example**:
@@ -373,7 +373,7 @@ The *Cancellable Work Pattern* in `View.Command` currently supports local `Comma
   }
   ```
 
-- **Impact**: Enables `Command.Activate` propagation for `MenuBarv2` while preserving `Command.Accept` propagation, maintaining decoupling and avoiding noise from irrelevant commands.
+- **Impact**: Enables `Command.Activate` propagation for `MenuBar` while preserving `Command.Accept` propagation, maintaining decoupling and avoiding noise from irrelevant commands.
 
 ### **Conflation in FlagSelector**:
    - **Issue**: `CheckBox.Activating` triggers `Accepting`, conflating state change and confirmation.
@@ -389,7 +389,7 @@ The *Cancellable Work Pattern* in `View.Command` currently supports local `Comma
      ```
 
 ### **Propagation Limitations**:
-   - **Issue**: Local `Command.Activate` restricts `MenuBarv2` coordination; `Command.Accept` uses hacks (#3925).
+   - **Issue**: Local `Command.Activate` restricts `MenuBar` coordination; `Command.Accept` uses hacks (#3925).
    - **Recommendation**: Adopt `PropagatedCommands` to enable targeted propagation, as proposed.
 
 ### **Complexity in Multi-Phase Workflows**:

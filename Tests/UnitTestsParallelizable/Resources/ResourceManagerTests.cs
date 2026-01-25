@@ -6,9 +6,9 @@ using System.Resources;
 using System.Runtime.CompilerServices;
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ResourcesTests;
+namespace ResourcesTests;
 
-public class ResourceManagerTests : FakeDriverBase
+public class ResourceManagerTests : TestDriverBase
 {
     private const string EXISTENT_CULTURE = "pt-PT";
     private const string NO_EXISTENT_CULTURE = "de-DE";

@@ -1,4 +1,3 @@
-#nullable enable
 
 
 namespace Terminal.Gui.ViewBase;
@@ -181,10 +180,8 @@ public partial class View // Text Property APIs
         Size? size = _contentSize;
 
         // Use _width & _height instead of Width & Height to avoid debug spew
-        var widthAuto = _width as DimAuto;
-        var heightAuto = _height as DimAuto;
 
-        if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
+        if (_width is DimAuto { } widthAuto && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
         {
             TextFormatter.ConstrainToWidth = null;
         }
@@ -196,6 +193,8 @@ public partial class View // Text Property APIs
             }
         }
 
+        // Use _width & _height instead of Width & Height to avoid debug spew
+        DimAuto? heightAuto = _height as DimAuto;
         if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
         {
             TextFormatter.ConstrainToHeight = null;

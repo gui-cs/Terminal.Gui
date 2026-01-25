@@ -3,117 +3,8 @@ using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 
-public class WindowTests (ITestOutputHelper output)
+public class WindowTests ()
 {
-    [Fact]
-    [AutoInitShutdown]
-    public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
-    {
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem ("Child", new MenuItem [] { new ("_Create Child", "", null) })
-            ]
-        };
-        var win = new Window ();
-        win.Add (menu);
-        var top = new Toplevel ();
-        top.Add (win);
-        Application.Begin (top);
-
-        Exception exception = Record.Exception (() => win.NewKeyDownEvent (KeyCode.AltMask));
-        Assert.Null (exception);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void MenuBar_And_StatusBar_Inside_Window ()
-    {
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem ("File", new MenuItem [] { new ("Open", "", null), new ("Quit", "", null) }),
-                new MenuBarItem (
-                                 "Edit",
-                                 new MenuItem [] { new ("Copy", "", null) }
-                                )
-            ]
-        };
-
-        var sb = new StatusBar ();
-
-        var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View", BorderStyle = LineStyle.Single };
-        var win = new Window ();
-        win.Add (menu, sb, fv);
-        Toplevel top = new ();
-        top.Add (win);
-        Application.Begin (top);
-        Application.Driver!.SetScreenSize (20, 10);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│ File  Edit       │
-│┌┤Frame View├────┐│
-││                ││
-││                ││
-││                ││
-││                ││
-│└────────────────┘│
-│                  │
-└──────────────────┘",
-                                                      output
-                                                     );
-
-        Application.Driver!.SetScreenSize (40, 20);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────────────────────────┐
-│ File  Edit                           │
-│┌┤Frame View├────────────────────────┐│
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-│└────────────────────────────────────┘│
-│                                      │
-└──────────────────────────────────────┘",
-                                                      output
-                                                     );
-
-        Application.Driver!.SetScreenSize (20, 10);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│ File  Edit       │
-│┌┤Frame View├────┐│
-││                ││
-││                ││
-││                ││
-││                ││
-│└────────────────┘│
-│                  │
-└──────────────────┘",
-                                                      output
-                                                     );
-        top.Dispose ();
-    }
-
     [Fact]
     public void New_Initializes ()
     {
@@ -123,7 +14,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.NotNull (defaultWindow);
         Assert.Equal (string.Empty, defaultWindow.Title);
 
-        // Toplevels have Width/Height set to Dim.Fill
+        // Runnables have Width/Height set to Dim.Fill
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
@@ -139,8 +30,8 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (Dim.Fill (), defaultWindow.Height);
         Assert.False (defaultWindow.IsCurrentTop);
         Assert.Empty (defaultWindow.Id);
-        Assert.False (defaultWindow.WantContinuousButtonPressed);
-        Assert.False (defaultWindow.WantMousePositionReports);
+        Assert.Null (defaultWindow.MouseHoldRepeat);
+        Assert.False (defaultWindow.MousePositionTracking );
         Assert.Null (defaultWindow.SuperView);
         Assert.Null (defaultWindow.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, defaultWindow.TextDirection);
@@ -161,8 +52,8 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
         Assert.Equal (0, windowWithFrameRectEmpty.Height);
         Assert.False (windowWithFrameRectEmpty.IsCurrentTop);
-        Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
-        Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
+        Assert.Null (windowWithFrameRectEmpty.MouseHoldRepeat);
+        Assert.False (windowWithFrameRectEmpty.MousePositionTracking );
         Assert.Null (windowWithFrameRectEmpty.SuperView);
         Assert.Null (windowWithFrameRectEmpty.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrameRectEmpty.TextDirection);
@@ -185,8 +76,8 @@ public class WindowTests (ITestOutputHelper output)
         Assert.Equal (3, windowWithFrame1234.Width);
         Assert.Equal (4, windowWithFrame1234.Height);
         Assert.False (windowWithFrame1234.IsCurrentTop);
-        Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
-        Assert.False (windowWithFrame1234.WantMousePositionReports);
+        Assert.Null (windowWithFrame1234.MouseHoldRepeat);
+        Assert.False (windowWithFrame1234.MousePositionTracking );
         Assert.Null (windowWithFrame1234.SuperView);
         Assert.Null (windowWithFrame1234.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrame1234.TextDirection);

@@ -177,11 +177,11 @@ protected bool? RaiseAccepting(ICommandContext? ctx)
 - **Cancellation**: `OnAccepting` returning `true` or `args.Handled = true`.
 - **Context**: `ICommandContext` provides `Command`, `Source`, and `Binding`.
 - **Default Behavior**: Propagates to `SuperView` or default button if not handled.
-- **Use Case**: Allows customization of state changes (e.g., `CheckBox` toggling) or cancellation (e.g., preventing focus in `MenuItemv2`).
+- **Use Case**: Allows customization of state changes (e.g., `CheckBox` toggling) or cancellation (e.g., preventing focus in `MenuItem`).
 
 #### Propagation Challenge
 
-- `Command.Activate` is local, limiting hierarchical coordination (e.g., `MenuBarv2` popovers). A proposed `PropagatedCommands` property addresses this, as detailed in the appendix.
+- `Command.Activate` is local, limiting hierarchical coordination (e.g., `MenuBar` popovers). A proposed `PropagatedCommands` property addresses this, as detailed in the appendix.
 
 ### 4. Application.Keyboard: Application-Level Keyboard Input
 

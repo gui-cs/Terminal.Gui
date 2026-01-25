@@ -1,4 +1,4 @@
-﻿
+
 namespace Terminal.Gui.Drawing;
 
 /// <summary>Extension methods for <see cref="StraightLine"/> (including collections).</summary>
@@ -187,7 +187,7 @@ public static class StraightLineExtensions
     {
         if (length == 0)
         {
-            throw new ArgumentException ("0 length lines are not supported", nameof (length));
+            throw new ArgumentException (@"0 length lines are not supported", nameof (length));
         }
 
         int sub = length > 0 ? 1 : -1;
@@ -220,7 +220,7 @@ public static class StraightLineExtensions
     {
         if (length == 0)
         {
-            throw new ArgumentException ("0 length lines are not supported", nameof (length));
+            throw new ArgumentException (@"0 length lines are not supported", nameof (length));
         }
 
         int sub = length > 0 ? 1 : -1;

@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
 {
@@ -10,7 +10,7 @@ public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Draw_Does_Not_Layout (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
@@ -21,6 +21,7 @@ public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        view.Driver = driver;
         output.WriteLine ($"Testing {viewType}");
 
         if (view is IDesignable designable)

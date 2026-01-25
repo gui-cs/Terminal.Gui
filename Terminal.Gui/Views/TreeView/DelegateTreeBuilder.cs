@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Implementation of <see cref="ITreeBuilder{T}"/> that uses user defined functions</summary>

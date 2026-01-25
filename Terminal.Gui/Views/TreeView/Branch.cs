@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 
 namespace Terminal.Gui.Views;
@@ -87,9 +87,9 @@ internal class Branch<T> where T : class
             isSelected ? _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.Focus) : _tree.GetAttributeForRole (VisualRole.HotNormal) : _tree.GetAttributeForRole (VisualRole.Normal);
         Attribute symbolColor = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.Normal) : textColor;
 
-        // Everything on line before the expansion run and branch text
-        Rune [] prefix = GetLinePrefix ().ToArray ();
-        Rune expansion = GetExpandableSymbol ();
+        // Everything on the line before the expansion run and branch text
+        string [] prefix = GetLinePrefix ().ToArray ();
+        string expansion = GetExpandableSymbol ();
         string lineBody = _tree.AspectGetter (Model) ?? "";
 
         _tree.Move (0, y);
@@ -99,7 +99,7 @@ internal class Branch<T> where T : class
         Attribute attr = symbolColor;
 
         // Draw the line prefix (all parallel lanes or whitespace and an expand/collapse/leaf symbol)
-        foreach (Rune r in prefix)
+        foreach (string s in prefix)
         {
             if (toSkip > 0)
             {
@@ -107,8 +107,8 @@ internal class Branch<T> where T : class
             }
             else
             {
-                cells.Add (NewCell (attr, r));
-                availableWidth -= r.GetColumns ();
+                cells.Add (NewCell (attr, s));
+                availableWidth -= s.GetColumns ();
             }
         }
 
@@ -212,7 +212,7 @@ internal class Branch<T> where T : class
         }
 
         attr = modelColor;
-        cells.AddRange (lineBody.Select (r => NewCell (attr, new (r))));
+        cells.AddRange (lineBody.Select (c => NewCell (attr, c.ToString ())));
 
         if (availableWidth > 0)
         {
@@ -220,7 +220,7 @@ internal class Branch<T> where T : class
 
             cells.AddRange (
                             Enumerable.Repeat (
-                                               NewCell (attr, new (' ')),
+                                               NewCell (attr, " "),
                                                availableWidth
                                               )
                            );
@@ -243,7 +243,7 @@ internal class Branch<T> where T : class
             foreach (Cell cell in cells)
             {
                 _tree.SetAttribute ((Attribute)cell.Attribute!);
-                _tree.AddRune (cell.Rune);
+                _tree.AddStr (cell.Grapheme);
             }
         }
 
@@ -288,21 +288,21 @@ internal class Branch<T> where T : class
     ///     object to indicate whether it <see cref="IsExpanded"/> or not (or it is a leaf).
     /// </summary>
     /// <returns></returns>
-    public Rune GetExpandableSymbol ()
+    public string GetExpandableSymbol ()
     {
         Rune leafSymbol = _tree.Style.ShowBranchLines ? Glyphs.HLine : (Rune)' ';
 
         if (IsExpanded)
         {
-            return _tree.Style.CollapseableSymbol ?? leafSymbol;
+            return _tree.Style.CollapseableSymbol.ToString () ?? leafSymbol.ToString ();
         }
 
         if (CanExpand ())
         {
-            return _tree.Style.ExpandableSymbol ?? leafSymbol;
+            return _tree.Style.ExpandableSymbol.ToString () ?? leafSymbol.ToString ();
         }
 
-        return leafSymbol;
+        return leafSymbol.ToString ();
     }
 
     /// <summary>
@@ -409,14 +409,14 @@ internal class Branch<T> where T : class
     ///     any tree branches (if enabled).
     /// </summary>
     /// <returns></returns>
-    internal IEnumerable<Rune> GetLinePrefix ()
+    internal IEnumerable<string> GetLinePrefix ()
     {
         // If not showing line branches or this is a root object.
         if (!_tree.Style.ShowBranchLines)
         {
             for (var i = 0; i < Depth; i++)
             {
-                yield return new (' ');
+                yield return new (" ");
             }
 
             yield break;
@@ -427,23 +427,23 @@ internal class Branch<T> where T : class
         {
             if (cur.IsLast ())
             {
-                yield return new (' ');
+                yield return new (" ");
             }
             else
             {
-                yield return Glyphs.VLine;
+                yield return Glyphs.VLine.ToString ();
             }
 
-            yield return new (' ');
+            yield return new (" ");
         }
 
         if (IsLast ())
         {
-            yield return Glyphs.LLCorner;
+            yield return Glyphs.LLCorner.ToString ();
         }
         else
         {
-            yield return Glyphs.LeftTee;
+            yield return Glyphs.LeftTee.ToString ();
         }
     }
 
@@ -531,5 +531,5 @@ internal class Branch<T> where T : class
         return Parent.ChildBranches.LastOrDefault () == this;
     }
 
-    private static Cell NewCell (Attribute attr, Rune r) { return new () { Rune = r, Attribute = new (attr) }; }
+    private static Cell NewCell (Attribute attr, string s) { return new () { Grapheme = s, Attribute = new (attr) }; }
 }

@@ -1,19 +1,19 @@
 ﻿using Xunit.Abstractions;
 
-//using static Terminal.Gui.ViewTests.MenuTests;
+//using static Terminal.Gui.ViewBaseTests.MenuTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class MenuBarItemTests ()
 {
     [Fact]
     public void Constructors_Defaults ()
     {
-        var menuBarItem = new MenuBarItemv2 ();
+        var menuBarItem = new MenuBarItem ();
         Assert.Null (menuBarItem.PopoverMenu);
         Assert.Null (menuBarItem.TargetView);
 
-        menuBarItem = new MenuBarItemv2 (targetView: null, command: Command.NotBound, commandText: null, popoverMenu: null);
+        menuBarItem = new MenuBarItem (targetView: null, command: Command.NotBound, commandText: null, popoverMenu: null);
         Assert.Null (menuBarItem.PopoverMenu);
         Assert.Null (menuBarItem.TargetView);
 

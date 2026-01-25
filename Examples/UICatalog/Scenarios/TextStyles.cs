@@ -5,17 +5,20 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Text Styles", "Shows Attribute.TextStyles including bold, italic, etc...")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Colors")]
-public sealed class TestStyles : Scenario
+public sealed class TextStyles : Scenario
 {
     private CheckBox? _drawDirectly;
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
-        Application.Init ();
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Id = "appWindow",
             Title = GetQuitKeyAndName ()
@@ -46,11 +49,7 @@ public sealed class TestStyles : Scenario
         AddButtons (appWindow);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private void AddButtons (Window appWindow)
@@ -82,7 +81,7 @@ public sealed class TestStyles : Scenario
                                                       return;
                                                   }
 
-                                                  if (args.Result is { })
+                                                  if (args.Result is not null)
                                                   {
                                                       args.Result = args.Result.Value with { Style = style };
                                                   }
@@ -130,7 +129,7 @@ public sealed class TestStyles : Scenario
             };
             button.GettingAttributeForRole += (_, args) =>
                                               {
-                                                  if (args.Result is { })
+                                                  if (args.Result is not null)
                                                   {
                                                       args.Result = args.Result.Value with { Style = combination };
                                                   }

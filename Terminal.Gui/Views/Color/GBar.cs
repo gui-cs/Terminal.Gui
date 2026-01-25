@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 using ColorHelper;
 
 namespace Terminal.Gui.Views;

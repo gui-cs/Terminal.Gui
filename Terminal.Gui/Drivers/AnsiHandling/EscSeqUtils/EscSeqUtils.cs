@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 using System.Globalization;
 
@@ -117,44 +116,128 @@ public static class EscSeqUtils
     #region Mouse
 
     /// <summary>
-    ///     ESC [ ? 1003 l - Disable any mouse event tracking.
+    ///     ESC [ ? 1003 l - Disable any-event mouse tracking (mode 1003).
     /// </summary>
+    /// <remarks>
+    ///     Mode 1003 enables reporting of all mouse events including motion with or without buttons pressed.
+    ///     This is the most comprehensive tracking mode and includes button press/release and motion events.
+    /// </remarks>
     public static readonly string CSI_DisableAnyEventMouse = CSI + "?1003l";
 
     /// <summary>
-    ///     ESC [ ? 1006 l - Disable SGR (Select Graphic Rendition).
+    ///     ESC [ ? 1006 l - Disable SGR extended mouse mode (mode 1006).
     /// </summary>
+    /// <remarks>
+    ///     SGR mode uses decimal text format (ESC[&lt;b;x;yM/m) instead of binary encoding, providing
+    ///     unlimited coordinate range and unambiguous press (M) vs release (m) distinction.
+    ///     This is the preferred modern mouse reporting format.
+    /// </remarks>
     public static readonly string CSI_DisableSgrExtModeMouse = CSI + "?1006l";
 
     /// <summary>
-    ///     ESC [ ? 1015 l - Disable URXVT (Unicode Extended Virtual Terminal).
+    ///     ESC [ ? 1015 l - Disable URXVT extended mouse mode (mode 1015).
     /// </summary>
+    /// <remarks>
+    ///     URXVT mode uses UTF-8 encoding for mouse coordinates, extending the coordinate range
+    ///     from 223×223 (traditional mode) to 2015×2015. Largely superseded by SGR mode but
+    ///     useful for terminals that support URXVT but not SGR.
+    /// </remarks>
     public static readonly string CSI_DisableUrxvtExtModeMouse = CSI + "?1015l";
 
     /// <summary>
-    ///     ESC [ ? 1003 h - Enable  mouse event tracking.
+    ///     ESC [ ? 1003 h - Enable any-event mouse tracking (mode 1003).
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Mode 1003 enables reporting of all mouse events:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item><description>Button press and release events</description></item>
+    ///         <item><description>Motion events with buttons pressed (drag)</description></item>
+    ///         <item><description>Motion events without buttons pressed</description></item>
+    ///     </list>
+    ///     <para>
+    ///         Note: This mode controls WHICH events are reported. The format of event data is controlled
+    ///         by modes 1006 (SGR) or 1015 (URXVT).
+    ///     </para>
+    /// </remarks>
     public static readonly string CSI_EnableAnyEventMouse = CSI + "?1003h";
 
     /// <summary>
-    ///     ESC [ ? 1006 h - Enable SGR (Select Graphic Rendition).
+    ///     ESC [ ? 1006 h - Enable SGR extended mouse mode (mode 1006).
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         SGR mode provides the modern mouse reporting format with several advantages:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item><description>Decimal text format: ESC[&lt;button;x;yM (press) or ESC[&lt;button;x;ym (release)</description></item>
+    ///         <item><description>Unlimited coordinate range (not constrained by byte encoding)</description></item>
+    ///         <item><description>Unambiguous press/release distinction via M/m terminator</description></item>
+    ///         <item><description>Human-readable and easier to parse</description></item>
+    ///     </list>
+    ///     <para>
+    ///         Supported by Windows Terminal, iTerm2, xterm, and most modern terminal emulators.
+    ///     </para>
+    /// </remarks>
     public static readonly string CSI_EnableSgrExtModeMouse = CSI + "?1006h";
 
     /// <summary>
-    ///     ESC [ ? 1015 h - Enable URXVT (Unicode Extended Virtual Terminal).
+    ///     ESC [ ? 1015 h - Enable URXVT extended mouse mode (mode 1015).
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         URXVT mode extends traditional mouse reporting by using UTF-8 encoding for coordinates:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item><description>Coordinate range: up to 2015×2015 (vs 223×223 in traditional mode)</description></item>
+    ///         <item><description>Uses multi-byte UTF-8 sequences for position encoding</description></item>
+    ///         <item><description>Maintains ESC[M format with UTF-8 encoded coordinate bytes</description></item>
+    ///     </list>
+    ///     <para>
+    ///         Originally developed for rxvt-unicode terminal emulator. Largely superseded by SGR mode (1006)
+    ///         but useful for backward compatibility with older terminals.
+    ///     </para>
+    /// </remarks>
     public static readonly string CSI_EnableUrxvtExtModeMouse = CSI + "?1015h";
 
     /// <summary>
-    ///     Control sequence for disabling mouse events.
+    ///     Control sequence for disabling all mouse event tracking.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Disables all mouse tracking modes in this order:
+    ///     </para>
+    ///     <list type="number">
+    ///         <item><description>Mode 1003 (any-event tracking) - stops reporting mouse events</description></item>
+    ///         <item><description>Mode 1015 (URXVT format) - disables UTF-8 coordinate encoding</description></item>
+    ///         <item><description>Mode 1006 (SGR format) - disables decimal text format</description></item>
+    ///     </list>
+    /// </remarks>
     public static readonly string CSI_DisableMouseEvents =
         CSI_DisableAnyEventMouse + CSI_DisableUrxvtExtModeMouse + CSI_DisableSgrExtModeMouse;
 
     /// <summary>
-    ///     Control sequence for enabling mouse events.
+    ///     Control sequence for enabling comprehensive mouse event tracking.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Enables three mouse tracking modes simultaneously:
+    ///     </para>
+    ///     <list type="number">
+    ///         <item><description>Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons</description></item>
+    ///         <item><description>Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)</description></item>
+    ///         <item><description>Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)</description></item>
+    ///     </list>
+    ///     <para>
+    ///         When multiple format modes are enabled, modern terminals typically use the most capable format (SGR),
+    ///         while older terminals fall back to URXVT or traditional encoding. This ensures broad terminal compatibility.
+    ///     </para>
+    ///     <para>
+    ///         Note: The ANSI specification does NOT provide auto-repeat of button press events while held stationary.
+    ///         You receive one press event, optional motion events (if mode 1003 is enabled), and one release event.
+    ///     </para>
+    /// </remarks>
     public static readonly string CSI_EnableMouseEvents =
         CSI_EnableAnyEventMouse + CSI_EnableUrxvtExtModeMouse + CSI_EnableSgrExtModeMouse;
 
@@ -555,53 +638,12 @@ public static class EscSeqUtils
     //ESC [ ? 25 l - DECTCEM Text Cursor Enable Mode Hide    Hide the cursor
 
     /// <summary>
-    ///     Styles for ANSI ESC "[x q" - Set Cursor Style
-    /// </summary>
-    public enum DECSCUSR_Style
-    {
-        /// <summary>
-        ///     DECSCUSR - User Shape - Default cursor shape configured by the user
-        /// </summary>
-        UserShape = 0,
-
-        /// <summary>
-        ///     DECSCUSR - Blinking Block - Blinking block cursor shape
-        /// </summary>
-        BlinkingBlock = 1,
-
-        /// <summary>
-        ///     DECSCUSR - Steady Block - Steady block cursor shape
-        /// </summary>
-        SteadyBlock = 2,
-
-        /// <summary>
-        ///     DECSCUSR - Blinking Underline - Blinking underline cursor shape
-        /// </summary>
-        BlinkingUnderline = 3,
-
-        /// <summary>
-        ///     DECSCUSR - Steady Underline - Steady underline cursor shape
-        /// </summary>
-        SteadyUnderline = 4,
-
-        /// <summary>
-        ///     DECSCUSR - Blinking Bar - Blinking bar cursor shape
-        /// </summary>
-        BlinkingBar = 5,
-
-        /// <summary>
-        ///     DECSCUSR - Steady Bar - Steady bar cursor shape
-        /// </summary>
-        SteadyBar = 6
-    }
-
-    /// <summary>
     ///     ESC [ n SP q - Select Cursor Style (DECSCUSR)
     ///     https://terminalguide.namepad.de/seq/csi_sq_t_space/
     /// </summary>
     /// <param name="style"></param>
     /// <returns></returns>
-    public static string CSI_SetCursorStyle (DECSCUSR_Style style) { return $"{CSI}{(int)style} q"; }
+    public static string CSI_SetCursorStyle (CursorStyle style) { return $"{CSI}{(int)style} q"; }
 
     #endregion Cursor
 
