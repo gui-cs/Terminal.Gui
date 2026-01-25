@@ -54,7 +54,7 @@ internal sealed class Arranger : IDisposable
             _border.App.Mouse.GrabbingMouse += ApplicationOnGrabbingMouse;
         }
 
-        bool mouseMode = _border.App is { } && _border.App.Mouse.MouseGrabView == _border;
+        bool mouseMode = _border.App is { } && _border.App.Mouse.IsGrabbed (_border);
 
         _border.HotKeyBindings.Add (Key.Esc, Command.Quit);
 
@@ -120,7 +120,7 @@ internal sealed class Arranger : IDisposable
     /// </remarks>
     private void ApplicationOnGrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
-        if (_border.App?.Mouse.MouseGrabView == _border && IsDragging)
+        if (_border.App is { } && _border.App.Mouse.IsGrabbed (_border) && IsDragging)
         {
             e.Cancel = true;
         }
@@ -136,7 +136,7 @@ internal sealed class Arranger : IDisposable
             _border.App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
             _border.App.Mouse.GrabbingMouse -= ApplicationOnGrabbingMouse;
 
-            if (_border.App.Mouse.MouseGrabView == _border)
+            if (_border.App.Mouse.IsGrabbed (_border))
             {
                 _border.App.Mouse.UngrabMouse ();
             }
@@ -630,7 +630,8 @@ internal sealed class Arranger : IDisposable
 
         // Dragging - update position
         if (mouseEvent.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
-            && _border.App?.Mouse.MouseGrabView == _border
+            && _border.App is { }
+            && _border.App.Mouse.IsGrabbed (_border)
             && _dragPosition.HasValue)
         {
             HandleMouseDrag (mouseEvent);
@@ -955,9 +956,9 @@ internal sealed class Arranger : IDisposable
     public void Dispose ()
     {
         // Ungrab mouse if we're still holding it
-        if (IsDragging && _border.App?.Mouse.MouseGrabView == _border)
+        if (IsDragging && _border.App is { } && _border.App.Mouse.IsGrabbed (_border))
         {
-            _border.App?.Mouse.UngrabMouse ();
+            _border.App.Mouse.UngrabMouse ();
         }
 
         ExitArrangeMode ();
