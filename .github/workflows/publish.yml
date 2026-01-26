@@ -66,4 +66,21 @@ jobs:
     #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
         
     - name: Publish Terminal.Gui.${{ steps.gitversion.outputs.SemVer }} to NuGet.org
-      run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} 
+      run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }}
+    
+    - name: Delist old NuGet packages
+      if: github.ref == 'refs/heads/v2_release'
+      shell: pwsh
+      run: |
+        $version = "${{ steps.gitversion.outputs.SemVer }}"
+        Write-Host "Running delist script for just-published version: $version"
+        ./Scripts/delist-nuget.ps1 -ApiKey "${{ secrets.NUGET_API_KEY }}" -JustPublishedVersion "$version"
+    
+    - name: Trigger Terminal.Gui.templates update
+      if: github.ref == 'refs/heads/v2_release'
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.PAT_FOR_TEMPLATES }}
+        repository: gui-cs/Terminal.Gui.templates
+        event-type: nuget-published
+        client-payload: '{"version": "${{ steps.gitversion.outputs.SemVer }}"}' 
