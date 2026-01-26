@@ -29,7 +29,7 @@ function Get-VersionSortKey {
     
     # Extract the numeric part after the last dot for prerelease versions
     # E.g., "2.0.0-develop.123" -> 123, "2.0.0-alpha.5" -> 5
-    if ($version -match '[\-\.](\d+)$') {
+    if ($version -match '[-.](\d+)$') {
         return [int]$matches[1]
     }
     return 0
