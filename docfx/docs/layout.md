@@ -124,7 +124,7 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 * Automatic size based on the View's content (either SubViews or Text) - @Terminal.Gui.Dim.Auto* - See [Dim.Auto Deep Dive](dimauto.md).
 * Absolute size, by passing an integer - @Terminal.Gui.Dim.Absolute(System.Int32).
 * Percentage of the SuperView's Content Area  - @Terminal.Gui.Dim.Percent(System.Int32).
-* Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill*.
+* Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill*. **Note:** `Dim.Fill` does not contribute to a SuperView's @Terminal.Gui.Dim.Auto sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
 * Reference the Width or Height of another view - @Terminal.Gui.Dim.Width(Terminal.Gui.View), @Terminal.Gui.Dim.Height(Terminal.Gui.View).
 * An arbitrary function - @Terminal.Gui.Dim.Func(System.Func{System.Int32}).
 

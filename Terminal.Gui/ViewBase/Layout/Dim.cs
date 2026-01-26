@@ -1,6 +1,6 @@
-namespace Terminal.Gui.ViewBase;
-
 using System.Numerics;
+
+namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     <para>
@@ -92,14 +92,25 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Dim"/>.</returns>
     /// <param name="size">The value to convert to the <see cref="Dim"/>.</param>
-    public static Dim Absolute (int size) { return new DimAbsolute (size); }
+    public static Dim Absolute (int size) => new DimAbsolute (size);
 
     /// <summary>
-    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's Content, SubViews, and/or Text.
+    ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's Content, SubViews,
+    ///     and/or Text.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         See <see cref="DimAutoStyle"/>.
+    ///     </para>
+    ///     <para>
+    ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for comprehensive documentation including
+    ///         non-trivial usage patterns.
+    ///     </para>
+    ///     <para>
+    ///         SubViews that use <see cref="Dim.Fill()"/> do not contribute to the auto-sizing calculation unless
+    ///         <see cref="DimFill.MinimumContentDim"/> is specified. Without it, a <see cref="DimFill"/> SubView will
+    ///         receive a size of 0. Use <see cref="Dim.Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> to ensure
+    ///         the SubView contributes a minimum size.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -118,34 +129,45 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </param>
     /// <param name="minimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
     /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
-    public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null)
-    {
-        return new DimAuto (
-                            MinimumContentDim: minimumContentDim,
-                            MaximumContentDim: maximumContentDim,
-                            Style: style);
-    }
+    public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null) =>
+        new DimAuto (MinimumContentDim: minimumContentDim, MaximumContentDim: maximumContentDim, Style: style);
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving no margin.
     /// </summary>
     /// <remarks>
-    ///     The view will fill from its position to the end of the SuperView's content area.
+    ///     <para>
+    ///         The view will fill from its position to the end of the SuperView's content area.
+    ///     </para>
+    ///     <para>
+    ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
+    ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
+    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> to ensure the SubView contributes
+    ///         a minimum size. See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
+    ///     </para>
     /// </remarks>
     /// <example>
-    /// <code>
+    ///     <code>
     /// var view = new View { X = 5, Y = 0, Width = Dim.Fill(), Height = 1 };
     /// // If SuperView width is 80, view width will be 75 (80 - 5)
     /// </code>
     /// </example>
     /// <returns>The Fill dimension.</returns>
-    public static Dim Fill () { return new DimFill (0); }
+    public static Dim Fill () => new DimFill (0);
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified margin.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
+    ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
+    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> to ensure the SubView contributes
+    ///         a minimum size. See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
+    ///     </para>
+    /// </remarks>
     /// <example>
-    /// <code>
+    ///     <code>
     /// var view = new View { X = 0, Y = 0, Width = Dim.Fill(2), Height = 1 };
     /// // If SuperView width is 80, view width will be 78 (80 - 2)
     /// </code>
@@ -160,12 +182,17 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When the SuperView uses <see cref="Dim.Auto"/>, the <paramref name="minimumContentDim"/> will contribute
-    ///         to the auto-sizing calculation, ensuring the SuperView is at least large enough to accommodate the minimum.
+    ///         When the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
+    ///         contribute to the auto-sizing calculation by default. The <paramref name="minimumContentDim"/> parameter
+    ///         resolves this: it contributes a floor to the auto-sizing calculation, ensuring the SuperView is at least
+    ///         large enough to accommodate the minimum. Without it, the SubView will receive a size of 0.
+    ///     </para>
+    ///     <para>
+    ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
     /// <example>
-    /// <code>
+    ///     <code>
     /// // Fill with minimum width of 40
     /// var view = new View { X = 0, Y = 0, Width = Dim.Fill(margin: 0, minimumContentDim: 40), Height = 1 };
     /// // If SuperView has Dim.Auto() width, it will be at least 40 wide
@@ -178,7 +205,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <param name="minimumContentDim">
     ///     The minimum dimension. If <see langword="null"/>, no minimum is enforced.
     /// </param>
-    public static Dim Fill (Dim margin, Dim? minimumContentDim) { return new DimFill (margin, minimumContentDim); }
+    public static Dim Fill (Dim margin, Dim? minimumContentDim) => new DimFill (margin, minimumContentDim);
 
     /// <summary>
     ///     Creates a function <see cref="Dim"/> object that computes the dimension based on the passed view and by executing
@@ -188,12 +215,12 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <param name="function">The function to be executed.</param>
     /// <param name="view">The view where the data will be retrieved.</param>
     /// <returns>The <see cref="Dim"/> returned from the function based on the passed view.</returns>
-    public static Dim Func (Func<View?, int> function, View? view = null) { return new DimFunc (function, view); }
+    public static Dim Func (Func<View?, int> function, View? view = null) => new DimFunc (function, view);
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Height (View? view) { return new DimView (view, Dimension.Height); }
+    public static Dim Height (View? view) => new DimView (view, Dimension.Height);
 
     /// <summary>Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.</summary>
     /// <returns>The percent <see cref="Dim"/> object.</returns>
@@ -222,10 +249,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.</summary>
     /// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
     /// <param name="view">The view that will be tracked.</param>
-    public static Dim Width (View? view) { return new DimView (view, Dimension.Width); }
+    public static Dim Width (View? view) => new DimView (view, Dimension.Width);
 
     #endregion static Dim creation methods
-
 
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TDim"/> is in the hierarchy of this Dim object.
@@ -237,11 +263,11 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         dim = (this as TDim)!;
 
         return this switch
-        {
-            DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),
-            TDim => true,
-            _ => false
-        };
+               {
+                   DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),
+                   TDim => true,
+                   _ => false
+               };
     }
 
     #region virtual methods
@@ -274,16 +300,14 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     The calculated size of the View. The way this size is calculated depends on the specific subclass of Dim that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
-    {
-        return Math.Clamp (GetAnchor (superviewContentSize - location), 0, short.MaxValue);
-    }
+    internal virtual int Calculate (int location, int superviewContentSize, View us, Dimension dimension) =>
+        Math.Clamp (GetAnchor (superviewContentSize - location), 0, short.MaxValue);
 
     /// <summary>
     ///     Diagnostics API to determine if this Dim object references other views.
     /// </summary>
     /// <returns></returns>
-    internal virtual bool ReferencesOtherViews () { return false; }
+    internal virtual bool ReferencesOtherViews () => false;
 
     #endregion virtual methods
 
@@ -309,7 +333,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Dim"/>.</returns>
     /// <param name="n">The value to convert to the pos.</param>
-    public static implicit operator Dim (int n) { return new DimAbsolute (n); }
+    public static implicit operator Dim (int n) => new DimAbsolute (n);
 
     /// <summary>
     ///     Subtracts a <see cref="Dim"/> from a <see cref="Dim"/>, yielding a new
@@ -332,5 +356,4 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     }
 
     #endregion operators
-
 }
