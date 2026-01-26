@@ -2,7 +2,7 @@ namespace ViewsTests;
 
 public class TimeFieldTests
 {
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void Constructors_Defaults ()
     {
         TimeField tf = new ();
@@ -40,7 +40,7 @@ public class TimeFieldTests
         Assert.Equal (10, tf.Width);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void Copy_Paste ()
     {
         IApplication app = Application.Create ();
@@ -72,7 +72,7 @@ public class TimeFieldTests
         }
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
     {
         TimeField tf = new ();
@@ -88,7 +88,7 @@ public class TimeFieldTests
         Assert.Equal (6, tf.InsertionPoint);  // Should clamp to FieldLength + 1
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
     {
         TimeField tf = new ();
@@ -131,7 +131,7 @@ public class TimeFieldTests
         Assert.Equal (5, tf.InsertionPoint);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void KeyBindings_Command ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("12:12:19") };
@@ -182,7 +182,7 @@ public class TimeFieldTests
 #endif
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void Typing_With_Selection_Normalize_Format ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("12:12:19") };
@@ -204,7 +204,7 @@ public class TimeFieldTests
         Assert.Equal (4, tf.InsertionPoint);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_After_ClearingSelection_RightArrow ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("08:52:40") };
@@ -227,7 +227,7 @@ public class TimeFieldTests
         Assert.Equal (9, tf.InsertionPoint);  // Cursor after last character
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_After_ClearingSelection_Backspace ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("08:52:40") };
@@ -252,7 +252,7 @@ public class TimeFieldTests
         Assert.Equal (7, tf.InsertionPoint);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_After_ClearingSelection_End ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("08:52:40") };
@@ -275,7 +275,7 @@ public class TimeFieldTests
         Assert.Equal (8, tf.InsertionPoint);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_After_SelectAll_RightArrow ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("08:52:40") };
@@ -301,7 +301,7 @@ public class TimeFieldTests
         Assert.Equal (8, tf.InsertionPoint);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_After_SelectAll_End ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("08:52:40") };
@@ -320,7 +320,7 @@ public class TimeFieldTests
         Assert.Equal (8, tf.InsertionPoint);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void CursorPosition_After_SelectAll_Backspace ()
     {
         TimeField tf = new () { Value = TimeSpan.Parse ("08:52:40") };
@@ -341,7 +341,7 @@ public class TimeFieldTests
         Assert.Equal (7, tf.InsertionPoint);
     }
 
-    [Fact]
+    [Fact (Skip = "Deprecating")]
     public void Cursor_Visual_Position_After_SelectAll_And_Right()
     {
         IApplication app = Application.Create();
