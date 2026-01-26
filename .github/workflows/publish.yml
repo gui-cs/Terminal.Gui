@@ -79,12 +79,8 @@ jobs:
     - name: Prepare payload for template dispatch
       if: github.ref == 'refs/heads/v2_release'
       id: payload
-      shell: bash
       run: |
-        # Use printf and jq to safely construct JSON payload
-        version="${{ steps.gitversion.outputs.SemVer }}"
-        payload=$(printf '%s' "$version" | jq -R -c '{version: .}')
-        echo "json=$payload" >> $GITHUB_OUTPUT
+        echo "json={\"version\":\"${{ steps.gitversion.outputs.SemVer }}\"}" >> $GITHUB_OUTPUT
     
     - name: Trigger Terminal.Gui.templates update
       if: github.ref == 'refs/heads/v2_release'
