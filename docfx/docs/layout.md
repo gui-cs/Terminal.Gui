@@ -124,7 +124,7 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 * Automatic size based on the View's content (either SubViews or Text) - @Terminal.Gui.Dim.Auto* - See [Dim.Auto Deep Dive](dimauto.md).
 * Absolute size, by passing an integer - @Terminal.Gui.Dim.Absolute(System.Int32).
 * Percentage of the SuperView's Content Area  - @Terminal.Gui.Dim.Percent(System.Int32).
-* Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill*.
+* Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill*. **Note:** `Dim.Fill` does not contribute to a SuperView's @Terminal.Gui.Dim.Auto sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
 * Reference the Width or Height of another view - @Terminal.Gui.Dim.Width(Terminal.Gui.View), @Terminal.Gui.Dim.Height(Terminal.Gui.View).
 * An arbitrary function - @Terminal.Gui.Dim.Func(System.Func{System.Int32}).
 
@@ -144,35 +144,22 @@ anotherView.Height = Dim.Height (view) + 1;
 
 ```mermaid
 classDiagram
-    class View {
-    }
+    class View ["View — location and size relative to SuperView"]
+    class Frame ["Frame — Rectangle"]
+    class Viewport ["Viewport — visible portion of Content Area"]
+    class Margin ["Margin — where Shadows live"]
+    class Border ["Border — Title and Arrangement controls"]
+    class Padding ["Padding — where ScrollBars live"]
+    class Adornment
+    class Thickness ["Thickness — each side has a width"]
 
-    View --> Frame : is Rectangle
-    View --> Viewport : is Rectangle
-
-    class Border {
-    }
-
-    class Adornment {
-    }
-
-    class Thickness {
-    }
-
-
-    Margin --> Adornment : is
-    Border --> Adornment : is
-    Padding --> Adornment : is
-    Adornment --> Thickness : has
-
+    View --> Frame
+    View --> Viewport
     View --> Margin : has
     View --> Border : has
     View --> Padding : has
-
-    note for View "Defines location and size relative to SuperView"
-    note for Viewport "Defines the visible portion of the Content Area"
-    note for Margin "Where Shadows live"
-    note for Border "Where Border, Title, and Arrangement controls live"
-    note for Padding "Where ScrollBars live"
-    note for Thickness "A rectangle where each side can have a width"
+    Margin --|> Adornment
+    Border --|> Adornment
+    Padding --|> Adornment
+    Adornment --> Thickness : has
 ```
