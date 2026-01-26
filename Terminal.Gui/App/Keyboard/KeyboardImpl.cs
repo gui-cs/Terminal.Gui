@@ -301,9 +301,13 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                         View? viewToArrange = App?.Navigation?.GetFocused ();
 
                         // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
-                        while (viewToArrange is { SuperView: { }, Arrangement: ViewArrangement.Fixed })
+                        while (viewToArrange is { Arrangement: ViewArrangement.Fixed })
                         {
-                            viewToArrange = viewToArrange.SuperView;
+                            viewToArrange = viewToArrange switch
+                            {
+                                Adornment adornmentView => adornmentView.Parent,
+                                _ => viewToArrange.SuperView
+                            };
                         }
 
                         if (viewToArrange is { })
