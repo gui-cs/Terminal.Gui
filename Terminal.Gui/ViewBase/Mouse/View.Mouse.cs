@@ -60,7 +60,7 @@ public partial class View // Mouse APIs
 
         MouseState |= MouseState.In;
 
-        if (MouseHighlightStates != MouseState.None)
+        if ((MouseHighlightStates & MouseState.In) != MouseState.None)
         {
             SetNeedsDraw ();
         }
@@ -146,7 +146,7 @@ public partial class View // Mouse APIs
 
         MouseState &= ~MouseState.In;
 
-        if (MouseHighlightStates != MouseState.None)
+        if ((MouseHighlightStates & MouseState.In) != MouseState.None)
         {
             SetNeedsDraw ();
         }
