@@ -150,8 +150,8 @@ public class DateField : TextField, IValue<DateTime?>
     /// <seealso cref="AdjustInsertionPoint"/>
     public override int InsertionPoint
     {
-        get => Math.Max (Math.Min (base.InsertionPoint, FormatLength), 1);
-        set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1);
+        get => Math.Max (Math.Min (base.InsertionPoint, FormatLength + 1), 1);
+        set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength + 1), 1);
     }
 
     /// <summary>
@@ -344,9 +344,9 @@ public class DateField : TextField, IValue<DateTime?>
         int newPoint = point;
 
         // Clamp to valid bounds
-        if (point > FormatLength)
+        if (point > FormatLength + 1)
         {
-            newPoint = FormatLength;
+            newPoint = FormatLength + 1;
         }
 
         if (point < 1)
@@ -513,9 +513,9 @@ public class DateField : TextField, IValue<DateTime?>
     /// </remarks>
     private void IncrementInsertionPoint ()
     {
-        if (InsertionPoint >= FormatLength)
+        if (InsertionPoint >= FormatLength + 1)
         {
-            InsertionPoint = FormatLength;
+            InsertionPoint = FormatLength + 1;
 
             return;
         }
@@ -527,7 +527,7 @@ public class DateField : TextField, IValue<DateTime?>
     private new bool MoveEnd ()
     {
         ClearAllSelection ();
-        InsertionPoint = FormatLength;
+        InsertionPoint = FormatLength + 1;
 
         return true;
     }

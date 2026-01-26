@@ -126,7 +126,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         //Debug.Fail ("Application.Create() called");
         ApplicationImpl.MarkInstanceBasedModelUsed ();
 
-        IApplication app = new ApplicationImpl (timeProvider ?? new SystemTimeProvider (), false);
+        IApplication app = new ApplicationImpl (timeProvider ?? new SystemTimeProvider ());
         RaiseInstanceCreated (app);
 
         return app;

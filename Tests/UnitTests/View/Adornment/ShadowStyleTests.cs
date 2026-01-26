@@ -164,7 +164,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonReleased, Position = new (0, 0) });
         Assert.Equal (origThickness, view.Margin.Thickness);
 
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
         Application.ResetState (true);
     }
 }

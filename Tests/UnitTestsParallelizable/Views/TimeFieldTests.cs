@@ -79,13 +79,13 @@ public class TimeFieldTests
         Assert.Equal (1, tf.InsertionPoint);
         tf.InsertionPoint = 0;
         Assert.Equal (1, tf.InsertionPoint);
-        tf.InsertionPoint = 9;
-        Assert.Equal (8, tf.InsertionPoint);
+        tf.InsertionPoint = 10;  // Try to set beyond max
+        Assert.Equal (9, tf.InsertionPoint);  // Should clamp to FieldLength + 1
         tf.IsShortFormat = true;
         tf.InsertionPoint = 0;
         Assert.Equal (1, tf.InsertionPoint);
-        tf.InsertionPoint = 6;
-        Assert.Equal (5, tf.InsertionPoint);
+        tf.InsertionPoint = 7;  // Try to set beyond max for short format
+        Assert.Equal (6, tf.InsertionPoint);  // Should clamp to FieldLength + 1
     }
 
     [Fact]
@@ -108,11 +108,11 @@ public class TimeFieldTests
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (8, tf.SelectedStart);
         Assert.Equal (1, tf.SelectedLength);
-        Assert.Equal (8, tf.InsertionPoint); // Clamped to FieldLength
+        Assert.Equal (9, tf.InsertionPoint);  // Moved to after last character
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (-1, tf.SelectedStart);
         Assert.Equal (0, tf.SelectedLength);
-        Assert.Equal (8, tf.InsertionPoint);
+        Assert.Equal (9, tf.InsertionPoint);  // Stays at end
         Assert.False (tf.IsShortFormat);
         Assert.False (tf.IsInitialized);
         tf.BeginInit ();
@@ -213,18 +213,18 @@ public class TimeFieldTests
 
         // Simulate selecting all text (like when field gets focus)
         tf.SelectedStart = 1;
-        tf.InsertionPoint = 9; // End of selection
+        tf.InsertionPoint = 9;  // End of selection
         Assert.Equal (1, tf.SelectedStart);
-        Assert.Equal (7, tf.SelectedLength); // It's 7 because InsertionPoint was clamped to 8
-        Assert.Equal (8, tf.InsertionPoint); // Clamped from 9 to 8
+        Assert.Equal (8, tf.SelectedLength);  // Full selection
+        Assert.Equal (9, tf.InsertionPoint);  // Cursor after last character
 
-        // Press Right arrow - should clear selection and move to end
+        // Press Right arrow - should clear selection and keep cursor at end
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
 
-        // After clearing selection, cursor should be at the end (position 8, the max valid position)
+        // After clearing selection, cursor should be at the end (position 9)
         Assert.Equal (-1, tf.SelectedStart);
         Assert.Equal (0, tf.SelectedLength);
-        Assert.Equal (8, tf.InsertionPoint);
+        Assert.Equal (9, tf.InsertionPoint);  // Cursor after last character
     }
 
     [Fact]
@@ -239,7 +239,7 @@ public class TimeFieldTests
         tf.InsertionPoint = 9; // End of selection
         Assert.Equal (1, tf.SelectedStart);
         Assert.Equal (7, tf.SelectedLength); // Length is 7 because InsertionPoint was clamped to 8
-        Assert.Equal (8, tf.InsertionPoint); // Clamped from 9 to 8
+        Assert.Equal (9, tf.InsertionPoint);  // Cursor after last character
 
         // Press Backspace - should clear selection, replace char at InsertionPoint with '0', and move left
         Assert.True (tf.NewKeyDownEvent (Key.Backspace));
@@ -264,7 +264,7 @@ public class TimeFieldTests
         tf.InsertionPoint = 9; // End of selection
         Assert.Equal (1, tf.SelectedStart);
         Assert.Equal (7, tf.SelectedLength); // Length is 7 because InsertionPoint was clamped to 8
-        Assert.Equal (8, tf.InsertionPoint); // Clamped from 9 to 8
+        Assert.Equal (9, tf.InsertionPoint);  // Cursor after last character
 
         // Press End - should clear selection and move to end
         Assert.True (tf.NewKeyDownEvent (Key.End));
@@ -339,5 +339,40 @@ public class TimeFieldTests
         Assert.Equal (-1, tf.SelectedStart);
         Assert.Equal (0, tf.SelectedLength);
         Assert.Equal (7, tf.InsertionPoint);
+    }
+
+    [Fact]
+    public void Cursor_Visual_Position_After_SelectAll_And_Right()
+    {
+        IApplication app = Application.Create();
+        app.Init(DriverRegistry.Names.ANSI);
+
+        try
+        {
+            TimeField tf = new () { Value = TimeSpan.Parse ("08:52:40"), App = app, Width = 12, Height = 1 };
+            tf.BeginInit ();
+            tf.EndInit ();
+            
+            // Ensure layout
+            tf.Layout ();
+            tf.HasFocus = true;
+            
+            // Select all
+            tf.SelectAll ();
+            
+            // Press Right arrow
+            tf.NewKeyDownEvent (Key.CursorRight);
+            
+            // Check InsertionPoint - should be 9 (after the last digit)
+            Assert.Equal (9, tf.InsertionPoint);
+            
+            // Check visual cursor position - should be at column 9 (after last digit '0')
+            Assert.NotNull (tf.Cursor.Position);
+            Assert.Equal (9, tf.Cursor.Position.Value.X);
+        }
+        finally
+        {
+            app.Dispose ();
+        }
     }
 }

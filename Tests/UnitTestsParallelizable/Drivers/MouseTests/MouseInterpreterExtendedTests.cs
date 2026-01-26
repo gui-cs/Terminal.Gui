@@ -103,27 +103,27 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         List<Mouse> allEvents = [];
 
         // Button1 first click
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button1 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button2 first click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Button2 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Assert
         Assert.Contains (allEvents, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
@@ -185,12 +185,13 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     #region Modifier Key Tests
 
     // CoPilot: claude-3-7-sonnet-20250219
+    // Claude - Opus 4.5 - Updated to verify modifiers ARE preserved
     [Theory]
     [InlineData (MouseFlags.Shift)]
     [InlineData (MouseFlags.Ctrl)]
     [InlineData (MouseFlags.Alt)]
     [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)]
-    public void Process_ClickWithModifier_DoesNotPreserveModifier (MouseFlags modifier)
+    public void Process_ClickWithModifier_PreservesModifier (MouseFlags modifier)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
@@ -209,19 +210,16 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         Mouse? clickEvent = events2.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
         Assert.NotNull (clickEvent);
 
-        // NOTE: This documents a known limitation - MouseInterpreter's CreateClickEvent method
-        // copies ScreenPosition from the original event, but does NOT preserve modifiers.
-        // The synthetic click event only has the button click flag, not the modifier flags.
-        Assert.False (
-                      clickEvent.Flags.HasFlag (modifier),
-                      $"KNOWN LIMITATION: Synthetic click events do not preserve {modifier} modifier. "
-                      + "This is because CreateClickEvent in MouseInterpreter only sets Flags to ToClicks() result, "
-                      + "which doesn't include modifiers from the original event.");
+        // Verify that modifier flags are preserved in the synthetic click event
+        Assert.True (clickEvent.Flags.HasFlag (modifier),
+                     $"Synthetic click events should preserve {modifier} modifier. "
+                     + "CreateClickEvent in MouseInterpreter now ORs modifier flags from the original event.");
     }
 
     // CoPilot: claude-3-7-sonnet-20250219
+    // Claude - Opus 4.5 - Updated to verify modifiers ARE preserved
     [Fact]
-    public void Process_DoubleClickWithShift_DoesNotPreserveModifier ()
+    public void Process_DoubleClickWithShift_PreservesModifier ()
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
@@ -232,13 +230,13 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Act - Double-click with Shift held
         List<Mouse> allEvents = [];
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new () { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
 
         // Assert
         Mouse? singleClick =
@@ -248,14 +246,10 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         Assert.NotNull (singleClick);
         Assert.NotNull (doubleClick);
 
-        // NOTE: This documents a known limitation - modifiers are NOT preserved in synthetic events
-        Assert.False (
-                      singleClick.Flags.HasFlag (MouseFlags.Shift),
-                      "KNOWN LIMITATION: Single click synthetic event does not preserve Shift modifier");
+        // Verify that modifier flags are preserved in both single and double click synthetic events
+        Assert.True (singleClick.Flags.HasFlag (MouseFlags.Shift), "Single click synthetic event should preserve Shift modifier");
 
-        Assert.False (
-                      doubleClick.Flags.HasFlag (MouseFlags.Shift),
-                      "KNOWN LIMITATION: Double click synthetic event does not preserve Shift modifier");
+        Assert.True (doubleClick.Flags.HasFlag (MouseFlags.Shift), "Double click synthetic event should preserve Shift modifier");
     }
 
     #endregion

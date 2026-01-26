@@ -97,7 +97,7 @@ public class MouseTests : TestsAllViews
 
         view.Dispose ();
 
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
         Application.ResetState (true);
     }
 
@@ -321,7 +321,7 @@ public class MouseTests : TestsAllViews
 
     //    testView.Dispose ();
 
-    //    // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
+    //    // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
     //    Application.ResetState (true);
 
     //}
@@ -386,7 +386,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
         Application.ResetState (true);
     }
 
@@ -448,7 +448,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
         Application.ResetState (true);
     }
 
@@ -511,7 +511,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
         Application.ResetState (true);
     }
 
@@ -574,7 +574,7 @@ public class MouseTests : TestsAllViews
 
         testView.Dispose ();
 
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
         Application.ResetState (true);
     }
 
