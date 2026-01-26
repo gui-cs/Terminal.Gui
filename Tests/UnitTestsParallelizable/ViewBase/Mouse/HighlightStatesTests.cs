@@ -480,7 +480,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // Verify view1 grabbed the mouse
-        Assert.Equal (view1, app.Mouse.MouseGrabView);
+        Assert.True (app.Mouse.IsGrabbed (view1));
 
         // Clear tracking
         view2Events.Clear ();
