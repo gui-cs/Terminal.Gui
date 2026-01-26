@@ -88,5 +88,5 @@ jobs:
       with:
         token: ${{ secrets.TEMPLATE_REPO_TOKEN }}
         repository: gui-cs/Terminal.Gui.templates
-        event-type: nuget-published
+        event-type: terminal-gui-v2-released
         client-payload: ${{ steps.payload.outputs.json }} 
