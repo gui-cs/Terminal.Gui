@@ -40,6 +40,7 @@ public sealed class ShortcutTestWindow : Window
 
         // Test Shortcut 1: CheckBox CommandView
         CheckBox cb1 = new () { Text = "Option 1", CanFocus = false };
+
         var shortcut1 = new Shortcut
         {
             MouseHighlightStates = MouseState.In,
