@@ -76,6 +76,12 @@ jobs:
         Write-Host "Running delist script for just-published version: $version"
         ./Scripts/delist-nuget.ps1 -ApiKey "${{ secrets.NUGET_API_KEY }}" -JustPublishedVersion "$version"
     
+    - name: Prepare payload for template dispatch
+      if: github.ref == 'refs/heads/v2_release'
+      id: payload
+      run: |
+        echo "json={\"version\":\"${{ steps.gitversion.outputs.SemVer }}\"}" >> $GITHUB_OUTPUT
+    
     - name: Trigger Terminal.Gui.templates update
       if: github.ref == 'refs/heads/v2_release'
       uses: peter-evans/repository-dispatch@v3
@@ -83,4 +89,4 @@ jobs:
         token: ${{ secrets.PAT_FOR_TEMPLATES }}
         repository: gui-cs/Terminal.Gui.templates
         event-type: nuget-published
-        client-payload: '{"version": "${{ steps.gitversion.outputs.SemVer }}"}' 
+        client-payload: ${{ steps.payload.outputs.json }} 

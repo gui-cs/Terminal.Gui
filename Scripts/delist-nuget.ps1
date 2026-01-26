@@ -27,113 +27,73 @@ try {
 function Get-VersionSortKey {
     param([string]$version)
     
-    # Extract the numeric part after the last dot (e.g., "2.0.0-develop.123" -> 123)
-    if ($version -match '\.(\d+)$') {
+    # Extract the numeric part after the last dot for prerelease versions
+    # E.g., "2.0.0-develop.123" -> 123, "2.0.0-alpha.5" -> 5
+    if ($version -match '[\-\.](\d+)$') {
         return [int]$matches[1]
     }
     return 0
 }
 
-# Process develop packages - keep only the most recent
-$developPattern = "^2\.0\.0-develop\..*$"
-$developVersions = $allVersions | Where-Object { $_ -match $developPattern }
-
-if ($developVersions.Count -gt 1) {
-    # Sort by version number and keep the most recent
-    $sortedDevelopVersions = $developVersions | Sort-Object { Get-VersionSortKey $_ } -Descending
-    $toKeep = $sortedDevelopVersions[0]
-    $toUnlist = $sortedDevelopVersions | Select-Object -Skip 1
+# Function to process package versions with a specific pattern
+function Process-PackageVersions {
+    param(
+        [string]$Pattern,
+        [string]$PackageType,
+        [array]$AllVersions,
+        [string]$JustPublished = ""
+    )
     
-    Write-Host "Found $($developVersions.Count) develop versions. Keeping most recent: $toKeep"
+    $matchingVersions = $AllVersions | Where-Object { $_ -match $Pattern }
     
+    if ($matchingVersions.Count -eq 0) {
+        Write-Host "No $PackageType versions found."
+        return
+    }
+    
+    # Determine which version to keep
+    $toKeep = $null
+    $toUnlist = @()
+    
+    if ($JustPublished -ne "" -and $JustPublished -match $Pattern) {
+        # Keep the just-published version
+        $toKeep = $JustPublished
+        $toUnlist = $matchingVersions | Where-Object { $_ -ne $JustPublished }
+        
+        if ($toUnlist.Count -gt 0) {
+            Write-Host "Found $($matchingVersions.Count) $PackageType versions. Keeping just-published: $toKeep"
+        } else {
+            Write-Host "Found $($matchingVersions.Count) $PackageType versions. Just-published version is the only one."
+            return
+        }
+    } else {
+        # Keep the most recent version
+        if ($matchingVersions.Count -eq 1) {
+            Write-Host "Found 1 $PackageType version. Nothing to unlist."
+            return
+        }
+        
+        $sortedVersions = $matchingVersions | Sort-Object { Get-VersionSortKey $_ } -Descending
+        $toKeep = $sortedVersions[0]
+        $toUnlist = $sortedVersions | Select-Object -Skip 1
+        
+        Write-Host "Found $($matchingVersions.Count) $PackageType versions. Keeping most recent: $toKeep"
+    }
+    
+    # Delist versions
     foreach ($version in $toUnlist) {
-        Write-Host "Unlisting develop package: $packageId - $version"
+        Write-Host "Unlisting $PackageType package: $packageId - $version"
         dotnet nuget delete $packageId $version --source $nugetSource --api-key $ApiKey --non-interactive
     }
-} else {
-    Write-Host "Found $($developVersions.Count) develop versions. Nothing to unlist."
 }
 
-# Process alpha packages - keep only the just-published one
-$alphaPattern = "^2\.0\.0-alpha\..*$"
-$alphaVersions = $allVersions | Where-Object { $_ -match $alphaPattern }
+# Process develop packages - keep only the most recent
+Process-PackageVersions -Pattern "^2\.0\.0-develop\..*$" -PackageType "develop" -AllVersions $allVersions
 
-if ($alphaVersions.Count -gt 0) {
-    # If a version was just published, keep only that one
-    if ($JustPublishedVersion -ne "" -and $JustPublishedVersion -match $alphaPattern) {
-        $toUnlist = $alphaVersions | Where-Object { $_ -ne $JustPublishedVersion }
-        
-        if ($toUnlist.Count -gt 0) {
-            Write-Host "Found $($alphaVersions.Count) alpha versions. Keeping just-published: $JustPublishedVersion"
-            
-            foreach ($version in $toUnlist) {
-                Write-Host "Unlisting alpha package: $packageId - $version"
-                dotnet nuget delete $packageId $version --source $nugetSource --api-key $ApiKey --non-interactive
-            }
-        } else {
-            Write-Host "Found $($alphaVersions.Count) alpha versions. Just-published version is the only one."
-        }
-    } else {
-        # If no version was just published or it's not alpha, keep the most recent
-        $sortedAlphaVersions = $alphaVersions | Sort-Object { Get-VersionSortKey $_ } -Descending
-        $toKeep = $sortedAlphaVersions[0]
-        
-        if ($alphaVersions.Count -gt 1) {
-            $toUnlist = $sortedAlphaVersions | Select-Object -Skip 1
-            
-            Write-Host "Found $($alphaVersions.Count) alpha versions. Keeping most recent: $toKeep"
-            
-            foreach ($version in $toUnlist) {
-                Write-Host "Unlisting alpha package: $packageId - $version"
-                dotnet nuget delete $packageId $version --source $nugetSource --api-key $ApiKey --non-interactive
-            }
-        } else {
-            Write-Host "Found $($alphaVersions.Count) alpha versions. Nothing to unlist."
-        }
-    }
-} else {
-    Write-Host "No alpha versions found."
-}
+# Process alpha packages - keep only the just-published one or most recent
+Process-PackageVersions -Pattern "^2\.0\.0-alpha\..*$" -PackageType "alpha" -AllVersions $allVersions -JustPublished $JustPublishedVersion
 
-# Process beta packages - keep only the just-published one (for future use)
-$betaPattern = "^2\.0\.0-beta\..*$"
-$betaVersions = $allVersions | Where-Object { $_ -match $betaPattern }
-
-if ($betaVersions.Count -gt 0) {
-    # If a version was just published, keep only that one
-    if ($JustPublishedVersion -ne "" -and $JustPublishedVersion -match $betaPattern) {
-        $toUnlist = $betaVersions | Where-Object { $_ -ne $JustPublishedVersion }
-        
-        if ($toUnlist.Count -gt 0) {
-            Write-Host "Found $($betaVersions.Count) beta versions. Keeping just-published: $JustPublishedVersion"
-            
-            foreach ($version in $toUnlist) {
-                Write-Host "Unlisting beta package: $packageId - $version"
-                dotnet nuget delete $packageId $version --source $nugetSource --api-key $ApiKey --non-interactive
-            }
-        } else {
-            Write-Host "Found $($betaVersions.Count) beta versions. Just-published version is the only one."
-        }
-    } else {
-        # If no version was just published or it's not beta, keep the most recent
-        $sortedBetaVersions = $betaVersions | Sort-Object { Get-VersionSortKey $_ } -Descending
-        $toKeep = $sortedBetaVersions[0]
-        
-        if ($betaVersions.Count -gt 1) {
-            $toUnlist = $sortedBetaVersions | Select-Object -Skip 1
-            
-            Write-Host "Found $($betaVersions.Count) beta versions. Keeping most recent: $toKeep"
-            
-            foreach ($version in $toUnlist) {
-                Write-Host "Unlisting beta package: $packageId - $version"
-                dotnet nuget delete $packageId $version --source $nugetSource --api-key $ApiKey --non-interactive
-            }
-        } else {
-            Write-Host "Found $($betaVersions.Count) beta versions. Nothing to unlist."
-        }
-    }
-} else {
-    Write-Host "No beta versions found."
-}
+# Process beta packages - keep only the just-published one or most recent (for future use)
+Process-PackageVersions -Pattern "^2\.0\.0-beta\..*$" -PackageType "beta" -AllVersions $allVersions -JustPublished $JustPublishedVersion
 
 Write-Host "Operation complete."
