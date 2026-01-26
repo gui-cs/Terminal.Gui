@@ -20,7 +20,7 @@ try {
     $allVersions = $versionsResponse.versions
 } catch {
     Write-Host "Error fetching package versions: $_"
-    exit 1
+    exit 0
 }
 
 # Function to parse version and extract numeric parts for comparison
@@ -87,13 +87,13 @@ function Process-PackageVersions {
     }
 }
 
-# Process develop packages - keep only the most recent
-Process-PackageVersions -Pattern "^2\.0\.0-develop\..*$" -PackageType "develop" -AllVersions $allVersions
+# # Process develop packages - keep only the most recent
+# Process-PackageVersions -Pattern "^2\.0\.0-develop\..*$" -PackageType "develop" -AllVersions $allVersions
 
-# Process alpha packages - keep only the just-published one or most recent
-Process-PackageVersions -Pattern "^2\.0\.0-alpha\..*$" -PackageType "alpha" -AllVersions $allVersions -JustPublished $JustPublishedVersion
+# # Process alpha packages - keep only the just-published one or most recent
+# Process-PackageVersions -Pattern "^2\.0\.0-alpha\..*$" -PackageType "alpha" -AllVersions $allVersions -JustPublished $JustPublishedVersion
 
-# Process beta packages - keep only the just-published one or most recent (for future use)
-Process-PackageVersions -Pattern "^2\.0\.0-beta\..*$" -PackageType "beta" -AllVersions $allVersions -JustPublished $JustPublishedVersion
+# # Process beta packages - keep only the just-published one or most recent (for future use)
+# Process-PackageVersions -Pattern "^2\.0\.0-beta\..*$" -PackageType "beta" -AllVersions $allVersions -JustPublished $JustPublishedVersion
 
 Write-Host "Operation complete."
