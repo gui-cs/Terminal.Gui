@@ -113,8 +113,6 @@ public class Shortcut : View, IOrientation, IDesignable
     // Helper to set Width consistently
     internal Dim GetWidthDimAuto () => Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => _minimumNaturalWidth ?? 0), Dim.Func (_ => _minimumNaturalWidth ?? 0));
 
-    private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
-
     // This is used to calculate the minimum width of the Shortcut when Width is NOT Dim.Auto
     // It is calculated by setting Width to DimAuto temporarily and forcing layout.
     // Once Frame.Width gets below this value, LayoutStarted makes HelpView an KeyView smaller.
@@ -131,15 +129,15 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </remarks>
     public AlignmentModes AlignmentModes
     {
-        get => _alignmentModes;
+        get;
         set
         {
-            _alignmentModes = value;
+            field = value;
             SetCommandViewDefaultLayout ();
             SetHelpViewDefaultLayout ();
             SetKeyViewDefaultLayout ();
         }
-    }
+    } = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
     // When one of the subviews is "empty" we don't want to show it. So we
     // Use Add/Remove. We need to be careful to add them in the right order
@@ -660,22 +658,20 @@ public class Shortcut : View, IOrientation, IDesignable
 
     public View KeyView { get; } = new ();
 
-    private int _minimumKeyTextSize;
-
     /// <summary>
     ///     Gets or sets the minimum size of the key text. Useful for aligning the key text with other <see cref="Shortcut"/>s.
     /// </summary>
     public int MinimumKeyTextSize
     {
-        get => _minimumKeyTextSize;
+        get;
         set
         {
-            if (value == _minimumKeyTextSize)
+            if (value == field)
             {
                 return;
             }
 
-            _minimumKeyTextSize = value;
+            field = value;
             SetKeyViewDefaultLayout ();
         }
     }
