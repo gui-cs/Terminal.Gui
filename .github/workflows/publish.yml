@@ -86,7 +86,7 @@ jobs:
       if: github.ref == 'refs/heads/v2_release'
       uses: peter-evans/repository-dispatch@v3
       with:
-        token: ${{ secrets.PAT_FOR_TEMPLATES }}
+        token: ${{ secrets.TEMPLATE_REPO_TOKEN }}
         repository: gui-cs/Terminal.Gui.templates
         event-type: nuget-published
         client-payload: ${{ steps.payload.outputs.json }} 
