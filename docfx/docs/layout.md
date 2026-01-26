@@ -144,35 +144,22 @@ anotherView.Height = Dim.Height (view) + 1;
 
 ```mermaid
 classDiagram
-    class View {
-    }
+    class View ["View — location and size relative to SuperView"]
+    class Frame ["Frame — Rectangle"]
+    class Viewport ["Viewport — visible portion of Content Area"]
+    class Margin ["Margin — where Shadows live"]
+    class Border ["Border — Title and Arrangement controls"]
+    class Padding ["Padding — where ScrollBars live"]
+    class Adornment
+    class Thickness ["Thickness — each side has a width"]
 
-    View --> Frame : is Rectangle
-    View --> Viewport : is Rectangle
-
-    class Border {
-    }
-
-    class Adornment {
-    }
-
-    class Thickness {
-    }
-
-
-    Margin --> Adornment : is
-    Border --> Adornment : is
-    Padding --> Adornment : is
-    Adornment --> Thickness : has
-
+    View --> Frame
+    View --> Viewport
     View --> Margin : has
     View --> Border : has
     View --> Padding : has
-
-    note for View "Defines location and size relative to SuperView"
-    note for Viewport "Defines the visible portion of the Content Area"
-    note for Margin "Where Shadows live"
-    note for Border "Where Border, Title, and Arrangement controls live"
-    note for Padding "Where ScrollBars live"
-    note for Thickness "A rectangle where each side can have a width"
+    Margin --|> Adornment
+    Border --|> Adornment
+    Padding --|> Adornment
+    Adornment --> Thickness : has
 ```
