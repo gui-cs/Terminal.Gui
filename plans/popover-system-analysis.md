@@ -172,43 +172,395 @@ This means menu items automatically show the correct keyboard shortcut without m
 
 ---
 
+## Integration Points
+
+### Keyboard Pipeline
+
+The keyboard dispatch in `KeyboardImpl.RaiseKeyDownEvent()` (`Terminal.Gui/App/Keyboard/KeyboardImpl.cs:148-206`) routes keys through the popover system **before** sending them to the `TopRunnableView`:
+
+1. `KeyDown` event is raised (line 160)
+2. **`App?.Popover?.DispatchKeyDown(key)`** is called (line 167) — popovers get first priority
+3. If no popover handled it, `TopRunnableView.NewKeyDownEvent()` is called (line 192)
+4. Finally, application-level command bindings are checked (line 198)
+
+### Mouse Pipeline
+
+The mouse dismiss logic in `MouseImpl.RaiseMouseEvent()` (`Terminal.Gui/App/Mouse/MouseImpl.cs:42-93`):
+
+1. Gets views under the mouse location (line 60)
+2. If a mouse press occurs outside the active popover's hierarchy (lines 83-85), calls `HideWithQuitCommand()` to dismiss the popover
+3. Recursively re-raises the mouse event so the underlying view receives the click (line 90)
+4. A secondary check at line 109-113 ensures mouse events only go to views inside the `TopRunnableView` or active popover hierarchy
+
+### Application Lifecycle
+
+- **Initialization**: `ApplicationImpl.Popover` is lazy-initialized (`ApplicationImpl.cs:251-260`)
+- **Session End**: `ApplicationImpl.Run.End()` hides the active popover (`ApplicationImpl.Run.cs:300-305`)
+- **Shutdown**: `ApplicationImpl.ResetState()` hides active, disposes `ApplicationPopover`, sets to null (`ApplicationImpl.Lifecycle.cs:248-258`)
+
+### MenuBar Integration
+
+- `MenuBar` creates/manages `PopoverMenu` instances for each `MenuBarItem`
+- `MenuBarItem.PopoverMenu` property subscribes to `VisibleChanged` and `Accepted` events
+- `MenuBar.ShowItem()` calls `PopoverMenu.MakeVisible()` and subscribes to `Accepting`
+- `MenuBar.HideItem()` / `HideActiveItem()` manages visibility state
+
+### View Integration
+
+- `TextField` creates a context menu (`TextField.cs:106-127`) and registers it with `App.Popover`
+- `CharMap` similarly uses `PopoverMenu.DefaultKey` for context menu binding
+
+---
+
+## Code Review — Issues Found
+
+### CRITICAL — Bugs That Can Cause Crashes or Memory Leaks
+
+#### Issue 1: Event Handlers Not Unsubscribed When `PopoverMenu.Root` Changes
+
+**File:** `PopoverMenu.cs:305-336`
+
+When the `Root` property setter is called with a new value, it subscribes event handlers (`MenuOnAccepting`, `MenuAccepted`, `MenuOnSelectedMenuItemChanged`) to every menu in the *new* hierarchy — but never unsubscribes the same handlers from the *old* hierarchy:
+
+```csharp
+// Line 312: old root is hidden but handlers remain attached
+HideAndRemoveSubMenu (_root);
+_root = value;
+// ...
+// Line 328-335: only subscribes to new menus
+foreach (Menu menu in allMenus)
+{
+    menu.Accepting += MenuOnAccepting;       // old menu still has this handler!
+    menu.Accepted += MenuAccepted;
+    menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
+}
+```
+
+Contrast this with the `Dispose` method (`PopoverMenu.cs:682-700`) which *does* unsubscribe — proving the intent exists but was missed in the setter. If `Root` is set multiple times, handlers accumulate on old menu objects, preventing GC and causing ghost event firings.
+
+**Fix:** Add unsubscription before `HideAndRemoveSubMenu(_root)`:
+
+```csharp
+if (_root is { })
+{
+    IEnumerable<Menu> oldMenus = GetAllSubMenus ();
+    foreach (Menu menu in oldMenus)
+    {
+        menu.Accepting -= MenuOnAccepting;
+        menu.Accepted -= MenuAccepted;
+        menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
+    }
+}
+```
+
+---
+
+#### Issue 2: `DispatchKeyDown` Can Crash If a Popover Is DeRegistered During Iteration
+
+**File:** `ApplicationPopover.cs:213-231`
+
+The `foreach (IPopover popover in _popovers)` loop iterates the live `_popovers` list. If `NewKeyDownEvent()` on line 225 triggers user code that calls `DeRegister()`, the list is modified during enumeration, throwing `InvalidOperationException`:
+
+```csharp
+foreach (IPopover popover in _popovers)   // <-- iterating live list
+{
+    // ...
+    hotKeyHandled = popoverView.NewKeyDownEvent (key);  // could trigger DeRegister()
+}
+```
+
+**Fix:** Iterate a snapshot: `foreach (IPopover popover in _popovers.ToList())`.
+
+---
+
+#### Issue 3: `MenuBar.ShowItem` Subscribes to Wrong Event for Unsubscription
+
+**File:** `MenuBar.cs:425-442`
+
+This is a clear bug — the handler subscribes to `menuBarItem.Accepting` but tries to unsubscribe from `menuBarItem.PopoverMenu.VisibleChanged`:
+
+```csharp
+menuBarItem.Accepting += OnMenuItemAccepted;          // subscribes to Accepting
+
+void OnMenuItemAccepted (object? sender, EventArgs args)
+{
+    menuBarItem.PopoverMenu.VisibleChanged -= OnMenuItemAccepted;  // wrong event!
+    // ...
+}
+```
+
+This means:
+- The `Accepting` handler is **never** unsubscribed (memory leak, handler accumulation)
+- Each call to `ShowItem()` adds *another* `OnMenuItemAccepted` handler since the local function captures the `menuBarItem` parameter (a new closure per call)
+- Over time, repeated open/close cycles cause `OnMenuItemAccepted` to fire multiple times
+
+---
+
+### HIGH — Significant Design Issues
+
+#### Issue 4: `HideWithQuitCommand` Has Confusing / Possibly Inverted Logic
+
+**File:** `ApplicationPopover.cs:177-185`
+
+```csharp
+if (visiblePopover.Visible
+    && (!visiblePopover.GetSupportedCommands ().Contains (Command.Quit)
+    || (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)))
+{
+    visiblePopover.Visible = false;
+}
+```
+
+This reads: "If the popover is visible AND (doesn't support Quit **OR** (Quit returned true AND still visible)), then force hide."
+
+- If the popover **doesn't support** `Command.Quit`, it gets force-hidden anyway — this seems inverted. Why force-hide a popover that hasn't opted into Quit behavior?
+- If `InvokeCommand(Command.Quit)` returns `true` (handled), the handler should have already hidden the popover. The `visiblePopover.Visible` re-check implies distrust of the handler.
+- Called from `MouseImpl.RaiseMouseEvent` (line 87) and `ApplicationImpl.Run.End` (line 302).
+
+---
+
+#### Issue 5: Recursive `OnVisibleChanged` ↔ `HideAndRemoveSubMenu` Interaction
+
+**File:** `PopoverMenu.cs:272-286` and `548-570`
+
+`HideAndRemoveSubMenu` sets `Visible = false` on Root (line 567), which triggers `OnVisibleChanged`, which calls `HideAndRemoveSubMenu(_root)` again. Currently this doesn't infinite-loop because the second call finds `menu.Visible` already `false` and exits — but this is a fragile invariant:
+
+```csharp
+private void HideAndRemoveSubMenu (Menu? menu)
+{
+    if (menu is { Visible: true })       // guard saves us, but fragile
+    {
+        // ...
+        menu.Visible = false;
+        if (menu == Root) { Visible = false; }  // triggers OnVisibleChanged → HideAndRemoveSubMenu again
+    }
+}
+```
+
+**Fix:** Add a `_isHiding` guard flag to make this robust.
+
+---
+
+#### Issue 6: `Dispose()` Doesn't Clear `_activePopover`
+
+**File:** `ApplicationPopover.cs:237-248`
+
+After disposing all registered popovers and clearing the list, `_activePopover` is never set to `null`. If `GetActivePopover()` is called after `Dispose()`, it returns a reference to a disposed `View`, potentially causing `ObjectDisposedException`.
+
+---
+
+### MEDIUM — Design Smells and Edge Cases
+
+#### Issue 7: `PopoverBaseImpl.OnVisibleChanging` — Counter-Intuitive Logic
+
+**File:** `PopoverBaseImpl.cs:111-139`
+
+The method checks `!Visible` to mean "about to become visible," which is correct but reads backwards:
+
+```csharp
+if (!Visible)   // Comment says: "When visible is changing to true"
+{
+    Layout (App.Screen.Size);
+}
+else            // Comment says: "When visible is changing to false"
+{
+    // restore focus
+}
+```
+
+This works because `OnVisibleChanging` fires *before* the property value changes. The comments are correct but the code reads opposite to the comments. This is a maintenance trap.
+
+---
+
+#### Issue 8: `ForceFocusColors` Not Reset When Popover Is Closed
+
+**File:** `PopoverMenu.cs:483, 497, 558`
+
+When `ShowSubMenu()` is called, `menuItem.ForceFocusColors = true` (line 497). But when the entire popover is hidden (not just when switching to a peer submenu), `ForceFocusColors` is never reset to `false`. The `HideAndRemoveSubMenu` method only resets it for *peer* items (line 484), not for the item whose submenu is being hidden.
+
+---
+
+#### Issue 9: `Hide()` Silently No-Ops for Non-Active Popovers
+
+**File:** `ApplicationPopover.cs:161-170`
+
+If you call `Hide()` with a popover that isn't the active one, nothing happens — no exception, no return value, no logging:
+
+```csharp
+public void Hide (IPopover? popover)
+{
+    if (_activePopover is View popoverView && popoverView == popover)
+    {
+        // only hides if it's the active popover
+    }
+    // else: silently does nothing
+}
+```
+
+---
+
+#### Issue 10: `Show()` Skips All Validation If Popover Is Not a `View`
+
+**File:** `ApplicationPopover.cs:130-152`
+
+The entire validation and activation block is wrapped in `if (popover is View newPopover)`. If someone implements `IPopover` on a non-`View` class, `Show()` would pass the registration check but then silently skip all initialization.
+
+---
+
+#### Issue 11: Commented-Out Filter in `OnAccepting`
+
+**File:** `PopoverMenu.cs:645-649`
+
+```csharp
+// Only raise Accepted if the command came from one of our MenuItems
+//if (GetMenuItemsOfAllSubMenus ().Contains (args.Context?.Source))
+{
+    RaiseAccepted (args.Context);  // always runs — ignores the contract in the comment
+}
+```
+
+`RaiseAccepted` fires unconditionally, even for commands that didn't originate from a `MenuItem`. The comment indicates intent to filter, but the filter is commented out.
+
+---
+
+#### Issue 12: Unused Variable in `GetMostVisibleLocationForSubMenu`
+
+**File:** `PopoverMenu.cs:512`
+
+```csharp
+var pos = Point.Empty;  // created but never used
+```
+
+---
+
+#### Issue 13: Indentation Error in `MenuOnAccepting`
+
+**File:** `PopoverMenu.cs:584`
+
+The `if` block starting at line 584 has incorrect indentation (extra indent level), suggesting a refactoring leftover.
+
+---
+
+#### Issue 14: Dynamic Menu Support Not Implemented (TODOs)
+
+**File:** `PopoverMenu.cs:321-325`
+
+Two TODO comments indicate that key bindings and event subscriptions should be updated whenever `MenuItem`s change in the tree, but this isn't implemented. Adding/removing menu items dynamically after `Root` is set results in stale bindings and missing event handlers.
+
+---
+
 ## Test Coverage Summary
 
-### `PopoverBaseImplTests` (Parallelizable)
+### Existing Test Files (8 files, ~80+ tests)
 
-- Constructor defaults verification
-- `Current` property get/set
-- `Show` throws on missing Transparent flags
-- `Show` throws on missing Quit command
-- `Show` throws if not registered
+| Test File | Project | Tests | Coverage Area |
+|-----------|---------|-------|---------------|
+| `UnitTests/Application/ApplicationPopoverTests.cs` | UnitTests | 11 | App lifecycle, disposal, runnable scoping, GetViewsUnderMouse |
+| `UnitTestsParallelizable/Application/Popover/Application.PopoverTests.cs` | Parallelizable | 8 | Register/DeRegister, Show/Hide, DispatchKeyDown routing |
+| `UnitTestsParallelizable/Application/Popover/PopoverBaseImplTests.cs` | Parallelizable | 5 | Constructor defaults, Show validation |
+| `IntegrationTests/FluentTests/PopverMenuTests.cs` | Integration | 9 | EnableForDesign, QuitKey, focus, context menus, submenus |
+| `IntegrationTests/FluentTests/MenuBarvTests.cs` | Integration | 15 | MenuBar activation, navigation, show/hide popovers |
+| `UnitTests/Views/MenuBarTests.cs` | UnitTests | 17 | MenuBar hotkeys, mouse, dynamic updates, disabled state |
+| `UnitTestsParallelizable/Views/MenuBarItemTests.cs` | Parallelizable | 1 | Constructor defaults |
+| `TerminalGuiFluentTesting/TestContext.ContextMenu.cs` | Test Helper | — | `WithContextMenu()` helper method |
 
-### `ApplicationPopoverTests` (Parallelizable)
+### Test Coverage Gaps
 
-- Register/DeRegister with Moq
-- Show/Hide active popover management
-- DispatchKeyDown routing (active gets all keys, inactive gets hotkeys+keys)
-- Uses a custom `PopoverTestClass : View, IPopover` (NOT PopoverBaseImpl)
+#### Gap 1: No Test for Setting `Root` Multiple Times
+**Covers bug:** Issue 1 (event handler leak)
 
-### `ApplicationPopoverTests` (UnitTests — non-parallel)
+No test verifies that setting `PopoverMenu.Root` to a new value properly unsubscribes from the old menu hierarchy. A test should:
+1. Create a `PopoverMenu`, set `Root` to Menu A
+2. Set `Root` to Menu B
+3. Trigger events on Menu A and verify they do NOT reach the `PopoverMenu`
+4. Verify Menu A's event subscribers are empty
 
-- Application.Init/Shutdown lifecycle
-- Registered popovers disposed on Shutdown
-- DeRegistered popovers NOT disposed on Shutdown
-- Application.End hides active but doesn't reset manager
-- Register auto-sets Runnable
-- Keyboard events scoped to associated Runnable
-- `GetViewsUnderMouse` with active popover (transparent mouse behavior)
-- Uses `PopoverTestClass : PopoverBaseImpl`
+---
 
-### `PopoverMenuTests` (Integration — FluentTesting)
+#### Gap 2: No Test for `DeRegister` During `DispatchKeyDown`
+**Covers bug:** Issue 2 (iteration crash)
 
-- `EnableForDesign` creates correct menu items
-- Show sets navigation/focus correctly
-- QuitKey hides and restores focus
-- QuitKey doesn't quit the app when popover handles it
-- Inactive popover doesn't consume Space/Enter/QuitKey events
-- Context menu with right-click + left-click selection
-- Context menu with submenu navigation (arrow keys + Enter)
+No test verifies that calling `DeRegister()` from within a key handler doesn't crash. A test should:
+1. Register two popovers
+2. Have the first popover's key handler call `DeRegister()` on the second
+3. Verify no `InvalidOperationException`
+
+---
+
+#### Gap 3: No Test for `MenuBar.ShowItem` Handler Accumulation
+**Covers bug:** Issue 3 (wrong event unsubscription)
+
+No test verifies that calling `ShowItem()` multiple times doesn't accumulate `Accepting` handlers. Note: `MenuBarTests.cs` has a **skipped test** (`Mouse_Click_Deactivates`) commenting about a "known issue with popover mouse handling" — this may be related.
+
+---
+
+#### Gap 4: No Test for `HideWithQuitCommand` Edge Cases
+**Covers issue:** Issue 4
+
+No test verifies behavior when `HideWithQuitCommand` is called on a popover that doesn't support `Command.Quit`. The current behavior (force-hide) is untested and possibly wrong.
+
+---
+
+#### Gap 5: No Test for `Hide()` With Non-Active Popover
+**Covers issue:** Issue 9
+
+No test verifies behavior when `Hide()` is called with a registered-but-not-active popover.
+
+---
+
+#### Gap 6: No Test for `Dispose()` Cleanup of `_activePopover`
+**Covers issue:** Issue 6
+
+Tests verify that registered popovers are disposed on shutdown, but no test verifies that `GetActivePopover()` returns `null` after disposal.
+
+---
+
+#### Gap 7: No Test for Showing the Same Popover Twice
+
+No test verifies what happens when `Show()` is called with the already-active popover. Currently it hides and re-shows, which is wasteful but not harmful.
+
+---
+
+#### Gap 8: No Test for `OnVisibleChanging` Focus Restoration Path
+
+`PopoverBaseImpl.OnVisibleChanging` restores focus when hiding (line 132-135). Integration tests verify focus restoration via `QuitKey_Restores_Focus_Correctly`, but no unit test directly tests the `OnVisibleChanging` path — especially the `ApplicationNavigation.IsInHierarchy` check.
+
+---
+
+#### Gap 9: No Test for `ForceFocusColors` State After Popover Close
+**Covers issue:** Issue 8
+
+No test verifies that `MenuItem.ForceFocusColors` is properly reset when the entire popover is closed.
+
+---
+
+#### Gap 10: No Test for Mouse Dismiss → Recurse Behavior
+
+`MouseImpl.cs:86-92` hides the popover on outside click and then **recursively calls** `RaiseMouseEvent` so the click passes through. No test verifies:
+- That the recursion doesn't infinite-loop
+- That the underlying view actually receives the click
+- That the recursion happens exactly once
+
+---
+
+## Issues Summary Table
+
+| # | Issue | Severity | File:Line | Has Test? |
+|---|-------|----------|-----------|-----------|
+| 1 | Event handlers not unsubscribed on `Root` change | **CRITICAL** | PopoverMenu.cs:305 | No |
+| 2 | `DispatchKeyDown` iteration crash on `DeRegister` | **CRITICAL** | ApplicationPopover.cs:213 | No |
+| 3 | `ShowItem` subscribes/unsubscribes wrong events | **CRITICAL** | MenuBar.cs:425-442 | No |
+| 4 | `HideWithQuitCommand` confusing/inverted logic | HIGH | ApplicationPopover.cs:177 | No |
+| 5 | Recursive `OnVisibleChanged` ↔ `HideAndRemoveSubMenu` | HIGH | PopoverMenu.cs:272,548 | No |
+| 6 | `Dispose()` doesn't clear `_activePopover` | HIGH | ApplicationPopover.cs:237 | No |
+| 7 | `OnVisibleChanging` counter-intuitive `!Visible` check | MEDIUM | PopoverBaseImpl.cs:120 | Partial |
+| 8 | `ForceFocusColors` not reset on popover close | MEDIUM | PopoverMenu.cs:497 | No |
+| 9 | `Hide()` silent no-op for non-active popover | MEDIUM | ApplicationPopover.cs:161 | No |
+| 10 | `Show()` skips validation for non-View IPopover | MEDIUM | ApplicationPopover.cs:130 | No |
+| 11 | Commented-out filter in `OnAccepting` | MEDIUM | PopoverMenu.cs:645 | No |
+| 12 | Unused variable `pos` | LOW | PopoverMenu.cs:512 | — |
+| 13 | Indentation error | LOW | PopoverMenu.cs:584 | — |
+| 14 | Dynamic menu updates not supported | MEDIUM | PopoverMenu.cs:321 | — |
 
 ---
 
@@ -221,4 +573,11 @@ This means menu items automatically show the correct keyboard shortcut without m
 | `Terminal.Gui/App/ApplicationPopover.cs` | Manager singleton |
 | `Terminal.Gui/App/Application.Popover.cs` | Static accessor (legacy) |
 | `Terminal.Gui/Views/Menu/PopoverMenu.cs` | Concrete cascading menu |
+| `Terminal.Gui/Views/Menu/MenuBar.cs` | MenuBar integration |
+| `Terminal.Gui/Views/Menu/MenuBarItem.cs` | MenuBarItem integration |
+| `Terminal.Gui/App/Keyboard/KeyboardImpl.cs` | Keyboard dispatch pipeline |
+| `Terminal.Gui/App/Mouse/MouseImpl.cs` | Mouse dismiss pipeline |
+| `Terminal.Gui/App/ApplicationImpl.cs` | Popover lazy init |
+| `Terminal.Gui/App/ApplicationImpl.Lifecycle.cs` | Shutdown cleanup |
+| `Terminal.Gui/App/ApplicationImpl.Run.cs` | Session end cleanup |
 | `docfx/docs/Popovers.md` | User-facing documentation |
