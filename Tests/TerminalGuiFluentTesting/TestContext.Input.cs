@@ -84,7 +84,7 @@ public partial class TestContext
                            if (app.Driver is { })
                            {
                                // Set timestamp from virtual time provider
-                               mouse.Timestamp = _timeProvider.Now;
+                               mouse.Timestamp = TimeProvider.Now;
                                mouse.Position = mouse.ScreenPosition;
 
                                // Use the new simplified injection API
@@ -93,7 +93,7 @@ public partial class TestContext
                                // Advance virtual time after complete clicks to space them apart
                                // This prevents rapid clicks from being detected as multi-clicks
                                // while keeping Press+Release pairs together (no delay within a single click)
-                               if (advanceTimeAfter && _timeProvider is VirtualTimeProvider vtp)
+                               if (advanceTimeAfter && TimeProvider is VirtualTimeProvider vtp)
                                {
                                    // Advance virtual time beyond the double-click threshold (500ms)
                                    // This is instant - no real delay!

@@ -101,7 +101,7 @@ public partial class View // Layout APIs
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?
         OnFrameChanged (in frame);
-        FrameChanged?.Invoke (this, new (in frame));
+        FrameChanged?.Invoke (this, new EventArgs<Rectangle> (in frame));
 
         if (oldViewport != Viewport)
         {
@@ -165,7 +165,7 @@ public partial class View // Layout APIs
     {
         if (SuperView is null)
         {
-            return new (location.X - Frame.X, location.Y - Frame.Y);
+            return new Point (location.X - Frame.X, location.Y - Frame.Y);
         }
 
         Point superViewViewportOffset = SuperView.GetViewportOffsetFromFrame ();
@@ -326,8 +326,7 @@ public partial class View // Layout APIs
         get => _height;
         set
         {
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref _height,
                                               value,
                                               OnHeightChanging,
@@ -415,8 +414,7 @@ public partial class View // Layout APIs
         get => _width;
         set
         {
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref _width,
                                               value,
                                               OnWidthChanging,
@@ -439,12 +437,10 @@ public partial class View // Layout APIs
 
     private void NeedsClearScreenNextIteration ()
     {
-        if (App is { TopRunnableView: { } }
-            && App.TopRunnableView == this
-            && App.SessionStack!.Select (r => r.Runnable as View).Count () == 1)
+        if (App?.SessionStack?.Select (r => r.Runnable as View).Count () == 1)
         {
-            // If this is the only Runnable, we need to redraw the screen
-            App.ClearScreenNextIteration = true;
+            // this is the root IRunnable; we need to redraw the screen
+            App?.ClearScreenNextIteration = true;
         }
     }
 
@@ -717,8 +713,8 @@ public partial class View // Layout APIs
 
         Size contentSize = GetContentSize ();
 
-        OnSubViewLayout (new (contentSize));
-        SubViewLayout?.Invoke (this, new (contentSize));
+        OnSubViewLayout (new LayoutEventArgs (contentSize));
+        SubViewLayout?.Invoke (this, new LayoutEventArgs (contentSize));
 
         // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
         if (Margin is { SubViews.Count: > 0 })
@@ -779,8 +775,8 @@ public partial class View // Layout APIs
 
         NeedsLayout = layoutStillNeeded;
 
-        OnSubViewsLaidOut (new (contentSize));
-        SubViewsLaidOut?.Invoke (this, new (contentSize));
+        OnSubViewsLaidOut (new LayoutEventArgs (contentSize));
+        SubViewsLaidOut?.Invoke (this, new LayoutEventArgs (contentSize));
     }
 
     /// <summary>
@@ -809,7 +805,9 @@ public partial class View // Layout APIs
     ///     Override to perform tasks after the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { /*Debug.Assert (!NeedsLayout);*/ }
+    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args)
+    { /*Debug.Assert (!NeedsLayout);*/
+    }
 
     /// <summary>Raised after all sub-views have been laid out.</summary>
     /// <remarks>
@@ -1003,6 +1001,7 @@ public partial class View // Layout APIs
                 }
 
                 return;
+
             case PosCombine pc:
                 // TODO: Redo without recursion
                 CollectPos (pc.Left, from, ref nNodes, ref nEdges);
@@ -1013,11 +1012,7 @@ public partial class View // Layout APIs
     }
 
     // https://en.wikipedia.org/wiki/Topological_sorting
-    internal static List<View> TopologicalSort (
-        View superView,
-        IEnumerable<View> nodes,
-        ICollection<(View From, View To)> edges
-    )
+    internal static List<View> TopologicalSort (View superView, IEnumerable<View> nodes, ICollection<(View From, View To)> edges)
     {
         List<View> result = new ();
 
@@ -1091,16 +1086,11 @@ public partial class View // Layout APIs
             {
                 if (ReferenceEquals (from.SuperView, to))
                 {
-                    throw new LayoutException (
-                                               $"ComputedLayout for \"{superView}\": \"{to}\" "
-                                               + $"references a SubView (\"{from}\")."
-                                              );
+                    throw new LayoutException ($"ComputedLayout for \"{superView}\": \"{to}\" " + $"references a SubView (\"{from}\").");
                 }
 
-                throw new LayoutException (
-                                           $"ComputedLayout for \"{superView}\": \"{from}\" "
-                                           + $"linked with \"{to}\" was not found. Did you forget to add it to {superView}?"
-                                          );
+                throw new LayoutException ($"ComputedLayout for \"{superView}\": \"{from}\" "
+                                           + $"linked with \"{to}\" was not found. Did you forget to add it to {superView}?");
             }
         }
 
@@ -1123,7 +1113,7 @@ public partial class View // Layout APIs
         Size superViewContentSize = SuperView?.GetContentSize ()
                                     ?? (App?.TopRunnableView is { } && App?.TopRunnableView != this && App!.TopRunnableView.IsInitialized
                                             ? App.TopRunnableView.GetContentSize ()
-                                            : App?.Screen.Size ?? new (2048, 2048));
+                                            : App?.Screen.Size ?? new Size (2048, 2048));
 
         return superViewContentSize;
     }
@@ -1147,13 +1137,7 @@ public partial class View // Layout APIs
     ///     Either <see cref="IApplication.TopRunnableView"/> (if <paramref name="viewToMove"/> does not have a Super View) or
     ///     <paramref name="viewToMove"/>'s SuperView. This can be used to ensure LayoutSubViews is called on the correct View.
     /// </returns>
-    internal static View? GetLocationEnsuringFullVisibility (
-        View viewToMove,
-        int targetX,
-        int targetY,
-        out int nx,
-        out int ny
-    )
+    internal static View? GetLocationEnsuringFullVisibility (View viewToMove, int targetX, int targetY, out int nx, out int ny)
     {
         int maxDimension;
         View? superView;
@@ -1209,9 +1193,7 @@ public partial class View // Layout APIs
 
         if (viewToMove?.Frame.Height <= maxDimension)
         {
-            ny = ny + viewToMove.Frame.Height > maxDimension
-                     ? Math.Max (maxDimension - viewToMove.Frame.Height, 0)
-                     : ny;
+            ny = ny + viewToMove.Frame.Height > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Height, 0) : ny;
         }
         else
         {
@@ -1325,20 +1307,17 @@ public partial class View // Layout APIs
 
                                           bool? ret = null;
 
-                                          if (viewsUnderLocation.Contains (v.Margin)
-                                              && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Margin) && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Border)
-                                              && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Border) && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Padding)
-                                              && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Padding) && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
@@ -1435,7 +1414,6 @@ public partial class View // Layout APIs
 
     #region Diagnostics and Verification
 
-
     /// <summary>Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs.</summary>
     /// <remarks>
     ///     Setting this to <see langword="true"/> will enable validation of <see cref="X"/>, <see cref="Y"/>,
@@ -1521,10 +1499,8 @@ public partial class View // Layout APIs
 
             if (bad != null)
             {
-                throw new LayoutException (
-                                           $"{view.GetType ().Name}.{name} = {bad.GetType ().Name} "
-                                           + $"which depends on the SuperView's dimensions and the SuperView uses Dim.Auto."
-                                          );
+                throw new LayoutException ($"{view.GetType ().Name}.{name} = {bad.GetType ().Name} "
+                                           + $"which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
             }
         }
     }
