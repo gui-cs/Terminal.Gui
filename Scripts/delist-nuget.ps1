@@ -11,17 +11,19 @@ param(
 $packageId = "terminal.gui"  # Ensure this is the correct package name (case-sensitive)
 $nugetSource = "https://api.nuget.org/v3/index.json"
 
-# Fetch package versions from NuGet API
-$nugetApiUrl = "https://api.nuget.org/v3-flatcontainer/$packageId/index.json"
-Write-Host "Fetching package versions for '$packageId'..."
+# Fetch ONLY listed package versions from NuGet Autocomplete API
+$nugetApiUrl = "https://api-v2v3search-0.nuget.org/autocomplete?id=$packageId&prerelease=true&semVerLevel=2.0.0"
+Write-Host "Fetching listed package versions for '$packageId'..."
 
 try {
     $versionsResponse = Invoke-RestMethod -Uri $nugetApiUrl
-    $allVersions = $versionsResponse.versions
+    $allVersions = $versionsResponse.data
 } catch {
     Write-Host "Error fetching package versions: $_"
     exit 0
 }
+
+Write-Host "Found $($allVersions.Count) listed versions."
 
 # Function to parse version and extract numeric parts for comparison
 function Get-VersionSortKey {
@@ -87,13 +89,13 @@ function Process-PackageVersions {
     }
 }
 
-# # Process develop packages - keep only the most recent
-# Process-PackageVersions -Pattern "^2\.0\.0-develop\..*$" -PackageType "develop" -AllVersions $allVersions
+# Process develop packages - keep only the most recent
+Process-PackageVersions -Pattern "^2\.0\.0-develop\..*$" -PackageType "develop" -AllVersions $allVersions
 
-# # Process alpha packages - keep only the just-published one or most recent
-# Process-PackageVersions -Pattern "^2\.0\.0-alpha\..*$" -PackageType "alpha" -AllVersions $allVersions -JustPublished $JustPublishedVersion
+# Process alpha packages - keep only the just-published one or most recent
+Process-PackageVersions -Pattern "^2\.0\.0-alpha\..*$" -PackageType "alpha" -AllVersions $allVersions -JustPublished $JustPublishedVersion
 
-# # Process beta packages - keep only the just-published one or most recent (for future use)
-# Process-PackageVersions -Pattern "^2\.0\.0-beta\..*$" -PackageType "beta" -AllVersions $allVersions -JustPublished $JustPublishedVersion
+# Process beta packages - keep only the just-published one or most recent (for future use)
+Process-PackageVersions -Pattern "^2\.0\.0-beta\..*$" -PackageType "beta" -AllVersions $allVersions -JustPublished $JustPublishedVersion
 
 Write-Host "Operation complete."
