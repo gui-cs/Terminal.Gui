@@ -74,9 +74,9 @@ public partial class TextField : View, IDesignable, IValue<string>
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
-        if (App?.Mouse.MouseGrabView is { } && App?.Mouse.MouseGrabView == this)
+        if (App is { } && App.Mouse.IsGrabbed (this))
         {
-            App?.Mouse.UngrabMouse ();
+            App.Mouse.UngrabMouse ();
         }
 
         // If gaining focus via keyboard (not mouse), select all text

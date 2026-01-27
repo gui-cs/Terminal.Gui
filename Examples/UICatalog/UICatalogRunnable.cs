@@ -398,7 +398,7 @@ public sealed class UICatalogRunnable : Runnable
             Width = Dim.Fill (),
             Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
 
-            //AllowsMarking = false,
+            //ShowMarks = false,
             CanFocus = true,
             Title = "_Scenarios",
             BorderStyle = _categoryList!.BorderStyle,
@@ -481,14 +481,19 @@ public sealed class UICatalogRunnable : Runnable
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Auto (),
             Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
-            AllowsMarking = false,
+            ShowMarks = false,
             CanFocus = true,
             Title = "_Categories",
             BorderStyle = LineStyle.Rounded,
             SuperViewRendersLineCanvas = true,
             Source = new ListWrapper<string> (CachedCategories)
         };
-        categoryList.OpenSelectedItem += (_, _) => { _scenarioList!.SetFocus (); };
+
+        categoryList.Accepting += (_, e) =>
+                                  {
+                                      _scenarioList!.SetFocus ();
+                                      e.Handled = true;
+                                  };
         categoryList.ValueChanged += CategoryView_SelectedChanged;
 
         // This enables the scrollbar by causing lazy instantiation to happen
