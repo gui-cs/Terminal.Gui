@@ -65,6 +65,31 @@ public class LineTests : TestDriverBase
     }
 
     [Fact]
+    public void Line_ChangeOrientation_IsInitialized_UpdatesDimensions ()
+    {
+        var line = new Line { Orientation = Orientation.Horizontal, Width = Dim.Fill (), Height = 1 };
+
+        line.BeginInit ();
+        line.EndInit ();
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (Dim.Fill (), line.Width);
+        Assert.Equal (1, line.Height);
+
+        line.Orientation = Orientation.Vertical;
+
+        Assert.Equal (Orientation.Vertical, line.Orientation);
+        Assert.Equal (1, line.Width);
+        Assert.Equal (Dim.Fill (), line.Height);
+
+        line.Orientation = Orientation.Horizontal;
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (Dim.Fill (), line.Width);
+        Assert.Equal (1, line.Height);
+    }
+
+    [Fact]
     public void Line_Style_CanBeSet ()
     {
         var line = new Line { Style = LineStyle.Double };

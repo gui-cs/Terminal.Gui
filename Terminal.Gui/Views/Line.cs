@@ -45,7 +45,7 @@ public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
     private LineStyle _style = LineStyle.Single;
-    private Dim _length = Dim.Fill ();
+    private Dim _length;
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Line"/> class with horizontal orientation.
@@ -183,8 +183,12 @@ public class Line : View, IOrientation
     /// <inheritdoc/>
     protected override bool OnWidthChanging (ValueChangingEventArgs<Dim> e)
     {
-        // If horizontal, allow width changes and update _length
-        _length = e.NewValue;
+        if (!IsInitialized)
+        {
+            // If horizontal, allow width changes and update _length
+            _length = e.NewValue;
+        }
+
         if (Orientation == Orientation.Horizontal)
         {
             return base.OnWidthChanging (e);
@@ -199,13 +203,18 @@ public class Line : View, IOrientation
     /// <inheritdoc/>
     protected override bool OnHeightChanging (ValueChangingEventArgs<Dim> e)
     {
-        // If vertical, allow height changes and update _length
-        _length = e.NewValue;
+        if (!IsInitialized)
+        {
+            // If vertical, allow height changes and update _length
+            _length = e.NewValue;
+        }
+
         if (Orientation == Orientation.Vertical)
         {
             return base.OnHeightChanging (e);
         }
 
+        // If horizontal, keep height at 1 (don't allow changes to perpendicular dimension)
         e.NewValue = 1;
 
         return base.OnHeightChanging (e);
