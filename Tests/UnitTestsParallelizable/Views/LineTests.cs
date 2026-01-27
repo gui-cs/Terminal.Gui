@@ -87,6 +87,25 @@ public class LineTests : TestDriverBase
         Assert.Equal (Orientation.Horizontal, line.Orientation);
         Assert.Equal (Dim.Fill (), line.Width);
         Assert.Equal (1, line.Height);
+
+        // Change Length will update correct dimension based on orientation
+        line.Length = 10;
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (10, line.Width);
+        Assert.Equal (1, line.Height);
+
+        line.Orientation = Orientation.Vertical;
+
+        Assert.Equal (Orientation.Vertical, line.Orientation);
+        Assert.Equal (1, line.Width);
+        Assert.Equal (10, line.Height);
+
+        line.Orientation = Orientation.Horizontal;
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (10, line.Width);
+        Assert.Equal (1, line.Height);
     }
 
     [Fact]
