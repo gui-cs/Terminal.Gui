@@ -167,12 +167,6 @@ public class Images : Scenario
 
     private void Win_SubViewsLaidOut (object sender, LayoutEventArgs e)
     {
-        if (_sixelImage is { } && _imageView.GetContentSize () != _sixelImageSize)
-        {
-            LayoutEventArgs args = new (_imageView.GetContentSize ());
-            SixelView_SubViewsLaidOut (sender, args);
-        }
-
         if (_winSize == e.OldContentSize)
         {
             return;
@@ -238,6 +232,8 @@ public class Images : Scenario
                 return;
             }
         }
+
+        _winSize = _win.Viewport.Size;
 
         GenerateSixelFire (true);
     }
@@ -582,6 +578,8 @@ public class Images : Scenario
 
             return;
         }
+
+        _sixelImageSize = _sixelView.Viewport.Size;
 
         GenerateSixelImage (true);
     }
