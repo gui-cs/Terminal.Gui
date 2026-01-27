@@ -191,6 +191,12 @@ public class Line : View, IOrientation
 
         if (Orientation == Orientation.Horizontal)
         {
+            if (IsInitialized)
+            {
+                // If horizontal, allow width changes and update _length
+                _length = e.NewValue;
+            }
+
             return base.OnWidthChanging (e);
         }
 
@@ -211,6 +217,12 @@ public class Line : View, IOrientation
 
         if (Orientation == Orientation.Vertical)
         {
+            if (IsInitialized)
+            {
+                // If vertical, allow height changes and update _length
+                _length = e.NewValue;
+            }
+
             return base.OnHeightChanging (e);
         }
 
