@@ -11,6 +11,46 @@ Normally, Views cannot draw outside of their `Viewport`. To display content that
 - Automatically hide in response to user actions
 - Can receive global hotkeys even when not visible
 
+## Architecture
+
+The popover system follows a layered architecture with well-defined responsibilities at each level:
+
+```
+Application.Popover (static accessor)
+    └── ApplicationPopover (manager)
+            └── IPopover (interface contract)
+                    └── PopoverBaseImpl (abstract base)
+                            └── PopoverMenu (concrete implementation)
+```
+
+### @Terminal.Gui.IPopover — The Contract
+
+The @Terminal.Gui.IPopover interface defines the minimal contract: a single `Current` property that associates the popover with a specific @Terminal.Gui.IRunnable. This association controls keyboard event scoping — if `Current` is `null`, the popover receives all keyboard events globally; if set, events only flow when the associated runnable is the active `TopRunnableView`.
+
+### @Terminal.Gui.PopoverBaseImpl — The Foundation
+
+@Terminal.Gui.PopoverBaseImpl provides the standard popover behavior that all concrete popovers inherit. It configures:
+
+- **Full-screen sizing** — `Width = Dim.Fill()`, `Height = Dim.Fill()`
+- **Transparency** — `ViewportSettings.Transparent | ViewportSettings.TransparentMouse`
+- **Dismiss key** — Binds `Application.QuitKey` to `Command.Quit`
+- **Focus management** — Restores focus to the previously-focused view when hidden
+- **Layout on show** — Lays out the popover to fit the screen when becoming visible
+
+### @Terminal.Gui.ApplicationPopover — The Manager
+
+@Terminal.Gui.ApplicationPopover is a singleton held by `IApplication.Popover` that manages the lifecycle of all popovers. It maintains a list of registered popovers and tracks the single active (visible) popover. Only one popover can be active at a time — showing a new one automatically hides the previous one.
+
+## The Transparency Model
+
+Popovers use a "full-screen transparent overlay" technique. Instead of drawing a small popup widget directly, a popover fills the entire screen with `Dim.Fill()` but sets its viewport to be transparent. This means:
+
+- The popover view itself is invisible — only its SubViews (like a @Terminal.Gui.Menu) are drawn
+- Mouse clicks that don't hit a SubView pass through to views beneath (via `TransparentMouse`)
+- This naturally creates the "click outside to dismiss" behavior without complex hit-testing
+
+This approach is elegant because the framework's existing transparency system handles the overlay logic. The popover doesn't need to know what's behind it or where it is positioned relative to other views.
+
 ## Creating a Popover
 
 ### Using PopoverMenu
@@ -48,11 +88,11 @@ public class MyCustomPopover : PopoverBaseImpl
         // - ViewportSettings with Transparent and TransparentMouse flags
         // - Command.Quit binding to hide the popover
         // - Width/Height set to Dim.Fill()
-        
+
         // Add your custom content
         Label label = new () { Text = "Custom Popover Content" };
         Add (label);
-        
+
         // Optionally override size
         Width = 40;
         Height = 10;
@@ -69,20 +109,25 @@ Application.Popover?.Show (myPopover);
 
 A View qualifies as a popover if it:
 
-1. **Implements @Terminal.Gui.IPopover** - Provides the `Current` property for runnable association
-2. **Is Focusable** - `CanFocus = true` to receive keyboard input
-3. **Is Transparent** - `ViewportSettings` includes both:
-   - `ViewportSettings.Transparent` - Allows content beneath to show through
-   - `ViewportSettings.TransparentMouse` - Mouse clicks outside subviews pass through
-4. **Handles Quit** - Binds `Application.QuitKey` to `Command.Quit` and sets `Visible = false`
+1. **Implements @Terminal.Gui.IPopover** — Provides the `Current` property for runnable association
+2. **Is Focusable** — `CanFocus = true` to receive keyboard input
+3. **Is Transparent** — `ViewportSettings` includes both:
+   - `ViewportSettings.Transparent` — Allows content beneath to show through
+   - `ViewportSettings.TransparentMouse` — Mouse clicks outside SubViews pass through
+4. **Handles Quit** — Binds `Application.QuitKey` to `Command.Quit` and sets `Visible = false`
 
 @Terminal.Gui.PopoverBaseImpl provides all these requirements by default.
 
 ## Registration and Lifecycle
 
-### Registration (REQUIRED)
+### The Registration-Before-Show Pattern
 
-**All popovers must be registered before they can be shown:**
+**All popovers must be registered before they can be shown.** Registration and showing are intentionally separate operations:
+
+- **Registration** (`Register()`) is done once and enables the popover to participate in keyboard event routing, even when hidden. It also enrolls the popover for automatic lifecycle management.
+- **Showing** (`Show()`) can be called many times and makes the popover visible.
+
+Attempting to call `Show()` on an unregistered popover throws `InvalidOperationException`.
 
 ```csharp
 PopoverMenu popover = new ([...]);
@@ -90,16 +135,17 @@ PopoverMenu popover = new ([...]);
 // REQUIRED: Register with the application
 Application.Popover?.Register (popover);
 
-// Now you can show it
+// Now you can show it (and hide/show it repeatedly)
 Application.Popover?.Show (popover);
 // OR
 popover.MakeVisible (); // For PopoverMenu
 ```
 
 **Why Registration is Required:**
-- Enables keyboard event routing to the popover
-- Allows global hotkeys to work even when popover is hidden
-- Manages popover lifecycle and disposal
+
+- Enables keyboard event routing to the popover (global hotkeys work even when hidden)
+- Manages popover lifecycle (auto-disposal on `Application.Shutdown`)
+- Sets the `Current` runnable association automatically to `TopRunnableView`
 
 ### Showing and Hiding
 
@@ -107,6 +153,13 @@ popover.MakeVisible (); // For PopoverMenu
 ```csharp
 Application.Popover?.Show (popover);
 ```
+
+The `Show()` method validates that the popover:
+- Is registered
+- Has `Transparent` and `TransparentMouse` viewport flags set
+- Has a key binding for `Command.Quit`
+
+It then initializes the popover if needed, hides any previously active popover, and makes the new one visible.
 
 **Hide a popover:**
 ```csharp
@@ -118,7 +171,7 @@ popover.Visible = false;
 
 // Automatic hiding occurs when:
 // - User presses Application.QuitKey (typically Esc)
-// - User clicks outside the popover (not on a subview)
+// - User clicks outside the popover (not on a SubView)
 // - Another popover is shown
 ```
 
@@ -138,7 +191,35 @@ Application.Popover?.DeRegister (popover);
 popover.Dispose ();
 ```
 
+## Visibility-Driven Lifecycle
+
+The popover lifecycle is driven entirely by the `Visible` property — there is no separate "Open/Close" API. When visibility changes, a cascade of events occurs:
+
+**Becoming visible (`Visible` changes to `true`):**
+1. `PopoverBaseImpl.OnVisibleChanging()` calls `Layout(App.Screen.Size)` to size the popover to the screen
+2. `PopoverMenu.OnVisibleChanged()` adds the root @Terminal.Gui.Menu as a SubView
+3. The popover receives focus
+
+**Becoming hidden (`Visible` changes to `false`):**
+1. `PopoverBaseImpl.OnVisibleChanging()` restores focus to the previously-focused view in the `TopRunnableView`
+2. `PopoverMenu.OnVisibleChanged()` removes the root menu SubView and calls `ApplicationPopover.Hide()`
+3. `ApplicationPopover.Hide()` clears the active popover reference and triggers a redraw
+
+This pattern means setting `Visible = false` is equivalent to calling `Hide()` — both produce the same result.
+
 ## Keyboard Event Routing
+
+### Dispatch Order
+
+When a key is pressed, @Terminal.Gui.ApplicationPopover.DispatchKeyDown routes it through popovers in a specific order:
+
+1. **Active (visible) popover** receives ALL key events first. If it handles the key, processing stops.
+2. **Inactive (hidden) popovers** each receive the key event, filtered by their `Current` runnable association. Popovers whose `Current` doesn't match the active `TopRunnableView` are skipped.
+
+This design ensures:
+- A visible popover can intercept any key (e.g., Escape to close, arrow keys to navigate)
+- Hidden popovers can still respond to global hotkeys (e.g., Shift+F10 to open a menu)
+- Popovers scoped to a specific runnable only activate when that runnable is in focus
 
 ### Global Hotkeys
 
@@ -171,8 +252,8 @@ myPopover.Current = myWindow; // Only active when myWindow is the top runnable
 **When visible:**
 - Popovers receive focus automatically
 - All keyboard input goes to the popover until hidden
-- Mouse clicks on subviews are captured
-- Mouse clicks outside subviews pass through (due to `TransparentMouse`)
+- Mouse clicks on SubViews are captured
+- Mouse clicks outside SubViews pass through (due to `TransparentMouse`)
 
 **When hidden:**
 - Only registered hotkeys are processed
@@ -228,7 +309,7 @@ The menu automatically adjusts position to ensure it remains fully visible on sc
 **Key Features:**
 - Cascading submenus with automatic positioning
 - Keyboard navigation (arrow keys, hotkeys)
-- Automatic key binding from Commands
+- Automatic key binding discovery from Commands — menu items that specify a `Command` automatically display the correct keyboard shortcut
 - Mouse support
 - Separator lines via `new Line ()`
 
@@ -256,8 +337,8 @@ fileMenu.MakeVisible ();
 
 Popovers use `ViewportSettings.TransparentMouse`, which means:
 
-- **Clicks on popover subviews**: Captured and handled normally
-- **Clicks outside subviews**: Pass through to views beneath
+- **Clicks on popover SubViews**: Captured and handled normally
+- **Clicks outside SubViews**: Pass through to views beneath
 - **Clicks on background**: Automatically hide the popover
 
 This creates the expected behavior where clicking outside a menu or dialog closes it.
@@ -269,7 +350,7 @@ This creates the expected behavior where clicking outside a menu or dialog close
    // WRONG - Will throw InvalidOperationException
    PopoverMenu menu = new ([...]);
    menu.MakeVisible ();
-   
+
    // CORRECT
    PopoverMenu menu = new ([...]);
    Application.Popover?.Register (menu);
@@ -318,12 +399,12 @@ myView.MouseClick += (s, e) =>
 public class AutocompletePopover : PopoverBaseImpl
 {
     private ListView _listView;
-    
+
     public AutocompletePopover ()
     {
         Width = 30;
         Height = 10;
-        
+
         _listView = new ListView
         {
             Width = Dim.Fill (),
@@ -331,7 +412,7 @@ public class AutocompletePopover : PopoverBaseImpl
         };
         Add (_listView);
     }
-    
+
     public void ShowSuggestions (IEnumerable<string> suggestions, Point position)
     {
         _listView.SetSource (suggestions.ToList ());

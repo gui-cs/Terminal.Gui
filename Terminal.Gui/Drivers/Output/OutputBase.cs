@@ -159,7 +159,7 @@ public abstract class OutputBase
             }
 
             SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-            Write ((StringBuilder)new (s.SixelData));
+            Write (new StringBuilder (s.SixelData));
         }
     }
 
