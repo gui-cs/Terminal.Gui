@@ -128,7 +128,7 @@ public class Dialog : Dialog<int>
 
         int buttonIndex = Buttons.IndexOf (sourceButton);
         Result = buttonIndex != -1 ? buttonIndex : Buttons.IndexOf (Buttons.FirstOrDefault (b => b.IsDefault));
-
+        args.Handled = true;
         RequestStop ();
         return true;
     }

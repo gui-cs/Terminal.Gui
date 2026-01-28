@@ -375,6 +375,11 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
             if (!field)
             {
+                if (App?.Mouse.IsGrabbed (this) == true)
+                {
+                    App.Mouse.UngrabMouse ();
+                }
+
                 // BUGBUG: Ideally we'd reset _previouslyFocused to the first focusable subview
                 _previouslyFocused = SubViews.FirstOrDefault (v => v.CanFocus);
 

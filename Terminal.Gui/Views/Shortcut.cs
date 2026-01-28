@@ -83,6 +83,8 @@ public class Shortcut : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (_, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (_, e) => OrientationChanged?.Invoke (this, e);
 
+        PropagatedCommands = [Command.Accept, Command.Activate];
+
         AddCommands ();
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
@@ -101,22 +103,20 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
     }
 
-    /// <inheritdoc/>
-    public override void EndInit ()
-    {
-        base.EndInit ();
-        App ??= SuperView?.App; // HACK: Remove once legacy static Application is gone
-        Debug.Assert (App is { });
-        UpdateKeyBindings (Key.Empty);
-    }
-
-    // Helper to set Width consistently
-    internal Dim GetWidthDimAuto () => Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => _minimumNaturalWidth ?? 0), Dim.Func (_ => _minimumNaturalWidth ?? 0));
-
     // This is used to calculate the minimum width of the Shortcut when Width is NOT Dim.Auto
     // It is calculated by setting Width to DimAuto temporarily and forcing layout.
     // Once Frame.Width gets below this value, LayoutStarted makes HelpView an KeyView smaller.
     private int? _minimumNaturalWidth;
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        Title = "_Shortcut";
+        HelpText = "Shortcut help";
+        Key = Key.F1;
+
+        return true;
+    }
 
     /// <summary>
     ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Shortcut"/>.
@@ -139,49 +139,40 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     } = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
-    // When one of the subviews is "empty" we don't want to show it. So we
-    // Use Add/Remove. We need to be careful to add them in the right order
-    // so Pos.Align works correctly.
-    internal void ShowHide ()
+    /// <inheritdoc/>
+    public override void EndInit ()
     {
-        RemoveAll ();
-
-        if (CommandView.Visible)
-        {
-            Add (CommandView);
-            SetCommandViewDefaultLayout ();
-        }
-
-        if (HelpView.Visible && !string.IsNullOrEmpty (HelpView.Text))
-        {
-            Add (HelpView);
-            SetHelpViewDefaultLayout ();
-        }
-
-        if (KeyView.Visible && (Key != Key.Empty || KeyView.Text != string.Empty))
-        {
-            Add (KeyView);
-            SetKeyViewDefaultLayout ();
-        }
+        base.EndInit ();
+        App ??= SuperView?.App; // HACK: Remove once legacy static Application is gone
+        Debug.Assert (App is { });
+        UpdateKeyBindings (Key.Empty);
     }
 
-    // Force Width to DimAuto to calculate natural width and then set it back
-    private void ForceCalculateNaturalWidth ()
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
     {
-        // Get the natural size of each subview
-        Size screenSize = App?.Screen.Size ?? new Size (2048, 2048);
-        CommandView.SetRelativeLayout (screenSize);
-        HelpView.SetRelativeLayout (screenSize);
-        KeyView.SetRelativeLayout (screenSize);
+        if (disposing)
+        {
+            TitleChanged -= Shortcut_TitleChanged;
 
-        _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, SubViews, Dimension.Width);
+            if (CommandView.SuperView is null)
+            {
+                CommandView.Dispose ();
+            }
 
-        // Reset our relative layout
-        SetRelativeLayout (SuperView?.GetContentSize () ?? screenSize);
+            if (HelpView.SuperView is null)
+            {
+                HelpView.Dispose ();
+            }
+
+            if (KeyView.SuperView is null)
+            {
+                KeyView.Dispose ();
+            }
+        }
+
+        base.Dispose (disposing);
     }
-
-    // TODO: Enable setting of the margin thickness
-    private Thickness GetMarginThickness () => new (1, 0, 1, 0);
 
     // When layout starts, we need to adjust the layout of the HelpView and KeyView
     /// <inheritdoc/>
@@ -228,18 +219,151 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
+    // Helper to set Width consistently
+    internal Dim GetWidthDimAuto () => Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => _minimumNaturalWidth ?? 0), Dim.Func (_ => _minimumNaturalWidth ?? 0));
+
+    // When one of the subviews is "empty" we don't want to show it. So we
+    // Use Add/Remove. We need to be careful to add them in the right order
+    // so Pos.Align works correctly.
+    internal void ShowHide ()
+    {
+        RemoveAll ();
+
+        if (CommandView.Visible)
+        {
+            Add (CommandView);
+            SetCommandViewDefaultLayout ();
+        }
+
+        if (HelpView.Visible && !string.IsNullOrEmpty (HelpView.Text))
+        {
+            Add (HelpView);
+            SetHelpViewDefaultLayout ();
+        }
+
+        if (KeyView.Visible && (Key != Key.Empty || KeyView.Text != string.Empty))
+        {
+            Add (KeyView);
+            SetKeyViewDefaultLayout ();
+        }
+    }
+
+    // Force Width to DimAuto to calculate natural width and then set it back
+    private void ForceCalculateNaturalWidth ()
+    {
+        // Get the natural size of each subview
+        Size screenSize = App?.Screen.Size ?? new Size (2048, 2048);
+        CommandView.SetRelativeLayout (screenSize);
+        HelpView.SetRelativeLayout (screenSize);
+        KeyView.SetRelativeLayout (screenSize);
+
+        _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, SubViews, Dimension.Width);
+
+        // Reset our relative layout
+        SetRelativeLayout (SuperView?.GetContentSize () ?? screenSize);
+    }
+
+    // TODO: Enable setting of the margin thickness
+    private Thickness GetMarginThickness () => new (1, 0, 1, 0);
+
     #region Accept/Select/HotKey Command Handling
 
     private void AddCommands ()
     {
+        //// Activate (Space key or click) -
+        //AddCommand (Command.Activate,
+        //            ctx =>
+        //            {
+        //                if (RaiseActivating (ctx) is true)
+        //                {
+        //                    return true;
+        //                }
+
+        //                if (CanFocus)
+        //                {
+        //                    SetFocus ();
+        //                }
+
+        //                return false;
+        //            });
+
         // Accept (Enter key) -
-        AddCommand (Command.Accept, DispatchCommand);
+        //AddCommand (Command.Accept, DispatchCommand);
 
         // Hotkey -
-        AddCommand (Command.HotKey, DispatchCommand);
+        // AddCommand (Command.HotKey, DispatchCommand);
+    }
 
-        // Activate (Space key or click) -
-        AddCommand (Command.Activate, DispatchCommand);
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        bool ret = base.OnActivating (args);
+
+        if (ret)
+        {
+            return ret;
+        }
+        SetFocus ();
+
+        if (IsFromShortcut (args))
+        {
+            string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+
+            // Invoke Activate on the CommandView to cause it to change state if it wants to
+            // CommandView is responsible for checking CanFocus before changing state
+            Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+            ICommandContext? context = new CommandContext (Command.Activate, new WeakReference<View> (CommandView), args.Context?.Binding);
+            args.Handled = true;
+
+            return CommandView.InvokeCommand (Command.Activate, context) is true;
+        }
+
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        return DispatchCommand (args.Context) is true;
+        return RaiseAccepting (args.Context) is true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        bool ret = base.OnHandlingHotKey (args);
+
+        if (ret)
+        {
+            return ret;
+        }
+        SetFocus ();
+
+        KeyBinding? keyBinding = args.Context?.Binding as KeyBinding?;
+
+        //if (keyBinding?.Target == this)
+        {
+            return args.Handled = RaiseActivating (args.Context) is true;
+        }
+
+        if (IsFromShortcut (args))
+        {
+            string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+
+            // Invoke Activate on the CommandView to cause it to change state if it wants to
+            // CommandView is responsible for checking CanFocus before changing state
+            Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+            ICommandContext? context = new CommandContext (Command.Activate, new WeakReference<View> (CommandView), args.Context?.Binding);
+            args.Handled = true;
+
+            args.Handled = CommandView.InvokeCommand (Command.Activate, context) is true;
+
+            if (args.Handled)
+            {
+                return true;
+            }
+        }
+
+        return args.Handled;
     }
 
     /// <summary>
@@ -261,33 +385,33 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Logging.Debug ($"{Title} ({sourceTitle}) Command: {commandContext?.Command}");
 
-        // Invoke Activate on the CommandView to cause it to change state if it wants to
-        // CommandView is responsible for checking CanFocus before changing state
-        Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+        // // Invoke Activate on the CommandView to cause it to change state if it wants to
+        // // CommandView is responsible for checking CanFocus before changing state
+        // Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-        if (keyBinding is { } kb)
-        {
-            KeyBinding updatedBinding = kb with { Data = this };
-            CommandView.InvokeCommand (Command.Activate, updatedBinding);
-        }
-        else
-        {
-            CommandView.InvokeCommand (Command.Activate, commandContext);
-        }
+        // if (keyBinding is { } kb)
+        // {
+        //    KeyBinding updatedBinding = kb with { Data = this };
+        //    CommandView.InvokeCommand (Command.Activate, updatedBinding);
+        // }
+        // else
+        // {
+        //    CommandView.InvokeCommand (Command.Activate, commandContext);
+        // }
 
-        Logging.Debug ($"{Title} ({sourceTitle}) - RaiseActivating ...");
+        // Logging.Debug ($"{Title} ({sourceTitle}) - RaiseActivating ...");
 
-        if (RaiseActivating (commandContext) is true)
-        {
-            return true;
-        }
+        // if (RaiseActivating (commandContext) is true)
+        // {
+        //    return true;
+        // }
 
-        if (CanFocus && SuperView is { CanFocus: true })
-        {
-            // The default HotKey handler sets Focus
-            Logging.Debug ($"{Title} ({sourceTitle}) - SetFocus...");
-            SetFocus ();
-        }
+        // if (CanFocus && SuperView is { CanFocus: true })
+        // {
+        //    // The default HotKey handler sets Focus
+        //    Logging.Debug ($"{Title} ({sourceTitle}) - SetFocus...");
+        //    SetFocus ();
+        // }
 
         var cancel = false;
 
@@ -410,8 +534,9 @@ public class Shortcut : View, IOrientation, IDesignable
             ArgumentNullException.ThrowIfNull (value);
 
             // Clean up old
-            _commandView.Activating -= CommandViewOnActivating;
-            _commandView.Accepting -= CommandViewOnAccepted;
+            // _commandView.Activating -= CommandViewOnActivating;
+            // _commandView.Accepting -= CommandViewOnAccepted;
+            _commandView.HotKeyChanged -= OnCommandViewOnHotKeyChanged;
             Remove (_commandView);
             _commandView.Dispose ();
 
@@ -419,72 +544,90 @@ public class Shortcut : View, IOrientation, IDesignable
             _commandView = value;
             _commandView.Id = "_commandView";
 
-            _commandView.HotKeyChanged += (_, e) =>
-                                          {
-                                              if (e.NewKey != Key.Empty)
-                                              {
-                                                  // Add it
-                                                  AddKeyBindingsForHotKey (e.OldKey, e.NewKey);
-                                              }
-                                          };
+            _commandView.HotKeyChanged += OnCommandViewOnHotKeyChanged;
 
             _commandView.HotKeySpecifier = new Rune ('_');
 
             Title = _commandView.Text;
 
-            _commandView.Activating += CommandViewOnActivating;
-            _commandView.Accepting += CommandViewOnAccepted;
+            // _commandView.Activating += CommandViewOnActivating;
+            // _commandView.Accepting += CommandViewOnAccepted;
 
             UpdateKeyBindings (Key.Empty);
 
             return;
 
-            // Helper to check if command context originated from this Shortcut
-            bool IsFromShortcut (CommandEventArgs e)
+            void OnCommandViewOnHotKeyChanged (object? _, KeyChangedEventArgs e)
             {
-                // KeyBinding with Data == this means it came from DispatchCommand
-                if (e.Context?.Binding is KeyBinding { Data: var data } && data == this)
+                if (e.NewKey != Key.Empty)
                 {
-                    return true;
+                    // Add it
+                    AddKeyBindingsForHotKey (e.OldKey, e.NewKey);
                 }
-
-                // Source == this means the event originated from clicking on Shortcut (not CommandView)
-                if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView == this)
-                {
-                    return true;
-                }
-
-                return false;
             }
 
-            void CommandViewOnAccepted (object? sender, CommandEventArgs e)
-            {
-                // Forward Accept to Shortcut only if it originated from CommandView directly
-                // (e.g., user double-clicked on CheckBox)
-                // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
-                if (!IsFromShortcut (e))
-                {
-                    RaiseAccepting (e.Context);
-                }
+            // void CommandViewOnAccepted (object? sender, CommandEventArgs e)
+            // {
+            //    // Forward Accept to Shortcut only if it originated from CommandView directly
+            //    // (e.g., user double-clicked on CheckBox)
+            //    // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
+            //    if (!IsFromShortcut (e))
+            //    {
+            //        RaiseAccepting (e.Context);
+            //    }
 
-                // Don't set e.Handled - let CommandView continue processing
-            }
+            //    // Don't set e.Handled - let CommandView continue processing
+            // }
 
-            void CommandViewOnActivating (object? sender, CommandEventArgs e)
-            {
-                // Forward Activating to Shortcut only if it originated from CommandView directly
-                // (e.g., user clicked on CommandView)
-                // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
-                if (IsFromShortcut (e))
-                {
-                    return;
-                }
-                SetFocus ();
-                RaiseActivating (e.Context);
+            // void CommandViewOnActivating (object? sender, CommandEventArgs e)
+            // {
+            //    // Forward Activating to Shortcut only if it originated from CommandView directly
+            //    // (e.g., user clicked on CommandView)
+            //    // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
+            //    if (IsFromShortcut (e))
+            //    {
+            //        return;
+            //    }
+            //    SetFocus ();
+            //    RaiseActivating (e.Context);
 
-                // Don't set e.Handled - let CommandView continue processing (change state, etc.)
-            }
+            //    // Don't set e.Handled - let CommandView continue processing (change state, etc.)
+            // }
         }
+    }
+
+    // Helper to check if command context originated from the Shortcut, the HelpView, or the KeyView
+    private bool IsFromKeyView (CommandEventArgs e)
+    {
+        // Source == this means the event originated from clicking on Shortcut (not CommandView)
+        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView == KeyView)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsFromShortcut (CommandEventArgs e)
+    {
+        // KeyBinding with Data == this means it came from DispatchCommand
+        if (e.Context?.Binding is KeyBinding { Data: var data } && data == this)
+        {
+            return true;
+        }
+
+        if (IsFromKeyView (e))
+        {
+            return true;
+        }
+
+        // Source == this means the event originated from clicking on Shortcut (not CommandView)
+        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true && (sourceView == this || sourceView == HelpView))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void SetCommandViewDefaultLayout ()
@@ -788,40 +931,4 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     #endregion Focus
-
-    /// <inheritdoc/>
-    public bool EnableForDesign ()
-    {
-        Title = "_Shortcut";
-        HelpText = "Shortcut help";
-        Key = Key.F1;
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            TitleChanged -= Shortcut_TitleChanged;
-
-            if (CommandView.SuperView is null)
-            {
-                CommandView.Dispose ();
-            }
-
-            if (HelpView.SuperView is null)
-            {
-                HelpView.Dispose ();
-            }
-
-            if (KeyView.SuperView is null)
-            {
-                KeyView.Dispose ();
-            }
-        }
-
-        base.Dispose (disposing);
-    }
 }

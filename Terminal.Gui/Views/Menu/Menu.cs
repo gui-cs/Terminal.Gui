@@ -30,6 +30,8 @@ public class Menu : Bar
 
         BorderStyle = DefaultBorderStyle;
 
+        PropagatedCommands = [Command.Accept, Command.Activate];
+
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 
@@ -80,15 +82,15 @@ public class Menu : Bar
                                 return true;
                             });
 
-                menuItem.Accepted += MenuItemOnAccepted;
+                //menuItem.Accepting += MenuItemOnAccepted;
 
                 break;
 
                 void MenuItemOnAccepted (object? sender, CommandEventArgs e) =>
 
-                    // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
-                    RaiseAccepted (e.Context);
-            }
+                        // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
+                        RaiseAccepted (e.Context);
+                }
 
             case Line line:
                 // Grow line so we get auto-join line
@@ -102,35 +104,35 @@ public class Menu : Bar
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
+        //// When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
 
-        // Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
+        //// Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
 
-        // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
-        // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
-        if (SuperView is { })
-        {
-            // Logging.Debug ($"{Title} - SuperView is null");
-            //return false;
-        }
+        //// TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
+        //// TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
+        //if (SuperView is { })
+        //{
+        //    // Logging.Debug ($"{Title} - SuperView is null");
+        //    //return false;
+        //}
 
-        // Logging.Debug ($"{Title} - {args.Context}");
+        //// Logging.Debug ($"{Title} - {args.Context}");
 
-        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
-        {
-            // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-            // And causes just the menu to quit.
-            // Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
-            return true;
-        }
+        //if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
+        //{
+        //    // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+        //    // And causes just the menu to quit.
+        //    // Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
+        //    return true;
+        //}
 
-        // Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
-        // Command.Accept to the SuperMenuItem if it exists.
-        if (SuperView is null && SuperMenuItem is { })
-        {
-            // Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
-            return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
-        }
+        //// Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
+        //// Command.Accept to the SuperMenuItem if it exists.
+        //if (SuperView is null && SuperMenuItem is { })
+        //{
+        //    // Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
+        //    return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
+        //}
 
         return false;
     }

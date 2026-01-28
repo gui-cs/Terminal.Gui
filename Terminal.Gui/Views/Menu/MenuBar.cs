@@ -238,13 +238,13 @@ public class MenuBar : Menu, IDesignable
 
             _active = value;
 
-            // Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+            Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
             // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
             // it won't be to the MenuBar
             CanFocus = value;
 
-            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+            Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
             if (!_active)
             {
@@ -325,11 +325,10 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
-
         // TODO: Ensure sourceMenuBar is actually one of our bar items
         if (Visible && Enabled && args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
         {
+            Logging.Debug ($"{Title} ({sourceView.Title})");
             if (!CanFocus)
             {
                 Debug.Assert (!Active);
@@ -362,10 +361,14 @@ public class MenuBar : Menu, IDesignable
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
         base.OnAccepted (args);
 
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
+        View? sourceView = null;
+        if (args.Context?.Source?.TryGetTarget (out sourceView) == true && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
         {
+            Logging.Debug ($"{Title} ({sourceView.Title}) - returning");
             return;
         }
+
+        Logging.Debug ($"{Title} ({sourceView?.Title})");
 
         Active = false;
     }

@@ -317,7 +317,8 @@ public partial class View // Command APIs
         // If Accepting was handled, raise Accepted (non-cancelable event)
         if (args.Handled)
         {
-            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling RaiseAccepted");
+            Logging.Debug ($"{Title} ({ctx?.Source}) - Calling RaiseAccepted");
+            OnAccepted (new CommandEventArgs() { Context = ctx });
             RaiseAccepted (ctx);
         }
 

@@ -94,56 +94,81 @@ public class MenuItem : Shortcut
         }
     }
 
-    internal override bool? DispatchCommand (ICommandContext? commandContext)
+    /// <inheritdoc/>
+    protected override void OnAccepted (CommandEventArgs args)
     {
-        // Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
-        bool? ret = null;
-
-        var quit = false;
-
-        if (commandContext?.Binding is KeyBinding { Key: { } key })
-        {
-            if (key == Application.QuitKey && SuperView is { Visible: true })
-            {
-                // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-                // Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
-                quit = true;
-
-                //ret = true;
-            }
-        }
+        Logging.Debug ($"{Title} ({TargetView?.Title})");
+        base.OnAccepted (args);
 
         // Translate the incoming command to Command
-        if (Command != Command.NotBound && commandContext is { })
+        if (Command != Command.NotBound && args.Context is { })
         {
-            commandContext.Command = Command;
+            args.Context.Command = Command;
         }
 
-        if (!quit)
+        if (TargetView is { })
         {
-            if (TargetView is { })
-            {
-                // Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
-                ret = TargetView.InvokeCommand (Command, commandContext);
-            }
-            else
-            {
-                // Is this an Application-bound command?
-                // Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
-                ret = App?.Keyboard.InvokeCommandsBoundToKey (Key);
-            }
+            Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
+           // TargetView.InvokeCommand (Command, args.Context) is true;
         }
-
-        if (ret is not true)
+        else if (Key.IsValid)
         {
-            // Logging.Debug ($"{Title} - calling base.DispatchCommand...");
-            // Base will Raise Selected, then Accepting, then invoke the Action, if any
-            // Note: base.DispatchCommand will call RaiseAccepted via RaiseAccepting when handled
-            ret = base.DispatchCommand (commandContext);
+            // Is this an Application-bound command?
+            Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
+            //App?.Keyboard.InvokeCommandsBoundToKey (Key) ?? false;
         }
-
-        return ret;
     }
+
+    //internal override bool? DispatchCommand (ICommandContext? commandContext)
+    //{
+    //    //Logging.Debug ($"{Title} - {commandContext?.Source} Command: {commandContext?.Command}");
+    //    bool? ret = null;
+
+    //    var quit = false;
+
+    //    if (commandContext?.Binding is KeyBinding { Key: { } key })
+    //    {
+    //        if (key == Application.QuitKey && SuperView is { Visible: true })
+    //        {
+    //            // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
+    //            // Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
+    //            quit = true;
+
+    //            //ret = true;
+    //        }
+    //    }
+
+    //    // Translate the incoming command to Command
+    //    if (Command != Command.NotBound && commandContext is { })
+    //    {
+    //        commandContext.Command = Command;
+    //    }
+
+    //    if (!quit)
+    //    {
+    //        if (TargetView is { })
+    //        {
+    //            Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
+    //            ret = TargetView.InvokeCommand (Command, commandContext);
+    //        }
+    //        else if (Key.IsValid)
+    //        {
+    //            // Is this an Application-bound command?
+    //            Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
+    //            ret = App?.Keyboard.InvokeCommandsBoundToKey (Key);
+    //        }
+    //    }
+
+    //    if (ret is not true)
+    //    {
+    //        Logging.Debug ($"{Title} - calling base.DispatchCommand...");
+    //        // Base will Raise Selected, then Accepting, then invoke the Action, if any
+    //        // Note: base.DispatchCommand will call RaiseAccepted via RaiseAccepting when handled
+    //        ret = base.DispatchCommand (commandContext);
+    //    }
+
+    //    return ret;
+    //}
 
     ///// <inheritdoc />
     //protected override bool OnAccepting (CommandEventArgs e)

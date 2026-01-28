@@ -82,6 +82,11 @@ public class ApplicationNavigation
             return;
         }
 
+        if (_focused is { } && App?.Mouse.IsGrabbed (_focused) == true)
+        {
+            App.Mouse.UngrabMouse ();
+        }
+
         //Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;

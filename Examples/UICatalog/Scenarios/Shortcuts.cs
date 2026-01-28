@@ -21,15 +21,21 @@ public class Shortcuts : Scenario
 
         using Window window = new ();
 
-        window.IsModalChanged += App_Loaded;
+        window.IsRunningChanged += HandleOnIsRunningChanged;
 
         app.Run (window);
     }
 
     // Setting everything up in Loaded handler because we change the
     // QuitKey and it only sticks if changed after init
-    private void App_Loaded (object? sender, EventArgs e)
+    private void HandleOnIsRunningChanged (object? sender, EventArgs<bool> e)
     {
+        if (!e.Value)
+        {
+            // Stopping
+            return;
+        }
+
         _app!.TopRunnableView!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
@@ -148,12 +154,20 @@ public class Shortcuts : Scenario
             Id = "appShortcut",
             X = 0,
             Y = Pos.Bottom (canFocusShortcut),
-            Width = Dim.Fill (Dim.Func (_ => eventLog.Frame.Width)),
+            Width = Dim.Fill (Dim.Func (_ => eventLog.Frame.Width)), 
             Title = "A_pp Shortcut",
             Key = Key.F1,
             Text = "Width is DimFill",
             BindKeyToApplication = true
         };
+
+        _app?.TopRunnableView.PropagatedCommands = [Command.Accept, Command.Activate];
+
+        appShortcut.Accepting += (_, args) =>
+                                 {
+                                     args.Handled = true;
+                                     MessageBox.Query (_app!, "App Shortcut", "You activated the App scoped shortcut!", Strings.btnOk);
+                                 };
 
         _app?.TopRunnableView.Add (appShortcut);
 
@@ -431,7 +445,17 @@ public class Shortcuts : Scenario
             Title = "Quit",
             HelpText = "App Scope"
         };
-        appQuitShortcut.Accepting += (sendingView, _) => { (sendingView as View)?.App?.RequestStop (); };
+        appQuitShortcut.Activating += (sendingView, args) =>
+                                     {
+                                         args.Handled = true;
+                                         (sendingView as View)?.App?.RequestStop ();
+                                     };
+
+        appQuitShortcut.Accepting += (sendingView, args) =>
+                                     {
+                                         args.Handled=true;
+                                         (sendingView as View)?.App?.RequestStop ();
+                                     };
 
         _app!.TopRunnableView!.Add (appQuitShortcut);
 

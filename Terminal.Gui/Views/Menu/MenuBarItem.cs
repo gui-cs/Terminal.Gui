@@ -131,7 +131,7 @@ public class MenuBarItem : MenuItem
 
             void OnPopoverMenuOnAccepted (object? sender, CommandEventArgs args)
             {
-                // Logging.Debug ($"OnPopoverMenuOnAccepted - {Title} - {args.Context?.Source?.Title} - {args.Context?.Command}");
+                Logging.Debug ($"OnPopoverMenuOnAccepted - {Title} - {args.Context?.Source} - {args.Context?.Command}");
                 RaiseAccepted (args.Context);
             }
         }

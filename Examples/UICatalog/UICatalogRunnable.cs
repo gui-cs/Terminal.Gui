@@ -553,7 +553,8 @@ public sealed class UICatalogRunnable : Runnable
 
         // ReSharper restore All
 
-        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey };
+        // This demonstrates a shortcut that invokes RequestStop to quit the app
+        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey/*, Action = RequestStop*/ };
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 

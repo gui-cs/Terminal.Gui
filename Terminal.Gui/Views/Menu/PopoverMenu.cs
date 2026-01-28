@@ -149,6 +149,87 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private Key _key = DefaultKey;
 
+    private Menu? _root;
+
+    /// <summary>
+    ///     Enables the popover menu for use in design-time scenarios.
+    /// </summary>
+    /// <typeparam name="TContext">The type of the target view context.</typeparam>
+    /// <param name="targetView">The target view to associate with the menu commands.</param>
+    /// <returns><see langword="true"/> if successfully enabled for design; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    ///     This method creates a default set of menu items (Cut, Copy, Paste, Select All, Quit) for design-time use.
+    ///     It is primarily used for demonstration and testing purposes.
+    /// </remarks>
+    public bool EnableForDesign<TContext> (ref TContext targetView) where TContext : notnull
+    {
+        // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
+        // unit tests.
+
+        Root = new Menu ([
+                             new MenuItem (targetView as View, Command.Cut),
+                             new MenuItem (targetView as View, Command.Copy),
+                             new MenuItem (targetView as View, Command.Paste),
+                             new Line (),
+                             new MenuItem (targetView as View, Command.SelectAll),
+                             new Line (),
+                             new MenuItem (targetView as View, Command.Quit)
+                         ]) { Title = "Popover Demo Root" };
+
+        // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
+        // NOTE: without being activated via App?.Popover. But we want it to be visible.
+        // NOTE: If you use PopoverView.EnableForDesign for real Popover scenarios, change back to false
+        // NOTE: after calling EnableForDesign.
+        // Visible = true;
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Gets or sets the default key for activating popover menus. The default value is <see cref="Key.F10"/> with Shift.
+    /// </summary>
+    /// <remarks>
+    ///     This is a configuration property that affects all new <see cref="PopoverMenu"/> instances.
+    /// </remarks>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key DefaultKey { get; set; } = Key.F10.WithShift;
+
+    /// <summary>
+    ///     Gets all the submenus in the popover menu hierarchy, including the root menu.
+    /// </summary>
+    /// <returns>An enumerable collection of all <see cref="Menu"/> instances in the hierarchy.</returns>
+    /// <remarks>
+    ///     This method performs a depth-first traversal of the menu tree, starting from <see cref="Root"/>.
+    /// </remarks>
+    public IEnumerable<Menu> GetAllSubMenus ()
+    {
+        List<Menu> result = [];
+
+        if (Root == null)
+        {
+            return result;
+        }
+
+        Stack<Menu> stack = new ();
+        stack.Push (Root);
+
+        while (stack.Count > 0)
+        {
+            Menu currentMenu = stack.Pop ();
+            result.Add (currentMenu);
+
+            foreach (View subView in currentMenu.SubViews)
+            {
+                if (subView is MenuItem { SubMenu: { } } menuItem)
+                {
+                    stack.Push (menuItem.SubMenu);
+                }
+            }
+        }
+
+        return result;
+    }
+
     /// <summary>
     ///     Gets or sets the key that will activate the popover menu when it is registered but not visible.
     /// </summary>
@@ -172,21 +253,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     ///     Raised when the <see cref="Key"/> property is changed.
     /// </summary>
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
-
-    /// <summary>
-    ///     Gets or sets the default key for activating popover menus. The default value is <see cref="Key.F10"/> with Shift.
-    /// </summary>
-    /// <remarks>
-    ///     This is a configuration property that affects all new <see cref="PopoverMenu"/> instances.
-    /// </remarks>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F10.WithShift;
-
-    /// <summary>
-    ///     The mouse flags that will cause the popover menu to be visible. The default is
-    ///     <see cref="MouseFlags.RightButtonClicked"/> which is typically the right mouse button.
-    /// </summary>
-    public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
 
     /// <summary>
     ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the
@@ -221,6 +287,61 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         UpdateKeyBindings ();
         SetPosition (idealScreenPosition);
         App!.Popover?.Show (this);
+    }
+
+    /// <summary>
+    ///     The mouse flags that will cause the popover menu to be visible. The default is
+    ///     <see cref="MouseFlags.RightButtonClicked"/> which is typically the right mouse button.
+    /// </summary>
+    public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Menu"/> that is the root of the popover menu hierarchy.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The root menu contains the top-level menu items. Setting this property updates key bindings and
+    ///         event subscriptions for all menus in the hierarchy.
+    ///     </para>
+    ///     <para>
+    ///         When set, all submenus are configured with appropriate event handlers for selection and acceptance.
+    ///     </para>
+    /// </remarks>
+    public Menu? Root
+    {
+        get => _root;
+        set
+        {
+            if (_root == value)
+            {
+                return;
+            }
+
+            HideAndRemoveSubMenu (_root);
+
+            _root = value;
+
+            if (_root is { })
+            {
+                _root.App = App;
+            }
+
+            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
+            // TODO: And it needs to clear the old bindings first
+            UpdateKeyBindings ();
+
+            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
+            IEnumerable<Menu> allMenus = GetAllSubMenus ();
+
+            foreach (Menu menu in allMenus)
+            {
+                menu.App = App;
+                menu.Visible = false;
+                menu.Accepting += MenuOnAccepting;
+                menu.Accepted += MenuOnAccepted;
+                menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
+            }
+        }
     }
 
     /// <summary>
@@ -266,109 +387,71 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     When becoming visible, the root menu is added and shown. When becoming hidden, the root menu is removed
-    ///     and the popover is hidden via <see cref="ApplicationPopover.Hide"/>.
+    ///     This method unsubscribes from all menu events and disposes the root menu.
     /// </remarks>
-    protected override void OnVisibleChanged ()
+    protected override void Dispose (bool disposing)
     {
-        // Logging.Debug ($"{Title} - Visible: {Visible}");
-        base.OnVisibleChanged ();
-
-        if (Visible)
+        if (disposing)
         {
-            AddAndShowSubMenu (_root);
-        }
-        else
-        {
-            HideAndRemoveSubMenu (_root);
-            App?.Popover?.Hide (this);
-        }
-    }
-
-    private Menu? _root;
-
-    /// <summary>
-    ///     Gets or sets the <see cref="Menu"/> that is the root of the popover menu hierarchy.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The root menu contains the top-level menu items. Setting this property updates key bindings and
-    ///         event subscriptions for all menus in the hierarchy.
-    ///     </para>
-    ///     <para>
-    ///         When set, all submenus are configured with appropriate event handlers for selection and acceptance.
-    ///     </para>
-    /// </remarks>
-    public Menu? Root
-    {
-        get => _root;
-        set
-        {
-            if (_root == value)
-            {
-                return;
-            }
-
-            HideAndRemoveSubMenu (_root);
-
-            _root = value;
-
-            if (_root is { })
-            {
-                _root.App = App;
-            }
-
-            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
-            // TODO: And it needs to clear the old bindings first
-            UpdateKeyBindings ();
-
-            // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             IEnumerable<Menu> allMenus = GetAllSubMenus ();
 
             foreach (Menu menu in allMenus)
             {
-                menu.App = App;
-                menu.Visible = false;
-                menu.Accepting += MenuOnAccepting;
-                menu.Accepted += MenuAccepted;
-                menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
+                menu.Accepting -= MenuOnAccepting;
+                menu.Accepted -= MenuOnAccepted;
+                menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
             }
+
+            _root?.Dispose ();
+            _root = null;
         }
+
+        base.Dispose (disposing);
     }
 
-    private void UpdateKeyBindings ()
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     <para>
+    ///         When the popover is not visible, only hotkey commands are processed.
+    ///     </para>
+    ///     <para>
+    ///         This method raises <see cref="View.Accepted"/> for commands that originate from menu items in the hierarchy.
+    ///     </para>
+    /// </remarks>
+    protected override bool OnAccepting (CommandEventArgs args)
     {
-        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus ();
+        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
 
-        foreach (MenuItem menuItem in all.Where (mi => mi.Command != Command.NotBound))
+        // If we're not visible, ignore any keys that are not hotkeys
+        KeyBinding? keyBinding = args.Context?.Binding as KeyBinding?;
+
+        if (!Visible && keyBinding is { Key: { } key })
         {
-            Key? key;
-
-            if (menuItem.TargetView is { })
+            if (GetMenuItemsOfAllSubMenus ().All (i => i.Key != key))
             {
-                // A TargetView implies HotKey
-                key = menuItem.TargetView.HotKeyBindings.GetFirstFromCommands (menuItem.Command);
-            }
-            else
-            {
-                // No TargetView implies Application HotKey
-                key = App?.Keyboard.KeyBindings.GetFirstFromCommands (menuItem.Command);
-            }
+                // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command} - ignore any keys that are not hotkeys");
 
-            if (key is not { IsValid: true })
-            {
-                continue;
+                return false;
             }
-
-            if (menuItem.Key.IsValid)
-            {
-                //Logging.Warning ("Do not specify a Key for MenuItems where a Command is specified. Key will be determined automatically.");
-            }
-
-            menuItem.Key = key;
-
-            // Logging.Debug ($"{Title} - HotKey: {menuItem.Key}->{menuItem.Command}");
         }
+
+        // Logging.Debug ($"{Title} - calling base.OnAccepting: {args.Context?.Command}");
+        bool? ret = base.OnAccepting (args);
+
+        if (ret is true || args.Handled)
+        {
+            return args.Handled = true;
+        }
+
+        // Only raise Accepted if the command came from one of our MenuItems
+        // if (GetMenuItemsOfAllSubMenus ().Contains (args.Context?.Source))
+        {
+            // Logging.Debug ($"{Title} - Calling RaiseAccepted {args.Context?.Command}");
+            RaiseAccepted (args.Context);
+        }
+
+        // Always return false to enable accepting to continue propagating
+        return false;
     }
 
     /// <inheritdoc/>
@@ -394,40 +477,43 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         return base.OnKeyDownNotHandled (key);
     }
 
-    /// <summary>
-    ///     Gets all the submenus in the popover menu hierarchy, including the root menu.
-    /// </summary>
-    /// <returns>An enumerable collection of all <see cref="Menu"/> instances in the hierarchy.</returns>
+    /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if attempting to add a <see cref="Menu"/> or <see cref="MenuItem"/> directly to the popover.
+    /// </exception>
     /// <remarks>
-    ///     This method performs a depth-first traversal of the menu tree, starting from <see cref="Root"/>.
+    ///     Do not add <see cref="MenuItem"/> or <see cref="Menu"/> views directly to the popover.
+    ///     Use the <see cref="Root"/> property instead.
     /// </remarks>
-    public IEnumerable<Menu> GetAllSubMenus ()
+    protected override void OnSubViewAdded (View view)
     {
-        List<Menu> result = [];
-
-        if (Root == null)
+        if (Root is null && (view is Menu || view is MenuItem))
         {
-            return result;
+            throw new InvalidOperationException ("Do not add MenuItems or Menus directly to a PopoverMenu. Use the Root property.");
         }
 
-        Stack<Menu> stack = new ();
-        stack.Push (Root);
+        base.OnSubViewAdded (view);
+    }
 
-        while (stack.Count > 0)
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     When becoming visible, the root menu is added and shown. When becoming hidden, the root menu is removed
+    ///     and the popover is hidden via <see cref="ApplicationPopover.Hide"/>.
+    /// </remarks>
+    protected override void OnVisibleChanged ()
+    {
+        // Logging.Debug ($"{Title} - Visible: {Visible}");
+        base.OnVisibleChanged ();
+
+        if (Visible)
         {
-            Menu currentMenu = stack.Pop ();
-            result.Add (currentMenu);
-
-            foreach (View subView in currentMenu.SubViews)
-            {
-                if (subView is MenuItem { SubMenu: { } } menuItem)
-                {
-                    stack.Push (menuItem.SubMenu);
-                }
-            }
+            AddAndShowSubMenu (_root);
         }
-
-        return result;
+        else
+        {
+            HideAndRemoveSubMenu (_root);
+            App?.Popover?.Hide (this);
+        }
     }
 
     /// <summary>
@@ -453,6 +539,25 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
 
         return result;
+    }
+
+    /// <summary>
+    ///     Calculates the most visible screen-relative location for the specified <paramref name="menu"/>.
+    /// </summary>
+    /// <param name="menu">The menu to position.</param>
+    /// <param name="idealLocation">The ideal screen-relative location.</param>
+    /// <returns>The adjusted screen-relative position that ensures maximum visibility of the menu.</returns>
+    /// <remarks>
+    ///     This method adjusts the position to keep the menu fully visible on screen, considering screen boundaries.
+    /// </remarks>
+    internal Point GetMostVisibleLocationForSubMenu (Menu menu, Point idealLocation)
+    {
+        var pos = Point.Empty;
+
+        // Calculate the initial position to the right of the menu item
+        GetLocationEnsuringFullVisibility (menu, idealLocation.X, idealLocation.Y, out int nx, out int ny);
+
+        return new Point (nx, ny);
     }
 
     /// <summary>
@@ -498,25 +603,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    /// <summary>
-    ///     Calculates the most visible screen-relative location for the specified <paramref name="menu"/>.
-    /// </summary>
-    /// <param name="menu">The menu to position.</param>
-    /// <param name="idealLocation">The ideal screen-relative location.</param>
-    /// <returns>The adjusted screen-relative position that ensures maximum visibility of the menu.</returns>
-    /// <remarks>
-    ///     This method adjusts the position to keep the menu fully visible on screen, considering screen boundaries.
-    /// </remarks>
-    internal Point GetMostVisibleLocationForSubMenu (Menu menu, Point idealLocation)
-    {
-        var pos = Point.Empty;
-
-        // Calculate the initial position to the right of the menu item
-        GetLocationEnsuringFullVisibility (menu, idealLocation.X, idealLocation.Y, out int nx, out int ny);
-
-        return new Point (nx, ny);
-    }
-
     private void AddAndShowSubMenu (Menu? menu)
     {
         if (menu is { SuperView: null, Visible: false })
@@ -549,7 +635,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         if (menu is { Visible: true })
         {
-            // Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
+            Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
 
             // If there's a visible submenu, remove / hide it
             if (menu.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
@@ -569,31 +655,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    private void MenuOnAccepting (object? sender, CommandEventArgs e)
+    private void MenuOnAccepted (object? sender, CommandEventArgs e)
     {
-        var senderView = sender as View;
-
-        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command} - Sender: {senderView?.GetType ().Name}");
-
-        if (e.Context?.Command != Command.HotKey)
-        {
-            // Logging.Debug ($"{Title} - Setting Visible = false");
-            Visible = false;
-        }
-
-            if (e.Context?.Binding is KeyBinding { Key: { } key })
-            {
-                if (key == Application.QuitKey && SuperView is { Visible: true })
-                {
-                    // Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
-                    e.Handled = true;
-                }
-            }
-        }
-
-    private void MenuAccepted (object? sender, CommandEventArgs e)
-    {
-        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
+        Logging.Debug ($"{Title} ({e.Context}) Command: {e.Context?.Command}");
 
         if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true)
         {
@@ -610,49 +674,26 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         RaiseAccepted (e.Context);
     }
 
-    /// <inheritdoc/>
-    /// <remarks>
-    ///     <para>
-    ///         When the popover is not visible, only hotkey commands are processed.
-    ///     </para>
-    ///     <para>
-    ///         This method raises <see cref="View.Accepted"/> for commands that originate from menu items in the hierarchy.
-    ///     </para>
-    /// </remarks>
-    protected override bool OnAccepting (CommandEventArgs args)
+    private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
-        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
+        var senderView = sender as View;
 
-        // If we're not visible, ignore any keys that are not hotkeys
-        KeyBinding? keyBinding = args.Context?.Binding as KeyBinding?;
+        Logging.Debug ($"{Title} ({e.Context}) Command: {e.Context?.Command} - Sender: {senderView?.GetType ().Name}");
 
-        if (!Visible && keyBinding is { Key: { } key })
+        if (e.Context?.Command != Command.HotKey)
         {
-            if (GetMenuItemsOfAllSubMenus ().All (i => i.Key != key))
-            {
-                // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command} - ignore any keys that are not hotkeys");
+            Logging.Debug ($"{Title} - Setting Visible = false");
+            Visible = false;
+        }
 
-                return false;
+        if (e.Context?.Binding is KeyBinding { Key: { } key })
+        {
+            if (key == Application.QuitKey && SuperView is { Visible: true })
+            {
+                Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
+                e.Handled = true;
             }
         }
-
-        // Logging.Debug ($"{Title} - calling base.OnAccepting: {args.Context?.Command}");
-        bool? ret = base.OnAccepting (args);
-
-        if (ret is true || args.Handled)
-        {
-            return args.Handled = true;
-        }
-
-        // Only raise Accepted if the command came from one of our MenuItems
-        //if (GetMenuItemsOfAllSubMenus ().Contains (args.Context?.Source))
-        {
-            // Logging.Debug ($"{Title} - Calling RaiseAccepted {args.Context?.Command}");
-            RaiseAccepted (args.Context);
-        }
-
-        // Always return false to enable accepting to continue propagating
-        return false;
     }
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e) =>
@@ -660,79 +701,38 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Logging.Debug ($"{Title} - e.Title: {e?.Title}");
         ShowSubMenu (e);
 
-    /// <inheritdoc/>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown if attempting to add a <see cref="Menu"/> or <see cref="MenuItem"/> directly to the popover.
-    /// </exception>
-    /// <remarks>
-    ///     Do not add <see cref="MenuItem"/> or <see cref="Menu"/> views directly to the popover.
-    ///     Use the <see cref="Root"/> property instead.
-    /// </remarks>
-    protected override void OnSubViewAdded (View view)
+    private void UpdateKeyBindings ()
     {
-        if (Root is null && (view is Menu || view is MenuItem))
+        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus ();
+
+        foreach (MenuItem menuItem in all.Where (mi => mi.Command != Command.NotBound))
         {
-            throw new InvalidOperationException ("Do not add MenuItems or Menus directly to a PopoverMenu. Use the Root property.");
-        }
+            Key? key;
 
-        base.OnSubViewAdded (view);
-    }
-
-    /// <inheritdoc/>
-    /// <remarks>
-    ///     This method unsubscribes from all menu events and disposes the root menu.
-    /// </remarks>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            IEnumerable<Menu> allMenus = GetAllSubMenus ();
-
-            foreach (Menu menu in allMenus)
+            if (menuItem.TargetView is { })
             {
-                menu.Accepting -= MenuOnAccepting;
-                menu.Accepted -= MenuAccepted;
-                menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
+                // A TargetView implies HotKey
+                key = menuItem.TargetView.HotKeyBindings.GetFirstFromCommands (menuItem.Command);
+            }
+            else
+            {
+                // No TargetView implies Application HotKey
+                key = App?.Keyboard.KeyBindings.GetFirstFromCommands (menuItem.Command);
             }
 
-            _root?.Dispose ();
-            _root = null;
+            if (key is not { IsValid: true })
+            {
+                continue;
+            }
+
+            if (menuItem.Key.IsValid)
+            {
+                // Logging.Warning ("Do not specify a Key for MenuItems where a Command is specified. Key will be determined automatically.");
+            }
+
+            menuItem.Key = key;
+
+            // Logging.Debug ($"{Title} - HotKey: {menuItem.Key}->{menuItem.Command}");
         }
-
-        base.Dispose (disposing);
-    }
-
-    /// <summary>
-    ///     Enables the popover menu for use in design-time scenarios.
-    /// </summary>
-    /// <typeparam name="TContext">The type of the target view context.</typeparam>
-    /// <param name="targetView">The target view to associate with the menu commands.</param>
-    /// <returns><see langword="true"/> if successfully enabled for design; otherwise, <see langword="false"/>.</returns>
-    /// <remarks>
-    ///     This method creates a default set of menu items (Cut, Copy, Paste, Select All, Quit) for design-time use.
-    ///     It is primarily used for demonstration and testing purposes.
-    /// </remarks>
-    public bool EnableForDesign<TContext> (ref TContext targetView) where TContext : notnull
-    {
-        // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
-        // unit tests.
-
-        Root = new Menu ([
-                             new MenuItem (targetView as View, Command.Cut),
-                             new MenuItem (targetView as View, Command.Copy),
-                             new MenuItem (targetView as View, Command.Paste),
-                             new Line (),
-                             new MenuItem (targetView as View, Command.SelectAll),
-                             new Line (),
-                             new MenuItem (targetView as View, Command.Quit)
-                         ]) { Title = "Popover Demo Root" };
-
-        // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
-        // NOTE: without being activated via App?.Popover. But we want it to be visible.
-        // NOTE: If you use PopoverView.EnableForDesign for real Popover scenarios, change back to false
-        // NOTE: after calling EnableForDesign.
-        //Visible = true;
-
-        return true;
     }
 }
