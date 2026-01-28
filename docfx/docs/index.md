@@ -36,6 +36,7 @@ Welcome to the Terminal.Gui documentation! This comprehensive guide covers every
 - [Keyboard](~/docs/keyboard.md) - Key handling, bindings, commands, and shortcuts
 - [Layout](~/docs/layout.md) - View positioning, sizing, and arrangement
 - [Logging](~/docs/logging.md) - Comprehensive logging and performance monitoring
+- [Menus](~/docs/menus.md) - Menu system architecture including MenuBar, MenuItem, and PopoverMenu
 - [Mouse](~/docs/mouse.md) - Mouse event handling and interaction patterns
 - [Multitasking](~/docs/multitasking.md) - Background operations and task management
 - [Navigation](~/docs/navigation.md) - Focus management, keyboard navigation, and accessibility
