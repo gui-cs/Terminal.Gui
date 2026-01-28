@@ -34,23 +34,17 @@ public static class Program
         // Get allowed driver names
         string? [] allowedDrivers = DriverRegistry.GetDriverNames ().ToArray ();
 
-        Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.")
-            .FromAmong (allowedDrivers!);
+        Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.").FromAmong (allowedDrivers!);
         driverOption.SetDefaultValue (string.Empty);
         driverOption.AddAlias ("-d");
 
-        Option<bool> disableConfigManagement = new (
-                                                    "--disable-cm",
-                                                    "Indicates Configuration Management should not be enabled.");
+        Option<bool> disableConfigManagement = new ("--disable-cm", "Indicates Configuration Management should not be enabled.");
         disableConfigManagement.AddAlias ("-dcm");
 
-        Option<bool> force16Colors = new (
-                                          "--force-16-colors",
-                                          "Forces the driver to use 16-color mode instead of TrueColor.");
+        Option<bool> force16Colors = new ("--force-16-colors", "Forces the driver to use 16-color mode instead of TrueColor.");
         force16Colors.AddAlias ("-16");
 
-        Option<uint> benchmarkTimeout = new (
-                                             "--timeout",
+        Option<uint> benchmarkTimeout = new ("--timeout",
                                              () => Scenario.BenchmarkTimeout,
                                              $"The maximum time in milliseconds to run a benchmark. Default is {Scenario.BenchmarkTimeout}ms.");
         benchmarkTimeout.AddAlias ("-t");
@@ -60,8 +54,7 @@ public static class Program
 
         LogFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}";
 
-        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", "The level to use for logging.")
-            .FromAmong (Enum.GetNames<LogLevel> ());
+        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", "The level to use for logging.").FromAmong (Enum.GetNames<LogLevel> ());
         debugLogLevel.SetDefaultValue ("Warning");
         debugLogLevel.AddAlias ("-dl");
 
@@ -82,22 +75,16 @@ public static class Program
                                 });
 
         // Run command
-        Argument<string> scenarioArgument = new (
-                                                 "scenario",
-                                                 "The name of the Scenario to run.");
+        Argument<string> scenarioArgument = new ("scenario", "The name of the Scenario to run.");
 
-        Command runCommand = new ("run", "Run a specific scenario")
-        {
-            scenarioArgument
-        };
+        Command runCommand = new ("run", "Run a specific scenario") { scenarioArgument };
 
         runCommand.AddOption (driverOption);
         runCommand.AddOption (disableConfigManagement);
         runCommand.AddOption (force16Colors);
         runCommand.AddOption (debugLogLevel);
 
-        runCommand.SetHandler (
-                               (scenarioName, driver, disableCm, force16, logLevel) =>
+        runCommand.SetHandler ((scenarioName, driver, disableCm, force16, logLevel) =>
                                {
                                    SetupLogging (logLevel);
 
@@ -126,15 +113,10 @@ public static class Program
                                debugLogLevel);
 
         // Benchmark command
-        Argument<string?> benchmarkScenarioArgument = new (
-                                                           "scenario",
-                                                           () => null,
-                                                           "The name of the Scenario to benchmark. If not specified, all scenarios are benchmarked.");
+        Argument<string?> benchmarkScenarioArgument =
+            new ("scenario", () => null, "The name of the Scenario to benchmark. If not specified, all scenarios are benchmarked.");
 
-        Command benchmarkCommand = new ("benchmark", "Benchmark scenarios")
-        {
-            benchmarkScenarioArgument
-        };
+        Command benchmarkCommand = new ("benchmark", "Benchmark scenarios") { benchmarkScenarioArgument };
 
         benchmarkCommand.AddOption (driverOption);
         benchmarkCommand.AddOption (disableConfigManagement);
@@ -143,8 +125,7 @@ public static class Program
         benchmarkCommand.AddOption (resultsFile);
         benchmarkCommand.AddOption (debugLogLevel);
 
-        benchmarkCommand.SetHandler (
-                                     (scenarioName, driver, disableCm, force16, timeout, file, logLevel) =>
+        benchmarkCommand.SetHandler ((scenarioName, driver, disableCm, force16, timeout, file, logLevel) =>
                                      {
                                          SetupLogging (logLevel);
                                          Scenario.BenchmarkTimeout = timeout;
@@ -206,16 +187,9 @@ public static class Program
                                      resultsFile,
                                      debugLogLevel);
 
-        RootCommand rootCommand = new ("Terminal.Gui Scenario Runner - Run and benchmark Terminal.Gui scenarios")
-        {
-            listCommand,
-            runCommand,
-            benchmarkCommand
-        };
+        RootCommand rootCommand = new ("Terminal.Gui Scenario Runner - Run and benchmark Terminal.Gui scenarios") { listCommand, runCommand, benchmarkCommand };
 
-        Parser parser = new CommandLineBuilder (rootCommand)
-                        .UseDefaults ()
-                        .Build ();
+        Parser parser = new CommandLineBuilder (rootCommand).UseDefaults ().Build ();
 
         return parser.Invoke (args);
     }
@@ -232,36 +206,28 @@ public static class Program
         var logLevel = Enum.Parse<LogLevel> (logLevelName);
         LogLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (logLevel);
 
-        Log.Logger = new LoggerConfiguration ()
-                     .MinimumLevel.ControlledBy (LogLevelSwitch)
-                     .Enrich.FromLogContext ()
-                     .WriteTo.Debug ()
-                     .WriteTo.File (
-                                    LogFilePath,
-                                    rollingInterval: RollingInterval.Day,
-                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                     .CreateLogger ();
+        Log.Logger = new LoggerConfiguration ().MinimumLevel.ControlledBy (LogLevelSwitch)
+                                               .Enrich.FromLogContext ()
+                                               .WriteTo.Debug ()
+                                               .WriteTo.File (LogFilePath,
+                                                              rollingInterval: RollingInterval.Day,
+                                                              outputTemplate:
+                                                              "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                                               .CreateLogger ();
 
-        using ILoggerFactory loggerFactory = LoggerFactory.Create (builder =>
-                                                                   {
-                                                                       builder
-                                                                           .AddSerilog (dispose: true)
-                                                                           .SetMinimumLevel (LogLevel.Trace);
-                                                                   });
+        using ILoggerFactory loggerFactory = LoggerFactory.Create (builder => { builder.AddSerilog (dispose: true).SetMinimumLevel (LogLevel.Trace); });
 
         Logging.Logger = loggerFactory.CreateLogger ("ScenarioRunner");
     }
 
-    private static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel)
-    {
-        return logLevel switch
-               {
-                   LogLevel.Trace => LogEventLevel.Verbose,
-                   LogLevel.Debug => LogEventLevel.Debug,
-                   LogLevel.Information => LogEventLevel.Information,
-                   LogLevel.Warning => LogEventLevel.Warning,
-                   LogLevel.Error => LogEventLevel.Error,
-                   _ => LogEventLevel.Fatal
-               };
-    }
+    private static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel) =>
+        logLevel switch
+        {
+            LogLevel.Trace => LogEventLevel.Verbose,
+            LogLevel.Debug => LogEventLevel.Debug,
+            LogLevel.Information => LogEventLevel.Information,
+            LogLevel.Warning => LogEventLevel.Warning,
+            LogLevel.Error => LogEventLevel.Error,
+            _ => LogEventLevel.Fatal
+        };
 }

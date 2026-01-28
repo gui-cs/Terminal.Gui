@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Concurrent;
 using Moq;
 
 namespace DrawingTests;
@@ -249,5 +250,47 @@ public class SixelToRenderTests
             // Restore environment
             Environment.SetEnvironmentVariable ("XTERM_VERSION", prev);
         }
+    }
+
+    [Fact]
+    public void ConcurrentQueue_Allows_Mixed_SixelToRender_With_And_Without_Id ()
+    {
+        var queue = new ConcurrentQueue<SixelToRender> ();
+
+        var withId = new SixelToRender
+        {
+            Id = "render-1",
+            ScreenPosition = new Point (0, 0),
+            SixelData = "sixel-1"
+        };
+
+        var withoutId = new SixelToRender
+        {
+            ScreenPosition = new Point (1, 0),
+            SixelData = "sixel-2"
+            // Id intentionally left null
+        };
+
+        var withIdAgain = new SixelToRender
+        {
+            Id = "render-2",
+            ScreenPosition = new Point (2, 0),
+            SixelData = "sixel-3"
+        };
+
+        // Enqueue mixed items
+        queue.Enqueue (withId);
+        queue.Enqueue (withoutId);
+        queue.Enqueue (withIdAgain);
+
+        // Dequeue and validate order and Id semantics
+        Assert.True (queue.TryDequeue (out var first));
+        Assert.Equal ("render-1", first.Id);
+
+        Assert.True (queue.TryDequeue (out var second));
+        Assert.Null (second.Id);
+
+        Assert.True (queue.TryDequeue (out var third));
+        Assert.Equal ("render-2", third.Id);
     }
 }
