@@ -8,29 +8,24 @@ namespace Terminal.Gui.Drivers;
 public static class PlatformDetection
 {
     /// <summary>
-    ///     Determines if the current platform is WSL (Windows Subsystem for Linux).
+    ///     Determines whether the current operating system is Linux.
     /// </summary>
-    /// <returns>True if running on WSL, false otherwise.</returns>
-    public static bool IsWSL ()
-    {
-        try
-        {
-            // xclip does not work on WSL, so we need to use the Windows clipboard via Powershell
-            (int exitCode, string result) = ClipboardProcessRunner.Bash ("uname -a", waitForOutput: true);
-
-            return exitCode == 0 && result.Contains ("microsoft") && result.Contains ("WSL");
-        }
-        catch
-        {
-            return false; // If Bash is unavailable (e.g., running on Windows)
-        }
-    }
+    /// <remarks>
+    ///     This method returns <see langword="true"/> only when running on a Linux
+    ///     distribution. Other Unix-like platforms such as macOS and FreeBSD
+    ///     return <see langword="false"/>.
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if the operating system is Linux;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool IsLinux () => RuntimeInformation.IsOSPlatform (OSPlatform.Linux);
 
     /// <summary>
-    ///     Determines if the current platform is Windows.
+    ///     Determines whether the current operating system is macOS.
     /// </summary>
-    /// <returns></returns>
-    public static bool IsWindows () => RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
+    /// <returns>true if the current operating system is macOS; otherwise, false.</returns>
+    public static bool IsMac () => RuntimeInformation.IsOSPlatform (OSPlatform.OSX);
 
     /// <summary>
     ///     Determines whether the current operating system is a Unix-like platform.
@@ -50,22 +45,26 @@ public static class PlatformDetection
         || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD);
 
     /// <summary>
-    ///     Determines whether the current operating system is Linux.
+    ///     Determines if the current platform is Windows.
     /// </summary>
-    /// <remarks>
-    ///     This method returns <see langword="true"/> only when running on a Linux
-    ///     distribution. Other Unix-like platforms such as macOS and FreeBSD
-    ///     return <see langword="false"/>.
-    /// </remarks>
-    /// <returns>
-    ///     <see langword="true"/> if the operating system is Linux;
-    ///     otherwise, <see langword="false"/>.
-    /// </returns>
-    public static bool IsLinux () => RuntimeInformation.IsOSPlatform (OSPlatform.Linux);
+    /// <returns></returns>
+    public static bool IsWindows () => RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
     /// <summary>
-    ///     Determines whether the current operating system is macOS.
+    ///     Determines if the current platform is WSL (Windows Subsystem for Linux).
     /// </summary>
-    /// <returns>true if the current operating system is macOS; otherwise, false.</returns>
-    public static bool IsMac () => RuntimeInformation.IsOSPlatform (OSPlatform.OSX);
+    /// <returns>True if running on WSL, false otherwise.</returns>
+    public static bool IsWSL ()
+    {
+        const string PROC_VERSION = "/proc/version";
+
+        try
+        {
+            return File.ReadAllText (PROC_VERSION).Contains ("microsoft", StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
