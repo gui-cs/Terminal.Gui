@@ -619,17 +619,20 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
     {
-        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
+        Logging.Debug ($"{Title} ({e.Context}) Command: {e.Context?.Command}");
 
-        if (e.Context?.Source is MenuItem { SubMenu: null })
+        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true)
         {
-            HideAndRemoveSubMenu (_root);
-        }
-        else if (e.Context?.Source is MenuItem { SubMenu: { } } menuItemWithSubMenu)
-        {
-            ShowSubMenu (menuItemWithSubMenu);
-        }
 
+            if (sourceView is MenuItem { SubMenu: null })
+            {
+                HideAndRemoveSubMenu (_root);
+            }
+            else if (sourceView is MenuItem { SubMenu: { } } menuItemWithSubMenu)
+            {
+                ShowSubMenu (menuItemWithSubMenu);
+            }
+        }
         RaiseAccepted (e.Context);
     }
 
@@ -647,9 +650,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
 
         // If we're not visible, ignore any keys that are not hotkeys
-        KeyBinding? keyBinding = args.Context?.Binding as KeyBinding?;
 
-        if (!Visible && keyBinding is { Key: { } key })
+        if (!Visible && args.Context?.Binding is KeyBinding { Key: { } key } keyBinding)
         {
             if (GetMenuItemsOfAllSubMenus ().All (i => i.Key != key))
             {
@@ -668,7 +670,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
 
         // Only raise Accepted if the command came from one of our MenuItems
-        if (GetMenuItemsOfAllSubMenus ().Contains (args.Context?.Source))
+        // if (GetMenuItemsOfAllSubMenus ().Contains (args.Context?.Source))
         {
             // Logging.Debug ($"{Title} - Calling RaiseAccepted {args.Context?.Command}");
             RaiseAccepted (args.Context);

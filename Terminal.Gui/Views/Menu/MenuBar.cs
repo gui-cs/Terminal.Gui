@@ -448,7 +448,13 @@ public class MenuBar : Menu, IDesignable
         }
     }
 
- ($"{Title} ({sourceView.Title})");
+    /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        // TODO: Ensure sourceMenuBar is actually one of our bar items
+        if (Visible && Enabled && args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
+        {
+            Logging.Debug ($"{Title} ({sourceView.Title})");
             if (!CanFocus)
             {
                 Debug.Assert (!Active);
@@ -652,21 +658,16 @@ public class MenuBar : Menu, IDesignable
             menuBarItem.PopoverMenu.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
         }
 
-        // Subscribe to VisibleChanged to detect when the popover closes
-        if (menuBarItem.PopoverMenu is { })
-        {
-            menuBarItem.PopoverMenu.VisibleChanged += OnPopoverVisibleChanged;
-        }
+        menuBarItem.Accepting += OnMenuItemAccepted;
 
         return;
 
-        void OnPopoverVisibleChanged (object? sender, EventArgs args)
+        void OnMenuItemAccepted (object? sender, EventArgs args)
         {
-            // Logging.Debug ($"{Title} - OnPopoverVisibleChanged");
-            // Unsubscribe from VisibleChanged (the event we subscribed to)
+            // Logging.Debug ($"{Title} - OnMenuItemAccepted");
             if (menuBarItem.PopoverMenu is { })
             {
-                menuBarItem.PopoverMenu.VisibleChanged -= OnPopoverVisibleChanged;
+                menuBarItem.PopoverMenu.VisibleChanged -= OnMenuItemAccepted;
             }
 
             if (Active && menuBarItem.PopoverMenu is { Visible: false })
@@ -676,4 +677,5 @@ public class MenuBar : Menu, IDesignable
             }
         }
     }
+
 }

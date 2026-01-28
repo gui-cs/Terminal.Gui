@@ -324,7 +324,7 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         return DispatchCommand (args.Context) is true;
-        return RaiseAccepting (args.Context) is true;
+       // return RaiseAccepting (args.Context) is true;
     }
 
     /// <inheritdoc/>

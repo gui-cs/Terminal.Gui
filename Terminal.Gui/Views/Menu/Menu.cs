@@ -86,10 +86,10 @@ public class Menu : Bar
 
                 break;
 
-                void MenuItemOnAccepted (object? sender, CommandEventArgs e) =>
+                //void MenuItemOnAccepted (object? sender, CommandEventArgs e) =>
 
-                        // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
-                        RaiseAccepted (e.Context);
+                //        // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
+                //        RaiseAccepted (e.Context);
                 }
 
             case Line line:
