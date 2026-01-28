@@ -509,6 +509,7 @@ public class MenuBar : Menu, IDesignable
 
         // HideActiveItem ();
         base.OnBorderStyleChanged ();
+    }
 
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
