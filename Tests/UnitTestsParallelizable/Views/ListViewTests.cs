@@ -619,10 +619,15 @@ public class ListViewTests (ITestOutputHelper output)
         var removed = 0;
         var otherActions = 0;
         IList<string> source1 = [];
-        var lv = new ListView { Source = new ListWrapper<string> (new (source1)) };
+        ObservableCollection<string> source2 = [];
+        ObservableCollection<string> source3 = [];
+        IListDataSource? src3 = null;
+        var lv = new ListView { Source = new ListWrapper<string> (new ObservableCollection<string> (source1)) };
 
         lv.CollectionChanged += (sender, args) =>
                                 {
+                                    Assert.Equal (src3, (sender as ListView)?.Source);
+
                                     if (args.Action == NotifyCollectionChangedAction.Add)
                                     {
                                         added++;
@@ -637,10 +642,9 @@ public class ListViewTests (ITestOutputHelper output)
                                     }
                                 };
 
-        ObservableCollection<string> source2 = [];
         lv.Source = new ListWrapper<string> (source2);
-        ObservableCollection<string> source3 = [];
         lv.Source = new ListWrapper<string> (source3);
+        src3 = lv.Source;
         Assert.Equal (0, added);
         Assert.Equal (0, removed);
         Assert.Equal (0, otherActions);
@@ -730,10 +734,15 @@ public class ListViewTests (ITestOutputHelper output)
         var removed = 0;
         var otherActions = 0;
         ObservableCollection<string> source1 = [];
+        ObservableCollection<string> source2 = [];
+        ObservableCollection<string> source3 = [];
         ListWrapper<string> lw = new (source1);
 
         lw.CollectionChanged += (sender, args) =>
                                 {
+                                    // The source3 isn't the current event because ListWrapper wasn't disposed any time we changed source
+                                    Assert.NotEqual (source3, sender);
+
                                     if (args.Action == NotifyCollectionChangedAction.Add)
                                     {
                                         added++;
@@ -748,10 +757,8 @@ public class ListViewTests (ITestOutputHelper output)
                                     }
                                 };
 
-        ObservableCollection<string> source2 = [];
-        lw = new (source2);
-        ObservableCollection<string> source3 = [];
-        lw = new (source3);
+        lw = new ListWrapper<string> (source2);
+        lw = new ListWrapper<string> (source3);
         Assert.Equal (0, added);
         Assert.Equal (0, removed);
         Assert.Equal (0, otherActions);
