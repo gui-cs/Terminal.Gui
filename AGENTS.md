@@ -92,3 +92,96 @@ See `.claude/tasks/` for specialized checklists:
 
 See `.claude/cookbook/` for common UI patterns:
 - [common-patterns.md](.claude/cookbook/common-patterns.md) - Forms, lists, menus, dialogs, etc.
+
+---
+
+## Documentation Index (Compressed)
+
+> **IMPORTANT**: Use retrieval-led reasoning. Read full docs before making changes.
+> Detailed index: [.tg-docs/INDEX.md](.tg-docs/INDEX.md)
+
+### Deep Dives (docfx/docs/)
+
+```
+[Core Architecture]
+|application.md|IApplication,SessionStack,Run/Dispose,View.App,instance-based pattern
+|View.md|SuperView/SubView,Frame/Viewport/ContentArea,composition layers
+|drivers.md|IDriver,DriverRegistry,ANSI/Windows/Unix,platform abstraction
+|navigation.md|Focus,TabStop/TabGroup,Tab/F6 keys,HasFocus,ApplicationNavigation
+
+[Layout & Arrangement]
+|layout.md|Pos/Dim,absolute/relative positioning,SetNeedsLayout
+|arrangement.md|ViewArrangement,Movable/Resizable/Overlapped,tiled vs overlapped
+|dimauto.md|Dim.Auto,content-based sizing,DimAutoStyle
+|scrolling.md|Viewport vs ContentSize,scroll events
+
+[Commands & Events]
+|command.md|Command enum,AddCommand,KeyBindings/MouseBindings,Activate/Accept/HotKey
+|events.md|Event categories,CWP integration,binding types (KeyBinding/MouseBinding)
+|cancellable-work-pattern.md|CWP: Work→Virtual→Event,OnXxx methods,Raise pattern
+
+[Input]
+|keyboard.md|Key class,KeyBindings,key processing order,IKeyboard
+|mouse.md|MouseFlags,MouseBindings,grab/release
+|input-injection.md|VirtualTimeProvider,InjectKey/InjectMouse,testing
+
+[Visual]
+|drawing.md|Move/AddStr/AddRune,Attribute,LineCanvas
+|scheme.md|Scheme,VisualRole,theming
+|cursor.md|View.Cursor,CursorVisibility
+|Popovers.md|Drawing outside viewport,modal behavior
+
+[Components]
+|views.md|Complete catalog of built-in views
+|menus.md|MenuBar,ContextMenu,MenuItem
+|tableview.md|TableView data binding
+|treeview.md|TreeView hierarchical data
+|prompt.md|MessageBox,input dialogs
+
+[Config & Advanced]
+|config.md|ConfigurationManager,themes,JSON config
+|multitasking.md|Background ops,Invoke,threading
+|logging.md|ILogger,debug output
+|ansihandling.md|ANSI escape parsing
+
+[Migration]
+|newinv2.md|v2 changes,new features
+|migratingfromv1.md|Migration guide,API changes
+|lexicon.md|Terminology definitions
+```
+
+### API Namespaces (docfx/apispec/)
+
+```
+|namespace-app.md|Application,IApplication,IRunnable,SessionToken
+|namespace-viewbase.md|View,Adornment,Border,Margin,Padding
+|namespace-views.md|Button,Label,TextField,ListView,CheckBox,etc.
+|namespace-input.md|Key,Mouse,Command,ICommandContext
+|namespace-drawing.md|Attribute,Color,LineCanvas,Cell
+|namespace-drivers.md|IDriver,DriverRegistry
+|namespace-configuration.md|ConfigurationManager,themes
+|namespace-text.md|Text processing,autocomplete
+|namespace-fileservices.md|File dialogs
+```
+
+### Source Code (Terminal.Gui/)
+
+```
+[Key Directories]
+|Application/|IApplication,ApplicationImpl,SessionStack
+|View/|View base,layout,drawing,focus
+|Views/|All built-in views
+|Input/|Key,Mouse,Command,bindings
+|Drawing/|Attribute,Color,LineCanvas
+|Drivers/|IDriver implementations
+|Configuration/|ConfigurationManager,themes
+
+[Critical Files]
+|View/View.cs|Core View class
+|View/View.Layout.cs|Layout implementation
+|View/View.Drawing.cs|Drawing implementation
+|View/View.Navigation.cs|Focus and navigation
+|Application/ApplicationImpl.cs|IApplication implementation
+|Input/Command.cs|Command enum
+|Input/Key.cs|Key class
+```
