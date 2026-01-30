@@ -164,8 +164,12 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     /// <summary>
-    ///     Call the event to raises the <see cref="SourceChanged"/>.
+    ///     Determine if the <see cref="SourceChanged"/> event should be raised.
     /// </summary>
+    /// <returns>
+    ///     If <see langword="true"/> the event will be raised, otherwise <see langword="false"/>.
+    ///     The default implementation returns <see langword="false"/>.
+    /// </returns>
     protected virtual bool OnSourceChanged () => false;
 
     /// <summary>
