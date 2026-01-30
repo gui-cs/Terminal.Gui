@@ -129,11 +129,8 @@ public partial class ListView : View, IDesignable, IValue<int?>
 
             SelectedItem = null;
             _lastSelectedItem = null;
-
-            if (!OnSourceChanged ())
-            {
-                SourceChanged?.Invoke (this, EventArgs.Empty);
-            }
+            OnSourceChanged ();
+            SourceChanged?.Invoke (this, EventArgs.Empty);
             SetNeedsDraw ();
         }
     }
@@ -164,13 +161,9 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     /// <summary>
-    ///     Determine if the <see cref="SourceChanged"/> event should be raised.
+    ///     Called when the <see cref="Source"/> property is changed. Invokes the <see cref="SourceChanged"/> event.
     /// </summary>
-    /// <returns>
-    ///     If <see langword="true"/> the event will be raised, otherwise <see langword="false"/>.
-    ///     The default implementation returns <see langword="false"/>.
-    /// </returns>
-    protected virtual bool OnSourceChanged () => false;
+    protected virtual void OnSourceChanged () { }
 
     /// <summary>
     ///     Event to raise when the <see cref="Source"/> data is changed.
