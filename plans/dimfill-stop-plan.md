@@ -60,17 +60,6 @@ Below is a comprehensive list of locations where `Dim.Func` is used with `Frame.
 ### Height with Dim.Fill(Dim.Func(...Frame.Height))
 
 
-3. **Examples/UICatalog/Scenarios/ConfigurationEditor.cs:43**
-   ```cs
-   Height = Dim.Fill (Dim.Func (_ => statusBar.Frame.Height))
-   ```
-   Could become: `Height = Dim.Fill (to: statusBar)`
-
-4. **Examples/UICatalog/Scenarios/ViewportSettings.cs:35**
-   ```cs
-   Height = Dim.Fill (Dim.Func (_ => mainWindow.IsInitialized ? viewportSettingsEditor.Frame.Height : 1))
-   ```
-   Could become: `Height = Dim.Fill (to: viewportSettingsEditor)` (with conditional logic handled separately)
 
 5. **Terminal.Gui/ViewBase/View.ScrollBars.cs:90**
    ```cs

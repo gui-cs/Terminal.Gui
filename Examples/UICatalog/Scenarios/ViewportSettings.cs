@@ -31,8 +31,8 @@ public class ViewportSettings : Scenario
         ViewportSettingsDemoView view = new ()
         {
             Title = "ViewportSettings Demo View",
-            Width = Dim.Fill (Dim.Func (_ => mainWindow.IsInitialized ? adornmentsEditor.Frame.Width + 1 : 1)),
-            Height = Dim.Fill (Dim.Func (_ => mainWindow.IsInitialized ? viewportSettingsEditor.Frame.Height : 1))
+            Width = Dim.Fill (adornmentsEditor),
+            Height = Dim.Fill (viewportSettingsEditor)
         };
 
         mainWindow.Add (view);
