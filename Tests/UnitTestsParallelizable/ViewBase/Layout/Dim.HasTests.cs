@@ -144,55 +144,78 @@ public class DimHasTests
         Assert.Null (result);
     }
 
-    // The following tests document the current behavior where Has<T> does NOT
-    // traverse into DimAuto or DimFill's inner Dim properties. This is noted
-    // in the QUESTION comment in Dim.Has<T>.
+    // The following tests verify that Has<T> correctly traverses into
+    // DimAuto and DimFill's inner Dim properties.
 
     [Fact]
-    public void Has_DimAuto_ContainingMinimum_DoesNotTraverseIntoMinimum ()
+    public void Has_DimAuto_ContainingMinimum_TraversesIntoMinimum ()
     {
-        // Current implementation does NOT traverse into DimAuto's MinimumContentDim
         Dim dim = Dim.Auto (minimumContentDim: Dim.Fill ());
 
         Assert.True (dim.Has<DimAuto> (out _));
-
-        // This returns false because Has<T> does not traverse into DimAuto's properties
-        Assert.False (dim.Has<DimFill> (out _));
+        Assert.True (dim.Has (out DimFill result));
+        Assert.IsType<DimFill> (result);
     }
 
     [Fact]
-    public void Has_DimAuto_ContainingMaximum_DoesNotTraverseIntoMaximum ()
+    public void Has_DimAuto_ContainingMaximum_TraversesIntoMaximum ()
     {
-        // Current implementation does NOT traverse into DimAuto's MaximumContentDim
         Dim dim = Dim.Auto (maximumContentDim: Dim.Percent (80));
 
         Assert.True (dim.Has<DimAuto> (out _));
-
-        // This returns false because Has<T> does not traverse into DimAuto's properties
-        Assert.False (dim.Has<DimPercent> (out _));
+        Assert.True (dim.Has (out DimPercent result));
+        Assert.IsType<DimPercent> (result);
     }
 
     [Fact]
-    public void Has_DimFill_ContainingMargin_DoesNotTraverseIntoMargin ()
+    public void Has_DimAuto_ContainingBothMinAndMax_FindsBoth ()
     {
-        // Current implementation does NOT traverse into DimFill's Margin
+        Dim dim = Dim.Auto (minimumContentDim: Dim.Fill (), maximumContentDim: Dim.Percent (80));
+
+        Assert.True (dim.Has<DimAuto> (out _));
+        Assert.True (dim.Has<DimFill> (out _));
+        Assert.True (dim.Has<DimPercent> (out _));
+    }
+
+    [Fact]
+    public void Has_DimFill_ContainingMargin_TraversesIntoMargin ()
+    {
         Dim dim = Dim.Fill (Dim.Percent (10));
 
         Assert.True (dim.Has<DimFill> (out _));
-
-        // This returns false because Has<T> does not traverse into DimFill's properties
-        Assert.False (dim.Has<DimPercent> (out _));
+        Assert.True (dim.Has (out DimPercent result));
+        Assert.IsType<DimPercent> (result);
     }
 
     [Fact]
-    public void Has_DimFill_ContainingMinimum_DoesNotTraverseIntoMinimum ()
+    public void Has_DimFill_ContainingMinimum_TraversesIntoMinimum ()
     {
-        // Current implementation does NOT traverse into DimFill's MinimumContentDim
         Dim dim = Dim.Fill (Dim.Absolute (0), Dim.Percent (50));
 
         Assert.True (dim.Has<DimFill> (out _));
+        Assert.True (dim.Has (out DimPercent result));
+        Assert.IsType<DimPercent> (result);
+    }
 
-        // This returns false because Has<T> does not traverse into DimFill's properties
-        Assert.False (dim.Has<DimPercent> (out _));
+    [Fact]
+    public void Has_DimFill_ContainingBothMarginAndMinimum_FindsBoth ()
+    {
+        Dim dim = Dim.Fill (Dim.Percent (10), Dim.Absolute (50));
+
+        Assert.True (dim.Has<DimFill> (out _));
+        Assert.True (dim.Has<DimPercent> (out _));
+        Assert.True (dim.Has<DimAbsolute> (out _));
+    }
+
+    [Fact]
+    public void Has_NestedDims_TraversesMultipleLevels ()
+    {
+        // DimAuto containing DimFill containing DimPercent
+        Dim innerFill = Dim.Fill (Dim.Percent (10));
+        Dim dim = Dim.Auto (minimumContentDim: innerFill);
+
+        Assert.True (dim.Has<DimAuto> (out _));
+        Assert.True (dim.Has<DimFill> (out _));
+        Assert.True (dim.Has<DimPercent> (out _));
     }
 }

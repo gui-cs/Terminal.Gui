@@ -80,4 +80,22 @@ public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = nul
     }
 
     internal override bool ReferencesOtherViews () => To is { };
+
+    /// <inheritdoc/>
+    protected override bool HasInner<TDim> (out TDim dim)
+    {
+        if (Margin.Has (out dim))
+        {
+            return true;
+        }
+
+        if (MinimumContentDim is { } && MinimumContentDim.Has (out dim))
+        {
+            return true;
+        }
+
+        dim = null!;
+
+        return false;
+    }
 }

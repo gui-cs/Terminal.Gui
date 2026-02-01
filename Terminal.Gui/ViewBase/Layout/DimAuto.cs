@@ -499,4 +499,22 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
         return max;
     }
+
+    /// <inheritdoc/>
+    protected override bool HasInner<TDim> (out TDim dim)
+    {
+        if (MinimumContentDim is { } && MinimumContentDim.Has (out dim))
+        {
+            return true;
+        }
+
+        if (MaximumContentDim is { } && MaximumContentDim.Has (out dim))
+        {
+            return true;
+        }
+
+        dim = null!;
+
+        return false;
+    }
 }

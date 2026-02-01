@@ -961,16 +961,19 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectDim (Dim? dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        if (dim!.Has (out DimView dv))
+        // Use direct type checking instead of Has<T>() because Has<T>() now traverses into
+        // nested Dims (DimAuto, DimFill). We only want to process the top-level Dim type here;
+        // nested Dims are handled via the DimCombine recursion below.
+        if (dim is DimView dv)
         {
             if (dv.Target != this)
             {
-                Debug.Assert (dim.ReferencesOtherViews());
+                Debug.Assert (dim.ReferencesOtherViews ());
                 nEdges.Add ((dv.Target!, from));
             }
         }
 
-        if (dim!.Has (out DimFill df))
+        if (dim is DimFill df)
         {
             if (df.To is { } && df.To != this)
             {
@@ -979,7 +982,8 @@ public partial class View // Layout APIs
             }
         }
 
-        if (dim!.Has (out DimCombine dc))
+        // Only recurse if the dim itself is a DimCombine (not a nested one found via HasInner)
+        if (dim is DimCombine dc)
         {
             // TODO: Redo without recursion
             CollectDim (dc.Left, from, ref nNodes, ref nEdges);
