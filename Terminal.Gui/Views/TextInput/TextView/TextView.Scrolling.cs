@@ -2,8 +2,6 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-    private bool _scrollBars;
-
     /// <summary>
     ///     Gets or sets a value indicating whether scroll bars are enabled.
     /// </summary>
@@ -12,15 +10,15 @@ public partial class TextView
     /// </remarks>
     public bool ScrollBars
     {
-        get => _scrollBars;
+        get;
         set
         {
-            if (_scrollBars == value)
+            if (field == value)
             {
                 return;
             }
 
-            _scrollBars = value;
+            field = value;
 
             UpdateScrollBars ();
         }
@@ -29,7 +27,6 @@ public partial class TextView
     private void UpdateScrollBars ()
     {
         // Configure scrollbars to use modern Viewport system
-        //VerticalScrollBar.AutoShow = false;
         UpdateHorizontalScrollBarVisibility ();
         AdjustViewport ();
     }
@@ -80,7 +77,12 @@ public partial class TextView
     private void AdjustViewport ()
     {
         List<Cell> line = GetCurrentLine ();
-        bool need = NeedsDraw || _wrapNeeded || !Used;
+
+        // Track if content may have changed (vs pure cursor movement)
+        // Only update content size when content actually changes to avoid expensive recalculation
+        bool contentMayHaveChanged = NeedsDraw || _wrapNeeded || !Used;
+        bool need = contentMayHaveChanged;
+
         (int size, int length) tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
         (int size, int length) dSize = TextModel.DisplaySize (line, Viewport.X, CurrentColumn, true, TabWidth);
 
@@ -136,6 +138,11 @@ public partial class TextView
             PositionCursor ();
         }
 
-        OnUnwrappedCursorPosition ();
+        // Only update content size when content may have changed, not for pure cursor movement
+        // This avoids expensive GetMaxVisibleLine() calls on every cursor move
+        if (contentMayHaveChanged)
+        {
+            UpdateContentSize ();
+        }
     }
 }

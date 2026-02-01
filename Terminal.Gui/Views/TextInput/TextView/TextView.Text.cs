@@ -113,11 +113,6 @@ public partial class TextView
                 WordWrap = false;
 
                 // Don't reset cursor position - this causes unwanted scrolling (issue #3988)
-                // CurrentColumn = 0;
-                // CurrentRow = 0;
-                //_savedHeight = Height;
-
-                //Height = Dim.Auto (DimAutoStyle.Text, 1);
 
                 if (!IsInitialized)
                 {
@@ -126,9 +121,8 @@ public partial class TextView
 
                 SetNeedsDraw ();
             }
-            else if (_multiline /*&& _savedHeight is { }*/)
+            else if (_multiline)
             {
-                //Height = _savedHeight;
                 SetNeedsDraw ();
             }
 
