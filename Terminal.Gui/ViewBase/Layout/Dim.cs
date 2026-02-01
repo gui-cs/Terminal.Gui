@@ -142,8 +142,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     <para>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
-    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> to ensure the SubView contributes
-    ///         a minimum size. See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
+    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
+    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing. 
+    ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -162,8 +163,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     <para>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
-    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> to ensure the SubView contributes
-    ///         a minimum size. See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
+    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
+    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing. 
+    ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -185,7 +187,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///         When the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation by default. The <paramref name="minimumContentDim"/> parameter
     ///         resolves this: it contributes a floor to the auto-sizing calculation, ensuring the SuperView is at least
-    ///         large enough to accommodate the minimum. Without it, the SubView will receive a size of 0.
+    ///         large enough to accommodate the minimum. Without it (or without using <see cref="Fill(View)"/> with 
+    ///         a <c>to</c> parameter), the SubView will receive a size of 0.
     ///     </para>
     ///     <para>
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
@@ -206,6 +209,83 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     The minimum dimension. If <see langword="null"/>, no minimum is enforced.
     /// </param>
     public static Dim Fill (Dim margin, Dim? minimumContentDim) => new DimFill (margin, minimumContentDim);
+
+    /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension up to the position of another view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view will fill from its position up to (but not including) the position of the <paramref name="to"/> view.
+    ///         For Width, this means filling up to the X coordinate of the <paramref name="to"/> view.
+    ///         For Height, this means filling up to the Y coordinate of the <paramref name="to"/> view.
+    ///     </para>
+    ///     <para>
+    ///         When the SuperView uses <see cref="Dim.Auto"/>, this <see cref="DimFill"/> with <c>to</c> parameter
+    ///         <b>does</b> contribute to the auto-sizing calculation by ensuring the SuperView is large enough to
+    ///         accommodate both this view and the <paramref name="to"/> view.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    /// var label = new Label { X = 0, Y = 0, Width = 10, Text = "Name:" };
+    /// var btn = new Button { X = Pos.AnchorEnd(), Text = "OK" };
+    /// var textField = new TextField { X = Pos.Right(label) + 1, Y = 0, Width = Dim.Fill(to: btn) };
+    /// // textField will fill the space between the label and the button
+    /// </code>
+    /// </example>
+    /// <returns>The Fill dimension.</returns>
+    /// <param name="to">The view to fill up to.</param>
+    public static Dim Fill (View to) => new DimFill (Absolute (0), null, to);
+
+    /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension up to the position of another view, with a margin.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view will fill from its position up to (but not including) the position of the <paramref name="to"/> view,
+    ///         minus the specified margin.
+    ///     </para>
+    ///     <para>
+    ///         When the SuperView uses <see cref="Dim.Auto"/>, this <see cref="DimFill"/> with <c>to</c> parameter
+    ///         <b>does</b> contribute to the auto-sizing calculation by ensuring the SuperView is large enough to
+    ///         accommodate both this view and the <paramref name="to"/> view.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    /// var btn = new Button { X = Pos.AnchorEnd(), Text = "OK" };
+    /// var textField = new TextField { X = 0, Y = 0, Width = Dim.Fill(margin: 2, to: btn) };
+    /// // textField will fill the space up to 2 columns before the button
+    /// </code>
+    /// </example>
+    /// <returns>The Fill dimension.</returns>
+    /// <param name="margin">Margin to use.</param>
+    /// <param name="to">The view to fill up to.</param>
+    public static Dim Fill (Dim margin, View to) => new DimFill (margin, null, to);
+
+    /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension up to the position of another view,
+    ///     with a margin and minimum dimension.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view will fill from its position up to (but not including) the position of the <paramref name="to"/> view,
+    ///         minus the specified margin, while respecting the minimum dimension.
+    ///     </para>
+    ///     <para>
+    ///         When the SuperView uses <see cref="Dim.Auto"/>, this <see cref="DimFill"/> with <c>to</c> parameter
+    ///         <b>does</b> contribute to the auto-sizing calculation by ensuring the SuperView is large enough to
+    ///         accommodate both this view and the <paramref name="to"/> view. If <paramref name="minimumContentDim"/>
+    ///         is also specified, both constraints contribute to the calculation.
+    ///     </para>
+    /// </remarks>
+    /// <returns>The Fill dimension.</returns>
+    /// <param name="margin">Margin to use.</param>
+    /// <param name="minimumContentDim">
+    ///     The minimum dimension. If <see langword="null"/>, no minimum is enforced.
+    /// </param>
+    /// <param name="to">The view to fill up to.</param>
+    public static Dim Fill (Dim margin, Dim? minimumContentDim, View to) => new DimFill (margin, minimumContentDim, to);
 
     /// <summary>
     ///     Creates a function <see cref="Dim"/> object that computes the dimension based on the passed view and by executing
