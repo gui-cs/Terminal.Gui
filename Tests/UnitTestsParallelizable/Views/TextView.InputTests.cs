@@ -10,12 +10,7 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -44,12 +39,7 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -59,7 +49,7 @@ public class TextViewInputTests
 
         // CursorRight should move from (0,0) to (1,0)
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
 
@@ -71,26 +61,21 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
 
         // Move right one character first
         app.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
 
         // Ctrl+End should move to end of document
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal (2, tv.CurrentRow);
         Assert.Equal (23, tv.CurrentColumn);
         Assert.Equal (tv.CurrentColumn, tv.GetCurrentLine ().Count);
-        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
 
@@ -102,23 +87,18 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
 
         // Navigate to end of document
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
-        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
 
         // CursorRight at end should return false
         Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
 
@@ -130,27 +110,19 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
 
         // Navigate to end and type 'F'
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
-        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
-                      tv.Text
-                     );
-        Assert.Equal (new (24, 2), tv.InsertionPoint);
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
+        Assert.Equal (new Point (24, 2), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
 
@@ -162,12 +134,7 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -176,20 +143,14 @@ public class TextViewInputTests
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
         app.Keyboard.RaiseKeyDownEvent (Key.F.WithShift);
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
-                      tv.Text
-                     );
-        Assert.Equal (new (24, 2), tv.InsertionPoint);
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
+        Assert.Equal (new Point (24, 2), tv.InsertionPoint);
 
         // Undo should restore original text
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
-        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
 
@@ -201,12 +162,7 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -216,20 +172,14 @@ public class TextViewInputTests
         app.Keyboard.RaiseKeyDownEvent (Key.F.WithShift);
         app.Keyboard.RaiseKeyDownEvent (Key.Z.WithCtrl);
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
-        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
 
         // Redo should reapply the 'F' character
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
-                      tv.Text
-                     );
-        Assert.Equal (new (24, 2), tv.InsertionPoint);
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
+        Assert.Equal (new Point (24, 2), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
 
@@ -241,28 +191,20 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line.F"
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line.F" };
 
         runnable.Add (tv);
         app.Begin (runnable);
 
         // Navigate to end
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
-        Assert.Equal (new (24, 2), tv.InsertionPoint);
+        Assert.Equal (new Point (24, 2), tv.InsertionPoint);
 
         // Backspace should delete the 'F'
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
-        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
 
@@ -335,8 +277,8 @@ public class TextViewInputTests
             Text = "a\t1"
         };
 
-        tv.InsertionPoint = new (3, 0);
-        int expectedVisualColumn = 5;
+        tv.InsertionPoint = new Point (3, 0);
+        var expectedVisualColumn = 5;
         int fixedVisualColumn = 1 + (4 - 1 % 4) + 1;
 
         Assert.Equal (expectedVisualColumn, fixedVisualColumn);
@@ -354,8 +296,8 @@ public class TextViewInputTests
             Text = "??\t1"
         };
 
-        tv.InsertionPoint = new (3, 0);
-        int expectedVisualColumn = 5;
+        tv.InsertionPoint = new Point (3, 0);
+        var expectedVisualColumn = 5;
         int fixedVisualColumn = 2 + (4 - 2 % 4) + 1;
 
         Assert.Equal (expectedVisualColumn, fixedVisualColumn);
@@ -373,8 +315,8 @@ public class TextViewInputTests
             Text = "a??\t?\tX"
         };
 
-        tv.InsertionPoint = new (6, 0);
-        int expectedVisualColumn = 17;
+        tv.InsertionPoint = new Point (6, 0);
+        var expectedVisualColumn = 17;
         int fixedVisualColumn = 1 + 2 + (8 - 3 % 8) + 2 + (8 - 10 % 8) + 1;
 
         Assert.Equal (expectedVisualColumn, fixedVisualColumn);
@@ -396,10 +338,11 @@ public class TextViewInputTests
             Text = text
         };
 
-        tv.InsertionPoint = new (text.Length, 0);
+        tv.InsertionPoint = new Point (text.Length, 0);
 
-        int visualColumn = 0;
-        for (int i = 0; i < text.Length; i++)
+        var visualColumn = 0;
+
+        for (var i = 0; i < text.Length; i++)
         {
             if (text [i] == '\t')
             {
@@ -446,22 +389,17 @@ public class TextViewInputTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 30,
-            Height = 5,
-            Text = $"This is the second line.{Environment.NewLine}This is the third "
-        };
+        TextView tv = new () { Width = 30, Height = 5, Text = $"This is the second line.{Environment.NewLine}This is the third " };
 
         runnable.Add (tv);
         app.Begin (runnable);
 
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
-        Assert.Equal (new (18, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 
         tv.EnterKeyAddsLine = false;
-        Assert.Equal (new (18, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
@@ -469,22 +407,19 @@ public class TextViewInputTests
 
         Assert.False (app.Keyboard.RaiseKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
-        Assert.Equal (new (18, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
 
         tv.EnterKeyAddsLine = true;
-        Assert.Equal (new (18, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.True (tv.EnterKeyAddsLine);
         Assert.True (tv.Multiline);
 
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Enter));
-        Assert.Equal (
-                      $"This is the second line.{Environment.NewLine}This is the third {Environment.NewLine}",
-                      tv.Text
-                     );
-        Assert.Equal (new (0, 2), tv.InsertionPoint);
+        Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third {Environment.NewLine}", tv.Text);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
