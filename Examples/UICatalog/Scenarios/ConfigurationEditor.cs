@@ -23,6 +23,7 @@ public class ConfigurationEditor : Scenario
         _app = app;
 
         using Window win = new ();
+        win.BorderStyle = LineStyle.None;
 
         _lenShortcut = new Shortcut { Title = "" };
 
@@ -40,7 +41,7 @@ public class ConfigurationEditor : Scenario
 
         StatusBar statusBar = new ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
 
-        _tabView = new TabView { Width = Dim.Fill (), Height = Dim.Fill (Dim.Func (_ => statusBar.Frame.Height)) };
+        _tabView = new TabView { Width = Dim.Fill (), Height = Dim.Fill (to: statusBar) };
 
         win.Add (_tabView, statusBar);
 

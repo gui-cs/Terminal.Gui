@@ -74,13 +74,19 @@ public sealed class UICatalogRunnable : Runnable
             _scenarioList?.SetFocus ();
         }
 
-        if (_statusBar is { })
-        {
-            _statusBar.VisibleChanged += (_, _) => { ShowStatusBar = _statusBar.Visible; };
-        }
-
         _categoryList?.EnsureSelectedItemVisible ();
         _scenarioList?.EnsureSelectedCellIsVisible ();
+
+        if (ShowStatusBar)
+        {
+            _statusBar!.Height = Dim.Auto ();
+            _statusBar!.Layout ();
+        }
+        else
+        {
+            _statusBar!.Height = 0;
+            _statusBar!.Layout ();
+        }
     }
 
     /// <inheritdoc/>
@@ -157,7 +163,8 @@ public sealed class UICatalogRunnable : Runnable
                                                                                               buttons: Strings.btnOk),
                                                                       Key.A.WithCtrl)
                                                     ])
-                               ]) { Title = "menuBar", Id = "menuBar" };
+                               ])
+        { Title = "menuBar", Id = "menuBar" };
 
         return menuBar;
 
@@ -165,7 +172,7 @@ public sealed class UICatalogRunnable : Runnable
         {
             List<View> menuItems = [];
 
-            _force16ColorsMenuItemCb = new ()
+            _force16ColorsMenuItemCb = new CheckBox
             {
                 Title = "Force _16 Colors",
                 Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
@@ -394,9 +401,7 @@ public sealed class UICatalogRunnable : Runnable
             X = Pos.Right (_categoryList!) - 1,
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
-
-            //ShowMarks = false,
+            Height = Dim.Height (_categoryList),
             CanFocus = true,
             Title = "_Scenarios",
             BorderStyle = _categoryList!.BorderStyle,
@@ -478,7 +483,8 @@ public sealed class UICatalogRunnable : Runnable
             X = 0,
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Auto (),
-            Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
+            Height = Dim.Fill (to: _statusBar!),
+
             ShowMarks = false,
             CanFocus = true,
             Title = "_Categories",
@@ -534,7 +540,22 @@ public sealed class UICatalogRunnable : Runnable
 
     [ConfigurationProperty (Scope = typeof (AppSettingsScope), OmitClassName = true)]
     [JsonPropertyName ("UICatalog.StatusBar")]
-    public static bool ShowStatusBar { get; set; } = true;
+    public static bool ShowStatusBar
+    {
+        get => field;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+            field = value;
+            StatusBarChanged?.Invoke (null, new ValueChangedEventArgs<bool> (!field, field));
+        }
+    } = true;
+
+    /// <summary>Raised when "UICatalog.StatusBar" changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<bool>>? StatusBarChanged;
 
     private Shortcut? _shQuit;
     private Shortcut? _shVersion;
@@ -542,14 +563,7 @@ public sealed class UICatalogRunnable : Runnable
 
     private StatusBar CreateStatusBar ()
     {
-        StatusBar statusBar = new () { Visible = ShowStatusBar, AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
-
-        // ReSharper disable All
-        statusBar.Height = Dim.Auto (DimAutoStyle.Auto,
-                                     minimumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0),
-                                     maximumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0));
-
-        // ReSharper restore All
+        StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
 
         _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey };
 
@@ -559,7 +573,7 @@ public sealed class UICatalogRunnable : Runnable
 
         statusBarShortcut.Accepting += (_, args) =>
                                        {
-                                           statusBar.Visible = !_statusBar!.Visible;
+                                           ShowStatusBar = !ShowStatusBar;
                                            args.Handled = true;
                                        };
 
@@ -591,6 +605,24 @@ public sealed class UICatalogRunnable : Runnable
             statusBar.AddShortcutAt (statusBar.SubViews.ToList ().IndexOf (_shVersion), new Shortcut { Title = "CM is Disabled" });
         }
 
+        StatusBarChanged += (_, args) =>
+                            {
+                                switch (args.NewValue)
+                                {
+                                    case true:
+                                        _statusBar!.Height = Dim.Auto ();
+                                        _statusBar!.Layout ();
+
+                                        break;
+
+                                    case false:
+                                        _statusBar!.Height = 0;
+                                        _statusBar!.Layout ();
+
+                                        break;
+                                }
+                            };
+
         return statusBar;
     }
 
@@ -609,7 +641,6 @@ public sealed class UICatalogRunnable : Runnable
 
         _shQuit?.Key = Application.QuitKey;
 
-        _statusBar!.Visible = ShowStatusBar;
         _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
