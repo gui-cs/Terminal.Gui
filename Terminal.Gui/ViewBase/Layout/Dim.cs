@@ -336,19 +336,38 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TDim"/> is in the hierarchy of this Dim object.
     /// </summary>
-    /// <param name="dim">A reference to this <see cref="Dim"/> instance.</param>
-    /// <returns></returns>
+    /// <param name="dim">
+    ///     When this method returns, contains the first instance of type <typeparamref name="TDim"/> found,
+    ///     or <see langword="null"/> if no instance was found.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim or any nested Dim is of type <typeparamref name="TDim"/>;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
     public bool Has<TDim> (out TDim dim) where TDim : Dim
     {
         dim = (this as TDim)!;
 
-        // QUESTION: Should this check DimAuto, DimFill, and other Dim types that may contain other Dims?
-        return this switch
-               {
-                   TDim => true,
-                   DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),
-                   _ => false
-               };
+        return this is TDim || HasInner (out dim);
+    }
+
+    /// <summary>
+    ///     Searches nested Dim objects for the specified type. Override in subclasses that contain
+    ///     other Dim objects to enable <see cref="Has{TDim}"/> to find nested types.
+    /// </summary>
+    /// <param name="dim">
+    ///     When this method returns, contains the first instance of type <typeparamref name="TDim"/> found,
+    ///     or <see langword="null"/> if no instance was found.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if any nested Dim is of type <typeparamref name="TDim"/>;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    protected virtual bool HasInner<TDim> (out TDim dim) where TDim : Dim
+    {
+        dim = null!;
+
+        return false;
     }
 
     #region virtual methods
