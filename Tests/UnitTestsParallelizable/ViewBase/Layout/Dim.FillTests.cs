@@ -216,9 +216,9 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_Width_FillsToViewX ()
     {
-        var super = new View { Width = 100, Height = 25 };
+        View super = new () { Width = 100, Height = 25 };
 
-        var targetView = new View
+        View targetView = new ()
         {
             X = 80,
             Y = 0,
@@ -226,7 +226,7 @@ public class DimFillTests (ITestOutputHelper output)
             Height = 1
         };
 
-        var fillView = new View
+        View fillView = new ()
         {
             X = 10,
             Y = 0,
@@ -249,9 +249,9 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_Height_FillsToViewY ()
     {
-        var super = new View { Width = 100, Height = 100 };
+        View super = new () { Width = 100, Height = 100 };
 
-        var targetView = new View
+        View targetView = new ()
         {
             X = 0,
             Y = 80,
@@ -259,7 +259,7 @@ public class DimFillTests (ITestOutputHelper output)
             Height = 10
         };
 
-        var fillView = new View
+        View fillView = new ()
         {
             X = 0,
             Y = 10,
@@ -282,9 +282,9 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_WithMargin_FillsToViewXMinusMargin ()
     {
-        var super = new View { Width = 100, Height = 25 };
+        View super = new () { Width = 100, Height = 25 };
 
-        var targetView = new View
+        View targetView = new ()
         {
             X = 80,
             Y = 0,
@@ -292,7 +292,7 @@ public class DimFillTests (ITestOutputHelper output)
             Height = 1
         };
 
-        var fillView = new View
+        View fillView = new ()
         {
             X = 10,
             Y = 0,
@@ -314,9 +314,9 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_WithMinimumContentDim_RespectsMinimum ()
     {
-        var super = new View { Width = 100, Height = 25 };
+        View super = new () { Width = 100, Height = 25 };
 
-        var targetView = new View
+        View targetView = new ()
         {
             X = 20, // Very close to fillView
             Y = 0,
@@ -324,7 +324,7 @@ public class DimFillTests (ITestOutputHelper output)
             Height = 1
         };
 
-        var fillView = new View
+        View fillView = new ()
         {
             X = 10,
             Y = 0,
@@ -348,9 +348,9 @@ public class DimFillTests (ITestOutputHelper output)
     public void DimFill_To_ExampleFromIssue4656 ()
     {
         // This test validates the example code from the issue
-        var appWindow = new View { Width = 100, Height = 25 };
+        View appWindow = new () { Width = 100, Height = 25 };
 
-        var label = new Label
+        Label label = new ()
         {
             X = 0,
             Y = 0,
@@ -358,7 +358,7 @@ public class DimFillTests (ITestOutputHelper output)
             Text = "Name:"
         };
 
-        var btn = new Button
+        Button btn = new ()
         {
             X = Pos.AnchorEnd (),
             Y = 0,
@@ -366,7 +366,7 @@ public class DimFillTests (ITestOutputHelper output)
             Text = "OK"
         };
 
-        var textField = new TextField
+        TextField textField = new ()
         {
             X = Pos.Right (label) + 1,
             Y = 0,
@@ -390,7 +390,7 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_ToString ()
     {
-        var targetView = new View ();
+        View targetView = new ();
         Dim fill = Dim.Fill (to: targetView);
 
         string str = fill.ToString ();
@@ -402,7 +402,7 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_WithMargin_ToString ()
     {
-        var targetView = new View ();
+        View targetView = new ();
         Dim fill = Dim.Fill (margin: 5, to: targetView);
 
         string str = fill.ToString ();
@@ -414,7 +414,7 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_WithMinimumContentDim_ToString ()
     {
-        var targetView = new View ();
+        View targetView = new ();
         Dim fill = Dim.Fill (margin: 5, minimumContentDim: 40, to: targetView);
 
         string str = fill.ToString ();
@@ -427,7 +427,7 @@ public class DimFillTests (ITestOutputHelper output)
     [Fact]
     public void DimFill_To_ReferencesOtherViews_ReturnsTrue ()
     {
-        var targetView = new View ();
+        View targetView = new ();
         Dim fill = Dim.Fill (to: targetView);
 
         Assert.True (fill.ReferencesOtherViews ());
@@ -447,9 +447,9 @@ public class DimFillTests (ITestOutputHelper output)
     public void DimFill_To_NegativeResult_ReturnsZero ()
     {
         // Test that when the target view is before the fill view, it returns 0
-        var super = new View { Width = 100, Height = 25 };
+        View super = new () { Width = 100, Height = 25 };
 
-        var targetView = new View
+        View targetView = new ()
         {
             X = 5,
             Y = 0,
@@ -457,7 +457,7 @@ public class DimFillTests (ITestOutputHelper output)
             Height = 1
         };
 
-        var fillView = new View
+        View fillView = new ()
         {
             X = 20,
             Y = 0,
