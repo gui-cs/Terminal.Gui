@@ -58,27 +58,6 @@ All tests passing: 40/40 DimFillTests, 395/395 Dim tests, 2,387/2,387 ViewBase t
 Below is a comprehensive list of locations where `Dim.Func` is used with `Frame.Width`, `Frame.Height`, `Frame.X`, or `Frame.Y` that could potentially be simplified with the new `to:` parameter:
 
 
-
-### Width with Dim.Fill(Dim.Func(...Frame.Width))
-
-6. **Examples/UICatalog/Scenarios/Shortcuts.cs:151**
-   ```cs
-   Width = Dim.Fill (Dim.Func (_ => eventLog.Frame.Width))
-   ```
-   Could become: `Width = Dim.Fill (to: eventLog)`
-
-7. **Examples/UICatalog/Scenarios/ViewportSettings.cs:34**
-   ```cs
-   Width = Dim.Fill (Dim.Func (_ => mainWindow.IsInitialized ? adornmentsEditor.Frame.Width + 1 : 1))
-   ```
-   Could become: `Width = Dim.Fill (margin: 1, to: adornmentsEditor)` (with conditional logic handled separately)
-
-8. **Examples/UICatalog/Scenarios/Adornments.cs:42**
-   ```cs
-   Width = Dim.Fill (Dim.Func (_ => editor.Frame.Width))
-   ```
-   Could become: `Width = Dim.Fill (to: editor)`
-
 9. **Examples/UICatalog/Scenarios/CharacterMap/CharacterMap.cs:182**
    ```cs
    Width = Dim.Fill (Dim.Func (v => v!.Frame.Width, _categoryList))
