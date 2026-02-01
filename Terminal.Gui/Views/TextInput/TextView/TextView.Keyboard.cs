@@ -177,7 +177,7 @@ public partial class TextView
         // draw autocomplete
         GenerateSuggestions ();
 
-        var renderAt = new Point (Autocomplete.Context.CursorPosition, Autocomplete.PopupInsideContainer ? InsertionPoint.Y + 1 - TopRow : 0);
+        var renderAt = new Point (Autocomplete.Context.CursorPosition, Autocomplete.PopupInsideContainer ? InsertionPoint.Y + 1 - Viewport.Y : 0);
 
         Autocomplete.RenderOverlay (renderAt);
     }

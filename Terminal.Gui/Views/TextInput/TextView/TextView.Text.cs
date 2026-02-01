@@ -65,21 +65,6 @@ public partial class TextView
     /// </summary>
     public bool IsDirty { get => _historyText.IsDirty (_model.GetAllLines ()); set => _historyText.Clear (_model.GetAllLines ()); }
 
-    /// <summary>Gets or sets the left column.</summary>
-    public int LeftColumn
-    {
-        get => Viewport.X;
-        set
-        {
-            if (value > 0 && _wordWrap)
-            {
-                return;
-            }
-
-            Viewport = Viewport with { X = Math.Max (Math.Min (value, Maxlength - 1), 0) };
-        }
-    }
-
     /// <summary>Gets the number of lines.</summary>
     public int Lines => _model.Count;
 
@@ -211,9 +196,6 @@ public partial class TextView
             _historyText.Clear (_model.GetAllLines ());
         }
     }
-
-    /// <summary>Gets or sets the top row.</summary>
-    public int TopRow { get => Viewport.Y; set => Viewport = Viewport with { Y = Math.Max (Math.Min (value, Lines - 1), 0) }; }
 
     /// <summary>
     ///     Tracks whether the text view should be considered "used", that is, that the user has moved in the entry, so

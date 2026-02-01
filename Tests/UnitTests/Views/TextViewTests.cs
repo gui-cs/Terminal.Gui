@@ -398,7 +398,7 @@ public partial class TextViewTests
         Assert.True (Application.Driver!.GetCursor ().IsVisible);
 
         Assert.True (tv.HasFocus);
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.True (tv.Cursor.IsVisible);
 
@@ -407,7 +407,7 @@ public partial class TextViewTests
             // Scroll right, hiding the insertion point
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledRight });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
+            Assert.Equal (Math.Min (i + 1, 11), tv.Viewport.X);
             Assert.False (tv.Cursor.IsVisible);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
@@ -417,7 +417,7 @@ public partial class TextViewTests
             // Scroll left, eventually showing insertion point
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledLeft });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i - 1, tv.LeftColumn);
+            Assert.Equal (i - 1, tv.Viewport.X);
 
             if (i - 1 == 0)
             {
@@ -466,13 +466,13 @@ public partial class TextViewTests
         top.Add (tv);
         Application.Begin (top);
 
-        Assert.Equal (0, tv.TopRow);
+        Assert.Equal (0, tv.Viewport.Y);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledDown });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i + 1, tv.TopRow);
+            Assert.Equal (i + 1, tv.Viewport.Y);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
 
@@ -480,7 +480,7 @@ public partial class TextViewTests
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledUp });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i - 1, tv.TopRow);
+            Assert.Equal (i - 1, tv.Viewport.Y);
 
             if (i - 1 == 0)
             {
@@ -1574,7 +1574,7 @@ This is the second line.
         tv.ScrollTo (50);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        tv.InsertionPoint = new (tv.LeftColumn, tv.TopRow);
+        tv.InsertionPoint = new (tv.Viewport.X, tv.Viewport.Y);
         Assert.Equal (new (0, 50), tv.InsertionPoint);
     }
 
@@ -1697,7 +1697,7 @@ This is the second line.
                 _textView.NewKeyDownEvent (Key.Tab);
                 Assert.Equal (new (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             while (col > 0)
@@ -1706,7 +1706,7 @@ This is the second line.
                 _textView.NewKeyDownEvent (Key.CursorLeft);
                 Assert.Equal (new (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             while (col < 100)
@@ -1715,7 +1715,7 @@ This is the second line.
                 _textView.NewKeyDownEvent (Key.CursorRight);
                 Assert.Equal (new (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             top.Remove (_textView);
@@ -1754,7 +1754,7 @@ This is the second line.
                 _textView.NewKeyDownEvent (Key.Tab);
                 Assert.Equal (new (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             Assert.Equal (132, _textView.Text.Length);
@@ -1765,7 +1765,7 @@ This is the second line.
                 _textView.NewKeyDownEvent (Key.CursorLeft);
                 Assert.Equal (new (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             while (col < 100)
@@ -1774,7 +1774,7 @@ This is the second line.
                 _textView.NewKeyDownEvent (Key.CursorRight);
                 Assert.Equal (new (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             top.Remove (_textView);
@@ -3247,7 +3247,7 @@ line.
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -3259,7 +3259,7 @@ aaaa
         tv.InsertionPoint = new (5, 0);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -3270,7 +3270,7 @@ aaa
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -3281,7 +3281,7 @@ aa
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -3292,7 +3292,7 @@ a
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -3303,7 +3303,7 @@ a
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         DriverAssert.AssertDriverContentsAre (
                                               @"
@@ -3518,12 +3518,12 @@ line.
             return 0;
         }
 
-        if (start == _textView.LeftColumn)
+        if (start == _textView.Viewport.X)
         {
             return start;
         }
 
-        if (_textView.LeftColumn == _textView.CurrentColumn)
+        if (_textView.Viewport.X == _textView.CurrentColumn)
         {
             return _textView.CurrentColumn;
         }

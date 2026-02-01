@@ -1308,21 +1308,21 @@ public class TextViewTests
     }
 
     [Fact]
-    public void LeftColumn_Add_One_If_Text_Length_Is_Equal_To_Width ()
+    public void Viewport_X_Add_One_If_Text_Length_Is_Equal_To_Width ()
     {
         var tv = new TextView { Width = 10, Text = "1234567890" };
 
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         tv.InsertionPoint = new Point (9, 0);
         Assert.Equal (new Point (9, 0), tv.InsertionPoint);
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         tv.InsertionPoint = new Point (10, 0);
         Assert.Equal (new Point (10, 0), tv.InsertionPoint);
-        Assert.Equal (1, tv.LeftColumn);
+        Assert.Equal (1, tv.Viewport.X);
     }
 
     [Fact]
@@ -2131,23 +2131,23 @@ public class TextViewTests
     }
 
     [Fact]
-    public void LeftColumn_Treat_Negative_Width_As_One_Column ()
+    public void Viewport_X_Treat_Negative_Width_As_One_Column ()
     {
         TextView tv = new () { Width = 2, Height = 1, Text = "\u001B[" };
 
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
         Assert.Equal (new Point (0, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
         Assert.Equal (new Point (1, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (1, tv.LeftColumn);
+        Assert.Equal (1, tv.Viewport.X);
         Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
         Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (1, tv.LeftColumn);
+        Assert.Equal (1, tv.Viewport.X);
         Assert.Equal (new Point (2, 0), tv.InsertionPoint);
     }
 
