@@ -208,6 +208,67 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     public static Dim Fill (Dim margin, Dim? minimumContentDim) => new DimFill (margin, minimumContentDim);
 
     /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension up to the position of another view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view will fill from its position up to (but not including) the position of the <paramref name="to"/> view.
+    ///         For Width, this means filling up to the X coordinate of the <paramref name="to"/> view.
+    ///         For Height, this means filling up to the Y coordinate of the <paramref name="to"/> view.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    /// var label = new Label { X = 0, Y = 0, Width = 10, Text = "Name:" };
+    /// var btn = new Button { X = Pos.AnchorEnd(), Text = "OK" };
+    /// var textField = new TextField { X = Pos.Right(label) + 1, Y = 0, Width = Dim.Fill(to: btn) };
+    /// // textField will fill the space between the label and the button
+    /// </code>
+    /// </example>
+    /// <returns>The Fill dimension.</returns>
+    /// <param name="to">The view to fill up to.</param>
+    public static Dim Fill (View to) => new DimFill (0, null, to);
+
+    /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension up to the position of another view, with a margin.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view will fill from its position up to (but not including) the position of the <paramref name="to"/> view,
+    ///         minus the specified margin.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    /// var btn = new Button { X = Pos.AnchorEnd(), Text = "OK" };
+    /// var textField = new TextField { X = 0, Y = 0, Width = Dim.Fill(margin: 2, to: btn) };
+    /// // textField will fill the space up to 2 columns before the button
+    /// </code>
+    /// </example>
+    /// <returns>The Fill dimension.</returns>
+    /// <param name="margin">Margin to use.</param>
+    /// <param name="to">The view to fill up to.</param>
+    public static Dim Fill (Dim margin, View to) => new DimFill (margin, null, to);
+
+    /// <summary>
+    ///     Creates a <see cref="Dim"/> object that fills the dimension up to the position of another view,
+    ///     with a margin and minimum dimension.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view will fill from its position up to (but not including) the position of the <paramref name="to"/> view,
+    ///         minus the specified margin, while respecting the minimum dimension.
+    ///     </para>
+    /// </remarks>
+    /// <returns>The Fill dimension.</returns>
+    /// <param name="margin">Margin to use.</param>
+    /// <param name="minimumContentDim">
+    ///     The minimum dimension. If <see langword="null"/>, no minimum is enforced.
+    /// </param>
+    /// <param name="to">The view to fill up to.</param>
+    public static Dim Fill (Dim margin, Dim? minimumContentDim, View to) => new DimFill (margin, minimumContentDim, to);
+
+    /// <summary>
     ///     Creates a function <see cref="Dim"/> object that computes the dimension based on the passed view and by executing
     ///     the provided function.
     ///     The function will be called every time the dimension is needed.

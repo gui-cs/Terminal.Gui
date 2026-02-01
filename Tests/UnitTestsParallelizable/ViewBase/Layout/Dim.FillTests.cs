@@ -210,4 +210,268 @@ public class DimFillTests (ITestOutputHelper output)
 
         Assert.Equal ("Fill(Absolute(5))", fill.ToString ());
     }
+
+    // Claude - Opus 4.5
+    // Tests for DimFill with 'to:' parameter
+    [Fact]
+    public void DimFill_To_Width_FillsToViewX ()
+    {
+        var super = new View { Width = 100, Height = 25 };
+
+        var targetView = new View
+        {
+            X = 80,
+            Y = 0,
+            Width = 10,
+            Height = 1
+        };
+
+        var fillView = new View
+        {
+            X = 10,
+            Y = 0,
+            Width = Dim.Fill (to: targetView),
+            Height = 1
+        };
+
+        super.Add (targetView, fillView);
+        super.BeginInit ();
+        super.EndInit ();
+        super.Layout ();
+
+        Assert.Equal (100, super.Frame.Width);
+        Assert.Equal (80, targetView.Frame.X);
+        Assert.Equal (10, fillView.Frame.X);
+        Assert.Equal (70, fillView.Frame.Width); // 80 - 10 = 70
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_Height_FillsToViewY ()
+    {
+        var super = new View { Width = 100, Height = 100 };
+
+        var targetView = new View
+        {
+            X = 0,
+            Y = 80,
+            Width = 10,
+            Height = 10
+        };
+
+        var fillView = new View
+        {
+            X = 0,
+            Y = 10,
+            Width = 10,
+            Height = Dim.Fill (to: targetView)
+        };
+
+        super.Add (targetView, fillView);
+        super.BeginInit ();
+        super.EndInit ();
+        super.Layout ();
+
+        Assert.Equal (100, super.Frame.Height);
+        Assert.Equal (80, targetView.Frame.Y);
+        Assert.Equal (10, fillView.Frame.Y);
+        Assert.Equal (70, fillView.Frame.Height); // 80 - 10 = 70
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_WithMargin_FillsToViewXMinusMargin ()
+    {
+        var super = new View { Width = 100, Height = 25 };
+
+        var targetView = new View
+        {
+            X = 80,
+            Y = 0,
+            Width = 10,
+            Height = 1
+        };
+
+        var fillView = new View
+        {
+            X = 10,
+            Y = 0,
+            Width = Dim.Fill (margin: 5, to: targetView),
+            Height = 1
+        };
+
+        super.Add (targetView, fillView);
+        super.BeginInit ();
+        super.EndInit ();
+        super.Layout ();
+
+        Assert.Equal (80, targetView.Frame.X);
+        Assert.Equal (10, fillView.Frame.X);
+        Assert.Equal (65, fillView.Frame.Width); // 80 - 10 - 5 = 65
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_WithMinimumContentDim_RespectsMinimum ()
+    {
+        var super = new View { Width = 100, Height = 25 };
+
+        var targetView = new View
+        {
+            X = 20, // Very close to fillView
+            Y = 0,
+            Width = 10,
+            Height = 1
+        };
+
+        var fillView = new View
+        {
+            X = 10,
+            Y = 0,
+            Width = Dim.Fill (margin: 0, minimumContentDim: 50, to: targetView),
+            Height = 1
+        };
+
+        super.Add (targetView, fillView);
+        super.BeginInit ();
+        super.EndInit ();
+        super.Layout ();
+
+        Assert.Equal (20, targetView.Frame.X);
+        Assert.Equal (10, fillView.Frame.X);
+        // Should be 50 (minimum), not 10 (20 - 10)
+        Assert.Equal (50, fillView.Frame.Width);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_ExampleFromIssue4656 ()
+    {
+        // This test validates the example code from the issue
+        var appWindow = new View { Width = 100, Height = 25 };
+
+        var label = new Label
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Text = "Name:"
+        };
+
+        var btn = new Button
+        {
+            X = Pos.AnchorEnd (),
+            Y = 0,
+            Width = 10,
+            Text = "OK"
+        };
+
+        var textField = new TextField
+        {
+            X = Pos.Right (label) + 1,
+            Y = 0,
+            Width = Dim.Fill (to: btn)
+        };
+
+        appWindow.Add (label, btn, textField);
+        appWindow.BeginInit ();
+        appWindow.EndInit ();
+        appWindow.Layout ();
+
+        Assert.Equal (100, appWindow.Frame.Width);
+        Assert.Equal (0, label.Frame.X);
+        Assert.Equal (10, label.Frame.Width);
+        Assert.Equal (90, btn.Frame.X); // AnchorEnd with width 10
+        Assert.Equal (11, textField.Frame.X); // Right(label) + 1 = 10 + 1
+        Assert.Equal (79, textField.Frame.Width); // 90 - 11 = 79
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_ToString ()
+    {
+        var targetView = new View ();
+        Dim fill = Dim.Fill (to: targetView);
+
+        string str = fill.ToString ();
+        Assert.Contains ("Fill(Absolute(0)", str);
+        Assert.Contains ($"to:{targetView}", str);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_WithMargin_ToString ()
+    {
+        var targetView = new View ();
+        Dim fill = Dim.Fill (margin: 5, to: targetView);
+
+        string str = fill.ToString ();
+        Assert.Contains ("Fill(Absolute(5)", str);
+        Assert.Contains ($"to:{targetView}", str);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_WithMinimumContentDim_ToString ()
+    {
+        var targetView = new View ();
+        Dim fill = Dim.Fill (margin: 5, minimumContentDim: 40, to: targetView);
+
+        string str = fill.ToString ();
+        Assert.Contains ("Fill(Absolute(5)", str);
+        Assert.Contains ("min:Absolute(40)", str);
+        Assert.Contains ($"to:{targetView}", str);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_ReferencesOtherViews_ReturnsTrue ()
+    {
+        var targetView = new View ();
+        Dim fill = Dim.Fill (to: targetView);
+
+        Assert.True (fill.ReferencesOtherViews ());
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_WithoutTo_ReferencesOtherViews_ReturnsFalse ()
+    {
+        Dim fill = Dim.Fill ();
+
+        Assert.False (fill.ReferencesOtherViews ());
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void DimFill_To_NegativeResult_ReturnsZero ()
+    {
+        // Test that when the target view is before the fill view, it returns 0
+        var super = new View { Width = 100, Height = 25 };
+
+        var targetView = new View
+        {
+            X = 5,
+            Y = 0,
+            Width = 10,
+            Height = 1
+        };
+
+        var fillView = new View
+        {
+            X = 20,
+            Y = 0,
+            Width = Dim.Fill (to: targetView),
+            Height = 1
+        };
+
+        super.Add (targetView, fillView);
+        super.BeginInit ();
+        super.EndInit ();
+        super.Layout ();
+
+        Assert.Equal (5, targetView.Frame.X);
+        Assert.Equal (20, fillView.Frame.X);
+        Assert.Equal (0, fillView.Frame.Width); // Should be 0, not negative
+    }
 }
