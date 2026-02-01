@@ -57,15 +57,7 @@ All tests passing: 40/40 DimFillTests, 395/395 Dim tests, 2,387/2,387 ViewBase t
 
 Below is a comprehensive list of locations where `Dim.Func` is used with `Frame.Width`, `Frame.Height`, `Frame.X`, or `Frame.Y` that could potentially be simplified with the new `to:` parameter:
 
-### Height with Dim.Fill(Dim.Func(...Frame.Height))
 
-
-
-5. **Terminal.Gui/ViewBase/View.ScrollBars.cs:90**
-   ```cs
-   Height = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Bottom))
-   ```
-   This is using Padding thickness, not a view's Frame, so NOT a candidate for simplification.
 
 ### Width with Dim.Fill(Dim.Func(...Frame.Width))
 
