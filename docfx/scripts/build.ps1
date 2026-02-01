@@ -9,6 +9,10 @@ Set-Location $docfxDir
 try {
     Write-Host "Working directory: $(Get-Location)"
 
+    # Generate source index for AI agents (Vercel-style file path index)
+    Write-Host "Generating source index..." -ForegroundColor Cyan
+    & "$scriptDir/Generate-SourceIndex.ps1"
+
     dotnet tool update -g docfx
 
     # Force delete metadata
