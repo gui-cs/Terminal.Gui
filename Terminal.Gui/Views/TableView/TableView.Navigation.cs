@@ -22,6 +22,7 @@ public partial class TableView
         set
         {
             _table = value;
+            SetContentSize(CalculateContentSize());
             Update ();
         }
     }
@@ -126,6 +127,7 @@ public partial class TableView
         dt.Columns.Add (new DataColumn ("DoubleCol", typeof (double)));
         dt.Columns.Add (new DataColumn ("NullsCol", typeof (string)));
         dt.Columns.Add (new DataColumn ("Unicode", typeof (string)));
+        dt.Columns.Add (new DataColumn ("VarLength", typeof (string))); //ColIdx = 6
 
         for (var i = 0; i < cols - explicitCols; i++)
         {
@@ -133,6 +135,20 @@ public partial class TableView
         }
 
         var r = new Random (100);
+
+        string NumberText (int len)
+        {
+            string result = string.Empty;
+
+            for (int i = 1; i <= len; i++)
+            {
+                result += i % 10;
+            }
+
+            return result;
+        }
+
+        var numberText = NumberText (rows);
 
         for (var i = 0; i < rows; i++)
         {
@@ -143,7 +159,8 @@ public partial class TableView
                 r.Next (i),
                 r.NextDouble () * i - 0.5 /*add some negatives to demo styles*/,
                 DBNull.Value,
-                "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables"
+                "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables",
+                numberText [..i],
             ];
 
             for (var j = 0; j < cols - explicitCols; j++)

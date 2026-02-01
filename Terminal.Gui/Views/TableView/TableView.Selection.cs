@@ -135,47 +135,103 @@ public partial class TableView
         ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
         int headerHeight = GetHeaderHeightIfAny ();
 
-        //if we have scrolled too far to the left
-        if (SelectedColumn < columnsToRender.Min (r => r.Column))
+        if (UseScrollbars)
         {
-            ColumnOffset = SelectedColumn;
-        }
+            var selectedColToRender = columnsToRender.FirstOrDefault (c => c.Column == SelectedColumn);
 
-        //if we have scrolled too far to the right
-        if (SelectedColumn > columnsToRender.Max (r => r.Column))
-        {
-            if (Style.SmoothHorizontalScrolling)
+            if (SelectedColumn < 0 || selectedColToRender == null ||
+                SelectedRow < 0 || SelectedRow >= Table.Rows)
             {
-                // Scroll right 1 column at a time until the users selected column is visible
-                while (SelectedColumn > columnsToRender.Max (r => r.Column))
-                {
-                    ColumnOffset++;
-                    columnsToRender = CalculateViewport (Viewport).ToArray ();
+                return;
+            }
 
-                    // if we are already scrolled to the last column then break
-                    // this will prevent any theoretical infinite loop
-                    if (ColumnOffset >= Table.Columns - 1)
-                    {
-                        break;
-                    }
-                }
+            int rowStart;
+            int rowEnd;
+
+            if (Style.AlwaysShowHeaders)
+            {
+                rowStart = Viewport.Y;
+                rowEnd = Viewport.Y + Viewport.Height - headerHeight - 1;
             }
             else
             {
-                ColumnOffset = SelectedColumn;
+                rowStart = Math.Max (Viewport.Y - headerHeight, 0);
+                rowEnd = Viewport.Y + Viewport.Height - headerHeight - 1;
+            }
+
+            if (rowEnd < rowStart)
+            {
+                return;
+            }
+
+            if (SelectedRow < rowStart)
+            {
+                Viewport = Viewport with {Y = Viewport.Y - (rowStart - SelectedRow)};
+            }
+
+            if (SelectedRow > rowEnd)
+            {
+                Viewport = Viewport with {Y = Viewport.Y + (SelectedRow - rowEnd)};
+            }
+
+            var colStart = columnsToRender.FirstOrDefault (c => c.X + c.Width - 1 > Viewport.Left);
+            var colEnd = columnsToRender.LastOrDefault (c => c.X < Viewport.Right);
+
+            if (colEnd is not null && SelectedColumn > colEnd.Column)
+            {
+                Viewport = Viewport with {X = Math.Min(selectedColToRender.X, selectedColToRender.X + selectedColToRender.Width - Viewport.Width)};
+            }
+
+            if (colStart is not null && SelectedColumn < colStart.Column)
+            {
+                Viewport = Viewport with {X = selectedColToRender.X - 1};
             }
         }
-
-        //if we have scrolled too far down
-        if (SelectedRow >= RowOffset + (Viewport.Height - headerHeight))
+        else
         {
-            RowOffset = SelectedRow - (Viewport.Height - headerHeight) + 1;
-        }
+            //if we have scrolled too far to the left
+            if (SelectedColumn < columnsToRender.Min (r => r.Column))
+            {
+                ColumnOffset = SelectedColumn;
+            }
 
-        //if we have scrolled too far up
-        if (SelectedRow < RowOffset)
-        {
-            RowOffset = SelectedRow;
+            //if we have scrolled too far to the right
+            if (SelectedColumn > columnsToRender.Max (r => r.Column))
+            {
+                if (Style.SmoothHorizontalScrolling)
+                {
+                    // Scroll right 1 column at a time until the users selected column is visible
+                    while (SelectedColumn > columnsToRender.Max (r => r.Column))
+                    {
+                        ColumnOffset++;
+                        columnsToRender = CalculateViewport (Viewport).ToArray ();
+
+                        // if we are already scrolled to the last column then break
+                        // this will prevent any theoretical infinite loop
+                        if (ColumnOffset >= Table.Columns - 1)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    ColumnOffset = SelectedColumn;
+                }
+            }
+
+            //if we have scrolled too far down
+            if (SelectedRow >= RowOffset + (Viewport.Height - headerHeight))
+            {
+                RowOffset = SelectedRow - (Viewport.Height - headerHeight) + 1;
+            }
+
+            //if we have scrolled too far up
+            if (SelectedRow < RowOffset)
+            {
+                RowOffset = SelectedRow;
+            }
+
         }
     }
 

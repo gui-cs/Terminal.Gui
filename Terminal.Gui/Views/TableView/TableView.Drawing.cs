@@ -7,6 +7,46 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public partial class TableView
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether to use scrollbars.
+    /// This will change the behavior of the TableView to use the Viewport and ContentSize
+    /// The tableview takes care of showing and hiding the scrollbars as needed.
+    /// It takes as much space as needed to render the content, in case you can use the scrollbars.
+    /// </summary>
+    public bool UseScrollbars
+    {
+        get => field;
+        set
+        {
+            field = value;
+
+            //refresh content size
+            SetContentSize (value ? CalculateContentSize () : null);
+        }
+    }
+
+    /// <summary>
+    /// calculates the current header height based on what is visible
+    /// This respects the viewport Y position and the AlwaysShowHeaders style
+    /// </summary>
+    /// <returns>height</returns>
+    protected int CurrentHeaderHeightVisible ()
+    {
+        if (!ShouldRenderHeaders ())
+        {
+            return 0;
+        }
+
+        if (Style.AlwaysShowHeaders)
+        {
+            return Math.Min (GetHeaderHeight (), Viewport.Height);
+        }
+        else
+        {
+            return Math.Min (Math.Max (GetHeaderHeight () - Viewport.Y, 0), Viewport.Height);
+        }
+    }
+
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext context)
     {
@@ -18,9 +58,11 @@ public partial class TableView
         ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
-        //invalidate current row (prevents scrolling around leaving old characters in the frame
+        // invalidate current row (prevents scrolling around leaving old characters in the frame
         AddStr (new string (' ', Viewport.Width));
         var line = 0;
+        int headerLinesHandled = 0;
+        var availableWidth = UseScrollbars ? GetContentSize ().Width : Viewport.Width;
 
         if (ShouldRenderHeaders ())
         {
@@ -30,36 +72,51 @@ public partial class TableView
                 │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
                 └────────────────────┴──────────┴───────────┴──────────────┴─────────┘
             */
+
             if (Style.ShowHorizontalHeaderOverline)
             {
-                RenderHeaderOverline (line, Viewport.Width, columnsToRender);
-                line++;
+                if ((Viewport.Y <= line || Style.AlwaysShowHeaders) && line < Viewport.Height)
+                {
+                    RenderHeaderOverline (line, availableWidth, columnsToRender);
+                    line++;
+                }
+                headerLinesHandled++;
             }
 
             if (Style.ShowHeaders)
             {
-                RenderHeaderMidline (line, columnsToRender);
-                line++;
+                if ((Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height)
+                {
+                    RenderHeaderMidline (line, availableWidth, columnsToRender);
+                    line++;
+                }
+                headerLinesHandled++;
             }
 
             if (Style.ShowHorizontalHeaderUnderline)
             {
-                RenderHeaderUnderline (line, Viewport.Width, columnsToRender);
-                line++;
+                if ((Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height)
+                {
+                    RenderHeaderUnderline (line, availableWidth, columnsToRender);
+                    line++;
+                }
+                headerLinesHandled++;
             }
         }
 
         int headerLinesConsumed = line;
 
-        //render the cells
+        var locRowOffset = UseScrollbars ? Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - headerLinesHandled, 0) : RowOffset;
+
+        // render the cells
         for (; line < Viewport.Height; line++)
         {
             ClearLine (line, Viewport.Width);
 
-            //work out what Row to render
-            int rowToRender = RowOffset + (line - headerLinesConsumed);
+            // work out what Row to render
+            int rowToRender = locRowOffset + (line - headerLinesConsumed);
 
-            //if we have run off the end of the table
+            // if we have run off the end of the table
             if (TableIsNullOrInvisible () || rowToRender < 0)
             {
                 continue;
@@ -70,7 +127,7 @@ public partial class TableView
             {
                 if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline)
                 {
-                    RenderBottomLine (line, Viewport.Width, columnsToRender);
+                    RenderBottomLine (line, availableWidth, columnsToRender);
                 }
 
                 continue;
@@ -89,10 +146,12 @@ public partial class TableView
     ///     <see cref="ColumnStyle.ColorGetter"/>. For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>.
     /// </summary>
+    /// <param name="ypos">the x value where to render the cell (absolute value in context of GetContentSize)</param>
+    /// <param name="xpos">the y value where to render the cell (absolute value in context of GetContentSize)</param>
     /// <param name="cellAttribute"></param>
     /// <param name="render"></param>
     /// <param name="isPrimaryCell"></param>
-    protected virtual void RenderCell (Attribute cellAttribute, string render, bool isPrimaryCell)
+    protected virtual void RenderCell (int xpos, int ypos, Attribute cellAttribute, string render, bool isPrimaryCell)
     {
         // If the cell is the selected col/row then draw the first rune in inverted colors
         // this allows the user to track which cell is the active one during a multi cell
@@ -106,7 +165,7 @@ public partial class TableView
 
             // invert the color of the current cell for the first character
             SetAttribute (new Attribute (cellAttribute.Foreground, cellAttribute.Background, TextStyle.Reverse));
-            AddRune ((Rune)render [0]);
+            RenderRune (xpos, ypos, (Rune) render [0]);
 
             if (render.Length <= 1)
             {
@@ -114,12 +173,12 @@ public partial class TableView
             }
 
             SetAttribute (cellAttribute);
-            AddStr (render [1..]);
+            RenderStr (xpos, ypos, render [1..]);
         }
         else
         {
             SetAttribute (cellAttribute);
-            AddStr (render);
+            RenderStr (xpos, ypos, render);
         }
     }
 
@@ -157,20 +216,71 @@ public partial class TableView
                 }
             }
 
-            AddRuneAt (c, row, rune);
+            RenderRune (c, row, rune);
         }
     }
 
-    private void RenderHeaderMidline (int row, ColumnToRender [] columnsToRender)
+    private void RenderRune (int col, int row, Rune rune)
+    {
+        if (UseScrollbars)
+        {
+            if (col >= Viewport.X && col < Viewport.X + Viewport.Width)
+            {
+                AddRuneAt (col - Viewport.X, row, rune);
+            }
+        }
+        else
+        {
+            AddRuneAt (col, row, rune);
+        }
+    }
+
+    /// <summary>
+    /// renders the text but does clipping if needed
+    /// </summary>
+    /// <param name="col">col is absolute, see GetContentSize</param>
+    /// <param name="row"></param>
+    /// <param name="text"></param>
+    private void RenderStr (int col, int row, string text)
+    {
+        if (UseScrollbars)
+        {
+            // check if within visible viewport
+            if (col + text.Length >= Viewport.X && col < Viewport.Right)
+            {
+                var x = col - Viewport.X;
+
+                if (x < 0)
+                {
+                    text = text [-x..];
+                    x = 0;
+                }
+                var clipEnd = (col + text.Length) - Viewport.Right;
+
+                if (clipEnd > 0)
+                {
+                    text = text [..^clipEnd];
+                }
+
+                AddStr (x, row, text);
+            }
+        }
+        else
+        {
+            AddStr (col, row, text);
+        }
+    }
+
+    private void RenderHeaderMidline (int row, int availableWidth, ColumnToRender [] columnsToRender)
     {
         // Renders something like:
         // │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
         ClearLine (row, Viewport.Width);
 
-        //render start of line
+        // render start of line
         if (_style.ShowVerticalHeaderLines)
         {
-            AddRune (0, row, Glyphs.VLine);
+            RenderRune (0, row, Glyphs.VLine);
         }
 
         for (var i = 0; i < columnsToRender.Length; i++)
@@ -179,8 +289,8 @@ public partial class TableView
             ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
             string colName = _table.ColumnNames [current.Column];
             RenderSeparator (current.X - 1, row, true);
-            Move (current.X, row);
-            AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
+
+            RenderStr (current.X, row, TruncateOrPad (colName, colName, current.Width, colStyle));
 
             if (!Style.ExpandLastColumn && current.IsVeryLast)
             {
@@ -188,10 +298,10 @@ public partial class TableView
             }
         }
 
-        //render end of line
+        // render end of line
         if (_style.ShowVerticalHeaderLines)
         {
-            AddRune (Viewport.Width - 1, row, Glyphs.VLine);
+            RenderRune (availableWidth - 1, row, Glyphs.VLine);
         }
     }
 
@@ -229,7 +339,7 @@ public partial class TableView
 
             if (App?.Screen.Height > 0)
             {
-                AddRuneAt (c, row, rune);
+                RenderRune (c, row, rune);
             }
         }
     }
@@ -320,7 +430,7 @@ public partial class TableView
                 }
             }
 
-            AddRuneAt (c, row, rune);
+            RenderRune (c, row, rune);
         }
     }
 
@@ -329,7 +439,9 @@ public partial class TableView
         bool focused = HasFocus;
         Scheme rowScheme = Style.RowColorGetter?.Invoke (new RowColorGetterArgs (Table, rowToRender)) ?? GetScheme ();
 
-        //start by clearing the entire line
+        // start by clearing the entire line
+        // not needed, see Attribute below:
+        ClearLine (row, Viewport.Width);
         Move (0, row);
         Attribute? attribute;
 
@@ -350,9 +462,6 @@ public partial class TableView
         {
             ColumnToRender current = columnsToRender [i];
             ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
-
-            // move to start of cell (in line with header positions)
-            Move (current.X, row);
 
             // Set scheme based on whether the current cell is the selected one
             bool isSelectedCell = IsSelected (current.Column, rowToRender);
@@ -382,7 +491,7 @@ public partial class TableView
 
             // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
             bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
-            RenderCell (cellColor, render, isPrimaryCell);
+            RenderCell (current.X, row, cellColor, render, isPrimaryCell);
 
             // Reset scheme to normal for drawing separators if we drew text with custom scheme
             if (scheme != rowScheme)
@@ -425,9 +534,22 @@ public partial class TableView
 
         SetAttribute (rowScheme.Normal);
 
-        //render start and end of line
-        AddRune (0, row, Glyphs.VLine);
-        AddRune (Viewport.Width - 1, row, Glyphs.VLine);
+        // render start and end of line
+        RenderRune (0, row, Glyphs.VLine);
+
+        if (UseScrollbars)
+        {
+            var lastCol = columnsToRender.LastOrDefault ();
+
+            if (lastCol != null)
+            {
+                RenderRune (lastCol.X + lastCol.Width - 1, row, Glyphs.VLine);
+            }
+        }
+        else
+        {
+            AddRune (Viewport.Width - 1, row, Glyphs.VLine);
+        }
     }
 
     private void RenderSeparator (int col, int row, bool isHeader)
@@ -438,8 +560,8 @@ public partial class TableView
         }
 
         bool renderLines = isHeader ? _style.ShowVerticalHeaderLines : _style.ShowVerticalCellLines;
-        Rune symbol = renderLines ? Glyphs.VLine : (Rune)SeparatorSymbol;
-        AddRune (col, row, symbol);
+        Rune symbol = renderLines ? Glyphs.VLine : (Rune) SeparatorSymbol;
+        RenderRune (col, row, symbol);
     }
 
     private bool ShouldRenderHeaders ()
@@ -449,6 +571,6 @@ public partial class TableView
             return false;
         }
 
-        return Style.AlwaysShowHeaders || _rowOffset == 0;
+        return Style.AlwaysShowHeaders || _rowOffset == 0 || UseScrollbars;
     }
 }

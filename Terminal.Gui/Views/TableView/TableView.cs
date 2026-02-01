@@ -230,7 +230,7 @@ public partial class TableView : View, IDesignable
     {
         get;
 
-        //try to prevent this being set to an out-of-bounds column
+        // try to prevent this being set to an out-of-bounds column
         set
         {
             int prev = field;
@@ -328,6 +328,47 @@ public partial class TableView : View, IDesignable
             return null;
         }
 
+        if (UseScrollbars)
+        {
+            int y;
+            var x = Math.Max (colHit.X, 0) - Viewport.X;
+
+            if (x >= Viewport.Width
+                || // column starts after the visible viewport
+                x + colHit.Width < 0) // column ends before the visible viewport
+            {
+                // column is outside the horizontal scroll area
+                return null;
+            }
+
+            if (Style.AlwaysShowHeaders)
+            {
+                y = CurrentHeaderHeightVisible () + tableRow - Viewport.Y; // + GetHeaderHeightIfAny();
+
+                if (y < CurrentHeaderHeightVisible ()
+                    || // the cell is too far up above the current scroll area
+                    y >= Viewport.Y + Viewport.Height) // the cell is way down below the scroll area and off the screen
+                {
+                    // column is outside the vertical scroll area
+                    return null;
+                }
+            }
+            else
+            {
+                y = tableRow - Viewport.Y + GetHeaderHeightIfAny ();
+
+                if (y < 0
+                    || // the cell is too far up above the current scroll area
+                    y >= Viewport.Y + Viewport.Height) // the cell is way down below the scroll area and off the screen
+                {
+                    // column is outside the vertical scroll area
+                    return null;
+                }
+            }
+
+            return new Point (x, y);
+        }
+
         // the cell is too far up above the current scroll area
         if (RowOffset > tableRow)
         {
@@ -419,19 +460,46 @@ public partial class TableView : View, IDesignable
         }
 
         IEnumerable<ColumnToRender> viewPort = CalculateViewport (Viewport);
-        int headerHeight = GetHeaderHeightIfAny ();
-        ColumnToRender col = viewPort.LastOrDefault (c => c.X <= clientX);
+        int rowIdx;
+        ColumnToRender col;
 
-        // Click is on the header section of rendered UI
-        if (clientY < headerHeight)
+        if (UseScrollbars)
         {
-            headerIfAny = col?.Column;
-            offsetX = clientX - col?.X;
+            var currentHeaderHeightVisible = CurrentHeaderHeightVisible ();
+            col = viewPort.LastOrDefault (c => c.X <= clientX + Viewport.X);
+            offsetX = clientX + Viewport.X - col?.X;
 
-            return null;
+            if (clientY < currentHeaderHeightVisible)
+            {
+                // header clicked
+                headerIfAny = col?.Column;
+            }
+
+            if (Style.AlwaysShowHeaders)
+            {
+                rowIdx = clientY - currentHeaderHeightVisible + Viewport.Y;
+            }
+            else
+            {
+                rowIdx = clientY + Viewport.Y - GetHeaderHeightIfAny ();
+            }
         }
+        else
+        {
+            int headerHeight = GetHeaderHeightIfAny ();
+            col = viewPort.LastOrDefault (c => c.X <= clientX);
 
-        int rowIdx = RowOffset - headerHeight + clientY;
+            // Click is on the header section of rendered UI
+            if (clientY < headerHeight)
+            {
+                headerIfAny = col?.Column;
+                offsetX = clientX - col?.X;
+
+                return null;
+            }
+
+            rowIdx = RowOffset - headerHeight + clientY;
+        }
 
         // if click is off bottom of the rows don't give an
         // invalid index back to user!
@@ -547,7 +615,7 @@ public partial class TableView : View, IDesignable
 
         for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows; i++)
         {
-            //expand required space if cell is bigger than the last biggest cell or header
+            // expand required space if cell is bigger than the last biggest cell or header
             spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).EnumerateRunes ().Sum (c => c.GetColumns ()));
         }
 
@@ -590,10 +658,15 @@ public partial class TableView : View, IDesignable
             return Enumerable.Empty<ColumnToRender> ();
         }
 
+        if (UseScrollbars)
+        {
+            bounds = new Rectangle (new Point (0, 0), GetContentSize ());
+        }
+
         List<ColumnToRender> toReturn = new ();
         var usedSpace = 0;
 
-        //if horizontal space is required at the start of the line (before the first header)
+        // if horizontal space is required at the start of the line (before the first header)
         if (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines)
         {
             usedSpace += 1;
@@ -647,7 +720,7 @@ public partial class TableView : View, IDesignable
 
                 // if this column accepts flexible width rendering and
                 // is therefore happy rendering into less space
-                if (colStyle is { MinAcceptableWidth: > 0 }
+                if (colStyle is {MinAcceptableWidth: > 0}
                     && // is there enough space to meet the MinAcceptableWidth
                     availableHorizontalSpace - usedSpace >= colStyle.MinAcceptableWidth)
                 {
@@ -692,6 +765,78 @@ public partial class TableView : View, IDesignable
         last.Width = Math.Max (last.Width, availableHorizontalSpace - last.X);
 
         return toReturn;
+    }
+
+    private Size? CalculateContentSize ()
+    {
+        if (!UseScrollbars)
+        {
+            return null;
+        }
+
+        var contentSize = new Size (0, 0);
+
+        contentSize.Height += GetHeaderHeightIfAny () + Table?.Rows ?? 0;
+
+        if (Style.ShowHorizontalBottomline)
+        {
+            contentSize.Height++;
+        }
+
+        // we assume that padding is 0 here
+        var padding = 0;
+
+        if (RowOffset > 0)
+        {
+            throw new InvalidOperationException ("RowOffset should be 0");
+        }
+
+        if (Table != null)
+        {
+            // Calculate the content size based on the table's data
+            foreach (int col in Enumerable.Range (0, Table.Columns))
+            {
+                ColumnStyle colStyle = Style.GetColumnStyleIfAny (col);
+
+                // if column is not being rendered
+                if (colStyle?.Visible == false)
+                {
+                    // do not calculate space for invisible columns
+                    continue;
+                }
+
+                int colWidth = CalculateMaxCellWidth (col, Table.Rows, colStyle) + padding;
+
+                if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
+                {
+                    if (MinCellWidth > MaxCellWidth)
+                    {
+                        colWidth = MaxCellWidth + padding;
+                    }
+                    else
+                    {
+                        colWidth = MinCellWidth + padding;
+                    }
+                }
+
+                // ToDo: MinAcceptableWidth handling?
+                // if (colStyle is { MinAcceptableWidth: > 0 }
+
+                contentSize.Width += colWidth;
+            }
+
+            contentSize.Width += (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0)
+                                 + // for right border
+                                 Math.Max (Table.Columns - 1, 0)
+                                 + // for separator symbols between columns
+                                 (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0); // for left border
+        }
+        else
+        {
+            contentSize.Width = 0;
+        }
+
+        return contentSize;
     }
 
     /// <summary>Clears a line of the console by filling it with spaces</summary>
@@ -791,24 +936,24 @@ public partial class TableView : View, IDesignable
         // if value is too wide
         if (representation.EnumerateRunes ().Sum (c => c.GetColumns ()) >= availableHorizontalSpace)
         {
-            return new string (representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0).ToArray ());
+            return new string (representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune) c).GetColumns ()) > 0).ToArray ());
         }
 
         // pad it out with spaces to the given alignment
         int toPad = availableHorizontalSpace - (representation.EnumerateRunes ().Sum (c => c.GetColumns ()) + 1 /*leave 1 space for cell boundary*/);
 
         return (colStyle?.GetAlignment (originalCellValue) ?? Alignment.Start) switch
-        {
-            Alignment.Start => representation + new string (' ', toPad),
-            Alignment.End => new string (' ', toPad) + representation,
+               {
+                   Alignment.Start => representation + new string (' ', toPad),
+                   Alignment.End => new string (' ', toPad) + representation,
 
-            // TODO: With single line cells, centered and justified are the same right?
-            Alignment.Center or Alignment.Fill => new string (' ', (int)Math.Floor (toPad / 2.0))
-                                                   + // round down
-                                                   representation
-                                                   + new string (' ', (int)Math.Ceiling (toPad / 2.0)), // round up
-            _ => representation + new string (' ', toPad)
-        };
+                   // TODO: With single line cells, centered and justified are the same right?
+                   Alignment.Center or Alignment.Fill => new string (' ', (int) Math.Floor (toPad / 2.0))
+                                                         + // round down
+                                                         representation
+                                                         + new string (' ', (int) Math.Ceiling (toPad / 2.0)), // round up
+                   _ => representation + new string (' ', toPad)
+               };
     }
 
     private bool TryGetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection, out int idx)
@@ -958,7 +1103,7 @@ public partial class TableView : View, IDesignable
             && CollectionNavigator.Matcher.IsCompatibleKey (key)
             && !key.KeyCode.HasFlag (KeyCode.CtrlMask)
             && !key.KeyCode.HasFlag (KeyCode.AltMask)
-            && Rune.IsLetterOrDigit ((Rune)key))
+            && Rune.IsLetterOrDigit ((Rune) key))
         {
             return CycleToNextTableEntryBeginningWith (key);
         }
@@ -984,6 +1129,26 @@ public partial class TableView : View, IDesignable
         }
 
         ColumnOffset = Math.Max (Math.Min (ColumnOffset, Table.Columns - 1), 0);
-        RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows - 1), 0);
+
+        if (UseScrollbars)
+        {
+            var contentSize = GetContentSize ();
+            var maxX = contentSize.Width - Viewport.Width;
+            var maxY = contentSize.Height - Viewport.Height;
+
+            if (Viewport.Y > maxY)
+            {
+                Viewport = Viewport with {Y = Math.Max (maxY, 0)};
+            }
+
+            if (Viewport.X > maxX)
+            {
+                Viewport = Viewport with {X = Math.Max (maxX, 0)};
+            }
+        }
+        else
+        {
+            RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows - 1), 0);
+        }
     }
 }

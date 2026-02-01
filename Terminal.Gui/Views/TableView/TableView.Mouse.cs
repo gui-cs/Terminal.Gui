@@ -34,14 +34,28 @@ public partial class TableView
         switch (me.Flags)
         {
             case MouseFlags.WheeledDown:
-                RowOffset++;
+                if (UseScrollbars)
+                {
+                    Viewport = Viewport with {Y = Viewport.Y + 1};
+                }
+                else
+                {
+                    RowOffset++;
+                }
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
                 return true;
 
             case MouseFlags.WheeledUp:
-                RowOffset--;
+                if (UseScrollbars)
+                {
+                    Viewport = Viewport with {Y = Viewport.Y - 1};
+                }
+                else
+                {
+                    RowOffset--;
+                }
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
