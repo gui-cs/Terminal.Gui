@@ -433,11 +433,11 @@ public class TextViewInputTests
         app.Begin (runnable);
 
         tv.SelectAll ();
-        int leftColumnBefore = tv.LeftColumn;
+        int leftColumnBefore = tv.Viewport.X;
 
         tv.EnterKeyAddsLine = false;
 
-        Assert.Equal (leftColumnBefore, tv.LeftColumn);
+        Assert.Equal (leftColumnBefore, tv.Viewport.X);
     }
 
     [Fact]

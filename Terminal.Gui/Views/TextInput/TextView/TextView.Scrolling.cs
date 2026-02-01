@@ -143,6 +143,7 @@ public partial class TextView
         if (contentMayHaveChanged)
         {
             UpdateContentSize ();
+            OnUnwrappedCursorPosition ();
         }
     }
 }

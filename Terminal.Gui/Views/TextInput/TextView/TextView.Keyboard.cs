@@ -2,8 +2,6 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-    private bool _enterKeyAddsLine = true;
-
     /// <summary>
     ///     Gets or sets whether pressing ENTER in a <see cref="TextView"/> adds a new line of text
     ///     invokes the <see cref="View.Accepting"/> event.
@@ -22,18 +20,18 @@ public partial class TextView
     /// </remarks>
     public bool EnterKeyAddsLine
     {
-        get => _enterKeyAddsLine;
+        get;
         set
         {
-            _enterKeyAddsLine = value;
+            field = value;
 
-            if (_enterKeyAddsLine && !_multiline)
+            if (field && !_multiline)
             {
                 // BUGBUG: Setting properties should not have side effects like this. Multiline and AllowsReturn should be independent.
                 Multiline = true;
             }
 
-            if (!_enterKeyAddsLine && _multiline)
+            if (!field && _multiline)
             {
                 Multiline = false;
 
@@ -43,7 +41,7 @@ public partial class TextView
 
             SetNeedsDraw ();
         }
-    }
+    } = true;
 
     private bool _tabKeyAddsTab = true;
 

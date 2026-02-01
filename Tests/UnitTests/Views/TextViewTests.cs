@@ -59,7 +59,7 @@ public partial class TextViewTests
         Assert.False (fv.HasFocus);
         top.Dispose ();
     }
-    
+
     [Fact]
     [TextViewTestsSetupFakeApplication]
     public void Changing_Selection_Or_InsertionPoint_Update_SelectedLength_And_SelectedText ()
