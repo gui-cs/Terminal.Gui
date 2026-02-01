@@ -69,7 +69,7 @@ public partial class TextView
     public int Lines => _model.Count;
 
     /// <summary>Gets the maximum visible length line.</summary>
-    public int Maxlength => _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
+    public int MaxVisibleLineLength => _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
 
     private bool _multiline = true;
 
