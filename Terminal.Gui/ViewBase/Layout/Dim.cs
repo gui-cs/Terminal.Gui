@@ -345,8 +345,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         // QUESTION: Should this check DimAuto, DimFill, and other Dim types that may contain other Dims?
         return this switch
                {
-                   DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),
                    TDim => true,
+                   DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),
                    _ => false
                };
     }
@@ -385,7 +385,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         Math.Clamp (GetAnchor (superviewContentSize - location), 0, short.MaxValue);
 
     /// <summary>
-    ///     Diagnostics API to determine if this Dim object references other views.
+    ///     Returns <see langword="true"/> if this Dim object references other views.
     /// </summary>
     /// <returns></returns>
     internal virtual bool ReferencesOtherViews () => false;
@@ -406,6 +406,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Add, left, right);
+
+        // QUESTION: This seems like a hack. Is it really needed?
         (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
@@ -431,6 +433,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
+
+        // QUESTION: This seems like a hack. Is it really needed?
         (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
