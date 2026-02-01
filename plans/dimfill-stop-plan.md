@@ -22,28 +22,36 @@ Width = Dim.Fill (margin: 0, to: otherView)
 ### 1. Update DimFill Record
 **File:** `Terminal.Gui/ViewBase/Layout/DimFill.cs`
 
-- Add `View? to` parameter to record definition
-- Update `Calculate` method to use `to.Frame.X` or `to.Frame.Y` as endpoint
-- Update `ToString()` method to include `to` information
-- Update XML documentation
+- ✅ Add `View? To` parameter to record definition
+- ✅ Update `Calculate` method to use `to.Frame.X` or `to.Frame.Y` as endpoint
+- ✅ Update `ToString()` method to include `to` information
+- ✅ Update XML documentation
+- ✅ Add `ReferencesOtherViews()` override
+- ✅ Use StringBuilder for performance (code review feedback)
 
 ### 2. Update Dim.Fill Factory Methods
 **File:** `Terminal.Gui/ViewBase/Layout/Dim.cs`
 
-Add overloads:
-- `Fill (View to, Dim? margin = null)`
-- `Fill (Dim margin, Dim? minimumContentDim, View? to)`
+Added overloads:
+- ✅ `Fill (View to)`
+- ✅ `Fill (Dim margin, View to)`
+- ✅ `Fill (Dim margin, Dim? minimumContentDim, View to)`
+- ✅ Use Dim.Absolute(0) for consistency (code review feedback)
 
 ### 3. Add Unit Tests
 **File:** `Tests/UnitTestsParallelizable/ViewBase/Layout/Dim.FillTests.cs`
 
-Tests should cover:
-- Fill to another view's X position (width)
-- Fill to another view's Y position (height)
-- Fill with margin and to parameter
-- Fill with minimumContentDim and to parameter
-- The example from the issue (#4656)
-- Edge cases (null view, uninitialized view)
+Added 14 new tests covering:
+- ✅ Fill to another view's X position (width)
+- ✅ Fill to another view's Y position (height)
+- ✅ Fill with margin and to parameter
+- ✅ Fill with minimumContentDim and to parameter
+- ✅ The example from the issue (#4656)
+- ✅ Edge cases (negative results return 0)
+- ✅ ToString() output
+- ✅ ReferencesOtherViews() behavior
+
+All tests passing: 40/40 DimFillTests, 395/395 Dim tests, 2,387/2,387 ViewBase tests, 13,402/13,402 parallelizable tests
 
 ## Usages of Dim.Func That Could Be Simplified
 
@@ -140,18 +148,33 @@ These will serve as validation that the new feature provides value. We won't nec
 
 ## Testing Strategy
 
-1. Create comprehensive unit tests covering all scenarios
-2. Ensure backward compatibility (existing code continues to work)
-3. Validate the example from issue #4656 works correctly
-4. Run full test suite to ensure no regressions
+1. ✅ Create comprehensive unit tests covering all scenarios
+2. ✅ Ensure backward compatibility (existing code continues to work)
+3. ✅ Validate the example from issue #4656 works correctly
+4. ✅ Run full test suite to ensure no regressions
 
 ## Implementation Steps
 
 1. ✅ Create this plan document
-2. ⬜ Modify `DimFill` record to add `to:` parameter
-3. ⬜ Update `Dim.Fill()` factory methods
-4. ⬜ Add comprehensive unit tests
-5. ⬜ Build and test the changes
-6. ⬜ Run code review
-7. ⬜ Run security scan (codeql)
-8. ⬜ Final validation
+2. ✅ Modify `DimFill` record to add `to:` parameter
+3. ✅ Update `Dim.Fill()` factory methods
+4. ✅ Add comprehensive unit tests
+5. ✅ Build and test the changes
+6. ✅ Run code review
+7. ✅ Run security scan (codeql)
+8. ✅ Final validation
+
+## Results
+
+- **All tests passing:** 13,402 parallelizable tests, including 40 DimFillTests
+- **Code review:** Completed, all feedback addressed
+- **Security scan:** Passed (no issues detected)
+- **Backward compatibility:** Maintained (all existing tests pass)
+- **Documentation:** XML documentation added to all new methods
+
+## Files Changed
+
+1. `Terminal.Gui/ViewBase/Layout/DimFill.cs` - Added To parameter, updated Calculate and ToString
+2. `Terminal.Gui/ViewBase/Layout/Dim.cs` - Added 3 new factory method overloads
+3. `Tests/UnitTestsParallelizable/ViewBase/Layout/Dim.FillTests.cs` - Added 14 new tests
+4. `plans/dimfill-stop-plan.md` - This document
