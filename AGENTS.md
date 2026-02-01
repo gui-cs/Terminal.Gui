@@ -1,16 +1,55 @@
 # Terminal.Gui - AI Agent Instructions
 
 > **📘 Source of Truth: [CONTRIBUTING.md](CONTRIBUTING.md)**
-> 
-> This file provides quick-reference coding conventions for AI agents.
-> For complete guidelines, architecture concepts, and workflows, see [CONTRIBUTING.md](CONTRIBUTING.md).
+>
+> This file provides quick-reference conventions for AI agents.
+> See also: [llms.txt](llms.txt) for machine-readable context.
 
-## Project Essentials
+## Are You Building an App or Contributing?
+
+| Task | Start Here |
+|------|------------|
+| **Building an app** with Terminal.Gui | [.claude/tasks/build-app.md](.claude/tasks/build-app.md) |
+| **Contributing** to the library | Continue reading below |
+
+---
+
+## For App Builders
+
+### Quick Start
+```bash
+dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new tui-simple -n myproj
+cd myproj
+dotnet run
+```
+
+### Key Resources
+- **App Building Guide**: [.claude/tasks/build-app.md](.claude/tasks/build-app.md)
+- **Common Patterns**: [.claude/cookbook/common-patterns.md](.claude/cookbook/common-patterns.md)
+- **Examples**: `Examples/Example/` (minimal), `Examples/UICatalog/` (comprehensive)
+
+### API Reference (Compressed)
+| Namespace | Contents |
+|-----------|----------|
+| [namespace-app.md](docfx/apispec/namespace-app.md) | Application lifecycle, IApplication |
+| [namespace-views.md](docfx/apispec/namespace-views.md) | All UI controls (Button, Label, ListView, etc.) |
+| [namespace-viewbase.md](docfx/apispec/namespace-viewbase.md) | View, Pos, Dim, Adornments |
+| [namespace-drawing.md](docfx/apispec/namespace-drawing.md) | Colors, LineStyle, rendering |
+| [namespace-input.md](docfx/apispec/namespace-input.md) | Keyboard, mouse handling |
+| [namespace-text.md](docfx/apispec/namespace-text.md) | Text manipulation |
+| [namespace-configuration.md](docfx/apispec/namespace-configuration.md) | Configuration, themes |
+
+---
+
+## For Library Contributors
+
+### Project Essentials
 
 **Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 12, net8.0)
 
-**Build:** `dotnet restore && dotnet build --no-restore`  
-**Test:** `dotnet test --no-build`  
+**Build:** `dotnet restore && dotnet build --no-restore`
+**Test:** `dotnet test --no-build`
 **Details:** [Build & Test Workflow](.claude/workflows/build-test-workflow.md)
 
 ## Quick Rules
@@ -48,4 +87,8 @@ Process guides in `.claude/workflows/`:
 
 ## Task-Specific Guides
 
-Check `.claude/tasks/` for specialized task checklists before starting work.
+See `.claude/tasks/` for specialized checklists:
+- [build-app.md](.claude/tasks/build-app.md) - Building apps with Terminal.Gui
+
+See `.claude/cookbook/` for common UI patterns:
+- [common-patterns.md](.claude/cookbook/common-patterns.md) - Forms, lists, menus, dialogs, etc.
