@@ -59,17 +59,6 @@ Below is a comprehensive list of locations where `Dim.Func` is used with `Frame.
 
 ### Height with Dim.Fill(Dim.Func(...Frame.Height))
 
-1. **Examples/UICatalog/UICatalogRunnable.cs:397**
-   ```cs
-   Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar))
-   ```
-   Could become: `Height = Dim.Fill (to: _statusBar)`
-
-2. **Examples/UICatalog/UICatalogRunnable.cs:481**
-   ```cs
-   Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar))
-   ```
-   Could become: `Height = Dim.Fill (to: _statusBar)`
 
 3. **Examples/UICatalog/Scenarios/ConfigurationEditor.cs:43**
    ```cs
