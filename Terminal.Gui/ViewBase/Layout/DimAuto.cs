@@ -13,10 +13,10 @@ namespace Terminal.Gui.ViewBase;
 ///     </para>
 ///     <para>
 ///         SubViews that use <see cref="DimFill"/> do not contribute to the auto-sizing calculation unless
-///         <see cref="DimFill.MinimumContentDim"/> or <see cref="DimFill.To"/> is specified. Without either, a 
-///         <see cref="DimFill"/> SubView will receive a size of 0 because the SuperView has no content-based size 
+///         <see cref="DimFill.MinimumContentDim"/> or <see cref="DimFill.To"/> is specified. Without either, a
+///         <see cref="DimFill"/> SubView will receive a size of 0 because the SuperView has no content-based size
 ///         to fill against. Use <see cref="Dim.Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> parameter or
-///         <see cref="Dim.Fill(View)"/> with a <c>to</c> parameter to ensure the SubView contributes to the 
+///         <see cref="Dim.Fill(View)"/> with a <c>to</c> parameter to ensure the SubView contributes to the
 ///         auto-sizing calculation.
 ///     </para>
 ///     <para>
@@ -454,7 +454,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                             maxCalculatedSize = totalSize;
                         }
                     }
-                    
+
                     if (dimFill?.To is { })
                     {
                         // This DimFill has a To view - it contributes to auto-sizing

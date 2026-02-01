@@ -32,9 +32,7 @@ public sealed class ViewManipulator
     /// <param name="view">The view to manipulate.</param>
     /// <param name="minWidth">Minimum allowed width.</param>
     /// <param name="minHeight">Minimum allowed height.</param>
-    public ViewManipulator (View view, int minWidth, int minHeight)
-        : this (view, Point.Empty, minWidth, minHeight)
-    { }
+    public ViewManipulator (View view, int minWidth, int minHeight) : this (view, Point.Empty, minWidth, minHeight) { }
 
     #region Mouse-Based Manipulation (Absolute Positioning)
 
@@ -57,18 +55,19 @@ public sealed class ViewManipulator
         int deltaY = location.Y - _view.Frame.Y;
         int newHeight = Math.Max (_minHeight, _view.Frame.Height - deltaY);
 
-        if (newHeight != _view.Frame.Height)
+        if (newHeight == _view.Frame.Height)
         {
-            _view.Height = newHeight;
-            _view.Y = location.Y - _grabPoint.Y;
+            return;
         }
+        _view.Height = newHeight;
+        _view.Y = location.Y - _grabPoint.Y;
     }
 
     /// <summary>
     ///     Resizes view from the bottom edge, adjusting height only.
     /// </summary>
     /// <param name="location">Mouse position in view's coordinate space.</param>
-    public void ResizeBottom (Point location) { _view.Height = Math.Max (_minHeight, location.Y - _view.Frame.Y + _view.Margin!.Thickness.Bottom + 1); }
+    public void ResizeBottom (Point location) => _view.Height = Math.Max (_minHeight, location.Y - _view.Frame.Y + _view.Margin!.Thickness.Bottom + 1);
 
     /// <summary>
     ///     Resizes view from the left edge, adjusting X position and width.
@@ -79,18 +78,19 @@ public sealed class ViewManipulator
         int deltaX = location.X - _view.Frame.X;
         int newWidth = Math.Max (_minWidth, _view.Frame.Width - deltaX);
 
-        if (newWidth != _view.Frame.Width)
+        if (newWidth == _view.Frame.Width)
         {
-            _view.Width = newWidth;
-            _view.X = location.X - _grabPoint.X;
+            return;
         }
+        _view.Width = newWidth;
+        _view.X = location.X - _grabPoint.X;
     }
 
     /// <summary>
     ///     Resizes view from the right edge, adjusting width only.
     /// </summary>
     /// <param name="location">Mouse position in view's coordinate space.</param>
-    public void ResizeRight (Point location) { _view.Width = Math.Max (_minWidth, location.X - _view.Frame.X + _view.Margin!.Thickness.Right + 1); }
+    public void ResizeRight (Point location) => _view.Width = Math.Max (_minWidth, location.X - _view.Frame.X + _view.Margin!.Thickness.Right + 1);
 
     #endregion
 
@@ -100,13 +100,13 @@ public sealed class ViewManipulator
     ///     Adjusts the view's X position by the specified delta.
     /// </summary>
     /// <param name="delta">Amount to adjust X by (positive = right, negative = left).</param>
-    public void AdjustX (int delta) { _view.X += delta; }
+    public void AdjustX (int delta) => _view.X += delta;
 
     /// <summary>
     ///     Adjusts the view's Y position by the specified delta.
     /// </summary>
     /// <param name="delta">Amount to adjust Y by (positive = down, negative = up).</param>
-    public void AdjustY (int delta) { _view.Y += delta; }
+    public void AdjustY (int delta) => _view.Y += delta;
 
     /// <summary>
     ///     Adjusts the view's width by the specified delta, respecting minimum width.
@@ -128,14 +128,13 @@ public sealed class ViewManipulator
         int newWidth = Math.Max (_minWidth, currentFrameWidth + delta);
 
         // Only apply if it actually changed
-        if (newWidth != currentFrameWidth)
+        if (newWidth == currentFrameWidth)
         {
-            _view.Width = newWidth;
-
-            return true;
+            return false;
         }
+        _view.Width = newWidth;
 
-        return false;
+        return true;
     }
 
     /// <summary>
@@ -158,14 +157,13 @@ public sealed class ViewManipulator
         int newHeight = Math.Max (_minHeight, currentFrameHeight + delta);
 
         // Only apply if it actually changed
-        if (newHeight != currentFrameHeight)
+        if (newHeight == currentFrameHeight)
         {
-            _view.Height = newHeight;
-
-            return true;
+            return false;
         }
+        _view.Height = newHeight;
 
-        return false;
+        return true;
     }
 
     /// <summary>
@@ -189,16 +187,15 @@ public sealed class ViewManipulator
         int newHeight = Math.Max (_minHeight, currentFrameHeight - delta);
 
         // Only apply if height would actually change
-        if (newHeight != currentFrameHeight)
+        if (newHeight == currentFrameHeight)
         {
-            int actualDelta = currentFrameHeight - newHeight;
-            _view.Y += actualDelta;
-            _view.Height = newHeight;
-
-            return true;
+            return false;
         }
+        int actualDelta = currentFrameHeight - newHeight;
+        _view.Y += actualDelta;
+        _view.Height = newHeight;
 
-        return false;
+        return true;
     }
 
     /// <summary>
@@ -222,16 +219,15 @@ public sealed class ViewManipulator
         int newWidth = Math.Max (_minWidth, currentFrameWidth - delta);
 
         // Only apply if width would actually change
-        if (newWidth != currentFrameWidth)
+        if (newWidth == currentFrameWidth)
         {
-            int actualDelta = currentFrameWidth - newWidth;
-            _view.X += actualDelta;
-            _view.Width = newWidth;
-
-            return true;
+            return false;
         }
+        int actualDelta = currentFrameWidth - newWidth;
+        _view.X += actualDelta;
+        _view.Width = newWidth;
 
-        return false;
+        return true;
     }
 
     #endregion

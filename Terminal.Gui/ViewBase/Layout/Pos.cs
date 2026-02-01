@@ -151,15 +151,7 @@ public abstract record Pos
     /// </param>
     /// <returns></returns>
     public static Pos Align (Alignment alignment, AlignmentModes modes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0) =>
-        new PosAlign
-        {
-            Aligner = new ()
-            {
-                Alignment = alignment,
-                AlignmentModes = modes
-            },
-            GroupId = groupId
-        };
+        new PosAlign { Aligner = new () { Alignment = alignment, AlignmentModes = modes }, GroupId = groupId };
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView's

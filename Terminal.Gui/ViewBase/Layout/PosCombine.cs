@@ -32,7 +32,7 @@ public record PosCombine (AddOrSubtract Add, Pos Left, Pos Right) : Pos
     public new Pos Right { get; } = Right;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }
+    public override string ToString () => $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})";
 
     internal override int GetAnchor (int size)
     {

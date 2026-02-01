@@ -30,16 +30,16 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
     public Dim Right { get; } = Right;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }
+    public override string ToString () => $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})";
 
     internal override int GetAnchor (int size)
     {
         if (Add == AddOrSubtract.Add)
         {
-            return Left!.GetAnchor (size) + Right!.GetAnchor (size);
+            return Left.GetAnchor (size) + Right.GetAnchor (size);
         }
 
-        return Left!.GetAnchor (size) - Right!.GetAnchor (size);
+        return Left.GetAnchor (size) - Right.GetAnchor (size);
     }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
@@ -48,16 +48,30 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
 
         if (Add == AddOrSubtract.Add)
         {
-            newDimension = Left!.Calculate (location, superviewContentSize, us, dimension) + Right!.Calculate (location, superviewContentSize, us, dimension);
+            newDimension = Left.Calculate (location, superviewContentSize, us, dimension) + Right.Calculate (location, superviewContentSize, us, dimension);
         }
         else
         {
-            newDimension = Math.Max (
-                                     0,
-                                     Left!.Calculate (location, superviewContentSize, us, dimension)
-                                     - Right!.Calculate (location, superviewContentSize, us, dimension));
+            newDimension = Math.Max (0,
+                                     Left.Calculate (location, superviewContentSize, us, dimension)
+                                     - Right.Calculate (location, superviewContentSize, us, dimension));
         }
 
         return newDimension;
+    }
+
+    internal override bool ReferencesOtherViews ()
+    {
+        if (Left.ReferencesOtherViews ())
+        {
+            return true;
+        }
+
+        if (Right.ReferencesOtherViews ())
+        {
+            return true;
+        }
+
+        return false;
     }
 }

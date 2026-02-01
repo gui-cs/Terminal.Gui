@@ -143,7 +143,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
     ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing. 
+    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
@@ -164,7 +164,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
     ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing. 
+    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
@@ -187,7 +187,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///         When the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation by default. The <paramref name="minimumContentDim"/> parameter
     ///         resolves this: it contributes a floor to the auto-sizing calculation, ensuring the SuperView is at least
-    ///         large enough to accommodate the minimum. Without it (or without using <see cref="Fill(View)"/> with 
+    ///         large enough to accommodate the minimum. Without it (or without using <see cref="Fill(View)"/> with
     ///         a <c>to</c> parameter), the SubView will receive a size of 0.
     ///     </para>
     ///     <para>
@@ -342,6 +342,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     {
         dim = (this as TDim)!;
 
+        // QUESTION: Should this check DimAuto, DimFill, and other Dim types that may contain other Dims?
         return this switch
                {
                    DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),

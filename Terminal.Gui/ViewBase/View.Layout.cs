@@ -965,7 +965,17 @@ public partial class View // Layout APIs
         {
             if (dv.Target != this)
             {
+                Debug.Assert (dim.ReferencesOtherViews());
                 nEdges.Add ((dv.Target!, from));
+            }
+        }
+
+        if (dim!.Has (out DimFill df))
+        {
+            if (df.To is { } && df.To != this)
+            {
+                Debug.Assert (dim.ReferencesOtherViews ());
+                nEdges.Add ((df.To!, from));
             }
         }
 
@@ -997,6 +1007,7 @@ public partial class View // Layout APIs
 
                 if (pv.Target != this)
                 {
+                    Debug.Assert (pos.ReferencesOtherViews ());
                     nEdges.Add ((pv.Target!, from));
                 }
 

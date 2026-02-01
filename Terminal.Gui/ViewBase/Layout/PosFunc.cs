@@ -25,4 +25,6 @@ public record PosFunc (Func<View?, int> Fn, View? View = null) : Pos
     public override string ToString () { return $"PosFunc({Fn (View)})"; }
 
     internal override int GetAnchor (int size) { return Fn (View); }
+
+    internal override bool ReferencesOtherViews () => View is { };
 }
