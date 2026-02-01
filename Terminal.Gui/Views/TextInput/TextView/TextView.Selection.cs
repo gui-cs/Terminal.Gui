@@ -78,7 +78,6 @@ public partial class TextView
 
         if (!_isReadOnly)
         {
-            // BUGBUG: This calls Move/AddRune - these should only be called in the View.Draw loop
             ClearRegion ();
         }
 

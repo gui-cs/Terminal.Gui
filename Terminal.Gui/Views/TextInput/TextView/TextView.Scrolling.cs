@@ -140,10 +140,11 @@ public partial class TextView
 
         // Only update content size when content may have changed, not for pure cursor movement
         // This avoids expensive GetMaxVisibleLine() calls on every cursor move
-        if (contentMayHaveChanged)
+        if (!contentMayHaveChanged)
         {
-            UpdateContentSize ();
-            OnUnwrappedCursorPosition ();
+            return;
         }
+        UpdateContentSize ();
+        OnUnwrappedCursorPosition ();
     }
 }
