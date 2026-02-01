@@ -61,6 +61,11 @@ View
 - `Menu` is a vertical `Bar` specialized for `MenuItem` items
 - `MenuBar` is a horizontal `Menu` specialized for `MenuBarItem` items
 
+For completeness, here's how `StatusBar` fits in:
+
+**Bar → StatusBar:**
+- `StatusBar` is a horizontal `Bar` specialized for `Shortcuts` items
+
 ---
 
 ## Component Descriptions
