@@ -7,7 +7,7 @@ namespace UnitTests.ViewsTests;
 public partial class TextViewTests
 {
     private static TextView _textView;
-    public TextViewTests (ITestOutputHelper output) { _output = output; }
+    public TextViewTests (ITestOutputHelper output) => _output = output;
     private readonly ITestOutputHelper _output;
 
     [Fact]
@@ -17,10 +17,7 @@ public partial class TextViewTests
         Runnable top = new ();
         var tv = new TextView { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
-        var fv = new FrameView
-        {
-            Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false, Title = "I shouldn't get focus"
-        };
+        var fv = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false, Title = "I shouldn't get focus" };
         fv.Add (tv);
         top.Add (fv);
 
@@ -31,7 +28,7 @@ public partial class TextViewTests
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        tv.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
+        tv.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.NotEmpty (tv.SelectedText);
         Assert.False (tv.CanFocus);
@@ -41,7 +38,7 @@ public partial class TextViewTests
 
         fv.CanFocus = true;
         tv.CanFocus = true;
-        tv.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
+        tv.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText);
         Assert.True (tv.CanFocus);
@@ -50,7 +47,7 @@ public partial class TextViewTests
         Assert.True (fv.HasFocus);
 
         fv.CanFocus = false;
-        tv.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
+        tv.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal ("some ", tv.SelectedText); // Setting CanFocus to false don't change the SelectedText
         Assert.True (tv.CanFocus); // v2: CanFocus is not longer automatically changed
@@ -59,7 +56,7 @@ public partial class TextViewTests
         Assert.False (fv.HasFocus);
         top.Dispose ();
     }
-    
+
     [Fact]
     [TextViewTestsSetupFakeApplication]
     public void Changing_Selection_Or_InsertionPoint_Update_SelectedLength_And_SelectedText ()
@@ -70,7 +67,7 @@ public partial class TextViewTests
         Assert.Equal (0, _textView.InsertionPoint.Y);
         Assert.Equal (2, _textView.SelectedLength);
         Assert.Equal ("TA", _textView.SelectedText);
-        _textView.InsertionPoint = new (20, 0);
+        _textView.InsertionPoint = new Point (20, 0);
         Assert.Equal (2, _textView.SelectionStartColumn);
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (18, _textView.SelectedLength);
@@ -256,23 +253,23 @@ public partial class TextViewTests
     {
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
-        _textView.InsertionPoint = new (24, 0);
+        _textView.InsertionPoint = new Point (24, 0);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
-        Assert.Equal (new (24, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (24, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         _textView.IsSelecting = false;
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
-        Assert.Equal (new (28, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (28, 0), _textView.InsertionPoint);
         Assert.False (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
         _textView.SelectionStartColumn = 24;
         _textView.SelectionStartRow = 0;
         _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
-        Assert.Equal (new (24, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (24, 0), _textView.InsertionPoint);
         Assert.False (_textView.IsSelecting);
         Assert.Equal ("", _textView.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
@@ -280,7 +277,7 @@ public partial class TextViewTests
         _textView.SelectionStartRow = 0;
         _textView.IsSelecting = false;
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
-        Assert.Equal (new (28, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (28, 0), _textView.InsertionPoint);
         Assert.False (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
     }
@@ -291,7 +288,7 @@ public partial class TextViewTests
     {
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
-        _textView.InsertionPoint = new (24, 0);
+        _textView.InsertionPoint = new Point (24, 0);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
@@ -310,7 +307,7 @@ public partial class TextViewTests
     {
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
-        _textView.InsertionPoint = new (24, 0);
+        _textView.InsertionPoint = new Point (24, 0);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
         _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
@@ -337,10 +334,7 @@ public partial class TextViewTests
         _textView.SelectAll ();
         _textView.Cut ();
 
-        Assert.Equal (
-                      "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
-                      Application.Driver?.Clipboard.GetClipboardData ()
-                     );
+        Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", Application.Driver?.Clipboard.GetClipboardData ());
         Assert.Equal (string.Empty, _textView.Text);
         _textView.Paste ();
         Assert.Equal ("TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textView.Text);
@@ -351,30 +345,41 @@ public partial class TextViewTests
     public void Copy_Without_Selection ()
     {
         _textView.Text = "This is the first line.\nThis is the second line.\n";
-        _textView.InsertionPoint = new (0, _textView.Lines - 1);
+        _textView.InsertionPoint = new Point (0, _textView.Lines - 1);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
-                      _textView.Text
-                     );
-        _textView.InsertionPoint = new (3, 1);
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
+        _textView.InsertionPoint = new Point (3, 1);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
-                      _textView.Text
-                     );
-        Assert.Equal (new (3, 2), _textView.InsertionPoint);
+        Assert.Equal ($"This is the first line.{
+            Environment.NewLine
+        }This is the second line.{
+            Environment.NewLine
+        }This is the second line.{
+            Environment.NewLine
+        }{
+            Environment.NewLine
+        }",
+                      _textView.Text);
+        Assert.Equal (new Point (3, 2), _textView.InsertionPoint);
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}",
-                      _textView.Text
-                     );
-        Assert.Equal (new (3, 3), _textView.InsertionPoint);
+        Assert.Equal ($"This is the first line.{
+            Environment.NewLine
+        }This is the second line.{
+            Environment.NewLine
+        }This is the second line.{
+            Environment.NewLine
+        }This is the second line.{
+            Environment.NewLine
+        }{
+            Environment.NewLine
+        }",
+                      _textView.Text);
+        Assert.Equal (new Point (3, 3), _textView.InsertionPoint);
     }
 
     [Fact]
@@ -398,16 +403,16 @@ public partial class TextViewTests
         Assert.True (Application.Driver!.GetCursor ().IsVisible);
 
         Assert.True (tv.HasFocus);
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.True (tv.Cursor.IsVisible);
 
         for (var i = 0; i < 12; i++)
         {
             // Scroll right, hiding the insertion point
-            tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledRight });
+            tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledRight });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
+            Assert.Equal (Math.Min (i + 1, 11), tv.Viewport.X);
             Assert.False (tv.Cursor.IsVisible);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
@@ -415,9 +420,9 @@ public partial class TextViewTests
         for (var i = 11; i > 0; i--)
         {
             // Scroll left, eventually showing insertion point
-            tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledLeft });
+            tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledLeft });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i - 1, tv.LeftColumn);
+            Assert.Equal (i - 1, tv.Viewport.X);
 
             if (i - 1 == 0)
             {
@@ -466,21 +471,21 @@ public partial class TextViewTests
         top.Add (tv);
         Application.Begin (top);
 
-        Assert.Equal (0, tv.TopRow);
+        Assert.Equal (0, tv.Viewport.Y);
 
         for (var i = 0; i < 12; i++)
         {
-            tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledDown });
+            tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledDown });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i + 1, tv.TopRow);
+            Assert.Equal (i + 1, tv.Viewport.Y);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
 
         for (var i = 12; i > 0; i--)
         {
-            tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledUp });
+            tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledUp });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i - 1, tv.TopRow);
+            Assert.Equal (i - 1, tv.Viewport.Y);
 
             if (i - 1 == 0)
             {
@@ -503,13 +508,11 @@ public partial class TextViewTests
         _textView.ReadOnly = true;
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
-        _textView.InsertionPoint = new (24, 0);
+        _textView.InsertionPoint = new Point (24, 0);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
 
-        _textView.NewKeyDownEvent (
-                                   Key.W.WithCtrl
-                                  ); // Selecting is set to false after Cut.
+        _textView.NewKeyDownEvent (Key.W.WithCtrl); // Selecting is set to false after Cut.
         Assert.Equal ("", _textView.SelectedText);
         _textView.ReadOnly = false;
         Assert.False (_textView.IsSelecting);
@@ -535,52 +538,44 @@ public partial class TextViewTests
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (3, 0);
-        Assert.Equal (new (3, 0), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (3, 0);
+        Assert.Equal (new Point (3, 0), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (0, 1);
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (0, 1);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (22, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (22, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         while (tv.Text != envText)
         {
@@ -589,7 +584,7 @@ This is the second line.
 
         SetupFakeApplicationAttribute.RunIteration ();
         Assert.Equal (envText, tv.Text);
-        Assert.Equal (new (3, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (3, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         top.Dispose ();
     }
@@ -609,52 +604,44 @@ This is the second line.
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (3, 0);
-        Assert.Equal (new (3, 0), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (3, 0);
+        Assert.Equal (new Point (3, 0), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (0, 1);
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (0, 1);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (22, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (22, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         while (tv.Text != envText)
         {
@@ -664,7 +651,7 @@ This is the second line.
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.Equal (envText, tv.Text);
-        Assert.Equal (new (3, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (3, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         top.Dispose ();
     }
@@ -684,52 +671,44 @@ This is the second line.
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (2, 0);
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (2, 0);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (22, 0);
-        Assert.Equal (new (22, 0), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (22, 0);
+        Assert.Equal (new Point (22, 0), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (22, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (22, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         while (tv.Text != envText)
         {
@@ -737,7 +716,7 @@ This is the second line.
         }
 
         Assert.Equal (envText, tv.Text);
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         top.Dispose ();
     }
@@ -757,52 +736,44 @@ This is the second line.
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (2, 0);
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (2, 0);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        tv.InsertionPoint = new (22, 0);
-        Assert.Equal (new (22, 0), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (22, 0);
+        Assert.Equal (new Point (22, 0), tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Delete));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (22, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (22, 0), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.  
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         while (tv.Text != envText)
         {
@@ -812,7 +783,7 @@ This is the second line.
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.Equal (envText, tv.Text);
-        Assert.Equal (new (2, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         top.Dispose ();
     }
@@ -821,11 +792,7 @@ This is the second line.
     [SetupFakeApplication]
     public void Draw_Esc_Rune ()
     {
-        var tv = new TextView
-        {
-            Driver = ApplicationImpl.Instance.Driver,
-            Width = 5, Height = 1, Text = "\u001b"
-        };
+        var tv = new TextView { Driver = ApplicationImpl.Instance.Driver, Width = 5, Height = 1, Text = "\u001b" };
         tv.BeginInit ();
         tv.EndInit ();
         tv.Draw ();
@@ -839,7 +806,7 @@ This is the second line.
     [TextViewTestsSetupFakeApplication]
     public void InsertionPoint_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
     {
-        _textView.InsertionPoint = new (33, 1);
+        _textView.InsertionPoint = new Point (33, 1);
         Assert.Equal (32, _textView.InsertionPoint.X);
         Assert.Equal (0, _textView.InsertionPoint.Y);
         Assert.Equal (0, _textView.SelectedLength);
@@ -850,7 +817,7 @@ This is the second line.
     [TextViewTestsSetupFakeApplication]
     public void InsertionPoint_With_Value_Less_Than_Zero_Changes_To_Zero ()
     {
-        _textView.InsertionPoint = new (-1, -1);
+        _textView.InsertionPoint = new Point (-1, -1);
         Assert.Equal (0, _textView.InsertionPoint.X);
         Assert.Equal (0, _textView.InsertionPoint.Y);
         Assert.Equal (0, _textView.SelectedLength);
@@ -866,19 +833,19 @@ This is the second line.
         top.Add (_textView);
         Application.Begin (top);
 
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (22, 0), Flags = MouseFlags.LeftButtonPressed });
+        Application.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (22, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.Equal (22, _textView.InsertionPoint.X);
         Assert.Equal (0, _textView.InsertionPoint.Y);
         Assert.Equal (0, _textView.SelectedLength);
         Assert.True (_textView.IsSelecting);
 
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (22, 0), Flags = MouseFlags.LeftButtonReleased });
+        Application.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (22, 0), Flags = MouseFlags.LeftButtonReleased });
         Assert.Equal (22, _textView.InsertionPoint.X);
         Assert.Equal (0, _textView.InsertionPoint.Y);
         Assert.Equal (0, _textView.SelectedLength);
         Assert.True (_textView.IsSelecting);
 
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (22, 0), Flags = MouseFlags.LeftButtonClicked });
+        Application.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (22, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (22, _textView.InsertionPoint.X);
         Assert.Equal (0, _textView.InsertionPoint.Y);
         Assert.Equal (0, _textView.SelectedLength);
@@ -911,36 +878,42 @@ This is the second line.
                     Assert.Equal ("This is the first line", _textView.Text);
 
                     break;
+
                 case 1:
                     Assert.Equal (18, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the first ", _textView.Text);
 
                     break;
+
                 case 2:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the ", _textView.Text);
 
                     break;
+
                 case 3:
                     Assert.Equal (8, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is ", _textView.Text);
 
                     break;
+
                 case 4:
                     Assert.Equal (5, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This ", _textView.Text);
 
                     break;
+
                 case 5:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("", _textView.Text);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -971,110 +944,98 @@ This is the second line.
                     Assert.Equal (23, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "This is the first line."
-                                  + Environment.NewLine
-                                  + "This is the second line",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("This is the first line." + Environment.NewLine + "This is the second line", _textView.Text);
 
                     break;
+
                 case 1:
                     Assert.Equal (19, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "This is the first line."
-                                  + Environment.NewLine
-                                  + "This is the second ",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("This is the first line." + Environment.NewLine + "This is the second ", _textView.Text);
 
                     break;
+
                 case 2:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "This is the first line."
-                                  + Environment.NewLine
-                                  + "This is the ",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("This is the first line." + Environment.NewLine + "This is the ", _textView.Text);
 
                     break;
+
                 case 3:
                     Assert.Equal (8, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "This is the first line."
-                                  + Environment.NewLine
-                                  + "This is ",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("This is the first line." + Environment.NewLine + "This is ", _textView.Text);
 
                     break;
+
                 case 4:
                     Assert.Equal (5, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "This is the first line."
-                                  + Environment.NewLine
-                                  + "This ",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("This is the first line." + Environment.NewLine + "This ", _textView.Text);
 
                     break;
+
                 case 5:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the first line." + Environment.NewLine, _textView.Text);
 
                     break;
+
                 case 6:
                     Assert.Equal (23, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the first line.", _textView.Text);
 
                     break;
+
                 case 7:
                     Assert.Equal (22, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the first line", _textView.Text);
 
                     break;
+
                 case 8:
                     Assert.Equal (18, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the first ", _textView.Text);
 
                     break;
+
                 case 9:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the ", _textView.Text);
 
                     break;
+
                 case 10:
                     Assert.Equal (8, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is ", _textView.Text);
 
                     break;
+
                 case 11:
                     Assert.Equal (5, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This ", _textView.Text);
 
                     break;
+
                 case 12:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("", _textView.Text);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -1105,36 +1066,42 @@ This is the second line.
                     Assert.Equal ("is the first line.", _textView.Text);
 
                     break;
+
                 case 1:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("the first line.", _textView.Text);
 
                     break;
+
                 case 2:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("first line.", _textView.Text);
 
                     break;
+
                 case 3:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("line.", _textView.Text);
 
                     break;
+
                 case 4:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal (".", _textView.Text);
 
                     break;
+
                 case 5:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("", _textView.Text);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -1164,116 +1131,99 @@ This is the second line.
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "is the first line."
-                                  + Environment.NewLine
-                                  + "This is the second line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("is the first line." + Environment.NewLine + "This is the second line.", _textView.Text);
 
                     break;
+
                 case 1:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "the first line."
-                                  + Environment.NewLine
-                                  + "This is the second line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("the first line." + Environment.NewLine + "This is the second line.", _textView.Text);
 
                     break;
+
                 case 2:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "first line."
-                                  + Environment.NewLine
-                                  + "This is the second line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("first line." + Environment.NewLine + "This is the second line.", _textView.Text);
 
                     break;
+
                 case 3:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "line."
-                                  + Environment.NewLine
-                                  + "This is the second line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("line." + Environment.NewLine + "This is the second line.", _textView.Text);
 
                     break;
+
                 case 4:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  "."
-                                  + Environment.NewLine
-                                  + "This is the second line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("." + Environment.NewLine + "This is the second line.", _textView.Text);
 
                     break;
+
                 case 5:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
 
-                    Assert.Equal (
-                                  ""
-                                  + Environment.NewLine
-                                  + "This is the second line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ("" + Environment.NewLine + "This is the second line.", _textView.Text);
 
                     break;
+
                 case 6:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the second line.", _textView.Text);
 
                     break;
+
                 case 7:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("is the second line.", _textView.Text);
 
                     break;
+
                 case 8:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("the second line.", _textView.Text);
 
                     break;
+
                 case 9:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("second line.", _textView.Text);
 
                     break;
+
                 case 10:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("line.", _textView.Text);
 
                     break;
+
                 case 11:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal (".", _textView.Text);
 
                     break;
+
                 case 12:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("", _textView.Text);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -1304,38 +1254,31 @@ This is the second line.
                     Assert.Equal ("This is the first line.", Clipboard.Contents);
 
                     break;
+
                 case 1:
-                    _textView.NewKeyDownEvent (
-                                               new (
-                                                    KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                   )
-                                              );
+                    _textView.NewKeyDownEvent (new Key (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask));
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the second line.", _textView.Text);
                     Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents);
 
                     break;
+
                 case 2:
                     _textView.NewKeyDownEvent (Key.K.WithCtrl);
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("", _textView.Text);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is the second line.",
-                                  Clipboard.Contents
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
 
                     // Paste
                     _textView.NewKeyDownEvent (Key.Y.WithCtrl);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is the second line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -1367,38 +1310,31 @@ This is the second line.
                     Assert.Equal ("This is the second line.", Clipboard.Contents);
 
                     break;
+
                 case 1:
-                    _textView.NewKeyDownEvent (
-                                               new (
-                                                    KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                                   )
-                                              );
+                    _textView.NewKeyDownEvent (new Key (KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask));
                     Assert.Equal (23, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("This is the first line.", _textView.Text);
                     Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents);
 
                     break;
+
                 case 2:
                     _textView.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift);
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
                     Assert.Equal ("", _textView.Text);
 
-                    Assert.Equal (
-                                  $"This is the second line.{Environment.NewLine}This is the first line.",
-                                  Clipboard.Contents
-                                 );
+                    Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
 
                     // Paste inverted
                     _textView.NewKeyDownEvent (Key.Y.WithCtrl);
 
-                    Assert.Equal (
-                                  $"This is the second line.{Environment.NewLine}This is the first line.",
-                                  _textView.Text
-                                 );
+                    Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -1415,64 +1351,52 @@ This is the second line.
     {
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 
-        Assert.True (
-                     _textView.NewMouseEvent (
-                                              new () { Position = new (12, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift }
-                                             )
-                    );
+        Assert.True (_textView.NewMouseEvent (new Mouse { Position = new Point (12, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift }));
         Assert.Equal (0, _textView.SelectionStartColumn);
         Assert.Equal (0, _textView.SelectionStartRow);
-        Assert.Equal (new (12, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (12, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         Assert.Equal ("TAB to jump ", _textView.SelectedText);
 
-        Assert.True (_textView.NewMouseEvent (new () { Position = new (12, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.True (_textView.NewMouseEvent (new Mouse { Position = new Point (12, 0), Flags = MouseFlags.LeftButtonClicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
-        Assert.Equal (new (12, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (12, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         Assert.Equal ("TAB to jump ", _textView.SelectedText);
 
-        Assert.True (
-                     _textView.NewMouseEvent (
-                                              new () { Position = new (19, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift }
-                                             )
-                    );
+        Assert.True (_textView.NewMouseEvent (new Mouse { Position = new Point (19, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
-        Assert.Equal (new (19, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (19, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between", _textView.SelectedText);
 
-        Assert.True (_textView.NewMouseEvent (new () { Position = new (19, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.True (_textView.NewMouseEvent (new Mouse { Position = new Point (19, 0), Flags = MouseFlags.LeftButtonClicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
-        Assert.Equal (new (19, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (19, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between", _textView.SelectedText);
 
-        Assert.True (
-                     _textView.NewMouseEvent (
-                                              new () { Position = new (24, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift }
-                                             )
-                    );
+        Assert.True (_textView.NewMouseEvent (new Mouse { Position = new Point (24, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Shift }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
-        Assert.Equal (new (24, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (24, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between text", _textView.SelectedText);
 
-        Assert.True (_textView.NewMouseEvent (new () { Position = new (24, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.True (_textView.NewMouseEvent (new Mouse { Position = new Point (24, 0), Flags = MouseFlags.LeftButtonClicked }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
-        Assert.Equal (new (24, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (24, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between text", _textView.SelectedText);
 
-        Assert.True (_textView.NewMouseEvent (new () { Position = new (24, 0), Flags = MouseFlags.LeftButtonPressed }));
+        Assert.True (_textView.NewMouseEvent (new Mouse { Position = new Point (24, 0), Flags = MouseFlags.LeftButtonPressed }));
         Assert.Equal (0, _textView.SelectionStartRow);
         Assert.Equal (0, _textView.SelectionStartRow);
-        Assert.Equal (new (24, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (24, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         Assert.Equal ("", _textView.SelectedText);
     }
@@ -1490,11 +1414,11 @@ This is the second line.
         }
 
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        tv.InsertionPoint = new (5, 50);
-        Assert.Equal (new (5, 50), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (5, 50);
+        Assert.Equal (new Point (5, 50), tv.InsertionPoint);
 
-        tv.InsertionPoint = new (200, 200);
-        Assert.Equal (new (100, 99), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (200, 200);
+        Assert.Equal (new Point (100, 99), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1532,7 +1456,7 @@ This is the second line.
     {
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
-        _textView.InsertionPoint = new (24, 0);
+        _textView.InsertionPoint = new Point (24, 0);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
         _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
@@ -1574,8 +1498,8 @@ This is the second line.
         tv.ScrollTo (50);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        tv.InsertionPoint = new (tv.LeftColumn, tv.TopRow);
-        Assert.Equal (new (0, 50), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (tv.Viewport.X, tv.Viewport.Y);
+        Assert.Equal (new Point (0, 50), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1591,11 +1515,7 @@ This is the second line.
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
 
-        Attribute [] attributes =
-        {
-            _textView.GetScheme ().Focus,
-            new (_textView.GetScheme ().Focus.Background, _textView.GetScheme ().Focus.Foreground)
-        };
+        Attribute [] attributes = { _textView.GetScheme ().Focus, new (_textView.GetScheme ().Focus.Background, _textView.GetScheme ().Focus.Foreground) };
 
         //                                             TAB to jump between text fields.
         DriverAssert.AssertDriverAttributesAre ("0000000", _output, Application.Driver, attributes);
@@ -1604,7 +1524,7 @@ This is the second line.
         _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (new (4, 0), _textView.InsertionPoint);
+        Assert.Equal (new Point (4, 0), _textView.InsertionPoint);
 
         //                                             TAB to jump between text fields.
         DriverAssert.AssertDriverAttributesAre ("1111000", _output, Application.Driver, attributes);
@@ -1616,7 +1536,7 @@ This is the second line.
     [TextViewTestsSetupFakeApplication]
     public void Selection_And_InsertionPoint_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
     {
-        _textView.InsertionPoint = new (33, 2);
+        _textView.InsertionPoint = new Point (33, 2);
         _textView.SelectionStartColumn = 33;
         _textView.SelectionStartRow = 33;
         Assert.Equal (32, _textView.InsertionPoint.X);
@@ -1631,8 +1551,8 @@ This is the second line.
     [TextViewTestsSetupFakeApplication]
     public void Selection_With_Empty_Text ()
     {
-        _textView = new ();
-        _textView.InsertionPoint = new (2, 0);
+        _textView = new TextView ();
+        _textView.InsertionPoint = new Point (2, 0);
         _textView.SelectionStartColumn = 33;
         _textView.SelectionStartRow = 1;
         Assert.Equal (0, _textView.SelectionStartColumn);
@@ -1645,7 +1565,7 @@ This is the second line.
     [TextViewTestsSetupFakeApplication]
     public void Selection_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
     {
-        _textView.InsertionPoint = new (2, 0);
+        _textView.InsertionPoint = new Point (2, 0);
         _textView.SelectionStartColumn = 33;
         _textView.SelectionStartRow = 1;
         Assert.Equal (32, _textView.SelectionStartColumn);
@@ -1695,27 +1615,27 @@ This is the second line.
             {
                 col++;
                 _textView.NewKeyDownEvent (Key.Tab);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
+                Assert.Equal (new Point (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             while (col > 0)
             {
                 col--;
                 _textView.NewKeyDownEvent (Key.CursorLeft);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
+                Assert.Equal (new Point (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             while (col < 100)
             {
                 col++;
                 _textView.NewKeyDownEvent (Key.CursorRight);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
+                Assert.Equal (new Point (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             top.Remove (_textView);
@@ -1752,9 +1672,9 @@ This is the second line.
             {
                 col++;
                 _textView.NewKeyDownEvent (Key.Tab);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
+                Assert.Equal (new Point (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             Assert.Equal (132, _textView.Text.Length);
@@ -1763,18 +1683,18 @@ This is the second line.
             {
                 col--;
                 _textView.NewKeyDownEvent (Key.CursorLeft);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
+                Assert.Equal (new Point (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             while (col < 100)
             {
                 col++;
                 _textView.NewKeyDownEvent (Key.CursorRight);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
+                Assert.Equal (new Point (col, 0), _textView.InsertionPoint);
                 leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
+                Assert.Equal (leftCol, _textView.Viewport.X);
             }
 
             top.Remove (_textView);
@@ -1804,20 +1724,16 @@ This is the second line.
         Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
         SetupFakeApplicationAttribute.RunIteration ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 TAB to jump between text field",
-                                                       _output
-                                                      );
+                                                       _output);
 
         _textView.TabWidth = 4;
         SetupFakeApplicationAttribute.RunIteration ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
     TAB to jump between text f",
-                                                       _output
-                                                      );
+                                                       _output);
         top.Dispose ();
     }
 
@@ -1880,8 +1796,7 @@ TAB to jump between text field",
         SetupFakeApplicationAttribute.RunIteration ();
 
         //this passes
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                       @"
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (@"
 ┌─────────────┐
 │             │
 │aaa          │
@@ -1897,10 +1812,9 @@ TAB to jump between text field",
 │             │
 │             │
 └─────────────┘",
-                                                                       _output
-                                                                      );
+                                                                       _output);
 
-        Assert.Equal (new (0, 0, 15, 15), pos);
+        Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 
         Assert.True (tv.Used);
         tv.Used = false;
@@ -1908,8 +1822,7 @@ TAB to jump between text field",
         tv.InsertText ("\r\naaa\r\nbbb");
         SetupFakeApplicationAttribute.RunIteration ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 ┌─────────────┐
 │             │
 │aaa          │
@@ -1925,8 +1838,7 @@ TAB to jump between text field",
 │             │
 │             │
 └─────────────┘",
-                                                       _output
-                                                      );
+                                                       _output);
         top.Dispose ();
     }
 
@@ -1958,8 +1870,7 @@ TAB to jump between text field",
         SetupFakeApplicationAttribute.RunIteration ();
 
         //this passes
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (
-                                                                       @"
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (@"
 ┌─────────────┐
 │             │
 │aaa          │
@@ -1975,10 +1886,9 @@ TAB to jump between text field",
 │             │
 │             │
 └─────────────┘",
-                                                                       _output
-                                                                      );
+                                                                       _output);
 
-        Assert.Equal (new (0, 0, 15, 15), pos);
+        Assert.Equal (new Rectangle (0, 0, 15, 15), pos);
 
         Assert.True (tv.Used);
         tv.Used = false;
@@ -1986,8 +1896,7 @@ TAB to jump between text field",
         tv.InsertText ("\naaa\nbbb");
         SetupFakeApplicationAttribute.RunIteration ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 ┌─────────────┐
 │             │
 │aaa          │
@@ -2003,8 +1912,7 @@ TAB to jump between text field",
 │             │
 │             │
 └─────────────┘",
-                                                       _output
-                                                      );
+                                                       _output);
         top.Dispose ();
     }
 
@@ -2014,12 +1922,12 @@ TAB to jump between text field",
     {
         var tv = new TextView { Width = 10, Text = " " };
 
-        var ev = new Mouse { Position = new (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
+        var ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
 
         tv.NewMouseEvent (ev);
         Assert.Equal (1, tv.SelectedLength);
 
-        ev = new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
+        ev = new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
 
         tv.NewMouseEvent (ev);
         Assert.Equal (1, tv.SelectedLength);
@@ -2031,11 +1939,8 @@ TAB to jump between text field",
     {
         var cp = Point.Empty;
 
-        var tv = new TextView
-        {
-            Width = Dim.Fill (), Height = Dim.Fill (), Text = "This is the first line.\nThis is the second line.\n"
-        };
-        tv.UnwrappedCursorPosition += (s, e) => { cp = e; };
+        var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = "This is the first line.\nThis is the second line.\n" };
+        tv.UnwrappedCursorPositionChanged += (s, e) => { cp = e; };
         var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
@@ -2045,36 +1950,31 @@ TAB to jump between text field",
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.Equal (Point.Empty, cp);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         tv.WordWrap = true;
-        tv.InsertionPoint = new (12, 0);
+        tv.InsertionPoint = new Point (12, 0);
         tv.Draw ();
-        Assert.Equal (new (12, 0), tv.InsertionPoint);
-        Assert.Equal (new (12, 0), cp);
+        Assert.Equal (new Point (12, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (12, 0), cp);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is the first line. 
 This is the second line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Application.Driver!.SetScreenSize (6, 25);
         Application.LayoutAndDraw ();
         tv.Draw ();
-        Assert.Equal (new (4, 2), tv.InsertionPoint);
-        Assert.Equal (new (12, 0), cp);
+        Assert.Equal (new Point (4, 2), tv.InsertionPoint);
+        Assert.Equal (new Point (12, 0), cp);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -2088,16 +1988,14 @@ secon
 d    
 line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         tv.Draw ();
-        Assert.Equal (new (0, 3), tv.InsertionPoint);
-        Assert.Equal (new (12, 0), cp);
+        Assert.Equal (new Point (0, 3), tv.InsertionPoint);
+        Assert.Equal (new Point (12, 0), cp);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -2111,16 +2009,14 @@ secon
 d    
 line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         tv.Draw ();
-        Assert.Equal (new (1, 3), tv.InsertionPoint);
-        Assert.Equal (new (13, 0), cp);
+        Assert.Equal (new Point (1, 3), tv.InsertionPoint);
+        Assert.Equal (new Point (13, 0), cp);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -2134,16 +2030,14 @@ secon
 d    
 line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
-        Assert.True (tv.NewMouseEvent (new () { Position = new (0, 3), Flags = MouseFlags.LeftButtonPressed }));
+        Assert.True (tv.NewMouseEvent (new Mouse { Position = new Point (0, 3), Flags = MouseFlags.LeftButtonPressed }));
         tv.Draw ();
-        Assert.Equal (new (0, 3), tv.InsertionPoint);
-        Assert.Equal (new (12, 0), cp);
+        Assert.Equal (new Point (0, 3), tv.InsertionPoint);
+        Assert.Equal (new Point (12, 0), cp);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This 
 is   
 the  
@@ -2157,8 +2051,7 @@ secon
 d    
 line.
 ",
-                                                       _output
-                                                      );
+                                                       _output);
         top.Dispose ();
     }
 
@@ -2167,7 +2060,7 @@ line.
     public void Used_Is_False ()
     {
         _textView.Used = false;
-        _textView.InsertionPoint = new (10, 0);
+        _textView.InsertionPoint = new Point (10, 0);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         _textView.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumu between text fields.", _textView.Text);
@@ -2183,7 +2076,7 @@ line.
     [TextViewTestsSetupFakeApplication]
     public void Used_Is_True_By_Default ()
     {
-        _textView.InsertionPoint = new (10, 0);
+        _textView.InsertionPoint = new Point (10, 0);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         _textView.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumup between text fields.", _textView.Text);
@@ -2226,6 +2119,7 @@ line.
                     Assert.Equal (".", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (19, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2235,6 +2129,7 @@ line.
                     Assert.Equal ("line.", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2244,6 +2139,7 @@ line.
                     Assert.Equal ("second line.", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (8, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2253,6 +2149,7 @@ line.
                     Assert.Equal ("the second line.", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (5, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2262,6 +2159,7 @@ line.
                     Assert.Equal ("is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2271,6 +2169,7 @@ line.
                     Assert.Equal ("This is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (23, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2280,6 +2179,7 @@ line.
                     Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 7:
                     Assert.Equal (22, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2287,12 +2187,10 @@ line.
                     Assert.Equal (1, _textView.SelectionStartRow);
                     Assert.Equal (25 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $".{Environment.NewLine}This is the second line.",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($".{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 8:
                     Assert.Equal (18, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2300,12 +2198,10 @@ line.
                     Assert.Equal (1, _textView.SelectionStartRow);
                     Assert.Equal (29 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"line.{Environment.NewLine}This is the second line.",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"line.{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 9:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2313,12 +2209,10 @@ line.
                     Assert.Equal (1, _textView.SelectionStartRow);
                     Assert.Equal (35 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"first line.{Environment.NewLine}This is the second line.",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"first line.{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 10:
                     Assert.Equal (8, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2326,12 +2220,10 @@ line.
                     Assert.Equal (1, _textView.SelectionStartRow);
                     Assert.Equal (39 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"the first line.{Environment.NewLine}This is the second line.",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"the first line.{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 11:
                     Assert.Equal (5, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2339,12 +2231,10 @@ line.
                     Assert.Equal (1, _textView.SelectionStartRow);
                     Assert.Equal (42 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"is the first line.{Environment.NewLine}This is the second line.",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"is the first line.{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 case 12:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2352,12 +2242,10 @@ line.
                     Assert.Equal (1, _textView.SelectionStartRow);
                     Assert.Equal (47 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is the second line.",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -2372,7 +2260,7 @@ line.
     [TextViewTestsSetupFakeApplication]
     public void WordBackward_With_No_Selection ()
     {
-        _textView.InsertionPoint = new (_textView.Text.Length, 0);
+        _textView.InsertionPoint = new Point (_textView.Text.Length, 0);
         var iteration = 0;
 
         while (_textView.InsertionPoint.X > 0)
@@ -2390,6 +2278,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (25, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2399,6 +2288,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (20, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2408,6 +2298,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2417,6 +2308,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (7, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2426,6 +2318,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (4, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2435,6 +2328,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2457,7 +2351,7 @@ line.
         //                          1         2         3         4         5    
         //                0123456789012345678901234567890123456789012345678901234=55 (Length)
         _textView.Text = "TAB   t  o  jump         b  etween    t ext   f ields .";
-        _textView.InsertionPoint = new (_textView.Text.Length, 0);
+        _textView.InsertionPoint = new Point (_textView.Text.Length, 0);
         var iteration = 0;
 
         while (_textView.InsertionPoint.X > 0)
@@ -2475,6 +2369,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (48, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2484,6 +2379,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (46, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2493,6 +2389,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (40, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2502,6 +2399,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (38, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2511,6 +2409,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (28, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2520,6 +2419,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (25, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2529,6 +2429,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 7:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2538,6 +2439,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 8:
                     Assert.Equal (9, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2547,6 +2449,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 9:
                     Assert.Equal (6, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2556,6 +2459,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 10:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2575,7 +2479,7 @@ line.
     [TextViewTestsSetupFakeApplication]
     public void WordBackward_With_Selection ()
     {
-        _textView.InsertionPoint = new (_textView.Text.Length, 0);
+        _textView.InsertionPoint = new Point (_textView.Text.Length, 0);
         _textView.SelectionStartColumn = _textView.Text.Length;
         _textView.SelectionStartRow = 0;
         var iteration = 0;
@@ -2595,6 +2499,7 @@ line.
                     Assert.Equal (".", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (25, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2604,6 +2509,7 @@ line.
                     Assert.Equal ("fields.", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (20, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2613,6 +2519,7 @@ line.
                     Assert.Equal ("text fields.", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2622,6 +2529,7 @@ line.
                     Assert.Equal ("between text fields.", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (7, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2631,6 +2539,7 @@ line.
                     Assert.Equal ("jump between text fields.", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (4, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2640,6 +2549,7 @@ line.
                     Assert.Equal ("to jump between text fields.", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2657,10 +2567,9 @@ line.
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void
-        WordBackward_With_The_Same_Values_For_SelectedStart_And_InsertionPoint_And_Not_Starting_At_Beginning_Of_The_Text ()
+    public void WordBackward_With_The_Same_Values_For_SelectedStart_And_InsertionPoint_And_Not_Starting_At_Beginning_Of_The_Text ()
     {
-        _textView.InsertionPoint = new (10, 0);
+        _textView.InsertionPoint = new Point (10, 0);
         _textView.SelectionStartColumn = 10;
         _textView.SelectionStartRow = 0;
         var iteration = 0;
@@ -2680,6 +2589,7 @@ line.
                     Assert.Equal ("jum", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (4, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2689,6 +2599,7 @@ line.
                     Assert.Equal ("to jum", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2721,9 +2632,7 @@ line.
 
         while (!iterationsFinished)
         {
-            _textView.NewKeyDownEvent (
-                                       Key.CursorRight.WithCtrl.WithShift
-                                      );
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -2736,6 +2645,7 @@ line.
                     Assert.Equal ("This ", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (8, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2745,6 +2655,7 @@ line.
                     Assert.Equal ("This is ", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2754,6 +2665,7 @@ line.
                     Assert.Equal ("This is the ", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (18, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2763,6 +2675,7 @@ line.
                     Assert.Equal ("This is the first ", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (22, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2772,6 +2685,7 @@ line.
                     Assert.Equal ("This is the first line", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (23, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2781,6 +2695,7 @@ line.
                     Assert.Equal ("This is the first line.", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (0, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2790,6 +2705,7 @@ line.
                     Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.SelectedText);
 
                     break;
+
                 case 7:
                     Assert.Equal (5, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2797,12 +2713,10 @@ line.
                     Assert.Equal (0, _textView.SelectionStartRow);
                     Assert.Equal (28 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This ",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This ", _textView.SelectedText);
 
                     break;
+
                 case 8:
                     Assert.Equal (8, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2810,12 +2724,10 @@ line.
                     Assert.Equal (0, _textView.SelectionStartRow);
                     Assert.Equal (31 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is ",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is ", _textView.SelectedText);
 
                     break;
+
                 case 9:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2823,12 +2735,10 @@ line.
                     Assert.Equal (0, _textView.SelectionStartRow);
                     Assert.Equal (35 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is the ",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is the ", _textView.SelectedText);
 
                     break;
+
                 case 10:
                     Assert.Equal (19, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2836,12 +2746,10 @@ line.
                     Assert.Equal (0, _textView.SelectionStartRow);
                     Assert.Equal (42 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is the second ",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second ", _textView.SelectedText);
 
                     break;
+
                 case 11:
                     Assert.Equal (23, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2849,12 +2757,10 @@ line.
                     Assert.Equal (0, _textView.SelectionStartRow);
                     Assert.Equal (46 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is the second line",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line", _textView.SelectedText);
 
                     break;
+
                 case 12:
                     Assert.Equal (24, _textView.InsertionPoint.X);
                     Assert.Equal (1, _textView.InsertionPoint.Y);
@@ -2862,12 +2768,10 @@ line.
                     Assert.Equal (0, _textView.SelectionStartRow);
                     Assert.Equal (47 + Environment.NewLine.Length, _textView.SelectedLength);
 
-                    Assert.Equal (
-                                  $"This is the first line.{Environment.NewLine}This is the second line.",
-                                  _textView.SelectedText
-                                 );
+                    Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.SelectedText);
 
                     break;
+
                 default:
                     iterationsFinished = true;
 
@@ -2900,6 +2804,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (7, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2909,6 +2814,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2918,6 +2824,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (20, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2927,6 +2834,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (25, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2936,6 +2844,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (31, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2945,6 +2854,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (32, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2985,6 +2895,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (9, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -2994,6 +2905,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3003,6 +2915,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (25, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3012,6 +2925,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (28, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3021,6 +2935,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (38, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3030,6 +2945,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (40, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3039,6 +2955,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 7:
                     Assert.Equal (46, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3048,6 +2965,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 8:
                     Assert.Equal (48, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3057,6 +2975,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 9:
                     Assert.Equal (54, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3066,6 +2985,7 @@ line.
                     Assert.Equal ("", _textView.SelectedText);
 
                     break;
+
                 case 10:
                     Assert.Equal (55, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3092,9 +3012,7 @@ line.
 
         while (_textView.InsertionPoint.X < _textView.Text.Length)
         {
-            _textView.NewKeyDownEvent (
-                                       Key.CursorRight.WithCtrl.WithShift
-                                      );
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -3107,6 +3025,7 @@ line.
                     Assert.Equal ("TAB ", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (7, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3116,6 +3035,7 @@ line.
                     Assert.Equal ("TAB to ", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (12, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3125,6 +3045,7 @@ line.
                     Assert.Equal ("TAB to jump ", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (20, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3134,6 +3055,7 @@ line.
                     Assert.Equal ("TAB to jump between ", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (25, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3143,6 +3065,7 @@ line.
                     Assert.Equal ("TAB to jump between text ", _textView.SelectedText);
 
                     break;
+
                 case 5:
                     Assert.Equal (31, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3152,6 +3075,7 @@ line.
                     Assert.Equal ("TAB to jump between text fields", _textView.SelectedText);
 
                     break;
+
                 case 6:
                     Assert.Equal (32, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3169,19 +3093,16 @@ line.
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void
-        WordForward_With_The_Same_Values_For_SelectedStart_And_InsertionPoint_And_Not_Starting_At_Beginning_Of_The_Text ()
+    public void WordForward_With_The_Same_Values_For_SelectedStart_And_InsertionPoint_And_Not_Starting_At_Beginning_Of_The_Text ()
     {
-        _textView.InsertionPoint = new (10, 0);
+        _textView.InsertionPoint = new Point (10, 0);
         _textView.SelectionStartColumn = 10;
         _textView.SelectionStartRow = 0;
         var iteration = 0;
 
         while (_textView.InsertionPoint.X < _textView.Text.Length)
         {
-            _textView.NewKeyDownEvent (
-                                       Key.CursorRight.WithCtrl.WithShift
-                                      );
+            _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
@@ -3194,6 +3115,7 @@ line.
                     Assert.Equal ("p ", _textView.SelectedText);
 
                     break;
+
                 case 1:
                     Assert.Equal (20, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3203,6 +3125,7 @@ line.
                     Assert.Equal ("p between ", _textView.SelectedText);
 
                     break;
+
                 case 2:
                     Assert.Equal (25, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3212,6 +3135,7 @@ line.
                     Assert.Equal ("p between text ", _textView.SelectedText);
 
                     break;
+
                 case 3:
                     Assert.Equal (31, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3221,6 +3145,7 @@ line.
                     Assert.Equal ("p between text fields", _textView.SelectedText);
 
                     break;
+
                 case 4:
                     Assert.Equal (32, _textView.InsertionPoint.X);
                     Assert.Equal (0, _textView.InsertionPoint.Y);
@@ -3247,70 +3172,58 @@ line.
         SetupFakeApplicationAttribute.RunIteration ();
 
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
+        DriverAssert.AssertDriverContentsAre (@"
 aaaa
 ",
-                                              _output
-                                             );
+                                              _output);
 
-        tv.InsertionPoint = new (5, 0);
+        tv.InsertionPoint = new Point (5, 0);
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
+        DriverAssert.AssertDriverContentsAre (@"
 aaa
 ",
-                                              _output
-                                             );
+                                              _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
+        DriverAssert.AssertDriverContentsAre (@"
 aa
 ",
-                                              _output
-                                             );
+                                              _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
+        DriverAssert.AssertDriverContentsAre (@"
 a
 ",
-                                              _output
-                                             );
+                                              _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
+        DriverAssert.AssertDriverContentsAre (@"
 
 ",
-                                              _output
-                                             );
+                                              _output);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         SetupFakeApplicationAttribute.RunIteration ();
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (0, tv.Viewport.X);
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
+        DriverAssert.AssertDriverContentsAre (@"
 
 ",
-                                              _output
-                                             );
+                                              _output);
         top.Dispose ();
     }
 
@@ -3328,17 +3241,15 @@ a
 
         Assert.True (_textView.WordWrap);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Line 1.
 Line 2.",
-                                                       _output
-                                                      );
+                                                       _output);
 
         Assert.True (_textView.NewKeyDownEvent (Key.End.WithShift));
         Assert.Equal ("Line 1.", _textView.SelectedText);
 
-        Assert.True (_textView.NewKeyDownEvent (new (del)));
+        Assert.True (_textView.NewKeyDownEvent (new Key (del)));
         SetupFakeApplicationAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
@@ -3346,12 +3257,10 @@ Line 2.",
         Assert.NotEqual (Rectangle.Empty, _textView.NeedsDrawRect);
         SetupFakeApplicationAttribute.RunIteration ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 H      
 Line 2.",
-                                                       _output
-                                                      );
+                                                       _output);
         top.Dispose ();
     }
 
@@ -3368,8 +3277,7 @@ Line 2.",
                                                         WordWrap = true,
                                                         Text = "これは、左右のクリップ境界をテストするための非常に長いテキストです。"
                                                     };
-                                                }
-                                               );
+                                                });
         Assert.Null (exception);
     }
 
@@ -3380,30 +3288,18 @@ Line 2.",
         //          0123456789
         var text = "This is the first line.\nThis is the second line.\n";
 
-        var tv = new TextView
-        {
-            Width = 11,
-            Height = 9,
-            App = ApplicationImpl.Instance
-        };
+        var tv = new TextView { Width = 11, Height = 9, App = ApplicationImpl.Instance };
         tv.Text = text;
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
         tv.WordWrap = true;
 
-        var top = new Runnable
-        {
-            Driver = ApplicationImpl.Instance.Driver
-        };
+        var top = new Runnable { Driver = ApplicationImpl.Instance.Driver };
         top.Add (tv);
         top.Layout ();
         tv.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is  
 the first
 line.    
@@ -3412,18 +3308,16 @@ the
 second   
 line.    
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         tv.ReadOnly = true;
-        tv.InsertionPoint = new (6, 2);
-        Assert.Equal (new (5, 2), tv.InsertionPoint);
+        tv.InsertionPoint = new Point (6, 2);
+        Assert.Equal (new Point (5, 2), tv.InsertionPoint);
         top.LayoutSubViews ();
         top.SetClipToScreen ();
         tv.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is   
 the first 
 line.     
@@ -3431,8 +3325,7 @@ This is
 the second
 line.     
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         tv.SelectionStartRow = 0;
         tv.SelectionStartColumn = 0;
@@ -3460,10 +3353,7 @@ line.
 
             _textView.Load (stream);
 
-            Assert.Equal (
-                          $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                          _textView.Text
-                         );
+            Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", _textView.Text);
             Assert.True (_textView.WordWrap);
         }
     }
@@ -3477,23 +3367,16 @@ line.
         var tv = new TextView { Width = 10, Height = 10 };
         tv.Text = text;
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
         tv.WordWrap = true;
 
-        var top = new Runnable
-        {
-            Driver = ApplicationImpl.Instance.Driver
-        };
+        var top = new Runnable { Driver = ApplicationImpl.Instance.Driver };
         top.Add (tv);
 
         top.Layout ();
         tv.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 This is
 the    
 first  
@@ -3503,11 +3386,10 @@ the
 second 
 line.  
 ",
-                                                       _output
-                                                      );
+                                                       _output);
     }
 
-    private TextView CreateTextView () { return new () { Width = 30, Height = 10 }; }
+    private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 
     private int GetLeftCol (int start)
     {
@@ -3518,12 +3400,12 @@ line.
             return 0;
         }
 
-        if (start == _textView.LeftColumn)
+        if (start == _textView.Viewport.X)
         {
             return start;
         }
 
-        if (_textView.LeftColumn == _textView.CurrentColumn)
+        if (_textView.Viewport.X == _textView.CurrentColumn)
         {
             return _textView.CurrentColumn;
         }
@@ -3592,11 +3474,7 @@ line.
             byte [] buff = Encoding.Unicode.GetBytes (Txt);
             byte [] ms = new MemoryStream (buff).ToArray ();
 
-            _textView = new ()
-            {
-                App = ApplicationImpl.Instance,
-                Width = 30, Height = 10, SchemeName = "Base"
-            };
+            _textView = new TextView { App = ApplicationImpl.Instance, Width = 30, Height = 10, SchemeName = "Base" };
             _textView.Text = Encoding.Unicode.GetString (ms);
         }
     }
