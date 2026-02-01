@@ -58,23 +58,12 @@ All tests passing: 40/40 DimFillTests, 395/395 Dim tests, 2,387/2,387 ViewBase t
 Below is a comprehensive list of locations where `Dim.Func` is used with `Frame.Width`, `Frame.Height`, `Frame.X`, or `Frame.Y` that could potentially be simplified with the new `to:` parameter:
 
 
-9. **Examples/UICatalog/Scenarios/CharacterMap/CharacterMap.cs:182**
-   ```cs
-   Width = Dim.Fill (Dim.Func (v => v!.Frame.Width, _categoryList))
-   ```
-   Could become: `Width = Dim.Fill (to: _categoryList)`
-
 10. **Terminal.Gui/Views/FileDialogs/FileDialog.cs:1393**
     ```cs
     Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30))
     ```
     This has complex logic with margin calculation, but core could be: `Width = Dim.Fill (margin: 30, to: _tableViewContainer)` (with conditional logic for IsInitialized)
 
-11. **Terminal.Gui/ViewBase/View.ScrollBars.cs:106**
-    ```cs
-    Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Right))
-    ```
-    This is using Padding thickness, not a view's Frame, so NOT a candidate for simplification.
 
 ### Other Dim.Func Usages (NOT candidates)
 
