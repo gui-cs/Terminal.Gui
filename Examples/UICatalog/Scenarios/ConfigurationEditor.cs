@@ -72,7 +72,7 @@ public class ConfigurationEditor : Scenario
 
             ConfigTextView editor = new ()
             {
-                Title = config.Value.StartsWith ("resource://") ? fileInfo.Name : config.Value,
+                Title = config.Value.StartsWith ("resource://", StringComparison.Ordinal) ? fileInfo.Name : config.Value,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
                 FileInfo = fileInfo
@@ -171,7 +171,7 @@ public class ConfigurationEditor : Scenario
 
             if (assembly != null)
             {
-                string? name = assembly.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith ("config.json"));
+                string? name = assembly.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith ("config.json", StringComparison.Ordinal));
 
                 if (string.IsNullOrEmpty (name))
                 {
