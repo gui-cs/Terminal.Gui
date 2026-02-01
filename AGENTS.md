@@ -98,7 +98,7 @@ See `.claude/cookbook/` for common UI patterns:
 ## Documentation Index (Compressed)
 
 > **IMPORTANT**: Use retrieval-led reasoning. Read full docs before making changes.
-> Detailed index: [.tg-docs/INDEX.md](.tg-docs/INDEX.md)
+> Detailed index: [.tg-docs/INDEX.md](.tg-docs/INDEX.md) (~530 types across 12 namespaces)
 
 ### Deep Dives (docfx/docs/)
 
@@ -184,4 +184,170 @@ See `.claude/cookbook/` for common UI patterns:
 |Application/ApplicationImpl.cs|IApplication implementation
 |Input/Command.cs|Command enum
 |Input/Key.cs|Key class
+```
+
+---
+
+## Compressed API Type Index
+
+> Quick reference for key types. Full list: [.tg-docs/INDEX.md](.tg-docs/INDEX.md)
+> Format: `|Type|Category|Key members/notes`
+
+### Terminal.Gui.App (35 types)
+```
+|Application|Class|Static facade (obsolete),Init,Run,Shutdown,Top
+|IApplication|Interface|Instance-based,SessionStack,Run,Dispose
+|SessionToken|Class|Session lifecycle,IDisposable
+|Clipboard|Class|GetText,SetText,TryGetText
+|IRunnable|Interface|Run view modal,used by Dialog
+|ITimedEvents|Interface|AddTimeout,AddIdle,RemoveTimeout
+|CancelEventArgs<T>|Class|Cancel property,cancellable events
+|ValueChangingEventArgs<T>|Class|OldValue,NewValue,Cancel
+|ApplicationNavigation|Class|Focus management,GetFocused,AdvanceFocus
+|ApplicationPopover|Class|Popover management,Show,Hide
+```
+
+### Terminal.Gui.ViewBase (70 types)
+```
+|View|Class|Base class,Add,Remove,Frame,Viewport,Draw
+|Pos|Class|Position:Absolute,Percent,Center,AnchorEnd,Func
+|PosAbsolute|Class|Pos.At(n),absolute coordinate
+|PosPercent|Class|Pos.Percent(n),percentage of SuperView
+|PosCenter|Class|Pos.Center(),centered
+|PosAnchorEnd|Class|Pos.AnchorEnd(n),from right/bottom
+|PosView|Class|Pos.Left/Right/Top/Bottom(view)
+|Dim|Class|Dimension:Absolute,Auto,Fill,Percent,Func
+|DimAbsolute|Class|Dim.Absolute(n),fixed size
+|DimAuto|Class|Dim.Auto(),content-based sizing
+|DimFill|Class|Dim.Fill(margin),fill remaining
+|DimPercent|Class|Dim.Percent(n),percentage
+|Adornment|Class|Base for Border,Margin,Padding
+|Border|Class|View border,Title,LineStyle
+|Margin|Class|View outer margin
+|Padding|Class|View inner padding
+|Alignment|Enum|Start,Center,End,Fill
+|Orientation|Enum|Horizontal,Vertical
+|TabBehavior|Enum|NoStop,TabStop,TabGroup
+|ViewArrangement|Enum|Movable,Resizable,Overlapped
+```
+
+### Terminal.Gui.Views (180+ types)
+```
+[Core Controls]
+|Button|Class|Text,Accept event,IsDefault
+|Label|Class|Text display,TextAlignment
+|TextField|Class|Single-line input,Text,Secret
+|TextView|Class|Multi-line editor,Text,ReadOnly
+|CheckBox|Class|CheckedState,AllowCheckStateNone
+|ComboBox|Class|Dropdown,Source,SelectedItem
+|ProgressBar|Class|Fraction,BidirectionalMarquee
+|ScrollBar|Class|Position,Size,Orientation
+|NumericUpDown<T>|Class|Value,Increment,Min,Max
+
+[Containers]
+|Window|Class|Top-level,Title,MenuBar support
+|Dialog|Class|Modal,Buttons,AddButton
+|Dialog<T>|Class|Modal with result
+|FrameView|Class|Titled frame container
+|TabView|Class|Tabs,AddTab,SelectedTab
+|Wizard|Class|Multi-step,AddStep,CurrentStep
+
+[Lists & Data]
+|ListView|Class|Source,SelectedItem,AllowsMarking
+|TableView|Class|Table,SelectedRow,SelectedColumn
+|TreeView|Class|Objects,AddObject,SelectedObject
+|TreeView<T>|Class|Generic tree
+
+[Menus]
+|MenuBar|Class|Menus,UseKeysUpDownAsKeysLeftRight
+|MenuItem|Class|Title,Action,Shortcut,SubMenu
+|MenuBarItem|Class|Title,Children array
+|Menu|Class|Popup menu display
+|PopoverMenu|Class|Context menu,Show(items)
+|StatusBar|Class|Items,Visible
+
+[File Dialogs]
+|FileDialog|Class|Base,Path,AllowedFileTypes
+|OpenDialog|Class|OpenFile,AllowsMultipleSelection
+|SaveDialog|Class|SaveFile,FileName
+
+[Specialized]
+|ColorPicker|Class|SelectedColor,Style
+|GraphView|Class|Series,Annotations,AxisX/Y
+|HexView|Class|Source,Position,Edits
+|CharMap|Class|SelectedCodePoint,Start/End
+|SpinnerView|Class|SpinnerStyle,AutoSpin
+|MessageBox|Class|Query,ErrorQuery,static methods
+```
+
+### Terminal.Gui.Input (18 types)
+```
+|Key|Class|KeyCode,Modifiers,IsCtrl,IsAlt,IsShift
+|KeyBindings|Class|Add,Get,TryGet,Remove,GetCommands
+|KeyBinding|Struct|Commands[],Scope,Target
+|Mouse|Class|Position,Flags,View
+|MouseBindings|Class|Add,Get,TryGet,Remove
+|MouseBinding|Struct|Commands[],Scope
+|MouseFlags|Enum|Button1Clicked,Button1DoubleClicked,WheeledUp/Down
+|Command|Enum|Accept,Cancel,Select,HotKey,ScrollUp/Down
+|CommandContext|Struct|Command,KeyBinding,Source
+```
+
+### Terminal.Gui.Drawing (40 types)
+```
+|Attribute|Struct|Foreground,Background,constructor(fg,bg)
+|Color|Struct|R,G,B,Parse,TryParse,FromArgb
+|Scheme|Class|Normal,Focus,HotNormal,HotFocus,Disabled
+|LineCanvas|Class|AddLine,GetMap,Merge
+|LineStyle|Enum|None,Single,Double,Rounded,Heavy
+|Glyphs|Class|Bullet,CheckMark,Diamond,etc.
+|Cell|Struct|Rune,Attribute
+|Thickness|Struct|Top,Left,Bottom,Right,Vertical,Horizontal
+|Region|Class|Clipping,Union,Intersect,Exclude
+|Gradient|Class|Colors[],Spectrum
+```
+
+### Terminal.Gui.Drivers (80+ types)
+```
+|IDriver|Interface|Init,End,Refresh,AddStr,Move
+|Driver|Class|Base implementation
+|DriverRegistry|Class|GetDrivers,Get,MakeDriver
+|KeyCode|Enum|Key constants,A-Z,F1-F12,Enter,Esc
+|CursorVisibility|Enum|Default,Invisible,Underline,Box
+|IOutput|Interface|Terminal output
+|IInputProcessor|Interface|Input processing
+```
+
+### Terminal.Gui.Configuration (15 types)
+```
+|ConfigurationManager|Class|Settings,Themes,Apply,Reset
+|SchemeManager|Class|GetScheme,Schemes dictionary
+|ThemeManager|Class|Theme,Themes,SelectedTheme
+|ConfigLocations|Enum|Default,Global,App,Runtime
+```
+
+### Terminal.Gui.Testing (8 types)
+```
+|InputInjector|Class|InjectKey,InjectMouse,InjectChar
+|IInputInjector|Interface|Injection interface
+|VirtualTimeProvider|Class|Testing time control
+```
+
+### Terminal.Gui.Text (4 types)
+```
+|TextFormatter|Class|Text,Format,Size,Draw
+|TextDirection|Enum|LeftRight_TopBottom,RightLeft,etc.
+```
+
+### Terminal.Gui.Time (4 types)
+```
+|ITimeProvider|Interface|Now,UtcNow,CreateTimer
+|VirtualTimeProvider|Class|Testing,Advance,SetTime
+|SystemTimeProvider|Class|Real system time
+```
+
+### Terminal.Gui.FileServices (5 types)
+```
+|IFileOperations|Interface|GetFiles,GetDirectories,Exists
+|FileSystemTreeBuilder|Class|Build file trees
 ```
