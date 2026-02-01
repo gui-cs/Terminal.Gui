@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -35,21 +37,25 @@ public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = nul
     /// <inheritdoc/>
     public override string ToString ()
     {
-        string result = $"Fill({Margin}";
+        StringBuilder result = new ();
+        result.Append ("Fill(");
+        result.Append (Margin);
         
         if (MinimumContentDim is { })
         {
-            result += $",min:{MinimumContentDim}";
+            result.Append (",min:");
+            result.Append (MinimumContentDim);
         }
         
         if (To is { })
         {
-            result += $",to:{To}";
+            result.Append (",to:");
+            result.Append (To);
         }
         
-        result += ")";
+        result.Append (')');
         
-        return result;
+        return result.ToString ();
     }
 
     internal override int GetAnchor (int size) => size - Margin.GetAnchor (0);

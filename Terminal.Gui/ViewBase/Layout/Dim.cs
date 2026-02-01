@@ -227,7 +227,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </example>
     /// <returns>The Fill dimension.</returns>
     /// <param name="to">The view to fill up to.</param>
-    public static Dim Fill (View to) => new DimFill (0, null, to);
+    public static Dim Fill (View to) => new DimFill (Absolute (0), null, to);
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension up to the position of another view, with a margin.
