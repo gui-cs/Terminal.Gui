@@ -60,16 +60,14 @@ public partial class TextView
     }
 
     /// <summary>
-    ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
-    ///     <see langword="false"/> otherwise.
+    ///     Gets whatever the text was changed or not. <see langword="true"/> if the text was changed
+    ///     <see langword="false"/> otherwise. Calling <see cref="ClearHistoryChanges"/> will reset this property to
+    ///     <see langword="false"/>.
     /// </summary>
-    public bool IsDirty { get => _historyText.IsDirty (_model.GetAllLines ()); set => _historyText.Clear (_model.GetAllLines ()); }
+    public bool IsDirty => _historyText.IsDirty (_model.GetAllLines ());
 
     /// <summary>Gets the number of lines.</summary>
     public int Lines => _model.Count;
-
-    /// <summary>Gets the maximum visible length line.</summary>
-    public int MaxVisibleLineLength => _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
 
     private bool _multiline = true;
 
@@ -134,8 +132,6 @@ public partial class TextView
 
             SetNeedsDraw ();
 
-            // TODO: This call is probably not needed as Adjust also
-            // TODO: calls WrapTextModel
             WrapTextModel ();
             AdjustViewport ();
         }
