@@ -68,4 +68,7 @@ public record PosCombine (AddOrSubtract Add, Pos Left, Pos Right) : Pos
 
         return false;
     }
+
+    /// <inheritdoc/>
+    protected override bool HasInner<TPos> (out TPos pos) => Left.Has (out pos) || Right.Has (out pos);
 }

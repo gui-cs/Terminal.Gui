@@ -1003,7 +1003,9 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        // TODO: Use Pos.Has<T> instead.
+        // Use direct type checking instead of Has<T>() because Has<T>() traverses into
+        // nested Pos objects via HasInner. We only want to process the top-level Pos type here;
+        // nested Pos objects are handled via the PosCombine recursion below.
         switch (pos)
         {
             case PosView pv:
