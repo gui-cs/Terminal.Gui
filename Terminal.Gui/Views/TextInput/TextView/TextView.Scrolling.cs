@@ -145,6 +145,6 @@ public partial class TextView
             return;
         }
         UpdateContentSize ();
-        OnUnwrappedCursorPosition ();
+        RaiseUnwrappedCursorPositionChanged ();
     }
 }

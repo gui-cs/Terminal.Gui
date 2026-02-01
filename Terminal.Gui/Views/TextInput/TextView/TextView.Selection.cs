@@ -105,7 +105,7 @@ public partial class TextView
             model = _wrapManager.Model;
         }
 
-        OnUnwrappedCursorPosition (cRow, cCol);
+        RaiseUnwrappedCursorPositionChanged (cRow, cCol);
 
         return GetRegion (out _, startRow, startCol, cRow, cCol, model);
     }

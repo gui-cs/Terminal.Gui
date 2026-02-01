@@ -1940,7 +1940,7 @@ TAB to jump between text field",
         var cp = Point.Empty;
 
         var tv = new TextView { Width = Dim.Fill (), Height = Dim.Fill (), Text = "This is the first line.\nThis is the second line.\n" };
-        tv.UnwrappedCursorPosition += (s, e) => { cp = e; };
+        tv.UnwrappedCursorPositionChanged += (s, e) => { cp = e; };
         var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);

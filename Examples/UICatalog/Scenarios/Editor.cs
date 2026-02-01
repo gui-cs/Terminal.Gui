@@ -135,7 +135,7 @@ public class Editor : Scenario
                      siCursorPosition
                  ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
 
-        _textView.UnwrappedCursorPosition += (s, e) => { siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}"; };
+        _textView.UnwrappedCursorPositionChanged += (s, e) => { siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}"; };
 
         _appWindow.Add (statusBar);
 
