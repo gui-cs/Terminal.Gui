@@ -659,7 +659,7 @@ public sealed class UICatalogRunnable : Runnable
         {
             Process.Start ("open", url);
         }
-        else if (PlatformDetection.IsUnixLike ())
+        else if (PlatformDetection.IsLinux ())
         {
             using Process process = new ();
 

@@ -65,6 +65,50 @@ public class LineTests : TestDriverBase
     }
 
     [Fact]
+    public void Line_ChangeOrientation_IsInitialized_UpdatesDimensions ()
+    {
+        var line = new Line { Orientation = Orientation.Horizontal, Width = Dim.Fill (), Height = 1 };
+
+        line.BeginInit ();
+        line.EndInit ();
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (Dim.Fill (), line.Width);
+        Assert.Equal (1, line.Height);
+
+        line.Orientation = Orientation.Vertical;
+
+        Assert.Equal (Orientation.Vertical, line.Orientation);
+        Assert.Equal (1, line.Width);
+        Assert.Equal (Dim.Fill (), line.Height);
+
+        line.Orientation = Orientation.Horizontal;
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (Dim.Fill (), line.Width);
+        Assert.Equal (1, line.Height);
+
+        // Change Length will update correct dimension based on orientation
+        line.Length = 10;
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (10, line.Width);
+        Assert.Equal (1, line.Height);
+
+        line.Orientation = Orientation.Vertical;
+
+        Assert.Equal (Orientation.Vertical, line.Orientation);
+        Assert.Equal (1, line.Width);
+        Assert.Equal (10, line.Height);
+
+        line.Orientation = Orientation.Horizontal;
+
+        Assert.Equal (Orientation.Horizontal, line.Orientation);
+        Assert.Equal (10, line.Width);
+        Assert.Equal (1, line.Height);
+    }
+
+    [Fact]
     public void Line_Style_CanBeSet ()
     {
         var line = new Line { Style = LineStyle.Double };
@@ -221,6 +265,33 @@ public class LineTests : TestDriverBase
         var line = new Line ();
         var container = new View { Width = 50, Height = 20 };
         container.Add (line);
+
+        // Start horizontal with custom dimensions
+        line.Orientation = Orientation.Horizontal;
+        line.Width = 30;
+        line.Height = 1;
+        container.Layout ();
+
+        Assert.Equal (30, line.Frame.Width);
+        Assert.Equal (1, line.Frame.Height);
+
+        // Change to vertical - dimensions should swap
+        line.Orientation = Orientation.Vertical;
+        container.Layout ();
+
+        Assert.Equal (1, line.Frame.Width);
+        Assert.Equal (30, line.Frame.Height); // Width became Height
+    }
+
+    [Fact]
+    public void Line_OrientationChange_IsInitialized_SwapsDimensions ()
+    {
+        var line = new Line ();
+        var container = new View { Width = 50, Height = 20 };
+        container.Add (line);
+
+        line.BeginInit ();
+        line.EndInit();
 
         // Start horizontal with custom dimensions
         line.Orientation = Orientation.Horizontal;
