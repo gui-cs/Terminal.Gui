@@ -124,7 +124,7 @@ public partial class TextView
         }
 
         // Ignore control characters and other special keys
-        if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))
+        if (a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {
             return false;
         }
@@ -185,7 +185,7 @@ public partial class TextView
         List<Cell> currentLine = GetCurrentLine ();
         int cursorPosition = Math.Min (CurrentColumn, currentLine.Count);
 
-        Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
+        Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context?.Canceled ?? false);
 
         Autocomplete.GenerateSuggestions (Autocomplete.Context);
     }
