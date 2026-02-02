@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -40,21 +38,21 @@ public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = nul
         StringBuilder result = new ();
         result.Append ("Fill(");
         result.Append (Margin);
-        
+
         if (MinimumContentDim is { })
         {
             result.Append (",min:");
             result.Append (MinimumContentDim);
         }
-        
+
         if (To is { })
         {
             result.Append (",to:");
             result.Append (To);
         }
-        
+
         result.Append (')');
-        
+
         return result.ToString ();
     }
 
@@ -63,22 +61,48 @@ public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = nul
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
         int endPos = superviewContentSize;
-        
+
         if (To is { })
         {
             endPos = dimension == Dimension.Width ? To.Frame.X : To.Frame.Y;
         }
-        
+
         int fillSize = endPos - location - Margin.GetAnchor (0);
-        
-        if (MinimumContentDim is { })
+
+        if (MinimumContentDim is null)
         {
-            int minSize = MinimumContentDim.Calculate (location, superviewContentSize, us, dimension);
-            fillSize = int.Max (fillSize, minSize);
+            return int.Max (fillSize, 0);
         }
-        
+        int minSize = MinimumContentDim.Calculate (location, superviewContentSize, us, dimension);
+        fillSize = int.Max (fillSize, minSize);
+
         return int.Max (fillSize, 0);
     }
-    
-    internal override bool ReferencesOtherViews () => To is { };
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        if (To is { })
+        {
+            yield return To;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool HasInner<TDim> (out TDim dim)
+    {
+        if (Margin.Has (out dim))
+        {
+            return true;
+        }
+
+        if (MinimumContentDim is { } && MinimumContentDim.Has (out dim))
+        {
+            return true;
+        }
+
+        dim = null!;
+
+        return false;
+    }
 }

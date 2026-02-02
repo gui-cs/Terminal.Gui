@@ -9,7 +9,8 @@ namespace Terminal.Gui.ViewBase;
 /// </remarks>
 /// <param name="Percentage">The percentage.</param>
 /// <param name="Mode">
-///     If <see cref="DimPercentMode.Position"/> the dimension is computed using the View's position (<see cref="View.X"/> or
+///     If <see cref="DimPercentMode.Position"/> the dimension is computed using the View's position (<see cref="View.X"/>
+///     or
 ///     <see cref="View.Y"/>); otherwise, the dimension is computed using the View's <see cref="View.GetContentSize ()"/>.
 /// </param>
 public record DimPercent (int Percentage, DimPercentMode Mode = DimPercentMode.ContentSize) : Dim
@@ -17,17 +18,15 @@ public record DimPercent (int Percentage, DimPercentMode Mode = DimPercentMode.C
     /// <summary>
     /// </summary>
     /// <returns></returns>
-    public override string ToString () { return $"Percent({Percentage},{Mode})"; }
+    public override string ToString () => $"Percent({Percentage},{Mode})";
 
     /// <summary>
     ///     Gets whether the dimension is computed using the View's position or GetContentSize ().
     /// </summary>
     public DimPercentMode Mode { get; } = Mode;
 
-    internal override int GetAnchor (int size) { return (int)(size * (Percentage / 100f)); }
+    internal override int GetAnchor (int size) => (int)(size * (Percentage / 100f));
 
-    internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
-    {
-        return Mode == DimPercentMode.Position ? Math.Max (GetAnchor (superviewContentSize - location), 0) : GetAnchor (superviewContentSize);
-    }
+    internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension) =>
+        Mode == DimPercentMode.Position ? Math.Max (GetAnchor (superviewContentSize - location), 0) : GetAnchor (superviewContentSize);
 }

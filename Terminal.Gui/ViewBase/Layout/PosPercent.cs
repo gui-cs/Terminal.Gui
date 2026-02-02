@@ -18,7 +18,7 @@ public record PosPercent (int Percent) : Pos
     public new int Percent { get; } = Percent;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"Percent({Percent})"; }
+    public override string ToString () => $"Percent({Percent})";
 
-    internal override int GetAnchor (int size) { return (int)(size * (Percent / 100f)); }
+    internal override int GetAnchor (int size) => (int)(size * (Percent / 100f));
 }

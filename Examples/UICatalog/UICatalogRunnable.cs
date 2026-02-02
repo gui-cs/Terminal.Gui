@@ -80,12 +80,10 @@ public sealed class UICatalogRunnable : Runnable
         if (ShowStatusBar)
         {
             _statusBar!.Height = Dim.Auto ();
-            _statusBar!.Layout ();
         }
         else
         {
             _statusBar!.Height = 0;
-            _statusBar!.Layout ();
         }
     }
 
@@ -611,13 +609,11 @@ public sealed class UICatalogRunnable : Runnable
                                 {
                                     case true:
                                         _statusBar!.Height = Dim.Auto ();
-                                        _statusBar!.Layout ();
 
                                         break;
 
                                     case false:
                                         _statusBar!.Height = 0;
-                                        _statusBar!.Layout ();
 
                                         break;
                                 }
