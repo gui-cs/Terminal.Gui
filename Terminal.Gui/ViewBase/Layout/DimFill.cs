@@ -26,32 +26,83 @@ namespace Terminal.Gui.ViewBase;
 ///     this minimum will contribute to the auto-sizing calculation, ensuring the SuperView is at least large enough
 ///     to accommodate the minimum.
 /// </param>
-public record DimFill (Dim Margin, Dim? MinimumContentDim = null) : Dim
+/// <param name="To">
+///     The view to fill up to. When specified, the fill will stop at the position of this view (either its X or Y
+///     coordinate depending on the dimension being calculated).
+/// </param>
+public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = null) : Dim
 {
     /// <inheritdoc/>
     public override string ToString ()
     {
+        StringBuilder result = new ();
+        result.Append ("Fill(");
+        result.Append (Margin);
+
         if (MinimumContentDim is { })
         {
-            return $"Fill({Margin},min:{MinimumContentDim})";
+            result.Append (",min:");
+            result.Append (MinimumContentDim);
         }
 
-        return $"Fill({Margin})";
+        if (To is { })
+        {
+            result.Append (",to:");
+            result.Append (To);
+        }
+
+        result.Append (')');
+
+        return result.ToString ();
     }
 
     internal override int GetAnchor (int size) => size - Margin.GetAnchor (0);
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
-        int fillSize = base.Calculate (location, superviewContentSize, us, dimension);
+        int endPos = superviewContentSize;
+
+        if (To is { })
+        {
+            endPos = dimension == Dimension.Width ? To.Frame.X : To.Frame.Y;
+        }
+
+        int fillSize = endPos - location - Margin.GetAnchor (0);
 
         if (MinimumContentDim is null)
         {
-            return fillSize;
+            return int.Max (fillSize, 0);
         }
         int minSize = MinimumContentDim.Calculate (location, superviewContentSize, us, dimension);
         fillSize = int.Max (fillSize, minSize);
 
-        return fillSize;
+        return int.Max (fillSize, 0);
+    }
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        if (To is { })
+        {
+            yield return To;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool HasInner<TDim> (out TDim dim)
+    {
+        if (Margin.Has (out dim))
+        {
+            return true;
+        }
+
+        if (MinimumContentDim is { } && MinimumContentDim.Has (out dim))
+        {
+            return true;
+        }
+
+        dim = null!;
+
+        return false;
     }
 }

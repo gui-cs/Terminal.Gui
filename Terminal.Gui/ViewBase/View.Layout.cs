@@ -959,21 +959,14 @@ public partial class View // Layout APIs
     ///     A reference to a set of tuples representing edges in the layout graph, where each tuple consists of a pair of views
     ///     indicating a dependency.
     /// </param>
-    internal void CollectDim (Dim? dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+    internal void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        if (dim!.Has (out DimView dv))
+        foreach (View target in dim.GetReferencedViews ())
         {
-            if (dv.Target != this)
+            if (target != this)
             {
-                nEdges.Add ((dv.Target!, from));
+                nEdges.Add ((target, from));
             }
-        }
-
-        if (dim!.Has (out DimCombine dc))
-        {
-            // TODO: Redo without recursion
-            CollectDim (dc.Left, from, ref nNodes, ref nEdges);
-            CollectDim (dc.Right, from, ref nNodes, ref nEdges);
         }
     }
 
@@ -989,25 +982,12 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        // TODO: Use Pos.Has<T> instead.
-        switch (pos)
+        foreach (View target in pos.GetReferencedViews ())
         {
-            case PosView pv:
-                Debug.Assert (pv.Target is { });
-
-                if (pv.Target != this)
-                {
-                    nEdges.Add ((pv.Target!, from));
-                }
-
-                return;
-
-            case PosCombine pc:
-                // TODO: Redo without recursion
-                CollectPos (pc.Left, from, ref nNodes, ref nEdges);
-                CollectPos (pc.Right, from, ref nNodes, ref nEdges);
-
-                break;
+            if (target != this)
+            {
+                nEdges.Add ((target, from));
+            }
         }
     }
 

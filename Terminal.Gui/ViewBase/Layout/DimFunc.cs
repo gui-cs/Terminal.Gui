@@ -26,4 +26,6 @@ public record DimFunc (Func<View?, int> Fn, View? View = null) : Dim
     public override string ToString () { return $"DimFunc({Fn (View)})"; }
 
     internal override int GetAnchor (int size) { return Fn (View); }
+
+    internal override bool ReferencesOtherViews () => View is { };
 }

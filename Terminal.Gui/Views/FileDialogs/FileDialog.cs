@@ -126,16 +126,6 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        // Create tree view container (left pane)
-        _treeView = new TreeView<IFileSystemInfo>
-        {
-            X = 0,
-            Y = Pos.Bottom (_btnBack),
-            Width = Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30),
-            Height = Dim.Func (_ => _tableViewContainer?.Frame.Height ?? 0),
-            Visible = false
-        };
-
         // Create table view container (right pane)
         _tableViewContainer = new View
         {
@@ -148,6 +138,16 @@ public class FileDialog : Dialog, IDesignable
             SuperViewRendersLineCanvas = true,
             CanFocus = true,
             Id = "_tableViewContainer"
+        };
+
+        // Create tree view container (left pane)
+        _treeView = new TreeView<IFileSystemInfo>
+        {
+            X = 0,
+            Y = Pos.Bottom (_btnBack),
+            Width = Dim.Fill (margin: 30, to: _tableViewContainer!),
+            Height = Dim.Height (_tableViewContainer),
+            Visible = false
         };
 
         _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (1), FullRowSelect = true, Id = "_tableView" };
@@ -1390,7 +1390,7 @@ public class FileDialog : Dialog, IDesignable
         if (visible)
         {
             // When visible, the table view's left edge is a splitter next to the tree
-            _treeView.Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30));
+            _treeView.Width = Dim.Fill (to: _tableViewContainer);
             _tableViewContainer.X = 30;
             _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
             _tableViewContainer.Border!.Thickness = new Thickness (1, 0, 0, 0);
@@ -1406,6 +1406,7 @@ public class FileDialog : Dialog, IDesignable
         }
         _btnTreeToggle.Text = GetTreeToggleText (visible);
 
+        Layout ();
         SetNeedsLayout ();
         SetNeedsDraw ();
     }
