@@ -70,5 +70,19 @@ public record PosCombine (AddOrSubtract Add, Pos Left, Pos Right) : Pos
     }
 
     /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        foreach (View view in Left.GetReferencedViews ())
+        {
+            yield return view;
+        }
+
+        foreach (View view in Right.GetReferencedViews ())
+        {
+            yield return view;
+        }
+    }
+
+    /// <inheritdoc/>
     protected override bool HasInner<TPos> (out TPos pos) => Left.Has (out pos) || Right.Has (out pos);
 }

@@ -406,8 +406,26 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>
     ///     Returns <see langword="true"/> if this Dim object references other views.
     /// </summary>
-    /// <returns></returns>
-    internal virtual bool ReferencesOtherViews () => false;
+    /// <remarks>
+    ///     The default implementation uses <see cref="GetReferencedViews"/>. Override for optimization
+    ///     in types that can determine this without allocating an iterator.
+    /// </remarks>
+    /// <returns><see langword="true"/> if this Dim depends on other views for layout.</returns>
+    internal virtual bool ReferencesOtherViews () => GetReferencedViews ().Any ();
+
+    /// <summary>
+    ///     Returns the views that this Dim depends on for layout calculations.
+    ///     Used by the layout system to determine the order in which views should be laid out.
+    /// </summary>
+    /// <remarks>
+    ///     Override in subclasses that reference other views (e.g., <see cref="DimView"/>, <see cref="DimFill"/>).
+    ///     Composite types like <see cref="DimCombine"/> should aggregate results from their children.
+    /// </remarks>
+    /// <returns>An enumerable of views that this Dim depends on.</returns>
+    internal virtual IEnumerable<View> GetReferencedViews ()
+    {
+        yield break;
+    }
 
     #endregion virtual methods
 

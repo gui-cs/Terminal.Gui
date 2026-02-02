@@ -76,5 +76,19 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
     }
 
     /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        foreach (View view in Left.GetReferencedViews ())
+        {
+            yield return view;
+        }
+
+        foreach (View view in Right.GetReferencedViews ())
+        {
+            yield return view;
+        }
+    }
+
+    /// <inheritdoc/>
     protected override bool HasInner<TDim> (out TDim dim) => Left.Has (out dim) || Right.Has (out dim);
 }

@@ -50,4 +50,13 @@ public record DimView : Dim
         };
 
     internal override bool ReferencesOtherViews () => true;
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        if (Target is { })
+        {
+            yield return Target;
+        }
+    }
 }

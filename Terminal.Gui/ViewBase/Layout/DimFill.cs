@@ -79,7 +79,14 @@ public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = nul
         return int.Max (fillSize, 0);
     }
 
-    internal override bool ReferencesOtherViews () => To is { };
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        if (To is { })
+        {
+            yield return To;
+        }
+    }
 
     /// <inheritdoc/>
     protected override bool HasInner<TDim> (out TDim dim)

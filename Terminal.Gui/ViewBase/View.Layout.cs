@@ -959,35 +959,14 @@ public partial class View // Layout APIs
     ///     A reference to a set of tuples representing edges in the layout graph, where each tuple consists of a pair of views
     ///     indicating a dependency.
     /// </param>
-    internal void CollectDim (Dim? dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
+    internal void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        // Use direct type checking instead of Has<T>() because Has<T>() now traverses into
-        // nested Dims (DimAuto, DimFill). We only want to process the top-level Dim type here;
-        // nested Dims are handled via the DimCombine recursion below.
-        if (dim is DimView dv)
+        foreach (View target in dim.GetReferencedViews ())
         {
-            if (dv.Target != this)
+            if (target != this)
             {
-                Debug.Assert (dim.ReferencesOtherViews ());
-                nEdges.Add ((dv.Target!, from));
+                nEdges.Add ((target, from));
             }
-        }
-
-        if (dim is DimFill df)
-        {
-            if (df.To is { } && df.To != this)
-            {
-                Debug.Assert (dim.ReferencesOtherViews ());
-                nEdges.Add ((df.To!, from));
-            }
-        }
-
-        // Only recurse if the dim itself is a DimCombine (not a nested one found via HasInner)
-        if (dim is DimCombine dc)
-        {
-            // TODO: Redo without recursion
-            CollectDim (dc.Left, from, ref nNodes, ref nEdges);
-            CollectDim (dc.Right, from, ref nNodes, ref nEdges);
         }
     }
 
@@ -1003,28 +982,12 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        // Use direct type checking instead of Has<T>() because Has<T>() traverses into
-        // nested Pos objects via HasInner. We only want to process the top-level Pos type here;
-        // nested Pos objects are handled via the PosCombine recursion below.
-        switch (pos)
+        foreach (View target in pos.GetReferencedViews ())
         {
-            case PosView pv:
-                Debug.Assert (pv.Target is { });
-
-                if (pv.Target != this)
-                {
-                    Debug.Assert (pos.ReferencesOtherViews ());
-                    nEdges.Add ((pv.Target!, from));
-                }
-
-                return;
-
-            case PosCombine pc:
-                // TODO: Redo without recursion
-                CollectPos (pc.Left, from, ref nNodes, ref nEdges);
-                CollectPos (pc.Right, from, ref nNodes, ref nEdges);
-
-                break;
+            if (target != this)
+            {
+                nEdges.Add ((target, from));
+            }
         }
     }
 

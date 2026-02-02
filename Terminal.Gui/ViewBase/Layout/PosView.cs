@@ -63,4 +63,10 @@ public record PosView : Pos
         };
 
     internal override bool ReferencesOtherViews () => true;
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        yield return Target;
+    }
 }

@@ -373,8 +373,26 @@ public abstract record Pos
     /// <summary>
     ///     Returns <see langword="true"/> if this Pos object references other views.
     /// </summary>
-    /// <returns></returns>
-    internal virtual bool ReferencesOtherViews () => false;
+    /// <remarks>
+    ///     The default implementation uses <see cref="GetReferencedViews"/>. Override for optimization
+    ///     in types that can determine this without allocating an iterator.
+    /// </remarks>
+    /// <returns><see langword="true"/> if this Pos depends on other views for layout.</returns>
+    internal virtual bool ReferencesOtherViews () => GetReferencedViews ().Any ();
+
+    /// <summary>
+    ///     Returns the views that this Pos depends on for layout calculations.
+    ///     Used by the layout system to determine the order in which views should be laid out.
+    /// </summary>
+    /// <remarks>
+    ///     Override in subclasses that reference other views (e.g., <see cref="PosView"/>).
+    ///     Composite types like <see cref="PosCombine"/> should aggregate results from their children.
+    /// </remarks>
+    /// <returns>An enumerable of views that this Pos depends on.</returns>
+    internal virtual IEnumerable<View> GetReferencedViews ()
+    {
+        yield break;
+    }
 
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.
