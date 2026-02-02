@@ -316,4 +316,116 @@ public class CheckBoxTests ()
         Assert.Equal (0, selectCount);
         Assert.Equal (1, acceptCount);
     }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Command_Activate_TogglesState ()
+    {
+        CheckBox checkBox = new () { Text = "Test" };
+        CheckState initialState = checkBox.Value;
+        bool activatingFired = false;
+
+        checkBox.Activating += (_, _) => activatingFired = true;
+
+        bool? result = checkBox.InvokeCommand (Command.Activate);
+
+        Assert.True (activatingFired);
+        Assert.NotEqual (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Command_Accept_ConfirmsStateWithoutToggle ()
+    {
+        CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
+        CheckState initialState = checkBox.Value;
+        bool acceptingFired = false;
+
+        checkBox.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;  // Signal that the Accept was processed
+        };
+
+        bool? result = checkBox.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.Equal (initialState, checkBox.Value); // State unchanged
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Command_HotKey_InvokesActivate ()
+    {
+        CheckBox checkBox = new () { Text = "_Test" };
+        CheckState initialState = checkBox.Value;
+        bool activatingFired = false;
+
+        checkBox.Activating += (_, _) => activatingFired = true;
+
+        bool? result = checkBox.InvokeCommand (Command.HotKey);
+
+        // HotKey invokes Activate (toggles state + SetFocus)
+        Assert.True (activatingFired);
+        Assert.NotEqual (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Space_TogglesState ()
+    {
+        CheckBox checkBox = new () { Text = "Test" };
+        CheckState initialState = checkBox.Value;
+
+        // Space should trigger state toggle via Activate command
+        bool? result = checkBox.NewKeyDownEvent (Key.Space);
+
+        Assert.NotEqual (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Enter_ConfirmsWithoutToggle ()
+    {
+        CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
+        CheckState initialState = checkBox.Value;
+        bool acceptingFired = false;
+
+        checkBox.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        // Enter should confirm without toggling via Accept command
+        bool? result = checkBox.NewKeyDownEvent (Key.Enter);
+
+        Assert.True (acceptingFired);
+        Assert.Equal (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
 }

@@ -965,4 +965,91 @@ public class ButtonTests
 
         Assert.Equal (3, acceptingCount);
     }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Button_Command_HotKey_RaisesActivatingAndAccepting ()
+    {
+        Button button = new () { Text = "_Test" };
+        bool activatingFired = false;
+        bool acceptingFired = false;
+
+        // Don't set Handled in Activating, or it will return early without calling Accepting
+        button.Activating += (_, _) => activatingFired = true;
+
+        button.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        bool? result = button.InvokeCommand (Command.HotKey);
+
+        // HotKey should raise both Activating and Accepting events
+        Assert.True (activatingFired);
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        button.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Button_Space_InvokesHotKeyCommand ()
+    {
+        Button button = new () { Text = "Test" };
+        bool activatingFired = false;
+        bool acceptingFired = false;
+
+        // Don't set Handled in Activating, or it will return early without calling Accepting
+        button.Activating += (_, _) => activatingFired = true;
+
+        button.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        // Space is bound to HotKey command, which raises both events
+        bool? result = button.NewKeyDownEvent (Key.Space);
+
+        Assert.True (activatingFired);
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        button.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Button_Enter_InvokesHotKeyCommand ()
+    {
+        Button button = new () { Text = "Test" };
+        bool activatingFired = false;
+        bool acceptingFired = false;
+
+        // Don't set Handled in Activating, or it will return early without calling Accepting
+        button.Activating += (_, _) => activatingFired = true;
+
+        button.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        // Enter is bound to HotKey command, which raises both events
+        bool? result = button.NewKeyDownEvent (Key.Enter);
+
+        Assert.True (activatingFired);
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        button.Dispose ();
+    }
 }
