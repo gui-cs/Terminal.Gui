@@ -143,7 +143,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
     ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing. 
+    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
@@ -164,7 +164,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
     ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing. 
+    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
@@ -187,7 +187,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///         When the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
     ///         contribute to the auto-sizing calculation by default. The <paramref name="minimumContentDim"/> parameter
     ///         resolves this: it contributes a floor to the auto-sizing calculation, ensuring the SuperView is at least
-    ///         large enough to accommodate the minimum. Without it (or without using <see cref="Fill(View)"/> with 
+    ///         large enough to accommodate the minimum. Without it (or without using <see cref="Fill(View)"/> with
     ///         a <c>to</c> parameter), the SubView will receive a size of 0.
     ///     </para>
     ///     <para>
@@ -336,18 +336,38 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TDim"/> is in the hierarchy of this Dim object.
     /// </summary>
-    /// <param name="dim">A reference to this <see cref="Dim"/> instance.</param>
-    /// <returns></returns>
+    /// <param name="dim">
+    ///     When this method returns, contains the first instance of type <typeparamref name="TDim"/> found,
+    ///     or <see langword="null"/> if no instance was found.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim or any nested Dim is of type <typeparamref name="TDim"/>;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
     public bool Has<TDim> (out TDim dim) where TDim : Dim
     {
         dim = (this as TDim)!;
 
-        return this switch
-               {
-                   DimCombine combine => combine.Left.Has (out dim) || combine.Right.Has (out dim),
-                   TDim => true,
-                   _ => false
-               };
+        return this is TDim || HasInner (out dim);
+    }
+
+    /// <summary>
+    ///     Searches nested Dim objects for the specified type. Override in subclasses that contain
+    ///     other Dim objects to enable <see cref="Has{TDim}"/> to find nested types.
+    /// </summary>
+    /// <param name="dim">
+    ///     When this method returns, contains the first instance of type <typeparamref name="TDim"/> found,
+    ///     or <see langword="null"/> if no instance was found.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if any nested Dim is of type <typeparamref name="TDim"/>;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    protected virtual bool HasInner<TDim> (out TDim dim) where TDim : Dim
+    {
+        dim = null!;
+
+        return false;
     }
 
     #region virtual methods
@@ -384,10 +404,28 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         Math.Clamp (GetAnchor (superviewContentSize - location), 0, short.MaxValue);
 
     /// <summary>
-    ///     Diagnostics API to determine if this Dim object references other views.
+    ///     Returns <see langword="true"/> if this Dim object references other views.
     /// </summary>
-    /// <returns></returns>
-    internal virtual bool ReferencesOtherViews () => false;
+    /// <remarks>
+    ///     The default implementation uses <see cref="GetReferencedViews"/>. Override for optimization
+    ///     in types that can determine this without allocating an iterator.
+    /// </remarks>
+    /// <returns><see langword="true"/> if this Dim depends on other views for layout.</returns>
+    internal virtual bool ReferencesOtherViews () => GetReferencedViews ().Any ();
+
+    /// <summary>
+    ///     Returns the views that this Dim depends on for layout calculations.
+    ///     Used by the layout system to determine the order in which views should be laid out.
+    /// </summary>
+    /// <remarks>
+    ///     Override in subclasses that reference other views (e.g., <see cref="DimView"/>, <see cref="DimFill"/>).
+    ///     Composite types like <see cref="DimCombine"/> should aggregate results from their children.
+    /// </remarks>
+    /// <returns>An enumerable of views that this Dim depends on.</returns>
+    internal virtual IEnumerable<View> GetReferencedViews ()
+    {
+        yield break;
+    }
 
     #endregion virtual methods
 
@@ -405,6 +443,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Add, left, right);
+
+        // QUESTION: This seems like a hack. Is it really needed?
         (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
@@ -430,6 +470,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         }
 
         var newDim = new DimCombine (AddOrSubtract.Subtract, left, right);
+
+        // QUESTION: This seems like a hack. Is it really needed?
         (left as DimView)?.Target?.SetNeedsLayout ();
 
         return newDim;
