@@ -163,7 +163,7 @@ public partial class TextView
         else
         {
             PositionCursor ();
-            OnUnwrappedCursorPosition ();
+            RaiseUnwrappedCursorPositionChanged ();
         }
         ProcessAutocomplete ();
     }

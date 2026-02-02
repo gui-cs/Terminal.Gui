@@ -108,15 +108,15 @@ public class Editor : Scenario
         };
 
         _miForceMinimumPosToZeroCheckBox.ValueChanging += (s, e) =>
-                                                                 {
-                                                                     _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
+                                                          {
+                                                              _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
 
-                                                                     // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
-                                                                     // if (_textView?.ContextMenu is not null)
-                                                                     // {
-                                                                     //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-                                                                     // }
-                                                                 };
+                                                              // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
+                                                              // if (_textView?.ContextMenu is not null)
+                                                              // {
+                                                              //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+                                                              // }
+                                                          };
 
         menu.Add (new MenuBarItem ("Conte_xtMenu",
                                    [new MenuItem { CommandView = _miForceMinimumPosToZeroCheckBox }, new MenuBarItem ("_Languages", GetSupportedCultures ())]));
@@ -135,7 +135,7 @@ public class Editor : Scenario
                      siCursorPosition
                  ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
 
-        _textView.UnwrappedCursorPosition += (s, e) => { siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}"; };
+        _textView.UnwrappedCursorPositionChanged += (s, e) => { siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}"; };
 
         _appWindow.Add (statusBar);
 
@@ -169,7 +169,12 @@ public class Editor : Scenario
 
         Debug.Assert (_textView.IsDirty);
 
-        int? r = MessageBox.ErrorQuery (_appWindow!.App!, "Save File", $"Do you want save changes in {_appWindow.Title}?", Strings.btnCancel, Strings.btnNo, Strings.btnYes);
+        int? r = MessageBox.ErrorQuery (_appWindow!.App!,
+                                        "Save File",
+                                        $"Do you want save changes in {_appWindow.Title}?",
+                                        Strings.btnCancel,
+                                        Strings.btnNo,
+                                        Strings.btnYes);
 
         return r switch
                {
@@ -300,17 +305,17 @@ public class Editor : Scenario
             allCheckBoxes.Add (checkBox);
 
             checkBox.ValueChanging += (s, e) =>
-                                             {
-                                                 if (e.NewValue == CheckState.Checked)
-                                                 {
-                                                     Thread.CurrentThread.CurrentUICulture = new CultureInfo (cultureName);
+                                      {
+                                          if (e.NewValue == CheckState.Checked)
+                                          {
+                                              Thread.CurrentThread.CurrentUICulture = new CultureInfo (cultureName);
 
-                                                     foreach (CheckBox cb in allCheckBoxes)
-                                                     {
-                                                         cb.Value = cb == checkBox ? CheckState.Checked : CheckState.UnChecked;
-                                                     }
-                                                 }
-                                             };
+                                              foreach (CheckBox cb in allCheckBoxes)
+                                              {
+                                                  cb.Value = cb == checkBox ? CheckState.Checked : CheckState.UnChecked;
+                                              }
+                                          }
+                                      };
 
             MenuItem item = new () { CommandView = checkBox };
 
@@ -372,17 +377,17 @@ public class Editor : Scenario
         CheckBox checkBox = new () { Title = "Autocomplete", Value = CheckState.UnChecked };
 
         checkBox.ValueChanged += (s, e) =>
-                                        {
-                                            if (checkBox.Value == CheckState.Checked)
-                                            {
-                                                singleWordGenerator.AllSuggestions =
-                                                    Regex.Matches (_textView.Text, "\\w+").Select (s => s.Value).Distinct ().ToList ();
-                                            }
-                                            else
-                                            {
-                                                singleWordGenerator.AllSuggestions.Clear ();
-                                            }
-                                        };
+                                 {
+                                     if (checkBox.Value == CheckState.Checked)
+                                     {
+                                         singleWordGenerator.AllSuggestions =
+                                             Regex.Matches (_textView.Text, "\\w+").Select (s => s.Value).Distinct ().ToList ();
+                                     }
+                                     else
+                                     {
+                                         singleWordGenerator.AllSuggestions.Clear ();
+                                     }
+                                 };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -446,10 +451,7 @@ public class Editor : Scenario
             return new MenuItem { Title = "UseSameRuneTypeForWords" };
         }
 
-        CheckBox checkBox = new ()
-        {
-            Title = "UseSameRuneTypeForWords", Value = _textView.UseSameRuneTypeForWords ? CheckState.Checked : CheckState.UnChecked
-        };
+        CheckBox checkBox = new () { Title = "UseSameRuneTypeForWords", Value = _textView.UseSameRuneTypeForWords ? CheckState.Checked : CheckState.UnChecked };
 
         checkBox.ValueChanged += (s, e) => { _textView.UseSameRuneTypeForWords = checkBox.Value == CheckState.Checked; };
 
@@ -499,14 +501,14 @@ public class Editor : Scenario
         CheckBox checkBox = new () { Title = "CanFocus", Value = _textView.CanFocus ? CheckState.Checked : CheckState.UnChecked };
 
         checkBox.ValueChanged += (s, e) =>
-                                        {
-                                            _textView.CanFocus = checkBox.Value == CheckState.Checked;
+                                 {
+                                     _textView.CanFocus = checkBox.Value == CheckState.Checked;
 
-                                            if (_textView.CanFocus)
-                                            {
-                                                _textView.SetFocus ();
-                                            }
-                                        };
+                                     if (_textView.CanFocus)
+                                     {
+                                         _textView.SetFocus ();
+                                     }
+                                 };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -529,14 +531,14 @@ public class Editor : Scenario
         CheckBox checkBox = new () { Title = "Enabled", Value = _textView.Enabled ? CheckState.Checked : CheckState.UnChecked };
 
         checkBox.ValueChanged += (s, e) =>
-                                        {
-                                            _textView.Enabled = checkBox.Value == CheckState.Checked;
+                                 {
+                                     _textView.Enabled = checkBox.Value == CheckState.Checked;
 
-                                            if (_textView.Enabled)
-                                            {
-                                                _textView.SetFocus ();
-                                            }
-                                        };
+                                     if (_textView.Enabled)
+                                     {
+                                         _textView.SetFocus ();
+                                     }
+                                 };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -559,14 +561,14 @@ public class Editor : Scenario
         CheckBox checkBox = new () { Title = "Visible", Value = _textView.Visible ? CheckState.Checked : CheckState.UnChecked };
 
         checkBox.ValueChanged += (s, e) =>
-                                        {
-                                            _textView.Visible = checkBox.Value == CheckState.Checked;
+                                 {
+                                     _textView.Visible = checkBox.Value == CheckState.Checked;
 
-                                            if (_textView.Visible)
-                                            {
-                                                _textView.SetFocus ();
-                                            }
-                                        };
+                                     if (_textView.Visible)
+                                     {
+                                         _textView.SetFocus ();
+                                     }
+                                 };
 
         MenuItem item = new () { CommandView = checkBox };
 
@@ -678,7 +680,10 @@ public class Editor : Scenario
 
         if (_textView.ReplaceAllText (_textToFind, _matchCase, _matchWholeWord, _textToReplace))
         {
-            MessageBox.Query (_appWindow!.App!, "Replace All", $"All occurrences were replaced for the following specified text: '{_textToReplace}'", Strings.btnOk);
+            MessageBox.Query (_appWindow!.App!,
+                              "Replace All",
+                              $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
+                              Strings.btnOk);
         }
         else
         {
