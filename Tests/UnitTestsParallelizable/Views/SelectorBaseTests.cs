@@ -599,4 +599,47 @@ public class SelectorBaseTests
     }
 
     #endregion
+
+    #region Tab and Shift+Tab Test
+
+    [Fact]
+    public void Cursor_TabbingOrShiftTabbingMoveFocusToNextOrPreviousViewOutside ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        var runnable = new Runnable ();
+        var view1 = new View { CanFocus = true };
+        var selector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2", "Option3"];
+        selector.Labels = options;
+        var view2 = new View { CanFocus = true };
+        runnable.Add (view1, selector, view2);
+
+        var token = app.Begin (runnable);
+
+        // Set focus to view1
+        view1.SetFocus ();
+
+        // Invoke Tab command to move focus to selector
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
+        Assert.True (selector.HasFocus);
+
+        // Invoke Tab command again to move focus to view2
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
+        Assert.True (view2.HasFocus);
+
+        // Now test Shift+Tab to move focus back to selector
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.True (selector.HasFocus);
+
+        // Finally, Shift+Tab again to move focus back to view1
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.True (view1.HasFocus);
+
+        if (token is { })
+        {
+            app.End (token);
+        }
+    }
+
+    #endregion
 }

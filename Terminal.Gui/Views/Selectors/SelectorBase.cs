@@ -296,6 +296,18 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             MouseHighlightStates = DefaultMouseHighlightStates
         };
 
+        checkbox.KeyDown += (_, e) =>
+                            {
+                                if (e == Key.Tab)
+                                {
+                                    SubViews.OfType<CheckBox> ().Last ().SetFocus ();
+                                }
+                                else if (e == Key.Tab.WithShift)
+                                {
+                                    SubViews.OfType<CheckBox> ().First ().SetFocus ();
+                                }
+                            };
+
         return checkbox;
     }
 
