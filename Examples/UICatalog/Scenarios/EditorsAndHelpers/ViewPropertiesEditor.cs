@@ -12,48 +12,37 @@ public class ViewPropertiesEditor : EditorBase
     /// <inheritdoc/>
     public override void EndInit ()
     {
-        _canFocusCheckBox = new ()
+        _canFocusCheckBox = new CheckBox
         {
             Title = "CanFocus",
             X = 0,
             Y = 0,
-            Value = ViewToEdit is not null ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
+            Value = ViewToEdit is { } ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
         _canFocusCheckBox.ValueChanged += (_, _) =>
-                                                 {
-                                                     if (ViewToEdit is not null)
-                                                     {
-                                                         ViewToEdit.CanFocus = _canFocusCheckBox.Value == CheckState.Checked;
-                                                     }
-                                                 };
-        base.Add (_canFocusCheckBox);
+                                          {
+                                              ViewToEdit?.CanFocus = _canFocusCheckBox.Value == CheckState.Checked;
+                                          };
+        Add (_canFocusCheckBox);
 
-        _enabledCheckBox = new ()
+        _enabledCheckBox = new CheckBox
         {
             Title = "Enabled",
             X = Pos.Right (_canFocusCheckBox) + 1,
             Y = Pos.Top (_canFocusCheckBox),
-            Value = ViewToEdit is not null ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
+            Value = ViewToEdit is { } ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
         _enabledCheckBox.ValueChanged += (_, _) =>
-                                                {
-                                                    if (ViewToEdit is not null)
-                                                    {
-                                                        ViewToEdit.Enabled = _enabledCheckBox.Value == CheckState.Checked;
-                                                    }
-                                                };
-        base.Add (_enabledCheckBox);
+                                         {
+                                             ViewToEdit?.Enabled = _enabledCheckBox.Value == CheckState.Checked;
+                                         };
+        Add (_enabledCheckBox);
 
         Label label = new () { X = Pos.Right (_enabledCheckBox) + 1, Y = Pos.Top (_enabledCheckBox), Text = "Orientation:" };
 
-        _orientationOptionSelector = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Orientation = Orientation.Horizontal
-        };
+        _orientationOptionSelector = new OptionSelector<Orientation> { X = Pos.Right (label) + 1, Y = Pos.Top (label), Orientation = Orientation.Horizontal };
 
         _orientationOptionSelector.ValueChanged += (_, _) =>
                                                    {
@@ -64,9 +53,9 @@ public class ViewPropertiesEditor : EditorBase
                                                    };
         Add (label, _orientationOptionSelector);
 
-        label = new () { X = 0, Y = Pos.Bottom (_orientationOptionSelector), Text = "Text:" };
+        label = new Label { X = 0, Y = Pos.Bottom (_orientationOptionSelector), Text = "Text:" };
 
-        _text = new ()
+        _text = new TextView
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -77,10 +66,7 @@ public class ViewPropertiesEditor : EditorBase
 
         _text.ContentsChanged += (_, _) =>
                                  {
-                                     if (ViewToEdit is not null)
-                                     {
-                                         ViewToEdit.Text = _text.Text;
-                                     }
+                                     ViewToEdit?.Text = _text.Text;
                                  };
 
         Add (label, _text);
@@ -88,30 +74,27 @@ public class ViewPropertiesEditor : EditorBase
         base.EndInit ();
     }
 
-    public string DemoText
-    {
-        get => _text is null ? string.Empty : _text!.Text;
-        set => _text!.Text = value;
-    }
+    public string DemoText { get => _text is null ? string.Empty : _text!.Text; set => _text!.Text = value; }
 
     protected override void OnViewToEditChanged ()
     {
-        Enabled = ViewToEdit is not Adornment;
+        Enabled = ViewToEdit is { } and not Adornment;
 
-        if (ViewToEdit is not null and not Adornment)
+        if (ViewToEdit is null or Adornment)
         {
-            _canFocusCheckBox!.Value = ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked;
-            _enabledCheckBox!.Value = ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked;
+            return;
+        }
+        _canFocusCheckBox!.Value = ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked;
+        _enabledCheckBox!.Value = ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked;
 
-            if (ViewToEdit is IOrientation orientatedView)
-            {
-                _orientationOptionSelector!.Value = orientatedView.Orientation;
-                _orientationOptionSelector.Enabled = true;
-            }
-            else
-            {
-                _orientationOptionSelector!.Enabled = false;
-            }
+        if (ViewToEdit is IOrientation orientatedView)
+        {
+            _orientationOptionSelector!.Value = orientatedView.Orientation;
+            _orientationOptionSelector.Enabled = true;
+        }
+        else
+        {
+            _orientationOptionSelector!.Enabled = false;
         }
     }
 }
