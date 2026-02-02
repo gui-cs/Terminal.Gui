@@ -15,4 +15,3 @@ public enum AddOrSubtract
     /// </summary>
     Subtract = 1
 }
- 

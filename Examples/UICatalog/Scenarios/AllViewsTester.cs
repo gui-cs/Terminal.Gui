@@ -161,22 +161,7 @@ public class AllViewsTester : Scenario
         };
         _eventLog.Border!.Thickness = new Thickness (1);
 
-        _layoutEditor.Width = Dim.Fill (Dim.Func (_ =>
-                                                  {
-                                                      if (_eventLog.NeedsLayout)
-                                                      {
-                                                          // We have two choices:
-                                                          // 1) Call Layout explicitly
-                                                          // 2) Throw LayoutException so Layout tries again
-                                                          // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-                                                          // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                                          _eventLog.Layout ();
-
-                                                          //throw new LayoutException ("_eventLog");
-                                                      }
-
-                                                      return _eventLog.Frame.Width;
-                                                  }));
+        _layoutEditor.Width = Dim.Fill (_eventLog);
 
         _hostPane = new FrameView
         {

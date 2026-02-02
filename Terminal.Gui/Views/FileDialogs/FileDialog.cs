@@ -1406,7 +1406,6 @@ public class FileDialog : Dialog, IDesignable
         }
         _btnTreeToggle.Text = GetTreeToggleText (visible);
 
-        Layout ();
         SetNeedsLayout ();
         SetNeedsDraw ();
     }

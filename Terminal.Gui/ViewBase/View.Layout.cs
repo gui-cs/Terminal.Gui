@@ -961,12 +961,9 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectDim (Dim dim, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        foreach (View target in dim.GetReferencedViews ())
+        foreach (View target in dim.GetReferencedViews ().Where (v => v != this))
         {
-            if (target != this)
-            {
-                nEdges.Add ((target, from));
-            }
+            nEdges.Add ((target, from));
         }
     }
 
@@ -982,12 +979,9 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectPos (Pos pos, View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        foreach (View target in pos.GetReferencedViews ())
+        foreach (View target in pos.GetReferencedViews ().Where (v => v != this))
         {
-            if (target != this)
-            {
-                nEdges.Add ((target, from));
-            }
+            nEdges.Add ((target, from));
         }
     }
 
