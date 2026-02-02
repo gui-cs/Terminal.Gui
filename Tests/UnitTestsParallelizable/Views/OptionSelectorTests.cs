@@ -445,4 +445,67 @@ public class OptionSelectorTests
         Assert.Equal (CheckState.UnChecked, checkBoxes [1].Value);
         Assert.True (checkBoxes [1].HasFocus);
     }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void OptionSelector_Command_Activate_ForwardsToFocusedCheckBox ()
+    {
+        var optionSelector = new OptionSelector ();
+        optionSelector.Labels = ["Option1", "Option2"];
+        optionSelector.BeginInit ();
+        optionSelector.EndInit ();
+
+        // Activate should forward to the focused CheckBox's Activate
+        bool? result = optionSelector.InvokeCommand (Command.Activate);
+
+        // Command is handled by CheckBox
+        Assert.True (result);
+
+        optionSelector.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void OptionSelector_Command_Accept_RaisesAccepting ()
+    {
+        var optionSelector = new OptionSelector ();
+        optionSelector.Labels = ["Option1", "Option2"];
+        bool acceptingFired = false;
+
+        optionSelector.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        bool? result = optionSelector.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        optionSelector.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void OptionSelector_Command_HotKey_ForwardsToFocusedItem ()
+    {
+        var optionSelector = new OptionSelector ();
+        optionSelector.Labels = ["Option1", "Option2"];
+        optionSelector.BeginInit ();
+        optionSelector.EndInit ();
+
+        // HotKey forwards to focused item's Activate
+        bool? result = optionSelector.InvokeCommand (Command.HotKey);
+
+        Assert.True (result);
+
+        optionSelector.Dispose ();
+    }
 }

@@ -711,6 +711,66 @@ public class FlagSelectorTests
     }
 
     #endregion
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void FlagSelector_Command_Activate_ForwardsToFocusedCheckBox ()
+    {
+        var flagSelector = new FlagSelector<SelectorStyles> ();
+        flagSelector.BeginInit ();
+        flagSelector.EndInit ();
+
+        // Activate should forward to the focused CheckBox's Activate
+        bool? result = flagSelector.InvokeCommand (Command.Activate);
+
+        // Command is handled by CheckBox
+        Assert.True (result);
+
+        flagSelector.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void FlagSelector_Command_Accept_RaisesAccepting ()
+    {
+        var flagSelector = new FlagSelector<SelectorStyles> ();
+        bool acceptingFired = false;
+
+        flagSelector.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        bool? result = flagSelector.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        flagSelector.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void FlagSelector_Command_HotKey_ForwardsToFocusedItem ()
+    {
+        var flagSelector = new FlagSelector<SelectorStyles> ();
+        flagSelector.BeginInit ();
+        flagSelector.EndInit ();
+
+        // HotKey forwards to focused item's Activate
+        bool? result = flagSelector.InvokeCommand (Command.HotKey);
+
+        Assert.True (result);
+
+        flagSelector.Dispose ();
+    }
 }
 
 

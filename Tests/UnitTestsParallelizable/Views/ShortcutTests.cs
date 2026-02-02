@@ -492,4 +492,99 @@ public class ShortcutTests
         Assert.Equal (expectedSelect, selected);
     }
 
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    // NOTE: Shortcut has unified handling - all three commands invoke DispatchCommand
+    [Fact]
+    public void Shortcut_AllCommands_InvokeSameDispatchCommand ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        int dispatchCount = 0;
+
+        shortcut.Accepting += (_, e) =>
+        {
+            dispatchCount++;
+            e.Handled = true;
+        };
+
+        shortcut.InvokeCommand (Command.Activate);
+        shortcut.InvokeCommand (Command.Accept);
+        shortcut.InvokeCommand (Command.HotKey);
+
+        // All three should invoke the same DispatchCommand method
+        Assert.Equal (3, dispatchCount);
+
+        shortcut.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Shortcut_Command_Activate_DispatchesCommand ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        bool acceptingFired = false;
+
+        shortcut.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        bool? result = shortcut.InvokeCommand (Command.Activate);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        shortcut.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Shortcut_Command_Accept_SameAsActivate ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        bool acceptingFired = false;
+
+        shortcut.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        bool? result = shortcut.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        shortcut.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Shortcut_Command_HotKey_SameAsActivate ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        bool acceptingFired = false;
+
+        shortcut.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        bool? result = shortcut.InvokeCommand (Command.HotKey);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        shortcut.Dispose ();
+    }
+
 }

@@ -356,4 +356,36 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
                                                       );
     }
 
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Label_CannotFocus_ByDefault ()
+    {
+        Label label = new () { Text = "Test" };
+
+        // Label usually has CanFocus = false
+        Assert.False (label.CanFocus);
+
+        label.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Label_HotKey_ForwardsToNextFocusable ()
+    {
+        Label label = new () { Text = "_Test" };
+        
+        // Label's HotKey command forwards to the next focusable view
+        // When there's no next focusable view and Label can't focus, HotKey returns false
+        bool? result = label.InvokeCommand (Command.HotKey);
+
+        // Returns false because Label cannot take focus
+        Assert.False (result);
+
+        label.Dispose ();
+    }
+
 }

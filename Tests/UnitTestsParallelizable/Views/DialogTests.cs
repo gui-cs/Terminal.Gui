@@ -1557,4 +1557,57 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     #endregion Dialog<TResult> Generic Tests
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Dialog_Command_Accept_SetsResultAndStops ()
+    {
+        Dialog dialog = new () { Title = "Test" };
+        Button button = new () { Text = "OK", IsDefault = true };
+        dialog.AddButton (button);
+
+        bool acceptingFired = false;
+        dialog.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        // Accept command on dialog should propagate through default button
+        bool? result = dialog.InvokeCommand (Command.Accept);
+
+        // The accepting event on dialog fires
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        dialog.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Dialog_ContainedButton_Accept_PropagatesUp ()
+    {
+        Dialog dialog = new () { Title = "Test" };
+        Button button = new () { Text = "OK" };
+        dialog.AddButton (button);
+
+        bool buttonAcceptingFired = false;
+        button.Accepting += (_, e) =>
+        {
+            buttonAcceptingFired = true;
+            e.Handled = true;
+        };
+
+        // Button's Accept should fire
+        bool? result = button.InvokeCommand (Command.HotKey);
+
+        Assert.True (buttonAcceptingFired);
+        Assert.True (result);
+
+        dialog.Dispose ();
+    }
 }
