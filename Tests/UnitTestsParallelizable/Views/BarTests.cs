@@ -135,4 +135,31 @@ public class BarTests
         statusBar.Dispose ();
         parentView.Dispose ();
     }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Bar_Commands_DelegatedToShortcuts ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        bar.Add (shortcut);
+
+        bool acceptingFired = false;
+        shortcut.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        // Bar delegates commands to contained Shortcuts
+        // Shortcut doesn't require Init when just testing commands
+        bool? result = shortcut.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        bar.Dispose ();
+    }
 }

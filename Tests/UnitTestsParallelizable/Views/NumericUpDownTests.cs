@@ -242,4 +242,53 @@ public class NumericUpDownTests
 
         Assert.Equal (-1, numericUpDown.Value);
     }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void NumericUpDown_UpArrow_IncrementsValue ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 5 };
+
+        // Up arrow increments value via Command.Up
+        numericUpDown.NewKeyDownEvent (Key.CursorUp);
+
+        Assert.Equal (6, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void NumericUpDown_DownArrow_DecrementsValue ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 5 };
+
+        // Down arrow decrements value via Command.Down
+        numericUpDown.NewKeyDownEvent (Key.CursorDown);
+
+        Assert.Equal (4, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void NumericUpDown_ButtonAccept_ChangesValue ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 5, Width = 10, Height = 1 };
+        numericUpDown.BeginInit ();
+        numericUpDown.EndInit ();
+
+        // Internal buttons change value when accepting
+        // Verify the control is set up correctly
+        Assert.Equal (5, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
 }

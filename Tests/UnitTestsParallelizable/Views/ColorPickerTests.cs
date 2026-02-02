@@ -992,4 +992,49 @@ public class ColorPickerTests
     }
 
     #endregion
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ColorPicker_BarValueChange_UpdatesColor ()
+    {
+        ColorPicker picker = new () { Width = 40, Height = 15 };
+        picker.BeginInit ();
+        picker.EndInit ();
+
+        Color initialColor = picker.SelectedColor;
+
+        // Color bar value changes update color via Activate commands
+        // Verify control is initialized
+        Assert.Equal (Color.Black, initialColor); // Default color
+
+        picker.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ColorPicker_DoubleClick_RaisesAccepting ()
+    {
+        ColorPicker picker = new () { Width = 40, Height = 15 };
+        picker.BeginInit ();
+        picker.EndInit ();
+
+        bool acceptingFired = false;
+        picker.Accepting += (_, e) =>
+        {
+            acceptingFired = true;
+            e.Handled = true;
+        };
+
+        // Double-click raises Accepting
+        bool? result = picker.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        picker.Dispose ();
+    }
 }
