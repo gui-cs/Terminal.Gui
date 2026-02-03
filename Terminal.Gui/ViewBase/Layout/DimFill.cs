@@ -92,6 +92,9 @@ public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = nul
     internal override bool DependsOnSuperViewContentSize => true;
 
     /// <inheritdoc/>
+    internal override bool CanContributeToAutoSizing => MinimumContentDim is { } || To is { };
+
+    /// <inheritdoc/>
     protected override bool HasInner<TDim> (out TDim dim)
     {
         if (Margin.Has (out dim))

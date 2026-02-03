@@ -32,4 +32,7 @@ public record DimPercent (int Percentage, DimPercentMode Mode = DimPercentMode.C
 
     /// <inheritdoc/>
     internal override bool DependsOnSuperViewContentSize => true;
+
+    /// <inheritdoc/>
+    internal override bool CanContributeToAutoSizing => false;
 }

@@ -446,6 +446,26 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </returns>
     internal virtual bool DependsOnSuperViewContentSize => false;
 
+    /// <summary>
+    ///     Indicates whether this Dim can contribute to auto-sizing calculations.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to determine if a Dim should be considered
+    ///         when calculating the minimum content size of a SuperView.
+    ///     </para>
+    ///     <para>
+    ///         Types that cannot contribute include <see cref="DimPercent"/> (would be 0 without existing content)
+    ///         and <see cref="DimFill"/> without <see cref="DimFill.MinimumContentDim"/> or <see cref="DimFill.To"/>
+    ///         (would be 0 without content to fill against).
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim can contribute to determining the SuperView's auto-size;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool CanContributeToAutoSizing => true;
+
     #endregion virtual methods
 
     #region operators

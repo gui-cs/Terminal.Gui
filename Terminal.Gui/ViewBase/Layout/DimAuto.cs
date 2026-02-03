@@ -418,22 +418,26 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 #region DimFill
 
-                // DimFill subviews don't contribute to auto-sizing UNLESS they have MinimumContentDim or To set
-                List<View> dimFillSubViews;
+                // DimFill subviews contribute to auto-sizing only if they have MinimumContentDim or To set
+                List<View> contributingDimFillSubViews;
 
                 if (dimension == Dimension.Width)
                 {
-                    dimFillSubViews = us.InternalSubViews.Where (v => v.Width.Has<DimFill> (out _)).ToList ();
+                    contributingDimFillSubViews = us.InternalSubViews
+                                                    .Where (v => v.Width.Has<DimFill> (out _) && v.Width.CanContributeToAutoSizing)
+                                                    .ToList ();
                 }
                 else
                 {
-                    dimFillSubViews = us.InternalSubViews.Where (v => v.Height.Has<DimFill> (out _)).ToList ();
+                    contributingDimFillSubViews = us.InternalSubViews
+                                                    .Where (v => v.Height.Has<DimFill> (out _) && v.Height.CanContributeToAutoSizing)
+                                                    .ToList ();
                 }
 
                 // Process DimFill views with MinimumContentDim or To
-                for (var i = 0; i < dimFillSubViews.Count; i++)
+                for (var i = 0; i < contributingDimFillSubViews.Count; i++)
                 {
-                    View dimFillSubView = dimFillSubViews [i];
+                    View dimFillSubView = contributingDimFillSubViews [i];
                     DimFill? dimFill = dimension == Dimension.Width ? dimFillSubView.Width as DimFill : dimFillSubView.Height as DimFill;
 
                     if (dimFill?.MinimumContentDim is { })
