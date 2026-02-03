@@ -49,6 +49,52 @@ flowchart TD
 | **Current Limitation** | No generic propagation mechanism for hierarchical views | Relies on view-specific logic (e.g., `SuperMenuItem`) instead of generic propagation |
 | **Proposed Enhancement** | [#4473](https://github.com/gui-cs/Terminal.Gui/issues/4473) | Standardize propagation via subscription model instead of special properties |
 
+## View Command Behaviors
+
+The following table documents how each View subclass handles the `Activate`, `Accept`, and `HotKey` commands. This provides a reference for understanding what user actions trigger each command/event in specific views.
+
+| View | Activate (Space/Click) | Accept (Enter/Double-Click) | HotKey (Alt+Key) |
+|------|------------------------|----------------------------|------------------|
+| **Button** | RaiseActivating → SetFocus → RaiseAccepting | Same as Activate (via HotKey handler) | SetFocus + RaiseActivating + RaiseAccepting |
+| **CheckBox** | Toggles `CheckState`, raises `Activating` | Confirms current state (no toggle), raises `Accepting` | Invokes Activate (toggles state + SetFocus) |
+| **ComboBox** | Opens/closes dropdown | Selects highlighted item | Opens dropdown + SetFocus |
+| **ListView** | Changes selection (arrow keys) | Fires `RowActivated` event | SetFocus |
+| **TableView** | Space toggles cell selection | Enter fires `CellActivated` event | SetFocus |
+| **TreeView** | Same as Accept | Activates selected node (expand/collapse or raise `Accepting`) | SetFocus |
+| **TextField** | Click positions cursor | Raises `Accepting` (submit) | SetFocus |
+| **TextView** | Click positions cursor | Not typical (multiline input) | SetFocus |
+| **OptionSelector** | Forwards to focused CheckBox's Activate (changes selection) | Raises `Accepting` | Forwards to focused item's Activate |
+| **FlagSelector** | Forwards to focused CheckBox's Activate (toggles flag) | Raises `Accepting` | Forwards to focused item's Activate |
+| **Menu** | Focuses `MenuItem` (arrow keys, mouse enter) | Executes command or opens submenu | Activates item with matching hotkey |
+| **MenuBar** | Focuses `MenuBarItem` | Shows `PopoverMenu` or executes command | Activates item with matching hotkey |
+| **MenuItem** | Sets focus, raises `SelectedMenuItemChanged` | Executes `Action` or opens submenu | Invokes Accept |
+| **Shortcut** | DispatchCommand: Invoke CommandView.Activate → RaiseActivating → SetFocus → RaiseAccepting | Same as Activate | Same as Activate |
+| **Dialog** | Handled by contained views | Button press → sets `Result`, calls `RequestStop` | Handled by contained buttons |
+| **Wizard** | Handled by contained views | Next/Finish button advances step or completes | Handled by contained buttons |
+| **FileDialog** | TableView cell selection | Accepts selected file/folder or navigates | Handled by internal views |
+| **TabView** | Not explicitly handled | Not explicitly handled | SetFocus |
+| **ScrollBar** | Click on track jumps scroll position | Not typical | Not typical |
+| **HexView** | Click positions cursor; double-click toggles hex/text side | Not typical (editing view) | Not typical |
+| **NumericUpDown** | Not explicitly handled | Via internal button Accepting | Not typical |
+| **DatePicker** | Calendar cell selection changes date | Via internal button/field interactions | Handled by internal views |
+| **ColorPicker** | Color bar value changes | Double-click raises `Accepting` | Handled by internal views |
+| **ProgressBar** | N/A (`CanFocus = false`) | N/A | N/A |
+| **SpinnerView** | N/A (display only) | N/A | N/A |
+| **Bar** | Handled by contained Shortcuts | Handled by contained Shortcuts | Handled by contained Shortcuts |
+| **Label** | Not typical (usually `CanFocus = false`) | Not typical | Forwards HotKey to next focusable view |
+
+### Notes on Command Behaviors
+
+1. **Composite Views** (Dialog, Wizard, FileDialog, DatePicker, ColorPicker, Bar): These views delegate command handling to their SubViews. The parent view may intercept `Accepting` to coordinate actions (e.g., Dialog setting `Result`).
+
+2. **Display-Only Views** (ProgressBar, SpinnerView, Label): These views typically have `CanFocus = false` and do not handle commands directly.
+
+3. **TreeView Special Case**: Both `Activate` and `Accept` invoke the same handler (`ActivateSelectedObjectIfAny`), which calls `RaiseAccepting`.
+
+4. **Shortcut Unified Handling**: All three commands (`Activate`, `Accept`, `HotKey`) invoke the same `DispatchCommand` method, providing consistent behavior.
+
+5. **Selector Views** (OptionSelector, FlagSelector): These forward HotKey commands to the focused CheckBox's `Activate` command, enabling keyboard-driven selection changes.
+
 ### Key Takeaways
 
 1. **`Activate` = Interaction/Selection** (immediate, local)
