@@ -54,7 +54,7 @@ Added `GetReferencedViews()` virtual method to `Dim` and `Pos` base classes to d
 
 ## Proposed Future Refactoring
 
-### Phase 2: `DependsOnSuperViewContentSize`
+### Phase 2: `DependsOnSuperViewContentSize` (✅ Done)
 
 Add a virtual method to indicate whether a `Pos`/`Dim` depends on the SuperView's content size.
 
@@ -78,7 +78,7 @@ if (v.Width is DimPercent || v.Width is DimFill) { ... }
 if (v.Width.DependsOnSuperViewContentSize) { ... }
 ```
 
-### Phase 3: `CanContributeToAutoSizing`
+### Phase 3: `CanContributeToAutoSizing` (✅ Done)
 
 Add a method to indicate whether a `Dim` can contribute to auto-sizing calculations.
 
@@ -89,7 +89,7 @@ internal virtual bool CanContributeToAutoSizing => true;
 // DimPercent => false (without other content, would be 0)
 ```
 
-### Phase 4: `GetMinimumContribution()`
+### Phase 4: `GetMinimumContribution()` (✅ Done)
 
 Move the auto-sizing contribution calculation into each `Dim` type:
 
@@ -108,7 +108,7 @@ internal override int GetMinimumContribution(...)
 }
 ```
 
-### Phase 5: Categorization Methods
+### Phase 5: Categorization Methods 
 
 Add methods for the different categories used in `DimAuto`:
 
@@ -132,10 +132,10 @@ internal virtual bool RequiresTargetLayout => false;
 ## Implementation Order
 
 1. ✅ `GetReferencedViews()` - Foundation for view dependencies
-2. 🔲 `ReferencesOtherViews()` simplification - Use `GetReferencedViews().Any()` as default
-3. 🔲 `DependsOnSuperViewContentSize` - Reduce type checking in `DimAuto`
-4. 🔲 `CanContributeToAutoSizing` - Simplify auto-sizing logic
-5. 🔲 `GetMinimumContribution()` - Move calculation logic into types
+2. ✅ `ReferencesOtherViews()` simplification - Use `GetReferencedViews().Any()` as default
+3. ✅ `DependsOnSuperViewContentSize` - Reduce type checking in `DimAuto`
+4. ✅ `CanContributeToAutoSizing` - Simplify auto-sizing logic
+5. ✅ `GetMinimumContribution()` - Move calculation logic into types
 6. 🔲 `IsFixed` / `RequiresTargetLayout` - Final decoupling
 
 ## Testing Strategy
