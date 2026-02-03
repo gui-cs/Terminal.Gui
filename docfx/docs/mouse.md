@@ -627,14 +627,32 @@ This ensures consistent mouse behavior across platforms while maintaining platfo
 
 Terminal.Gui provides sophisticated input injection for testing without hardware:
 
-### Quick Test Example
+### Quick Test Example (Using Helper Methods)
+
+**Recommended approach** - Use helper methods for cleaner test code:
+
+```csharp
+using IApplication app = Application.Create();
+app.Init(DriverRegistry.Names.ANSI);
+
+// Inject a left click - simple and clear
+app.InjectSequence(InputInjectionExtensions.LeftButtonClick(new Point(10, 5)));
+
+// Inject a right click
+app.InjectSequence(InputInjectionExtensions.RightButtonClick(new Point(10, 5)));
+
+// Inject a double-click
+app.InjectSequence(InputInjectionExtensions.LeftButtonDoubleClick(new Point(10, 5)));
+```
+
+**Alternative approach** - Manual event creation for advanced scenarios:
 
 ```csharp
 VirtualTimeProvider time = new();
 using IApplication app = Application.Create(time);
 app.Init(DriverRegistry.Names.ANSI);
 
-// Inject click
+// Inject click manually
 app.InjectMouse(new() { 
     ScreenPosition = new(10, 5), 
     Flags = MouseFlags.LeftButtonPressed 
@@ -646,6 +664,18 @@ app.InjectMouse(new() {
 ```
 
 ### Testing Double-Click with Virtual Time
+
+**Using helper method** (recommended):
+
+```csharp
+using IApplication app = Application.Create();
+app.Init(DriverRegistry.Names.ANSI);
+
+// One line for a complete double-click
+app.InjectSequence(InputInjectionExtensions.LeftButtonDoubleClick(new Point(10, 5)));
+```
+
+**Manual approach** (for custom timing control):
 
 ```csharp
 VirtualTimeProvider time = new();
@@ -682,9 +712,24 @@ app.InjectMouse(new() {
 // Double-click detected!
 ```
 
+### Mouse Click Helper Methods
+
+Terminal.Gui provides three helper methods in `InputInjectionExtensions` to simplify common mouse click patterns:
+
+- **`LeftButtonClick(Point p)`** - Single left click (Press + Release)
+- **`RightButtonClick(Point p)`** - Single right click (Press + Release)
+- **`LeftButtonDoubleClick(Point p)`** - Double left click (two complete click sequences)
+
+**Benefits:**
+- Reduces boilerplate from 2-4 lines to 1 line
+- Built-in appropriate delays for reliable click detection
+- Clearer test intent
+- Fewer errors from mismatched Press/Release pairs
+
 ### Key Testing Features
 
 - **Virtual Time Control** - Deterministic multi-click timing
+- **Helper Methods** - `InputInjectionExtensions.LeftButtonClick()`, etc. for simplified injection
 - **Single-Call Injection** - `app.InjectMouse(mouse)` handles everything
 - **No Real Delays** - Tests run instantly with virtual time
 - **Two Modes** - Direct (fast) and Pipeline (full ANSI encoding)
