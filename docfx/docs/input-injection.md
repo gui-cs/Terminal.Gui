@@ -30,6 +30,8 @@ app.InjectKey(Key.Esc);
 
 ### Basic Mouse Input
 
+**Recommended: Use helper methods for common click patterns**
+
 ```csharp
 using IApplication app = Application.Create();
 app.Init(DriverRegistry.Names.ANSI);
@@ -37,7 +39,20 @@ app.Init(DriverRegistry.Names.ANSI);
 // Subscribe to mouse events
 app.Mouse.MouseEvent += (s, e) => Console.WriteLine($"Mouse: {e.Flags} at {e.ScreenPosition}");
 
-// Inject mouse click
+// Inject a left click using the helper method
+app.InjectSequence(InputInjectionExtensions.LeftButtonClick(new Point(10, 5)));
+
+// Inject a right click
+app.InjectSequence(InputInjectionExtensions.RightButtonClick(new Point(10, 5)));
+
+// Inject a double-click
+app.InjectSequence(InputInjectionExtensions.LeftButtonDoubleClick(new Point(10, 5)));
+```
+
+**Alternative: Manual event creation (for advanced scenarios)**
+
+```csharp
+// Inject mouse click manually (two separate events)
 app.InjectMouse(new() { 
     ScreenPosition = new(10, 5), 
     Flags = MouseFlags.LeftButtonPressed 
@@ -92,6 +107,72 @@ app.InjectMouse(new() {
 });
 
 // Double-click was detected!
+```
+
+### Mouse Click Helper Methods
+
+For simplified mouse click injection, use the `InputInjectionExtensions` helper methods. These encapsulate common click patterns and reduce boilerplate code.
+
+#### Available Helpers
+
+**`LeftButtonClick(Point p)`** - Single left mouse click
+```csharp
+app.InjectSequence(InputInjectionExtensions.LeftButtonClick(new Point(10, 5)));
+```
+
+**`RightButtonClick(Point p)`** - Single right mouse click
+```csharp
+app.InjectSequence(InputInjectionExtensions.RightButtonClick(new Point(10, 5)));
+```
+
+**`LeftButtonDoubleClick(Point p)`** - Double-click
+```csharp
+app.InjectSequence(InputInjectionExtensions.LeftButtonDoubleClick(new Point(10, 5)));
+```
+
+#### Benefits
+
+- **Less code** - One line instead of multiple `InjectMouse` calls
+- **Built-in timing** - Appropriate delays for reliable click detection
+- **Fewer errors** - No need to manually match Press/Release pairs
+- **Clearer intent** - Code explicitly shows what user action is being simulated
+
+#### Before and After Comparison
+
+**Before (manual):**
+```csharp
+// Double-click requires 4 separate events
+app.InjectMouse(new() { ScreenPosition = new(10, 5), Flags = MouseFlags.LeftButtonPressed });
+app.InjectMouse(new() { ScreenPosition = new(10, 5), Flags = MouseFlags.LeftButtonReleased });
+app.InjectMouse(new() { ScreenPosition = new(10, 5), Flags = MouseFlags.LeftButtonPressed });
+app.InjectMouse(new() { ScreenPosition = new(10, 5), Flags = MouseFlags.LeftButtonReleased });
+```
+
+**After (helper):**
+```csharp
+// Same behavior, one line
+app.InjectSequence(InputInjectionExtensions.LeftButtonDoubleClick(new Point(10, 5)));
+```
+
+#### Example: Testing Button Click
+
+```csharp
+using IApplication app = Application.Create();
+app.Init(DriverRegistry.Names.ANSI);
+
+using Runnable runnable = new();
+app.Begin(runnable);
+
+Button button = new() { Text = "Click Me" };
+runnable.Add(button);
+
+var acceptingCalled = false;
+button.Accepting += (s, e) => acceptingCalled = true;
+
+// Use helper to inject click
+app.InjectSequence(InputInjectionExtensions.LeftButtonClick(new Point(0, 0)));
+
+Assert.True(acceptingCalled);
 ```
 
 ## When to Use Each Mode
