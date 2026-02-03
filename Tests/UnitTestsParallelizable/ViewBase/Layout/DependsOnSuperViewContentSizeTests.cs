@@ -154,17 +154,17 @@ public class DependsOnSuperViewContentSizeTests
     }
 
     [Fact]
-    public void PosCenter_DependsOnSuperViewContentSize ()
+    public void PosCenter_DoesNotDependOnSuperViewContentSize ()
     {
         Pos pos = Pos.Center ();
-        Assert.True (pos.DependsOnSuperViewContentSize);
+        Assert.False (pos.DependsOnSuperViewContentSize);
     }
 
     [Fact]
-    public void PosPercent_DependsOnSuperViewContentSize ()
+    public void PosPercent_DoesNotDependOnSuperViewContentSize ()
     {
         Pos pos = Pos.Percent (50);
-        Assert.True (pos.DependsOnSuperViewContentSize);
+        Assert.False (pos.DependsOnSuperViewContentSize);
     }
 
     [Fact]
@@ -192,40 +192,48 @@ public class DependsOnSuperViewContentSizeTests
     public void PosCombine_DependsIfEitherChildDepends ()
     {
         // Both depend
-        Pos pos1 = Pos.Center () + Pos.Percent (10);
+        Pos pos1 = Pos.AnchorEnd () + Pos.Align (Alignment.Center);
         Assert.True (pos1.DependsOnSuperViewContentSize);
 
         // Left depends
-        Pos pos2 = Pos.Center () + Pos.Absolute (10);
+        Pos pos2 = Pos.AnchorEnd () + Pos.Absolute (10);
         Assert.True (pos2.DependsOnSuperViewContentSize);
 
         // Right depends
-        Pos pos3 = Pos.Absolute (10) + Pos.Percent (50);
+        Pos pos3 = Pos.Absolute (10) + Pos.Align (Alignment.End);
         Assert.True (pos3.DependsOnSuperViewContentSize);
 
-        // Neither depends
-        Pos pos4 = Pos.Absolute (10) + Pos.Absolute (5);
+        // Neither depends (Center and Percent don't depend)
+        Pos pos4 = Pos.Center () + Pos.Percent (10);
         Assert.False (pos4.DependsOnSuperViewContentSize);
+        
+        // Neither depends (absolute values)
+        Pos pos5 = Pos.Absolute (10) + Pos.Absolute (5);
+        Assert.False (pos5.DependsOnSuperViewContentSize);
     }
 
     [Fact]
     public void PosCombine_Subtraction_DependsIfEitherChildDepends ()
     {
         // Both depend
-        Pos pos1 = Pos.AnchorEnd () - Pos.Percent (10);
+        Pos pos1 = Pos.AnchorEnd () - Pos.Align (Alignment.Center);
         Assert.True (pos1.DependsOnSuperViewContentSize);
 
         // Left depends
-        Pos pos2 = Pos.Center () - Pos.Absolute (10);
+        Pos pos2 = Pos.AnchorEnd () - Pos.Absolute (10);
         Assert.True (pos2.DependsOnSuperViewContentSize);
 
-        // Right depends (unusual but possible)
-        Pos pos3 = Pos.Absolute (100) - Pos.Percent (10);
+        // Right depends
+        Pos pos3 = Pos.Absolute (100) - Pos.AnchorEnd ();
         Assert.True (pos3.DependsOnSuperViewContentSize);
 
-        // Neither depends
-        Pos pos4 = Pos.Absolute (100) - Pos.Absolute (10);
+        // Neither depends (Center and Percent don't depend)
+        Pos pos4 = Pos.Percent (100) - Pos.Center ();
         Assert.False (pos4.DependsOnSuperViewContentSize);
+
+        // Neither depends (absolute values)
+        Pos pos5 = Pos.Absolute (100) - Pos.Absolute (10);
+        Assert.False (pos5.DependsOnSuperViewContentSize);
     }
 
     #endregion

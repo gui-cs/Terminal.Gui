@@ -403,11 +403,18 @@ public abstract record Pos
     ///         without needing to perform type checking.
     ///     </para>
     ///     <para>
-    ///         Types that depend on SuperView content size include <see cref="PosCenter"/> and <see cref="PosPercent"/>.
+    ///         Types that depend on and actively contribute to SuperView content size determination include 
+    ///         <see cref="PosAnchorEnd"/> and <see cref="PosAlign"/>. These types require special handling during
+    ///         auto-sizing because they affect the minimum content size needed.
+    ///     </para>
+    ///     <para>
+    ///         Types like <see cref="PosCenter"/> and <see cref="PosPercent"/> also use the SuperView's content size
+    ///         for positioning, but they do NOT actively contribute to determining that size, so this property
+    ///         returns <see langword="false"/> for them.
     ///     </para>
     /// </remarks>
     /// <returns>
-    ///     <see langword="true"/> if this Pos's calculation depends on the SuperView's content size;
+    ///     <see langword="true"/> if this Pos actively contributes to determining the SuperView's content size;
     ///     otherwise, <see langword="false"/>.
     /// </returns>
     internal virtual bool DependsOnSuperViewContentSize => false;

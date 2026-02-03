@@ -150,11 +150,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                            .Where (v =>
                                                        (v.X is PosAbsolute or PosFunc
                                                         || v.Width is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
-                                                       && !v.X.Has<PosAnchorEnd> (out _)
-                                                       && !v.X.Has<PosAlign> (out _)
-                                                       && !v.X.Has<PosCenter> (out _)
-                                                       && !v.Width.Has<DimFill> (out _)
-                                                       && !v.Width.Has<DimPercent> (out _))
+                                                       && !v.X.DependsOnSuperViewContentSize
+                                                       && !v.Width.DependsOnSuperViewContentSize)
                                            .ToList ();
                 }
                 else
@@ -163,11 +160,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                            .Where (v =>
                                                        (v.Y is PosAbsolute or PosFunc
                                                         || v.Height is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
-                                                       && !v.Y.Has<PosAnchorEnd> (out _)
-                                                       && !v.Y.Has<PosAlign> (out _)
-                                                       && !v.Y.Has<PosCenter> (out _)
-                                                       && !v.Height.Has<DimFill> (out _)
-                                                       && !v.Height.Has<DimPercent> (out _))
+                                                       && !v.Y.DependsOnSuperViewContentSize
+                                                       && !v.Height.DependsOnSuperViewContentSize)
                                            .ToList ();
                 }
 

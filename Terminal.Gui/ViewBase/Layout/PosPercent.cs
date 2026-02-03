@@ -21,7 +21,4 @@ public record PosPercent (int Percent) : Pos
     public override string ToString () => $"Percent({Percent})";
 
     internal override int GetAnchor (int size) => (int)(size * (Percent / 100f));
-
-    /// <inheritdoc/>
-    internal override bool DependsOnSuperViewContentSize => true;
 }
