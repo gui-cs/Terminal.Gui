@@ -395,6 +395,24 @@ public abstract record Pos
     }
 
     /// <summary>
+    ///     Indicates whether this Pos depends on the SuperView's content size for its calculation.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to categorize subviews during auto-sizing calculations
+    ///         without needing to perform type checking.
+    ///     </para>
+    ///     <para>
+    ///         Types that depend on SuperView content size include <see cref="PosCenter"/> and <see cref="PosPercent"/>.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos's calculation depends on the SuperView's content size;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool DependsOnSuperViewContentSize => false;
+
+    /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.
     /// </summary>
     /// <param name="pos">

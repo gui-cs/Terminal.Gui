@@ -427,6 +427,25 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
         yield break;
     }
 
+    /// <summary>
+    ///     Indicates whether this Dim depends on the SuperView's content size for its calculation.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to categorize subviews during auto-sizing calculations
+    ///         without needing to perform type checking.
+    ///     </para>
+    ///     <para>
+    ///         Types that depend on SuperView content size include <see cref="DimPercent"/> and <see cref="DimFill"/>
+    ///         (unless it has a <see cref="DimFill.MinimumContentDim"/> without a <see cref="DimFill.To"/>).
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim's calculation depends on the SuperView's content size;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool DependsOnSuperViewContentSize => false;
+
     #endregion virtual methods
 
     #region operators

@@ -17,4 +17,7 @@ public record PosCenter : Pos
 
         return (superviewDimension - newDimension) / 2;
     }
+
+    /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => true;
 }

@@ -90,5 +90,8 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
     }
 
     /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => Left.DependsOnSuperViewContentSize || Right.DependsOnSuperViewContentSize;
+
+    /// <inheritdoc/>
     protected override bool HasInner<TDim> (out TDim dim) => Left.Has (out dim) || Right.Has (out dim);
 }
