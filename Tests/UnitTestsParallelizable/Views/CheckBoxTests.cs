@@ -1,11 +1,220 @@
-#nullable enable
-
-using System.Collections.ObjectModel;
-
 namespace ViewsTests;
 
-public class CheckBoxTests ()
+public class CheckBoxTests
 {
+    [Fact]
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
+    {
+        var ckb = new CheckBox ();
+        var acceptInvoked = false;
+
+        ckb.Accepting += ViewOnAccept;
+
+        bool? ret = ckb.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        return;
+
+        void ViewOnAccept (object? sender, CommandEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Handled = true;
+        }
+    }
+
+    [Fact]
+    public void AllowCheckStateNone_Get_Set ()
+    {
+        var checkBox = new CheckBox { Text = "Check this out 你" };
+
+        checkBox.HasFocus = true;
+        Assert.True (checkBox.HasFocus);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        // Select with keyboard
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+
+        // Select with mouse
+        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed }));
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        checkBox.AllowCheckStateNone = true;
+        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
+        Assert.Equal (CheckState.None, checkBox.Value);
+
+        checkBox.AllowCheckStateNone = false;
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0)]
+    [InlineData (1, 0, 1, 0)]
+    [InlineData (0, 1, 0, 1)]
+    [InlineData (1, 1, 1, 1)]
+    [InlineData (10, 1, 10, 1)]
+    [InlineData (10, 3, 10, 3)]
+    public void CheckBox_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    {
+        var checkBox = new CheckBox { X = 0, Y = 0, Width = width, Height = height };
+
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
+
+        checkBox.Dispose ();
+    }
+
+    [Theory]
+    [InlineData ("01234", 0, 0, 0, 0)]
+    [InlineData ("01234", 1, 0, 1, 0)]
+    [InlineData ("01234", 0, 1, 0, 1)]
+    [InlineData ("01234", 1, 1, 1, 1)]
+    [InlineData ("01234", 10, 1, 10, 1)]
+    [InlineData ("01234", 10, 3, 10, 3)]
+    [InlineData ("0_1234", 0, 0, 0, 0)]
+    [InlineData ("0_1234", 1, 0, 1, 0)]
+    [InlineData ("0_1234", 0, 1, 0, 1)]
+    [InlineData ("0_1234", 1, 1, 1, 1)]
+    [InlineData ("0_1234", 10, 1, 10, 1)]
+    [InlineData ("0_12你", 10, 3, 10, 3)]
+    [InlineData ("0_12你", 0, 0, 0, 0)]
+    [InlineData ("0_12你", 1, 0, 1, 0)]
+    [InlineData ("0_12你", 0, 1, 0, 1)]
+    [InlineData ("0_12你", 1, 1, 1, 1)]
+    [InlineData ("0_12你", 10, 1, 10, 1)]
+    public void CheckBox_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
+    {
+        var checkBox = new CheckBox
+        {
+            X = 0,
+            Y = 0,
+            Width = width,
+            Height = height,
+            Text = text
+        };
+        checkBox.Layout ();
+
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Command_Accept_ConfirmsStateWithoutToggle ()
+    {
+        CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
+        CheckState initialState = checkBox.Value;
+        var acceptingFired = false;
+
+        checkBox.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true; // Signal that the Accept was processed
+                              };
+
+        bool? result = checkBox.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.Equal (initialState, checkBox.Value); // State unchanged
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Command_Activate_TogglesState ()
+    {
+        CheckBox checkBox = new () { Text = "Test" };
+        CheckState initialState = checkBox.Value;
+        var activatingFired = false;
+
+        checkBox.Activating += (_, _) => activatingFired = true;
+
+        bool? result = checkBox.InvokeCommand (Command.Activate);
+
+        Assert.True (activatingFired);
+        Assert.NotEqual (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Command_HotKey_InvokesActivate ()
+    {
+        CheckBox checkBox = new () { Text = "_Test" };
+        CheckState initialState = checkBox.Value;
+        var activatingFired = false;
+
+        checkBox.Activating += (_, _) => activatingFired = true;
+
+        bool? result = checkBox.InvokeCommand (Command.HotKey);
+
+        // HotKey invokes Activate (toggles state + SetFocus)
+        Assert.True (activatingFired);
+        Assert.NotEqual (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Enter_ConfirmsWithoutToggle ()
+    {
+        CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
+        CheckState initialState = checkBox.Value;
+        var acceptingFired = false;
+
+        checkBox.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true;
+                              };
+
+        // Enter should confirm without toggling via Accept command
+        bool? result = checkBox.NewKeyDownEvent (Key.Enter);
+
+        Assert.True (acceptingFired);
+        Assert.Equal (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void CheckBox_Space_TogglesState ()
+    {
+        CheckBox checkBox = new () { Text = "Test" };
+        CheckState initialState = checkBox.Value;
+
+        // Space should trigger state toggle via Activate command
+        bool? result = checkBox.NewKeyDownEvent (Key.Space);
+
+        Assert.NotEqual (initialState, checkBox.Value);
+        Assert.True (result);
+
+        checkBox.Dispose ();
+    }
+
     [Fact]
     public void Commands_Select ()
     {
@@ -60,92 +269,6 @@ public class CheckBoxTests ()
         Assert.Equal (1, acceptCount);
     }
 
-    [Theory]
-    [InlineData ("01234", 0, 0, 0, 0)]
-    [InlineData ("01234", 1, 0, 1, 0)]
-    [InlineData ("01234", 0, 1, 0, 1)]
-    [InlineData ("01234", 1, 1, 1, 1)]
-    [InlineData ("01234", 10, 1, 10, 1)]
-    [InlineData ("01234", 10, 3, 10, 3)]
-    [InlineData ("0_1234", 0, 0, 0, 0)]
-    [InlineData ("0_1234", 1, 0, 1, 0)]
-    [InlineData ("0_1234", 0, 1, 0, 1)]
-    [InlineData ("0_1234", 1, 1, 1, 1)]
-    [InlineData ("0_1234", 10, 1, 10, 1)]
-    [InlineData ("0_12你", 10, 3, 10, 3)]
-    [InlineData ("0_12你", 0, 0, 0, 0)]
-    [InlineData ("0_12你", 1, 0, 1, 0)]
-    [InlineData ("0_12你", 0, 1, 0, 1)]
-    [InlineData ("0_12你", 1, 1, 1, 1)]
-    [InlineData ("0_12你", 10, 1, 10, 1)]
-    public void CheckBox_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
-    {
-        var checkBox = new CheckBox
-        {
-            X = 0,
-            Y = 0,
-            Width = width,
-            Height = height,
-            Text = text
-        };
-        checkBox.Layout ();
-
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
-
-        checkBox.Dispose ();
-    }
-
-    [Theory]
-    [InlineData (0, 0, 0, 0)]
-    [InlineData (1, 0, 1, 0)]
-    [InlineData (0, 1, 0, 1)]
-    [InlineData (1, 1, 1, 1)]
-    [InlineData (10, 1, 10, 1)]
-    [InlineData (10, 3, 10, 3)]
-    public void CheckBox_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
-    {
-        var checkBox = new CheckBox
-        {
-            X = 0,
-            Y = 0,
-            Width = width,
-            Height = height
-        };
-
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
-
-        checkBox.Dispose ();
-    }
-
-    // Test that Title and Text are the same
-    [Fact]
-    public void Text_Mirrors_Title ()
-    {
-        var view = new CheckBox ();
-        view.Title = "Hello";
-        Assert.Equal ("Hello", view.Title);
-        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
-
-        Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
-    }
-
-    [Fact]
-    public void Title_Mirrors_Text ()
-    {
-        var view = new CheckBox ();
-        view.Text = "Hello";
-        Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
-
-        Assert.Equal ("Hello", view.Title);
-        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
-    }
-
     [Fact]
     public void Constructors_Defaults ()
     {
@@ -192,52 +315,6 @@ public class CheckBoxTests ()
         Assert.Equal ($"{Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
         Assert.Equal (new (3, 4, 6, 1), ckb.Frame);
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
-    {
-        var ckb = new CheckBox ();
-        var acceptInvoked = false;
-
-        ckb.Accepting += ViewOnAccept;
-
-        bool? ret = ckb.InvokeCommand (Command.Accept);
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
-
-        return;
-
-        void ViewOnAccept (object? sender, CommandEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Handled = true;
-        }
-    }
-
-    [Fact]
-    public void AllowCheckStateNone_Get_Set ()
-    {
-        var checkBox = new CheckBox { Text = "Check this out 你" };
-
-        checkBox.HasFocus = true;
-        Assert.True (checkBox.HasFocus);
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
-
-        // Select with keyboard
-        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
-        Assert.Equal (CheckState.Checked, checkBox.Value);
-
-        // Select with mouse
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed }));
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
-
-        checkBox.AllowCheckStateNone = true;
-        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
-        Assert.Equal (CheckState.None, checkBox.Value);
-
-        checkBox.AllowCheckStateNone = false;
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
     [Fact]
@@ -315,5 +392,30 @@ public class CheckBoxTests ()
         Assert.Equal (0, checkedStateChangingCount);
         Assert.Equal (0, selectCount);
         Assert.Equal (1, acceptCount);
+    }
+
+    // Test that Title and Text are the same
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var view = new CheckBox ();
+        view.Title = "Hello";
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var view = new CheckBox ();
+        view.Text = "Hello";
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
     }
 }
