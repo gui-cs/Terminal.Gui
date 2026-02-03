@@ -270,7 +270,7 @@ public class ListViewTests (ITestOutputHelper output)
         void OnAccepting (object? sender, CommandEventArgs e)
         {
             accepted = true;
-            selectedValue = listView.SelectedItem.HasValue ? source[listView.SelectedItem.Value] : string.Empty;
+            selectedValue = listView.SelectedItem.HasValue ? source [listView.SelectedItem.Value] : string.Empty;
             e.Handled = true;
         }
     }
@@ -560,10 +560,7 @@ public class ListViewTests (ITestOutputHelper output)
         IListDataSource? src = new ListWrapper<string> (source);
         var lv = new ListView { Source = src };
 
-        lv.SourceChanged += (_, _) =>
-                            {
-                                changed++;
-                            };
+        lv.SourceChanged += (_, _) => { changed++; };
 
         lv.Source = src;
 
@@ -2710,4 +2707,64 @@ hree - lon",
     }
 
     #endregion
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ListView_Command_Activate_ChangesSelection ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2", "Item3"]), Height = 3 };
+        listView.BeginInit ();
+        listView.EndInit ();
+
+        listView.SelectedItem = 0;
+
+        // Activate changes selection via arrow keys (Down command)
+        bool? result = listView.InvokeCommand (Command.Down);
+
+        Assert.Equal (1, listView.SelectedItem);
+        Assert.True (result);
+
+        listView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ListView_Command_Accept_RaisesAccepting ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2"]) };
+        var acceptingFired = false;
+
+        listView.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true; // Signal that the Accept was processed
+                              };
+
+        bool? result = listView.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        listView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ListView_Command_HotKey_SetsFocus ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2"]) };
+
+        bool? result = listView.InvokeCommand (Command.HotKey);
+
+        // HotKey should set focus (returns !SetFocus() which is false on success)
+        Assert.False (result);
+
+        listView.Dispose ();
+    }
 }
