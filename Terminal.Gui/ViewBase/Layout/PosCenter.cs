@@ -6,9 +6,9 @@ namespace Terminal.Gui.ViewBase;
 public record PosCenter : Pos
 {
     /// <inheritdoc/>
-    public override string ToString () { return "Center"; }
+    public override string ToString () => "Center";
 
-    internal override int GetAnchor (int size) { return size / 2; }
+    internal override int GetAnchor (int size) => size / 2;
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {

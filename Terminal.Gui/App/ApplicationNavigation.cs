@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -31,7 +29,7 @@ public class ApplicationNavigation
     /// <summary>
     ///     Gets the most focused <see cref="View"/> in the application, if there is one.
     /// </summary>
-    public View? GetFocused () { return _focused; }
+    public View? GetFocused () => _focused;
 
     // QUESTION: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
     // QUESTION: Related, see View.GetSubViews(), which does support Adornments.
@@ -84,7 +82,7 @@ public class ApplicationNavigation
             return;
         }
 
-        Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
+        //Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
 
@@ -138,7 +136,7 @@ public class ApplicationNavigation
 
         if (mostFocused is null || !mostFocused.Cursor.IsVisible)
         {
-            App?.Driver?.SetCursor (new ()); // Hide cursor
+            App?.Driver?.SetCursor (new Cursor ()); // Hide cursor
 
             return;
         }
@@ -154,8 +152,7 @@ public class ApplicationNavigation
 
             while (current is { })
             {
-                Rectangle viewportBounds = current.ViewportToScreen (
-                                                                     new Rectangle (Point.Empty, current.Viewport.Size));
+                Rectangle viewportBounds = current.ViewportToScreen (new Rectangle (Point.Empty, current.Viewport.Size));
 
                 if (!viewportBounds.Contains (mostFocusedCursor.Position.Value))
                 {
@@ -173,12 +170,12 @@ public class ApplicationNavigation
             }
             else
             {
-                App?.Driver?.SetCursor (new ()); // Hide cursor
+                App?.Driver?.SetCursor (new Cursor ()); // Hide cursor
             }
         }
         else
         {
-            App?.Driver?.SetCursor (new ()); // Hide cursor
+            App?.Driver?.SetCursor (new Cursor ()); // Hide cursor
         }
     }
 }

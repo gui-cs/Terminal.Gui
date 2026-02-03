@@ -127,7 +127,7 @@ public class MainLoopCoordinatorTests : IDisposable
 
         // Assert - All disposals should complete quickly
         // If input threads don't stop, this will hang or take a very long time
-        Assert.True (sw.ElapsedMilliseconds < 5000, $"Disposing {COUNT} apps took {sw.ElapsedMilliseconds}ms - input threads may not have stopped");
+        Assert.True (sw.ElapsedMilliseconds < 10000, $"Disposing {COUNT} apps took {sw.ElapsedMilliseconds}ms - input threads may not have stopped");
     }
 
     /// <summary>

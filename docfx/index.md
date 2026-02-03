@@ -9,7 +9,7 @@
 - **[Migrating from v1](~/docs/migratingfromv1.md)** - Complete migration guide
 - **[Views Overview](~/docs/views.md)** - All built-in views and controls
 - **[Deep Dives](~/docs/index.md)** - Comprehensive guides and deep dives
-- **[API Reference](~/api/Terminal.Gui.App.html)** - Complete API documentation
+- **[API Reference](~/api/Terminal.Gui.App.md)** - Complete API documentation
 
 ## Contributing
 
