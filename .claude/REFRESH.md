@@ -41,4 +41,7 @@ Re-read the relevant rule file in `.claude/rules/`:
 
 ## Task-Specific Guides
 
-Check `.claude/tasks/` for task-specific checklists before starting work.
+Check `.claude/tasks/` for task-specific checklists:
+- `build-app.md` - Building applications with Terminal.Gui
+
+Check `.claude/cookbook/` for common UI patterns.

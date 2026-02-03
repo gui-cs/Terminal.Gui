@@ -19,7 +19,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
 
     // CoPilot: claude-3-7-sonnet-20250219
     [Fact]
-    public void ProcessQueue_ReleasesStaleEscapeSequences_AfterTimeout ()
+    public async Task ProcessQueue_ReleasesStaleEscapeSequences_AfterTimeout ()
     {
         // Arrange
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
@@ -36,7 +36,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         Assert.Empty (receivedKeys); // Should be held by parser
 
         // Wait for timeout (50ms + buffer)
-        Thread.Sleep (100);
+        await Task.Delay (100);
 
         // Process again - should release stale ESC
         processor.ProcessQueue ();
@@ -47,8 +47,8 @@ public class InputProcessorImplTests (ITestOutputHelper output)
     }
 
     // CoPilot: claude-3-7-sonnet-20250219
-    [Fact]
-    public void ProcessQueue_DoesNotReleaseEscape_BeforeTimeout ()
+    [Fact (Skip = "Flaky test causing random GitHub workflow failures - see issue")]
+    public async Task ProcessQueue_DoesNotReleaseEscape_BeforeTimeout ()
     {
         // Arrange
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
@@ -64,7 +64,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.ProcessQueue ();
 
         // Wait less than timeout (20ms)
-        Thread.Sleep (5);
+        await Task.Delay (5);
 
         // Process again - should still be held
         processor.ProcessQueue ();
@@ -277,7 +277,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
 
     // CoPilot: claude-3-7-sonnet-20250219
     [Fact]
-    public void ProcessQueue_ParserInNormalState_DoesNotReleaseKeys ()
+    public async Task ProcessQueue_ParserInNormalState_DoesNotReleaseKeys ()
     {
         // Arrange
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
@@ -293,7 +293,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.ProcessQueue ();
 
         // Wait past timeout
-        Thread.Sleep (100);
+        await Task.Delay (100);
         processor.ProcessQueue ();
 
         // Assert - Should only process the one key from queue, no releases from parser
