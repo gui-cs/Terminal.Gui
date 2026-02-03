@@ -387,18 +387,20 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                                     .ToList ();
                 }
 
-                // Process DimFill views with MinimumContentDim or To
+                // Process DimFill views that can contribute
                 for (var i = 0; i < contributingDimFillSubViews.Count; i++)
                 {
                     View dimFillSubView = contributingDimFillSubViews [i];
-                    DimFill? dimFill = dimension == Dimension.Width ? dimFillSubView.Width as DimFill : dimFillSubView.Height as DimFill;
+                    Dim dimFill = dimension == Dimension.Width ? dimFillSubView.Width : dimFillSubView.Height;
 
-                    if (dimFill?.MinimumContentDim is { })
+                    // Get the minimum contribution from the Dim itself
+                    int minContribution = dimFill.GetMinimumContribution (0, maxCalculatedSize, dimFillSubView, dimension);
+
+                    if (minContribution > 0)
                     {
-                        // This DimFill has a minimum - it contributes to auto-sizing
-                        int minSize = dimFill.MinimumContentDim.Calculate (0, maxCalculatedSize, dimFillSubView, dimension);
+                        // Add position offset to get total size needed
                         int positionOffset = dimension == Dimension.Width ? dimFillSubView.Frame.X : dimFillSubView.Frame.Y;
-                        int totalSize = positionOffset + minSize;
+                        int totalSize = positionOffset + minContribution;
 
                         if (totalSize > maxCalculatedSize)
                         {
@@ -406,13 +408,13 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                         }
                     }
 
-                    if (dimFill?.To is { })
+                    // Handle special case for DimFill with To (still needs type-specific logic)
+                    if (dimFill is DimFill dimFillTyped && dimFillTyped.To is { })
                     {
-                        // This DimFill has a To view - it contributes to auto-sizing
                         // The SuperView needs to be large enough to contain both the dimFillSubView and the To view
                         int dimFillPos = dimension == Dimension.Width ? dimFillSubView.Frame.X : dimFillSubView.Frame.Y;
-                        int toViewPos = dimension == Dimension.Width ? dimFill.To.Frame.X : dimFill.To.Frame.Y;
-                        int toViewSize = dimension == Dimension.Width ? dimFill.To.Frame.Width : dimFill.To.Frame.Height;
+                        int toViewPos = dimension == Dimension.Width ? dimFillTyped.To.Frame.X : dimFillTyped.To.Frame.Y;
+                        int toViewSize = dimension == Dimension.Width ? dimFillTyped.To.Frame.Width : dimFillTyped.To.Frame.Height;
                         int totalSize = int.Max (dimFillPos, toViewPos + toViewSize);
 
                         if (totalSize > maxCalculatedSize)

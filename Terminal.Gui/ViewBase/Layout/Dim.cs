@@ -463,6 +463,28 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </returns>
     internal virtual bool CanContributeToAutoSizing => true;
 
+    /// <summary>
+    ///     Gets the minimum contribution this Dim makes to auto-sizing calculations.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is used by <see cref="DimAuto"/> to determine the minimum size contribution
+    ///         of a Dim during auto-sizing calculations. The default implementation returns the
+    ///         result of <see cref="Calculate"/>.
+    ///     </para>
+    ///     <para>
+    ///         Types that have special minimum contribution logic (like <see cref="DimFill"/> with
+    ///         <see cref="DimFill.MinimumContentDim"/>) should override this method.
+    ///     </para>
+    /// </remarks>
+    /// <param name="location">The starting point from where the size calculation begins.</param>
+    /// <param name="superviewContentSize">The size of the SuperView's content.</param>
+    /// <param name="us">The View that holds this Dim object.</param>
+    /// <param name="dimension">Width or Height</param>
+    /// <returns>The minimum size contribution for auto-sizing calculations.</returns>
+    internal virtual int GetMinimumContribution (int location, int superviewContentSize, View us, Dimension dimension) =>
+        Calculate (location, superviewContentSize, us, dimension);
+
     #endregion virtual methods
 
     #region operators
