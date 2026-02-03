@@ -422,10 +422,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     Composite types like <see cref="DimCombine"/> should aggregate results from their children.
     /// </remarks>
     /// <returns>An enumerable of views that this Dim depends on.</returns>
-    internal virtual IEnumerable<View> GetReferencedViews ()
-    {
-        yield break;
-    }
+    internal virtual IEnumerable<View> GetReferencedViews () { yield break; }
 
     /// <summary>
     ///     Indicates whether this Dim depends on the SuperView's content size for its calculation.

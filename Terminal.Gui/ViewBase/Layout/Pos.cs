@@ -389,10 +389,7 @@ public abstract record Pos
     ///     Composite types like <see cref="PosCombine"/> should aggregate results from their children.
     /// </remarks>
     /// <returns>An enumerable of views that this Pos depends on.</returns>
-    internal virtual IEnumerable<View> GetReferencedViews ()
-    {
-        yield break;
-    }
+    internal virtual IEnumerable<View> GetReferencedViews () { yield break; }
 
     /// <summary>
     ///     Indicates whether this Pos depends on the SuperView's content size for its calculation.
@@ -403,7 +400,7 @@ public abstract record Pos
     ///         without needing to perform type checking.
     ///     </para>
     ///     <para>
-    ///         Types that depend on and actively contribute to SuperView content size determination include 
+    ///         Types that depend on and actively contribute to SuperView content size determination include
     ///         <see cref="PosAnchorEnd"/> and <see cref="PosAlign"/>. These types require special handling during
     ///         auto-sizing because they affect the minimum content size needed.
     ///     </para>

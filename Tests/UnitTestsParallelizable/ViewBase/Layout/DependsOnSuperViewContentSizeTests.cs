@@ -5,8 +5,8 @@
 namespace ViewBaseTests.Layout;
 
 /// <summary>
-/// Tests for the DependsOnSuperViewContentSize property on Dim and Pos types.
-/// This property is used by DimAuto to categorize subviews without type checking.
+///     Tests for the DependsOnSuperViewContentSize property on Dim and Pos types.
+///     This property is used by DimAuto to categorize subviews without type checking.
 /// </summary>
 public class DependsOnSuperViewContentSizeTests
 {
@@ -51,7 +51,7 @@ public class DependsOnSuperViewContentSizeTests
     [Fact]
     public void DimPercent_AllModes_DependOnSuperViewContentSize ()
     {
-        Dim dimContentSize = Dim.Percent (50, DimPercentMode.ContentSize);
+        Dim dimContentSize = Dim.Percent (50);
         Assert.True (dimContentSize.DependsOnSuperViewContentSize);
 
         Dim dimPosition = Dim.Percent (50, DimPercentMode.Position);
@@ -206,7 +206,7 @@ public class DependsOnSuperViewContentSizeTests
         // Neither depends (Center and Percent don't depend)
         Pos pos4 = Pos.Center () + Pos.Percent (10);
         Assert.False (pos4.DependsOnSuperViewContentSize);
-        
+
         // Neither depends (absolute values)
         Pos pos5 = Pos.Absolute (10) + Pos.Absolute (5);
         Assert.False (pos5.DependsOnSuperViewContentSize);

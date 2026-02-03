@@ -5,8 +5,8 @@
 namespace ViewBaseTests.Layout;
 
 /// <summary>
-/// Tests for the CanContributeToAutoSizing property on Dim types.
-/// This property is used by DimAuto to determine if a Dim should contribute to auto-sizing calculations.
+///     Tests for the CanContributeToAutoSizing property on Dim types.
+///     This property is used by DimAuto to determine if a Dim should contribute to auto-sizing calculations.
 /// </summary>
 public class CanContributeToAutoSizingTests
 {
@@ -49,7 +49,7 @@ public class CanContributeToAutoSizingTests
     [Fact]
     public void DimPercent_AllModes_CannotContributeToAutoSizing ()
     {
-        Dim dimContentSize = Dim.Percent (50, DimPercentMode.ContentSize);
+        Dim dimContentSize = Dim.Percent (50);
         Assert.False (dimContentSize.CanContributeToAutoSizing);
 
         Dim dimPosition = Dim.Percent (50, DimPercentMode.Position);
