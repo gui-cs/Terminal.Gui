@@ -280,4 +280,60 @@ public class InputInjectionExampleTests
     }
 
     #endregion
+
+    #region Example 8: Mouse Click Helper Methods
+
+    /// <summary>
+    ///     Example 8: Using helper methods for common mouse click patterns.
+    ///     These helpers encapsulate common sequences for cleaner test code.
+    /// </summary>
+    [Fact]
+    public void Example8_MouseClickHelpers ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        Button button = new () { Text = "Click Me", X = 5, Y = 2 };
+        (runnable as View)?.Add (button);
+
+        var acceptingCalled = false;
+        button.Accepting += (s, e) => acceptingCalled = true;
+
+        // Act - Use helper for simple left-click at button position
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (5, 2)));
+
+        // Assert
+        Assert.True (acceptingCalled);
+
+        // Reset for next test
+        acceptingCalled = false;
+
+        // Right-click helper
+        List<MouseFlags> receivedFlags = [];
+
+        app.Mouse.MouseEvent += (s, e) => receivedFlags.Add (e.Flags);
+
+        app.InjectSequence (InputInjectionExtensions.RightButtonClick (new Point (10, 5)));
+
+        Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.RightButtonClicked));
+
+        // Double-click helper
+        CheckBox checkBox = new () { Text = "_Check", X = 0, Y = 0 };
+        (runnable as View)?.Add (checkBox);
+
+        CheckState initialState = checkBox.Value;
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (new Point (0, 0)));
+
+        // After double-click, state should have toggled twice (back to initial)
+        Assert.Equal (initialState, checkBox.Value);
+
+        (runnable as View)?.Dispose ();
+    }
+
+    #endregion
 }

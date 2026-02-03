@@ -24,21 +24,8 @@ public class MouseInjectionDocTests
         var acceptingCalled = false;
         button.Accepting += (s, e) => acceptingCalled = true;
 
-        // Single-call injection - press
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed,
-                             ScreenPosition = new (0, 0)
-                         });
-
-        // Single-call injection - release
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased,
-                             ScreenPosition = new (0, 0)
-                         });
+        // Use helper method for simplified click injection
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new (0, 0)));
 
         Assert.True (acceptingCalled);
         (runnable as View)?.Dispose ();
