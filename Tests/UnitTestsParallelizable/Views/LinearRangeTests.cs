@@ -6,6 +6,47 @@ namespace ViewsTests;
 public class LinearRangeOptionTests : TestDriverBase
 {
     [Fact]
+    public void LinearRange_Option_Default_Constructor ()
+    {
+        LinearRangeOption<int> o = new ();
+        Assert.Null (o.Legend);
+        Assert.Equal (default (Rune), o.LegendAbbr);
+        Assert.Equal (0, o.Data);
+    }
+
+    [Fact]
+    public void LinearRange_Option_Values_Constructor ()
+    {
+        LinearRangeOption<int> o = new ("1 thousand", new ('y'), 1000);
+        Assert.Equal ("1 thousand", o.Legend);
+        Assert.Equal (new ('y'), o.LegendAbbr);
+        Assert.Equal (1000, o.Data);
+    }
+
+    [Fact]
+    public void LinearRangeOption_ToString_WhenEmpty ()
+    {
+        LinearRangeOption<object> sliderOption = new ();
+        Assert.Equal ("{Legend=, LegendAbbr=\0, Data=}", sliderOption.ToString ());
+    }
+
+    [Fact]
+    public void LinearRangeOption_ToString_WhenPopulated_WithInt ()
+    {
+        LinearRangeOption<int> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new ('l'), Data = 1 };
+
+        Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data=1}", sliderOption.ToString ());
+    }
+
+    [Fact]
+    public void LinearRangeOption_ToString_WhenPopulated_WithSizeF ()
+    {
+        LinearRangeOption<SizeF> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new ('l'), Data = new (32, 11) };
+
+        Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data={Width=32, Height=11}}", sliderOption.ToString ());
+    }
+
+    [Fact]
     public void OnChanged_Should_Raise_ChangedEvent ()
     {
         // Arrange
@@ -48,50 +89,6 @@ public class LinearRangeOptionTests : TestDriverBase
 
         // Assert
         Assert.True (eventRaised);
-    }
-
-    [Fact]
-    public void LinearRange_Option_Default_Constructor ()
-    {
-        LinearRangeOption<int> o = new ();
-        Assert.Null (o.Legend);
-        Assert.Equal (default (Rune), o.LegendAbbr);
-        Assert.Equal (default (int), o.Data);
-    }
-
-    [Fact]
-    public void LinearRange_Option_Values_Constructor ()
-    {
-        LinearRangeOption<int> o = new ("1 thousand", new ('y'), 1000);
-        Assert.Equal ("1 thousand", o.Legend);
-        Assert.Equal (new ('y'), o.LegendAbbr);
-        Assert.Equal (1000, o.Data);
-    }
-
-    [Fact]
-    public void LinearRangeOption_ToString_WhenEmpty ()
-    {
-        LinearRangeOption<object> sliderOption = new ();
-        Assert.Equal ("{Legend=, LegendAbbr=\0, Data=}", sliderOption.ToString ());
-    }
-
-    [Fact]
-    public void LinearRangeOption_ToString_WhenPopulated_WithInt ()
-    {
-        LinearRangeOption<int> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new ('l'), Data = 1 };
-
-        Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data=1}", sliderOption.ToString ());
-    }
-
-    [Fact]
-    public void LinearRangeOption_ToString_WhenPopulated_WithSizeF ()
-    {
-        LinearRangeOption<SizeF> sliderOption = new ()
-        {
-            Legend = "Lord flibble", LegendAbbr = new ('l'), Data = new (32, 11)
-        };
-
-        Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data={Width=32, Height=11}}", sliderOption.ToString ());
     }
 }
 
@@ -226,8 +223,7 @@ public class LinearRangeTests : TestDriverBase
         // Create args with cancel set to false
         cancel = false;
 
-        LinearRangeEventArgs<int> args =
-            new (new (), newFocusedOption) { Cancel = cancel };
+        LinearRangeEventArgs<int> args = new (new (), newFocusedOption) { Cancel = cancel };
         Assert.Equal (0, slider.FocusedOption);
 
         // Act
@@ -240,10 +236,7 @@ public class LinearRangeTests : TestDriverBase
         // Create args with cancel set to true
         cancel = true;
 
-        args = new (new (), newFocusedOption)
-        {
-            Cancel = cancel
-        };
+        args = new (new (), newFocusedOption) { Cancel = cancel };
 
         // Act
         slider.OnOptionFocused (2, args);
@@ -464,35 +457,14 @@ public class LinearRangeTests : TestDriverBase
         Assert.Equal (expectedY, position.y);
     }
 
-    // https://github.com/gui-cs/Terminal.Gui/issues/3099
-    [Fact]
-    private void One_Option_Does_Not_Throw ()
-    {
-        // Arrange
-        LinearRange<int> slider = new ();
-        slider.BeginInit ();
-        slider.EndInit ();
-
-        // Act/Assert
-        slider.Options = [new ()];
-    }
-
     [Fact]
     private void DimAuto_Both_Respects_SuperView_ContentSize ()
     {
-        View view = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        View view = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
         List<object> options = ["01234", "01234"];
 
-        LinearRange slider = new (options)
-        {
-            Orientation = Orientation.Vertical,
-            Type = LinearRangeType.Multiple
-        };
+        LinearRange slider = new (options) { Orientation = Orientation.Vertical, Type = LinearRangeType.Multiple };
         view.Add (slider);
         view.BeginInit ();
         view.EndInit ();
@@ -510,55 +482,13 @@ public class LinearRangeTests : TestDriverBase
     }
 
     [Fact]
-    private void DimAuto_Width_Respects_SuperView_ContentSize ()
-    {
-        View view = new ()
-        {
-            Width = Dim.Fill (),
-            Height = 10
-        };
-
-        List<object> options = new () { "01234", "01234" };
-
-        LinearRange slider = new (options)
-        {
-            Orientation = Orientation.Vertical,
-            Type = LinearRangeType.Multiple,
-            Height = 10
-        };
-        view.Add (slider);
-        view.BeginInit ();
-        view.EndInit ();
-
-        Size expectedSize = slider.Frame.Size;
-
-        Assert.Equal (new (6, 10), expectedSize);
-
-        view.SetContentSize (new (1, 1));
-
-        view.LayoutSubViews ();
-        slider.SetRelativeLayout (view.Viewport.Size);
-
-        Assert.Equal (expectedSize, slider.Frame.Size);
-    }
-
-    [Fact]
     private void DimAuto_Height_Respects_SuperView_ContentSize ()
     {
-        View view = new ()
-        {
-            Width = 10,
-            Height = Dim.Fill ()
-        };
+        View view = new () { Width = 10, Height = Dim.Fill () };
 
         List<object> options = new () { "01234", "01234" };
 
-        LinearRange slider = new (options)
-        {
-            Orientation = Orientation.Vertical,
-            Type = LinearRangeType.Multiple,
-            Width = 10
-        };
+        LinearRange slider = new (options) { Orientation = Orientation.Vertical, Type = LinearRangeType.Multiple, Width = 10 };
         view.Add (slider);
         view.BeginInit ();
         view.EndInit ();
@@ -575,59 +505,48 @@ public class LinearRangeTests : TestDriverBase
         Assert.Equal (expectedSize, slider.Frame.Size);
     }
 
+    [Fact]
+    private void DimAuto_Width_Respects_SuperView_ContentSize ()
+    {
+        View view = new () { Width = Dim.Fill (), Height = 10 };
+
+        List<object> options = new () { "01234", "01234" };
+
+        LinearRange slider = new (options) { Orientation = Orientation.Vertical, Type = LinearRangeType.Multiple, Height = 10 };
+        view.Add (slider);
+        view.BeginInit ();
+        view.EndInit ();
+
+        Size expectedSize = slider.Frame.Size;
+
+        Assert.Equal (new (6, 10), expectedSize);
+
+        view.SetContentSize (new (1, 1));
+
+        view.LayoutSubViews ();
+        slider.SetRelativeLayout (view.Viewport.Size);
+
+        Assert.Equal (expectedSize, slider.Frame.Size);
+    }
+
+    // https://github.com/gui-cs/Terminal.Gui/issues/3099
+    [Fact]
+    private void One_Option_Does_Not_Throw ()
+    {
+        // Arrange
+        LinearRange<int> slider = new ();
+        slider.BeginInit ();
+        slider.EndInit ();
+
+        // Act/Assert
+        slider.Options = [new ()];
+    }
+
     // Add more tests for different scenarios and edge cases.
 }
+
 public class LinearRangeCWPTests : TestDriverBase
 {
-    [Fact]
-    public void Type_PropertyChange_RaisesChangingAndChangedEvents ()
-    {
-        // Arrange
-        LinearRange<int> linearRange = new ();
-        var changingRaised = false;
-        var changedRaised = false;
-        var oldValue = LinearRangeType.Single;
-        var newValue = LinearRangeType.Range;
-
-        linearRange.TypeChanging += (sender, args) =>
-                                    {
-                                        changingRaised = true;
-                                        Assert.Equal (oldValue, args.CurrentValue);
-                                        Assert.Equal (newValue, args.NewValue);
-                                    };
-
-        linearRange.TypeChanged += (sender, args) =>
-                                   {
-                                       changedRaised = true;
-                                       Assert.Equal (oldValue, args.OldValue);
-                                       Assert.Equal (newValue, args.NewValue);
-                                   };
-
-        // Act
-        linearRange.Type = newValue;
-
-        // Assert
-        Assert.True (changingRaised);
-        Assert.True (changedRaised);
-        Assert.Equal (newValue, linearRange.Type);
-    }
-
-    [Fact]
-    public void Type_PropertyChange_CanBeCancelled ()
-    {
-        // Arrange
-        LinearRange<int> linearRange = new ();
-        LinearRangeType oldValue = linearRange.Type;
-
-        linearRange.TypeChanging += (sender, args) => { args.Handled = true; };
-
-        // Act
-        linearRange.Type = LinearRangeType.Range;
-
-        // Assert
-        Assert.Equal (oldValue, linearRange.Type);
-    }
-
     [Fact]
     public void LegendsOrientation_PropertyChange_RaisesChangingAndChangedEvents ()
     {
@@ -695,39 +614,6 @@ public class LinearRangeCWPTests : TestDriverBase
     }
 
     [Fact]
-    public void ShowLegends_PropertyChange_RaisesChangingAndChangedEvents ()
-    {
-        // Arrange
-        LinearRange<int> linearRange = new ();
-        var changingRaised = false;
-        var changedRaised = false;
-        var oldValue = true;
-        var newValue = false;
-
-        linearRange.ShowLegendsChanging += (sender, args) =>
-                                           {
-                                               changingRaised = true;
-                                               Assert.Equal (oldValue, args.CurrentValue);
-                                               Assert.Equal (newValue, args.NewValue);
-                                           };
-
-        linearRange.ShowLegendsChanged += (sender, args) =>
-                                          {
-                                              changedRaised = true;
-                                              Assert.Equal (oldValue, args.OldValue);
-                                              Assert.Equal (newValue, args.NewValue);
-                                          };
-
-        // Act
-        linearRange.ShowLegends = newValue;
-
-        // Assert
-        Assert.True (changingRaised);
-        Assert.True (changedRaised);
-        Assert.Equal (newValue, linearRange.ShowLegends);
-    }
-
-    [Fact]
     public void ShowEndSpacing_PropertyChange_RaisesChangingAndChangedEvents ()
     {
         // Arrange
@@ -761,6 +647,123 @@ public class LinearRangeCWPTests : TestDriverBase
     }
 
     [Fact]
+    public void ShowLegends_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        var oldValue = true;
+        var newValue = false;
+
+        linearRange.ShowLegendsChanging += (sender, args) =>
+                                           {
+                                               changingRaised = true;
+                                               Assert.Equal (oldValue, args.CurrentValue);
+                                               Assert.Equal (newValue, args.NewValue);
+                                           };
+
+        linearRange.ShowLegendsChanged += (sender, args) =>
+                                          {
+                                              changedRaised = true;
+                                              Assert.Equal (oldValue, args.OldValue);
+                                              Assert.Equal (newValue, args.NewValue);
+                                          };
+
+        // Act
+        linearRange.ShowLegends = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.ShowLegends);
+    }
+
+    [Fact]
+    public void Type_PropertyChange_CanBeCancelled ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        LinearRangeType oldValue = linearRange.Type;
+
+        linearRange.TypeChanging += (sender, args) => { args.Handled = true; };
+
+        // Act
+        linearRange.Type = LinearRangeType.Range;
+
+        // Assert
+        Assert.Equal (oldValue, linearRange.Type);
+    }
+
+    [Fact]
+    public void Type_PropertyChange_ChangingEventCanModifyNewValue ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var modifiedValue = LinearRangeType.Multiple;
+
+        linearRange.TypeChanging += (sender, args) => { args.NewValue = modifiedValue; };
+
+        // Act
+        linearRange.Type = LinearRangeType.Range;
+
+        // Assert
+        Assert.Equal (modifiedValue, linearRange.Type);
+    }
+
+    [Fact]
+    public void Type_PropertyChange_NoEventsWhenValueUnchanged ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+
+        linearRange.TypeChanging += (sender, args) => changingRaised = true;
+        linearRange.TypeChanged += (sender, args) => changedRaised = true;
+
+        // Act
+        linearRange.Type = linearRange.Type;
+
+        // Assert
+        Assert.False (changingRaised);
+        Assert.False (changedRaised);
+    }
+
+    [Fact]
+    public void Type_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        var oldValue = LinearRangeType.Single;
+        var newValue = LinearRangeType.Range;
+
+        linearRange.TypeChanging += (sender, args) =>
+                                    {
+                                        changingRaised = true;
+                                        Assert.Equal (oldValue, args.CurrentValue);
+                                        Assert.Equal (newValue, args.NewValue);
+                                    };
+
+        linearRange.TypeChanged += (sender, args) =>
+                                   {
+                                       changedRaised = true;
+                                       Assert.Equal (oldValue, args.OldValue);
+                                       Assert.Equal (newValue, args.NewValue);
+                                   };
+
+        // Act
+        linearRange.Type = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.Type);
+    }
+
+    [Fact]
     public void UseMinimumSize_PropertyChange_RaisesChangingAndChangedEvents ()
     {
         // Arrange
@@ -791,40 +794,5 @@ public class LinearRangeCWPTests : TestDriverBase
         Assert.True (changingRaised);
         Assert.True (changedRaised);
         Assert.Equal (newValue, linearRange.UseMinimumSize);
-    }
-
-    [Fact]
-    public void Type_PropertyChange_NoEventsWhenValueUnchanged ()
-    {
-        // Arrange
-        LinearRange<int> linearRange = new ();
-        var changingRaised = false;
-        var changedRaised = false;
-
-        linearRange.TypeChanging += (sender, args) => changingRaised = true;
-        linearRange.TypeChanged += (sender, args) => changedRaised = true;
-
-        // Act
-        linearRange.Type = linearRange.Type;
-
-        // Assert
-        Assert.False (changingRaised);
-        Assert.False (changedRaised);
-    }
-
-    [Fact]
-    public void Type_PropertyChange_ChangingEventCanModifyNewValue ()
-    {
-        // Arrange
-        LinearRange<int> linearRange = new ();
-        var modifiedValue = LinearRangeType.Multiple;
-
-        linearRange.TypeChanging += (sender, args) => { args.NewValue = modifiedValue; };
-
-        // Act
-        linearRange.Type = LinearRangeType.Range;
-
-        // Assert
-        Assert.Equal (modifiedValue, linearRange.Type);
     }
 }

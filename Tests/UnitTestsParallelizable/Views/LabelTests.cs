@@ -1,12 +1,11 @@
-﻿#nullable enable
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 namespace ViewsTests;
 
 /// <summary>
-/// Pure unit tests for <see cref="Label"/> that don't require Application.Driver or Application context.
-/// These tests can run in parallel without interference.
+///     Pure unit tests for <see cref="Label"/> that don't require Application.Driver or Application context.
+///     These tests can run in parallel without interference.
 /// </summary>
 public class LabelTests (ITestOutputHelper output) : TestDriverBase
 {
@@ -90,7 +89,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
 
         return;
 
-        void LabelOnAccept (object? sender, CommandEventArgs e) { accepted = true; }
+        void LabelOnAccept (object? sender, CommandEventArgs e) => accepted = true;
     }
 
     [Fact]
@@ -109,15 +108,15 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
     {
         var label = new Label ();
         var fired = false;
-        Key oldKey = Key.Empty;
-        Key newKey = Key.Empty;
+        var oldKey = Key.Empty;
+        var newKey = Key.Empty;
 
         label.HotKeyChanged += (s, e) =>
-        {
-            fired = true;
-            oldKey = e.OldKey;
-            newKey = e.NewKey;
-        };
+                               {
+                                   fired = true;
+                                   oldKey = e.OldKey;
+                                   newKey = e.NewKey;
+                               };
 
         label.HotKey = Key.A.WithAlt;
 
@@ -131,15 +130,15 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
     {
         var label = new Label { HotKey = Key.A.WithAlt };
         var fired = false;
-        Key oldKey = Key.Empty;
-        Key newKey = Key.Empty;
+        var oldKey = Key.Empty;
+        var newKey = Key.Empty;
 
         label.HotKeyChanged += (s, e) =>
-        {
-            fired = true;
-            oldKey = e.OldKey;
-            newKey = e.NewKey;
-        };
+                               {
+                                   fired = true;
+                                   oldKey = e.OldKey;
+                                   newKey = e.NewKey;
+                               };
 
         label.HotKey = Key.Empty;
 
@@ -156,26 +155,14 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal ("Test", label.Text);
     }
 
-
     [Fact]
     public void CanFocus_False_HotKey_SetsFocus_Next ()
     {
-        View otherView = new ()
-        {
-            Text = "otherView",
-            CanFocus = true
-        };
+        View otherView = new () { Text = "otherView", CanFocus = true };
 
-        Label label = new ()
-        {
-            Text = "_label"
-        };
+        Label label = new () { Text = "_label" };
 
-        View nextView = new ()
-        {
-            Text = "nextView",
-            CanFocus = true
-        };
+        View nextView = new () { Text = "nextView", CanFocus = true };
 
         IApplication app = Application.Create ();
         Runnable<bool> runnable = new ();
@@ -195,11 +182,25 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void CanFocus_False_LeftButtonPressed_SetsFocus_Next ()
     {
-        View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
+        View otherView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 1,
+            Height = 1,
+            Id = "otherView",
+            CanFocus = true
+        };
         Label label = new () { X = 0, Y = 1, Text = "_label" };
+
         View nextView = new ()
         {
-            X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Width = 1,
+            Height = 1,
+            Id = "nextView",
+            CanFocus = true
         };
 
         IApplication app = Application.Create ();
@@ -214,21 +215,12 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (nextView.HasFocus);
     }
 
-
     [Fact]
     public void CanFocus_True_HotKey_SetsFocus ()
     {
-        Label label = new ()
-        {
-            Text = "_label",
-            CanFocus = true
-        };
+        Label label = new () { Text = "_label", CanFocus = true };
 
-        View view = new ()
-        {
-            Text = "view",
-            CanFocus = true
-        };
+        View view = new () { Text = "view", CanFocus = true };
 
         IApplication app = Application.Create ();
         Runnable<bool> runnable = new ();
@@ -250,13 +242,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void CanFocus_True_LeftButtonPressed_Focuses ()
     {
-        Label label = new ()
-        {
-            Text = "label",
-            X = 0,
-            Y = 0,
-            CanFocus = true
-        };
+        Label label = new () { Text = "label", X = 0, Y = 0, CanFocus = true };
 
         View otherView = new ()
         {
@@ -269,11 +255,8 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         };
 
         IApplication app = Application.Create ();
-        Runnable<bool> runnable = new ()
-        {
-            Width = 10,
-            Height = 10
-        }; ;
+        Runnable<bool> runnable = new () { Width = 10, Height = 10 };
+        ;
         app.Begin (runnable);
         runnable.Add (label, otherView);
         label.SetFocus ();
@@ -297,17 +280,13 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (otherView.HasFocus);
     }
 
-
     [Fact]
     public void With_Top_Margin_Without_Top_Border ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        Runnable<bool> runnable = new ()
-        {
-            Width = 10,
-            Height = 10
-        }; ;
+        Runnable<bool> runnable = new () { Width = 10, Height = 10 };
+        ;
         app.Begin (runnable);
 
         var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
@@ -318,13 +297,12 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 │Test│
 └────┘",
                                                        output,
-                                                       app.Driver
-                                                      );
+                                                       app.Driver);
     }
 
     [Fact]
@@ -332,11 +310,8 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        Runnable<bool> runnable = new ()
-        {
-            Width = 10,
-            Height = 10
-        }; ;
+        Runnable<bool> runnable = new () { Width = 10, Height = 10 };
+        ;
         app.Begin (runnable);
 
         var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
@@ -347,13 +322,42 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (new (0, 0, 6, 2), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 │Test│
 └────┘",
                                                        output,
-                                                       app.Driver
-                                                      );
+                                                       app.Driver);
     }
 
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Label_CannotFocus_ByDefault ()
+    {
+        Label label = new () { Text = "Test" };
+
+        // Label usually has CanFocus = false
+        Assert.False (label.CanFocus);
+
+        label.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Label_HotKey_ForwardsToNextFocusable ()
+    {
+        Label label = new () { Text = "_Test" };
+
+        // Label's HotKey command forwards to the next focusable view
+        // When there's no next focusable view and Label can't focus, HotKey returns false
+        bool? result = label.InvokeCommand (Command.HotKey);
+
+        // Returns false because Label cannot take focus
+        Assert.False (result);
+
+        label.Dispose ();
+    }
 }
