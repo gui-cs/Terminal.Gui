@@ -65,6 +65,7 @@ public abstract class PopoverBaseImpl : View, IPopover
 
         AddCommand (Command.Quit, Quit);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
+        KeyBindings.Remove (Key.Enter);
 
         return;
 

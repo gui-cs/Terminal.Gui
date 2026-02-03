@@ -1542,7 +1542,7 @@ public class TextViewTests
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 1)]
-    public void Accepted_Command_Raises_Accepted_Regardles_Of_AllowsReturn (bool allowsReturn, int expectedAcceptEvents)
+    public void Accepted_Command_Raises_Accepted_Regardless_Of_EnterKeyAddsLine (bool allowsReturn, int expectedAcceptEvents)
     {
         var view = new TextView { EnterKeyAddsLine = allowsReturn };
 
@@ -2427,8 +2427,8 @@ public class TextViewTests
         // Just verify the command doesn't crash
         bool? result = textView.InvokeCommand (Command.Accept);
 
-        // Accept returns false for TextView (not handled)
-        Assert.False (result);
+        // Accept returns true for TextView (not handled)
+        Assert.True (result);
 
         textView.Dispose ();
     }

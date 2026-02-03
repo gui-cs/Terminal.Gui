@@ -404,8 +404,10 @@ public class TextViewInputTests
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.EnterKeyAddsLine);
+        Assert.False (tv.Multiline);
 
-        Assert.False (app.Keyboard.RaiseKeyDownEvent (Key.Enter));
+        // Pressing Enter should fire Accepted event, not add a new line
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
         Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
