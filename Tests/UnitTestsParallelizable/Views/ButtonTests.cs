@@ -54,7 +54,7 @@ public class ButtonTests
     [InlineData (1, 1, 1, 1)]
     [InlineData (10, 1, 10, 1)]
     [InlineData (10, 3, 10, 3)]
-    public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
         var btn1 = new Button ();
         btn1.ShadowStyle = ShadowStyle.None;
@@ -86,7 +86,7 @@ public class ButtonTests
     [InlineData ("0_12你", 0, 1, 0, 1)]
     [InlineData ("0_12你", 1, 1, 1, 1)]
     [InlineData ("0_12你", 10, 1, 10, 1)]
-    public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
         var btn1 = new Button { ShadowStyle = ShadowStyle.None, Text = text, Width = width, Height = height };
 
@@ -98,66 +98,8 @@ public class ButtonTests
         btn1.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void Button_Command_HotKey_RaisesActivatingAndAccepting ()
-    {
-        Button button = new () { Text = "_Test" };
-        var activatingFired = false;
-        var acceptingFired = false;
-
-        // Don't set Handled in Activating, or it will return early without calling Accepting
-        button.Activating += (_, _) => activatingFired = true;
-
-        button.Accepting += (_, e) =>
-                            {
-                                acceptingFired = true;
-                                e.Handled = true;
-                            };
-
-        bool? result = button.InvokeCommand (Command.HotKey);
-
-        // HotKey should raise both Activating and Accepting events
-        Assert.True (activatingFired);
-        Assert.True (acceptingFired);
-        Assert.True (result);
-
-        button.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void Button_Enter_InvokesHotKeyCommand ()
-    {
-        Button button = new () { Text = "Test" };
-        var activatingFired = false;
-        var acceptingFired = false;
-
-        // Don't set Handled in Activating, or it will return early without calling Accepting
-        button.Activating += (_, _) => activatingFired = true;
-
-        button.Accepting += (_, e) =>
-                            {
-                                acceptingFired = true;
-                                e.Handled = true;
-                            };
-
-        // Enter is bound to HotKey command, which raises both events
-        bool? result = button.NewKeyDownEvent (Key.Enter);
-
-        Assert.True (activatingFired);
-        Assert.True (acceptingFired);
-        Assert.True (result);
-
-        button.Dispose ();
-    }
-
-    [Fact]
-    public void Button_HotKeyChanged_EventFires ()
+    public void HotKeyChanged_EventFires ()
     {
         var btn = new Button { Text = "_Yar" };
 
@@ -188,7 +130,7 @@ public class ButtonTests
     }
 
     [Fact]
-    public void Button_HotKeyChanged_EventFires_WithNone ()
+    public void HotKeyChanged_EventFires_WithNone ()
     {
         var btn = new Button ();
 
@@ -212,14 +154,11 @@ public class ButtonTests
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void Button_Space_InvokesHotKeyCommand ()
+    public void Accepting_Handled_Prevents_Accept ()
     {
         Button button = new () { Text = "Test" };
-        var activatingFired = false;
+        var acceptedFired = false;
         var acceptingFired = false;
-
-        // Don't set Handled in Activating, or it will return early without calling Accepting
-        button.Activating += (_, _) => activatingFired = true;
 
         button.Accepting += (_, e) =>
                             {
@@ -227,12 +166,12 @@ public class ButtonTests
                                 e.Handled = true;
                             };
 
-        // Space is bound to HotKey command, which raises both events
-        bool? result = button.NewKeyDownEvent (Key.Space);
+        button.Accepted += (_, _) => acceptedFired = true;
 
-        Assert.True (activatingFired);
+        button.InvokeCommand (Command.Accept);
+
         Assert.True (acceptingFired);
-        Assert.True (result);
+        Assert.False (acceptedFired);
 
         button.Dispose ();
     }
@@ -326,34 +265,34 @@ public class ButtonTests
         Button button = new () { Text = "_Button" };
         Assert.True (button.CanFocus);
 
-        var activatingCount = 0;
-        button.Activating += (_, _) => activatingCount++;
-
         var acceptingCount = 0;
         button.Accepting += (_, _) => acceptingCount++;
 
+        var acceptedCount = 0;
+        button.Accepted += (_, _) => acceptedCount++;
+
         button.HasFocus = true;
         Assert.True (button.HasFocus);
-        Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptingCount);
+        Assert.Equal (0, acceptedCount);
 
         button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptingCount);
+        Assert.Equal (1, acceptedCount);
 
         button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (2, activatingCount);
         Assert.Equal (2, acceptingCount);
+        Assert.Equal (2, acceptedCount);
 
         // Disable Mouse Highlighting to test that it does not interfere with Accepting event
         button.MouseHighlightStates = MouseState.None;
         button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (3, activatingCount);
         Assert.Equal (3, acceptingCount);
+        Assert.Equal (3, acceptedCount);
 
         button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (4, activatingCount);
         Assert.Equal (4, acceptingCount);
+        Assert.Equal (4, acceptedCount);
     }
 
     [Fact]
@@ -376,15 +315,15 @@ public class ButtonTests
         runnable.Add (button);
         runnable.Layout ();
 
-        var activatingCount = 0;
-        button.Activating += (_, _) => activatingCount++;
-
         var acceptingCount = 0;
         button.Accepting += (_, _) => acceptingCount++;
 
+        var acceptedCount = 0;
+        button.Accepted += (_, _) => acceptedCount++;
+
         button.HasFocus = true;
         Assert.True (button.HasFocus);
-        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptedCount);
         Assert.Equal (0, acceptingCount);
 
         // Use deterministic base time instead of DateTime.Now for predictable test behavior
@@ -399,14 +338,14 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
 
         Assert.Equal (1, acceptingCount);
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, acceptedCount);
 
         // Second click - more than 500ms later to avoid double-click detection
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
 
         Assert.Equal (2, acceptingCount);
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, acceptedCount);
     }
 
     /// <summary>
@@ -437,15 +376,15 @@ public class ButtonTests
         runnable.Add (button);
         runnable.Layout ();
 
-        var activatingCount = 0;
-        button.Activating += (_, _) => activatingCount++;
-
         var acceptingCount = 0;
         button.Accepting += (_, _) => acceptingCount++;
 
+        var acceptedCount = 0;
+        button.Accepted += (_, _) => acceptedCount++;
+
         button.HasFocus = true;
         Assert.True (button.HasFocus);
-        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptedCount);
         Assert.Equal (0, acceptingCount);
 
         // Use deterministic base time for predictable test behavior
@@ -456,23 +395,17 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // First click - when MouseHighlightStates = None:
-        // - Pressed event fires Activating (Command.Activate)
-        // - Clicked event fires both Activating and Accepting (Command.Accept)
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
 
-        // Activating: 1 from Pressed + 1 from Clicked = 2
-        // Accepting: 1 from Clicked only = 1
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, acceptedCount);
         Assert.Equal (1, acceptingCount);
 
         // Second click - more than 500ms later to avoid double-click detection
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
 
-        // Activating: previous 2 + 1 from Pressed + 1 from Clicked = 4
-        // Accepting: previous 1 + 1 from Clicked = 2
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, acceptedCount);
         Assert.Equal (2, acceptingCount);
 
         // Third click - verify it continues to work
@@ -481,9 +414,7 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
                               options);
 
-        // Activating: previous 4 + 1 from Pressed + 1 from Clicked = 6
-        // Accepting: previous 2 + 1 from Clicked = 3
-        Assert.Equal (6, activatingCount);
+        Assert.Equal (3, acceptedCount);
         Assert.Equal (3, acceptingCount);
 
         // Fourth click - verify consistency
@@ -492,9 +423,7 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1850) },
                               options);
 
-        // Activating: previous 6 + 1 from Pressed + 1 from Clicked = 8
-        // Accepting: previous 3 + 1 from Clicked = 4
-        Assert.Equal (8, activatingCount);
+        Assert.Equal (4, acceptedCount);
         Assert.Equal (4, acceptingCount);
     }
 
@@ -523,10 +452,10 @@ public class ButtonTests
         SessionToken token = app.Begin (top);
         button.HasFocus = true;
 
-        var activatingCount = 0;
+        var acceptedCount = 0;
         var acceptingCount = 0;
 
-        button.Activating += (_, _) => activatingCount++;
+        button.Accepted += (_, _) => acceptedCount++;
         button.Accepting += (_, _) => acceptingCount++;
 
         // Act - Inject a complete click sequence (Press -> Release) with timestamps using Direct mode
@@ -542,7 +471,7 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
 
         // Assert - Button should receive Clicked event and fire both Activating and Accepting
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, acceptedCount);
         Assert.Equal (1, acceptingCount);
 
         // Act - Second click with timestamp spacing >500ms should be a new single click
@@ -551,7 +480,7 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
 
         // Assert - Should fire again (two independent single clicks, not a double-click)
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, acceptedCount);
         Assert.Equal (2, acceptingCount);
 
         // Cleanup

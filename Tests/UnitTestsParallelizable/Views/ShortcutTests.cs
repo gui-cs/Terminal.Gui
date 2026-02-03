@@ -434,11 +434,7 @@ public class ShortcutTests
     public void CheckBox_CanFocus_False_Changes_State_On_Direct_Activate ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = false
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
         Assert.False (checkBox.CanFocus);
@@ -460,11 +456,7 @@ public class ShortcutTests
     public void CheckBox_CanFocus_True_Changes_State_On_Direct_Activate ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = true
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
         Assert.True (checkBox.CanFocus);
@@ -486,17 +478,9 @@ public class ShortcutTests
     public void CheckBox_CanFocus_False_CommandView_Changes_State_On_Shortcut_Activate ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = false
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
         Assert.False (checkBox.CanFocus);
@@ -519,17 +503,9 @@ public class ShortcutTests
     public void CheckBox_CanFocus_True_CommandView_Changes_State_On_Shortcut_Activate ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = true
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
         Assert.True (checkBox.CanFocus);
@@ -550,17 +526,9 @@ public class ShortcutTests
     public void CheckBox_CommandView_MousePress_Changes_State ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = false
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
@@ -570,11 +538,7 @@ public class ShortcutTests
 
         // Act - Simulate a mouse press by invoking the bound command directly
         // This is what NewMouseEvent would do internally
-        checkBox.NewMouseEvent (new ()
-        {
-            Position = new (0, 0),
-            Flags = MouseFlags.LeftButtonPressed
-        });
+        checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert - CheckBox should change state
         Assert.Equal (CheckState.Checked, checkBox.Value);
@@ -589,17 +553,9 @@ public class ShortcutTests
     public void CheckBox_CommandView_Direct_Activate_Changes_State ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = false
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
@@ -634,17 +590,9 @@ public class ShortcutTests
     public void CommandView_Activating_Forwards_To_Shortcut_Activating ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = false
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         var shortcutActivatingRaised = false;
         shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
@@ -665,17 +613,9 @@ public class ShortcutTests
     public void CommandView_Accepting_Forwards_To_Shortcut_Accepting ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = true
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         var shortcutAcceptingRaised = false;
         shortcut.Accepting += (_, _) => shortcutAcceptingRaised = true;
@@ -693,20 +633,12 @@ public class ShortcutTests
     ///     the CommandView processes the activation but does NOT cause double-forwarding.
     /// </summary>
     [Fact]
-    public void Shortcut_Activate_Does_Not_Double_Forward_To_Shortcut ()
+    public void Shortcut_Activate_Does_Not_Double_Bubble_To_Shortcut ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = false
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         var shortcutActivatingCount = 0;
         shortcut.Activating += (_, _) => shortcutActivatingCount++;
@@ -716,6 +648,7 @@ public class ShortcutTests
 
         // Assert - Shortcut.Activating should be raised exactly once (not twice from forwarding)
         Assert.Equal (1, shortcutActivatingCount);
+
         // And CheckBox should have changed state
         Assert.Equal (CheckState.Checked, checkBox.Value);
     }
@@ -729,17 +662,9 @@ public class ShortcutTests
     public void CommandView_CanFocus_True_Click_Raises_Shortcut_Activating ()
     {
         // Arrange
-        CheckBox checkBox = new ()
-        {
-            Title = "_Toggle",
-            CanFocus = true
-        };
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         var shortcutActivatingRaised = false;
         shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
@@ -749,6 +674,7 @@ public class ShortcutTests
 
         // Assert - Shortcut.Activating should have been raised
         Assert.True (shortcutActivatingRaised);
+
         // And CheckBox should have changed state
         Assert.Equal (CheckState.Checked, checkBox.Value);
     }

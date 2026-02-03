@@ -40,6 +40,7 @@ public class EventLog : ListView
         AddCommand (Command.DeleteAll,
                     () =>
                     {
+                        SelectedItem = null;
                         _eventSource.Clear ();
 
                         return true;

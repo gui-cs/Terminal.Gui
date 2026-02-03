@@ -323,7 +323,7 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        return DispatchCommand (args.Context) is true;
+        return false;//DispatchCommand (args.Context) is true;
        // return RaiseAccepting (args.Context) is true;
     }
 
@@ -366,79 +366,85 @@ public class Shortcut : View, IOrientation, IDesignable
         return args.Handled;
     }
 
-    /// <summary>
-    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Activating, then Accepting, then invoke the
-    ///     Action, if any).
-    ///     Called when Command.Activate, Accept, or HotKey has been invoked on this Shortcut.
-    /// </summary>
-    /// <param name="commandContext"></param>
-    /// <returns>
-    ///     <see langword="null"/> if no event was raised; input processing should continue.
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
-    /// </returns>
-    internal virtual bool? DispatchCommand (ICommandContext? commandContext)
+    ///// <summary>
+    /////     Dispatches the Command in the <paramref name="commandContext"/> (Raises Activating, then Accepting, then invoke the
+    /////     Action, if any).
+    /////     Called when Command.Activate, Accept, or HotKey has been invoked on this Shortcut.
+    ///// </summary>
+    ///// <param name="commandContext"></param>
+    ///// <returns>
+    /////     <see langword="null"/> if no event was raised; input processing should continue.
+    /////     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should
+    /////     continue.
+    /////     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
+    ///// </returns>
+    //internal virtual bool? DispatchCommand (ICommandContext? commandContext)
+    //{
+    //    KeyBinding? keyBinding = commandContext?.Binding as KeyBinding?;
+    //    string sourceTitle = commandContext?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+
+    //    Logging.Debug ($"{Title} ({sourceTitle}) Command: {commandContext?.Command}");
+
+    //    // // Invoke Activate on the CommandView to cause it to change state if it wants to
+    //    // // CommandView is responsible for checking CanFocus before changing state
+    //    // Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+
+    //    // if (keyBinding is { } kb)
+    //    // {
+    //    //    KeyBinding updatedBinding = kb with { Data = this };
+    //    //    CommandView.InvokeCommand (Command.Activate, updatedBinding);
+    //    // }
+    //    // else
+    //    // {
+    //    //    CommandView.InvokeCommand (Command.Activate, commandContext);
+    //    // }
+
+    //    // Logging.Debug ($"{Title} ({sourceTitle}) - RaiseActivating ...");
+
+    //    // if (RaiseActivating (commandContext) is true)
+    //    // {
+    //    //    return true;
+    //    // }
+
+    //    // if (CanFocus && SuperView is { CanFocus: true })
+    //    // {
+    //    //    // The default HotKey handler sets Focus
+    //    //    Logging.Debug ($"{Title} ({sourceTitle}) - SetFocus...");
+    //    //    SetFocus ();
+    //    // }
+
+    //    var cancel = false;
+
+    //    //if (commandContext is { Source: null })
+    //    //{
+    //    //    commandContext.Source = new WeakReference<View> (this);
+    //    //}
+
+    //    //Logging.Debug ($"{Title} ({sourceTitle}) - Calling RaiseAccepting...");
+    //    //cancel = RaiseAccepting (commandContext) is true;
+
+    //    //if (cancel)
+    //    //{
+    //    //    return true;
+    //    //}
+
+    //    if (Action is null)
+    //    {
+    //        return cancel;
+    //    }
+    //    Logging.Debug ($"{Title} ({sourceTitle}) - Invoke Action...");
+    //    Action.Invoke ();
+
+    //    // Assume if there's a subscriber to Action, it's handled.
+    //    cancel = true;
+
+    //    return cancel;
+    //}
+
+    /// <inheritdoc />
+    protected override void OnAccepted (CommandEventArgs args)
     {
-        KeyBinding? keyBinding = commandContext?.Binding as KeyBinding?;
-        string sourceTitle = commandContext?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-
-        Logging.Debug ($"{Title} ({sourceTitle}) Command: {commandContext?.Command}");
-
-        // // Invoke Activate on the CommandView to cause it to change state if it wants to
-        // // CommandView is responsible for checking CanFocus before changing state
-        // Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
-
-        // if (keyBinding is { } kb)
-        // {
-        //    KeyBinding updatedBinding = kb with { Data = this };
-        //    CommandView.InvokeCommand (Command.Activate, updatedBinding);
-        // }
-        // else
-        // {
-        //    CommandView.InvokeCommand (Command.Activate, commandContext);
-        // }
-
-        // Logging.Debug ($"{Title} ({sourceTitle}) - RaiseActivating ...");
-
-        // if (RaiseActivating (commandContext) is true)
-        // {
-        //    return true;
-        // }
-
-        // if (CanFocus && SuperView is { CanFocus: true })
-        // {
-        //    // The default HotKey handler sets Focus
-        //    Logging.Debug ($"{Title} ({sourceTitle}) - SetFocus...");
-        //    SetFocus ();
-        // }
-
-        var cancel = false;
-
-        if (commandContext is { Source: null })
-        {
-            commandContext.Source = new WeakReference<View> (this);
-        }
-
-        Logging.Debug ($"{Title} ({sourceTitle}) - Calling RaiseAccepting...");
-        cancel = RaiseAccepting (commandContext) is true;
-
-        if (cancel)
-        {
-            return true;
-        }
-
-        if (Action is null)
-        {
-            return cancel;
-        }
-        Logging.Debug ($"{Title} ({sourceTitle}) - Invoke Action...");
-        Action.Invoke ();
-
-        // Assume if there's a subscriber to Action, it's handled.
-        cancel = true;
-
-        return cancel;
+        Action?.Invoke ();
     }
 
     /// <summary>
@@ -554,6 +560,7 @@ public class Shortcut : View, IOrientation, IDesignable
             // _commandView.Accepting += CommandViewOnAccepted;
 
             UpdateKeyBindings (Key.Empty);
+            ShowHide ();
 
             return;
 
