@@ -5,8 +5,8 @@
 namespace ViewBaseTests.Layout;
 
 /// <summary>
-/// Tests for the GetMinimumContribution method on Dim types.
-/// This method is used by DimAuto to get minimum size contribution during auto-sizing.
+///     Tests for the GetMinimumContribution method on Dim types.
+///     This method is used by DimAuto to get minimum size contribution during auto-sizing.
 /// </summary>
 public class GetMinimumContributionTests
 {
@@ -24,7 +24,7 @@ public class GetMinimumContributionTests
         var view = new View { Width = Dim.Auto (), Height = Dim.Auto () };
         view.BeginInit ();
         view.EndInit ();
-        
+
         // DimAuto calculates based on content
         int contribution = view.Width.GetMinimumContribution (0, 100, view, Dimension.Width);
         Assert.True (contribution >= 0);
@@ -43,7 +43,7 @@ public class GetMinimumContributionTests
     {
         var targetView = new View { Width = 30, Height = 20 };
         Dim dim = Dim.Width (targetView);
-        
+
         int contribution = dim.GetMinimumContribution (0, 100, null, Dimension.Width);
         Assert.Equal (30, contribution);
     }
@@ -104,7 +104,7 @@ public class GetMinimumContributionTests
         // because the actual contribution depends on the To view's position, which DimAuto handles specially
         var toView = new View { X = 50, Y = 30 };
         Dim dim = Dim.Fill (toView);
-        
+
         int contribution = dim.GetMinimumContribution (0, 100, null, Dimension.Width);
         Assert.Equal (0, contribution);
     }
@@ -114,7 +114,7 @@ public class GetMinimumContributionTests
     {
         var toView = new View { X = 50, Y = 30 };
         Dim dim = Dim.Fill (5, toView);
-        
+
         int contribution = dim.GetMinimumContribution (0, 100, null, Dimension.Width);
         Assert.Equal (0, contribution);
     }

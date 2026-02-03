@@ -52,23 +52,6 @@ Added `GetReferencedViews()` virtual method to `Dim` and `Pos` base classes to d
 
 **Result:** `CollectDim` and `CollectPos` no longer need to know about `DimView`, `DimFill`, `DimCombine`, `PosView`, `PosCombine`.
 
-### Phase 1b: `ReferencesOtherViews()` Simplification (✅ Done)
-
-Changed `ReferencesOtherViews()` to use `GetReferencedViews().Any()` as default implementation, removing duplication.
-
-**Changes:**
-- `Dim.ReferencesOtherViews()` - Now uses `GetReferencedViews().Any()` by default
-- `Pos.ReferencesOtherViews()` - Now uses `GetReferencedViews().Any()` by default
-- `DimFill.ReferencesOtherViews()` - Removed (uses default)
-- `PosFunc.ReferencesOtherViews()` - Removed (uses default)
-
-**Kept for optimization (avoid iterator allocation):**
-- `DimView.ReferencesOtherViews()` - Always returns `true`
-- `PosView.ReferencesOtherViews()` - Always returns `true`
-- `DimCombine.ReferencesOtherViews()` - Short-circuits via `Left`/`Right`
-- `PosCombine.ReferencesOtherViews()` - Short-circuits via `Left`/`Right`
-- `PosAlign.ReferencesOtherViews()` - Always returns `true` (special case: alignment affects layout but doesn't track specific views)
-
 ## Proposed Future Refactoring
 
 ### Phase 2: `DependsOnSuperViewContentSize`
@@ -149,7 +132,7 @@ internal virtual bool RequiresTargetLayout => false;
 ## Implementation Order
 
 1. ✅ `GetReferencedViews()` - Foundation for view dependencies
-2. ✅ `ReferencesOtherViews()` simplification - Uses `GetReferencedViews().Any()` as default
+2. 🔲 `ReferencesOtherViews()` simplification - Use `GetReferencedViews().Any()` as default
 3. 🔲 `DependsOnSuperViewContentSize` - Reduce type checking in `DimAuto`
 4. 🔲 `CanContributeToAutoSizing` - Simplify auto-sizing logic
 5. 🔲 `GetMinimumContribution()` - Move calculation logic into types
