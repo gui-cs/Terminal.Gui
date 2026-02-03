@@ -35,6 +35,9 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
     /// <inheritdoc/>
     internal override int GetAnchor (int size) => 0;
 
+    /// <inheritdoc/>
+    internal override bool IsFixed => true;
+
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
         var textSize = 0;

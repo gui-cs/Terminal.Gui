@@ -347,3 +347,15 @@ If you encounter unexpected sizing with `Dim.Auto`, consider the following debug
 - **Inspect Text Formatting**: For `Text` style, check `TextFormatter` settings and constraints (`ConstrainToWidth`, `ConstrainToHeight`). Ensure text is formatted correctly before sizing calculations.
 
 By understanding the intricacies of `Dim.Auto` as implemented in Terminal.Gui v2, developers can create responsive and adaptive terminal UIs that automatically adjust to content changes, enhancing user experience and maintainability.
+
+## Internal Architecture
+
+`Dim.Auto` uses a polymorphic design to minimize coupling with specific `Pos` and `Dim` types. The layout system uses virtual properties and methods to categorize and process layout elements:
+
+- **`DependsOnSuperViewContentSize`**: Identifies types that actively contribute to content size determination (e.g., `DimPercent`, `DimFill`, `PosAnchorEnd`, `PosAlign`)
+- **`CanContributeToAutoSizing`**: Indicates whether a `Dim` can meaningfully contribute to auto-sizing (returns `false` for `DimPercent` and `DimFill` without `MinimumContentDim`/`To`)
+- **`GetMinimumContribution()`**: Calculates the minimum size contribution during auto-sizing (overridden by `DimFill` to return its `MinimumContentDim`)
+- **`IsFixed`**: Identifies fixed-value types that don't depend on layout calculations (`DimAbsolute`, `PosAbsolute`, `DimFunc`, `PosFunc`, `DimAuto`)
+- **`RequiresTargetLayout`**: Indicates types requiring target view layout first (`DimView`, `PosView`)
+
+This design allows new `Pos`/`Dim` types to be added without modifying `DimAuto.Calculate()`.
