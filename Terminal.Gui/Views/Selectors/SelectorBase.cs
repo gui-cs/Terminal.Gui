@@ -30,6 +30,51 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         AddCommand (Command.Accept, HandleAcceptCommand);
 
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+
+        KeyBindings.ReplaceCommands (Key.CursorDown, Command.Down);
+        KeyBindings.ReplaceCommands (Key.CursorRight, Command.Right);
+        KeyBindings.ReplaceCommands (Key.CursorUp, Command.Up);
+        KeyBindings.ReplaceCommands (Key.CursorLeft, Command.Left);
+
+        AddCommand (Command.Down, () => MoveDownRight ());
+        AddCommand (Command.Right, () => MoveDownRight ());
+
+        AddCommand (Command.Up, () => MoveUpLeft ());
+        AddCommand (Command.Left, () => MoveUpLeft ());
+    }
+
+    private bool MoveDownRight ()
+    {
+        int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+
+        if (active < SubViews.OfType<CheckBox> ().Count () - 1)
+        {
+            active++;
+        }
+        else
+        {
+            active = 0;
+        }
+        SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
+
+        return true;
+    }
+
+    private bool MoveUpLeft ()
+    {
+        int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+
+        if (active > 0)
+        {
+            active--;
+        }
+        else
+        {
+            active = SubViews.OfType<CheckBox> ().Count () - 1;
+        }
+        SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
+
+        return true;
     }
 
     /// <summary>
@@ -259,7 +304,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
-                ReadOnly = true
+                ReadOnly = true,
+                TabStop = TabBehavior.NoStop
             };
 
             Add (_valueField);
@@ -293,20 +339,10 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             Title = label,
             Id = label,
             Data = value,
-            MouseHighlightStates = DefaultMouseHighlightStates
+            MouseHighlightStates = DefaultMouseHighlightStates,
+            TabStop = TabBehavior.NoStop
         };
 
-        checkbox.KeyDown += (_, e) =>
-                            {
-                                if (e == Key.Tab)
-                                {
-                                    SubViews.OfType<CheckBox> ().Last ().SetFocus ();
-                                }
-                                else if (e == Key.Tab.WithShift)
-                                {
-                                    SubViews.OfType<CheckBox> ().First ().SetFocus ();
-                                }
-                            };
 
         return checkbox;
     }
