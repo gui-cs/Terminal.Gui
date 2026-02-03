@@ -30,6 +30,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         AddCommand (Command.Accept, HandleAcceptCommand);
 
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+
+        CommandsToBubbleUp = [Command.Accept];
     }
 
     /// <summary>

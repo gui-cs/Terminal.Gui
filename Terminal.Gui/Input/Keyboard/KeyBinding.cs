@@ -58,4 +58,11 @@ public record struct KeyBinding : IInputBinding
     ///     </para>
     /// </remarks>
     public View? Target { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString ()
+    {
+        return $"[{string.Join (", ", Commands)}], Key={Key}, Source={Source}, Target={Target}, Data={Data}";
+    }
+
 }

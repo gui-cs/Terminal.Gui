@@ -39,4 +39,10 @@ public record struct MouseBinding : IInputBinding
 
     /// <inheritdoc/>
     public View? Source { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString ()
+    {
+        return $"[{string.Join (", ", Commands)}], MouseEvent={MouseEvent}, Source={Source}, Data={Data}";
+    }
 }
