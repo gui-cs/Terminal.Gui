@@ -827,13 +827,13 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     public void TextField_Command_Accept_RaisesAccepting ()
     {
         TextField textField = new () { Text = "Test" };
-        bool acceptingFired = false;
+        var acceptingFired = false;
 
         textField.Accepting += (_, e) =>
-        {
-            acceptingFired = true;
-            e.Handled = true;  // Signal that the Accept was processed
-        };
+                               {
+                                   acceptingFired = true;
+                                   e.Handled = true; // Signal that the Accept was processed
+                               };
 
         bool? result = textField.InvokeCommand (Command.Accept);
 
@@ -866,13 +866,13 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     public void TextField_Enter_RaisesAccepting ()
     {
         TextField textField = new () { Text = "Test" };
-        bool acceptingFired = false;
+        var acceptingFired = false;
 
         textField.Accepting += (_, e) =>
-        {
-            acceptingFired = true;
-            e.Handled = true;
-        };
+                               {
+                                   acceptingFired = true;
+                                   e.Handled = true;
+                               };
 
         // Enter should raise Accepting
         bool? result = textField.NewKeyDownEvent (Key.Enter);

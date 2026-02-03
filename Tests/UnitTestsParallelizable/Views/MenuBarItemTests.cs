@@ -1,10 +1,10 @@
-﻿using Xunit.Abstractions;
+﻿
 
 //using static Terminal.Gui.ViewBaseTests.MenuTests;
 
 namespace ViewsTests;
 
-public class MenuBarItemTests ()
+public class MenuBarItemTests
 {
     [Fact]
     public void Constructors_Defaults ()
@@ -13,11 +13,9 @@ public class MenuBarItemTests ()
         Assert.Null (menuBarItem.PopoverMenu);
         Assert.Null (menuBarItem.TargetView);
 
-        menuBarItem = new MenuBarItem (targetView: null, command: Command.NotBound, commandText: null, popoverMenu: null);
+        menuBarItem = new MenuBarItem (null, Command.NotBound, null, null);
         Assert.Null (menuBarItem.PopoverMenu);
         Assert.Null (menuBarItem.TargetView);
-
-
     }
 
     // Claude - Opus 4.5
@@ -44,7 +42,7 @@ public class MenuBarItemTests ()
     public void MenuItem_Command_Accept_ExecutesAction ()
     {
         MenuItem menuItem = new () { Title = "Test" };
-        bool actionFired = false;
+        var actionFired = false;
         menuItem.Action = () => actionFired = true;
 
         // Accept executes Action
@@ -63,7 +61,7 @@ public class MenuBarItemTests ()
     public void MenuItem_Command_HotKey_InvokesAccept ()
     {
         MenuItem menuItem = new () { Title = "_Test" };
-        bool actionFired = false;
+        var actionFired = false;
         menuItem.Action = () => actionFired = true;
 
         // HotKey invokes Accept

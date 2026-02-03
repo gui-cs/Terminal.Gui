@@ -1,6 +1,5 @@
 namespace ViewsTests;
 
-
 public class WizardTests
 {
     #region Constructor Tests

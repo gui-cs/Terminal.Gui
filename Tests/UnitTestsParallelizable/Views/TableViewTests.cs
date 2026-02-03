@@ -1,5 +1,4 @@
 ﻿using System.Data;
-#nullable enable
 using JetBrains.Annotations;
 
 namespace ViewsTests;
@@ -74,7 +73,6 @@ public class TableViewTests
 
         Assert.Same (tf2, tableView.App!.TopRunnableView!.MostFocused);
         Assert.True (tf2.HasFocus);
-
     }
 
     [Fact]
@@ -264,7 +262,7 @@ public class TableViewTests
         dt.Rows.Add ("Data1");
 
         TableView tableView = new () { Table = new DataTableSource (dt) };
-        bool cellActivatedFired = false;
+        var cellActivatedFired = false;
 
         tableView.CellActivated += (_, _) => cellActivatedFired = true;
 
@@ -311,7 +309,7 @@ public class TableViewTests
         dt.Rows.Add ("Data1");
 
         TableView tableView = new () { Table = new DataTableSource (dt) };
-        bool cellActivatedFired = false;
+        var cellActivatedFired = false;
 
         tableView.CellActivated += (_, _) => cellActivatedFired = true;
 

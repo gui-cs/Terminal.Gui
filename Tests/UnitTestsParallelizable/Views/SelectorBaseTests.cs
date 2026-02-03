@@ -1,4 +1,3 @@
-#nullable enable
 namespace ViewsTests;
 
 /// <summary>
@@ -193,7 +192,7 @@ public class SelectorBaseTests
         selector.SetValuesAndLabels<SelectorStyles> ();
 
         // Verify values match enum integer values
-        var expectedValues = Enum.GetValues<SelectorStyles> ().Select (e => (int)e).ToList ();
+        List<int> expectedValues = Enum.GetValues<SelectorStyles> ().Select (e => (int)e).ToList ();
         Assert.Equal (expectedValues, selector.Values);
     }
 
@@ -305,7 +304,7 @@ public class SelectorBaseTests
         selector.Labels = ["Option1", "Option2", "Option3"];
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
-        var hotKeys = checkBoxes.Select (cb => cb.HotKey).ToList ();
+        List<Key> hotKeys = checkBoxes.Select (cb => cb.HotKey).ToList ();
         Assert.Equal (3, hotKeys.Distinct ().Count ()); // All unique
     }
 
@@ -329,6 +328,7 @@ public class SelectorBaseTests
         selector.Labels = ["_Alt Option", "Option2"];
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+
         // Should use 'A' from "_Alt"
         Assert.Equal (Key.A, checkBoxes [0].HotKey);
     }
@@ -346,6 +346,7 @@ public class SelectorBaseTests
         selector.Labels = ["Option1", "Option2"];
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+
         // Should skip 'O' and use next available character
         Assert.NotEqual (Key.O, checkBoxes [0].HotKey);
     }
@@ -437,6 +438,7 @@ public class SelectorBaseTests
         selector.Layout ();
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+
         // HorizontalSpace is applied via Margin.Thickness.Right
         int spacing2 = checkBoxes [0].Margin!.Thickness.Right;
 
@@ -458,6 +460,7 @@ public class SelectorBaseTests
         selector.Layout ();
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+
         // In vertical mode, checkboxes should be at same X
         Assert.Equal (checkBoxes [0].Frame.X, checkBoxes [1].Frame.X);
     }
@@ -592,7 +595,7 @@ public class SelectorBaseTests
         var selector = new OptionSelector ();
 
         // This should work even without labels
-        var exception = Record.Exception (() => selector.Value = null);
+        Exception? exception = Record.Exception (() => selector.Value = null);
 
         Assert.Null (exception);
         Assert.Null (selector.Value);

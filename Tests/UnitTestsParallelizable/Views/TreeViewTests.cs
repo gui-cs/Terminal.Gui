@@ -5,18 +5,18 @@ namespace ViewsTests;
 [TestSubject (typeof (TreeView))]
 public class TreeViewTests
 {
-
     [Fact]
     public void TreeView_CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
         var tree = new TreeView ();
+
         tree.AddObjects ([
-                             new TreeNode(){ Text="apricot" },
-                             new TreeNode(){ Text="arm" },
-                             new TreeNode(){ Text="bat" },
-                             new TreeNode(){ Text="batman" },
-                             new TreeNode(){ Text="bates hotel" },
-                             new TreeNode(){ Text="candle" },
+                             new TreeNode { Text = "apricot" },
+                             new TreeNode { Text = "arm" },
+                             new TreeNode { Text = "bat" },
+                             new TreeNode { Text = "batman" },
+                             new TreeNode { Text = "bates hotel" },
+                             new TreeNode { Text = "candle" }
                          ]);
 
         tree.SetFocus ();
@@ -50,12 +50,13 @@ public class TreeViewTests
         treeView.AddObject (root);
         treeView.SelectedObject = root;
 
-        int acceptingCount = 0;
+        var acceptingCount = 0;
+
         treeView.Accepting += (_, e) =>
-        {
-            acceptingCount++;
-            e.Handled = true;
-        };
+                              {
+                                  acceptingCount++;
+                                  e.Handled = true;
+                              };
 
         treeView.InvokeCommand (Command.Activate);
         int afterActivate = acceptingCount;
@@ -81,12 +82,13 @@ public class TreeViewTests
         treeView.AddObject (root);
         treeView.SelectedObject = root;
 
-        bool acceptingFired = false;
+        var acceptingFired = false;
+
         treeView.Accepting += (_, e) =>
-        {
-            acceptingFired = true;
-            e.Handled = true;
-        };
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true;
+                              };
 
         bool? result = treeView.InvokeCommand (Command.Accept);
 

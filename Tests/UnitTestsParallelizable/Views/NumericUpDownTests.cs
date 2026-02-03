@@ -52,11 +52,7 @@ public class NumericUpDownTests
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_int ()
     {
-        NumericUpDown<int> numericUpDown = new()
-        {
-            Value = 10,
-            Increment = 2
-        };
+        NumericUpDown<int> numericUpDown = new () { Value = 10, Increment = 2 };
 
         Assert.Equal (10, numericUpDown.Value);
         Assert.Equal (2, numericUpDown.Increment);
@@ -65,11 +61,7 @@ public class NumericUpDownTests
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_float ()
     {
-        NumericUpDown<float> numericUpDown = new()
-        {
-            Value = 10.5F,
-            Increment = 2.5F
-        };
+        NumericUpDown<float> numericUpDown = new () { Value = 10.5F, Increment = 2.5F };
 
         Assert.Equal (10.5F, numericUpDown.Value);
         Assert.Equal (2.5F, numericUpDown.Increment);
@@ -78,21 +70,15 @@ public class NumericUpDownTests
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_decimal ()
     {
-        NumericUpDown<decimal> numericUpDown = new ()
-        {
-            Value = 10.5m,
-            Increment = 2.5m
-        };
+        NumericUpDown<decimal> numericUpDown = new () { Value = 10.5m, Increment = 2.5m };
 
         Assert.Equal (10.5m, numericUpDown.Value);
         Assert.Equal (2.5m, numericUpDown.Increment);
     }
 
     [Fact]
-    public void WhenCreatedWithInvalidType_ShouldThrowInvalidOperationException ()
-    {
+    public void WhenCreatedWithInvalidType_ShouldThrowInvalidOperationException () =>
         Assert.Throws<InvalidOperationException> (() => new NumericUpDown<string> ());
-    }
 
     [Fact]
     public void WhenCreatedWithInvalidTypeObject_ShouldNotThrowInvalidOperationException ()

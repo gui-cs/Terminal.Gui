@@ -88,12 +88,13 @@ public class MenuBarShowItemTests
         menuBar.EndInit ();
 
         // Accept shows PopoverMenu or executes command
-        bool acceptingFired = false;
+        var acceptingFired = false;
+
         item.Accepting += (_, e) =>
-        {
-            acceptingFired = true;
-            e.Handled = true;
-        };
+                          {
+                              acceptingFired = true;
+                              e.Handled = true;
+                          };
 
         bool? result = item.InvokeCommand (Command.Accept);
 

@@ -4,11 +4,27 @@ using UnitTests;
 namespace ViewsTests;
 
 /// <summary>
-/// Pure unit tests for <see cref="DatePicker"/> that don't require Application.Driver or View context.
-/// These tests can run in parallel without interference.
+///     Pure unit tests for <see cref="DatePicker"/> that don't require Application.Driver or View context.
+///     These tests can run in parallel without interference.
 /// </summary>
 public class DatePickerTests : TestDriverBase
 {
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void DatePicker_CalendarCellSelection_ChangesDate ()
+    {
+        DatePicker datePicker = new () { Value = new DateTime (2024, 1, 15) };
+        datePicker.BeginInit ();
+        datePicker.EndInit ();
+
+        // Calendar cell selection changes date via internal interactions
+        Assert.Equal (new DateTime (2024, 1, 15), datePicker.Value);
+
+        datePicker.Dispose ();
+    }
+
     [Fact]
     public void DatePicker_ChangingCultureChangesFormat ()
     {
@@ -28,15 +44,6 @@ public class DatePickerTests : TestDriverBase
     }
 
     [Fact]
-    public void DatePicker_Default_Constructor_ShouldSetCurrenDate ()
-    {
-        var datePicker = new DatePicker ();
-        Assert.Equal (DateTime.Now.Date.Day, datePicker.Value.Day);
-        Assert.Equal (DateTime.Now.Date.Month, datePicker.Value.Month);
-        Assert.Equal (DateTime.Now.Date.Year, datePicker.Value.Year);
-    }
-
-    [Fact]
     public void DatePicker_Constrctor_Now_ShouldSetCurrenDate ()
     {
         var datePicker = new DatePicker (DateTime.Now);
@@ -46,39 +53,12 @@ public class DatePickerTests : TestDriverBase
     }
 
     [Fact]
-    public void DatePicker_X_Y_Init ()
+    public void DatePicker_Default_Constructor_ShouldSetCurrenDate ()
     {
-        var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
+        var datePicker = new DatePicker ();
         Assert.Equal (DateTime.Now.Date.Day, datePicker.Value.Day);
         Assert.Equal (DateTime.Now.Date.Month, datePicker.Value.Month);
         Assert.Equal (DateTime.Now.Date.Year, datePicker.Value.Year);
-    }
-
-    [Fact]
-    public void DatePicker_SetDate_ShouldChangeText ()
-    {
-        var datePicker = new DatePicker { Culture = CultureInfo.GetCultureInfo ("en-GB") };
-        var newDate = new DateTime (2024, 1, 15);
-        string format = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-
-        datePicker.Value = newDate;
-        Assert.Equal (newDate.ToString (format), datePicker.Text);
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void DatePicker_CalendarCellSelection_ChangesDate ()
-    {
-        DatePicker datePicker = new () { Value = new DateTime (2024, 1, 15) };
-        datePicker.BeginInit ();
-        datePicker.EndInit ();
-
-        // Calendar cell selection changes date via internal interactions
-        Assert.Equal (new DateTime (2024, 1, 15), datePicker.Value);
-
-        datePicker.Dispose ();
     }
 
     // Claude - Opus 4.5
@@ -96,5 +76,25 @@ public class DatePickerTests : TestDriverBase
         Assert.Equal (new DateTime (2024, 1, 15), datePicker.Value);
 
         datePicker.Dispose ();
+    }
+
+    [Fact]
+    public void DatePicker_SetDate_ShouldChangeText ()
+    {
+        var datePicker = new DatePicker { Culture = CultureInfo.GetCultureInfo ("en-GB") };
+        var newDate = new DateTime (2024, 1, 15);
+        string format = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+
+        datePicker.Value = newDate;
+        Assert.Equal (newDate.ToString (format), datePicker.Text);
+    }
+
+    [Fact]
+    public void DatePicker_X_Y_Init ()
+    {
+        var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
+        Assert.Equal (DateTime.Now.Date.Day, datePicker.Value.Day);
+        Assert.Equal (DateTime.Now.Date.Month, datePicker.Value.Month);
+        Assert.Equal (DateTime.Now.Date.Year, datePicker.Value.Year);
     }
 }

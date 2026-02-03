@@ -41,12 +41,13 @@ public class TabViewCommandTests
         tabView.EndInit ();
 
         // Accept focuses tab content
-        bool acceptingFired = false;
+        var acceptingFired = false;
+
         tabView.Accepting += (_, e) =>
-        {
-            acceptingFired = true;
-            e.Handled = true;
-        };
+                             {
+                                 acceptingFired = true;
+                                 e.Handled = true;
+                             };
 
         bool? result = tabView.InvokeCommand (Command.Accept);
 

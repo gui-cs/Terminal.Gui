@@ -270,7 +270,7 @@ public class ListViewTests (ITestOutputHelper output)
         void OnAccepting (object? sender, CommandEventArgs e)
         {
             accepted = true;
-            selectedValue = listView.SelectedItem.HasValue ? source[listView.SelectedItem.Value] : string.Empty;
+            selectedValue = listView.SelectedItem.HasValue ? source [listView.SelectedItem.Value] : string.Empty;
             e.Handled = true;
         }
     }
@@ -560,10 +560,7 @@ public class ListViewTests (ITestOutputHelper output)
         IListDataSource? src = new ListWrapper<string> (source);
         var lv = new ListView { Source = src };
 
-        lv.SourceChanged += (_, _) =>
-                            {
-                                changed++;
-                            };
+        lv.SourceChanged += (_, _) => { changed++; };
 
         lv.Source = src;
 
@@ -2739,13 +2736,13 @@ hree - lon",
     public void ListView_Command_Accept_RaisesAccepting ()
     {
         ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2"]) };
-        bool acceptingFired = false;
+        var acceptingFired = false;
 
         listView.Accepting += (_, e) =>
-        {
-            acceptingFired = true;
-            e.Handled = true;  // Signal that the Accept was processed
-        };
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true; // Signal that the Accept was processed
+                              };
 
         bool? result = listView.InvokeCommand (Command.Accept);
 
