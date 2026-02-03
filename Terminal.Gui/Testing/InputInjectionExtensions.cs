@@ -26,4 +26,39 @@ public static class InputInjectionExtensions
         /// <param name="events">The events to inject.</param>
         public void InjectSequence (params InputInjectionEvent [] events) { app.GetInputInjector ().InjectSequence (events); }
     }
+
+    /// <summary>
+    ///     Gets the injection events for a left button click at the specified point.
+    /// </summary>
+    /// <param name="p">The screen position for the click.</param>
+    /// <returns>An array of injection events representing a left button click.</returns>
+    public static InputInjectionEvent [] LeftButtonClick (Point p) =>
+    [
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (10) },
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (10) }
+    ];
+
+    /// <summary>
+    ///     Gets the injection events for a right button click at the specified point.
+    /// </summary>
+    /// <param name="p">The screen position for the click.</param>
+    /// <returns>An array of injection events representing a right button click.</returns>
+    public static InputInjectionEvent [] RightButtonClick (Point p) =>
+    [
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.RightButtonPressed, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (10) },
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.RightButtonReleased, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (10) }
+    ];
+
+    /// <summary>
+    ///     Gets the injection events for a left button double-click at the specified point.
+    /// </summary>
+    /// <param name="p">The screen position for the double-click.</param>
+    /// <returns>An array of injection events representing a left button double-click.</returns>
+    public static InputInjectionEvent [] LeftButtonDoubleClick (Point p) =>
+    [
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (0) },
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (10) },
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (10) },
+        new MouseInjectionEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = p }) { Delay = TimeSpan.FromMilliseconds (10) }
+    ];
 }
