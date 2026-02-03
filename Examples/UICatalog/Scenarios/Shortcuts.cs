@@ -156,7 +156,7 @@ public class Shortcuts : Scenario
             BindKeyToApplication = true
         };
 
-        _app?.TopRunnableView.PropagatedCommands = [Command.Accept, Command.Activate];
+        _app?.TopRunnableView.CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
         appShortcut.Accepting += (_, args) =>
                                  {

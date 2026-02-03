@@ -10,7 +10,7 @@ public class InputBindingTests
 {
     #region Constructor Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void Constructor_WithCommands_SetsCommands ()
     {
         Command [] commands = [Command.Activate, Command.Accept];
@@ -22,7 +22,7 @@ public class InputBindingTests
         Assert.Null (binding.Data);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void Constructor_WithCommandsAndSource_SetsBothProperties ()
     {
         Command [] commands = [Command.Activate];
@@ -35,7 +35,7 @@ public class InputBindingTests
         Assert.Null (binding.Data);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void Constructor_WithAllParameters_SetsAllProperties ()
     {
         Command [] commands = [Command.Accept];
@@ -53,7 +53,7 @@ public class InputBindingTests
 
     #region Property Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void Commands_CanBeModified ()
     {
         InputBinding binding = new ([Command.Activate]);
@@ -65,7 +65,7 @@ public class InputBindingTests
         Assert.Equal (Command.Cancel, binding.Commands [1]);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void Source_CanBeModified ()
     {
         InputBinding binding = new ([Command.Activate]);
@@ -76,7 +76,7 @@ public class InputBindingTests
         Assert.Equal ("newSource", binding.Source?.Id);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void Data_CanBeModified ()
     {
         InputBinding binding = new ([Command.Activate]);
@@ -90,7 +90,7 @@ public class InputBindingTests
 
     #region IInputBinding Interface Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void ImplementsIInputBinding ()
     {
         InputBinding binding = new ([Command.Activate]) { Source = new View { Id = "test" }, Data = "data" };
@@ -102,7 +102,7 @@ public class InputBindingTests
         Assert.Equal (binding.Data, iBinding.Data);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void CanBeUsedPolymorphically ()
     {
         IInputBinding binding = new InputBinding ([Command.Accept], new View { Id = "polymorphic" });
@@ -116,7 +116,7 @@ public class InputBindingTests
 
     #region Pattern Matching Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void PatternMatching_CanDistinguishFromKeyBinding ()
     {
         IInputBinding inputBinding = new InputBinding ([Command.Activate]);
@@ -128,7 +128,7 @@ public class InputBindingTests
         Assert.False (keyBinding is InputBinding);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void PatternMatching_CanDistinguishFromMouseBinding ()
     {
         IInputBinding inputBinding = new InputBinding ([Command.Activate]);
@@ -140,7 +140,7 @@ public class InputBindingTests
         Assert.False (mouseBinding is InputBinding);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void PatternMatching_SwitchExpression_Works ()
     {
         IInputBinding binding = new InputBinding ([Command.Accept], new View { Id = "source" });
@@ -160,7 +160,7 @@ public class InputBindingTests
 
     #region CommandContext Integration Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void CanBeUsedWithCommandContext ()
     {
         View source = new () { Id = "contextSource" };
@@ -184,7 +184,7 @@ public class InputBindingTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void Binding_Property_ReturnsIInputBinding ()
     {
         InputBinding binding = new ([Command.Accept]);
@@ -196,12 +196,13 @@ public class InputBindingTests
         Assert.IsType<InputBinding> (ctx.Binding);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void PatternMatching_ThroughICommandContext_Works ()
     {
         InputBinding binding = new ([Command.Accept], new View { Id = "test" });
         ICommandContext ctx = new CommandContext { Command = Command.Accept, Binding = binding };
 
+        // Can pattern match the binding from the interface
         // Can pattern match the binding from the interface
         if (ctx.Binding is InputBinding ib)
         {
@@ -217,7 +218,7 @@ public class InputBindingTests
 
     #region Record Equality Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void RecordEquality_SameValues_AreEqual ()
     {
         Command [] commands = [Command.Activate];
@@ -229,7 +230,7 @@ public class InputBindingTests
         Assert.Equal (binding1, binding2);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void RecordEquality_DifferentCommands_AreNotEqual ()
     {
         InputBinding binding1 = new ([Command.Activate]);
@@ -238,7 +239,7 @@ public class InputBindingTests
         Assert.NotEqual (binding1, binding2);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact ]
     public void RecordEquality_DifferentSources_AreNotEqual ()
     {
         InputBinding binding1 = new ([Command.Activate], new View { Id = "source1" });

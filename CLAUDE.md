@@ -58,6 +58,14 @@ See `.claude/tasks/` for task checklists:
 - `clean-code-review.md` - Creating clean git commit histories
 - `build-app.md` - Building applications with Terminal.Gui
 
+## Planning Mode
+
+When in planning mode:
+- **Create plan files in `./plans/`** (relative to the repository root)
+- Plan files should be markdown format
+- Include detailed implementation steps, file changes, and verification steps
+- Reference existing code patterns and reuse opportunities
+
 ---
 
 ## Project Overview

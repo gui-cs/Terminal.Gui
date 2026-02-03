@@ -30,7 +30,7 @@ public class Menu : Bar
 
         BorderStyle = DefaultBorderStyle;
 
-        PropagatedCommands = [Command.Accept, Command.Activate];
+        CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }

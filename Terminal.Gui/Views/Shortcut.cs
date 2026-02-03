@@ -83,7 +83,7 @@ public class Shortcut : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (_, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (_, e) => OrientationChanged?.Invoke (this, e);
 
-        PropagatedCommands = [Command.Accept, Command.Activate];
+        CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
         AddCommands ();
 

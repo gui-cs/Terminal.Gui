@@ -314,17 +314,23 @@ public partial class View // Command APIs
             Accepting?.Invoke (this, args);
         }
 
-        // If Accepting was handled, raise Accepted (non-cancelable event)
+        // If Accepting was not handled, raise Accepted (non-cancelable event)
         if (args.Handled)
         {
-            Logging.Debug ($"{Title} ({ctx?.Source}) - Calling RaiseAccepted");
-            OnAccepted (new CommandEventArgs() { Context = ctx });
-            RaiseAccepted (ctx);
+            return true;
         }
 
-        // Use PropagateCommand helper to handle Accept propagation
-        // (maintains backward compatibility with IsDefault button and SuperView propagation)
-        return PropagateCommand (Command.Accept, ctx, args.Handled);
+        // Use TryBubbleToSuperView helper to handle Accept bubbling
+        // (maintains backward compatibility with IsDefault button and SuperView bubbling)
+        if (TryBubbleToSuperView (Command.Accept, ctx, args.Handled) is true)
+        {
+            return true;
+        }
+
+        Logging.Debug ($"{Title} ({ctx?.Source}) - Calling RaiseAccepted");
+        RaiseAccepted (ctx);
+
+        return true;
     }
 
     /// <summary>
@@ -430,8 +436,8 @@ public partial class View // Command APIs
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         Activating?.Invoke (this, args);
 
-        // Use PropagateCommand helper to handle Activate propagation (opt-in via PropagatedCommands)
-        return PropagateCommand (Command.Activate, ctx, args.Handled);
+        // Use TryBubbleToSuperView helper to handle Activate bubbling (opt-in via CommandsToBubbleUp)
+        return TryBubbleToSuperView (Command.Activate, ctx, args.Handled);
     }
 
     /// <summary>
@@ -504,31 +510,30 @@ public partial class View // Command APIs
     #region Command Propagation
 
     /// <summary>
-    ///     Gets or sets the list of commands that should propagate to this View from unhandled SubViews.
+    ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews.
     ///     When a SubView raises a command that is not handled, and the command is in the SuperView's
-    ///     <see cref="PropagatedCommands"/> list, the command will be invoked on the SuperView.
+    ///     <see cref="CommandsToBubbleUp"/> list, the command will be invoked on the SuperView.
     /// </summary>
     /// <remarks>
-    ///     By default, only <see cref="Command.Accept"/> propagates (backward compatibility).
-    ///     To enable <see cref="Command.Activate"/> propagation for hierarchical views:
+    ///     e.g. to enable <see cref="Command.Activate"/> bubbling for hierarchical views:
     ///     <code>
-    ///         menuBar.PropagatedCommands = [Command.Accept, Command.Activate];
+    ///         menuBar.CommandsToBubbleUp = [Command.Activate];
     ///     </code>
     /// </remarks>
-    public IReadOnlyList<Command> PropagatedCommands { get; set; } = [Command.Accept];
+    public IReadOnlyList<Command> CommandsToBubbleUp { get; set; } = [];
 
     /// <summary>
-    ///     Propagates a command to the SuperView if the command is in SuperView's <see cref="PropagatedCommands"/> list.
+    ///     Bubbles a command to the SuperView if the command is in SuperView's <see cref="CommandsToBubbleUp"/> list.
     ///     Handles the special case of invoking <see cref="Command.Accept"/> on a peer IsDefault button.
     /// </summary>
-    /// <param name="command">The command to potentially propagate.</param>
+    /// <param name="command">The command to potentially bubble up.</param>
     /// <param name="ctx">The command context to pass along.</param>
     /// <param name="handled">Whether the command was already handled by this View.</param>
     /// <returns>
-    ///     <see langword="true"/> if the command was handled (either locally or by propagation).
+    ///     <see langword="true"/> if the command was handled (either locally or by bubbling).
     ///     <see langword="false"/> if the command was not handled.
     /// </returns>
-    protected bool? PropagateCommand (Command command, ICommandContext? ctx, bool handled)
+    protected bool? TryBubbleToSuperView (Command command, ICommandContext? ctx, bool handled)
     {
         if (handled)
         {
@@ -551,8 +556,8 @@ public partial class View // Command APIs
             }
         }
 
-        // Check if SuperView wants this command propagated
-        if (SuperView?.PropagatedCommands.Contains (command) == true)
+        // Check if SuperView wants this command bubbled up to it
+        if (SuperView?.CommandsToBubbleUp.Contains (command) == true)
         {
             return SuperView.InvokeCommand (command, ctx);
         }
