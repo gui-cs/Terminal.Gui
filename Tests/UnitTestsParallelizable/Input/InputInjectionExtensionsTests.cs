@@ -1,4 +1,4 @@
-namespace TestingTests;
+namespace InputTests;
 
 /// <summary>
 ///     Tests for InputInjectionExtensions helper methods.

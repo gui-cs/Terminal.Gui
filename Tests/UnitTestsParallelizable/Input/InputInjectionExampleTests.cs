@@ -25,7 +25,7 @@ public class InputInjectionExampleTests
         using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
-        int keyPressed = 0;
+        var keyPressed = 0;
         Key? receivedKey = null;
 
         app.Keyboard.KeyDown += (s, e) =>
@@ -63,18 +63,11 @@ public class InputInjectionExampleTests
         app.Mouse.MouseEvent += (s, e) => { receivedEvents.Add (e.Flags); };
 
         // Act - Inject press and release with controlled timing
-        Mouse press = new ()
-        {
-            ScreenPosition = new (5, 5),
-            Flags = MouseFlags.LeftButtonPressed,
-            Timestamp = time.Now
-        };
+        Mouse press = new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = time.Now };
 
         Mouse release = new ()
         {
-            ScreenPosition = new (5, 5),
-            Flags = MouseFlags.LeftButtonReleased,
-            Timestamp = time.Now.AddMilliseconds (50) // Controlled 50ms delay
+            ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = time.Now.AddMilliseconds (50) // Controlled 50ms delay
         };
 
         app.InjectMouse (press);
@@ -144,7 +137,7 @@ public class InputInjectionExampleTests
         using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
-        string typedText = "";
+        var typedText = "";
 
         app.Keyboard.KeyDown += (s, e) =>
                                 {
@@ -223,8 +216,7 @@ public class InputInjectionExampleTests
 
         app.Mouse.MouseEvent += (s, e) =>
                                 {
-                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked) ||
-                                        e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
+                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked) || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
                                     {
                                         clicks.Add (e.Flags);
                                     }
@@ -299,7 +291,7 @@ public class InputInjectionExampleTests
         app.Begin (runnable);
 
         Button button = new () { Text = "Click Me", X = 5, Y = 2 };
-        (runnable as View)?.Add (button);
+        runnable?.Add (button);
 
         var acceptingCalled = false;
         button.Accepting += (s, e) => acceptingCalled = true;
@@ -324,7 +316,7 @@ public class InputInjectionExampleTests
 
         // Double-click helper
         CheckBox checkBox = new () { Text = "_Check", X = 0, Y = 0 };
-        (runnable as View)?.Add (checkBox);
+        runnable?.Add (checkBox);
 
         CheckState initialState = checkBox.Value;
         app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (new Point (0, 0)));
@@ -332,7 +324,74 @@ public class InputInjectionExampleTests
         // After double-click, state should have toggled twice (back to initial)
         Assert.Equal (initialState, checkBox.Value);
 
-        (runnable as View)?.Dispose ();
+        runnable?.Dispose ();
+    }
+
+    #endregion
+
+    #region Tests for https: //github.com/gui-cs/Terminal.Gui/issues/4675
+
+    [Fact]
+    public void Issue_4675_MakeInjectingDoubleClickEasier_WorksAsExpected ()
+    {
+        // This test reproduces the exact scenario from the issue
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        CheckBox checkBox = new () { Text = "_Checkbox" };
+        runnable?.Add (checkBox);
+
+        CheckState initialState = checkBox.Value;
+
+        // This is the simplified syntax requested in the issue
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (new Point (0, 0)));
+
+        // After double-click, checkbox should have toggled twice (back to initial)
+        Assert.Equal (initialState, checkBox.Value);
+
+        runnable?.Dispose ();
+    }
+
+    [Fact]
+    public void Issue_4675_LeftButtonClick_WorksAsExpected ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        Button button = new () { Text = "Click Me" };
+        runnable?.Add (button);
+
+        var acceptingCalled = false;
+        button.Accepting += (s, e) => acceptingCalled = true;
+
+        // Test the LeftButtonClick helper
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (0, 0)));
+
+        Assert.True (acceptingCalled);
+        runnable?.Dispose ();
+    }
+
+    [Fact]
+    public void Issue_4675_RightButtonClick_WorksAsExpected ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        List<MouseFlags> receivedFlags = [];
+        app.Mouse.MouseEvent += (s, e) => receivedFlags.Add (e.Flags);
+
+        // Test the RightButtonClick helper
+        app.InjectSequence (InputInjectionExtensions.RightButtonClick (new Point (5, 5)));
+
+        Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.RightButtonPressed));
+        Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.RightButtonReleased));
+        Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.RightButtonClicked));
     }
 
     #endregion

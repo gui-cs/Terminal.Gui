@@ -46,36 +46,20 @@ public class MouseInjectionDocTests
         app.Mouse.MouseEvent += (s, e) => receivedFlags.Add (e.Flags);
 
         // First click at T+0
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
 
         time.Advance (TimeSpan.FromMilliseconds (50));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
 
         // Second click at T+350 (within 500ms double-click threshold)
         time.Advance (TimeSpan.FromMilliseconds (300));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
 
         time.Advance (TimeSpan.FromMilliseconds (50));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
 
         // Verify double-click detected
         Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.LeftButtonDoubleClicked));
@@ -94,36 +78,20 @@ public class MouseInjectionDocTests
         app.Mouse.MouseEvent += (s, e) => receivedFlags.Add (e.Flags);
 
         // First click at T+0
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
 
         time.Advance (TimeSpan.FromMilliseconds (50));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
 
         // Second click at T+600 (outside 500ms threshold)
         time.Advance (TimeSpan.FromMilliseconds (600));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
 
         time.Advance (TimeSpan.FromMilliseconds (50));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
 
         // Verify double-click NOT detected
         Assert.DoesNotContain (receivedFlags, f => f.HasFlag (MouseFlags.LeftButtonDoubleClicked));
@@ -147,53 +115,29 @@ public class MouseInjectionDocTests
         app.Mouse.MouseEvent += (s, e) => receivedFlags.Add (e.Flags);
 
         // First click
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
 
         time.Advance (TimeSpan.FromMilliseconds (50));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
 
         // Second click (within 500ms)
         time.Advance (TimeSpan.FromMilliseconds (200));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
 
         time.Advance (TimeSpan.FromMilliseconds (50));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
 
         // Third click (within 500ms of second)
         time.Advance (TimeSpan.FromMilliseconds (200));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
 
         time.Advance (TimeSpan.FromMilliseconds (50));
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
 
         // Verify triple-click detected
         Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.LeftButtonTripleClicked));
@@ -221,17 +165,9 @@ public class MouseInjectionDocTests
                                 };
 
         // Right click
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.RightButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.RightButtonPressed });
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.RightButtonReleased, Position = new (10, 10)
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.RightButtonReleased, Position = new (10, 10) });
 
         Assert.True (rightClickReceived);
     }
@@ -254,17 +190,9 @@ public class MouseInjectionDocTests
                                 };
 
         // Middle click
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.MiddleButtonPressed
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.MiddleButtonPressed });
 
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.MiddleButtonReleased
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.MiddleButtonReleased });
 
         Assert.True (middleClickReceived);
     }
@@ -278,10 +206,7 @@ public class MouseInjectionDocTests
         using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
-        View view = new ()
-        {
-            Width = 10, Height = 10,
-        };
+        View view = new () { Width = 10, Height = 10 };
         Point? lastPosition = null;
 
         view.MouseEvent += (s, e) =>
@@ -290,6 +215,7 @@ public class MouseInjectionDocTests
                                {
                                    lastPosition = e.Position;
                                }
+
                                if (e.Flags.HasFlag (MouseFlags.PositionReport) && lastPosition.HasValue && e.Position.HasValue)
                                {
                                    // Handle drag
@@ -304,29 +230,14 @@ public class MouseInjectionDocTests
         app.Begin (runnable);
 
         // Press at (5, 5)
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonPressed,
-                             ScreenPosition = new (0, 0)
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (0, 0) });
 
         // Drag to (10, 10)
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.PositionReport | MouseFlags.LeftButtonPressed,
-                             ScreenPosition = new (5, 5)
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.PositionReport | MouseFlags.LeftButtonPressed, ScreenPosition = new (5, 5) });
         app.LayoutAndDraw ();
 
         // Release
-        app.InjectMouse (
-                         new ()
-                         {
-                             Flags = MouseFlags.LeftButtonReleased,
-                             ScreenPosition = new (5, 5)
-                         });
+        app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (5, 5) });
 
         Assert.Equal (5, view.Frame.X);
         Assert.Equal (5, view.Frame.Y);
