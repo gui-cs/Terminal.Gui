@@ -69,6 +69,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		docfx\docs\events.md = docfx\docs\events.md
 		docfx\docs\getting-started.md = docfx\docs\getting-started.md
 		docfx\docs\index.md = docfx\docs\index.md
+		docfx\docs\input-injection.md = docfx\docs\input-injection.md
 		docfx\docs\keyboard.md = docfx\docs\keyboard.md
 		docfx\docs\layout.md = docfx\docs\layout.md
 		docfx\docs\lexicon.md = docfx\docs\lexicon.md
