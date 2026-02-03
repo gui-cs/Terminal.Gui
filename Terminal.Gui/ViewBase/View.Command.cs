@@ -330,7 +330,8 @@ public partial class View // Command APIs
         Logging.Debug ($"{Title} ({ctx?.Source}) - Calling RaiseAccepted");
         RaiseAccepted (ctx);
 
-        return true;
+        // Return null here to indicate no one handled the Accepting event
+        return null;
     }
 
     /// <summary>

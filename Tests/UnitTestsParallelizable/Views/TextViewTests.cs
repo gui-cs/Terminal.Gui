@@ -2427,8 +2427,7 @@ public class TextViewTests
         // Just verify the command doesn't crash
         bool? result = textView.InvokeCommand (Command.Accept);
 
-        // Accept returns true for TextView (not handled)
-        Assert.True (result);
+        Assert.Null (result);
 
         textView.Dispose ();
     }

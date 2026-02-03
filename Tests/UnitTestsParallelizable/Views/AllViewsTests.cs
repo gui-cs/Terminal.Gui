@@ -130,7 +130,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Command_Select_Raises_Selecting (Type viewType)
+    public void AllViews_Command_Activate_Raises_Activating (Type viewType)
     {
         var view = CreateInstanceIfNotGeneric (viewType);
 
