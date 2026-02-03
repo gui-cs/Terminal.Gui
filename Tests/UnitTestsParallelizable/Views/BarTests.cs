@@ -6,6 +6,54 @@ namespace ViewsTests;
 public class BarTests
 {
     [Fact]
+    public void AddShortcutAt_InsertsShortcutCorrectly ()
+    {
+        var bar = new Bar ();
+        var shortcut = new Shortcut (Key.Empty, "Command", null);
+        bar.AddShortcutAt (0, shortcut);
+
+        Assert.Contains (shortcut, bar.SubViews);
+    }
+
+    [Fact]
+    public void AlignmentModesProperty_SetsCorrectly ()
+    {
+        var bar = new Bar ();
+        Assert.Equal (AlignmentModes.StartToEnd, bar.AlignmentModes); // Default value
+
+        bar.AlignmentModes = AlignmentModes.EndToStart;
+        Assert.Equal (AlignmentModes.EndToStart, bar.AlignmentModes);
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Bar_Commands_DelegatedToShortcuts ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        bar.Add (shortcut);
+
+        var acceptingFired = false;
+
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true;
+                              };
+
+        // Bar delegates commands to contained Shortcuts
+        // Shortcut doesn't require Init when just testing commands
+        bool? result = shortcut.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        bar.Dispose ();
+    }
+
+    [Fact]
     public void Constructor_Defaults ()
     {
         var bar = new Bar ();
@@ -28,19 +76,68 @@ public class BarTests
     [Fact]
     public void Constructor_InitializesWithShortcuts_WhenProvided ()
     {
-        var shortcuts = new List<Shortcut>
-        {
-            new Shortcut(Key.Empty, "Command1", null, null),
-            new Shortcut(Key.Empty, "Command2", null, null)
-        };
+        List<Shortcut> shortcuts = new() { new Shortcut (Key.Empty, "Command1", null), new Shortcut (Key.Empty, "Command2", null) };
 
         var bar = new Bar (shortcuts);
 
         Assert.Equal (shortcuts.Count, bar.SubViews.Count);
-        for (int i = 0; i < shortcuts.Count; i++)
+
+        for (var i = 0; i < shortcuts.Count; i++)
         {
             Assert.Same (shortcuts [i], bar.SubViews.ElementAt (i));
         }
+    }
+
+    [Fact]
+    public void GetAttributeForRole_DoesNotDeferToSuperView_WhenSchemeNameIsSet ()
+    {
+        // This test would fail before the fix that checks SchemeName in GetAttributeForRole
+        // StatusBar and MenuBar set SchemeName = "Menu", and should use Menu scheme
+        // instead of deferring to parent's customized attributes
+
+        var parentView = new View { SchemeName = "Base" };
+        var statusBar = new StatusBar ();
+        parentView.Add (statusBar);
+
+        // Parent customizes attribute resolution
+        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+
+        parentView.GettingAttributeForRole += (sender, args) =>
+                                              {
+                                                  if (args.Role == VisualRole.Normal)
+                                                  {
+                                                      args.Result = customAttribute;
+                                                      args.Handled = true;
+                                                  }
+                                              };
+
+        // StatusBar sets SchemeName = "Menu" in its constructor
+        // Before the fix: StatusBar would defer to parent and get customAttribute (WRONG)
+        // After the fix: StatusBar uses Menu scheme (CORRECT)
+        Scheme? menuScheme = SchemeManager.GetHardCodedSchemes ()? ["Menu"];
+        Assert.NotEqual (customAttribute, statusBar.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (menuScheme!.Normal, statusBar.GetAttributeForRole (VisualRole.Normal));
+
+        statusBar.Dispose ();
+        parentView.Dispose ();
+    }
+
+    [Fact]
+    public void Layout_ChangesBasedOnOrientation ()
+    {
+        var shortcut1 = new Shortcut (Key.Empty, "Command1", null);
+        var shortcut2 = new Shortcut (Key.Empty, "Command2", null);
+        var bar = new Bar (new List<Shortcut> { shortcut1, shortcut2 });
+
+        bar.Orientation = Orientation.Horizontal;
+        bar.LayoutSubViews ();
+
+        // TODO: Assert specific layout expectations for horizontal orientation
+
+        bar.Orientation = Orientation.Vertical;
+        bar.LayoutSubViews ();
+
+        // TODO: Assert specific layout expectations for vertical orientation
     }
 
     [Fact]
@@ -54,85 +151,16 @@ public class BarTests
     }
 
     [Fact]
-    public void AlignmentModesProperty_SetsCorrectly ()
-    {
-        var bar = new Bar ();
-        Assert.Equal (AlignmentModes.StartToEnd, bar.AlignmentModes); // Default value
-
-        bar.AlignmentModes = AlignmentModes.EndToStart;
-        Assert.Equal (AlignmentModes.EndToStart, bar.AlignmentModes);
-    }
-
-    [Fact]
-    public void AddShortcutAt_InsertsShortcutCorrectly ()
-    {
-        var bar = new Bar ();
-        var shortcut = new Shortcut (Key.Empty, "Command", null, null);
-        bar.AddShortcutAt (0, shortcut);
-
-        Assert.Contains (shortcut, bar.SubViews);
-    }
-
-    [Fact]
     public void RemoveShortcut_RemovesShortcutCorrectly ()
     {
-        var shortcut1 = new Shortcut (Key.Empty, "Command1", null, null);
-        var shortcut2 = new Shortcut (Key.Empty, "Command2", null, null);
+        var shortcut1 = new Shortcut (Key.Empty, "Command1", null);
+        var shortcut2 = new Shortcut (Key.Empty, "Command2", null);
         var bar = new Bar (new List<Shortcut> { shortcut1, shortcut2 });
 
-        var removedShortcut = bar.RemoveShortcut (0);
+        Shortcut? removedShortcut = bar.RemoveShortcut (0);
 
         Assert.Same (shortcut1, removedShortcut);
         Assert.DoesNotContain (shortcut1, bar.SubViews);
         Assert.Contains (shortcut2, bar.SubViews);
-    }
-
-    [Fact]
-    public void Layout_ChangesBasedOnOrientation ()
-    {
-        var shortcut1 = new Shortcut (Key.Empty, "Command1", null, null);
-        var shortcut2 = new Shortcut (Key.Empty, "Command2", null, null);
-        var bar = new Bar (new List<Shortcut> { shortcut1, shortcut2 });
-
-        bar.Orientation = Orientation.Horizontal;
-        bar.LayoutSubViews ();
-        // TODO: Assert specific layout expectations for horizontal orientation
-
-        bar.Orientation = Orientation.Vertical;
-        bar.LayoutSubViews ();
-        // TODO: Assert specific layout expectations for vertical orientation
-    }
-
-    [Fact]
-    public void GetAttributeForRole_DoesNotDeferToSuperView_WhenSchemeNameIsSet ()
-    {
-        // This test would fail before the fix that checks SchemeName in GetAttributeForRole
-        // StatusBar and MenuBar set SchemeName = "Menu", and should use Menu scheme
-        // instead of deferring to parent's customized attributes
-        
-        var parentView = new View { SchemeName = "Base" };
-        var statusBar = new StatusBar ();
-        parentView.Add (statusBar);
-
-        // Parent customizes attribute resolution
-        var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
-        parentView.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Normal)
-            {
-                args.Result = customAttribute;
-                args.Handled = true;
-            }
-        };
-
-        // StatusBar sets SchemeName = "Menu" in its constructor
-        // Before the fix: StatusBar would defer to parent and get customAttribute (WRONG)
-        // After the fix: StatusBar uses Menu scheme (CORRECT)
-        var menuScheme = SchemeManager.GetHardCodedSchemes ()? ["Menu"];
-        Assert.NotEqual (customAttribute, statusBar.GetAttributeForRole (VisualRole.Normal));
-        Assert.Equal (menuScheme!.Normal, statusBar.GetAttributeForRole (VisualRole.Normal));
-
-        statusBar.Dispose ();
-        parentView.Dispose ();
     }
 }

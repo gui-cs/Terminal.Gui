@@ -270,7 +270,7 @@ public class ListViewTests (ITestOutputHelper output)
         void OnAccepting (object? sender, CommandEventArgs e)
         {
             accepted = true;
-            selectedValue = listView.SelectedItem.HasValue ? source[listView.SelectedItem.Value] : string.Empty;
+            selectedValue = listView.SelectedItem.HasValue ? source [listView.SelectedItem.Value] : string.Empty;
             e.Handled = true;
         }
     }
@@ -498,6 +498,78 @@ public class ListViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void SourceChanged_Event ()
+    {
+        var changed = 0;
+        ObservableCollection<string> source1 = [];
+        ObservableCollection<string> source2 = [];
+        IListDataSource? src2 = null;
+        var lv = new ListView { Source = new ListWrapper<string> (source1) };
+
+        lv.SourceChanged += (sender, _) =>
+                            {
+                                Assert.Equal (src2, (sender as ListView)?.Source);
+                                changed++;
+                            };
+
+        lv.Source = src2 = new ListWrapper<string> (source2);
+
+        for (var i = 0; i < 3; i++)
+        {
+            source1.Add ($"Item{i}");
+            source2.Add ($"Item{i}");
+        }
+
+        Assert.Equal (1, changed);
+
+        for (var i = 0; i < 3; i++)
+        {
+            source1.Remove (source1 [0]);
+            source2.Remove (source2 [0]);
+        }
+
+        Assert.Equal (1, changed);
+        Assert.Empty (source1);
+        Assert.Empty (source2);
+    }
+
+    [Fact]
+    public void SourceChanged_Event_Raised_IfSetSourceWithNull ()
+    {
+        var changed = 0;
+        ObservableCollection<string> source = [];
+        IListDataSource? src = null;
+        var lv = new ListView { Source = new ListWrapper<string> (source) };
+
+        lv.SourceChanged += (sender, _) =>
+                            {
+                                Assert.Equal (src, (sender as ListView)?.Source);
+                                changed++;
+                            };
+
+        lv.Source = src = new ListWrapper<string> (null);
+
+        Assert.Equal (1, changed);
+    }
+
+    [Theory]
+    [MemberData (nameof (GetSources))]
+    public void SourceChanged_Event_Not_Raised_IfSetSourceWithSameSource (ObservableCollection<string>? source)
+    {
+        var changed = 0;
+        IListDataSource? src = new ListWrapper<string> (source);
+        var lv = new ListView { Source = src };
+
+        lv.SourceChanged += (_, _) => { changed++; };
+
+        lv.Source = src;
+
+        Assert.Equal (0, changed);
+    }
+
+    public static TheoryData<ObservableCollection<string>?> GetSources () => [null, [], ["Item1", "Item2"]];
+
+    [Fact]
     public void CollectionChanged_Event ()
     {
         var added = 0;
@@ -544,10 +616,15 @@ public class ListViewTests (ITestOutputHelper output)
         var removed = 0;
         var otherActions = 0;
         IList<string> source1 = [];
-        var lv = new ListView { Source = new ListWrapper<string> (new (source1)) };
+        ObservableCollection<string> source2 = [];
+        ObservableCollection<string> source3 = [];
+        IListDataSource? src3 = null;
+        var lv = new ListView { Source = new ListWrapper<string> (new ObservableCollection<string> (source1)) };
 
         lv.CollectionChanged += (sender, args) =>
                                 {
+                                    Assert.Equal (src3, (sender as ListView)?.Source);
+
                                     if (args.Action == NotifyCollectionChangedAction.Add)
                                     {
                                         added++;
@@ -562,10 +639,9 @@ public class ListViewTests (ITestOutputHelper output)
                                     }
                                 };
 
-        ObservableCollection<string> source2 = [];
         lv.Source = new ListWrapper<string> (source2);
-        ObservableCollection<string> source3 = [];
         lv.Source = new ListWrapper<string> (source3);
+        src3 = lv.Source;
         Assert.Equal (0, added);
         Assert.Equal (0, removed);
         Assert.Equal (0, otherActions);
@@ -655,10 +731,15 @@ public class ListViewTests (ITestOutputHelper output)
         var removed = 0;
         var otherActions = 0;
         ObservableCollection<string> source1 = [];
+        ObservableCollection<string> source2 = [];
+        ObservableCollection<string> source3 = [];
         ListWrapper<string> lw = new (source1);
 
         lw.CollectionChanged += (sender, args) =>
                                 {
+                                    // The source3 isn't the current event because ListWrapper wasn't disposed any time we changed source
+                                    Assert.NotEqual (source3, sender);
+
                                     if (args.Action == NotifyCollectionChangedAction.Add)
                                     {
                                         added++;
@@ -673,10 +754,8 @@ public class ListViewTests (ITestOutputHelper output)
                                     }
                                 };
 
-        ObservableCollection<string> source2 = [];
-        lw = new (source2);
-        ObservableCollection<string> source3 = [];
-        lw = new (source3);
+        lw = new ListWrapper<string> (source2);
+        lw = new ListWrapper<string> (source3);
         Assert.Equal (0, added);
         Assert.Equal (0, removed);
         Assert.Equal (0, otherActions);
@@ -2628,4 +2707,64 @@ hree - lon",
     }
 
     #endregion
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ListView_Command_Activate_ChangesSelection ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2", "Item3"]), Height = 3 };
+        listView.BeginInit ();
+        listView.EndInit ();
+
+        listView.SelectedItem = 0;
+
+        // Activate changes selection via arrow keys (Down command)
+        bool? result = listView.InvokeCommand (Command.Down);
+
+        Assert.Equal (1, listView.SelectedItem);
+        Assert.True (result);
+
+        listView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ListView_Command_Accept_RaisesAccepting ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2"]) };
+        var acceptingFired = false;
+
+        listView.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true; // Signal that the Accept was processed
+                              };
+
+        bool? result = listView.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        listView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ListView_Command_HotKey_SetsFocus ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2"]) };
+
+        bool? result = listView.InvokeCommand (Command.HotKey);
+
+        // HotKey should set focus (returns !SetFocus() which is false on success)
+        Assert.False (result);
+
+        listView.Dispose ();
+    }
 }
