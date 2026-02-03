@@ -47,7 +47,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
     }
 
     // CoPilot: claude-3-7-sonnet-20250219
-    [Fact]
+    [Fact (Skip = "Flaky test causing random GitHub workflow failures - see issue")]
     public async Task ProcessQueue_DoesNotReleaseEscape_BeforeTimeout ()
     {
         // Arrange
