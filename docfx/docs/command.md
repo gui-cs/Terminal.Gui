@@ -51,49 +51,83 @@ flowchart TD
 
 ## View Command Behaviors
 
-The following table documents how each View subclass handles the `Activate`, `Accept`, and `HotKey` commands. This provides a reference for understanding what user actions trigger each command/event in specific views.
+The following table documents how each View subclass binds or handles keyboard and mouse events. This provides a comprehensive reference for understanding which commands are bound to specific inputs or whether views handle events directly through method overrides.
 
-| View | Activate (Space/Click) | Accept (Enter/Double-Click) | HotKey (Alt+Key) |
-|------|------------------------|----------------------------|------------------|
-| **Button** | RaiseActivating → SetFocus → RaiseAccepting | Same as Activate (via HotKey handler) | SetFocus + RaiseActivating + RaiseAccepting |
-| **CheckBox** | Toggles `CheckState`, raises `Activating` | Confirms current state (no toggle), raises `Accepting` | Invokes Activate (toggles state + SetFocus) |
-| **ComboBox** | Opens/closes dropdown | Selects highlighted item | Opens dropdown + SetFocus |
-| **ListView** | Changes selection (arrow keys) | Fires `RowActivated` event | SetFocus |
-| **TableView** | Space toggles cell selection | Enter fires `CellActivated` event | SetFocus |
-| **TreeView** | Same as Accept | Activates selected node (expand/collapse or raise `Accepting`) | SetFocus |
-| **TextField** | Click positions cursor | Raises `Accepting` (submit) | SetFocus |
-| **TextView** | Click positions cursor | Not typical (multiline input) | SetFocus |
-| **OptionSelector** | Forwards to focused CheckBox's Activate (changes selection) | Raises `Accepting` | Forwards to focused item's Activate |
-| **FlagSelector** | Forwards to focused CheckBox's Activate (toggles flag) | Raises `Accepting` | Forwards to focused item's Activate |
-| **Menu** | Focuses `MenuItem` (arrow keys, mouse enter) | Executes command or opens submenu | Activates item with matching hotkey |
-| **MenuBar** | Focuses `MenuBarItem` | Shows `PopoverMenu` or executes command | Activates item with matching hotkey |
-| **MenuItem** | Sets focus, raises `SelectedMenuItemChanged` | Executes `Action` or opens submenu | Invokes Accept |
-| **Shortcut** | DispatchCommand: Invoke CommandView.Activate → RaiseActivating → SetFocus → RaiseAccepting | Same as Activate | Same as Activate |
-| **Dialog** | Handled by contained views | Button press → sets `Result`, calls `RequestStop` | Handled by contained buttons |
-| **Wizard** | Handled by contained views | Next/Finish button advances step or completes | Handled by contained buttons |
-| **FileDialog** | TableView cell selection | Accepts selected file/folder or navigates | Handled by internal views |
-| **TabView** | Not explicitly handled | Not explicitly handled | SetFocus |
-| **ScrollBar** | Click on track jumps scroll position | Not typical | Not typical |
-| **HexView** | Click positions cursor; double-click toggles hex/text side | Not typical (editing view) | Not typical |
-| **NumericUpDown** | Not explicitly handled | Via internal button Accepting | Not typical |
-| **DatePicker** | Calendar cell selection changes date | Via internal button/field interactions | Handled by internal views |
-| **ColorPicker** | Color bar value changes | Double-click raises `Accepting` | Handled by internal views |
-| **ProgressBar** | N/A (`CanFocus = false`) | N/A | N/A |
-| **SpinnerView** | N/A (display only) | N/A | N/A |
-| **Bar** | Handled by contained Shortcuts | Handled by contained Shortcuts | Handled by contained Shortcuts |
-| **Label** | Not typical (usually `CanFocus = false`) | Not typical | Forwards HotKey to next focusable view |
+| View | Space | Enter | HotKey | Pressed | Released | Clicked | DoubleClicked |
+|------|-------|-------|--------|---------|----------|---------|---------------|
+| **View** (base) | `Command.Activate` (default) | `Command.Accept` (default) | `Command.HotKey` (default) | Base OnMouseEvent (updates MouseState) | Base OnMouseEvent (updates MouseState) | Not bound by default | Not bound by default |
+| **Button** | `Command.HotKey` | `Command.HotKey` | `Command.HotKey` | OnMouseEvent (updates MouseState) | OnMouseEvent (updates MouseState) | `Command.HotKey` | `Command.HotKey` |
+| **CheckBox** | `Command.Activate` | `Command.Accept` | `Command.HotKey` | `Command.Activate` | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
+| **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **ListView** | Custom handler (selection) | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (selects item) | `Command.Accept` |
+| **TableView** | Custom handler (toggle selection) | `Command.Accept` | `Command.HotKey` | OnMouseEvent (cell selection) | OnMouseEvent (end drag) | OnMouseEvent (cell selection) | `Command.Accept` |
+| **TreeView** | `Command.Accept` | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (node selection) | `Command.Accept` |
+| **TextField** | OnKeyDown (inserts space) | `Command.Accept` | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
+| **TextView** | OnKeyDown (inserts space) | OnKeyDown (inserts newline) | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
+| **OptionSelector** | Forwards to SubView | `Command.Accept` | Forwards to SubView HotKey | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **FlagSelector** | Forwards to SubView | `Command.Accept` | Forwards to SubView HotKey | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Menu** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **MenuBar** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **MenuItem** | Base handler | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
+| **Shortcut** | `Command.HotKey` | `Command.HotKey` | `Command.HotKey` | OnMouseEvent (updates MouseState) | OnMouseEvent (updates MouseState) | `Command.HotKey` | `Command.HotKey` |
+| **Dialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Wizard** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **FileDialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **TabView** | Not bound | Not bound | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
+| **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent (auto-repeat/jump) | OnMouseEvent (auto-repeat) | OnMouseEvent (jump position) | Not bound |
+| **HexView** | OnKeyDown (custom) | Not bound | Not bound | OnMouseEvent (position cursor) | Base OnMouseEvent | OnMouseEvent (position cursor) | OnMouseEvent (toggle side) |
+| **NumericUpDown** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **DatePicker** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **ColorPicker** | OnKeyDown (custom) | Not bound | Handled by SubViews | OnMouseEvent (adjust value) | Base OnMouseEvent | OnMouseEvent (adjust value) | `Command.Accept` |
+| **ProgressBar** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
+| **SpinnerView** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
+| **Bar** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Label** | Not bound | Not bound | Forwards to next focusable | Not bound | Not bound | Not bound | Not bound |
 
 ### Notes on Command Behaviors
 
-1. **Composite Views** (Dialog, Wizard, FileDialog, DatePicker, ColorPicker, Bar): These views delegate command handling to their SubViews. The parent view may intercept `Accepting` to coordinate actions (e.g., Dialog setting `Result`).
+#### Table Notation
 
-2. **Display-Only Views** (ProgressBar, SpinnerView, Label): These views typically have `CanFocus = false` and do not handle commands directly.
+The table shows how each view handles keyboard and mouse input using one of these approaches:
 
-3. **TreeView Special Case**: Both `Activate` and `Accept` invoke the same handler (`ActivateSelectedObjectIfAny`), which calls `RaiseAccepting`.
+- **`Command.X`** - Input is bound to a command via KeyBinding or MouseBinding (e.g., `Command.HotKey`, `Command.Activate`, `Command.Accept`)
+- **OnKeyDown (custom)** - Input is handled directly by overriding `OnKeyDown` with view-specific logic
+- **OnMouseEvent (description)** - Input is handled directly by overriding `OnMouseEvent` with view-specific behavior
+- **Base OnMouseEvent** - Input uses the base `View.OnMouseEvent` implementation (updates MouseState)
+- **Custom handler** - Input uses a view-specific handler method (not a command)
+- **Handled by SubViews** - Composite views delegate input handling to their contained SubViews
+- **Forwards to SubView** - Input is forwarded to a specific SubView (e.g., OptionSelector → CheckBox)
+- **Not bound** - Input is not handled or bound by this view
 
-4. **Shortcut Unified Handling**: All three commands (`Activate`, `Accept`, `HotKey`) invoke the same `DispatchCommand` method, providing consistent behavior.
+#### Key Points
 
-5. **Selector Views** (OptionSelector, FlagSelector): These forward HotKey commands to the focused CheckBox's `Activate` command, enabling keyboard-driven selection changes.
+1. **View Base Class**: The first row shows the default behavior provided by the base `View` class. Space and Enter are bound to `Command.Activate` and `Command.Accept` respectively in `SetupCommands()`. Mouse events use the base `OnMouseEvent` implementation which updates `MouseState`. Subclasses typically override these bindings or add MouseBindings for Clicked/DoubleClicked events.
+
+2. **Composite Views** (Dialog, Wizard, FileDialog, DatePicker, NumericUpDown, Bar): These views delegate input handling to their SubViews. The parent view may intercept commands to coordinate actions (e.g., Dialog intercepting `Accept` to set `Result`).
+
+3. **Display-Only Views** (ProgressBar, SpinnerView, Label): These views typically have `CanFocus = false` and do not handle keyboard or mouse input directly.
+
+4. **Command Bindings vs. Event Handlers**: Views with simple, standardized behaviors use **command bindings** (KeyBinding/MouseBinding → Command). Views requiring custom logic (e.g., text editing, cursor positioning, drag selection) override **OnKeyDown** or **OnMouseEvent** directly.
+
+5. **TreeView Special Case**: Both Space and Enter are bound to `Command.Accept`, which invokes the same handler (`ActivateSelectedObjectIfAny`).
+
+6. **Shortcut and Button Unified Handling**: Space, Enter, Clicked, and DoubleClicked all map to `Command.HotKey`, providing consistent activation behavior.
+
+7. **Selector Views** (OptionSelector, FlagSelector): These forward Space and HotKey inputs to the focused CheckBox's handlers, enabling keyboard-driven selection changes.
+
+8. **Text Input Views** (TextField, TextView): These override OnKeyDown to handle Space (inserts space character) and OnMouseEvent for cursor positioning, text selection, and drag operations. Enter is bound to `Command.Accept` in TextField (submit), but handled directly in TextView (inserts newline).
+
+9. **Mouse Event Columns**:
+   - **Pressed**: `MouseFlags.LeftButtonPressed` - button initially pressed down
+   - **Released**: `MouseFlags.LeftButtonReleased` - button released after press
+   - **Clicked**: `MouseFlags.LeftButtonClicked` - synthesized from press+release in same location
+   - **DoubleClicked**: `MouseFlags.LeftButtonDoubleClicked` - synthesized from timing of two clicks
+   - For detailed information about the mouse event pipeline and how events are synthesized, see the [Mouse Deep Dive](mouse.md).
+
+10. **Implementation Patterns**: To understand how bindings work, see:
+    - `Terminal.Gui/ViewBase/Mouse/View.Mouse.cs` - Base mouse handling and MouseBindings
+    - `Terminal.Gui/ViewBase/Keyboard/View.Keyboard.cs` - Base keyboard handling and KeyBindings
+    - Individual view source files for view-specific overrides and custom handlers
 
 ### Key Takeaways
 
