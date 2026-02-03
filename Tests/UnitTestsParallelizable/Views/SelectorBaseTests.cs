@@ -668,67 +668,87 @@ public class SelectorBaseTests
         // Set focus to view1
         view1.SetFocus ();
 
+        Key keyNext;
+        Key keyPrevious;
+        Key keyNextView;
+        Key keyPreviousView;
+
+        if (orientation == Orientation.Vertical)
+        {
+            keyNext = Key.CursorDown;
+            keyPrevious = Key.CursorUp;
+            keyNextView = Key.CursorRight;
+            keyPreviousView = Key.CursorLeft;
+        }
+        else
+        {
+            keyNext = Key.CursorRight;
+            keyPrevious = Key.CursorLeft;
+            keyNextView = Key.CursorDown;
+            keyPreviousView = Key.CursorUp;
+        }
+
         // Invoke CursorDown command to move focus to selector
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
         Assert.True (selector.HasFocus);
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
         Assert.Equal (0, selector.Cursor);
 
         // Invoke CursorDown command again to move focus to next checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (1).HasFocus);
         Assert.Equal (1, selector.Cursor);
 
         // Invoke CursorRight command to move focus to next checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorRight));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
         Assert.Equal (2, selector.Cursor);
 
         // Invoke CursorDown command again to move focus to first checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
         Assert.Equal (0, selector.Cursor);
 
         // Invoke CursorUp command to move focus to last checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
         Assert.Equal (2, selector.Cursor);
 
         // Invoke Tab command to move focus to view2
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNextView));
         Assert.True (view2.HasFocus);
 
         // Set value to 2 (third option) to prepare for CursorUp/CursorLeft test
         selector.Value = 2;
 
         // Now test Shift+Tab to move focus back to selector
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPreviousView));
         Assert.True (selector.HasFocus);
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
         Assert.Equal (2, selector.Cursor);
 
         // Invoke CursorUp command to move focus to previous checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (1).HasFocus);
         Assert.Equal (1, selector.Cursor);
 
         // Invoke CursorLeft command to move focus to previous checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorLeft));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
         Assert.Equal (0, selector.Cursor);
 
         // Invoke CursorUp command to move focus to last checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
         Assert.Equal (2, selector.Cursor);
 
         // Invoke CursorRight command to move focus to first checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorRight));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
         Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
         Assert.Equal (0, selector.Cursor);
 
         // Finally, Shift+Tab to move focus back to view1
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPreviousView));
         Assert.True (view1.HasFocus);
 
         if (token is { })

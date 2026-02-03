@@ -36,15 +36,21 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         KeyBindings.ReplaceCommands (Key.CursorUp, Command.Up);
         KeyBindings.ReplaceCommands (Key.CursorLeft, Command.Left);
 
-        AddCommand (Command.Down, () => MoveDownRight ());
-        AddCommand (Command.Right, () => MoveDownRight ());
+        AddCommand (Command.Down, () => MoveNext (Command.Down));
+        AddCommand (Command.Right, () => MoveNext (Command.Right));
 
-        AddCommand (Command.Up, () => MoveUpLeft ());
-        AddCommand (Command.Left, () => MoveUpLeft ());
+        AddCommand (Command.Up, () => MovePrevious (Command.Up));
+        AddCommand (Command.Left, () => MovePrevious (Command.Left));
     }
 
-    private bool MoveDownRight ()
+    private bool MoveNext (Command command)
     {
+        if ((command == Command.Down && Orientation == Orientation.Horizontal)
+            || (command == Command.Right && Orientation == Orientation.Vertical))
+        {
+            return false;
+        }
+
         int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
 
         if (active < SubViews.OfType<CheckBox> ().Count () - 1)
@@ -60,8 +66,14 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         return true;
     }
 
-    private bool MoveUpLeft ()
+    private bool MovePrevious (Command command)
     {
+        if ((command == Command.Up && Orientation == Orientation.Horizontal)
+            || (command == Command.Left && Orientation == Orientation.Vertical))
+        {
+            return false;
+        }
+
         int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
 
         if (active > 0)
