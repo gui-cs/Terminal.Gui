@@ -471,10 +471,8 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        // Normal behavior: Use Clicked events (or Pressed if not auto-grab)
-        bool shouldInvokeOnPressed = mouse.IsPressed && !ShouldAutoGrab;
-
-        if (mouse.IsSingleDoubleOrTripleClicked || shouldInvokeOnPressed)
+        // Normal behavior: Invoke commands for clicked, released, or pressed (when not auto-grab)
+        if (mouse.IsSingleDoubleOrTripleClicked || mouse.IsReleased || (mouse.IsPressed && !ShouldAutoGrab))
         {
             return RaiseCommandsBoundToButtonFlags (mouse);
         }
@@ -615,7 +613,13 @@ public partial class View // Mouse APIs
         // Update MouseState
         UpdateMouseStateOnRelease ();
 
-        return !MouseHoldRepeat.HasValue;
+        if (MouseHoldRepeat != null)
+        {
+            // Allow command invocation to proceed
+            return false;
+        }
+
+        return InvokeCommandsBoundToMouse (mouse) is true;
     }
 
     /// <summary>
