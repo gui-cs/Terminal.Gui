@@ -45,8 +45,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
     private bool MoveNext (Command command)
     {
-        if ((command == Command.Down && Orientation == Orientation.Horizontal)
-            || (command == Command.Right && Orientation == Orientation.Vertical))
+        if ((command == Command.Down && Orientation == Orientation.Horizontal) || (command == Command.Right && Orientation == Orientation.Vertical))
         {
             return false;
         }
@@ -59,6 +58,12 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
         else
         {
+            if (Styles.HasFlag (SelectorStyles.ShowValue))
+            {
+                _valueField?.SetFocus ();
+
+                return true;
+            }
             active = 0;
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
@@ -68,21 +73,37 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
     private bool MovePrevious (Command command)
     {
-        if ((command == Command.Up && Orientation == Orientation.Horizontal)
-            || (command == Command.Left && Orientation == Orientation.Vertical))
+        if ((command == Command.Up && Orientation == Orientation.Horizontal) || (command == Command.Left && Orientation == Orientation.Vertical))
         {
             return false;
         }
 
         int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
 
-        if (active > 0)
+        switch (active)
         {
-            active--;
-        }
-        else
-        {
-            active = SubViews.OfType<CheckBox> ().Count () - 1;
+            case -1 when Styles.HasFlag (SelectorStyles.ShowValue):
+                active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                break;
+
+            case > 0:
+                active--;
+
+                break;
+
+            default:
+            {
+                if (Styles.HasFlag (SelectorStyles.ShowValue))
+                {
+                    _valueField?.SetFocus ();
+
+                    return true;
+                }
+                active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                break;
+            }
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
 
@@ -111,9 +132,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
     private bool? HandleAcceptCommand (ICommandContext? ctx)
     {
-        if (!DoubleClickAccepts
-            && ctx?.Binding is MouseBinding mouseBinding
-            && mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
+        if (!DoubleClickAccepts && ctx?.Binding is MouseBinding mouseBinding && mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
             return false;
         }
@@ -354,7 +373,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             MouseHighlightStates = DefaultMouseHighlightStates,
             TabStop = TabBehavior.NoStop
         };
-
 
         return checkbox;
     }
