@@ -37,8 +37,8 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
-        // Add custom binding for Released
-        view.MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Accept);
+        // Replace default Released binding (Activate) with custom binding (Accept)
+        view.MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Accept);
 
         var commandInvoked = false;
         view.Accepting += (_, _) => commandInvoked = true;
@@ -155,8 +155,8 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
-        // Add custom binding for Released
-        view.MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Accept);
+        // Replace default Released binding (Activate) with custom binding (Accept)
+        view.MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Accept);
 
         var commandInvoked = false;
         view.Accepting += (_, _) => commandInvoked = true;
@@ -218,7 +218,7 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
     #region Phase 1.3: Released Binding vs. Default Behavior
 
     [Fact]
-    public void LeftButtonReleased_NoCustomBinding_DoesNotInvokeAnyCommand ()
+    public void LeftButtonReleased_DefaultBinding_InvokesActivate ()
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -238,7 +238,7 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
-        // DO NOT add custom binding for Released - test default behavior
+        // Use default binding - test new default behavior (issue #4674)
         var activatingInvoked = false;
         var acceptingInvoked = false;
         view.Activating += (_, _) => activatingInvoked = true;
@@ -247,21 +247,20 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
         // Act - Press then Release
         app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (0, 0) });
 
-        // Reset flag from Pressed event (which should have fired Activating)
-        activatingInvoked = false;
+        // Press should NOT activate (default changed to Released)
+        Assert.False (activatingInvoked, "Pressed should not invoke Activating with default bindings");
 
         app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new Point (0, 0) });
 
-        // Assert - Released should not invoke any commands by default
-        // (only Pressed or Clicked invoke commands by default)
-        Assert.False (activatingInvoked, "Released event should not invoke Activating without custom binding");
-        Assert.False (acceptingInvoked, "Released event should not invoke Accepting without custom binding");
+        // Assert - Released SHOULD invoke Activate by default (new behavior)
+        Assert.True (activatingInvoked, "Released event should invoke Activating with default binding");
+        Assert.False (acceptingInvoked, "Released event should not invoke Accepting by default");
 
         (runnable as View)?.Dispose ();
     }
 
     [Fact]
-    public void LeftButtonReleased_CustomBinding_CoexistsWithPressedBinding ()
+    public void LeftButtonPressed_CustomBinding_CoexistsWithDefaultReleasedBinding ()
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -281,8 +280,8 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
-        // Add Released binding alongside default Pressed binding
-        view.MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Accept);
+        // Add custom Pressed binding alongside default Released binding (default changed to Released, issue #4674)
+        view.MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Accept);
 
         var activatingInvoked = false;
         var acceptingInvoked = false;
@@ -291,11 +290,13 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
 
         // Act - Press then Release
         app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (0, 0) });
+        Assert.True (acceptingInvoked, "Command.Accept (custom Pressed binding) should have been invoked");
+
         app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new Point (0, 0) });
 
         // Assert - Both Pressed and Released bindings should fire
-        Assert.True (activatingInvoked, "Command.Activate (Pressed) should have been invoked");
-        Assert.True (acceptingInvoked, "Command.Accept (Released) should have been invoked");
+        Assert.True (acceptingInvoked, "Command.Accept (Pressed) should have been invoked");
+        Assert.True (activatingInvoked, "Command.Activate (default Released) should have been invoked");
 
         (runnable as View)?.Dispose ();
     }
@@ -321,8 +322,8 @@ public class MouseReleasedBindingTests (ITestOutputHelper output)
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
-        // Add Released binding with multiple commands
-        view.MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Accept, Command.HotKey);
+        // Replace default Released binding with multiple commands
+        view.MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Accept, Command.HotKey);
 
         var acceptingInvoked = false;
         var hotKeyInvoked = false;

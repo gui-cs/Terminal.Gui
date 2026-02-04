@@ -399,14 +399,14 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
 
         Assert.Equal (1, acceptingCount);
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, activatingCount);
 
         // Second click - more than 500ms later to avoid double-click detection
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
 
         Assert.Equal (2, acceptingCount);
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, activatingCount);
     }
 
     /// <summary>
@@ -463,7 +463,7 @@ public class ButtonTests
 
         // Activating: 1 from Pressed + 1 from Clicked = 2
         // Accepting: 1 from Clicked only = 1
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptingCount);
 
         // Second click - more than 500ms later to avoid double-click detection
@@ -472,7 +472,7 @@ public class ButtonTests
 
         // Activating: previous 2 + 1 from Pressed + 1 from Clicked = 4
         // Accepting: previous 1 + 1 from Clicked = 2
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Third click - verify it continues to work
@@ -483,7 +483,7 @@ public class ButtonTests
 
         // Activating: previous 4 + 1 from Pressed + 1 from Clicked = 6
         // Accepting: previous 2 + 1 from Clicked = 3
-        Assert.Equal (6, activatingCount);
+        Assert.Equal (3, activatingCount);
         Assert.Equal (3, acceptingCount);
 
         // Fourth click - verify consistency
@@ -494,7 +494,7 @@ public class ButtonTests
 
         // Activating: previous 6 + 1 from Pressed + 1 from Clicked = 8
         // Accepting: previous 3 + 1 from Clicked = 4
-        Assert.Equal (8, activatingCount);
+        Assert.Equal (4, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
 
@@ -542,7 +542,7 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
 
         // Assert - Button should receive Clicked event and fire both Activating and Accepting
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptingCount);
 
         // Act - Second click with timestamp spacing >500ms should be a new single click
@@ -551,7 +551,7 @@ public class ButtonTests
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
 
         // Assert - Should fire again (two independent single clicks, not a double-click)
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Cleanup
