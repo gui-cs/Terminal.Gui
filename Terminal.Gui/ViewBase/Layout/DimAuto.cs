@@ -106,8 +106,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 {
                     notDependentSubViews = includedSubViews
                                            .Where (v =>
-                                                       (v.X is PosAbsolute or PosFunc
-                                                        || v.Width is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
+                                                       (v.X.IsFixed || v.Width.IsFixed)
                                                        && !v.X.DependsOnSuperViewContentSize
                                                        && !v.Width.DependsOnSuperViewContentSize)
                                            .ToList ();
@@ -116,8 +115,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 {
                     notDependentSubViews = includedSubViews
                                            .Where (v =>
-                                                       (v.Y is PosAbsolute or PosFunc
-                                                        || v.Height is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
+                                                       (v.Y.IsFixed || v.Height.IsFixed)
                                                        && !v.Y.DependsOnSuperViewContentSize
                                                        && !v.Height.DependsOnSuperViewContentSize)
                                            .ToList ();
