@@ -314,12 +314,6 @@ public partial class View // Command APIs
             Accepting?.Invoke (this, args);
         }
 
-        // If Accepting was not handled, raise Accepted (non-cancelable event)
-        if (args.Handled)
-        {
-            return true;
-        }
-
         // Use TryBubbleToSuperView helper to handle Accept bubbling
         // (maintains backward compatibility with IsDefault button and SuperView bubbling)
         if (TryBubbleToSuperView (Command.Accept, ctx, args.Handled) is true)
@@ -330,8 +324,8 @@ public partial class View // Command APIs
         Logging.Debug ($"{Title} ({ctx?.Source}) - Calling RaiseAccepted");
         RaiseAccepted (ctx);
 
-        // Return null here to indicate no one handled the Accepting event
-        return null;
+        // Do not return null as the event was raised.
+        return args.Handled;
     }
 
     /// <summary>
@@ -511,6 +505,23 @@ public partial class View // Command APIs
     #region Command Propagation
 
     /// <summary>
+    ///     Gets or sets the default accept view for this View. The default accept view will have <see cref="Command.Accept"/> invoked on it
+    ///     anytime a peer View raises <see cref="Command.Accept"/> and the event is not handled.
+    /// </summary>
+    public View? DefaultAcceptView
+    {
+        get
+        {
+            if (field is null)
+            {
+                return GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+            }
+            return field;
+        }
+        set => field = value;
+    }
+
+    /// <summary>
     ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews.
     ///     When a SubView raises a command that is not handled, and the command is in the SuperView's
     ///     <see cref="CommandsToBubbleUp"/> list, the command will be invoked on the SuperView.
@@ -544,10 +555,11 @@ public partial class View // Command APIs
         // Special case: Command.Accept checks for IsDefault peer button first
         if (command == Command.Accept)
         {
-            View? isDefaultView = SuperView?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+            View? isDefaultView = SuperView?.DefaultAcceptView;
 
-            if (isDefaultView != this && isDefaultView is Button { IsDefault: true })
+            if (isDefaultView is { } && isDefaultView != this)
             {
+                ctx?.Source = new WeakReference<View> (isDefaultView);
                 bool? buttonHandled = isDefaultView.InvokeCommand (Command.Accept, ctx);
 
                 if (buttonHandled == true)
@@ -561,6 +573,15 @@ public partial class View // Command APIs
         if (SuperView?.CommandsToBubbleUp.Contains (command) == true)
         {
             return SuperView.InvokeCommand (command, ctx);
+        }
+
+        if (SuperView is Padding padding)
+        {
+            // Check if Padding's Parent wants this command bubbled up to it
+            if (padding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+            {
+                return padding.Parent.InvokeCommand (command, ctx);
+            }
         }
 
         return handled;
