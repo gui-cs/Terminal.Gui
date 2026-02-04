@@ -49,8 +49,6 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         int screenX4 = dimension == Dimension.Width ? screenSize.Width * 4 : screenSize.Height * 4;
         int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screenX4;
 
-        //Debug.WriteLineIf (autoMin > autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");
-
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
             if (dimension == Dimension.Width)
@@ -85,8 +83,6 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 }
             }
         }
-
-        List<View> viewsNeedingLayout = [];
 
         if (Style.FastHasFlags (DimAutoStyle.Content))
         {
@@ -123,17 +119,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     }
                 }
 
-                // ************** We now have some idea of `us.ContentSize` ***************
-
-                #region Centered
-
-                // [ ] PosCenter    - Position is dependent `us.ContentSize` AND `subview.Frame`
                 var maxCentered = 0;
 
                 foreach (View v in GetViewsThatHavePos<PosCenter> (dimension, us.InternalSubViews))
                 {
-                    viewsNeedingLayout.Add (v);
-
                     maxCentered = dimension == Dimension.Width
                                       ? v.X.GetAnchor (0) + v.Width.Calculate (0, screenX4, v, dimension)
                                       : v.Y.GetAnchor (0) + v.Height.Calculate (0, screenX4, v, dimension);
@@ -141,21 +130,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxCentered);
 
-                #endregion Centered
-
-                #region Percent
-
-                // [ ] DimPercent   - Dimension is dependent on `us.ContentSize`
-                // No need to do anything.
-
-                #endregion Percent
-
-                #region Aligned
-
-                // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
                 var maxAlign = 0;
 
-                // Use Linq to get a list of distinct GroupIds from the subviews
                 List<int> groupIds = includedSubViews.Select (v =>
                                                               {
                                                                   return dimension switch
@@ -170,7 +146,6 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 foreach (int groupId in groupIds.Where (g => g != -1))
                 {
-                    // PERF: If this proves a perf issue, consider caching a ref to this list in each item
                     List<PosAlign?> posAlignsInGroup = includedSubViews.Where (v => PosAlign.HasGroupId (v, dimension, groupId))
                                                                        .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
                                                                        .ToList ();
@@ -185,17 +160,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxAlign);
 
-                #endregion Aligned
-
-                #region Anchored
-
-                // [x] PosAnchorEnd - Position is dependent on `us.ContentSize` AND `subview.Frame` 
                 var maxAnchorEnd = 0;
 
                 foreach (View anchoredSubView in GetViewsThatHavePos<PosAnchorEnd> (dimension, includedSubViews))
                 {
-                    viewsNeedingLayout.Add (anchoredSubView);
-
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
                     // TODO: Figure out a way to not have to calculate change the state of subviews (calling SRL).
                     if (dimension == Dimension.Width)
@@ -213,33 +181,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 }
 
                 maxCalculatedSize = Math.Max (maxCalculatedSize, maxAnchorEnd);
-
-                #endregion Anchored
-
-                #region PosView
-
-                // [x] PosView      - Position is dependent on `subview.Target` - it can cause a change in `us.ContentSize`
+                
                 maxCalculatedSize = GetMaxSizePos<PosView> (maxCalculatedSize, dimension, includedSubViews);
-
-                #endregion PosView
-
-                // [x] PosCombine   - Position is dependent if `Pos.Has ([one of the above]` - it can cause a change in `us.ContentSize`
-
-                #region DimView
-
-                // [x] DimView      - Dimension is dependent on `subview.Target` - it can cause a change in `us.ContentSize`
                 maxCalculatedSize = GetMaxSizeDim<DimView> (maxCalculatedSize, dimension, includedSubViews);
-
-                #endregion DimView
-
-                #region DimAuto
-
-                // [ ] DimAuto      - Dimension is internally calculated
                 maxCalculatedSize = GetMaxSizeDim<DimAuto> (maxCalculatedSize, dimension, includedSubViews);
-
-                #endregion
-
-                #region DimFill
 
                 // DimFill subviews contribute to auto-sizing only if they have MinimumContentDim or To set
                 // Process DimFill views that can contribute
@@ -285,8 +230,6 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                         maxCalculatedSize = totalSizeTo;
                     }
                 }
-
-                #endregion
             }
         }
 
