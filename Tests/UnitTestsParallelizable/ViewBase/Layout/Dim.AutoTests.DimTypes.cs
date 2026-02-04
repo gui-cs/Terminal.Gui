@@ -246,6 +246,124 @@ public partial class DimAutoTests
         Assert.Equal (expectedH, calculatedHeight);
     }
 
+    // Claude - Opus 4.5
+    [Fact]
+    public void With_SubView_Using_DimFill_With_To_Contributes_To_AutoSizing ()
+    {
+        // This test verifies that DimFill with To parameter contributes to Dim.Auto SuperView sizing
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        
+        View toView = new () { X = 80, Y = 40, Width = 10, Height = 5 };
+        view.Add (toView);
+        
+        View fillView = new () { X = 10, Y = 10, Width = Dim.Fill (to: toView), Height = Dim.Fill (to: toView) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // The auto view should be large enough to contain both the fillView and the toView
+        // Width: max(fillView.X, toView.X + toView.Width) = max(10, 80 + 10) = 90
+        // Height: max(fillView.Y, toView.Y + toView.Height) = max(10, 40 + 5) = 45
+        Assert.Equal (90, calculatedWidth);
+        Assert.Equal (45, calculatedHeight);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void With_SubView_Using_DimFill_With_To_At_Position_Zero ()
+    {
+        // Test when fillView starts at position 0
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        
+        View toView = new () { X = 50, Y = 30, Width = 20, Height = 10 };
+        view.Add (toView);
+        
+        View fillView = new () { X = 0, Y = 0, Width = Dim.Fill (to: toView), Height = Dim.Fill (to: toView) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // Width: max(0, 50 + 20) = 70
+        // Height: max(0, 30 + 10) = 40
+        Assert.Equal (70, calculatedWidth);
+        Assert.Equal (40, calculatedHeight);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void With_SubView_Using_DimFill_With_To_And_Margin ()
+    {
+        // Test DimFill with both To and margin parameters
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        
+        View toView = new () { X = 80, Y = 40, Width = 10, Height = 5 };
+        view.Add (toView);
+        
+        View fillView = new () { X = 10, Y = 10, Width = Dim.Fill (margin: 5, to: toView), Height = Dim.Fill (margin: 3, to: toView) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // The auto view should still be large enough to contain both views
+        // The margin affects the fill size but not the auto-sizing calculation
+        Assert.Equal (90, calculatedWidth);
+        Assert.Equal (45, calculatedHeight);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void With_SubView_Using_DimFill_With_To_And_MinimumContentDim ()
+    {
+        // Test DimFill with both To and MinimumContentDim - both should contribute
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        
+        View toView = new () { X = 50, Y = 30, Width = 10, Height = 5 };
+        view.Add (toView);
+        
+        // MinimumContentDim is larger than what To would give
+        View fillView = new () { X = 10, Y = 10, Width = Dim.Fill (margin: 0, minimumContentDim: 100, to: toView), Height = Dim.Fill (margin: 0, minimumContentDim: 50, to: toView) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // Should use minimum since it's larger
+        // Width: 10 (position) + 100 (minimum) = 110
+        // Height: 10 (position) + 50 (minimum) = 60
+        Assert.Equal (110, calculatedWidth);
+        Assert.Equal (60, calculatedHeight);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void With_SubView_Using_DimFill_With_To_And_Other_SubViews ()
+    {
+        // Verify that DimFill with To and other subviews both contribute
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        
+        View absView = new () { X = 5, Y = 5, Width = 100, Height = 50 };
+        view.Add (absView);
+        
+        View toView = new () { X = 80, Y = 40, Width = 10, Height = 10 };
+        view.Add (toView);
+        
+        View fillView = new () { X = 10, Y = 10, Width = Dim.Fill (to: toView), Height = Dim.Fill (to: toView) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 150, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 150, view, Dimension.Height);
+
+        // Should use the larger of the absolute view or the To-based calculation
+        // absView: 5 + 100 = 105
+        // fillView with To: max(10, 80 + 10) = 90
+        // Result: max(105, 90) = 105
+        Assert.Equal (105, calculatedWidth);
+        Assert.Equal (55, calculatedHeight); // absView: 5 + 50 = 55 is larger
+    }
+
     #endregion
 
     #region DimFunc

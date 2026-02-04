@@ -151,15 +151,7 @@ public abstract record Pos
     /// </param>
     /// <returns></returns>
     public static Pos Align (Alignment alignment, AlignmentModes modes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0) =>
-        new PosAlign
-        {
-            Aligner = new ()
-            {
-                Alignment = alignment,
-                AlignmentModes = modes
-            },
-            GroupId = groupId
-        };
+        new PosAlign { Aligner = new () { Alignment = alignment, AlignmentModes = modes }, GroupId = groupId };
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView's
@@ -379,26 +371,69 @@ public abstract record Pos
     internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension) => GetAnchor (superviewDimension);
 
     /// <summary>
-    ///     Diagnostics API to determine if this Pos object references other views.
+    ///     Returns <see langword="true"/> if this Pos object references other views.
     /// </summary>
-    /// <returns></returns>
-    internal virtual bool ReferencesOtherViews () => false;
+    /// <remarks>
+    ///     The default implementation uses <see cref="GetReferencedViews"/>. Override for optimization
+    ///     in types that can determine this without allocating an iterator.
+    /// </remarks>
+    /// <returns><see langword="true"/> if this Pos depends on other views for layout.</returns>
+    internal virtual bool ReferencesOtherViews () => GetReferencedViews ().Any ();
+
+    /// <summary>
+    ///     Returns the views that this Pos depends on for layout calculations.
+    ///     Used by the layout system to determine the order in which views should be laid out.
+    /// </summary>
+    /// <remarks>
+    ///     Override in subclasses that reference other views (e.g., <see cref="PosView"/>).
+    ///     Composite types like <see cref="PosCombine"/> should aggregate results from their children.
+    /// </remarks>
+    /// <returns>An enumerable of views that this Pos depends on.</returns>
+    internal virtual IEnumerable<View> GetReferencedViews ()
+    {
+        yield break;
+    }
 
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.
     /// </summary>
-    /// <param name="pos">A reference to this <see cref="Pos"/> instance.</param>
-    /// <returns></returns>
+    /// <param name="pos">
+    ///     When this method returns, contains the first instance of type <typeparamref name="TPos"/> found,
+    ///     or <see langword="null"/> if no instance was found.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos or any nested Pos is of type <typeparamref name="TPos"/>;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
     public bool Has<TPos> (out TPos pos) where TPos : Pos
     {
         pos = (this as TPos)!;
 
-        return this switch
-               {
-                   PosCombine combine => combine.Left.Has (out pos) || combine.Right.Has (out pos),
-                   TPos => true,
-                   _ => false
-               };
+        if (this is TPos)
+        {
+            return true;
+        }
+
+        return HasInner (out pos);
+    }
+
+    /// <summary>
+    ///     Searches nested Pos objects for the specified type. Override in subclasses that contain
+    ///     other Pos objects to enable <see cref="Has{TPos}"/> to find nested types.
+    /// </summary>
+    /// <param name="pos">
+    ///     When this method returns, contains the first instance of type <typeparamref name="TPos"/> found,
+    ///     or <see langword="null"/> if no instance was found.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if any nested Pos is of type <typeparamref name="TPos"/>;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    protected virtual bool HasInner<TPos> (out TPos pos) where TPos : Pos
+    {
+        pos = null!;
+
+        return false;
     }
 
     #endregion virtual methods
@@ -416,8 +451,9 @@ public abstract record Pos
             return new PosAbsolute (left.GetAnchor (0) + right.GetAnchor (0));
         }
 
-        var newPos = new PosCombine (AddOrSubtract.Add, left, right);
+        PosCombine newPos = new (AddOrSubtract.Add, left, right);
 
+        // QUESTION: This seems like a hack. Is it really needed?
         if (left is PosView view)
         {
             view.Target.SetNeedsLayout ();
@@ -445,8 +481,9 @@ public abstract record Pos
             return new PosAbsolute (left.GetAnchor (0) - right.GetAnchor (0));
         }
 
-        var newPos = new PosCombine (AddOrSubtract.Subtract, left, right);
+        PosCombine newPos = new (AddOrSubtract.Subtract, left, right);
 
+        // QUESTION: This seems like a hack. Is it really needed?
         if (left is PosView view)
         {
             view.Target.SetNeedsLayout ();

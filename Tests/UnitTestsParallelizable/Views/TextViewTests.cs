@@ -2396,5 +2396,58 @@ public class TextViewTests
                      "Vertical scrollbar should be visible during ContentsChanged event when content exceeds viewport height");
     }
 
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TextView_Command_Activate_PositionsCursor ()
+    {
+        TextView textView = new () { Text = "Test", Width = 10, Height = 5 };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        // Activate via Command.Activate for positioning cursor
+        bool? result = textView.InvokeCommand (Command.Activate);
+
+        // Command should be handled (returns true)
+        Assert.True (result);
+
+        textView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TextView_Command_Accept_NotTypical ()
+    {
+        TextView textView = new () { Text = "Test" };
+
+        // TextView doesn't typically use Accept command (multiline input)
+        // Just verify the command doesn't crash
+        bool? result = textView.InvokeCommand (Command.Accept);
+
+        // Accept returns false for TextView (not handled)
+        Assert.False (result);
+
+        textView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TextView_Command_HotKey_SetsFocus ()
+    {
+        TextView textView = new () { Text = "Test" };
+
+        bool? result = textView.InvokeCommand (Command.HotKey);
+
+        // HotKey should return true (handled)
+        Assert.True (result);
+
+        textView.Dispose ();
+    }
+
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 }

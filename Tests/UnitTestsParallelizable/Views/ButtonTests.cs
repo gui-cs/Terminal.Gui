@@ -9,29 +9,63 @@ namespace ViewsTests;
 public class ButtonTests
 {
     [Fact]
-    public void Text_Mirrors_Title ()
+    public void Accept_Cancel_Event_OnAccept_Returns_True ()
     {
-        var view = new Button ();
-        view.Title = "Hello";
-        Assert.Equal ("Hello", view.Title);
-        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+        var button = new Button ();
+        var acceptInvoked = false;
 
-        Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{Glyphs.LeftBracket} Hello {Glyphs.RightBracket}", view.TextFormatter.Text);
-        view.Dispose ();
+        button.Accepting += ButtonAccept;
+
+        bool? ret = button.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptInvoked);
+
+        button.Dispose ();
+
+        return;
+
+        void ButtonAccept (object sender, CommandEventArgs e)
+        {
+            acceptInvoked = true;
+            e.Handled = true;
+        }
     }
 
     [Fact]
-    public void Title_Mirrors_Text ()
+    public void Accept_Event_Returns_True ()
     {
-        var view = new Button ();
-        view.Text = "Hello";
-        Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{Glyphs.LeftBracket} Hello {Glyphs.RightBracket}", view.TextFormatter.Text);
+        var btn = new Button { Text = "Test" };
+        var acceptInvoked = false;
 
-        Assert.Equal ("Hello", view.Title);
-        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
-        view.Dispose ();
+        btn.Accepting += (_, e) =>
+                         {
+                             acceptInvoked = true;
+                             e.Handled = true;
+                         };
+
+        Assert.True (btn.InvokeCommand (Command.Accept));
+        Assert.True (acceptInvoked);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0)]
+    [InlineData (1, 0, 1, 0)]
+    [InlineData (0, 1, 0, 1)]
+    [InlineData (1, 1, 1, 1)]
+    [InlineData (10, 1, 10, 1)]
+    [InlineData (10, 3, 10, 3)]
+    public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    {
+        var btn1 = new Button ();
+        btn1.ShadowStyle = ShadowStyle.None;
+        btn1.Width = width;
+        btn1.Height = height;
+
+        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
+
+        btn1.Dispose ();
     }
 
     [Theory]
@@ -54,13 +88,7 @@ public class ButtonTests
     [InlineData ("0_12你", 10, 1, 10, 1)]
     public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
-        var btn1 = new Button
-        {
-            ShadowStyle = ShadowStyle.None,
-            Text = text,
-            Width = width,
-            Height = height
-        };
+        var btn1 = new Button { ShadowStyle = ShadowStyle.None, Text = text, Width = width, Height = height };
 
         Assert.Equal (new (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new (expectedWidth, expectedHeight), btn1.Viewport.Size);
@@ -70,25 +98,62 @@ public class ButtonTests
         btn1.Dispose ();
     }
 
-    [Theory]
-    [InlineData (0, 0, 0, 0)]
-    [InlineData (1, 0, 1, 0)]
-    [InlineData (0, 1, 0, 1)]
-    [InlineData (1, 1, 1, 1)]
-    [InlineData (10, 1, 10, 1)]
-    [InlineData (10, 3, 10, 3)]
-    public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Button_Command_HotKey_RaisesActivatingAndAccepting ()
     {
-        var btn1 = new Button ();
-        btn1.ShadowStyle = ShadowStyle.None;
-        btn1.Width = width;
-        btn1.Height = height;
+        Button button = new () { Text = "_Test" };
+        var activatingFired = false;
+        var acceptingFired = false;
 
-        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Frame.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Viewport.Size);
-        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
+        // Don't set Handled in Activating, or it will return early without calling Accepting
+        button.Activating += (_, _) => activatingFired = true;
 
-        btn1.Dispose ();
+        button.Accepting += (_, e) =>
+                            {
+                                acceptingFired = true;
+                                e.Handled = true;
+                            };
+
+        bool? result = button.InvokeCommand (Command.HotKey);
+
+        // HotKey should raise both Activating and Accepting events
+        Assert.True (activatingFired);
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        button.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Button_Enter_InvokesHotKeyCommand ()
+    {
+        Button button = new () { Text = "Test" };
+        var activatingFired = false;
+        var acceptingFired = false;
+
+        // Don't set Handled in Activating, or it will return early without calling Accepting
+        button.Activating += (_, _) => activatingFired = true;
+
+        button.Accepting += (_, e) =>
+                            {
+                                acceptingFired = true;
+                                e.Handled = true;
+                            };
+
+        // Enter is bound to HotKey command, which raises both events
+        bool? result = button.NewKeyDownEvent (Key.Enter);
+
+        Assert.True (activatingFired);
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        button.Dispose ();
     }
 
     [Fact]
@@ -143,53 +208,33 @@ public class ButtonTests
         btn.Dispose ();
     }
 
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void HotKeyChange_Works ()
+    public void Button_Space_InvokesHotKeyCommand ()
     {
-        var clicked = false;
-        var btn = new Button { Text = "_Test" };
-        btn.Accepting += (_, _) => clicked = true;
+        Button button = new () { Text = "Test" };
+        var activatingFired = false;
+        var acceptingFired = false;
 
-        Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
-        Assert.True (clicked);
+        // Don't set Handled in Activating, or it will return early without calling Accepting
+        button.Activating += (_, _) => activatingFired = true;
 
-        clicked = false;
-        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt)); // Button processes, but does not handle
-        Assert.True (clicked);
+        button.Accepting += (_, e) =>
+                            {
+                                acceptingFired = true;
+                                e.Handled = true;
+                            };
 
-        clicked = false;
-        btn.HotKey = KeyCode.E;
-        Assert.False (btn.NewKeyDownEvent (Key.E.WithAlt)); // Button processes, but does not handle
-        Assert.True (clicked);
-    }
+        // Space is bound to HotKey command, which raises both events
+        bool? result = button.NewKeyDownEvent (Key.Space);
 
-    [Theory]
-    [InlineData (false, 0)]
-    [InlineData (true, 1)]
-    public void Space_Fires_Accept (bool focused, int expected)
-    {
-        var superView = new View
-        {
-            CanFocus = true
-        };
+        Assert.True (activatingFired);
+        Assert.True (acceptingFired);
+        Assert.True (result);
 
-        Button button = new ();
-
-        button.CanFocus = focused;
-
-        var acceptInvoked = 0;
-        button.Accepting += (_, _) => acceptInvoked++;
-
-        superView.Add (button);
-        button.SetFocus ();
-        Assert.Equal (focused, button.HasFocus);
-
-        superView.NewKeyDownEvent (Key.Space);
-
-        Assert.Equal (expected, acceptInvoked);
-
-        superView.Dispose ();
+        button.Dispose ();
     }
 
     [Theory]
@@ -197,10 +242,7 @@ public class ButtonTests
     [InlineData (true, 1)]
     public void Enter_Fires_Accept (bool focused, int expected)
     {
-        var superView = new View
-        {
-            CanFocus = true
-        };
+        var superView = new View { CanFocus = true };
 
         Button button = new ();
 
@@ -220,20 +262,26 @@ public class ButtonTests
         superView.Dispose ();
     }
 
+    [Fact]
+    public void HotKey_Command_Accepts ()
+    {
+        var btn = new Button { Text = "_Test" };
+        var accepted = false;
+        btn.Accepting += (_, _) => accepted = true;
+
+        Assert.Equal (KeyCode.T, btn.HotKey);
+        btn.InvokeCommand (Command.HotKey);
+        Assert.True (accepted);
+    }
+
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 1)]
     public void HotKey_Fires_Accept (bool focused, int expected)
     {
-        var superView = new View
-        {
-            CanFocus = true
-        };
+        var superView = new View { CanFocus = true };
 
-        Button button = new ()
-        {
-            HotKey = Key.A
-        };
+        Button button = new () { HotKey = Key.A };
 
         button.CanFocus = focused;
 
@@ -252,254 +300,24 @@ public class ButtonTests
     }
 
     [Fact]
-    public void HotKey_Command_Accepts ()
+    public void HotKeyChange_Works ()
     {
+        var clicked = false;
         var btn = new Button { Text = "_Test" };
-        var accepted = false;
-        btn.Accepting += (_, _) => accepted = true;
+        btn.Accepting += (_, _) => clicked = true;
 
         Assert.Equal (KeyCode.T, btn.HotKey);
-        btn.InvokeCommand (Command.HotKey);
-        Assert.True (accepted);
-    }
+        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
+        Assert.True (clicked);
 
-    [Fact]
-    public void Accept_Event_Returns_True ()
-    {
-        var btn = new Button { Text = "Test" };
-        var acceptInvoked = false;
+        clicked = false;
+        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt)); // Button processes, but does not handle
+        Assert.True (clicked);
 
-        btn.Accepting += (_, e) =>
-                         {
-                             acceptInvoked = true;
-                             e.Handled = true;
-                         };
-
-        Assert.True (btn.InvokeCommand (Command.Accept));
-        Assert.True (acceptInvoked);
-    }
-
-    [Fact]
-    public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
-    {
-        var btn = new Button { Text = "_Test" };
-
-        Assert.Equal (KeyCode.T, btn.HotKey);
-
-        btn.Text = "";
-
-        Assert.Equal (KeyCode.Null, btn.HotKey);
-    }
-
-    /// <summary>
-    ///     Tests that Button's Accepting event fires correctly when using Direct mode injection with timestamps.
-    ///     Uses Direct mode to bypass ANSI encoding which cannot preserve timestamps.
-    /// </summary>
-    [Fact]
-    public void LeftButtonClicked_Accepts_Driver_Injection_With_Timestamps ()
-    {
-        // Arrange
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        Button button = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 10,
-            Height = 3,
-            Text = "Click Me"
-        };
-
-        Runnable top = new () { App = app };
-        top.Add (button);
-        SessionToken token = app.Begin (top);
-        button.HasFocus = true;
-
-        var activatingCount = 0;
-        var acceptingCount = 0;
-
-        button.Activating += (_, _) => activatingCount++;
-        button.Accepting += (_, _) => acceptingCount++;
-
-        // Act - Inject a complete click sequence (Press -> Release) with timestamps using Direct mode
-        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        Point clickPos = new (7, 6); // Inside button at screen coordinates
-
-        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
-        IInputInjector injector = app.GetInputInjector ();
-
-        // Inject Press and Release to generate a Clicked event
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime
-                              },
-                              options);
-
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (50)
-                              },
-                              options);
-
-        // Assert - Button should receive Clicked event and fire both Activating and Accepting
-        Assert.Equal (2, activatingCount);
-        Assert.Equal (1, acceptingCount);
-
-        // Act - Second click with timestamp spacing >500ms should be a new single click
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime.AddMilliseconds (600)
-                              },
-                              options);
-
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (650)
-                              },
-                              options);
-
-        // Assert - Should fire again (two independent single clicks, not a double-click)
-        Assert.Equal (4, activatingCount);
-        Assert.Equal (2, acceptingCount);
-
-        // Cleanup
-        app.End (token!);
-        top.Dispose ();
-    }
-
-    /// <summary>
-    ///     Tests that Button receives double-click events correctly when using Direct mode injection with timestamps.
-    ///     Uses Direct mode to bypass ANSI encoding which cannot preserve timestamps.
-    /// </summary>
-    [Fact]
-    public void LeftButtonDoubleClicked_Accepts_Driver_Injection_With_Timestamps ()
-    {
-        // Arrange
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        Button button = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 10,
-            Height = 3,
-            Text = "Click Me"
-        };
-
-        Runnable top = new () { App = app };
-        top.Add (button);
-        SessionToken token = app.Begin (top);
-        button.HasFocus = true;
-
-        List<MouseFlags> receivedFlags = [];
-
-        button.MouseEvent += (_, e) => { receivedFlags.Add (e.Flags); };
-
-        // Act - Inject two clicks with <500ms spacing to generate a double-click using Direct mode
-        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        Point clickPos = new (7, 6); // Inside button at screen coordinates
-
-        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
-        IInputInjector injector = app.GetInputInjector ();
-
-        // First click
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime
-                              },
-                              options);
-
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (50)
-                              },
-                              options);
-
-        // Second click within 500ms threshold
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime.AddMilliseconds (300)
-                              },
-                              options);
-
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (350)
-                              },
-                              options);
-
-        // Assert - Should receive a double-click event (timestamp spacing allows multi-click)
-        // We don't assert exact count since View may emit additional events,
-        // but we verify the double-click event was generated
-        Assert.Contains (MouseFlags.LeftButtonDoubleClicked, receivedFlags);
-
-        // Also verify we got the first single-click
-        Assert.Contains (MouseFlags.LeftButtonClicked, receivedFlags);
-
-        // Cleanup
-        app.End (token!);
-        top.Dispose ();
-    }
-
-    [Fact]
-    public void TestAssignTextToButton ()
-    {
-        var btn = new Button { Text = "_K Ok" };
-
-        Assert.Equal ("_K Ok", btn.Text);
-
-        btn.Text = "_N Btn";
-
-        Assert.Equal ("_N Btn", btn.Text);
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
-    {
-        var button = new Button ();
-        var acceptInvoked = false;
-
-        button.Accepting += ButtonAccept;
-
-        bool? ret = button.InvokeCommand (Command.Accept);
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
-
-        button.Dispose ();
-
-        return;
-
-        void ButtonAccept (object sender, CommandEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Handled = true;
-        }
+        clicked = false;
+        btn.HotKey = KeyCode.E;
+        Assert.False (btn.NewKeyDownEvent (Key.E.WithAlt)); // Button processes, but does not handle
+        Assert.True (clicked);
     }
 
     [Fact]
@@ -547,7 +365,14 @@ public class ButtonTests
         using Runnable runnable = new ();
         app.Begin (runnable);
 
-        Button button = new () { Text = "_Button", X = 0, Y = 0, Width = 10, Height = 3 };
+        Button button = new ()
+        {
+            Text = "_Button",
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 3
+        };
         runnable.Add (button);
         runnable.Layout ();
 
@@ -653,8 +478,7 @@ public class ButtonTests
         // Third click - verify it continues to work
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1200) }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
                               options);
 
         // Activating: previous 4 + 1 from Pressed + 1 from Clicked = 6
@@ -665,14 +489,189 @@ public class ButtonTests
         // Fourth click - verify consistency
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1800) }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1850) },
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1850) },
                               options);
 
         // Activating: previous 6 + 1 from Pressed + 1 from Clicked = 8
         // Accepting: previous 3 + 1 from Clicked = 4
         Assert.Equal (8, activatingCount);
         Assert.Equal (4, acceptingCount);
+    }
+
+    /// <summary>
+    ///     Tests that Button's Accepting event fires correctly when using Direct mode injection with timestamps.
+    ///     Uses Direct mode to bypass ANSI encoding which cannot preserve timestamps.
+    /// </summary>
+    [Fact]
+    public void LeftButtonClicked_Accepts_Driver_Injection_With_Timestamps ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Button button = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 3,
+            Text = "Click Me"
+        };
+
+        Runnable top = new () { App = app };
+        top.Add (button);
+        SessionToken token = app.Begin (top);
+        button.HasFocus = true;
+
+        var activatingCount = 0;
+        var acceptingCount = 0;
+
+        button.Activating += (_, _) => activatingCount++;
+        button.Accepting += (_, _) => acceptingCount++;
+
+        // Act - Inject a complete click sequence (Press -> Release) with timestamps using Direct mode
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        Point clickPos = new (7, 6); // Inside button at screen coordinates
+
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
+        IInputInjector injector = app.GetInputInjector ();
+
+        // Inject Press and Release to generate a Clicked event
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+
+        // Assert - Button should receive Clicked event and fire both Activating and Accepting
+        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, acceptingCount);
+
+        // Act - Second click with timestamp spacing >500ms should be a new single click
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
+
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
+
+        // Assert - Should fire again (two independent single clicks, not a double-click)
+        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, acceptingCount);
+
+        // Cleanup
+        app.End (token!);
+        top.Dispose ();
+    }
+
+    /// <summary>
+    ///     Tests that Button receives double-click events correctly when using Direct mode injection with timestamps.
+    ///     Uses Direct mode to bypass ANSI encoding which cannot preserve timestamps.
+    /// </summary>
+    [Fact]
+    public void LeftButtonDoubleClicked_Accepts_Driver_Injection_With_Timestamps ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Button button = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 3,
+            Text = "Click Me"
+        };
+
+        Runnable top = new () { App = app };
+        top.Add (button);
+        SessionToken token = app.Begin (top);
+        button.HasFocus = true;
+
+        List<MouseFlags> receivedFlags = [];
+
+        button.MouseEvent += (_, e) => { receivedFlags.Add (e.Flags); };
+
+        // Act - Inject two clicks with <500ms spacing to generate a double-click using Direct mode
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        Point clickPos = new (7, 6); // Inside button at screen coordinates
+
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
+        IInputInjector injector = app.GetInputInjector ();
+
+        // First click
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+
+        // Second click within 500ms threshold
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) }, options);
+
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) }, options);
+
+        // Assert - Should receive a double-click event (timestamp spacing allows multi-click)
+        // We don't assert exact count since View may emit additional events,
+        // but we verify the double-click event was generated
+        Assert.Contains (MouseFlags.LeftButtonDoubleClicked, receivedFlags);
+
+        // Also verify we got the first single-click
+        Assert.Contains (MouseFlags.LeftButtonClicked, receivedFlags);
+
+        // Cleanup
+        app.End (token!);
+        top.Dispose ();
+    }
+
+    /// <summary>
+    ///     Tests that MouseHoldRepeat button fires Accept on quick double-click.
+    ///     Per spec: When MouseHoldRepeat=true, Press/Release events are used (Click events ignored).
+    ///     Each Press/Release cycle fires exactly one Accept.
+    /// </summary>
+    [Fact]
+    public void MouseHoldRepeat_QuickDoubleClick_FiresAcceptTwice ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Button button = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 3,
+            Text = "Click Me",
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
+        };
+
+        Runnable top = new () { App = app };
+        top.Add (button);
+        SessionToken token = app.Begin (top);
+        button.HasFocus = true;
+
+        var acceptingCount = 0;
+        button.Accepting += (_, _) => acceptingCount++;
+
+        // Act - Quick double-click (both clicks within 500ms window)
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        Point clickPos = new (7, 6); // Inside button at screen coordinates
+
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
+        IInputInjector injector = app.GetInputInjector ();
+
+        // First click
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+
+        // Second click within 500ms threshold (creates double-click, but we ignore Click events)
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) }, options);
+
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) }, options);
+
+        // Assert - Should fire Accept twice (one per Press/Release cycle)
+        // MouseHoldRepeat uses Press/Release events only, ignoring Click/DoubleClick synthesized events
+        Assert.Equal (2, acceptingCount);
+
+        // Cleanup
+        app.End (token!);
+        top.Dispose ();
     }
 
     /// <summary>
@@ -721,90 +720,6 @@ public class ButtonTests
     }
 
     /// <summary>
-    ///     Tests that MouseHoldRepeat button fires Accept on quick double-click.
-    ///     Per spec: When MouseHoldRepeat=true, Press/Release events are used (Click events ignored).
-    ///     Each Press/Release cycle fires exactly one Accept.
-    /// </summary>
-    [Fact]
-    public void MouseHoldRepeat_QuickDoubleClick_FiresAcceptTwice ()
-    {
-        // Arrange
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        Button button = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 10,
-            Height = 3,
-            Text = "Click Me",
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
-        };
-
-        Runnable top = new () { App = app };
-        top.Add (button);
-        SessionToken token = app.Begin (top);
-        button.HasFocus = true;
-
-        var acceptingCount = 0;
-        button.Accepting += (_, _) => acceptingCount++;
-
-        // Act - Quick double-click (both clicks within 500ms window)
-        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        Point clickPos = new (7, 6); // Inside button at screen coordinates
-
-        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
-        IInputInjector injector = app.GetInputInjector ();
-
-        // First click
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime
-                              },
-                              options);
-
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (50)
-                              },
-                              options);
-
-        // Second click within 500ms threshold (creates double-click, but we ignore Click events)
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime.AddMilliseconds (300)
-                              },
-                              options);
-
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (350)
-                              },
-                              options);
-
-        // Assert - Should fire Accept twice (one per Press/Release cycle)
-        // MouseHoldRepeat uses Press/Release events only, ignoring Click/DoubleClick synthesized events
-        Assert.Equal (2, acceptingCount);
-
-        // Cleanup
-        app.End (token!);
-        top.Dispose ();
-    }
-
-    /// <summary>
     ///     Tests that MouseHoldRepeat button fires Accept on quick triple-click.
     ///     Per spec: When MouseHoldRepeat=true, Press/Release events are used (Click events ignored).
     ///     Each Press/Release cycle fires exactly one Accept.
@@ -842,61 +757,19 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // First click
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime
-                              },
-                              options);
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (50)
-                              },
-                              options);
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
 
         // Second click
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime.AddMilliseconds (200)
-                              },
-                              options);
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (200) }, options);
 
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (250)
-                              },
-                              options);
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (250) }, options);
 
         // Third click
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonPressed,
-                                  Timestamp = baseTime.AddMilliseconds (400)
-                              },
-                              options);
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (400) }, options);
 
-        injector.InjectMouse (
-                              new ()
-                              {
-                                  ScreenPosition = clickPos,
-                                  Flags = MouseFlags.LeftButtonReleased,
-                                  Timestamp = baseTime.AddMilliseconds (450)
-                              },
-                              options);
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (450) }, options);
 
         // Assert - Should fire Accept three times (one per Press/Release cycle)
         // MouseHoldRepeat uses Press/Release events only, ignoring Click/DoubleClick/TripleClick synthesized events
@@ -959,10 +832,84 @@ public class ButtonTests
         // Third click - more than 500ms after second
         injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1200) }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
+        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
                               options);
 
         Assert.Equal (3, acceptingCount);
+    }
+
+    [Fact]
+    public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
+    {
+        var btn = new Button { Text = "_Test" };
+
+        Assert.Equal (KeyCode.T, btn.HotKey);
+
+        btn.Text = "";
+
+        Assert.Equal (KeyCode.Null, btn.HotKey);
+    }
+
+    [Theory]
+    [InlineData (false, 0)]
+    [InlineData (true, 1)]
+    public void Space_Fires_Accept (bool focused, int expected)
+    {
+        var superView = new View { CanFocus = true };
+
+        Button button = new ();
+
+        button.CanFocus = focused;
+
+        var acceptInvoked = 0;
+        button.Accepting += (_, _) => acceptInvoked++;
+
+        superView.Add (button);
+        button.SetFocus ();
+        Assert.Equal (focused, button.HasFocus);
+
+        superView.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (expected, acceptInvoked);
+
+        superView.Dispose ();
+    }
+
+    [Fact]
+    public void TestAssignTextToButton ()
+    {
+        var btn = new Button { Text = "_K Ok" };
+
+        Assert.Equal ("_K Ok", btn.Text);
+
+        btn.Text = "_N Btn";
+
+        Assert.Equal ("_N Btn", btn.Text);
+    }
+
+    [Fact]
+    public void Text_Mirrors_Title ()
+    {
+        var view = new Button ();
+        view.Title = "Hello";
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{Glyphs.LeftBracket} Hello {Glyphs.RightBracket}", view.TextFormatter.Text);
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void Title_Mirrors_Text ()
+    {
+        var view = new Button ();
+        view.Text = "Hello";
+        Assert.Equal ("Hello", view.Text);
+        Assert.Equal ($"{Glyphs.LeftBracket} Hello {Glyphs.RightBracket}", view.TextFormatter.Text);
+
+        Assert.Equal ("Hello", view.Title);
+        Assert.Equal ("Hello", view.TitleTextFormatter.Text);
+        view.Dispose ();
     }
 }

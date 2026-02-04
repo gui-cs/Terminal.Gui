@@ -39,7 +39,7 @@ public class Adornments : Scenario
         {
             Title = "The _Window",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable,
-            Width = Dim.Fill (Dim.Func (_ => editor.Frame.Width)),
+            Width = Dim.Fill (editor),
             Height = Dim.Fill ()
         };
         appWindow.Add (window);
