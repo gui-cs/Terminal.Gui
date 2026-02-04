@@ -11,7 +11,7 @@ namespace Terminal.Gui.Views;
 //  HotKey - Do NOT Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Do NOT Focus item. If item is not active, make Active. Do NOT Accept.
 // Focused:
-//  Space key - If focused item is Active, move focus to and Acivate next. Else, Activate current. Do NOT Accept.
+//  Space key - If focused item is Active, move focus to and Activate next. Else, Activate current. Do NOT Accept.
 //  Enter key - Activate and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - If item is not active, make Active. Do NOT Accept.
@@ -34,7 +34,7 @@ public class OptionSelector : SelectorBase, IDesignable
     /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
-        if (base.OnHandlingHotKey (args) is true)
+        if (base.OnHandlingHotKey (args))
         {
             return true;
         }
@@ -65,7 +65,7 @@ public class OptionSelector : SelectorBase, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        if (base.OnActivating (args) is true)
+        if (base.OnActivating (args))
         {
             return true;
         }
@@ -116,32 +116,6 @@ public class OptionSelector : SelectorBase, IDesignable
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
-    /// <inheritdoc />
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
-    {
-        if (previousFocusedView == this)
-        {
-            // Losing focus, restore cursor to value
-            SetCursor ();
-        }
-        else if (focusedView == this)
-        {
-            // Gaining focus, restore cursor to value
-            SetCursor ();
-        }
-        base.OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
-
-        return;
-
-        void SetCursor ()
-        {
-            if (Values is { } && Value.HasValue && Cursor != Value)
-            {
-                Cursor = Value.Value;
-            }
-        }
-    }
-
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
@@ -160,17 +134,20 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
 
-        if (args.Context?.Binding is KeyBinding && args.Context.Command == Command.HotKey && checkbox.Value == CheckState.Checked)
+        if (args.Context is { Binding: KeyBinding, Command: Command.HotKey })
         {
-            // If user uses an item hotkey and the item is already checked, do nothing
-            args.Handled = true;
+            if (checkbox.Value == CheckState.Checked)
+            {
+                // If user uses an item hotkey and the item is already checked, do nothing
+                args.Handled = true;
 
-            return;
+                return;
+            }
         }
 
         if (checkbox.CanFocus)
         {
-            // For Select, if the view is focusable and SetFocus succeeds, by defition,
+            // For Select, if the view is focusable and SetFocus succeeds, by definition,
             // the event is handled. So return what SetFocus returns.
             checkbox.SetFocus ();
         }
@@ -202,7 +179,7 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         int valueIndex = Values.IndexOf (v => v == Value);
 
-        Value = valueIndex == Values?.Count () - 1 ? Values! [0] : Values! [valueIndex + 1];
+        Value = valueIndex == Values?.Count - 1 ? Values! [0] : Values! [valueIndex + 1];
 
         if (HasFocus)
         {
@@ -234,7 +211,8 @@ public class OptionSelector : SelectorBase, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets the <see cref="SelectorBase.Labels"/> index for the cursor. The cursor may or may not be the selected
+    ///     Gets or sets the <see cref="SelectorBase.Labels"/> index for the focused item. The active item may or may not be
+    ///     the selected
     ///     RadioItem.
     /// </summary>
     /// <remarks>
@@ -242,7 +220,7 @@ public class OptionSelector : SelectorBase, IDesignable
     ///         Maps to either the X or Y position within <see cref="View.Viewport"/> depending on <see cref="Orientation"/>.
     ///     </para>
     /// </remarks>
-    public new int Cursor
+    public int FocusedItem
     {
         get
         {
@@ -271,7 +249,7 @@ public class OptionSelector : SelectorBase, IDesignable
 
             if (value < 0 || value >= checkBoxes.Length)
             {
-                throw new ArgumentOutOfRangeException (nameof (value), @"Cursor index is out of range");
+                throw new ArgumentOutOfRangeException (nameof (value), @"FocusedItem index is out of range");
             }
 
             if (HasFocus)
