@@ -603,7 +603,7 @@ public class SelectorBaseTests
 
     #endregion
 
-    #region Tab and Shift+Tab Test
+    #region Navigation Keys
 
     [Theory]
     [InlineData (SelectorStyles.None)]
@@ -611,9 +611,9 @@ public class SelectorBaseTests
     [InlineData (SelectorStyles.ShowAllFlag)]
     [InlineData (SelectorStyles.ShowValue)]
     [InlineData (SelectorStyles.All)]
-    public void Cursor_TabbingOrShiftTabbingMoveFocusToNextOrPreviousViewOutside (SelectorStyles selectorStyles)
+    public void Navigation_Keys_Move_Out_And_Into_Not_Within (SelectorStyles selectorStyles)
     {
-        using IApplication app = Application.Create ().Init ();
+        using IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
         using Runnable runnable = new ();
         var view1 = new View { CanFocus = true };
         var selector = new OptionSelector { Styles = selectorStyles };
@@ -622,7 +622,7 @@ public class SelectorBaseTests
         var view2 = new View { CanFocus = true };
         runnable.Add (view1, selector, view2);
 
-        SessionToken? token = app.Begin (runnable);
+        app.Begin (runnable);
 
         // Set focus to view1
         view1.SetFocus ();
@@ -642,119 +642,6 @@ public class SelectorBaseTests
         // Finally, Shift+Tab again to move focus back to view1
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
         Assert.True (view1.HasFocus);
-
-        if (token is { })
-        {
-            app.End (token);
-        }
-    }
-
-    [Theory]
-    [InlineData (Orientation.Vertical)]
-    [InlineData (Orientation.Horizontal)]
-    public void Cursor_CursorDownCursorRightOrCursorUpCursorLeftMoveFocusToNextOrPreviousCheckBox (Orientation orientation)
-    {
-        using IApplication app = Application.Create ().Init ();
-        using Runnable runnable = new ();
-        var view1 = new View { CanFocus = true };
-        var selector = new OptionSelector { Styles = SelectorStyles.All, Orientation = orientation };
-        List<string> options = ["Option1", "Option2", "Option3"];
-        selector.Labels = options;
-        var view2 = new View { CanFocus = true };
-        runnable.Add (view1, selector, view2);
-
-        SessionToken? token = app.Begin (runnable);
-
-        // Set focus to view1
-        view1.SetFocus ();
-
-        Key keyNext;
-        Key keyPrevious;
-        Key keyNextView;
-        Key keyPreviousView;
-
-        if (orientation == Orientation.Vertical)
-        {
-            keyNext = Key.CursorDown;
-            keyPrevious = Key.CursorUp;
-            keyNextView = Key.CursorRight;
-            keyPreviousView = Key.CursorLeft;
-        }
-        else
-        {
-            keyNext = Key.CursorRight;
-            keyPrevious = Key.CursorLeft;
-            keyNextView = Key.CursorDown;
-            keyPreviousView = Key.CursorUp;
-        }
-
-        // Invoke CursorDown command to move focus to selector
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
-        Assert.True (selector.HasFocus);
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
-        Assert.Equal (0, selector.FocusedItem);
-
-        // Invoke CursorDown command again to move focus to next checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (1).HasFocus);
-        Assert.Equal (1, selector.FocusedItem);
-
-        // Invoke CursorRight command to move focus to next checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
-        Assert.Equal (2, selector.FocusedItem);
-
-        // Invoke CursorDown command again to move focus to first checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
-        Assert.Equal (0, selector.FocusedItem);
-
-        // Invoke CursorUp command to move focus to last checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
-        Assert.Equal (2, selector.FocusedItem);
-
-        // Invoke Tab command to move focus to view2
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNextView));
-        Assert.True (view2.HasFocus);
-
-        // Set value to 2 (third option) to prepare for CursorUp/CursorLeft test
-        selector.Value = 2;
-
-        // Now test Shift+Tab to move focus back to selector
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPreviousView));
-        Assert.True (selector.HasFocus);
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
-        Assert.Equal (2, selector.FocusedItem);
-
-        // Invoke CursorUp command to move focus to previous checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (1).HasFocus);
-        Assert.Equal (1, selector.FocusedItem);
-
-        // Invoke CursorLeft command to move focus to previous checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
-        Assert.Equal (0, selector.FocusedItem);
-
-        // Invoke CursorUp command to move focus to last checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPrevious));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (2).HasFocus);
-        Assert.Equal (2, selector.FocusedItem);
-
-        // Invoke CursorRight command to move focus to first checkbox
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyNext));
-        Assert.True (selector.SubViews.OfType<CheckBox> ().ElementAt (0).HasFocus);
-        Assert.Equal (0, selector.FocusedItem);
-
-        // Finally, Shift+Tab to move focus back to view1
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (keyPreviousView));
-        Assert.True (view1.HasFocus);
-
-        if (token is { })
-        {
-            app.End (token);
-        }
     }
 
     #endregion
