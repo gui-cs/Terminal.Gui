@@ -99,19 +99,21 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 // Process views that are not dependent on SuperView content size
                 foreach (View notDependentSubView in GetViewsThatMatch (includedSubViews,
-                                                                         v => dimension == Dimension.Width
-                                                                                  ? (v.X.IsFixed || v.Width.IsFixed)
-                                                                                    && !v.X.DependsOnSuperViewContentSize
-                                                                                    && !v.Width.DependsOnSuperViewContentSize
-                                                                                  : (v.Y.IsFixed || v.Height.IsFixed)
-                                                                                    && !v.Y.DependsOnSuperViewContentSize
-                                                                                    && !v.Height.DependsOnSuperViewContentSize))
+                                                                        v => dimension == Dimension.Width
+                                                                                 ? (v.X.IsFixed || v.Width.IsFixed)
+                                                                                   && !v.X.DependsOnSuperViewContentSize
+                                                                                   && !v.Width.DependsOnSuperViewContentSize
+                                                                                 : (v.Y.IsFixed || v.Height.IsFixed)
+                                                                                   && !v.Y.DependsOnSuperViewContentSize
+                                                                                   && !v.Height.DependsOnSuperViewContentSize))
                 {
                     notDependentSubView.SetRelativeLayout (us.GetContentSize ());
 
                     int size = dimension == Dimension.Width
-                                   ? notDependentSubView.X.GetAnchor (0) + notDependentSubView.Width.Calculate (0, superviewContentSize, notDependentSubView, dimension)
-                                   : notDependentSubView.Y.GetAnchor (0) + notDependentSubView.Height.Calculate (0, superviewContentSize, notDependentSubView, dimension);
+                                   ? notDependentSubView.X.GetAnchor (0)
+                                     + notDependentSubView.Width.Calculate (0, superviewContentSize, notDependentSubView, dimension)
+                                   : notDependentSubView.Y.GetAnchor (0)
+                                     + notDependentSubView.Height.Calculate (0, superviewContentSize, notDependentSubView, dimension);
 
                     if (size > maxCalculatedSize)
                     {
@@ -165,7 +167,6 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 foreach (View anchoredSubView in GetViewsThatHavePos<PosAnchorEnd> (dimension, includedSubViews))
                 {
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
-                    // TODO: Figure out a way to not have to calculate change the state of subviews (calling SRL).
                     if (dimension == Dimension.Width)
                     {
                         anchoredSubView.SetRelativeLayout (new Size (maxCalculatedSize, screenX4));
@@ -181,7 +182,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 }
 
                 maxCalculatedSize = Math.Max (maxCalculatedSize, maxAnchorEnd);
-                
+
                 maxCalculatedSize = GetMaxSizePos<PosView> (maxCalculatedSize, dimension, includedSubViews);
                 maxCalculatedSize = GetMaxSizeDim<DimView> (maxCalculatedSize, dimension, includedSubViews);
                 maxCalculatedSize = GetMaxSizeDim<DimAuto> (maxCalculatedSize, dimension, includedSubViews);
