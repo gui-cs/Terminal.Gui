@@ -35,4 +35,7 @@ public record DimFunc (Func<View?, int> Fn, View? View = null) : Dim
             yield return View;
         }
     }
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => true;
 }
