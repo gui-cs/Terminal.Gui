@@ -343,6 +343,7 @@ public class OptionSelectorTests
         List<string> options = ["Option1", "Option2", "Option3"];
 
         optionSelector.Labels = options;
+        optionSelector.SetFocus (); // Set focus to optionSelector
         optionSelector.Layout ();
 
         // Set cursor to second checkbox
@@ -397,6 +398,7 @@ public class OptionSelectorTests
 
         optionSelector.Labels = options;
         optionSelector.Value = 0; // First option is selected
+        optionSelector.SetFocus (); // Set focus to optionSelector
         optionSelector.Layout ();
 
         // Move cursor to second checkbox
@@ -412,6 +414,34 @@ public class OptionSelectorTests
         Assert.True (checkBoxes [1].HasFocus);
     }
 
+    [Fact]
+    public void Cursor_IsResetToValueAfterLoseFocus ()
+    {
+        var container = new View { CanFocus = true };
+        var optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2", "Option3"];
+        optionSelector.Labels = options;
+        var view = new View { CanFocus = true };
+        container.Add (optionSelector, view);
+
+        // Set focus to optionSelector
+        optionSelector.SetFocus ();
+
+        // Set Option2
+        optionSelector.Cursor = 1;
+        container.Layout ();
+
+        // Verify current assertions
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (1, optionSelector.Cursor);
+
+        // Move focus away
+        view.SetFocus ();
+
+        // Cursor should reset to Value
+        Assert.Equal (0, optionSelector.Cursor);
+    }
+  
     // Claude - Opus 4.5
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473

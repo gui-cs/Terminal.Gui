@@ -116,6 +116,32 @@ public class OptionSelector : SelectorBase, IDesignable
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
+    /// <inheritdoc />
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
+    {
+        if (previousFocusedView == this)
+        {
+            // Losing focus, restore cursor to value
+            SetCursor ();
+        }
+        else if (focusedView == this)
+        {
+            // Gaining focus, restore cursor to value
+            SetCursor ();
+        }
+        base.OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
+
+        return;
+
+        void SetCursor ()
+        {
+            if (Values is { } && Value.HasValue && Cursor != Value)
+            {
+                Cursor = Value.Value;
+            }
+        }
+    }
+
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
@@ -218,13 +244,28 @@ public class OptionSelector : SelectorBase, IDesignable
     /// </remarks>
     public new int Cursor
     {
-        get => !CanFocus ? 0 : SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+        get
+        {
+            if (!CanFocus)
+            {
+                return 0;
+            }
+
+            if (HasFocus)
+            {
+                return SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+            }
+
+            return field;
+        }
         set
         {
             if (!CanFocus)
             {
                 return;
             }
+
+            field = value;
 
             CheckBox [] checkBoxes = SubViews.OfType<CheckBox> ().ToArray ();
 
@@ -233,7 +274,10 @@ public class OptionSelector : SelectorBase, IDesignable
                 throw new ArgumentOutOfRangeException (nameof (value), @"Cursor index is out of range");
             }
 
-            checkBoxes [value].SetFocus ();
+            if (HasFocus)
+            {
+                checkBoxes [value].SetFocus ();
+            }
         }
     }
 

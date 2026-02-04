@@ -30,6 +30,63 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         AddCommand (Command.Accept, HandleAcceptCommand);
 
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+
+        KeyBindings.ReplaceCommands (Key.CursorDown, Command.Down);
+        KeyBindings.ReplaceCommands (Key.CursorRight, Command.Right);
+        KeyBindings.ReplaceCommands (Key.CursorUp, Command.Up);
+        KeyBindings.ReplaceCommands (Key.CursorLeft, Command.Left);
+
+        AddCommand (Command.Down, () => MoveNext (Command.Down));
+        AddCommand (Command.Right, () => MoveNext (Command.Right));
+
+        AddCommand (Command.Up, () => MovePrevious (Command.Up));
+        AddCommand (Command.Left, () => MovePrevious (Command.Left));
+    }
+
+    private bool MoveNext (Command command)
+    {
+        if ((command == Command.Down && Orientation == Orientation.Horizontal)
+            || (command == Command.Right && Orientation == Orientation.Vertical))
+        {
+            return false;
+        }
+
+        int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+
+        if (active < SubViews.OfType<CheckBox> ().Count () - 1)
+        {
+            active++;
+        }
+        else
+        {
+            active = 0;
+        }
+        SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
+
+        return true;
+    }
+
+    private bool MovePrevious (Command command)
+    {
+        if ((command == Command.Up && Orientation == Orientation.Horizontal)
+            || (command == Command.Left && Orientation == Orientation.Vertical))
+        {
+            return false;
+        }
+
+        int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+
+        if (active > 0)
+        {
+            active--;
+        }
+        else
+        {
+            active = SubViews.OfType<CheckBox> ().Count () - 1;
+        }
+        SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
+
+        return true;
     }
 
     /// <summary>
@@ -259,7 +316,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
-                ReadOnly = true
+                ReadOnly = true,
+                TabStop = TabBehavior.NoStop
             };
 
             Add (_valueField);
@@ -293,8 +351,10 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             Title = label,
             Id = label,
             Data = value,
-            MouseHighlightStates = DefaultMouseHighlightStates
+            MouseHighlightStates = DefaultMouseHighlightStates,
+            TabStop = TabBehavior.NoStop
         };
+
 
         return checkbox;
     }
