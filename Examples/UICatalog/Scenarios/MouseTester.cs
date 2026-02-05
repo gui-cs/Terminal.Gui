@@ -284,7 +284,7 @@ public class MouseTester : Scenario
 
         demo.CommandNotBound += (_, args) =>
                                 {
-                                    commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                    commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString ()}:{args.Context!.Command}");
                                     commandLog.MoveEnd ();
                                     args.Handled = true;
                                 };

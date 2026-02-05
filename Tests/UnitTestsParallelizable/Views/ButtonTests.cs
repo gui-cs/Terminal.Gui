@@ -337,21 +337,21 @@ public class ButtonTests
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (\1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (\1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (2, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Disable Mouse Highlighting to test that it does not interfere with Accepting event
         button.MouseHighlightStates = MouseState.None;
-        button.NewMouseEvent (new () { Position = new (\1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (3, activatingCount);
         Assert.Equal (3, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (\1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (4, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
