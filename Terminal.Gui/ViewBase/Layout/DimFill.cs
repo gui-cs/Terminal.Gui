@@ -89,6 +89,27 @@ public record DimFill (Dim Margin, Dim? MinimumContentDim = null, View? To = nul
     }
 
     /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => true;
+
+    /// <inheritdoc/>
+    internal override bool CanContributeToAutoSizing => MinimumContentDim is { } || To is { };
+
+    /// <inheritdoc/>
+    internal override int GetMinimumContribution (int location, int superviewContentSize, View us, Dimension dimension)
+    {
+        // DimFill's minimum contribution depends on MinimumContentDim and To
+        if (MinimumContentDim is { })
+        {
+            // Return the minimum content dimension
+            return MinimumContentDim.Calculate (0, superviewContentSize, us, dimension);
+        }
+
+        // If only To is set (without MinimumContentDim), we need special handling in DimAuto
+        // because the contribution depends on the To view's position
+        return 0;
+    }
+
+    /// <inheritdoc/>
     protected override bool HasInner<TDim> (out TDim dim)
     {
         if (Margin.Has (out dim))

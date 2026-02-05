@@ -6,6 +6,83 @@ namespace ViewsTests;
 /// </summary>
 public class ColorPickerTests
 {
+
+    [Fact]
+    public void ColorPicker16_MouseEvents ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        ColorPicker16 colorPicker = new () { X = 0, Y = 0, Height = 4, Width = 32 };
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
+        ((View)runnable).Add (colorPicker);
+        app.Begin (runnable);
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (4, 1)));
+        Assert.Equal (ColorName16.Blue, colorPicker.SelectedColor);
+    }
+
+    [Fact]
+    public void ColorPicker16_Constructors ()
+    {
+        var colorPicker = new ColorPicker16 ();
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
+        Assert.Equal (Point.Empty, colorPicker.Caret);
+        Assert.True (colorPicker.CanFocus);
+
+        colorPicker.BeginInit ();
+        colorPicker.EndInit ();
+        colorPicker.LayoutSubViews ();
+        Assert.Equal (new (0, 0, 32, 4), colorPicker.Frame);
+    }
+
+    [Fact]
+    public void ColorPicker16_KeyBindings_Command ()
+    {
+        var colorPicker = new ColorPicker16 ();
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
+
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (ColorName16.Blue, colorPicker.SelectedColor);
+
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorDown));
+        Assert.Equal (ColorName16.BrightBlue, colorPicker.SelectedColor);
+
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorLeft));
+        Assert.Equal (ColorName16.DarkGray, colorPicker.SelectedColor);
+
+        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorUp));
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
+
+        colorPicker.NewKeyDownEvent (Key.CursorLeft);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
+
+        colorPicker.NewKeyDownEvent (Key.CursorUp);
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
+    }
+
+    [Fact]
+    public void SelectedColorAndCursor ()
+    {
+        var colorPicker = new ColorPicker16 ();
+        colorPicker.SelectedColor = ColorName16.White;
+        Assert.Equal (7, colorPicker.Caret.X);
+        Assert.Equal (1, colorPicker.Caret.Y);
+
+        colorPicker.SelectedColor = Color.Black;
+        Assert.Equal (0, colorPicker.Caret.X);
+        Assert.Equal (0, colorPicker.Caret.Y);
+
+        colorPicker.Caret = new (7, 1);
+        Assert.Equal (ColorName16.White, colorPicker.SelectedColor);
+
+        colorPicker.Caret = Point.Empty;
+        Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
+    }
+
     [Fact]
     public void ChangedEvent_Fires ()
     {

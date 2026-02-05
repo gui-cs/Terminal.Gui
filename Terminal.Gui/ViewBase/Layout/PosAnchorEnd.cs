@@ -131,4 +131,7 @@ public record PosAnchorEnd : Pos
 
         return newLocation;
     }
+
+    /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => true;
 }
