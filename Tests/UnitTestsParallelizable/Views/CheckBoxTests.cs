@@ -26,7 +26,15 @@ public class CheckBoxTests
     [Fact]
     public void AllowCheckStateNone_Get_Set ()
     {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var checkBox = new CheckBox { Text = "Check this out 你" };
+        (runnable as View)?.Add (checkBox);
+        app.Begin (runnable);
 
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
@@ -37,7 +45,7 @@ public class CheckBoxTests
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
         // Select with mouse
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed }));
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (Point.Empty));
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
         checkBox.AllowCheckStateNone = true;
@@ -59,9 +67,9 @@ public class CheckBoxTests
     {
         var checkBox = new CheckBox { X = 0, Y = 0, Width = width, Height = height };
 
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), checkBox.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), checkBox.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
 
         checkBox.Dispose ();
     }
@@ -96,9 +104,9 @@ public class CheckBoxTests
         };
         checkBox.Layout ();
 
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Frame.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.Viewport.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), checkBox.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), checkBox.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), checkBox.TextFormatter.ConstrainToSize);
 
         checkBox.Dispose ();
     }
@@ -281,9 +289,9 @@ public class CheckBoxTests
         Assert.Equal (string.Empty, ckb.Text);
         Assert.Equal ($"{Glyphs.CheckStateUnChecked} ", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new (0, 0, 2, 1), ckb.Frame);
+        Assert.Equal (new Rectangle (0, 0, 2, 1), ckb.Frame);
 
-        ckb = new () { Text = "Test", Value = CheckState.Checked };
+        ckb = new CheckBox { Text = "Test", Value = CheckState.Checked };
         Assert.True (ckb.Width is DimAuto);
         Assert.True (ckb.Height is DimAuto);
         ckb.Layout ();
@@ -292,9 +300,9 @@ public class CheckBoxTests
         Assert.Equal ("Test", ckb.Text);
         Assert.Equal ($"{Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new (0, 0, 6, 1), ckb.Frame);
+        Assert.Equal (new Rectangle (0, 0, 6, 1), ckb.Frame);
 
-        ckb = new () { Text = "Test", X = 1, Y = 2 };
+        ckb = new CheckBox { Text = "Test", X = 1, Y = 2 };
         Assert.True (ckb.Width is DimAuto);
         Assert.True (ckb.Height is DimAuto);
         ckb.Layout ();
@@ -303,9 +311,9 @@ public class CheckBoxTests
         Assert.Equal ("Test", ckb.Text);
         Assert.Equal ($"{Glyphs.CheckStateUnChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new (1, 2, 6, 1), ckb.Frame);
+        Assert.Equal (new Rectangle (1, 2, 6, 1), ckb.Frame);
 
-        ckb = new () { Text = "Test", X = 3, Y = 4, Value = CheckState.Checked };
+        ckb = new CheckBox { Text = "Test", X = 3, Y = 4, Value = CheckState.Checked };
         Assert.True (ckb.Width is DimAuto);
         Assert.True (ckb.Height is DimAuto);
         ckb.Layout ();
@@ -314,49 +322,77 @@ public class CheckBoxTests
         Assert.Equal ("Test", ckb.Text);
         Assert.Equal ($"{Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        Assert.Equal (new (3, 4, 6, 1), ckb.Frame);
+        Assert.Equal (new Rectangle (3, 4, 6, 1), ckb.Frame);
     }
 
     [Fact]
-    public void LeftButtonPressed_Selects ()
+    public void LeftButtonReleased_Activates ()
     {
-        var checkBox = new CheckBox { Text = "_Checkbox" };
-        Assert.True (checkBox.CanFocus);
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        var checkBox = new CheckBox { Text = "Check this out 你" };
+        (runnable as View)?.Add (checkBox);
+        app.Begin (runnable);
 
         var checkedStateChangingCount = 0;
         checkBox.ValueChanging += (s, e) => checkedStateChangingCount++;
 
-        var selectCount = 0;
-        checkBox.Activating += (s, e) => selectCount++;
+        var activatingCount = 0;
+        checkBox.Activating += (s, e) => activatingCount++;
 
-        var acceptCount = 0;
-        checkBox.Accepting += (s, e) => acceptCount++;
+        var acceptingCount = 0;
+        checkBox.Accepting += (s, e) => acceptingCount++;
 
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
         Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptingCount);
 
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed }));
+        app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = Point.Empty });
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.Equal (0, checkedStateChangingCount);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = Point.Empty });
         Assert.Equal (CheckState.Checked, checkBox.Value);
         Assert.Equal (1, checkedStateChangingCount);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed }));
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
-        Assert.Equal (2, checkedStateChangingCount);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (0, acceptingCount);
 
         checkBox.AllowCheckStateNone = true;
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed }));
+
+        // Delay 500ms to prevent double click detection
+        app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = Point.Empty, Timestamp = time.Now.AddMilliseconds (500) });
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (1, checkedStateChangingCount);
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = Point.Empty });
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.Equal (2, checkedStateChangingCount);
+        Assert.Equal (2, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        // Delay 500ms to prevent double click detection
+        app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = Point.Empty, Timestamp = time.Now.AddMilliseconds (500) });
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.Equal (2, checkedStateChangingCount);
+        Assert.Equal (2, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        app.InjectMouse (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = Point.Empty });
         Assert.Equal (CheckState.None, checkBox.Value);
         Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (3, activatingCount);
+        Assert.Equal (0, acceptingCount);
     }
 
     [Fact]
@@ -386,7 +422,7 @@ public class CheckBoxTests
         Assert.Equal (0, selectCount);
         Assert.Equal (0, acceptCount);
 
-        checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
+        checkBox.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
         Assert.Equal (0, checkedStateChangingCount);

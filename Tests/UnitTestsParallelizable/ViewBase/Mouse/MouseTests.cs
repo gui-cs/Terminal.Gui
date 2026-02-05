@@ -11,8 +11,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var testView = new View ();
 
-        Assert.Contains (MouseFlags.LeftButtonPressed, testView.MouseBindings.GetAllFromCommands (Command.Activate));
-        Assert.Contains (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
+        // Default bindings changed to Released (issue #4674)
+        Assert.Contains (MouseFlags.LeftButtonReleased, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+        Assert.Contains (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
 
         Assert.Equal (2, testView.MouseBindings.GetBindings ().Count ());
 
@@ -21,11 +22,11 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
-        Assert.Contains (MouseFlags.LeftButtonPressed, testView.MouseBindings.GetAllFromCommands (Command.Activate));
-        Assert.Contains (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
+        // With MouseHoldRepeat set, the Released binding is used for repeat behavior
         Assert.Contains (MouseFlags.LeftButtonReleased, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+        Assert.Contains (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
 
-        Assert.Equal (3, testView.MouseBindings.GetBindings ().Count ());
+        Assert.Equal (2, testView.MouseBindings.GetBindings ().Count ());
 
     }
 
@@ -69,7 +70,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void LeftButtonPressed_RaisesActivating_WhenCanFocus ()
+    public void LeftButtonReleased_RaisesActivating_WhenCanFocus ()
     {
         // Arrange
         View superView = new () { CanFocus = true, Width = 20, Height = 20 };
@@ -87,14 +88,21 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         int acceptingCount = 0;
         view.Activating += (_, _) => acceptingCount++;
 
-        Mouse mouse = new ()
+        // Act - Press then Release (default behavior changed to Released, issue #4674)
+        Mouse pressedMouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.LeftButtonPressed
         };
+        view.NewMouseEvent (pressedMouse);
+        Assert.Equal (0, acceptingCount); // Should NOT activate on press
 
-        // Act
-        view.NewMouseEvent (mouse);
+        Mouse releasedMouse = new ()
+        {
+            Position = new (5, 5),
+            Flags = MouseFlags.LeftButtonReleased
+        };
+        view.NewMouseEvent (releasedMouse);
 
         // Assert
         Assert.Equal (1, acceptingCount);
@@ -142,7 +150,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
-        var testView = new View { CanFocus = canFocus, X = 4, Width = 4, Height = 1 };
+        var testView = new View { CanFocus = canFocus, X = 4, Width = 4, Height = 1, MouseHighlightStates = MouseState.Pressed };
         superView.Add (focusedView, testView);
 
         focusedView.SetFocus ();
@@ -156,6 +164,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             testView.SetFocus ();
         }
 
+        // Note: Pressed still sets focus (via HandleAutoGrabPress), even though activation moved to Released
         testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedHasFocus, testView.HasFocus);
@@ -166,7 +175,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (false, false, 1)]
     [InlineData (true, false, 1)]
     [InlineData (true, true, 1)]
-    public void LeftButtonPressed_Raises_Activating (bool canFocus, bool setFocus, int expectedAcceptingCount)
+    public void LeftButtonReleased_Raises_Activating (bool canFocus, bool setFocus, int expectedAcceptingCount)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
@@ -187,7 +196,11 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         var acceptingCount = 0;
         testView.Activating += (sender, args) => acceptingCount++;
 
+        // Default behavior changed to Released (issue #4674)
         testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        Assert.Equal (0, acceptingCount); // Should NOT activate on press
+
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedAcceptingCount, acceptingCount);
     }
