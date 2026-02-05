@@ -111,33 +111,37 @@ public class DynamicStatusBar : Scenario
             };
             Add (TextAction);
 
-            var lblShortcut = new Label
+            var lblKey = new Label
             {
-                X = Pos.Left (lblTitle), Y = Pos.Bottom (TextAction) + 1, Text = "Shortcut:"
+                X = Pos.Left (lblTitle), Y = Pos.Bottom (TextAction) + 1, Text = "Key:"
             };
-            Add (lblShortcut);
+            Add (lblKey);
 
-            TextShortcut = new TextField
+            TextKey = new TextField
             {
-                X = Pos.X (TextAction), Y = Pos.Y (lblShortcut), Width = Dim.Fill (), ReadOnly = true
+                X = Pos.X (TextAction), Y = Pos.Y (lblKey), Width = Dim.Fill (), ReadOnly = true
             };
 
-            TextShortcut.KeyDown += (_, e) =>
+            TextKey.KeyDown += (_, e) =>
                                     {
-                                        TextShortcut.Text = e.ToString ();
+                                        TextKey.Text = e.ToString ();
                                     };
-            Add (TextShortcut);
+            Add (TextKey);
 
-            var btnShortcut = new Button
+            var btnKey = new Button
             {
-                X = Pos.X (lblShortcut), Y = Pos.Bottom (TextShortcut) + 1, Text = "Clear Shortcut"
+                X = Pos.X (lblKey), Y = Pos.Bottom (TextKey) + 1, Text = "Clear Key"
             };
-            btnShortcut.Accepting += (_, _) => { TextShortcut.Text = ""; };
-            Add (btnShortcut);
+            btnKey.Accepting += (_, e) =>
+                                {
+                                    TextKey.Text = "";
+                                    e.Handled = true;
+                                };
+            Add (btnKey);
         }
 
         public TextView TextAction { get; }
-        public TextField TextShortcut { get; }
+        public TextField TextKey { get; }
         public TextField TextTitle { get; }
         public Action CreateAction (DynamicStatusItem item) => () => MessageBox.ErrorQuery (_app!, item.Title, item.Action, "Ok");
 
@@ -159,7 +163,7 @@ public class DynamicStatusBar : Scenario
                                   ? GetTargetAction (statusItem.Action)
                                   : string.Empty;
 
-            TextShortcut.Text = statusItem.Key == Key.Empty ? "" : statusItem.Key;
+            TextKey.Text = statusItem.Key == Key.Empty ? "" : statusItem.Key;
         }
 
         public DynamicStatusItem? EnterStatusItem ()
@@ -199,7 +203,7 @@ public class DynamicStatusBar : Scenario
                                       _app?.RequestStop ();
                                   };
 
-            Dialog dialog = new () { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel] };
+            Dialog dialog = new () { Title = "Enter the Shortcut details.", Buttons = [btnOk, btnCancel] };
 
             Width = Dim.Auto ();
             Height = Dim.Auto ();
@@ -212,7 +216,7 @@ public class DynamicStatusBar : Scenario
             return valid
                        ? new DynamicStatusItem
                        {
-                           Title = TextTitle.Text, Action = TextAction.Text, Key = TextShortcut.Text
+                           Title = TextTitle.Text, Action = TextAction.Text, Key = TextKey.Text
                        }
                        : null;
         }
@@ -221,7 +225,7 @@ public class DynamicStatusBar : Scenario
         {
             TextTitle.Text = "";
             TextAction.Text = "";
-            TextShortcut.Text = "";
+            TextKey.Text = "";
         }
 
         private string GetTargetAction (Action action)
@@ -400,7 +404,7 @@ public class DynamicStatusBar : Scenario
                                       {
                                           Title = frmStatusBarDetails.TextTitle.Text,
                                           Action = frmStatusBarDetails.TextAction.Text,
-                                          Key = frmStatusBarDetails.TextShortcut.Text
+                                          Key = frmStatusBarDetails.TextKey.Text
                                       };
 
                                       if (_lstItems.SelectedItem is { } selectedItem)
