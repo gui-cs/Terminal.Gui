@@ -195,4 +195,7 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         base.Dispose (disposing);
     }
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }

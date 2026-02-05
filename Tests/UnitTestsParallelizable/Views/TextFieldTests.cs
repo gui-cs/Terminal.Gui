@@ -174,7 +174,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         var handle = false;
         view.Accepting += TextViewAccepting;
 
-        Assert.Null (view.InvokeCommand (Command.Accept));
+        Assert.False (view.InvokeCommand (Command.Accept));
         Assert.True (tfAcceptingInvoked);
 
         tfAcceptingInvoked = false;

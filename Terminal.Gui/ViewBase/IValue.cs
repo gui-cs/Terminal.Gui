@@ -22,6 +22,11 @@ public interface IValue
     /// </summary>
     /// <returns>The current value, or <see langword="null"/> if no value is set.</returns>
     object? GetValue ();
+    /// <summary>
+    ///     Raised when <see cref="Value"/> has changed.
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
 }
 
 /// <summary>

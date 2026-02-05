@@ -12,7 +12,10 @@ public class MouseBindings : InputBindings<MouseFlags, MouseBinding>
     ///     Initializes a new instance.
     /// </summary>
     public MouseBindings () : base (
-                                    (commands, flags) => new (commands, flags),
+                                    (commands, flags, source) =>
+                                    {
+                                        return new MouseBinding (commands, flags, source);
+                                    },
                                     EqualityComparer<MouseFlags>.Default)
     { }
 

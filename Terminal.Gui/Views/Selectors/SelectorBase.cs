@@ -195,6 +195,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
     #region IValue<int?> Implementation
 
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     /// <summary>
     ///     Raises the <see cref="ValueChanging"/> event.
     /// </summary>
@@ -217,8 +220,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         _valueField?.Text = Value.ToString ()!;
 
         OnValueChanged (newValue, previousValue);
-
         ValueChanged?.Invoke (this, new ValueChangedEventArgs<int?> (previousValue, newValue));
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (previousValue, newValue));
     }
 
     /// <summary>

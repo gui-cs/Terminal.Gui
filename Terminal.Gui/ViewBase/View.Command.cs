@@ -9,46 +9,17 @@ public partial class View // Command APIs
     /// </summary>
     private void SetupCommands ()
     {
-        // NotBound - Invoked if no handler is bound
-        AddCommand (Command.NotBound, RaiseCommandNotBound);
+        // Space or single-click - Raise Activating
+        AddCommand (Command.Activate, DefaultActivateHandler);
 
         // Enter - Raise Accepted
-        AddCommand (Command.Accept, RaiseAccepting);
+        AddCommand (Command.Accept, DefaultAcceptHandler);
 
         // HotKey - SetFocus and raise HandlingHotKey
-        AddCommand (Command.HotKey,
-                    ctx =>
-                    {
-                        if (RaiseHandlingHotKey (ctx) is true)
-                        {
-                            return true;
-                        }
+        AddCommand (Command.HotKey, DefaultHotKeyHandler);
 
-                        SetFocus ();
-
-                        // Always return true on hotkey, even if SetFocus fails because
-                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
-                        return true;
-                    });
-
-        // Space or single-click - Raise Activating
-        AddCommand (Command.Activate,
-                    ctx =>
-                    {
-                        if (RaiseActivating (ctx) is true)
-                        {
-                            return true;
-                        }
-
-                        if (CanFocus)
-                        {
-                            // For Activate, if the view is focusable and SetFocus succeeds, by definition,
-                            // the event is handled. So return what SetFocus returns.
-                            return SetFocus ();
-                        }
-
-                        return false;
-                    });
+        // NotBound - Invoked if no handler is bound
+        AddCommand (Command.NotBound, DefaultCommandNotBoundHandler);
     }
 
     #region Command Management
@@ -229,6 +200,8 @@ public partial class View // Command APIs
 
     #region Default Event Handlers
 
+    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx) => RaiseCommandNotBound (ctx);
+
     /// <summary>
     ///     Called when a command that has not been bound is invoked.
     /// </summary>
@@ -271,6 +244,21 @@ public partial class View // Command APIs
     /// </summary>
     public event EventHandler<CommandEventArgs>? CommandNotBound;
 
+    #region Accept
+
+    internal bool? DefaultAcceptHandler (ICommandContext? ctx)
+    {
+        if (RaiseAccepting (ctx) is true)
+        {
+            return true;
+        }
+
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx?.Source}) - Calling RaiseAccepted");
+        RaiseAccepted (ctx);
+
+        return false;
+    }
+
     /// <summary>
     ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked.
     ///     Calls <see cref="OnAccepting"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
@@ -299,18 +287,18 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-        //Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
+        //Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
+        //Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx?.Source?.Title}) - Calling OnAccepting...");
         args.Handled = OnAccepting (args) || args.Handled;
 
         if (!args.Handled && Accepting is { })
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
+            //Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx?.Source?.Title}) - Raising Accepting...");
             Accepting?.Invoke (this, args);
         }
 
@@ -320,9 +308,6 @@ public partial class View // Command APIs
         {
             return true;
         }
-
-        Logging.Debug ($"{Title} ({ctx?.Source}) - Calling RaiseAccepted");
-        RaiseAccepted (ctx);
 
         // Do not return null as the event was raised.
         return args.Handled;
@@ -365,6 +350,7 @@ public partial class View // Command APIs
     ///     </para>
     /// </remarks>
     /// <param name="ctx">The command context.</param>
+    /// <seealso cref="RaiseAccepting"/>
     protected void RaiseAccepted (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
@@ -372,6 +358,8 @@ public partial class View // Command APIs
         OnAccepted (args);
         Accepted?.Invoke (this, args);
     }
+
+    // BUGBUG: Accepted should not use CommandEventArgs since it cannot be cancelled. Use EventArgs<ICommandContext?>?
 
     /// <summary>
     ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not
@@ -400,6 +388,29 @@ public partial class View // Command APIs
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepted;
 
+    #endregion Accept
+
+    #region Activate
+
+    internal bool? DefaultActivateHandler (ICommandContext? ctx)
+    {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        if (RaiseActivating (ctx) is true)
+        {
+            return true;
+        }
+
+        if (CanFocus)
+        {
+            // Set focus if not handled yet. Setting focus does NOT mean the event is handled, so we return.
+            SetFocus ();
+        }
+
+        RaiseActivated (ctx);
+
+        return false;
+    }
+
     /// <summary>
     ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state
     ///     or preparing it for interaction.
@@ -416,9 +427,9 @@ public partial class View // Command APIs
     ///     continue.
     ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected virtual bool? RaiseActivating (ICommandContext? ctx)
+    protected bool? RaiseActivating (ICommandContext? ctx)
     {
-        //Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
@@ -429,10 +440,16 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoking Activating event");
         Activating?.Invoke (this, args);
 
-        // Use TryBubbleToSuperView helper to handle Activate bubbling (opt-in via CommandsToBubbleUp)
-        return TryBubbleToSuperView (Command.Activate, ctx, args.Handled);
+        if (!args.Handled)
+        {
+            // Use TryBubbleToSuperView helper to handle Activate bubbling (opt-in via CommandsToBubbleUp)
+            args.Handled = TryBubbleToSuperView (Command.Activate, ctx, args.Handled) is true;
+        }
+
+        return args.Handled;
     }
 
     /// <summary>
@@ -455,6 +472,57 @@ public partial class View // Command APIs
     public event EventHandler<CommandEventArgs>? Activating;
 
     /// <summary>
+    ///     Raises the <see cref="OnActivated"/>/<see cref="Activated"/> event indicating the View has been activated.
+    ///     This is called after <see cref="Activated"/> has been raised and not cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="Activating"/>, this event cannot be cancelled. It is raised after the View has activated.
+    ///     </para>
+    /// </remarks>
+    /// <param name="ctx">The command context.</param>
+    /// <seealso cref="RaiseActivating"/>
+    protected void RaiseActivated (ICommandContext? ctx)
+    {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        OnActivated (ctx);
+        Activated?.Invoke (this, new EventArgs<ICommandContext?> (ctx));
+    }
+
+    /// <summary>
+    ///     Called when the View has been activated. This is called after <see cref="Accepting"/> has been raised and not
+    ///     cancelled.
+    /// </summary>
+    /// <param name="ctx">The event arguments.</param>
+    protected virtual void OnActivated (ICommandContext? ctx) { }
+
+    /// <summary>
+    ///     Event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the
+    ///     View to change state or preparing it for interaction.
+    /// </summary>
+    public event EventHandler<EventArgs<ICommandContext?>>? Activated;
+
+    #endregion Activate
+
+    #region HotKey
+
+    internal bool? DefaultHotKeyHandler (ICommandContext? ctx)
+    {
+        if (RaiseHandlingHotKey (ctx) is true)
+        {
+            return true;
+        }
+
+        if (CanFocus)
+        {
+            // Set focus if not handled yet. Setting focus does NOT mean the event is handled, so we return.
+            SetFocus ();
+        }
+
+        return false;
+    }
+
+    /// <summary>
     ///     Called when the View is handling the user pressing the View's <see cref="HotKey"/>s. Calls
     ///     <see cref="OnHandlingHotKey"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
     ///     event. The default <see cref="Command.HotKey"/> handler calls this method.
@@ -470,7 +538,7 @@ public partial class View // Command APIs
     {
         CommandEventArgs args = new () { Context = ctx };
 
-        //Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
+        //Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context?.Source?.Title})");
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
@@ -482,7 +550,7 @@ public partial class View // Command APIs
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         HandlingHotKey?.Invoke (this, args);
 
-        return HandlingHotKey is null ? null : args.Handled;
+        return args.Handled;
     }
 
     /// <summary>
@@ -500,12 +568,15 @@ public partial class View // Command APIs
     /// </summary>
     public event EventHandler<CommandEventArgs>? HandlingHotKey;
 
+    #endregion HotKey
+
     #endregion Default Event Handlers
 
     #region Command Propagation
 
     /// <summary>
-    ///     Gets or sets the default accept view for this View. The default accept view will have <see cref="Command.Accept"/> invoked on it
+    ///     Gets or sets the default accept view for this View. The default accept view will have <see cref="Command.Accept"/>
+    ///     invoked on it
     ///     anytime a peer View raises <see cref="Command.Accept"/> and the event is not handled.
     /// </summary>
     public View? DefaultAcceptView
@@ -516,6 +587,7 @@ public partial class View // Command APIs
             {
                 return GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
             }
+
             return field;
         }
         set => field = value;
@@ -551,6 +623,8 @@ public partial class View // Command APIs
         {
             return true;
         }
+
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         // Special case: Command.Accept checks for IsDefault peer button first
         if (command == Command.Accept)

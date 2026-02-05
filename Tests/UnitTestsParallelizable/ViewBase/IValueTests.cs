@@ -36,6 +36,9 @@ public class IValueTests
 
         protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
         protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
+
+        /// <inheritdoc />
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
     }
 
     /// <summary>
@@ -65,6 +68,9 @@ public class IValueTests
 
         protected virtual bool OnValueChanging (ValueChangingEventArgs<string?> args) => false;
         protected virtual void OnValueChanged (ValueChangedEventArgs<string?> args) { }
+
+        /// <inheritdoc />
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
     }
 
     [Fact]

@@ -93,6 +93,9 @@ public class DatePicker : View, IValue<DateTime>
     /// <inheritdoc/>
     object? IValue.GetValue () => _date;
 
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     /// <summary>
     ///     Called when the <see cref="DatePicker"/> <see cref="Value"/> is changing.
     /// </summary>

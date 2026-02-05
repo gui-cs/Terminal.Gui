@@ -30,7 +30,7 @@ public class EventLog : ListView
                           });
         Height = Dim.Fill ();
 
-        ExpandButton = new () { Orientation = Orientation.Horizontal };
+        ExpandButton = new ExpanderButton { Orientation = Orientation.Horizontal };
 
         Initialized += EventLog_Initialized;
 
@@ -65,23 +65,64 @@ public class EventLog : ListView
                 return;
             }
 
+            UnsubscribeFromViewToLog (_viewToLog);
+
             _viewToLog = value;
 
             if (_viewToLog is { })
             {
-                _viewToLog.Initialized += (s, _) =>
-                                          {
-                                              var sender = s as View;
-                                              Log ($"Initialized: {GetIdentifyingString (sender)}");
-                                          };
-
-                _viewToLog.HandlingHotKey += (_, args) => { Log ($"HandlingHotKey: {FormatContext (args.Context)}"); };
-                _viewToLog.Activating += (_, args) => { Log ($"Activating: {FormatContext (args.Context)}"); };
-                _viewToLog.Accepting += (_, args) => { Log ($"Accepting: {FormatContext (args.Context)}"); };
-                _viewToLog.Accepted += (_, args) => { Log ($"Accepted: {FormatContext (args.Context)}"); };
+                SetViewToLog (_viewToLog);
             }
         }
     }
+
+    private void UnsubscribeFromViewToLog (View? view)
+    {
+        view?.Initialized -= OnViewOnInitialized;
+        view?.HandlingHotKey -= OnViewOnHandlingHotKey;
+        view?.Activating -= OnViewOnActivating;
+        view?.Activated -= OnViewOnActivated;
+        view?.Accepting -= OnViewOnAccepting;
+        view?.Accepted -= OnViewOnAccepted;
+
+        if (view is IValue valueView)
+        {
+            valueView.ValueChangedUntyped -= OnValueViewOnValueChanged;
+        }
+    }
+
+    public void SetViewToLog (View? view)
+    {
+        view?.Initialized += OnViewOnInitialized;
+        view?.HandlingHotKey += OnViewOnHandlingHotKey;
+        view?.Activating += OnViewOnActivating;
+        view?.Activated += OnViewOnActivated;
+        view?.Accepting += OnViewOnAccepting;
+        view?.Accepted += OnViewOnAccepted;
+
+        if (view is IValue valueView)
+        {
+            valueView.ValueChangedUntyped += OnValueViewOnValueChanged;
+        }
+    }
+
+    private void OnViewOnInitialized (object? s, EventArgs _) => Log ($"{(s as View).ToIdentifyingString ()} Initialized");
+
+    private void OnViewOnAccepted (object? s, CommandEventArgs args) => Log ($"{(s as View).ToIdentifyingString ()} Accepted: {FormatContext (args.Context)}");
+
+    private void OnViewOnAccepting (object? s, CommandEventArgs args) => Log ($"{(s as View).ToIdentifyingString ()} Accepting: {FormatContext (args.Context)}");
+
+    private void OnViewOnActivating (object? s, CommandEventArgs args) =>
+        Log ($"{(s as View).ToIdentifyingString ()} Activating: {FormatContext (args.Context)}");
+
+    private void OnViewOnActivated (object? sender, EventArgs<ICommandContext?> e) =>
+        Log ($"{(sender as View).ToIdentifyingString ()} Activated: {FormatContext (e.Value)}");
+
+    private void OnViewOnHandlingHotKey (object? s, CommandEventArgs args) =>
+        Log ($"{(s as View).ToIdentifyingString ()} HandlingHotKey: {FormatContext (args.Context)}");
+
+    private void OnValueViewOnValueChanged (object? s, ValueChangedEventArgs<object?> e) =>
+        Log ($"{(s as View).ToIdentifyingString ()} ValueChanged: {e.OldValue} -> {e.NewValue}");
 
     private string FormatContext (ICommandContext? context)
     {
@@ -98,9 +139,9 @@ public class EventLog : ListView
             sb.Append ($", Binding={binding}");
         }
 
-        if (context.Source is { } && context.Source.TryGetTarget (out View? view))
+        if (context.Source is { })
         {
-            sb.Append ($", Source={GetIdentifyingString (view)}");
+            sb.Append ($", Source={context.Source.ToIdentifyingString ()}");
         }
 
         return sb.ToString ();
@@ -119,23 +160,4 @@ public class EventLog : ListView
         Source = new ListWrapper<string> (_eventSource);
     }
 
-    private string GetIdentifyingString (View? view)
-    {
-        if (view is null)
-        {
-            return "null";
-        }
-
-        if (!string.IsNullOrEmpty (view.Title))
-        {
-            return view.Title;
-        }
-
-        if (!string.IsNullOrEmpty (view.Text))
-        {
-            return view.Text;
-        }
-
-        return view.GetType ().Name;
     }
-}

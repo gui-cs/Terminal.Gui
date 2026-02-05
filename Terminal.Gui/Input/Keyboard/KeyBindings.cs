@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.Input;
 
 /// <summary>
@@ -11,13 +9,10 @@ namespace Terminal.Gui.Input;
 public class KeyBindings : InputBindings<Key, KeyBinding>
 {
     /// <summary>Initializes a new instance bound to <paramref name="target"/>.</summary>
-    public KeyBindings (View? target) : base ((commands, key) => new (commands), new KeyEqualityComparer ())
-    {
-        Target = target;
-    }
+    public KeyBindings (View? target) : base ((commands, key, source) => new KeyBinding (commands, source), new KeyEqualityComparer ()) => Target = target;
 
-    /// <inheritdoc />
-    public override bool IsValid (Key eventArgs) { return eventArgs.IsValid; }
+    /// <inheritdoc/>
+    public override bool IsValid (Key eventArgs) => eventArgs.IsValid;
 
     /// <summary>
     ///     <para>

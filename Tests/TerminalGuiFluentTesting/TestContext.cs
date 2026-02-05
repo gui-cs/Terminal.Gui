@@ -401,7 +401,7 @@ public partial class TestContext : IDisposable
 
     public TestContext ScreenShot (string title, TextWriter? writer) =>
 
-        //Logging.Trace ($"{title}");
+        //Logging.Trace ($"{this.ToIdentifyingString ()}");
         WaitIteration (app =>
                        {
                            writer?.WriteLine (title + ":");
@@ -412,7 +412,7 @@ public partial class TestContext : IDisposable
 
     public TestContext AnsiScreenShot (string title, TextWriter? writer) =>
 
-        //Logging.Trace ($"{title}");
+        //Logging.Trace ($"{this.ToIdentifyingString ()}");
         WaitIteration (app =>
                        {
                            writer?.WriteLine (title + ":");

@@ -83,19 +83,28 @@ public class Shortcut : View, IOrientation, IDesignable
         _orientationHelper.OrientationChanging += (_, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (_, e) => OrientationChanged?.Invoke (this, e);
 
-        CommandsToBubbleUp = [Command.Accept, Command.Activate];
-
-        AddCommands ();
+        CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
-        CommandView = new View { Id = "CommandView", Width = Dim.Auto (), Height = Dim.Fill () };
+        CommandView = new View
+        {
+#if DEBUG
+            Id = "CommandView",
+#endif
+            Width = Dim.Auto (),
+            Height = Dim.Fill ()
+        };
         Title = commandText ?? string.Empty;
 
+#if DEBUG
         HelpView.Id = "_helpView";
+#endif
         HelpView.Text = helpText ?? string.Empty;
 
+#if DEBUG
         KeyView.Id = "_keyView";
+#endif
         Key = key;
 
         Action = action;
@@ -268,54 +277,127 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Accept/Select/HotKey Command Handling
 
-    private void AddCommands ()
-    {
-        //// Activate (Space key or click) -
-        //AddCommand (Command.Activate,
-        //            ctx =>
-        //            {
-        //                if (RaiseActivating (ctx) is true)
-        //                {
-        //                    return true;
-        //                }
-
-        //                if (CanFocus)
-        //                {
-        //                    SetFocus ();
-        //                }
-
-        //                return false;
-        //            });
-
-        // Accept (Enter key) -
-        //AddCommand (Command.Accept, DispatchCommand);
-
-        // Hotkey -
-        // AddCommand (Command.HotKey, DispatchCommand);
-    }
-
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        bool ret = base.OnActivating (args);
-
-        if (ret)
+        if (base.OnActivating (args))
         {
-            return ret;
+            return true;
         }
-        SetFocus ();
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-        if (IsFromShortcut (args))
+        if (IsFromCommandView (args.Context))
         {
-            string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+            // The user did something in the CommandView (e.g., clicked on it or pressed its hotkey. We got here because BubbleCommandsToSuperView is true for Command.Activate,
+            // so the event bubbled up to Shortcut.
+            // We're going to cancel the CommandView's Activating and raise our own so that the Shortcut gets focus and can update its state if needed.
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsFromCommandView");
 
-            // Invoke Activate on the CommandView to cause it to change state if it wants to
-            // CommandView is responsible for checking CanFocus before changing state
-            Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
-            ICommandContext? context = new CommandContext (Command.Activate, new WeakReference<View> (CommandView), args.Context?.Binding);
+            // Set the context source to the Shortcut so that when we invoke Activate below on the CommandView, and the command bubbles to us again,
+            // we can detect that it originated from us and not from the CommandView with IsInvocationFromShortcut below.
+            ICommandContext context = new CommandContext (Command.Activate, new WeakReference<View> (this), args.Context?.Binding);
+
+            // Disable bubling
+            CommandsToBubbleUp = [];
+            if (CommandView.InvokeCommand (Command.Activate, context) is true)
+            {
+                // This is not expected; 
+                throw new InvalidOperationException ("CommandView.InvokeCommand(Command.Activate) returned true unexpectedly.");
+            }
+            CommandsToBubbleUp = [Command.Activate];
+
+            context = new CommandContext (Command.Activate, null, null);
+            args.Context?.Binding?.Source = null;
+            context = new CommandContext (Command.Activate, null, args.Context?.Binding);
+            InvokeCommand (Command.Activate, context);
+
+            // When the above InvokeCommand returns, the CommandView should have changed state (e.g., a CheckBox may have toggled its checked state).
+            // The call to this OnActivating should signal the event was handled, so the state doesn't change again.
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsFromCommandView - Back from CommandView.InvokeCommand");
+
+            return true;
+        }
+
+        if (IsBindingFromShortcut (args))
+        {
+            // The user did something in the Shortcut/KeyView/HelpView. Need to invoke on the command view so that it can update its state if needed (e.g., toggle a CheckBox).
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsBindingFromShortcut");
+
+            // Disable bubling
+            CommandsToBubbleUp = [];
+            ICommandContext context = new CommandContext (Command.Activate, null, null);
+            bool? ret = CommandView.InvokeCommand (Command.Activate, context);
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsBindingFromShortcut - Back from CommandView.InvokeCommand");
+
+            CommandsToBubbleUp = [Command.Activate];
+            args.Context?.Binding?.Source = null;
+            context = new CommandContext (Command.Activate, null, args.Context?.Binding);
+            InvokeCommand (Command.Activate, context) ;
+
+            return true;
+        }
+
+        //if (IsInvocationFromShortcut (args))
+        //{
+        //    // We invoked Activate on ourselves (either the CommandView or just ourselves). We need to cause RaiseActivating/RaiseActivated so that 
+        //    // SuperViews who subscribe will get the events.
+        //    Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsInvocationFromShortcut");
+
+        //    // Invoke the command on the CommandView with no binding so that it bubbles up to us again, but we can detect it with IsInvocationFromShortcut and not cause a loop.
+        //    args.Context?.Binding?.Source = null;
+        //    ICommandContext context = new CommandContext (Command.Activate, null, args.Context?.Binding);
+
+        //    return InvokeCommand (Command.Activate, context) is true;
+        //}
+
+        if (args.Context?.Source is null && args.Context?.Binding is null)
+        {
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - null both");
+
+           // return true;
+        }
+
+        // If we got here, the Activate came from somewhere else.
+        // We want to allow that, but we don't want to raise Activating again and cause a loop, so we'll just return false and allow it to bubble up.
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - returning false.");
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+
+        string sourceTitle = ctx?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+
+        //// Source == this means the event originated from clicking on Shortcut (not CommandView)
+        //if (ctx?.Source?.TryGetTarget (out View? sv) == true && (sv == this || sv == HelpView))
+        //{
+        //    // Invoke Activate on the CommandView to cause it to change state if it wants to
+        //    // CommandView is responsible for checking CanFocus before changing state
+        //    Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+        //    ICommandContext? context = new CommandContext (Command.Activate, new WeakReference<View> (CommandView), ctx?.Binding);
+
+        //    return;
+        //}
+
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
+        Action?.Invoke ();
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        if (!IsBindingFromShortcut (args))
+        {
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args})) - RaisingActivating");
+            RaiseActivating (args.Context);
+
+            // override handled; prevent Accepting from being raised
             args.Handled = true;
 
-            return CommandView.InvokeCommand (Command.Activate, context) is true;
+            return true;
         }
 
         if (args.Handled)
@@ -323,129 +405,30 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        return false;//DispatchCommand (args.Context) is true;
-       // return RaiseAccepting (args.Context) is true;
+        return base.OnAccepting (args);
     }
 
     /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
-        bool ret = base.OnHandlingHotKey (args);
-
-        if (ret)
+        if (base.OnHandlingHotKey (args) is true)
         {
-            return ret;
-        }
-        SetFocus ();
-
-        KeyBinding? keyBinding = args.Context?.Binding as KeyBinding?;
-
-        //if (keyBinding?.Target == this)
-        {
-            return args.Handled = RaiseActivating (args.Context) is true;
+            return true;
         }
 
-        if (IsFromShortcut (args))
+        if (IsBindingFromShortcut (args))
         {
-            string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - RaisingActivating");
+            RaiseActivating (args.Context);
 
-            // Invoke Activate on the CommandView to cause it to change state if it wants to
-            // CommandView is responsible for checking CanFocus before changing state
-            Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
-            ICommandContext? context = new CommandContext (Command.Activate, new WeakReference<View> (CommandView), args.Context?.Binding);
-            args.Handled = true;
-
-            args.Handled = CommandView.InvokeCommand (Command.Activate, context) is true;
-
-            if (args.Handled)
-            {
-                return true;
-            }
+            // ignore handled; allow HandlingHotKey to be raised
         }
 
         return args.Handled;
     }
 
-    ///// <summary>
-    /////     Dispatches the Command in the <paramref name="commandContext"/> (Raises Activating, then Accepting, then invoke the
-    /////     Action, if any).
-    /////     Called when Command.Activate, Accept, or HotKey has been invoked on this Shortcut.
-    ///// </summary>
-    ///// <param name="commandContext"></param>
-    ///// <returns>
-    /////     <see langword="null"/> if no event was raised; input processing should continue.
-    /////     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should
-    /////     continue.
-    /////     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
-    ///// </returns>
-    //internal virtual bool? DispatchCommand (ICommandContext? commandContext)
-    //{
-    //    KeyBinding? keyBinding = commandContext?.Binding as KeyBinding?;
-    //    string sourceTitle = commandContext?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-
-    //    Logging.Debug ($"{Title} ({sourceTitle}) Command: {commandContext?.Command}");
-
-    //    // // Invoke Activate on the CommandView to cause it to change state if it wants to
-    //    // // CommandView is responsible for checking CanFocus before changing state
-    //    // Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
-
-    //    // if (keyBinding is { } kb)
-    //    // {
-    //    //    KeyBinding updatedBinding = kb with { Data = this };
-    //    //    CommandView.InvokeCommand (Command.Activate, updatedBinding);
-    //    // }
-    //    // else
-    //    // {
-    //    //    CommandView.InvokeCommand (Command.Activate, commandContext);
-    //    // }
-
-    //    // Logging.Debug ($"{Title} ({sourceTitle}) - RaiseActivating ...");
-
-    //    // if (RaiseActivating (commandContext) is true)
-    //    // {
-    //    //    return true;
-    //    // }
-
-    //    // if (CanFocus && SuperView is { CanFocus: true })
-    //    // {
-    //    //    // The default HotKey handler sets Focus
-    //    //    Logging.Debug ($"{Title} ({sourceTitle}) - SetFocus...");
-    //    //    SetFocus ();
-    //    // }
-
-    //    var cancel = false;
-
-    //    //if (commandContext is { Source: null })
-    //    //{
-    //    //    commandContext.Source = new WeakReference<View> (this);
-    //    //}
-
-    //    //Logging.Debug ($"{Title} ({sourceTitle}) - Calling RaiseAccepting...");
-    //    //cancel = RaiseAccepting (commandContext) is true;
-
-    //    //if (cancel)
-    //    //{
-    //    //    return true;
-    //    //}
-
-    //    if (Action is null)
-    //    {
-    //        return cancel;
-    //    }
-    //    Logging.Debug ($"{Title} ({sourceTitle}) - Invoke Action...");
-    //    Action.Invoke ();
-
-    //    // Assume if there's a subscriber to Action, it's handled.
-    //    cancel = true;
-
-    //    return cancel;
-    //}
-
-    /// <inheritdoc />
-    protected override void OnAccepted (CommandEventArgs args)
-    {
-        Action?.Invoke ();
-    }
+    /// <inheritdoc/>
+    protected override void OnAccepted (CommandEventArgs args) => Action?.Invoke ();
 
     /// <summary>
     ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
@@ -531,7 +514,6 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     StatusBar.Add(force16ColorsShortcut);
     /// </code>
     /// </example>
-
     public View CommandView
     {
         get => _commandView;
@@ -540,24 +522,24 @@ public class Shortcut : View, IOrientation, IDesignable
             ArgumentNullException.ThrowIfNull (value);
 
             // Clean up old
-            // _commandView.Activating -= CommandViewOnActivating;
-            // _commandView.Accepting -= CommandViewOnAccepted;
             _commandView.HotKeyChanged -= OnCommandViewOnHotKeyChanged;
             Remove (_commandView);
             _commandView.Dispose ();
 
             // Set new
             _commandView = value;
-            _commandView.Id = "_commandView";
 
+#if DEBUG
+            if (string.IsNullOrEmpty (_commandView.Id))
+            {
+                _commandView.Id = "_commandView";
+            }
+#endif
             _commandView.HotKeyChanged += OnCommandViewOnHotKeyChanged;
 
             _commandView.HotKeySpecifier = new Rune ('_');
 
             Title = _commandView.Text;
-
-            // _commandView.Activating += CommandViewOnActivating;
-            // _commandView.Accepting += CommandViewOnAccepted;
 
             UpdateKeyBindings (Key.Empty);
             ShowHide ();
@@ -572,42 +554,13 @@ public class Shortcut : View, IOrientation, IDesignable
                     AddKeyBindingsForHotKey (e.OldKey, e.NewKey);
                 }
             }
-
-            // void CommandViewOnAccepted (object? sender, CommandEventArgs e)
-            // {
-            //    // Forward Accept to Shortcut only if it originated from CommandView directly
-            //    // (e.g., user double-clicked on CheckBox)
-            //    // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
-            //    if (!IsFromShortcut (e))
-            //    {
-            //        RaiseAccepting (e.Context);
-            //    }
-
-            //    // Don't set e.Handled - let CommandView continue processing
-            // }
-
-            // void CommandViewOnActivating (object? sender, CommandEventArgs e)
-            // {
-            //    // Forward Activating to Shortcut only if it originated from CommandView directly
-            //    // (e.g., user clicked on CommandView)
-            //    // Don't forward if it came from Shortcut.DispatchCommand (avoid recursion)
-            //    if (IsFromShortcut (e))
-            //    {
-            //        return;
-            //    }
-            //    SetFocus ();
-            //    RaiseActivating (e.Context);
-
-            //    // Don't set e.Handled - let CommandView continue processing (change state, etc.)
-            // }
         }
     }
 
-    // Helper to check if command context originated from the Shortcut, the HelpView, or the KeyView
-    private bool IsFromKeyView (CommandEventArgs e)
+    private bool IsBindingFromKeyView (CommandEventArgs e)
     {
         // Source == this means the event originated from clicking on Shortcut (not CommandView)
-        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView == KeyView)
+        if (e.Context?.Binding?.Source is { } sourceView && sourceView == KeyView)
         {
             return true;
         }
@@ -615,27 +568,58 @@ public class Shortcut : View, IOrientation, IDesignable
         return false;
     }
 
-    private bool IsFromShortcut (CommandEventArgs e)
+    private bool IsBindingFromHelpView (CommandEventArgs e)
     {
-        // KeyBinding with Data == this means it came from DispatchCommand
-        if (e.Context?.Binding is KeyBinding { Data: var data } && data == this)
-        {
-            return true;
-        }
-
-        if (IsFromKeyView (e))
-        {
-            return true;
-        }
-
         // Source == this means the event originated from clicking on Shortcut (not CommandView)
-        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true && (sourceView == this || sourceView == HelpView))
+        if (e.Context?.Binding?.Source is { } sourceView && sourceView == HelpView)
         {
             return true;
         }
 
         return false;
     }
+
+    // Helper to check if command was invoked from the Shortcut
+    private bool IsInvocationFromShortcut (CommandEventArgs e)
+    {
+        // Source == this means the event originated from clicking on Shortcut (not CommandView)
+        if (e.Context?.Source?.TryGetTarget (out View? contextSource) is true && contextSource == this)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Helper to check if command originated from Shortcut, the HelpView, or the KeyView mouse or keyboard binding
+    private bool IsBindingFromShortcut (CommandEventArgs e)
+    {
+        if (IsBindingFromKeyView (e))
+        {
+            return true;
+        }
+
+        if (IsBindingFromHelpView (e))
+        {
+            return true;
+        }
+
+        // Source == this means the event originated from clicking on Shortcut (not CommandView)
+        if (e.Context?.Binding?.Source is { } sourceView && sourceView == this)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Helper to check if command context originated from the CommandView
+    // Both the command source and binding source must be from the CommandView 
+    private bool IsFromCommandView (ICommandContext? ctx) =>
+        ctx?.Source?.TryGetTarget (out View? ctxSource) is true
+        && ctxSource == CommandView
+        && ctx?.Binding?.Source is { } bindingSource
+        && bindingSource == CommandView;
 
     private void SetCommandViewDefaultLayout ()
     {

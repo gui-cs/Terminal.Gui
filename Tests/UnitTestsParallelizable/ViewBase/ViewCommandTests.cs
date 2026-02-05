@@ -5,12 +5,12 @@ public class ViewCommandTests
     #region OnAccept/Accept tests
 
     [Fact]
-    public void Accept_Command_Raises_NoFocus ()
+    public void Accept_Command_Raised_With_HasFocus_False ()
     {
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        Assert.True (view.InvokeCommand (Command.Accept));
+        Assert.False (view.InvokeCommand (Command.Accept));
 
         Assert.Equal (1, view.OnAcceptedCount);
 
@@ -150,7 +150,7 @@ public class ViewCommandTests
                          };
 
         bool? ret = view.InvokeCommand (Command.Accept);
-        Assert.True (ret);
+        Assert.False (ret);
         Assert.True (acceptedInvoked);
     }
 

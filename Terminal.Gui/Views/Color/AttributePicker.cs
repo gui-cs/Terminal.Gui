@@ -265,4 +265,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
 
         base.Dispose (disposing);
     }
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }

@@ -39,4 +39,7 @@ public record struct CommandContext : ICommandContext
 
     /// <inheritdoc />
     public IInputBinding? Binding { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString () => $"{Command} (Source={Source.ToIdentifyingString ()}, Binding={Binding})";
 }

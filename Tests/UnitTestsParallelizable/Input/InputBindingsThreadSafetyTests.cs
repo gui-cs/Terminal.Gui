@@ -15,8 +15,7 @@ public class InputBindingsThreadSafetyTests
         const int ITEMS_PER_THREAD = 100;
 
         // Act
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       NUM_THREADS,
                       i =>
                       {
@@ -55,8 +54,7 @@ public class InputBindingsThreadSafetyTests
         }
 
         // Act - Multiple threads clearing simultaneously
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       NUM_THREADS,
                       i =>
                       {
@@ -113,8 +111,7 @@ public class InputBindingsThreadSafetyTests
 
         for (var i = 0; i < 5; i++)
         {
-            readerTasks.Add (
-                             Task.Run (() =>
+            readerTasks.Add (Task.Run (() =>
                                        {
                                            for (var j = 0; j < 50; j++)
                                            {
@@ -193,8 +190,7 @@ public class InputBindingsThreadSafetyTests
 
         for (var i = 0; i < 5; i++)
         {
-            readerTasks.Add (
-                             Task.Run (() =>
+            readerTasks.Add (Task.Run (() =>
                                        {
                                            for (var j = 0; j < 100; j++)
                                            {
@@ -247,8 +243,7 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -301,8 +296,7 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -325,8 +319,7 @@ public class InputBindingsThreadSafetyTests
         // Reader threads
         for (var i = 0; i < 3; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -349,8 +342,7 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -391,8 +383,7 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -441,8 +432,7 @@ public class InputBindingsThreadSafetyTests
         }
 
         // Act - Multiple threads removing items
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       NUM_ITEMS,
                       i =>
                       {
@@ -473,8 +463,7 @@ public class InputBindingsThreadSafetyTests
         // Act - Multiple threads trying to replace
         List<Exception> exceptions = new ();
 
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       10,
                       i =>
                       {
@@ -508,10 +497,7 @@ public class InputBindingsThreadSafetyTests
         // Act
         var results = new bool [100];
 
-        Parallel.For (
-                      0,
-                      100,
-                      i => { results [i] = bindings.TryGet (TEST_KEY, out _); });
+        Parallel.For (0, 100, i => { results [i] = bindings.TryGet (TEST_KEY, out _); });
 
         // Assert - All threads should consistently find the binding
         Assert.All (results, result => Assert.True (result));
@@ -520,14 +506,10 @@ public class InputBindingsThreadSafetyTests
     /// <summary>
     ///     Test implementation of InputBindings for testing purposes.
     /// </summary>
-    private class TestInputBindings () : InputBindings<string, KeyBinding> (
-                                                                            (commands, evt) => new ()
-                                                                            {
-                                                                                Commands = commands,
-                                                                                Key = Key.Empty
-                                                                            },
-                                                                            StringComparer.OrdinalIgnoreCase)
+    private class TestInputBindings ()
+        : InputBindings<string, KeyBinding> ((commands, evt, source) => new KeyBinding { Commands = commands, Key = Key.Empty },
+                                             StringComparer.OrdinalIgnoreCase)
     {
-        public override bool IsValid (string eventArgs) { return !string.IsNullOrEmpty (eventArgs); }
+        public override bool IsValid (string eventArgs) => !string.IsNullOrEmpty (eventArgs);
     }
 }

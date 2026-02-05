@@ -13,11 +13,11 @@ public record struct KeyBinding : IInputBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this key binding will invoke.</param>
-    /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
-    public KeyBinding (Command [] commands, object? context = null)
+    /// <param name="data">Arbitrary context that can be associated with this key binding.</param>
+    public KeyBinding (Command [] commands, object? data = null)
     {
         Commands = commands;
-        Data = context;
+        Data = data;
     }
 
     /// <summary>Initializes a new instance.</summary>
@@ -28,6 +28,21 @@ public record struct KeyBinding : IInputBinding
     {
         Commands = commands;
         Target = target;
+        Data = data;
+    }
+
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="commands">The commands this key binding will invoke.</param>
+    /// <param name="newKey">The key this binding is associated with.</param>
+    /// <param name="source">The view where this key binding was created.</param>
+    /// <param name="data">Arbitrary data that can be associated with this key binding.</param>
+    public KeyBinding (Command [] commands, Key newKey, View? source = null, object? data = null)
+    {
+        Commands = commands;
+        Source = source;
+        Key = newKey;
         Data = data;
     }
 

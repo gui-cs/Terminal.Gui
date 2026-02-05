@@ -15,7 +15,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// </summary>
     /// <param name="constructBinding"></param>
     /// <param name="equalityComparer"></param>
-    protected InputBindings (Func<Command [], TEvent, TBinding> constructBinding, IEqualityComparer<TEvent> equalityComparer)
+    protected InputBindings (Func<Command [], TEvent, View?, TBinding> constructBinding, IEqualityComparer<TEvent> equalityComparer)
     {
         _constructBinding = constructBinding;
         _bindings = new (equalityComparer);
@@ -26,7 +26,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// </summary>
     private readonly ConcurrentDictionary<TEvent, TBinding> _bindings;
 
-    private readonly Func<Command [], TEvent, TBinding> _constructBinding;
+    private readonly Func<Command [], TEvent, View?, TBinding> _constructBinding;
 
     /// <summary>Adds a <typeparamref name="TEvent"/> bound to <typeparamref name="TBinding"/> to the collection.</summary>
     /// <param name="eventArgs"></param>
@@ -75,7 +75,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (eventArgs));
         }
 
-        TBinding binding = _constructBinding (commands, eventArgs);
+        TBinding binding = _constructBinding (commands, eventArgs, null);
 
         if (!_bindings.TryAdd (eventArgs, binding))
         {
@@ -228,7 +228,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// <param name="newCommands">The set of commands to replace the old ones with.</param>
     public void ReplaceCommands (TEvent eventArgs, params Command [] newCommands)
     {
-        TBinding newBinding = _constructBinding (newCommands, eventArgs);
+        TBinding newBinding = _constructBinding (newCommands, eventArgs, null);
 
         // Thread-safe: Add or update atomically
         _bindings.AddOrUpdate (eventArgs, newBinding, (_, _) => newBinding);

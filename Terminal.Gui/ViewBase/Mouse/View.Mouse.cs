@@ -772,6 +772,7 @@ public partial class View // Mouse APIs
         }
 
         binding.MouseEvent = mouseEventArgs;
+        binding.Source = this;
 
         return InvokeCommands (binding.Commands, binding);
     }

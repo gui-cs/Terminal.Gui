@@ -31,7 +31,7 @@ public class MenuBar : Menu, IDesignable
         AddCommand (Command.HotKey,
                     ctx =>
                     {
-                        // Logging.Debug ($"{Title} - Command.HotKey");
+                        // Logging.Debug ($"{this.ToIdentifyingString ()} - Command.HotKey");
 
                         if (RaiseHandlingHotKey (ctx) is true)
                         {
@@ -63,7 +63,7 @@ public class MenuBar : Menu, IDesignable
         AddCommand (Command.Quit,
                     ctx =>
                     {
-                        // Logging.Debug ($"{Title} - Command.Quit");
+                        // Logging.Debug ($"{this.ToIdentifyingString ()} - Command.Quit");
 
                         if (HideActiveItem ())
                         {
@@ -372,11 +372,11 @@ public class MenuBar : Menu, IDesignable
     /// <returns><see langword="true"/> if the popover was hidden</returns>
     public bool HideItem (MenuBarItem? activeItem)
     {
-        // Logging.Debug ($"{Title} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
         if (activeItem is null || !activeItem.PopoverMenu!.Visible)
         {
-            // Logging.Debug ($"{Title} No active item.");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} No active item.");
 
             return false;
         }
@@ -454,7 +454,7 @@ public class MenuBar : Menu, IDesignable
         // TODO: Ensure sourceMenuBar is actually one of our bar items
         if (Visible && Enabled && args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
         {
-            Logging.Debug ($"{Title} ({sourceView.Title})");
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title})");
             if (!CanFocus)
             {
                 Debug.Assert (!Active);
@@ -484,17 +484,17 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnAccepted (CommandEventArgs args)
     {
-        // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
         base.OnAccepted (args);
 
         View? sourceView = null;
         if (args.Context?.Source?.TryGetTarget (out sourceView) == true && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
         {
-            Logging.Debug ($"{Title} ({sourceView.Title}) - returning");
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title}) - returning");
             return;
         }
 
-        Logging.Debug ($"{Title} ({sourceView?.Title})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView?.Title})");
 
         Active = false;
     }
@@ -541,7 +541,7 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnSelectedMenuItemChanged (MenuItem? selected)
     {
-        // Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({selected?.Title}) - IsOpen: {IsOpen ()}");
 
         if (IsOpen () && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
         {
@@ -592,7 +592,7 @@ public class MenuBar : Menu, IDesignable
 
     private void OnMenuBarItemAccepted (object? sender, CommandEventArgs e) =>
 
-        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
         RaiseAccepted (e.Context);
 
     private void OnMenuBarItemPopoverMenuOpenChanged (object? sender, EventArgs<bool> e)
@@ -612,11 +612,11 @@ public class MenuBar : Menu, IDesignable
     /// <param name="menuBarItem"></param>
     private void ShowItem (MenuBarItem? menuBarItem)
     {
-        // Logging.Debug ($"{Title} - {menuBarItem?.Id}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} - {menuBarItem?.Id}");
 
         if (!Active || !Visible)
         {
-            // Logging.Debug ($"{Title} - {menuBarItem?.Id} - Not Active, not showing.");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - {menuBarItem?.Id} - Not Active, not showing.");
 
             return;
         }
@@ -631,13 +631,13 @@ public class MenuBar : Menu, IDesignable
         // If the active Application Popover is part of this MenuBar, hide it.
         if (App?.Popover?.GetActivePopover () is PopoverMenu popoverMenu && popoverMenu.Root?.SuperMenuItem?.SuperView == this)
         {
-            // Logging.Debug ($"{Title} - Calling App?.Popover?.Hide ({popoverMenu.Title})");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - Calling App?.Popover?.Hide ({popoverMenu.Title})");
             App?.Popover.Hide (popoverMenu);
         }
 
         if (menuBarItem is null)
         {
-            // Logging.Debug ($"{Title} - menuBarItem is null.");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - menuBarItem is null.");
 
             return;
         }
@@ -651,7 +651,7 @@ public class MenuBar : Menu, IDesignable
             menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
         }
 
-        // Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
         if (menuBarItem.PopoverMenu is { })
         {
             menuBarItem.PopoverMenu.App ??= App;
@@ -664,7 +664,7 @@ public class MenuBar : Menu, IDesignable
 
         void OnMenuItemAccepted (object? sender, EventArgs args)
         {
-            // Logging.Debug ($"{Title} - OnMenuItemAccepted");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - OnMenuItemAccepted");
             if (menuBarItem.PopoverMenu is { })
             {
                 menuBarItem.PopoverMenu.VisibleChanged -= OnMenuItemAccepted;

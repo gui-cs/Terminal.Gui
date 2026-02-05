@@ -59,7 +59,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <returns></returns>
     public virtual string ToDebugString ()
     {
-        string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{Title}";
+        string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{this.ToIdentifyingString ()}";
 
         return $"{GetType ().Name}({identifyingText}) SuperView={(SuperView is { } ? SuperView.ToDebugString () : "null")}";
     }

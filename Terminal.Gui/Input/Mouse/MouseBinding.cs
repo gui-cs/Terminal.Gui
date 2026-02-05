@@ -10,11 +10,12 @@ public record struct MouseBinding : IInputBinding
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
     /// <param name="mouseFlags">The mouse flags that triggered this binding.</param>
-    public MouseBinding (Command [] commands, MouseFlags mouseFlags)
+    /// <param name="source"></param>
+    public MouseBinding (Command [] commands, MouseFlags mouseFlags, View? source = null)
     {
         Commands = commands;
-
         MouseEvent = new Mouse { Timestamp = DateTime.Now, Flags = mouseFlags };
+        Source = source;
     }
 
     /// <summary>Initializes a new instance.</summary>
@@ -40,9 +41,7 @@ public record struct MouseBinding : IInputBinding
     /// <inheritdoc/>
     public View? Source { get; set; }
 
-    /// <inheritdoc />
-    public override string ToString ()
-    {
-        return $"[{string.Join (", ", Commands)}], MouseEvent={MouseEvent}, Source={Source}, Data={Data}";
-    }
+    /// <inheritdoc/>
+    public override string ToString () =>
+        $"[{string.Join (", ", Commands)}] (MouseEvent={MouseEvent}, Source={Source.ToIdentifyingString ()}{(Data is { } ? ", Data=" : "")}";
 }

@@ -307,6 +307,9 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             return false;
         }
     }
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }
 
 /// <summary>
