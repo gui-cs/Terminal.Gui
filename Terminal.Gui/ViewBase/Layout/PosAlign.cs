@@ -175,5 +175,8 @@ public record PosAlign : Pos
 
     internal override bool ReferencesOtherViews () => true;
 
+    /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => true;
+
     private void Aligner_PropertyChanged (object? sender, PropertyChangedEventArgs e) => _cachedLocation = null;
 }

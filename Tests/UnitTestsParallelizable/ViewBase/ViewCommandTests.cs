@@ -261,10 +261,10 @@ public class ViewCommandTests
     }
 
     [Fact]
-    public void LeftButtonPressed_Invokes_Activate_Command ()
+    public void LeftButtonReleased_Invokes_Activate_Command ()
     {
         var view = new ViewEventTester ();
-        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonPressed, Position = Point.Empty, View = view });
+        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonReleased, Position = Point.Empty, View = view });
 
         Assert.Equal (1, view.OnActivatingCount);
     }

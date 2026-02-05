@@ -55,8 +55,8 @@ The following table documents how each View subclass binds or handles keyboard a
 
 | View | Space | Enter | HotKey | Pressed | Released | Clicked | DoubleClicked |
 |------|-------|-------|--------|---------|----------|---------|---------------|
-| **View** (base) | `Command.Activate` (default) | `Command.Accept` (default) | `Command.HotKey` (default) | Base OnMouseEvent (updates MouseState) | Base OnMouseEvent (updates MouseState) | Not bound by default | Not bound by default |
-| **Button** | `Command.HotKey` | `Command.HotKey` | `Command.HotKey` | OnMouseEvent (updates MouseState) | OnMouseEvent (updates MouseState) | `Command.HotKey` | `Command.HotKey` |
+| **View** (base) | `Command.Activate` (default) | `Command.Accept` (default) | `Command.HotKey` (default) | Base OnMouseEvent (updates MouseState) | `Command.Activate` (default) | Not bound by default | Not bound by default |
+| **Button** | `Command.Accept` | `Command.Accept` | `Command.HotKey` (calls RaiseAccepting) | OnMouseEvent (updates MouseState) | `Command.Activate` (inherited) | Not bound (overridden) | Not bound (overridden) |
 | **CheckBox** | `Command.Activate` | `Command.Accept` | `Command.HotKey` | `Command.Activate` | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
 | **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **ListView** | Custom handler (selection) | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (selects item) | `Command.Accept` |

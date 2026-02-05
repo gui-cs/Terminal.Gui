@@ -422,10 +422,68 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     Composite types like <see cref="DimCombine"/> should aggregate results from their children.
     /// </remarks>
     /// <returns>An enumerable of views that this Dim depends on.</returns>
-    internal virtual IEnumerable<View> GetReferencedViews ()
-    {
-        yield break;
-    }
+    internal virtual IEnumerable<View> GetReferencedViews () { yield break; }
+
+    /// <summary>
+    ///     Indicates whether this Dim depends on the SuperView's content size for its calculation.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to categorize subviews during auto-sizing calculations
+    ///         without needing to perform type checking.
+    ///     </para>
+    ///     <para>
+    ///         Types that depend on SuperView content size include <see cref="DimPercent"/> and <see cref="DimFill"/>
+    ///         (unless it has a <see cref="DimFill.MinimumContentDim"/> without a <see cref="DimFill.To"/>).
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim's calculation depends on the SuperView's content size;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool DependsOnSuperViewContentSize => false;
+
+    /// <summary>
+    ///     Indicates whether this Dim can contribute to auto-sizing calculations.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to determine if a Dim should be considered
+    ///         when calculating the minimum content size of a SuperView.
+    ///     </para>
+    ///     <para>
+    ///         Types that cannot contribute include <see cref="DimPercent"/> (would be 0 without existing content)
+    ///         and <see cref="DimFill"/> without <see cref="DimFill.MinimumContentDim"/> or <see cref="DimFill.To"/>
+    ///         (would be 0 without content to fill against).
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim can contribute to determining the SuperView's auto-size;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool CanContributeToAutoSizing => true;
+
+    /// <summary>
+    ///     Gets the minimum contribution this Dim makes to auto-sizing calculations.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is used by <see cref="DimAuto"/> to determine the minimum size contribution
+    ///         of a Dim during auto-sizing calculations. The default implementation returns the
+    ///         result of <see cref="Calculate"/>.
+    ///     </para>
+    ///     <para>
+    ///         Types that have special minimum contribution logic (like <see cref="DimFill"/> with
+    ///         <see cref="DimFill.MinimumContentDim"/>) should override this method.
+    ///     </para>
+    /// </remarks>
+    /// <param name="location">The starting point from where the size calculation begins.</param>
+    /// <param name="superviewContentSize">The size of the SuperView's content.</param>
+    /// <param name="us">The View that holds this Dim object.</param>
+    /// <param name="dimension">Width or Height</param>
+    /// <returns>The minimum size contribution for auto-sizing calculations.</returns>
+    internal virtual int GetMinimumContribution (int location, int superviewContentSize, View us, Dimension dimension) =>
+        Calculate (location, superviewContentSize, us, dimension);
 
     #endregion virtual methods
 

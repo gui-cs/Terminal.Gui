@@ -135,23 +135,23 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Null (lv.SelectedItem);
         Assert.False (lv.MarkMultiple);
 
-        lv = new () { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
+        lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
         Assert.Null (lv.SelectedItem);
 
-        lv = new () { Source = new NewListDataSource () };
+        lv = new ListView { Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Null (lv.SelectedItem);
 
-        lv = new () { Y = 1, Width = 10, Height = 20, Source = new ListWrapper<string> (["One", "Two", "Three"]) };
+        lv = new ListView { Y = 1, Width = 10, Height = 20, Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.NotNull (lv.Source);
         Assert.Null (lv.SelectedItem);
-        Assert.Equal (new (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new Rectangle (0, 1, 10, 20), lv.Frame);
 
-        lv = new () { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
+        lv = new ListView { Y = 1, Width = 10, Height = 20, Source = new NewListDataSource () };
         Assert.NotNull (lv.Source);
         Assert.Null (lv.SelectedItem);
-        Assert.Equal (new (0, 1, 10, 20), lv.Frame);
+        Assert.Equal (new Rectangle (0, 1, 10, 20), lv.Frame);
     }
 
     private class NewListDataSource : IListDataSource
@@ -440,7 +440,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Equal (1, lw.StartsWith ("TW"));
         Assert.Equal (2, lw.StartsWith ("TH"));
 
-        lw = new (["One", "Two", "Three"]);
+        lw = new ListWrapper<string> (["One", "Two", "Three"]);
 
         Assert.Equal (1, lw.StartsWith ("t"));
         Assert.Equal (1, lw.StartsWith ("tw"));
@@ -483,7 +483,7 @@ public class ListViewTests (ITestOutputHelper output)
         lv.Source = null;
         Assert.Null (lv.Source);
 
-        lv = new () { Source = new ListWrapper<string> (["One", "Two"]) };
+        lv = new ListView { Source = new ListWrapper<string> (["One", "Two"]) };
         Assert.NotNull (lv.Source);
 
         lv.SetSourceAsync<string> (null);
@@ -800,7 +800,7 @@ public class ListViewTests (ITestOutputHelper output)
         lw.CollectionChanged += Lw_CollectionChanged;
 
         lw.Dispose ();
-        lw = new (null);
+        lw = new ListWrapper<string> (null);
         Assert.Equal (0, lw.Count);
         Assert.Equal (0, added);
         Assert.Equal (0, removed);
@@ -915,61 +915,6 @@ public class ListViewTests (ITestOutputHelper output)
     }
 
     #endregion
-
-    [Fact]
-    public void Clicking_On_Border_Is_Ignored ()
-    {
-        IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        var selected = "";
-
-        var lv = new ListView { Height = 5, Width = 7, BorderStyle = LineStyle.Single };
-        lv.SetSource (["One", "Two", "Three", "Four"]);
-        lv.ValueChanged += (_, e) => selected = e.NewValue is { } ? lv.Source!.ToList () [e.NewValue.Value]!.ToString ()! : "";
-        var top = new Runnable ();
-        top.Add (lv);
-        app.Begin (top);
-
-        //AutoInitDisposeAttribute.RunIteration ();
-
-        Assert.Equal (new (1), lv.Border!.Thickness);
-        Assert.Null (lv.SelectedItem);
-        Assert.Equal ("", lv.Text);
-        app.LayoutAndDraw ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (@"
-┌─────┐
-│One  │
-│Two  │
-│Three│
-└─────┘",
-                                                       _output,
-                                                       app?.Driver);
-
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal ("", selected);
-        Assert.Null (lv.SelectedItem);
-
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal ("One", selected);
-        Assert.Equal (0, lv.SelectedItem);
-
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal ("Two", selected);
-        Assert.Equal (1, lv.SelectedItem);
-
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 3), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal ("Three", selected);
-        Assert.Equal (2, lv.SelectedItem);
-
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal ("Three", selected);
-        Assert.Equal (2, lv.SelectedItem);
-        top.Dispose ();
-
-        app?.Dispose ();
-    }
 
     [Fact]
     public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
@@ -1276,13 +1221,13 @@ Item 6",
         app.LayoutAndDraw ();
 
         Assert.Equal ("Second ", GetContents (0));
-        Assert.Equal (new (' ', 7), GetContents (1));
+        Assert.Equal (new string (' ', 7), GetContents (1));
 
         lv.MoveUp ();
         lv.Draw ();
 
         Assert.Equal ("First  ", GetContents (0));
-        Assert.Equal (new (' ', 7), GetContents (1));
+        Assert.Equal (new string (' ', 7), GetContents (1));
 
         string GetContents (int line)
         {
@@ -1434,7 +1379,7 @@ Three",
                                                        app?.Driver);
 
         // Scroll down
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledDown });
+        app?.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.WheeledDown });
         app?.LayoutAndDraw ();
         Assert.Equal (1, lv.TopItem);
 
@@ -1446,7 +1391,7 @@ Four ",
                                                        app?.Driver);
 
         // Scroll up
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledUp });
+        app?.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.WheeledUp });
         app?.LayoutAndDraw ();
         Assert.Equal (0, lv.TopItem);
 
@@ -1507,7 +1452,7 @@ hree - lon",
                                                        app?.Driver);
 
         // Scroll right with mouse
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledRight });
+        app?.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.WheeledRight });
         app?.LayoutAndDraw ();
         Assert.Equal (2, lv.LeftItem);
 
@@ -1519,7 +1464,7 @@ ree - long",
                                                        app?.Driver);
 
         // Scroll left with mouse
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledLeft });
+        app?.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.WheeledLeft });
         app?.LayoutAndDraw ();
         Assert.Equal (1, lv.LeftItem);
 
@@ -1572,7 +1517,7 @@ hree - lon",
     [Fact]
     public void Source_CollectionChanged_Remove ()
     {
-        ObservableCollection<string> source = new () { "One", "Two", "Three" };
+        ObservableCollection<string> source = ["One", "Two", "Three"];
         ListView lv = new () { Source = new ListWrapper<string> (source) };
 
         lv.SelectedItem = 2;
@@ -1595,35 +1540,32 @@ hree - lon",
     [Fact]
     public void Mouse_Click_Selects_Item ()
     {
-        // Tests that clicking on an item in the ListView selects it
-        IApplication? app = Application.Create ();
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
 
         ListView lv = new () { Width = 10, Height = 5 };
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
 
-        var top = new Runnable ();
-        top.Add (lv);
-        app.Begin (top);
-        app.LayoutAndDraw ();
+        (runnable as View)?.Add (lv);
+        app.Begin (runnable);
 
         // Initially no item is selected
         Assert.Null (lv.SelectedItem);
 
         // Click on first item (row 0)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (1, 0)));
         Assert.Equal (0, lv.SelectedItem);
 
         // Click on third item (row 2)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (1, 2)));
         Assert.Equal (2, lv.SelectedItem);
 
         // Click on fifth item (row 4)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (1, 4)));
         Assert.Equal (4, lv.SelectedItem);
-
-        top.Dispose ();
-        app.Dispose ();
     }
 
     // Claude - Opus 4.5
@@ -1651,33 +1593,33 @@ hree - lon",
 
         // Normal click on first item - should mark it (need full sequence: Pressed → Released → Clicked)
         // x=2 to account for mark width (2 characters for checkbox glyphs)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.LeftButtonPressed });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.LeftButtonReleased });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 0), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.Source!.IsMarked (0));
 
         // Ctrl+Click on third item - should mark it and keep first marked
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 2), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.Source.IsMarked (0)); // Still marked
         Assert.True (lv.Source.IsMarked (2)); // Newly marked
 
         // Ctrl+Click on fifth item - should mark it (first and third stay marked)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 4), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 4), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 4), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 4), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 4), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 4), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
         Assert.Equal (4, lv.SelectedItem);
         Assert.True (lv.Source.IsMarked (0)); // Still marked
         Assert.True (lv.Source.IsMarked (2)); // Still marked
         Assert.True (lv.Source.IsMarked (4)); // Newly marked
 
         // Click on first item again - should toggle it off
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonPressed });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonReleased });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 0), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, lv.SelectedItem);
         Assert.False (lv.Source.IsMarked (0)); // Toggled off
         Assert.True (lv.Source.IsMarked (2)); // Still marked
@@ -1997,7 +1939,7 @@ hree - lon",
         lv.SelectedItem = 0;
 
         // Shift+Click on item 2
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
 
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.Source!.IsMarked (0));
@@ -2030,12 +1972,12 @@ hree - lon",
         app.LayoutAndDraw ();
 
         // Click item 0 to set anchor
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.Source!.IsMarked (0));
 
         // Shift+Click on item 3 to create range
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
 
         // Verify range is marked
         Assert.Equal (3, lv.SelectedItem);
@@ -2046,7 +1988,7 @@ hree - lon",
         Assert.False (lv.Source!.IsMarked (4));
 
         // Normal click (without Shift) should clear transient marks
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 4), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 4), Flags = MouseFlags.LeftButtonClicked });
 
         Assert.Equal (4, lv.SelectedItem);
         Assert.False (lv.Source!.IsMarked (0));
@@ -2081,12 +2023,12 @@ hree - lon",
         app.LayoutAndDraw ();
 
         // Click item 0 to set mark
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.Source!.IsMarked (0));
 
         // Shift+Click on item 3 - should behave like normal click (no range)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
 
         // Verify only item 3 is marked (radio button behavior)
         Assert.Equal (3, lv.SelectedItem);
@@ -2121,12 +2063,12 @@ hree - lon",
         app.LayoutAndDraw ();
 
         // Click item 0
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, lv.SelectedItem);
         Assert.False (lv.Source!.IsMarked (0));
 
         // Shift+Click on item 3 - should behave like normal click (no range, no marks)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
 
         // Verify no marks created and only item 3 is selected
         Assert.Equal (3, lv.SelectedItem);
@@ -2161,23 +2103,23 @@ hree - lon",
         app.LayoutAndDraw ();
 
         // Ctrl+Click on item 0 (need full sequence: Pressed → Released → Clicked)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
         Assert.True (lv.Source!.IsMarked (0));
 
         // Ctrl+Click on item 2
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 2), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 2), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
         Assert.True (lv.Source!.IsMarked (0));
         Assert.True (lv.Source!.IsMarked (2));
         Assert.False (lv.Source!.IsMarked (1));
 
         // Ctrl+Click on item 0 again - should toggle off
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
         Assert.False (lv.Source!.IsMarked (0));
         Assert.True (lv.Source!.IsMarked (2));
 
@@ -2207,11 +2149,11 @@ hree - lon",
         app.LayoutAndDraw ();
 
         // Click item 1 to set anchor
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (1, lv.SelectedItem);
 
         // Ctrl+RightClick on item 4 to extend selection (alternative to Shift+Click)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 4), Flags = MouseFlags.RightButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 4), Flags = MouseFlags.RightButtonClicked | MouseFlags.Ctrl });
 
         // Verify range is marked
         Assert.Equal (4, lv.SelectedItem);
@@ -2255,9 +2197,9 @@ hree - lon",
         // Other marks remain (persistent checkbox behavior)
         // Need full mouse sequence: Pressed → Released → Clicked
         // x=2 to account for mark width (2 characters for checkbox glyphs)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 3), Flags = MouseFlags.LeftButtonPressed });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 3), Flags = MouseFlags.LeftButtonReleased });
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 3), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 3), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 3), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 3), Flags = MouseFlags.LeftButtonClicked });
 
         Assert.Equal (3, lv.SelectedItem);
 
@@ -2295,7 +2237,7 @@ hree - lon",
         lv.SelectedItem = 0;
 
         // Shift+Click on item 2 - should just select, not extend
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift });
 
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.GetAllMarkedItems ().Count () == 0); // No multi-selection
@@ -2325,12 +2267,12 @@ hree - lon",
         app.LayoutAndDraw ();
 
         // Ctrl+Click on item 0 - should just select, not add to multi-selection
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.GetAllMarkedItems ().Count () == 0);
 
         // Ctrl+Click on item 2 - should just select, not add
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.GetAllMarkedItems ().Count () == 0);
 

@@ -177,21 +177,30 @@ public class OptionSelectorTests
     [Fact]
     public void LeftButtonPressed_On_NotActivated_Activates ()
     {
-        OptionSelector optionSelector = new ();
-        List<string> options = ["Option1", "Option2"];
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
 
+        var optionSelector = new OptionSelector ();
+        List<string> options = ["Option1", "Option2"];
         optionSelector.Labels = options;
-        optionSelector.Layout ();
+
+        ((View)runnable).Add (optionSelector);
+        app.Begin (runnable);
 
         CheckBox checkBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
         Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
-        var mouse = new Mouse { Position = checkBox.Frame.Location, Flags = MouseFlags.LeftButtonPressed };
+        app.InjectMouse (new Mouse { ScreenPosition = checkBox.Frame.Location, Flags = MouseFlags.LeftButtonPressed });
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
-        checkBox.NewMouseEvent (mouse);
-
+        app.InjectMouse (new Mouse { ScreenPosition = checkBox.Frame.Location, Flags = MouseFlags.LeftButtonReleased });
         Assert.Equal (1, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.Value);
         Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
