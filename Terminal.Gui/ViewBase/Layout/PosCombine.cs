@@ -84,5 +84,8 @@ public record PosCombine (AddOrSubtract Add, Pos Left, Pos Right) : Pos
     }
 
     /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => Left.DependsOnSuperViewContentSize || Right.DependsOnSuperViewContentSize;
+
+    /// <inheritdoc/>
     protected override bool HasInner<TPos> (out TPos pos) => Left.Has (out pos) || Right.Has (out pos);
 }
