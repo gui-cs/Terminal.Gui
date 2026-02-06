@@ -128,7 +128,7 @@ public class ButtonTests
     // Claude - Opus 4.5
     // Button does not raise Activating events. See Button.cs documentation.
     [Fact]
-    public void Enter_InvokesHotKeyCommand_RaisesAccepting ()
+    public void Enter_Raises_Accepting_Not_Activating ()
     {
         var superView = new View { CanFocus = true };
         Button button = new () { Text = "Test" };
@@ -146,7 +146,6 @@ public class ButtonTests
         superView.Add (button);
         button.SetFocus ();
 
-        // Enter is bound to Accept command, which raises only Accepting (not Activating)
         superView.NewKeyDownEvent (Key.Enter);
 
         Assert.False (activatingFired);
@@ -210,7 +209,7 @@ public class ButtonTests
     // Claude - Opus 4.5
     // Button does not raise Activating events. See Button.cs documentation.
     [Fact]
-    public void Space_InvokesHotKeyCommand_RaisesAccepting ()
+    public void Space_Raises_Accepting_Not_Activating ()
     {
         var superView = new View { CanFocus = true };
         Button button = new () { Text = "Test" };
@@ -228,7 +227,6 @@ public class ButtonTests
         superView.Add (button);
         button.SetFocus ();
 
-        // Space is bound to Accept command, which raises only Accepting (not Activating)
         superView.NewKeyDownEvent (Key.Space);
 
         Assert.False (activatingFired);
@@ -343,21 +341,21 @@ public class ButtonTests
         Assert.Equal (0, acceptingCount);
 
         // LeftButtonClicked is bound to Command.Accept, so only Accepting fires (not Activating)
-        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, activatingCount);
         Assert.Equal (1, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Disable Mouse Highlighting to test that it does not interfere with Accepting event
         button.MouseHighlightStates = MouseState.None;
-        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, activatingCount);
         Assert.Equal (3, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
@@ -1006,7 +1004,7 @@ public class ButtonTests
         button.Activating += (_, _) => activatingFired = true;
 
         // Simulate left button clicked
-        button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
 
         Assert.False (activatingFired);
 
