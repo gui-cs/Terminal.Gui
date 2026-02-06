@@ -118,5 +118,11 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
     }
 
     /// <inheritdoc/>
+    internal override bool IsFixed => Left.IsFixed && Right.IsFixed;
+
+    /// <inheritdoc/>
+    internal override bool RequiresTargetLayout => Left.RequiresTargetLayout || Right.RequiresTargetLayout;
+
+    /// <inheritdoc/>
     protected override bool HasInner<TDim> (out TDim dim) => Left.Has (out dim) || Right.Has (out dim);
 }
