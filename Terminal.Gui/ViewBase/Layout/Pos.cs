@@ -389,10 +389,32 @@ public abstract record Pos
     ///     Composite types like <see cref="PosCombine"/> should aggregate results from their children.
     /// </remarks>
     /// <returns>An enumerable of views that this Pos depends on.</returns>
-    internal virtual IEnumerable<View> GetReferencedViews ()
-    {
-        yield break;
-    }
+    internal virtual IEnumerable<View> GetReferencedViews () { yield break; }
+
+    /// <summary>
+    ///     Indicates whether this Pos depends on the SuperView's content size for its calculation.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to categorize subviews during auto-sizing calculations
+    ///         without needing to perform type checking.
+    ///     </para>
+    ///     <para>
+    ///         Types that depend on and actively contribute to SuperView content size determination include
+    ///         <see cref="PosAnchorEnd"/> and <see cref="PosAlign"/>. These types require special handling during
+    ///         auto-sizing because they affect the minimum content size needed.
+    ///     </para>
+    ///     <para>
+    ///         Types like <see cref="PosCenter"/> and <see cref="PosPercent"/> also use the SuperView's content size
+    ///         for positioning, but they do NOT actively contribute to determining that size, so this property
+    ///         returns <see langword="false"/> for them.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos actively contributes to determining the SuperView's content size;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool DependsOnSuperViewContentSize => false;
 
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.

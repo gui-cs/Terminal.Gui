@@ -96,52 +96,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             }
             else
             {
-                // TODO: All the below is a naive implementation. It may be possible to optimize this.
-
                 List<View> includedSubViews = us.InternalSubViews.ToList ();
-
-                // If [x] it can cause `us.ContentSize` to change.
-                // If [ ] it doesn't need special processing for us to determine `us.ContentSize`.
-
-                // -------------------- Pos types that are dependent on `us.SubViews`
-                // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
-                // [x] PosView      - Position is dependent on `subview.Target` - it can cause a change in `us.ContentSize`
-                // [x] PosCombine   - Position is dependent if `Pos.Has [one of the above]` - it can cause a change in `us.ContentSize`
-
-                // -------------------- Pos types that are dependent on `us.ContentSize`
-                // [ ] PosAlign     - Position is dependent on other views with `GroupId` AND `us.ContentSize`
-                // [x] PosAnchorEnd - Position is dependent on `us.ContentSize` AND `subview.Frame` - it can cause a change in `us.ContentSize`
-                // [ ] PosCenter    - Position is dependent `us.ContentSize` AND `subview.Frame` - 
-                // [ ] PosPercent   - Position is dependent `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
-                // [x] PosCombine   - Position is dependent if `Pos.Has [one of the above]` - it can cause a change in `us.ContentSize`
-
-                // -------------------- Pos types that are not dependent on either `us.SubViews` or `us.ContentSize`
-                // [ ] PosAbsolute  - Position is fixed.
-                // [ ] PosFunc      - Position is internally calculated.
-
-                // -------------------- Dim types that are dependent on `us.SubViews`
-                // [x] DimView      - Dimension is dependent on `subview.Target`
-                // [x] DimCombine   - Dimension is dependent if `Dim.Has [one of the above]` - it can cause a change in `us.ContentSize`
-
-                // -------------------- Dim types that are dependent on `us.ContentSize`
-                // [ ] DimFill      - Dimension is dependent on `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
-                //                    Exception: If DimFill.To is set, it's dependent on another view's position and contributes to auto-sizing.
-                // [ ] DimPercent   - Dimension is dependent on `us.ContentSize` - Will always be 0 if there is no other content that makes the superview have a size.
-                // [ ] DimCombine   - Dimension is dependent if `Dim.Has [one of the above]`
-
-                // -------------------- Dim types that are not dependent on either `us.SubViews` or `us.ContentSize`
-                // [ ] DimAuto      - Dimension is internally calculated
-                // [ ] DimAbsolute  - Dimension is fixed
-                // [ ] DimFunc      - Dimension is internally calculated
-
-                // ======================================================
-                // Do the easy stuff first - subviews whose position and size are not dependent on other views or content size
-                // ======================================================
-                // [ ] PosAbsolute  - Position is fixed.
-                // [ ] PosFunc      - Position is internally calculated
-                // [ ] DimAuto      - Dimension is internally calculated
-                // [ ] DimAbsolute  - Dimension is fixed
-                // [ ] DimFunc      - Dimension is internally calculated
                 List<View> notDependentSubViews;
 
                 if (dimension == Dimension.Width)
@@ -150,11 +105,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                            .Where (v =>
                                                        (v.X is PosAbsolute or PosFunc
                                                         || v.Width is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
-                                                       && !v.X.Has<PosAnchorEnd> (out _)
-                                                       && !v.X.Has<PosAlign> (out _)
-                                                       && !v.X.Has<PosCenter> (out _)
-                                                       && !v.Width.Has<DimFill> (out _)
-                                                       && !v.Width.Has<DimPercent> (out _))
+                                                       && !v.X.DependsOnSuperViewContentSize
+                                                       && !v.Width.DependsOnSuperViewContentSize)
                                            .ToList ();
                 }
                 else
@@ -163,11 +115,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                            .Where (v =>
                                                        (v.Y is PosAbsolute or PosFunc
                                                         || v.Height is DimAuto or DimAbsolute or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
-                                                       && !v.Y.Has<PosAnchorEnd> (out _)
-                                                       && !v.Y.Has<PosAlign> (out _)
-                                                       && !v.Y.Has<PosCenter> (out _)
-                                                       && !v.Height.Has<DimFill> (out _)
-                                                       && !v.Height.Has<DimPercent> (out _))
+                                                       && !v.Y.DependsOnSuperViewContentSize
+                                                       && !v.Height.DependsOnSuperViewContentSize)
                                            .ToList ();
                 }
 
@@ -424,30 +373,34 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 #region DimFill
 
-                // DimFill subviews don't contribute to auto-sizing UNLESS they have MinimumContentDim or To set
-                List<View> dimFillSubViews;
+                // DimFill subviews contribute to auto-sizing only if they have MinimumContentDim or To set
+                List<View> contributingDimFillSubViews;
 
                 if (dimension == Dimension.Width)
                 {
-                    dimFillSubViews = us.InternalSubViews.Where (v => v.Width.Has<DimFill> (out _)).ToList ();
+                    contributingDimFillSubViews = us.InternalSubViews.Where (v => v.Width.Has<DimFill> (out _) && v.Width.CanContributeToAutoSizing).ToList ();
                 }
                 else
                 {
-                    dimFillSubViews = us.InternalSubViews.Where (v => v.Height.Has<DimFill> (out _)).ToList ();
+                    contributingDimFillSubViews = us.InternalSubViews
+                                                    .Where (v => v.Height.Has<DimFill> (out _) && v.Height.CanContributeToAutoSizing)
+                                                    .ToList ();
                 }
 
-                // Process DimFill views with MinimumContentDim or To
-                for (var i = 0; i < dimFillSubViews.Count; i++)
+                // Process DimFill views that can contribute
+                for (var i = 0; i < contributingDimFillSubViews.Count; i++)
                 {
-                    View dimFillSubView = dimFillSubViews [i];
-                    DimFill? dimFill = dimension == Dimension.Width ? dimFillSubView.Width as DimFill : dimFillSubView.Height as DimFill;
+                    View dimFillSubView = contributingDimFillSubViews [i];
+                    Dim dimFill = dimension == Dimension.Width ? dimFillSubView.Width : dimFillSubView.Height;
 
-                    if (dimFill?.MinimumContentDim is { })
+                    // Get the minimum contribution from the Dim itself
+                    int minContribution = dimFill.GetMinimumContribution (0, maxCalculatedSize, dimFillSubView, dimension);
+
+                    if (minContribution > 0)
                     {
-                        // This DimFill has a minimum - it contributes to auto-sizing
-                        int minSize = dimFill.MinimumContentDim.Calculate (0, maxCalculatedSize, dimFillSubView, dimension);
+                        // Add position offset to get total size needed
                         int positionOffset = dimension == Dimension.Width ? dimFillSubView.Frame.X : dimFillSubView.Frame.Y;
-                        int totalSize = positionOffset + minSize;
+                        int totalSize = positionOffset + minContribution;
 
                         if (totalSize > maxCalculatedSize)
                         {
@@ -455,13 +408,13 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                         }
                     }
 
-                    if (dimFill?.To is { })
+                    // Handle special case for DimFill with To (still needs type-specific logic)
+                    if (dimFill is DimFill dimFillTyped && dimFillTyped.To is { })
                     {
-                        // This DimFill has a To view - it contributes to auto-sizing
                         // The SuperView needs to be large enough to contain both the dimFillSubView and the To view
                         int dimFillPos = dimension == Dimension.Width ? dimFillSubView.Frame.X : dimFillSubView.Frame.Y;
-                        int toViewPos = dimension == Dimension.Width ? dimFill.To.Frame.X : dimFill.To.Frame.Y;
-                        int toViewSize = dimension == Dimension.Width ? dimFill.To.Frame.Width : dimFill.To.Frame.Height;
+                        int toViewPos = dimension == Dimension.Width ? dimFillTyped.To.Frame.X : dimFillTyped.To.Frame.Y;
+                        int toViewSize = dimension == Dimension.Width ? dimFillTyped.To.Frame.Width : dimFillTyped.To.Frame.Height;
                         int totalSize = int.Max (dimFillPos, toViewPos + toViewSize);
 
                         if (totalSize > maxCalculatedSize)
