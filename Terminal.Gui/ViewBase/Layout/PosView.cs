@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -44,7 +42,7 @@ public record PosView : Pos
     /// <inheritdoc/>
     public override string ToString ()
     {
-        string sideString = Side.ToString ();
+        var sideString = Side.ToString ();
 
         if (Target == null)
         {
@@ -54,17 +52,21 @@ public record PosView : Pos
         return $"View(Side={sideString},Target={Target})";
     }
 
-    internal override int GetAnchor (int size)
-    {
-        return Side switch
-               {
-                   Side.Left => Target!.Frame.X,
-                   Side.Top => Target!.Frame.Y,
-                   Side.Right => Target!.Frame.Right,
-                   Side.Bottom => Target!.Frame.Bottom,
-                   _ => 0
-               };
-    }
+    internal override int GetAnchor (int size) =>
+        Side switch
+        {
+            Side.Left => Target.Frame.X,
+            Side.Top => Target.Frame.Y,
+            Side.Right => Target.Frame.Right,
+            Side.Bottom => Target.Frame.Bottom,
+            _ => 0
+        };
 
-    internal override bool ReferencesOtherViews () { return true; }
+    internal override bool ReferencesOtherViews () => true;
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        yield return Target;
+    }
 }

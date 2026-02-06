@@ -2,36 +2,36 @@
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Abstract base class for popover views in Terminal.Gui.
+///     Abstract base class for popover views in Terminal.Gui. Implements <see cref="IPopover"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <b>Popover Lifecycle:</b><br/>
-///         To display a popover, use <see cref="ApplicationPopover.Show"/>. To hide a popover, either call
-///         <see cref="ApplicationPopover.Hide"/>,
-///         set <see cref="View.Visible"/> to <see langword="false"/>, or show another popover.
+///         <b>IMPORTANT:</b> Popovers must be registered with <see cref="Application.Popover"/> using
+///         <see cref="ApplicationPopover.Register"/> before they can be shown.
 ///     </para>
 ///     <para>
-///         <b>Focus and Input:</b><br/>
-///         When visible, a popover receives focus and input events. If the user clicks outside the popover (and not on a
-///         subview),
-///         presses <see cref="Application.QuitKey"/>, or another popover is shown, the popover will be hidden
-///         automatically.
+///         <b>Requirements:</b><br/>
+///         Derived classes must:
 ///     </para>
+///     <list type="bullet">
+///         <item>Set <see cref="View.ViewportSettings"/> to include <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
+///         <item>Add a key binding for <see cref="Command.Quit"/> (typically bound to <see cref="Application.QuitKey"/>).</item>
+///     </list>
 ///     <para>
-///         <b>Layout:</b><br/>
-///         When the popover becomes visible, it is automatically laid out to fill the screen by default. You can override
-///         this behavior
-///         by setting <see cref="View.Width"/> and <see cref="View.Height"/> in your derived class.
+///         <b>Default Behavior:</b><br/>
+///         This base class provides:
 ///     </para>
+///     <list type="bullet">
+///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
+///         <item>Transparent viewport settings for proper mouse event handling.</item>
+///         <item>Automatic layout when becoming visible.</item>
+///         <item>Focus restoration when hidden.</item>
+///         <item>Default <see cref="Command.Quit"/> implementation that hides the popover.</item>
+///     </list>
 ///     <para>
-///         <b>Mouse:</b><br/>
-///         Popovers are transparent to mouse events (see <see cref="ViewportSettingsFlags.TransparentMouse"/>),
-///         meaning mouse events in a popover that are not also within a subview of the popover will not be captured.
-///     </para>
-///     <para>
-///         <b>Custom Popovers:</b><br/>
-///         To create a custom popover, inherit from <see cref="PopoverBaseImpl"/> and add your own content and logic.
+///         <b>Lifecycle:</b><br/>
+///         Use <see cref="ApplicationPopover.Show"/> to display and <see cref="ApplicationPopover.Hide"/> or
+///         set <see cref="View.Visible"/> to <see langword="false"/> to hide.
 ///     </para>
 /// </remarks>
 public abstract class PopoverBaseImpl : View, IPopover
@@ -40,7 +40,15 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///     Initializes a new instance of the <see cref="PopoverBaseImpl"/> class.
     /// </summary>
     /// <remarks>
-    ///     By default, the popover fills the available screen area and is focusable.
+    ///     <para>
+    ///         Sets up default popover behavior:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
+    ///         <item>Sets <see cref="View.CanFocus"/> to <see langword="true"/>.</item>
+    ///         <item>Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
+    ///         <item>Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when invoked.</item>
+    ///     </list>
     /// </remarks>
     protected PopoverBaseImpl ()
     {
@@ -87,15 +95,19 @@ public abstract class PopoverBaseImpl : View, IPopover
     }
 
     /// <summary>
-    ///     Called when the <see cref="View.Visible"/> property is changing.
+    ///     Called when the <see cref="View.Visible"/> property is changing. Handles layout and focus management.
     /// </summary>
-    /// <remarks>
-    ///     When becoming visible, the popover is laid out to fit the screen.
-    ///     When becoming hidden, focus is restored to the previous view.
-    /// </remarks>
     /// <returns>
     ///     <see langword="true"/> to cancel the visibility change; otherwise, <see langword="false"/>.
     /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         <b>When becoming visible:</b> Lays out the popover to fit the screen.
+    ///     </para>
+    ///     <para>
+    ///         <b>When becoming hidden:</b> Restores focus to the previously focused view in the view hierarchy.
+    ///     </para>
+    /// </remarks>
     protected override bool OnVisibleChanging ()
     {
         bool ret = base.OnVisibleChanging ();

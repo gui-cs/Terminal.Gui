@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
@@ -12,7 +11,7 @@ namespace Terminal.Gui.Views;
 //  HotKey - Do NOT Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Do NOT Focus item. If item is not active, make Active. Do NOT Accept.
 // Focused:
-//  Space key - If focused item is Active, move focus to and Acivate next. Else, Activate current. Do NOT Accept.
+//  Space key - If focused item is Active, move focus to and Activate next. Else, Activate current. Do NOT Accept.
 //  Enter key - Activate and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - If item is not active, make Active. Do NOT Accept.
@@ -25,22 +24,21 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class OptionSelector : SelectorBase, IDesignable
 {
-    /// <inheritdoc />
-    public OptionSelector ()
-    {
+    /// <inheritdoc/>
+    public OptionSelector () =>
+
         // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
         // really wants that.
         base.Value = 0;
-    }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
-        if (base.OnHandlingHotKey (args) is true)
+        if (base.OnHandlingHotKey (args))
         {
             return true;
         }
+
         if (!CanFocus)
         {
             if (RaiseActivating (args.Context) is true)
@@ -54,18 +52,20 @@ public class OptionSelector : SelectorBase, IDesignable
             {
                 return true;
             }
+
             SetFocus ();
             Value = Values? [0];
+
             return true;
         }
 
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        if (base.OnActivating (args) is true)
+        if (base.OnActivating (args))
         {
             return true;
         }
@@ -77,7 +77,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return false;
         }
 
-        if (args.Context is CommandContext<KeyBinding> { } && (int)checkBox.Data! == Value)
+        if (args.Context?.Binding is KeyBinding && (int)checkBox.Data! == Value)
         {
             // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
             Cycle ();
@@ -100,11 +100,11 @@ public class OptionSelector : SelectorBase, IDesignable
         return false;
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
+
         if (view is not CheckBox checkbox)
         {
             return;
@@ -116,7 +116,6 @@ public class OptionSelector : SelectorBase, IDesignable
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
-
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
@@ -125,25 +124,30 @@ public class OptionSelector : SelectorBase, IDesignable
         }
 
         // Verify at most one is checked
-        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
+        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
 
-        if (args.Context is CommandContext<MouseBinding> { } && checkbox.CheckedState == CheckState.Checked)
+        if (args.Context?.Binding is MouseBinding && checkbox.Value == CheckState.Checked)
         {
             // If user clicks with mouse and item is already checked, do nothing
             args.Handled = true;
+
             return;
         }
 
-        if (args.Context is CommandContext<KeyBinding> binding && binding.Command == Command.HotKey && checkbox.CheckedState == CheckState.Checked)
+        if (args.Context is { Binding: KeyBinding, Command: Command.HotKey })
         {
-            // If user uses an item hotkey and the item is already checked, do nothing
-            args.Handled = true;
-            return;
+            if (checkbox.Value == CheckState.Checked)
+            {
+                // If user uses an item hotkey and the item is already checked, do nothing
+                args.Handled = true;
+
+                return;
+            }
         }
 
         if (checkbox.CanFocus)
         {
-            // For Select, if the view is focusable and SetFocus succeeds, by defition,
+            // For Select, if the view is focusable and SetFocus succeeds, by definition,
             // the event is handled. So return what SetFocus returns.
             checkbox.SetFocus ();
         }
@@ -166,6 +170,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             return;
         }
+
         Value = (int)checkbox.Data!;
         args.Handled = false; // Do not set to false; let Accepting propagate
     }
@@ -173,9 +178,8 @@ public class OptionSelector : SelectorBase, IDesignable
     private void Cycle ()
     {
         int valueIndex = Values.IndexOf (v => v == Value);
-        Value = valueIndex == Values?.Count () - 1
-            ? Values! [0]
-            : Values! [valueIndex + 1];
+
+        Value = valueIndex == Values?.Count - 1 ? Values! [0] : Values! [valueIndex + 1];
 
         if (HasFocus)
         {
@@ -184,9 +188,8 @@ public class OptionSelector : SelectorBase, IDesignable
         }
 
         // Verify at most one is checked
-        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
+        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
     }
-
 
     /// <summary>
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
@@ -198,17 +201,18 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            int value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            var value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
 
-            cb.CheckedState = value == Value ? CheckState.Checked : CheckState.UnChecked;
+            cb.Value = value == Value ? CheckState.Checked : CheckState.UnChecked;
         }
 
         // Verify at most one is checked
-        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
+        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
     }
 
     /// <summary>
-    ///     Gets or sets the <see cref="SelectorBase.Labels"/> index for the cursor. The cursor may or may not be the selected
+    ///     Gets or sets the <see cref="SelectorBase.Labels"/> index for the focused item. The active item may or may not be
+    ///     the selected
     ///     RadioItem.
     /// </summary>
     /// <remarks>
@@ -216,9 +220,22 @@ public class OptionSelector : SelectorBase, IDesignable
     ///         Maps to either the X or Y position within <see cref="View.Viewport"/> depending on <see cref="Orientation"/>.
     ///     </para>
     /// </remarks>
-    public int Cursor
+    public int FocusedItem
     {
-        get => !CanFocus ? 0 : SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+        get
+        {
+            if (!CanFocus)
+            {
+                return 0;
+            }
+
+            if (HasFocus)
+            {
+                return SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
+            }
+
+            return field;
+        }
         set
         {
             if (!CanFocus)
@@ -226,14 +243,19 @@ public class OptionSelector : SelectorBase, IDesignable
                 return;
             }
 
+            field = value;
+
             CheckBox [] checkBoxes = SubViews.OfType<CheckBox> ().ToArray ();
 
             if (value < 0 || value >= checkBoxes.Length)
             {
-                throw new ArgumentOutOfRangeException (nameof (value), @"Cursor index is out of range");
+                throw new ArgumentOutOfRangeException (nameof (value), @"FocusedItem index is out of range");
             }
 
-            checkBoxes [value].SetFocus ();
+            if (HasFocus)
+            {
+                checkBoxes [value].SetFocus ();
+            }
         }
     }
 

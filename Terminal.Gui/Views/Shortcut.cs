@@ -60,7 +60,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        HighlightStates = MouseState.None;
+        MouseHighlightStates = MouseState.None;
         CanFocus = true;
 
         if (Border is { })
@@ -71,7 +71,8 @@ public class Shortcut : View, IOrientation, IDesignable
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
-        _orientationHelper = new (this);
+        // ReSharper disable once UseObjectOrCollectionInitializer
+        _orientationHelper = new OrientationHelper (this);
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
@@ -79,12 +80,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
-        CommandView = new ()
-        {
-            Id = "CommandView",
-            Width = Dim.Auto (),
-            Height = Dim.Fill ()
-        };
+        CommandView = new View { Id = "CommandView", Width = Dim.Auto (), Height = Dim.Fill () };
         Title = commandText ?? string.Empty;
 
         HelpView.Id = "_helpView";
@@ -113,13 +109,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     // Helper to set Width consistently
-    internal Dim GetWidthDimAuto ()
-    {
-        return Dim.Auto (
-                         DimAutoStyle.Content,
-                         Dim.Func (_ => _minimumNaturalWidth ?? 0),
-                         Dim.Func (_ => _minimumNaturalWidth ?? 0))!;
-    }
+    internal Dim GetWidthDimAuto () => Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => _minimumNaturalWidth ?? 0), Dim.Func (_ => _minimumNaturalWidth ?? 0))!;
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
@@ -179,7 +169,7 @@ public class Shortcut : View, IOrientation, IDesignable
     private void ForceCalculateNaturalWidth ()
     {
         // Get the natural size of each subview
-        Size screenSize = App?.Screen.Size ?? new (2048, 2048);
+        Size screenSize = App?.Screen.Size ?? new Size (2048, 2048);
         CommandView.SetRelativeLayout (screenSize);
         HelpView.SetRelativeLayout (screenSize);
         KeyView.SetRelativeLayout (screenSize);
@@ -219,14 +209,14 @@ public class Shortcut : View, IOrientation, IDesignable
                 case 0:
                 case 1:
                     // Scrunch it by removing both margins
-                    HelpView.Margin!.Thickness = new (t.Right - 1, t.Top, t.Left - 1, t.Bottom);
+                    HelpView.Margin!.Thickness = new Thickness (t.Right - 1, t.Top, t.Left - 1, t.Bottom);
 
                     break;
 
                 case 2:
 
                     // Scrunch just the right margin
-                    HelpView.Margin!.Thickness = new (t.Right, t.Top, t.Left - 1, t.Bottom);
+                    HelpView.Margin!.Thickness = new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom);
 
                     break;
             }
@@ -266,20 +256,20 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
-        CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
+        KeyBinding? keyBinding = commandContext?.Binding as KeyBinding?;
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
 
-        if (keyCommandContext?.Binding.Data != this)
+        if (keyBinding is { } kb && kb.Data != this)
         {
             // TODO: Optimize this to only do this if CommandView is custom (non View)
             // Invoke Activate on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
-            keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
+            KeyBinding updatedBinding = kb with { Data = this };
 
             Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-            CommandView.InvokeCommand (Command.Activate, keyCommandContext);
+            CommandView.InvokeCommand (Command.Activate, updatedBinding);
         }
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
@@ -344,11 +334,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </summary>
     /// <remarks>
     /// </remarks>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
     /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
@@ -358,11 +344,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation)
-    {
+    public void OnOrientationChanged (Orientation newOrientation) =>
+
         // TODO: Determine what, if anything, is opinionated about the orientation.
         SetNeedsLayout ();
-    }
 
     #endregion
 
@@ -448,7 +433,7 @@ public class Shortcut : View, IOrientation, IDesignable
                                               }
                                           };
 
-            _commandView.HotKeySpecifier = new ('_');
+            _commandView.HotKeySpecifier = new Rune ('_');
 
             Title = _commandView.Text;
 
@@ -460,19 +445,18 @@ public class Shortcut : View, IOrientation, IDesignable
 
             return;
 
-            void CommandViewOnAccepted (object? sender, CommandEventArgs e)
-            {
+            void CommandViewOnAccepted (object? sender, CommandEventArgs e) =>
+
                 // Always eat CommandView.Accept
                 e.Handled = true;
-            }
 
             void CommandViewOnActivating (object? sender, CommandEventArgs e)
             {
-                if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Data != this)
-                    || e.Context is CommandContext<MouseBinding>)
+                if ((e.Context?.Binding is KeyBinding { Data: var data } && data != this)
+                    || e.Context?.Binding is MouseBinding)
                 {
                     // Forward command to ourselves
-                    InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
+                    InvokeCommand (Command.Activate, e.Context);
                 }
 
                 e.Handled = true;
@@ -496,7 +480,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
 
-        //CommandView.HighlightStates = HighlightStates.None;
+        //CommandView.MouseHighlightStates = MouseHighlightStates.None;
         CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
@@ -524,15 +508,14 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
-    {
+    private void Shortcut_TitleChanged (object? sender, EventArgs<string> e) =>
+
         // If the Title changes, update the CommandView text.
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
 
-        //_commandView.Title = Title;
-    }
+    //_commandView.Title = Title;
 
     #endregion Command
 
@@ -565,7 +548,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.VerticalTextAlignment = Alignment.Center;
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = false;
-        HelpView.HighlightStates = MouseState.None;
+        HelpView.MouseHighlightStates = MouseState.None;
 
         HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
@@ -634,9 +617,6 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _bindKeyToApplication;
         set
         {
-            App ??= SuperView?.App ?? Application.Instance; // HACK: Remove once legacy static Application is gone
-            Debug.Assert (App is { });
-
             if (value == _bindKeyToApplication)
             {
                 return;
@@ -703,7 +683,7 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
-        KeyView.HighlightStates = MouseState.None;
+        KeyView.MouseHighlightStates = MouseState.None;
 
         KeyView.GettingAttributeForRole += (sender, args) =>
                                            {

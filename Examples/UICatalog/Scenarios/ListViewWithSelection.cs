@@ -1,99 +1,88 @@
-﻿using System;
+﻿#nullable enable
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Text;
 using JetBrains.Annotations;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("List View With Selection", "ListView with custom rendering, columns, and selection")]
+[ScenarioMetadata ("ListView With Selection", "ListView with custom rendering, columns, and selection")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ListView")]
 [ScenarioCategory ("Scrolling")]
 public class ListViewWithSelection : Scenario
 {
-    private CheckBox _allowMarkingCb;
-    private CheckBox _allowMultipleCb;
-    private CheckBox _customRenderCb;
-    private CheckBox _keep;
-    private ListView _listView;
-    private ObservableCollection<Scenario> _scenarios;
-    private Window _appWindow;
+    private CheckBox? _showMarksCb;
+    private CheckBox? _markMultipleCb;
+    private CheckBox? _customRenderCb;
+    private ListView? _listView;
+    private ObservableCollection<Scenario>? _scenarios;
+    private Window? _appWindow;
+    private ViewportSettingsEditor? _viewportSettingsEditor;
 
-    private ObservableCollection<string> _eventList = new ();
-    private ListView _eventListView;
+    private ObservableCollection<string> _eventList = [];
+    private ListView? _eventListView;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        _appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-        };
+        _appWindow = new Window { Title = GetQuitKeyAndName () };
 
         _scenarios = GetScenarios ();
 
-        _customRenderCb = new CheckBox { X = 0, Y = 0, Text = "Custom _Rendering" };
+        _customRenderCb = new CheckBox { X = 0, Y = 0, Text = "Custom _Rendering", Value = CheckState.UnChecked };
         _appWindow.Add (_customRenderCb);
-        _customRenderCb.CheckedStateChanging += CustomRenderCB_Toggle;
+        _customRenderCb.ValueChanging += CustomRenderCB_Toggle;
 
-        _allowMarkingCb = new CheckBox
-        {
-            X = Pos.Right (_customRenderCb) + 1,
-            Y = 0,
-            Text = "Allows_Marking",
-            AllowCheckStateNone = false
-        };
-        _appWindow.Add (_allowMarkingCb);
-        _allowMarkingCb.CheckedStateChanging += AllowsMarkingCB_Toggle;
+        _showMarksCb = new CheckBox { X = Pos.Right (_customRenderCb) + 1, Y = 0, Text = "Show_Marks", AllowCheckStateNone = false };
+        _appWindow.Add (_showMarksCb);
+        _showMarksCb.ValueChanging += ShowMarksCB_Toggle;
 
-        _allowMultipleCb = new CheckBox
-        {
-            X = Pos.Right (_allowMarkingCb) + 1,
-            Y = 0,
-            Enabled = _allowMarkingCb.CheckedState == CheckState.Checked,
-            Text = "AllowsMulti_Select"
-        };
-        _appWindow.Add (_allowMultipleCb);
-        _allowMultipleCb.CheckedStateChanging += AllowsMultipleSelectionCB_Toggle;
+        _markMultipleCb = new CheckBox { X = Pos.Right (_showMarksCb) + 1, Y = 0, Text = "Mark_Multiple" };
+        _appWindow.Add (_markMultipleCb);
+        _markMultipleCb.ValueChanging += MarkMultipleCB_Toggle;
 
-        _keep = new CheckBox
+        _viewportSettingsEditor = new ViewportSettingsEditor
         {
-            X = Pos.Right (_allowMultipleCb) + 1,
-            Y = 0,
-            Text = "Allow_YGreaterThanContentHeight"
+            Title = "_ViewportSettings",
+            Y = Pos.Bottom (_markMultipleCb),
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            CanFocus = true,
+            AutoSelectViewToEdit = false,
+            AutoSelectAdornments = false,
+            SuperViewRendersLineCanvas = true
         };
-        _appWindow.Add (_keep);
-        _keep.CheckedStateChanging += AllowYGreaterThanContentHeightCB_Toggle;
+        _appWindow.Add (_viewportSettingsEditor);
 
         _listView = new ListView
         {
             Title = "_ListView",
             X = 0,
-            Y = Pos.Bottom (_allowMarkingCb),
-            Width = Dim.Func (_ => _listView?.MaxLength ?? 10),
+            Y = Pos.Bottom (_viewportSettingsEditor),
+            Width = Dim.Func (_ => _listView?.MaxItemLength ?? 10),
             Height = Dim.Fill (),
-            AllowsMarking = false,
-            AllowsMultipleSelection = false,
+            ShowMarks = false,
+            MarkMultiple = false,
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.Resizable
         };
-        _listView.RowRender += ListView_RowRender;
+        _listView?.RowRender += ListView_RowRender;
         _appWindow.Add (_listView);
 
-        _listView.SetSource (_scenarios);
+        _listView?.SetSource (_scenarios);
 
-        _eventList = new ();
+        _eventList = new ObservableCollection<string> ();
 
         _eventListView = new ListView
         {
-            X = Pos.Right (_listView) + 1,
-            Y = Pos.Top (_listView),
+            X = Pos.Right (_listView!) + 1,
+            Y = Pos.Top (_listView!),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList)
@@ -101,166 +90,213 @@ public class ListViewWithSelection : Scenario
         _eventListView.SchemeName = "Runnable";
         _appWindow.Add (_eventListView);
 
-        _listView.SelectedItemChanged += (s, a) => LogEvent (s as View, a, "SelectedItemChanged");
-        _listView.OpenSelectedItem += (s, a) => LogEvent (s as View, a, "OpenSelectedItem");
-        _listView.CollectionChanged += (s, a) => LogEvent (s as View, a, "CollectionChanged");
-        _listView.Accepting += (s, a) => LogEvent (s as View, a, "Accept");
-        _listView.Activating += (s, a) => LogEvent (s as View, a, "Activate");
-        _listView.VerticalScrollBar.AutoShow = true;
-        _listView.HorizontalScrollBar.AutoShow = true;
+        _listView?.ValueChanged += (s, a) => LogEvent (s as View, $"ValueChanged: {a.OldValue} -> {a.NewValue}");
+        _listView?.CollectionChanged += (s, a) => LogEvent (s as View, $"CollectionChanged: {a}");
+        _listView?.Accepting += (s, a) => LogEvent (s as View, $"Accept: {a}");
+        _listView?.Activating += (s, a) => LogEvent (s as View, $"Activate: {a}");
+        _listView?.VerticalScrollBar.AutoShow = true;
+        _listView?.HorizontalScrollBar.AutoShow = true;
 
-        bool? LogEvent (View sender, EventArgs args, string message)
+        _listView?.Initialized += (_, _) => _viewportSettingsEditor.ViewToEdit = _listView;
+
+        app.Run (_appWindow);
+        _appWindow.Dispose ();
+
+        return;
+
+        bool? LogEvent (View? _, string message)
         {
-            var msg = $"{message,-7}: {args}";
+            var msg = $"{message}";
             _eventList.Add (msg);
             _eventListView.MoveDown ();
 
             return null;
         }
-
-        Application.Run (_appWindow);
-        _appWindow.Dispose ();
-        Application.Shutdown ();
     }
 
-    private void CustomRenderCB_Toggle (object sender, ResultEventArgs<CheckState> stateEventArgs)
+    private void CustomRenderCB_Toggle (object? sender, ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.Result == CheckState.Checked)
+        if (stateEventArgs.NewValue != CheckState.Checked)
         {
-            _listView.SetSource (_scenarios);
+            // Scenario.GetString automatically pads the name to the width of the longest name
+            _listView?.SetSource (_scenarios);
         }
         else
         {
-            _listView.Source = new ScenarioListDataSource (_scenarios);
+            _listView?.Source = new CustomRenderListDataSource (_scenarios!);
         }
 
-        _appWindow.SetNeedsDraw ();
+        _appWindow?.SetNeedsDraw ();
     }
 
-    private void AllowsMarkingCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
+    private void ShowMarksCB_Toggle (object? sender, ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMarking = stateEventArgs.Result == CheckState.Checked;
-        _allowMultipleCb.Enabled = _listView.AllowsMarking;
-        _appWindow.SetNeedsDraw ();
+        _listView?.ShowMarks = stateEventArgs.NewValue == CheckState.Checked;
+        _appWindow?.SetNeedsDraw ();
     }
 
-    private void AllowsMultipleSelectionCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
+    private void MarkMultipleCB_Toggle (object? sender, ValueChangingEventArgs<CheckState> stateEventArgs)
     {
-        _listView.AllowsMultipleSelection = stateEventArgs.Result == CheckState.Checked;
-        _appWindow.SetNeedsDraw ();
+        _listView?.MarkMultiple = stateEventArgs.NewValue == CheckState.Checked;
+        _appWindow?.SetNeedsDraw ();
     }
 
+    private void ListView_RowRender (object? sender, ListViewRowEventArgs obj)
 
-    private void AllowYGreaterThanContentHeightCB_Toggle (object sender, [NotNull] ResultEventArgs<CheckState> stateEventArgs)
     {
-        if (stateEventArgs.Result == CheckState.Checked)
-        {
-            _listView.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
-        }
-        else
-        {
-            _listView.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
-        }
-        _appWindow.SetNeedsDraw ();
-    }
+        //if (_customRenderCb.Value == CheckState.Checked)
+        //{
+        //    // Only use the built-in RowRender event when we're not using custom rendering
+        //    return;
+        //}
 
-    private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
-    {
-        if (obj.Row == _listView.SelectedItem)
-        {
-            return;
-        }
+        //if (obj.Row == _listView?.SelectedItem)
+        //{
+        //    return;
+        //}
 
-        if (_listView.AllowsMarking && _listView.Source.IsMarked (obj.Row))
-        {
-            obj.RowAttribute = new Attribute (Color.Black, Color.White);
+        //if (_listView?.ShowMarks && _listView?.Source!.IsMarked (obj.Row))
+        //{
+        //    obj.RowAttribute = _listView?.GetAttributeForRole (VisualRole.Highlight);
 
-            return;
-        }
+        //    return;
+        //}
 
-        if (obj.Row % 2 == 0)
-        {
-            obj.RowAttribute = new Attribute (Color.Green, Color.Black);
-        }
-        else
-        {
-            obj.RowAttribute = new Attribute (Color.Black, Color.Green);
-        }
+        //if (obj.Row % 2 == 0)
+        //{
+        //    obj.RowAttribute = _listView?.GetAttributeForRole (VisualRole.Active);
+        //}
+        //else
+        //{
+        //    obj.RowAttribute = _listView?.GetAttributeForRole (VisualRole.Normal);
+        //}
     }
 
     // This is basically the same implementation used by the UICatalog main window
-    internal class ScenarioListDataSource : IListDataSource
+    internal class CustomRenderListDataSource : IListDataSource
     {
-        private readonly int _nameColumnWidth = 30;
         private int _count;
-        private BitArray _marks;
-        private ObservableCollection<Scenario> _scenarios;
-        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) { Scenarios = itemList; }
+        private BitArray? _marks;
+        private ObservableCollection<Scenario>? _scenarios;
+        public CustomRenderListDataSource (ObservableCollection<Scenario> itemList) => Scenarios = itemList;
 
-        public ObservableCollection<Scenario> Scenarios
+        public ObservableCollection<Scenario>? Scenarios
         {
             get => _scenarios;
             set
             {
-                if (value != null)
+                if (value == null)
                 {
-                    _count = value.Count;
-                    _marks = new BitArray (_count);
-                    _scenarios = value;
-                    Length = GetMaxLengthItem ();
+                    return;
                 }
+                _count = value.Count;
+                _marks = new BitArray (_count);
+                _scenarios = value;
+                _maxItemLength = GetMaxItemLength ();
             }
         }
 
-        public bool IsMarked (int item)
+#pragma warning disable CS0067
+        /// <inheritdoc/>
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+#pragma warning restore CS0067
+
+        #region IListDataSource members
+
+        bool IListDataSource.IsMarked (int item)
         {
             if (item >= 0 && item < _count)
             {
-                return _marks [item];
+                return _marks? [item] ?? false;
             }
 
             return false;
         }
-#pragma warning disable CS0067
-        /// <inheritdoc />
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-#pragma warning restore CS0067
 
-        public int Count => Scenarios?.Count ?? 0;
-        public int Length { get; private set; }
-        public bool SuspendCollectionChangedEvent { get => throw new System.NotImplementedException (); set => throw new System.NotImplementedException (); }
+        int IListDataSource.Count => Scenarios?.Count ?? 0;
 
-        public void Render (
-            ListView container,
-            bool selected,
-            int item,
-            int col,
-            int line,
-            int width,
-            int viewportX = 0
-        )
-        {
-            container.Move (col, line);
+        private int _maxItemLength;
 
-            // Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-            string s = string.Format (
-                                      string.Format ("{{0,{0}}}", -_nameColumnWidth),
-                                      Scenarios [item].GetName ()
-                                     );
-            RenderUstr (container, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, viewportX);
-        }
+        int IListDataSource.MaxItemLength => _maxItemLength;
 
-        public void SetMark (int item, bool value)
+        public bool SuspendCollectionChangedEvent { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+
+        void IListDataSource.SetMark (int item, bool value)
         {
             if (item >= 0 && item < _count)
             {
-                _marks [item] = value;
+                _marks? [item] = value;
             }
         }
 
-        public IList ToList () { return Scenarios; }
+        IList IListDataSource.ToList () => Scenarios!;
 
-        private int GetMaxLengthItem ()
+        void IListDataSource.Render (ListView listView, bool selected, int item, int col, int row, int width, int viewportX)
+        {
+            listView.Move (col - viewportX, row);
+
+            Attribute rowAttribute;
+
+            if (item % 2 == 0)
+            {
+                rowAttribute = listView.GetAttributeForRole (VisualRole.Active);
+            }
+            else
+            {
+                rowAttribute = listView.GetAttributeForRole (VisualRole.Normal);
+            }
+
+            if (item == listView.SelectedItem)
+            {
+                rowAttribute = listView.GetAttributeForRole (VisualRole.Focus);
+            }
+
+            var used = 0;
+
+            used = RenderString (listView, used, width, rowAttribute, $"{Scenarios! [item].GetName ()}: ");
+
+            used = RenderString (listView,
+                                 used,
+                                 width + viewportX,
+                                 rowAttribute with { Style = TextStyle.Italic },
+                                 $"{Scenarios [item].GetDescription ()}");
+
+            while (used < width + viewportX)
+            {
+                listView.AddRune ((Rune)' ');
+                used++;
+            }
+
+            // Reset attributes to normal; otherwise checks will be rendered with the last used attribute
+            listView.SetAttribute (listView.GetAttributeForRole (VisualRole.Normal));
+        }
+
+        private static int RenderString (ListView listView, int used, int remaining, Attribute attribute, string str)
+        {
+            var index = 0;
+            listView.SetAttribute (attribute);
+
+            while (index < str.Length)
+            {
+                (Rune rune, int size) = str.DecodeRune (index, index - str.Length);
+                int count = rune.GetColumns ();
+
+                if (used + count > remaining)
+                {
+                    break;
+                }
+
+                listView.AddRune (rune);
+                used += count;
+                index += size;
+            }
+
+            return used;
+        }
+
+        #endregion
+
+        private int GetMaxItemLength ()
         {
             if (_scenarios?.Count == 0)
             {
@@ -269,13 +305,9 @@ public class ListViewWithSelection : Scenario
 
             var maxLength = 0;
 
-            for (var i = 0; i < _scenarios.Count; i++)
+            for (var i = 0; i < _scenarios?.Count; i++)
             {
-                string s = string.Format (
-                                          $"{{0,{-_nameColumnWidth}}}",
-                                          Scenarios [i].GetName ()
-                                         );
-                var sc = $"{s}  {Scenarios [i].GetDescription ()}";
+                string sc = FormatRow (i);
                 int l = sc.Length;
 
                 if (l > maxLength)
@@ -287,37 +319,8 @@ public class ListViewWithSelection : Scenario
             return maxLength;
         }
 
-        // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-        private void RenderUstr (View view, string ustr, int col, int line, int width, int viewportX = 0)
-        {
-            var used = 0;
-            int index = viewportX;
+        private string FormatRow (int item) => $"{Scenarios! [item].GetName ()}: {Scenarios! [item].GetDescription ()}";
 
-            while (index < ustr.Length)
-            {
-                (Rune rune, int size) = ustr.DecodeRune (index, index - ustr.Length);
-                int count = rune.GetColumns ();
-
-                if (used + count >= width)
-                {
-                    break;
-                }
-
-                view.AddRune (rune);
-                used += count;
-                index += size;
-            }
-
-            while (used < width)
-            {
-                view.AddRune ((Rune)' ');
-                used++;
-            }
-        }
-
-        public void Dispose ()
-        {
-            _scenarios = null;
-        }
+        public void Dispose () => _scenarios = null;
     }
 }

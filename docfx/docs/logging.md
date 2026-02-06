@@ -2,7 +2,7 @@
 
 Logging has come to Terminal.Gui! You can now enable comprehensive logging of the internals of the library. This can help diagnose issues with specific terminals, keyboard cultures and/or operating system specific issues.
 
-To enable file logging you should set the static property @Terminal.Gui.App.Logging.Logger to an instance of `Microsoft.Extensions.Logging.ILogger`. If your program already uses logging you can provide a shared instance or instance from Dependency Injection (DI).
+To enable file logging you should set the static property @Terminal.Gui.Logging.Logger to an instance of `Microsoft.Extensions.Logging.ILogger`. If your program already uses logging you can provide a shared instance or instance from Dependency Injection (DI).
 
 Alternatively you can create a new log to ensure only Terminal.Gui logs appear.
 
@@ -62,7 +62,7 @@ Example logs:
 2025-02-15 13:36:48.668 +00:00 [INF] Creating NetInput
 2025-02-15 13:36:48.671 +00:00 [INF] Main Loop Coordinator booting complete
 2025-02-15 13:36:49.145 +00:00 [INF] Run 'MainWindow(){X=0,Y=0,Width=0,Height=0}'
-2025-02-15 13:36:49.163 +00:00 [VRB] Mouse Interpreter raising ReportMousePosition
+2025-02-15 13:36:49.163 +00:00 [VRB] Mouse Interpreter raising PositionReport
 2025-02-15 13:36:49.165 +00:00 [VRB] AnsiResponseParser handled as mouse '[<35;50;23m'
 2025-02-15 13:36:49.166 +00:00 [VRB] MainWindow triggered redraw (NeedsDraw=True NeedsLayout=True) 
 2025-02-15 13:36:49.167 +00:00 [INF] Console size changes from '{Width=0, Height=0}' to {Width=120, Height=30}
@@ -71,14 +71,14 @@ Example logs:
 2025-02-15 13:36:49.867 +00:00 [VRB] MainWindow triggered redraw (NeedsDraw=True NeedsLayout=True) 
 2025-02-15 13:36:50.857 +00:00 [VRB] MainWindow triggered redraw (NeedsDraw=True NeedsLayout=True) 
 2025-02-15 13:36:51.417 +00:00 [VRB] MainWindow triggered redraw (NeedsDraw=True NeedsLayout=True) 
-2025-02-15 13:36:52.224 +00:00 [VRB] Mouse Interpreter raising ReportMousePosition
+2025-02-15 13:36:52.224 +00:00 [VRB] Mouse Interpreter raising PositionReport
 2025-02-15 13:36:52.226 +00:00 [VRB] AnsiResponseParser handled as mouse '[<35;51;23m'
-2025-02-15 13:36:52.226 +00:00 [VRB] Mouse Interpreter raising ReportMousePosition
+2025-02-15 13:36:52.226 +00:00 [VRB] Mouse Interpreter raising PositionReport
 2025-02-15 13:36:52.226 +00:00 [VRB] AnsiResponseParser handled as mouse '[<35;52;23m'
-2025-02-15 13:36:52.226 +00:00 [VRB] Mouse Interpreter raising ReportMousePosition
+2025-02-15 13:36:52.226 +00:00 [VRB] Mouse Interpreter raising PositionReport
 2025-02-15 13:36:52.226 +00:00 [VRB] AnsiResponseParser handled as mouse '[<35;53;23m'
 ...
-2025-02-15 13:36:52.846 +00:00 [VRB] Mouse Interpreter raising ReportMousePosition
+2025-02-15 13:36:52.846 +00:00 [VRB] Mouse Interpreter raising PositionReport
 2025-02-15 13:36:52.846 +00:00 [VRB] AnsiResponseParser handled as mouse '[<35;112;4m'
 2025-02-15 13:36:54.151 +00:00 [INF] RequestStop ''
 2025-02-15 13:36:54.151 +00:00 [VRB] AnsiResponseParser handled as keyboard '[21~'

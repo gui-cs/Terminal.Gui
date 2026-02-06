@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -9,64 +8,51 @@ public class DimAutoDemo : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
 
         // For diagnostics
-        appWindow.Padding.Thickness = new Thickness (1);
+        appWindow.Padding!.Thickness = new (1);
 
-        FrameView dimAutoFrameView = CreateDimAutoContentFrameView ();
+        FrameView dimAutoFrameView = CreateDimAutoContentFrameView (app);
 
-        //FrameView sliderFrameView = CreateSliderFrameView ();
-        //sliderFrameView.X = Pos.Right(dimAutoFrameView) + 1;
-        //sliderFrameView.Width = Dim.Fill ();
-        //sliderFrameView.Height = Dim.Fill ();
-
-
-        ////var dlgButton = new Button
-        ////{
-        ////    Text = "Open Test _Dialog",
-        ////    X = Pos.Right (dimAutoFrameView),
-        ////    Y = Pos.Top (dimAutoFrameView)
-        ////};
-        ////dlgButton.Accept += DlgButton_Clicked;
-
-        appWindow.Add (dimAutoFrameView/*, sliderFrameView dlgButton*/);
+        appWindow.Add (dimAutoFrameView /*, sliderFrameView dlgButton*/);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
-    private static FrameView CreateDimAutoContentFrameView ()
+    private static FrameView CreateDimAutoContentFrameView (IApplication app)
     {
-        var dimAutoFrameView = new FrameView
+        FrameView dimAutoFrameView = new ()
         {
             Title = "Type to make View grow",
-            X = 0,
-            Y = 0,
-            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10)
+
+            //X = Pos.Center (),
+            //Y = Pos.Center (),
+            Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (25)),
+            Height = Dim.Auto (DimAutoStyle.Content, 10),
+            Arrangement = ViewArrangement.Resizable
         };
         dimAutoFrameView.Margin!.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;
 
-        var textEdit = new TextView
+        TextView textEdit = new ()
         {
             Text = "",
-            X = 0, Y = 0, Width = 20, Height = 4
+            X = 0,
+            Y = 0,
+            Width = 20,
+            Height = 4
         };
         dimAutoFrameView.Add (textEdit);
 
-        var vlabel = new Label
+        Label vlabel = new ()
         {
             Text = textEdit.Text,
             X = Pos.Left (textEdit),
@@ -79,7 +65,7 @@ public class DimAutoDemo : Scenario
         vlabel.Id = "vlabel";
         dimAutoFrameView.Add (vlabel);
 
-        var hlabel = new Label
+        Label hlabel = new ()
         {
             Text = textEdit.Text,
             X = Pos.Right (vlabel) + 1,
@@ -91,7 +77,7 @@ public class DimAutoDemo : Scenario
         hlabel.Id = "hlabel";
         dimAutoFrameView.Add (hlabel);
 
-        var heightAuto = new View
+        View heightAuto = new ()
         {
             X = Pos.Right (vlabel) + 1,
             Y = Pos.Bottom (hlabel) + 1,
@@ -104,7 +90,7 @@ public class DimAutoDemo : Scenario
         heightAuto.Id = "heightAuto";
         dimAutoFrameView.Add (heightAuto);
 
-        var widthAuto = new View
+        View widthAuto = new ()
         {
             X = Pos.Right (heightAuto) + 1,
             Y = Pos.Bottom (hlabel) + 1,
@@ -117,7 +103,7 @@ public class DimAutoDemo : Scenario
         widthAuto.Id = "widthAuto";
         dimAutoFrameView.Add (widthAuto);
 
-        var bothAuto = new View
+        View bothAuto = new ()
         {
             X = Pos.Right (widthAuto) + 1,
             Y = Pos.Bottom (hlabel) + 1,
@@ -139,31 +125,20 @@ public class DimAutoDemo : Scenario
                                         bothAuto.Text = textEdit.Text;
                                     };
 
-        //var movingButton = new Button
-        //{
-        //    Text = "_Click\nTo Move\nDown",
-        //    X = Pos.Right (vlabel),
-        //    Y = Pos.Bottom (vlabel)
-        //};
-        //movingButton.Accept += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
-        //dimAutoFrameView.Add (movingButton);
+        Button movingButton = new () { Text = "_Move", X = Pos.Right (vlabel), Y = Pos.Bottom (vlabel) };
+        movingButton.Accepting += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
+        dimAutoFrameView.Add (movingButton);
 
-        var resetButton = new Button
-        {
-            Text = "_Reset Button (AnchorEnd)",
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd ()
-        };
+        Button resetButton = new () { Text = "_Reset Button (AnchorEnd)", X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
 
         resetButton.Accepting += (s, e) =>
-        {
-            //movingButton.Y = Pos.Bottom (hlabel);
-            //movingButton.X = 0;
-        };
+                                 {
+                                     movingButton.Y = Pos.Bottom (hlabel);
+                                     movingButton.X = 0;
+                                 };
         dimAutoFrameView.Add (resetButton);
 
-
-        var optionSelector = new OptionSelector ()
+        OptionSelector optionSelector = new ()
         {
             Labels = ["One", "Two", "Three"],
             X = 0,
@@ -172,63 +147,37 @@ public class DimAutoDemo : Scenario
             BorderStyle = LineStyle.Dotted
         };
         dimAutoFrameView.Add (optionSelector);
+
+        FrameView fillFrame = new ()
+        {
+            Title = "_Fill View",
+            X = Pos.Right (optionSelector),
+            Y = Pos.Bottom (vlabel),
+            Width = Dim.Fill (Dim.Width (resetButton)),
+            Height = Dim.Fill ()
+        };
+        dimAutoFrameView.Add (fillFrame);
+
         return dimAutoFrameView;
     }
 
     private static FrameView CreateSliderFrameView ()
     {
-        var sliderFrameView = new FrameView
-        {
-            Title = "Slider - Example of a DimAuto View",
-        };
+        FrameView sliderFrameView = new () { Title = "LinearRange - Example of a DimAuto View" };
 
-        List<object> options = new () { "One", "Two", "Three", "Four" };
-        Slider slider = new (options)
+        List<object> options = ["One", "Two", "Three", "Four"];
+
+        LinearRange linearRange = new (options)
         {
             X = 0,
             Y = 0,
-            Type = SliderType.Multiple,
+            Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
-            Title = "_Slider"
+            Title = "_LinearRange"
         };
-        sliderFrameView.Add (slider);
+        sliderFrameView.Add (linearRange);
 
         return sliderFrameView;
-    }
-
-    private void DlgButton_Clicked (object sender, EventArgs e)
-    {
-        var dlg = new Dialog
-        {
-            Title = "Test Dialog",
-            Width = Dim.Auto (minimumContentDim: Dim.Percent (10))
-
-            //Height = Dim.Auto (min: Dim.Percent (50))
-        };
-        var text = new TextField
-        {
-            ValidatePosDim = true,
-            Text = "TextField: X=1; Y=Pos.Bottom (label)+1, Width=Dim.Fill (0); Height=1",
-            TextFormatter = new () { WordWrap = true },
-            X = 0,
-            Y = 0, //Pos.Bottom (label) + 1,
-            Width = Dim.Fill (10),
-            Height = 1
-        };
-
-        //var btn = new Button
-        //{
-        //    Text = "AnchorEnd", Y = Pos.AnchorEnd (1)
-        //};
-
-        //// TODO: We should really fix AnchorEnd to do this automatically. 
-        //btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
-        //dlg.Add (label);
-        dlg.Add (text);
-
-        //dlg.Add (btn);
-        Application.Run (dlg);
-        dlg.Dispose ();
     }
 }

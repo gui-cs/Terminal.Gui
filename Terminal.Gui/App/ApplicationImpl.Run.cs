@@ -36,22 +36,20 @@ internal partial class ApplicationImpl
     public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
     /// <inheritdoc/>
-    public void RaiseIteration () { Iteration?.Invoke (this, new (this)); }
+    public void RaiseIteration () => Iteration?.Invoke (this, new EventArgs<IApplication?> (this));
 
     #endregion Main Loop Iteration
 
     #region Timeouts and Invoke
 
-    private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    /// <inheritdoc/>
+    public ITimedEvents TimedEvents { get; }
 
     /// <inheritdoc/>
-    public ITimedEvents? TimedEvents => _timedEvents;
+    public object AddTimeout (TimeSpan time, Func<bool> callback) => TimedEvents.Add (time, callback);
 
     /// <inheritdoc/>
-    public object AddTimeout (TimeSpan time, Func<bool> callback) => _timedEvents.Add (time, callback);
-
-    /// <inheritdoc/>
-    public bool RemoveTimeout (object token) => _timedEvents.Remove (token);
+    public bool RemoveTimeout (object token) => TimedEvents.Remove (token);
 
     /// <inheritdoc/>
     public void Invoke (Action<IApplication>? action)
@@ -64,15 +62,13 @@ internal partial class ApplicationImpl
             return;
         }
 
-        _timedEvents.Add (
-                          TimeSpan.Zero,
-                          () =>
-                          {
-                              action?.Invoke (this);
+        TimedEvents.Add (TimeSpan.Zero,
+                         () =>
+                         {
+                             action?.Invoke (this);
 
-                              return false;
-                          }
-                         );
+                             return false;
+                         });
     }
 
     /// <inheritdoc/>
@@ -81,20 +77,18 @@ internal partial class ApplicationImpl
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
-            action?.Invoke ();
+            action.Invoke ();
 
             return;
         }
 
-        _timedEvents.Add (
-                          TimeSpan.Zero,
-                          () =>
-                          {
-                              action?.Invoke ();
+        TimedEvents.Add (TimeSpan.Zero,
+                         () =>
+                         {
+                             action.Invoke ();
 
-                              return false;
-                          }
-                         );
+                             return false;
+                         });
     }
 
     #endregion Timeouts and Invoke
@@ -130,13 +124,15 @@ internal partial class ApplicationImpl
         // Ensure the mouse is ungrabbed
         Mouse.UngrabMouse ();
 
+        Navigation?.SetFocused (null);
+
         IRunnable? previousTop = null;
 
         // CRITICAL SECTION - Atomic stack + cached state update
         lock (_sessionStackLock)
         {
             // Get the previous top BEFORE pushing new token
-            if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
+            if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken.Runnable is { })
             {
                 previousTop = previousToken.Runnable;
             }
@@ -152,24 +148,18 @@ internal partial class ApplicationImpl
             TopRunnable = runnable;
 
             // Update cached state atomically - IsRunning and IsModal are now consistent
-            SessionBegun?.Invoke (this, new (token));
+            SessionBegun?.Invoke (this, new SessionTokenEventArgs (token));
             runnable.SetIsRunning (true);
             runnable.SetIsModal (true);
 
             // Previous top is no longer modal
-            if (previousTop != null)
-            {
-                previousTop.SetIsModal (false);
-            }
+            previousTop?.SetIsModal (false);
         }
 
         // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
 
         // Fire events AFTER lock released (avoid deadlocks in event handlers)
-        if (previousTop != null)
-        {
-            previousTop.RaiseIsModalChangedEvent (false);
-        }
+        previousTop?.RaiseIsModalChangedEvent (false);
 
         runnable.RaiseIsRunningChangedEvent (true);
         runnable.RaiseIsModalChangedEvent (true);
@@ -186,8 +176,7 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new()
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ()
     {
         if (!Initialized)
         {
@@ -201,7 +190,7 @@ internal partial class ApplicationImpl
         }
 
         TRunnable runnable = new ();
-        object? result = Run (runnable, errorHandler);
+        Run (runnable, errorHandler);
 
         // We created the runnable, so dispose it if it's disposable
         if (runnable is IDisposable disposable)
@@ -237,7 +226,7 @@ internal partial class ApplicationImpl
 
         if (token is null)
         {
-            Logging.Trace (@"Run - Begin session failed or was cancelled.");
+            Logging.Warning (@"Run - Begin session failed or was cancelled.");
 
             return null;
         }
@@ -268,7 +257,7 @@ internal partial class ApplicationImpl
         {
             if (Coordinator is null)
             {
-                throw new ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
+                throw new Exception ($"{nameof (IMainLoopCoordinator)} inexplicably became null during Run");
             }
 
             try
@@ -338,7 +327,7 @@ internal partial class ApplicationImpl
             if (wasModal && SessionStack?.TryPop (out SessionToken? popped) == true && popped == token)
             {
                 // Restore previous top runnable
-                if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
+                if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken.Runnable is { })
                 {
                     previousRunnable = previousToken.Runnable;
 
@@ -368,7 +357,7 @@ internal partial class ApplicationImpl
             previousRunnable.RaiseIsModalChangedEvent (true);
         }
 
-        Mouse?.UngrabMouse ();
+        Mouse.UngrabMouse ();
 
         runnable.RaiseIsRunningChangedEvent (false);
 
@@ -378,7 +367,7 @@ internal partial class ApplicationImpl
 
         // Clear the Runnable from the token
         token.Runnable = null;
-        SessionEnded?.Invoke (this, new (token));
+        SessionEnded?.Invoke (this, new SessionTokenEventArgs (token));
     }
 
     #endregion Session Lifecycle - End
@@ -386,7 +375,7 @@ internal partial class ApplicationImpl
     #region Session Lifecycle - RequestStop
 
     /// <inheritdoc/>
-    public void RequestStop () { RequestStop (null); }
+    public void RequestStop () => RequestStop (null);
 
     /// <inheritdoc/>
     public void RequestStop (IRunnable? runnable)

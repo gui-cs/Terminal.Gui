@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests;
 
-[Collection ("Global Test Setup")]
+
 public class VisibleTests () : TestsAllViews
 {
     [Fact]

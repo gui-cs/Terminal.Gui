@@ -1,5 +1,3 @@
-using System;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -7,23 +5,20 @@ namespace Terminal.Gui.Views;
 ///     <see cref="FlagSelector"/> provides a non-type-safe version. <c>TFlagsEnum</c> must be a valid enum type with
 ///     the '[Flags]' attribute.
 /// </summary>
-public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : struct, Enum
+public sealed class FlagSelector<TFlagsEnum> : FlagSelector, IValue where TFlagsEnum : struct, Enum
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector{TFlagsEnum}"/> class.
     /// </summary>
-    public FlagSelector ()
-    {
-        SetValuesAndLabels<TFlagsEnum> ();
-    }
+    public FlagSelector () => SetValuesAndLabels<TFlagsEnum> ();
 
     /// <summary>
     ///     Gets or sets the value of the selected flags.
     /// </summary>
     public new TFlagsEnum? Value
     {
-        get => base.Value.HasValue ? (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), base.Value.Value) : (TFlagsEnum?)null;
-        set => base.Value = value.HasValue ? Convert.ToInt32 (value.Value) : (int?)null;
+        get => base.Value.HasValue ? (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), base.Value.Value) : null;
+        set => base.Value = value.HasValue ? Convert.ToInt32 (value.Value) : null;
     }
 
     /// <summary>
@@ -42,4 +37,7 @@ public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : s
 
         ValueChanged?.Invoke (this, new EventArgs<TFlagsEnum?> (newValue));
     }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => Value;
 }

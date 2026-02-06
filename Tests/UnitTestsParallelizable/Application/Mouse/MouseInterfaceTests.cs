@@ -1,12 +1,13 @@
 using Xunit.Abstractions;
 
-namespace ApplicationTests.Mouse;
+namespace ApplicationTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable tests for IMouse interface.
 ///     Tests the decoupled mouse handling without Application.Init or global state.
 /// </summary>
 [Trait ("Category", "Input")]
+[Collection ("Application Tests")]
 public class MouseInterfaceTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
@@ -88,7 +89,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         // Arrange
         MouseImpl mouse = new ();
         var eventFired = false;
-        MouseEventArgs? capturedArgs = null;
+        Mouse? capturedArgs = null;
 
         mouse.MouseEvent += (sender, args) =>
                             {
@@ -96,11 +97,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
                                 capturedArgs = args;
                             };
 
-        MouseEventArgs testEvent = new ()
-        {
-            ScreenPosition = new (5, 10),
-            Flags = MouseFlags.Button1Pressed
-        };
+        Mouse testEvent = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
         mouse.RaiseMouseEvent (testEvent);
@@ -119,15 +116,11 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         MouseImpl mouse = new ();
         var eventCount = 0;
 
-        void Handler (object? sender, MouseEventArgs args) { eventCount++; }
+        void Handler (object? sender, Mouse args) => eventCount++;
 
         mouse.MouseEvent += Handler;
 
-        MouseEventArgs testEvent = new ()
-        {
-            ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
-        };
+        Mouse testEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
 
         // Act - Fire once
         mouse.RaiseMouseEvent (testEvent);
@@ -153,11 +146,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse.MouseEvent += (sender, args) => { eventFired = true; };
         mouse.IsMouseDisabled = true;
 
-        MouseEventArgs testEvent = new ()
-        {
-            ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
-        };
+        Mouse testEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
         mouse.RaiseMouseEvent (testEvent);
@@ -167,12 +156,12 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed)]
-    [InlineData (MouseFlags.Button1Released)]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed)]
+    [InlineData (MouseFlags.LeftButtonPressed)]
+    [InlineData (MouseFlags.LeftButtonReleased)]
+    [InlineData (MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonPressed)]
     [InlineData (MouseFlags.WheeledUp)]
-    [InlineData (MouseFlags.ReportMousePosition)]
+    [InlineData (MouseFlags.PositionReport)]
     public void Mouse_RaiseMouseEvent_CorrectlyPassesFlags (MouseFlags flags)
     {
         // Arrange
@@ -181,11 +170,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         mouse.MouseEvent += (sender, args) => { capturedFlags = args.Flags; };
 
-        MouseEventArgs testEvent = new ()
-        {
-            ScreenPosition = new (5, 5),
-            Flags = flags
-        };
+        Mouse testEvent = new () { ScreenPosition = new Point (5, 5), Flags = flags };
 
         // Act
         mouse.RaiseMouseEvent (testEvent);
@@ -227,11 +212,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         mouse.MouseEvent += (sender, args) => eventCount++;
 
-        MouseEventArgs testEvent = new ()
-        {
-            ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
-        };
+        Mouse testEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
 
         // Verify event fires before reset
         mouse.RaiseMouseEvent (testEvent);
@@ -296,11 +277,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse1.MouseEvent += (sender, args) => mouse1EventCount++;
         mouse2.MouseEvent += (sender, args) => mouse2EventCount++;
 
-        MouseEventArgs testEvent = new ()
-        {
-            ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
-        };
+        Mouse testEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
         mouse1.RaiseMouseEvent (testEvent);
@@ -341,7 +318,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     #region Mouse Grab Tests
 
     [Fact]
-    public void Mouse_GrabMouse_SetsMouseGrabView ()
+    public void Mouse_GrabMouse_IsGrabbed_ReturnsTrue ()
     {
         // Arrange
         MouseImpl mouse = new ();
@@ -351,11 +328,11 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse.GrabMouse (testView);
 
         // Assert
-        Assert.Equal (testView, mouse.MouseGrabView);
+        Assert.True (mouse.IsGrabbed (testView));
     }
 
     [Fact]
-    public void Mouse_UngrabMouse_ClearsMouseGrabView ()
+    public void Mouse_UngrabMouse_IsGrabbed_ReturnsFalse ()
     {
         // Arrange
         MouseImpl mouse = new ();
@@ -366,7 +343,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse.UngrabMouse ();
 
         // Assert
-        Assert.Null (mouse.MouseGrabView);
+        Assert.False (mouse.IsGrabbed (testView));
     }
 
     [Fact]
@@ -388,7 +365,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (eventFired);
-        Assert.Null (mouse.MouseGrabView); // Should not be set because it was cancelled
+        Assert.False (mouse.IsGrabbed (testView)); // Should not be set because it was cancelled
     }
 
     [Fact]
@@ -437,6 +414,103 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         // Assert
         Assert.True (eventFired);
         Assert.Equal (testView, eventView);
+    }
+
+    [Fact]
+    public void Mouse_IsGrabbed_Parameterless_ReturnsFalseWhenNoViewGrabbed ()
+    {
+        // Arrange
+        MouseImpl mouse = new ();
+
+        // Act & Assert
+        Assert.False (mouse.IsGrabbed ());
+    }
+
+    [Fact]
+    public void Mouse_IsGrabbed_Parameterless_ReturnsTrueWhenViewGrabbed ()
+    {
+        // Arrange
+        MouseImpl mouse = new ();
+        View testView = new ();
+
+        // Act
+        mouse.GrabMouse (testView);
+
+        // Assert
+        Assert.True (mouse.IsGrabbed ());
+        Assert.True (mouse.IsGrabbed (testView));
+
+        testView.Dispose ();
+    }
+
+    [Fact]
+    public void Mouse_IsGrabbed_Parameterless_ReturnsFalseAfterUngrab ()
+    {
+        // Arrange
+        MouseImpl mouse = new ();
+        View testView = new ();
+        mouse.GrabMouse (testView);
+        Assert.True (mouse.IsGrabbed ());
+
+        // Act
+        mouse.UngrabMouse ();
+
+        // Assert
+        Assert.False (mouse.IsGrabbed ());
+        Assert.False (mouse.IsGrabbed (testView));
+
+        testView.Dispose ();
+    }
+
+    [Fact]
+    public void Mouse_IsGrabbed_Parameterless_WorksWithMultipleGrabCycles ()
+    {
+        // Arrange
+        MouseImpl mouse = new ();
+        View view1 = new () { Id = "view1" };
+        View view2 = new () { Id = "view2" };
+
+        // Initially no grab
+        Assert.False (mouse.IsGrabbed ());
+
+        // Grab view1
+        mouse.GrabMouse (view1);
+        Assert.True (mouse.IsGrabbed ());
+        Assert.True (mouse.IsGrabbed (view1));
+        Assert.False (mouse.IsGrabbed (view2));
+
+        // Transfer grab to view2 (GrabMouse with new view)
+        mouse.GrabMouse (view2);
+        Assert.True (mouse.IsGrabbed ());
+        Assert.False (mouse.IsGrabbed (view1));
+        Assert.True (mouse.IsGrabbed (view2));
+
+        // Ungrab
+        mouse.UngrabMouse ();
+        Assert.False (mouse.IsGrabbed ());
+        Assert.False (mouse.IsGrabbed (view1));
+        Assert.False (mouse.IsGrabbed (view2));
+
+        view1.Dispose ();
+        view2.Dispose ();
+    }
+
+    [Fact]
+    public void Mouse_IsGrabbed_Parameterless_ReturnsFalseAfterResetState ()
+    {
+        // Arrange
+        MouseImpl mouse = new ();
+        View testView = new ();
+        mouse.GrabMouse (testView);
+        Assert.True (mouse.IsGrabbed ());
+
+        // Act
+        mouse.ResetState ();
+
+        // Assert
+        Assert.False (mouse.IsGrabbed ());
+
+        testView.Dispose ();
     }
 
     #endregion
