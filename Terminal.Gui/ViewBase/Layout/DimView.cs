@@ -59,4 +59,7 @@ public record DimView : Dim
             yield return Target;
         }
     }
+
+    /// <inheritdoc/>
+    internal override bool RequiresTargetLayout => true;
 }
