@@ -417,6 +417,44 @@ public abstract record Pos
     internal virtual bool DependsOnSuperViewContentSize => false;
 
     /// <summary>
+    ///     Indicates whether this Pos has a fixed value that doesn't depend on layout calculations.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to identify positions that can be
+    ///         determined without performing layout calculations on other views.
+    ///     </para>
+    ///     <para>
+    ///         Fixed positions include <see cref="PosAbsolute"/> and positions calculated by
+    ///         <see cref="PosFunc"/> that don't depend on other views' layouts.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos has a fixed value independent of layout;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool IsFixed => false;
+
+    /// <summary>
+    ///     Indicates whether this Pos requires the target view to be laid out before it can be calculated.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to identify positions that depend on
+    ///         another view's layout being completed first.
+    ///     </para>
+    ///     <para>
+    ///         Positions that require target layout include <see cref="PosView"/> which depends on
+    ///         the target view's calculated position.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos requires the target view's layout to be calculated first;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool RequiresTargetLayout => false;
+
+    /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.
     /// </summary>
     /// <param name="pos">

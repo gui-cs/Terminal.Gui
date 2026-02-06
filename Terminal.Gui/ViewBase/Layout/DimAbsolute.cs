@@ -23,4 +23,7 @@ public record DimAbsolute (int Size) : Dim
     internal override int GetAnchor (int size) => Size;
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension) => Math.Max (GetAnchor (0), 0);
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => true;
 }

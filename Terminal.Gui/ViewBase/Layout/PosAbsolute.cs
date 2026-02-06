@@ -21,4 +21,7 @@ public record PosAbsolute (int Position) : Pos
     public override string ToString () => $"Absolute({Position})";
 
     internal override int GetAnchor (int size) => Position;
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => true;
 }

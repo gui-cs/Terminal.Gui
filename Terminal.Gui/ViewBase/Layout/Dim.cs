@@ -485,6 +485,44 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     internal virtual int GetMinimumContribution (int location, int superviewContentSize, View us, Dimension dimension) =>
         Calculate (location, superviewContentSize, us, dimension);
 
+    /// <summary>
+    ///     Indicates whether this Dim has a fixed value that doesn't depend on layout calculations.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to identify dimensions that can be
+    ///         determined without performing layout calculations on other views.
+    ///     </para>
+    ///     <para>
+    ///         Fixed dimensions include <see cref="DimAbsolute"/> and dimensions calculated by
+    ///         <see cref="DimFunc"/> that don't depend on other views' layouts.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim has a fixed value independent of layout;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool IsFixed => false;
+
+    /// <summary>
+    ///     Indicates whether this Dim requires the target view to be laid out before it can be calculated.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to identify dimensions that depend on
+    ///         another view's layout being completed first.
+    ///     </para>
+    ///     <para>
+    ///         Dimensions that require target layout include <see cref="DimView"/> which depends on
+    ///         the target view's calculated size.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Dim requires the target view's layout to be calculated first;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool RequiresTargetLayout => false;
+
     #endregion virtual methods
 
     #region operators

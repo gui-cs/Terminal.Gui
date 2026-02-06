@@ -34,4 +34,7 @@ public record PosFunc (Func<View?, int> Fn, View? View = null) : Pos
             yield return View;
         }
     }
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => true;
 }
