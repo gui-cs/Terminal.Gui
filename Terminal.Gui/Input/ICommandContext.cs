@@ -2,8 +2,7 @@
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
 /// <summary>
-///     Describes the context in which a <see cref="Command"/> is being invoked. <see cref="CommandContext{TBindingType}"/>
-///     inherits from this interface.
+///     Describes the context in which a <see cref="Command"/> is being invoked.
 ///     When a <see cref="Command"/> is invoked,
 ///     a context object is passed to Command handlers as an <see cref="ICommandContext"/> reference.
 /// </summary>
