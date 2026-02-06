@@ -38,10 +38,65 @@ public partial class TableView : View, IDesignable
         CollectionNavigator = new TableCollectionNavigator (this);
 
         // Things this view knows how to do
-        AddCommand (Command.Right, () => ChangeSelectionByOffsetWithReturn (1, 0));
-        AddCommand (Command.Left, () => ChangeSelectionByOffsetWithReturn (-1, 0));
-        AddCommand (Command.Up, () => ChangeSelectionByOffsetWithReturn (0, -1));
-        AddCommand (Command.Down, () => ChangeSelectionByOffsetWithReturn (0, 1));
+        AddCommand (Command.Right,
+                    () =>
+                    {
+                        var oldSelecteCol = SelectedColumn;
+                        var oldViewportX = Viewport.X;
+                        var result = ChangeSelectionByOffsetWithReturn (1, 0);
+
+                        if (oldSelecteCol == SelectedColumn && Viewport.X < MaxViewPort().X)
+                        {
+                            var maxViewPort = MaxViewPort ();
+                            Viewport = Viewport with {X = Math.Min(oldViewportX + 1, maxViewPort.X)};
+                        }
+                        return result;
+                    });
+        AddCommand (Command.Left,
+                    () =>
+                    {
+                        return ChangeSelectionByOffsetWithReturn (-1, 0);
+                    });
+
+        AddCommand (Command.Up,
+                    () =>
+                    {
+                        if (SelectedRow == 0 )
+                        {
+                            if (Viewport.Y > 0)
+                            {
+                                Viewport = Viewport with {Y = Viewport.Y - 1};
+
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+
+                        return ChangeSelectionByOffsetWithReturn (0, -1);
+                    });
+
+        AddCommand (Command.Down,
+                    () =>
+                    {
+                        if (Table != null && SelectedRow >= Table.Rows - 1)
+                        {
+                            if (Viewport.Y < GetContentSize ().Height - Viewport.Height)
+                            {
+                                Viewport = Viewport with {Y = Viewport.Y + 1};
+
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+
+                        return ChangeSelectionByOffsetWithReturn (0, 1);
+                    });
 
         AddCommand (Command.PageUp,
                     () =>
@@ -226,6 +281,7 @@ public partial class TableView : View, IDesignable
     ///     the view.
     /// </summary>
     /// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
+#warning a candidate to remove
     public int ColumnOffset
     {
         get;
@@ -255,6 +311,7 @@ public partial class TableView : View, IDesignable
     /// <summary>The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/></summary>
     public string NullSymbol { get; set; } = "-";
 
+#warning a candidate to remove
     private int _rowOffset;
 
     /// <summary>
@@ -328,60 +385,43 @@ public partial class TableView : View, IDesignable
             return null;
         }
 
-        if (UseScrollbars)
-        {
-            int y;
-            var x = Math.Max (colHit.X, 0) - Viewport.X;
+        int y;
+        var x = Math.Max (colHit.X, 0) - Viewport.X;
 
-            if (x >= Viewport.Width
-                || // column starts after the visible viewport
-                x + colHit.Width < 0) // column ends before the visible viewport
+        if (x >= Viewport.Width
+            || // column starts after the visible viewport
+            x + colHit.Width < 0) // column ends before the visible viewport
+        {
+            // column is outside the horizontal scroll area
+            return null;
+        }
+
+        if (Style.AlwaysShowHeaders)
+        {
+            y = CurrentHeaderHeightVisible () + tableRow - Viewport.Y; // + GetHeaderHeightIfAny();
+
+            if (y < CurrentHeaderHeightVisible ()
+                || // the cell is too far up above the current scroll area
+                y >= Viewport.Y + Viewport.Height) // the cell is way down below the scroll area and off the screen
             {
-                // column is outside the horizontal scroll area
+                // column is outside the vertical scroll area
                 return null;
             }
-
-            if (Style.AlwaysShowHeaders)
-            {
-                y = CurrentHeaderHeightVisible () + tableRow - Viewport.Y; // + GetHeaderHeightIfAny();
-
-                if (y < CurrentHeaderHeightVisible ()
-                    || // the cell is too far up above the current scroll area
-                    y >= Viewport.Y + Viewport.Height) // the cell is way down below the scroll area and off the screen
-                {
-                    // column is outside the vertical scroll area
-                    return null;
-                }
-            }
-            else
-            {
-                y = tableRow - Viewport.Y + GetHeaderHeightIfAny ();
-
-                if (y < 0
-                    || // the cell is too far up above the current scroll area
-                    y >= Viewport.Y + Viewport.Height) // the cell is way down below the scroll area and off the screen
-                {
-                    // column is outside the vertical scroll area
-                    return null;
-                }
-            }
-
-            return new Point (x, y);
         }
-
-        // the cell is too far up above the current scroll area
-        if (RowOffset > tableRow)
+        else
         {
-            return null;
+            y = tableRow - Viewport.Y + GetHeaderHeightIfAny ();
+
+            if (y < 0
+                || // the cell is too far up above the current scroll area
+                y >= Viewport.Y + Viewport.Height) // the cell is way down below the scroll area and off the screen
+            {
+                // column is outside the vertical scroll area
+                return null;
+            }
         }
 
-        // the cell is way down below the scroll area and off the screen
-        if (tableRow > RowOffset + (Viewport.Height - headerHeight))
-        {
-            return null;
-        }
-
-        return new Point (colHit.X, tableRow + headerHeight - RowOffset);
+        return new Point (x, y);
     }
 
     private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] MultiSelection);
@@ -390,7 +430,17 @@ public partial class TableView : View, IDesignable
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void PageDown (bool extend)
     {
-        ChangeSelectionByOffset (0, Viewport.Height - GetHeaderHeightIfAny (), extend);
+        var oldSelectedRow = SelectedRow;
+        ChangeSelectionByOffset (0, Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend);
+
+        //after scrolling the cells, also scroll to lower line
+        var remainingJump = Viewport.Height - (SelectedRow - oldSelectedRow);
+        var maxViewPort = MaxViewPort();
+        if (remainingJump > 0 && Viewport.Y < maxViewPort.Y)
+        {
+            Viewport = Viewport with {Y = Math.Min (Viewport.Y + remainingJump, maxViewPort.Y)};
+        }
+
         Update ();
     }
 
@@ -398,7 +448,16 @@ public partial class TableView : View, IDesignable
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void PageUp (bool extend)
     {
-        ChangeSelectionByOffset (0, -(Viewport.Height - GetHeaderHeightIfAny ()), extend);
+        var oldSelectedRow = SelectedRow;
+        ChangeSelectionByOffset (0, -(Viewport.Height /* - CurrentHeaderHeightVisible ()*/), extend);
+
+        //after scrolling the cells, also scroll to header
+        var remainingJump = Viewport.Height - (oldSelectedRow - SelectedRow);
+        if (remainingJump > 0 && Viewport.Y > 0)
+        {
+            Viewport = Viewport with {Y = Math.Max (Viewport.Y - remainingJump, 0)};
+        }
+
         Update ();
     }
 
@@ -463,42 +522,23 @@ public partial class TableView : View, IDesignable
         int rowIdx;
         ColumnToRender col;
 
-        if (UseScrollbars)
+        var currentHeaderHeightVisible = CurrentHeaderHeightVisible ();
+        col = viewPort.LastOrDefault (c => c.X <= clientX + Viewport.X);
+        offsetX = clientX + Viewport.X - col?.X;
+
+        if (clientY < currentHeaderHeightVisible)
         {
-            var currentHeaderHeightVisible = CurrentHeaderHeightVisible ();
-            col = viewPort.LastOrDefault (c => c.X <= clientX + Viewport.X);
-            offsetX = clientX + Viewport.X - col?.X;
+            // header clicked
+            headerIfAny = col?.Column;
+        }
 
-            if (clientY < currentHeaderHeightVisible)
-            {
-                // header clicked
-                headerIfAny = col?.Column;
-            }
-
-            if (Style.AlwaysShowHeaders)
-            {
-                rowIdx = clientY - currentHeaderHeightVisible + Viewport.Y;
-            }
-            else
-            {
-                rowIdx = clientY + Viewport.Y - GetHeaderHeightIfAny ();
-            }
+        if (Style.AlwaysShowHeaders)
+        {
+            rowIdx = clientY - currentHeaderHeightVisible + Viewport.Y;
         }
         else
         {
-            int headerHeight = GetHeaderHeightIfAny ();
-            col = viewPort.LastOrDefault (c => c.X <= clientX);
-
-            // Click is on the header section of rendered UI
-            if (clientY < headerHeight)
-            {
-                headerIfAny = col?.Column;
-                offsetX = clientX - col?.X;
-
-                return null;
-            }
-
-            rowIdx = RowOffset - headerHeight + clientY;
+            rowIdx = clientY + Viewport.Y - GetHeaderHeightIfAny ();
         }
 
         // if click is off bottom of the rows don't give an
@@ -603,17 +643,17 @@ public partial class TableView : View, IDesignable
     /// <param name="rowsToRender"></param>
     /// <param name="colStyle"></param>
     /// <returns></returns>
-    private int CalculateMaxCellWidth (int col, int rowsToRender, ColumnStyle colStyle)
+    private int CalculateMaxCellWidth (int col, ColumnStyle colStyle)
     {
         int spaceRequired = _table.ColumnNames [col].EnumerateRunes ().Sum (c => c.GetColumns ());
 
         // if table has no rows
-        if (RowOffset < 0)
+        if (Table == null || Table.Rows <= 0)
         {
             return spaceRequired;
         }
 
-        for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows; i++)
+        for (int i = 0; i < Table.Rows; i++)
         {
             // expand required space if cell is bigger than the last biggest cell or header
             spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).EnumerateRunes ().Sum (c => c.GetColumns ()));
@@ -658,10 +698,7 @@ public partial class TableView : View, IDesignable
             return Enumerable.Empty<ColumnToRender> ();
         }
 
-        if (UseScrollbars)
-        {
-            bounds = new Rectangle (new Point (0, 0), GetContentSize ());
-        }
+        bounds = new Rectangle (new Point (0, 0), GetContentSize ());
 
         List<ColumnToRender> toReturn = new ();
         var usedSpace = 0;
@@ -673,19 +710,12 @@ public partial class TableView : View, IDesignable
         }
 
         int availableHorizontalSpace = bounds.Width;
-        int rowsToRender = bounds.Height;
-
-        // reserved for the headers row
-        if (ShouldRenderHeaders ())
-        {
-            rowsToRender -= GetHeaderHeight ();
-        }
 
         var first = true;
         int lastColumn = Table.Columns - 1;
 
         // TODO : Maybe just a for loop?
-        foreach (int col in Enumerable.Range (0, Table.Columns).Skip (ColumnOffset))
+        foreach (int col in Enumerable.Range (0, Table.Columns))
         {
             int startingIdxForCurrentHeader = usedSpace;
             ColumnStyle colStyle = Style.GetColumnStyleIfAny (col);
@@ -698,7 +728,7 @@ public partial class TableView : View, IDesignable
             }
 
             // is there enough space for this column (and it's data)?
-            int colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+            int colWidth = CalculateMaxCellWidth (col, colStyle) + padding;
 
             if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
             {
@@ -769,11 +799,6 @@ public partial class TableView : View, IDesignable
 
     private Size? CalculateContentSize ()
     {
-        if (!UseScrollbars)
-        {
-            return null;
-        }
-
         var contentSize = new Size (0, 0);
 
         contentSize.Height += GetHeaderHeightIfAny () + Table?.Rows ?? 0;
@@ -785,11 +810,6 @@ public partial class TableView : View, IDesignable
 
         // we assume that padding is 0 here
         var padding = 0;
-
-        if (RowOffset > 0)
-        {
-            throw new InvalidOperationException ("RowOffset should be 0");
-        }
 
         if (Table != null)
         {
@@ -805,7 +825,7 @@ public partial class TableView : View, IDesignable
                     continue;
                 }
 
-                int colWidth = CalculateMaxCellWidth (col, Table.Rows, colStyle) + padding;
+                int colWidth = CalculateMaxCellWidth (col, colStyle) + padding;
 
                 if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
                 {
@@ -830,6 +850,11 @@ public partial class TableView : View, IDesignable
                                  Math.Max (Table.Columns - 1, 0)
                                  + // for separator symbols between columns
                                  (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0); // for left border
+
+            if (Style.ExpandLastColumn && Viewport.Width > contentSize.Width)
+            {
+                contentSize.Width = Viewport.Width;
+            }
         }
         else
         {
@@ -1111,8 +1136,22 @@ public partial class TableView : View, IDesignable
         return false;
     }
 
+#warning a candidate to remove
     private Point? _scrollLeftPoint;
     private Point? _scrollRightPoint;
+
+    /// <summary>
+    /// Gets the maximum top-left coordinates to which the viewport can be scrolled within the content area.
+    /// </summary>
+    /// <remarks>The returned point represents the largest X and Y values for the viewport's position such
+    /// that the entire viewport remains within the bounds of the content.</remarks>
+    public Point MaxViewPort ()
+    {
+        var contentSize = GetContentSize ();
+        var maxX = Math.Max(contentSize.Width - Viewport.Width, 0);
+        var maxY = Math.Max (contentSize.Height - Viewport.Height, 0);
+        return new Point (maxX, maxY);
+    }
 
     /// <summary>
     ///     Updates <see cref="ColumnOffset"/> and <see cref="RowOffset"/> where they are outside the bounds of the table
@@ -1128,27 +1167,16 @@ public partial class TableView : View, IDesignable
             return;
         }
 
-        ColumnOffset = Math.Max (Math.Min (ColumnOffset, Table.Columns - 1), 0);
+        var maxViewPort = MaxViewPort ();
 
-        if (UseScrollbars)
+        if (Viewport.Y > maxViewPort.Y)
         {
-            var contentSize = GetContentSize ();
-            var maxX = contentSize.Width - Viewport.Width;
-            var maxY = contentSize.Height - Viewport.Height;
-
-            if (Viewport.Y > maxY)
-            {
-                Viewport = Viewport with {Y = Math.Max (maxY, 0)};
-            }
-
-            if (Viewport.X > maxX)
-            {
-                Viewport = Viewport with {X = Math.Max (maxX, 0)};
-            }
+            Viewport = Viewport with {Y = Math.Max (maxViewPort.Y, 0)};
         }
-        else
+
+        if (Viewport.X > maxViewPort.X)
         {
-            RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows - 1), 0);
+            Viewport = Viewport with {X = Math.Max (maxViewPort.X, 0)};
         }
     }
 }

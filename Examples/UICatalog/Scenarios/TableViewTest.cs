@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Terminal.Gui.Views;
 
 namespace UICatalog.Scenarios;
 
@@ -41,16 +42,15 @@ public class TableViewTest : Scenario
             //X = 0, Y = Pos.Bottom(optionsView),
             //Width = Dim.Fill (), Height = Dim.Fill (),
             X = 0, Y = 17,
-            Width = Dim.Fill (), Height = Dim.Fill (),
-            Table = new DataTableSource (TableView.BuildDemoDataTable (5, 30))
-        };
+            Width = Dim.Fill(), Height = Dim.Fill (),
 
+            Table = new DataTableSource (TableView.BuildDemoDataTable (6, 30))
+        };
         tableView.Style.ColumnStyles [2] = new ColumnStyle () {Alignment = Alignment.End};
         tableView.Style.ColumnStyles [6] = new ColumnStyle ();
 
         (string text, Func<bool> iv, Action<bool> hndlr) [] options =
         [
-            ("UseScrollbars", () => tableView.UseScrollbars, b => tableView.UseScrollbars = b),
             ("Scrollbars Auto", () => tableView.HorizontalScrollBar.AutoShow, b => { tableView.HorizontalScrollBar.AutoShow = b; tableView.VerticalScrollBar.AutoShow = b; }),
             ("AlwaysShowHeaders", () => tableView.Style.AlwaysShowHeaders, b => tableView.Style.AlwaysShowHeaders = b),
             ("ShowHeaders", () => tableView.Style.ShowHeaders, b => tableView.Style.ShowHeaders = b),
@@ -60,11 +60,13 @@ public class TableViewTest : Scenario
             ("ShowVerticalCellLines", () => tableView.Style.ShowVerticalCellLines, b => tableView.Style.ShowVerticalCellLines = b),
             ("InvertSelectedCellFirstCharacter", () => tableView.Style.InvertSelectedCellFirstCharacter, b => tableView.Style.InvertSelectedCellFirstCharacter = b),
             ("ShowHorizontalBottomline", () => tableView.Style.ShowHorizontalBottomline, b => tableView.Style.ShowHorizontalBottomline = b),
+            ("ExpandLastColumn", () => tableView.Style.ExpandLastColumn, b => tableView.Style.ExpandLastColumn = b),
             ("FullRowSelect", () => tableView.FullRowSelect, b => tableView.FullRowSelect = b),
             ("MinAcceptableWidth (limit col 6 = 15)", () => tableView.Style.ColumnStyles[6].MinAcceptableWidth < TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH, b => tableView.Style.ColumnStyles[6].MinAcceptableWidth = b ? 15 : TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH),
         ];
 
         View? priorView = null;
+
         foreach ((string text, Func<bool> iv, Action<bool> hndlr) tuple in options)
         {
             CheckBox cb = new CheckBox()
@@ -73,7 +75,17 @@ public class TableViewTest : Scenario
                 Text = tuple.text,
                 Value = tuple.iv () ? CheckState.Checked : CheckState.UnChecked,
             };
-            cb.ValueChanged += (s, e) => tuple.hndlr (cb.Value == CheckState.Checked);
+
+            cb.ValueChanged += (s, e) =>
+                               {
+                                   tuple.hndlr (cb.Value == CheckState.Checked);
+
+                                   //ToDo: Investigate why this is needed to refresh the TableView layout
+                                   // without it some changes do not reflect until the next user interaction
+                                   // some cases here might work, but only because a redraw is forced when Clicking the checkbox
+                                   // which seems to be not correct! Changing the checkbox should redraw the checkbox, but not all views
+                                   tableView.RefreshContentSize ();
+                               };
             priorView = cb;
             optionsView.Add (cb);
         }

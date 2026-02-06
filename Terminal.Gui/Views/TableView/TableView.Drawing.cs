@@ -8,24 +8,6 @@ namespace Terminal.Gui.Views;
 public partial class TableView
 {
     /// <summary>
-    /// Gets or sets a value indicating whether to use scrollbars.
-    /// This will change the behavior of the TableView to use the Viewport and ContentSize
-    /// The tableview takes care of showing and hiding the scrollbars as needed.
-    /// It takes as much space as needed to render the content, in case you can use the scrollbars.
-    /// </summary>
-    public bool UseScrollbars
-    {
-        get => field;
-        set
-        {
-            field = value;
-
-            //refresh content size
-            SetContentSize (value ? CalculateContentSize () : null);
-        }
-    }
-
-    /// <summary>
     /// calculates the current header height based on what is visible
     /// This respects the viewport Y position and the AlwaysShowHeaders style
     /// </summary>
@@ -62,7 +44,7 @@ public partial class TableView
         AddStr (new string (' ', Viewport.Width));
         var line = 0;
         int headerLinesHandled = 0;
-        var availableWidth = UseScrollbars ? GetContentSize ().Width : Viewport.Width;
+        var availableWidth = GetContentSize ().Width;
 
         if (ShouldRenderHeaders ())
         {
@@ -106,7 +88,7 @@ public partial class TableView
 
         int headerLinesConsumed = line;
 
-        var locRowOffset = UseScrollbars ? Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - headerLinesHandled, 0) : RowOffset;
+        var locRowOffset = Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - headerLinesHandled, 0);
 
         // render the cells
         for (; line < Viewport.Height; line++)
@@ -222,16 +204,9 @@ public partial class TableView
 
     private void RenderRune (int col, int row, Rune rune)
     {
-        if (UseScrollbars)
+        if (col >= Viewport.X && col < Viewport.X + Viewport.Width)
         {
-            if (col >= Viewport.X && col < Viewport.X + Viewport.Width)
-            {
-                AddRuneAt (col - Viewport.X, row, rune);
-            }
-        }
-        else
-        {
-            AddRuneAt (col, row, rune);
+            AddRuneAt (col - Viewport.X, row, rune);
         }
     }
 
@@ -243,31 +218,24 @@ public partial class TableView
     /// <param name="text"></param>
     private void RenderStr (int col, int row, string text)
     {
-        if (UseScrollbars)
+        // check if within visible viewport
+        if (col + text.Length >= Viewport.X && col < Viewport.Right)
         {
-            // check if within visible viewport
-            if (col + text.Length >= Viewport.X && col < Viewport.Right)
+            var x = col - Viewport.X;
+
+            if (x < 0)
             {
-                var x = col - Viewport.X;
-
-                if (x < 0)
-                {
-                    text = text [-x..];
-                    x = 0;
-                }
-                var clipEnd = (col + text.Length) - Viewport.Right;
-
-                if (clipEnd > 0)
-                {
-                    text = text [..^clipEnd];
-                }
-
-                AddStr (x, row, text);
+                text = text [-x..];
+                x = 0;
             }
-        }
-        else
-        {
-            AddStr (col, row, text);
+            var clipEnd = (col + text.Length) - Viewport.Right;
+
+            if (clipEnd > 0)
+            {
+                text = text [..^clipEnd];
+            }
+
+            AddStr (x, row, text);
         }
     }
 
@@ -347,33 +315,6 @@ public partial class TableView
     private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
     {
         /*
-         *  First lets work out if we should be rendering scroll indicators
-         */
-        // are there are visible columns to the left that have been pushed
-        // off the screen due to horizontal scrolling?
-        bool moreColumnsToLeft = ColumnOffset > 0;
-
-        // if we moved left would we find a new column (or are they all invisible?)
-        if (!TryGetNearestVisibleColumn (ColumnOffset - 1, false, false, out _))
-        {
-            moreColumnsToLeft = false;
-        }
-
-        // are there visible columns to the right that have not yet been reached?
-        // lets find out, what is the column index of the last column we are rendering
-        int lastColumnIdxRendered = ColumnOffset + columnsToRender.Length - 1;
-
-        // are there more valid indexes?
-        bool moreColumnsToRight = lastColumnIdxRendered < Table.Columns;
-
-        // if we went right from the last column would we find a new visible column?
-        if (!TryGetNearestVisibleColumn (lastColumnIdxRendered + 1, true, false, out _))
-        {
-            // no we would not
-            moreColumnsToRight = false;
-        }
-
-        /*
          *  Now lets draw the line itself
          */
         // Renders a line below the table headers (when visible) like:
@@ -391,15 +332,6 @@ public partial class TableView
                 {
                     // for first character render line
                     rune = Style.ShowVerticalCellLines ? Glyphs.LeftTee : Glyphs.LLCorner;
-
-                    // unless we have horizontally scrolled along
-                    // in which case render an arrow, to indicate user
-                    // can scroll left
-                    if (Style.ShowHorizontalScrollIndicators && moreColumnsToLeft)
-                    {
-                        rune = Glyphs.LeftArrow;
-                        _scrollLeftPoint = new Point (c, row);
-                    }
                 }
 
                 // if the next column is the start of a header
@@ -412,15 +344,6 @@ public partial class TableView
                 {
                     // for the last character in the table
                     rune = Style.ShowVerticalCellLines ? Glyphs.RightTee : Glyphs.LRCorner;
-
-                    // unless there is more of the table we could horizontally
-                    // scroll along to see. In which case render an arrow,
-                    // to indicate user can scroll right
-                    if (Style.ShowHorizontalScrollIndicators && moreColumnsToRight)
-                    {
-                        rune = Glyphs.RightArrow;
-                        _scrollRightPoint = new Point (c, row);
-                    }
                 }
 
                 // if the next console column is the last column's end
@@ -537,18 +460,11 @@ public partial class TableView
         // render start and end of line
         RenderRune (0, row, Glyphs.VLine);
 
-        if (UseScrollbars)
-        {
-            var lastCol = columnsToRender.LastOrDefault ();
+        var lastCol = columnsToRender.LastOrDefault ();
 
-            if (lastCol != null)
-            {
-                RenderRune (lastCol.X + lastCol.Width - 1, row, Glyphs.VLine);
-            }
-        }
-        else
+        if (lastCol != null)
         {
-            AddRune (Viewport.Width - 1, row, Glyphs.VLine);
+            RenderRune (lastCol.X + lastCol.Width - 1, row, Glyphs.VLine);
         }
     }
 
@@ -564,6 +480,13 @@ public partial class TableView
         RenderRune (col, row, symbol);
     }
 
+    /// <summary>
+    /// This decides if we should render headers at all (no matter what the style settings are)
+    /// This may be a candidate to remove in future
+    /// (old implementation needed this logic to decide if the header is in current view (RowOffset))
+    /// </summary>
+    /// <returns></returns>
+#warning a candidate to remove
     private bool ShouldRenderHeaders ()
     {
         if (TableIsNullOrInvisible ())
@@ -571,6 +494,6 @@ public partial class TableView
             return false;
         }
 
-        return Style.AlwaysShowHeaders || _rowOffset == 0 || UseScrollbars;
+        return true;
     }
 }

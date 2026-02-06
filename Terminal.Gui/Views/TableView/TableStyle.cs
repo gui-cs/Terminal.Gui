@@ -67,6 +67,7 @@ public class TableStyle
     ///     True to render a arrows on the right/left of the table when there are more column(s) that can be scrolled to.
     ///     Requires <see cref="ShowHorizontalHeaderUnderline"/> to be true. Defaults to true
     /// </summary>
+#warning a candidate to remove
     public bool ShowHorizontalScrollIndicators { get; set; } = true;
 
     /// <summary>True to render a solid line vertical line between cells</summary>

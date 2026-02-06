@@ -1093,7 +1093,10 @@ public class FileDialog : Dialog, IDesignable
                 _history.ClearForward ();
             }
 
-            _tableView.RowOffset = 0;
+            if (_tableView.Viewport.Y != 0)
+            {
+                _tableView.Viewport = _tableView.Viewport with {Y = 0};
+            }
             _tableView.SelectedRow = 0;
 
             SetNeedsDraw ();

@@ -22,11 +22,29 @@ public partial class TableView
         set
         {
             _table = value;
-            SetContentSize(CalculateContentSize());
+            RefreshContentSize ();
             Update ();
         }
     }
 
+    /// <summary>
+    /// Recalculates and updates the content size based on the current state.
+    /// </summary>
+    /// <remarks>Call this method after making changes that affect the content's dimensions to ensure the
+    /// layout remains accurate.</remarks>
+    public void RefreshContentSize ()
+    {
+        SetContentSize (CalculateContentSize ());
+    }
+
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        base.OnViewportChanged (e);
+        RefreshContentSize (); //mainly needed only for ExpandLastColumn?!
+    }
+
+    /// <inheritdoc />
     /// <summary>
     ///     Moves or extends the selection to the final cell in the table (nX,nY). If <see cref="FullRowSelect"/> is
     ///     enabled then selection instead moves to ( <see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
