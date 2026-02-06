@@ -85,23 +85,20 @@ public class FlagSelectorTests
         flagSelector.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
     public void FlagSelector_Command_Activate_ForwardsToFocusedCheckBox ()
     {
-        FlagSelector<SelectorStyles> flagSelector = new ();
-        flagSelector.BeginInit ();
-        flagSelector.EndInit ();
+        using FlagSelector<SelectorStyles> flagSelector = new ();
+
+        CheckBox firstCheckBox = flagSelector.SubViews.OfType<CheckBox> ().ElementAt (0);
+
+        int cbActivatingRaised = 0;
+        firstCheckBox.Activating += (_, _) => cbActivatingRaised++;
 
         // Activate should forward to the focused CheckBox's Activate
-        bool? result = flagSelector.InvokeCommand (Command.Activate);
+        flagSelector.InvokeCommand (Command.Activate);
 
-        // Command is handled by CheckBox
-        Assert.True (result);
-
-        flagSelector.Dispose ();
+        Assert.Equal (1, cbActivatingRaised);
     }
 
     // Claude - Opus 4.5
@@ -349,7 +346,7 @@ public class FlagSelectorTests
     public void Styles_Set_ShouldCreateSubViews ()
     {
         var flagSelector = new FlagSelector ();
-        Dictionary<int, string> flags = new() { { 1, "Flag1" }, { 2, "Flag2" } };
+        Dictionary<int, string> flags = new () { { 1, "Flag1" }, { 2, "Flag2" } };
 
         flagSelector.Values = flags.Keys.ToList ();
         flagSelector.Labels = flags.Values.ToList ();
@@ -362,7 +359,7 @@ public class FlagSelectorTests
     public void Value_Set_ShouldUpdateCheckedState ()
     {
         var flagSelector = new FlagSelector ();
-        Dictionary<int, string> flags = new() { { 1, "Flag1" }, { 2, "Flag2" } };
+        Dictionary<int, string> flags = new () { { 1, "Flag1" }, { 2, "Flag2" } };
 
         flagSelector.Values = flags.Keys.ToList ();
         flagSelector.Labels = flags.Values.ToList ();
@@ -393,7 +390,7 @@ public class FlagSelectorTests
     public void ValueChanged_Event_ShouldBeRaised ()
     {
         var flagSelector = new FlagSelector ();
-        Dictionary<int, string> flags = new() { { 1, "Flag1" }, { 2, "Flag2" } };
+        Dictionary<int, string> flags = new () { { 1, "Flag1" }, { 2, "Flag2" } };
 
         flagSelector.Values = flags.Keys.ToList ();
         flagSelector.Labels = flags.Values.ToList ();
