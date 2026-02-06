@@ -268,63 +268,63 @@ public class MouseTester : Scenario
 
         demo.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         demo.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
 
         demo.CommandNotBound += (_, args) =>
                                 {
-                                    commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                    commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                     commandLog.MoveEnd ();
                                     args.Handled = true;
                                 };
 
         demoInPadding.Activating += (_, args) =>
                                     {
-                                        commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                        commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                         commandLog.MoveEnd ();
                                         args.Handled = true;
                                     };
 
         demoInPadding.Accepting += (_, args) =>
                                    {
-                                       commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                       commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                        commandLog.MoveEnd ();
                                        args.Handled = true;
                                    };
 
         sub1.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         sub1.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
 
         sub2.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         sub2.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
