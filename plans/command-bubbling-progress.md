@@ -10,95 +10,10 @@
 
 Terminal.Gui's command system needs refactoring to support hierarchical command bubbling through view hierarchies. This plan breaks the work into parallel task streams:
 
-1. **Foundation Tasks** (Dependency: None) - Core infrastructure
 2. **View Framework Tasks** (Dependency: Foundation) - Command propagation
 3. **View-Specific Tasks** (Dependency: View Framework) - Individual view changes
 4. **Testing Tasks** (Dependency: Code completion) - Test coverage
 5. **Documentation Tasks** (Dependency: All above) - Final documentation
-
----
-
-## TASK STREAM 1: Foundation Infrastructure (No Dependencies) **DO NOT ASSIGN TO AN AGENT**
-
-Can start immediately. Minimal, focused changes to command infrastructure.
-
-### Task 1.1: CommandContext Refactoring
-**Status:** In Progress (PR #4694) - **DO NOT ASSIGN TO AN AGENT**
-
-**Scope:**
-- Make CommandContext non-generic (remove `CommandContext<TBinding>` parameter)
-- Change `Source` from `View?` to `WeakReference<View>?`
-- Add `IInputBinding? Binding` property for polymorphic binding access
-- Update pattern matching to work with binding property
-
-**Files:**
-- `Terminal.Gui/Input/CommandContext.cs`
-- `Terminal.Gui/Input/ICommandContext.cs`
-
-**Acceptance Criteria:**
-- [ ] CommandContext is no longer generic
-- [ ] Source is `WeakReference<View>?`
-- [ ] IInputBinding? Binding property present and accessible
-- [ ] All command invocation sites updated to handle WeakReference
-- [ ] Existing command tests pass
-- [ ] XML documentation updated
-
-**Test Files:**
-- `Tests/UnitTestsParallelizable/ViewBase/CommandContextTests.cs`
-
----
-
-### Task 1.2: WeakReferenceExtensions Helper
-**Status:** In Progress (PR #4694) **DO NOT ASSIGN TO AN AGENT**
-
-**Scope:**
-- Create new file `Terminal.Gui/ViewBase/WeakReferenceExtensions.cs`
-- Implement `ToIdentifyingString()` extension for `WeakReference<View>`
-- Handle null references and dead targets gracefully
-
-**Files:**
-- `Terminal.Gui/ViewBase/WeakReferenceExtensions.cs` (NEW)
-
-**Acceptance Criteria:**
-- [ ] Extension file created
-- [ ] `ToIdentifyingString()` implemented
-- [ ] Handles null weak references
-- [ ] Handles dead targets (disposed views)
-- [ ] Returns formatted string for logging
-- [ ] XML documentation complete
-
-**Test Coverage Needed:**
-- Null weak reference handling
-- Dead target (disposed view) handling
-- Live target formatting
-- Integration with logging/debugging
-
----
-
-### Task 1.3: ViewExtensions Helper
-**Status:** In Progress (PR #4694) **DO NOT ASSIGN TO AN AGENT**
-
-**Scope:**
-- Create new file `Terminal.Gui/ViewBase/ViewExtensions.cs`
-- Implement `ToIdentifyingString()` extension for `View`
-- Return Id → Title → Text → Type name priority
-
-**Files:**
-- `Terminal.Gui/ViewBase/ViewExtensions.cs` (NEW)
-
-**Acceptance Criteria:**
-- [ ] Extension file created
-- [ ] `ToIdentifyingString()` implemented with correct priority
-- [ ] Works with null views
-- [ ] Works with all view types
-- [ ] XML documentation complete
-
-**Test Coverage Needed:**
-- View with Id set
-- View with Title set
-- View with Text set
-- View with nothing set (returns type name)
-- Null view handling
 
 ---
 
@@ -552,12 +467,3 @@ Stream 5 (Documentation)
 - All tests parallelizable where possible
 - Performance acceptable for deep hierarchies
 - Memory leak prevention verified
-
----
-
-## Notes
-
-- Stream 1 is in PR #4694 (Foundation Infrastructure)
-- This branch (copilot/fix-command-propagation-issue-clean) builds on Stream 1
-- Streams 2-5 are executed in this branch
-- Once Stream 1 PR merges to v2_develop, merging this branch will have minimal conflicts
