@@ -2,8 +2,7 @@
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
 /// <summary>
-///     Describes the context in which a <see cref="Command"/> is being invoked. <see cref="CommandContext{TBindingType}"/>
-///     inherits from this interface.
+///     Describes the context in which a <see cref="Command"/> is being invoked.
 ///     When a <see cref="Command"/> is invoked,
 ///     a context object is passed to Command handlers as an <see cref="ICommandContext"/> reference.
 /// </summary>
@@ -18,10 +17,19 @@ public interface ICommandContext
     public Command Command { get; set; }
 
     /// <summary>
-    ///     The View that was the source of the command invocation, if any.
+    ///     A weak reference to the View that was the source of the command invocation, if any.
     ///     (e.g. the view the user clicked on or the view that had focus when a key was pressed).
     /// </summary>
-    public View? Source { get; set; }
+    /// <remarks>
+    ///     <para>
+    ///         Uses <see cref="WeakReference{T}"/> to prevent memory leaks during command propagation.
+    ///         Use <see cref="WeakReference{T}.TryGetTarget"/> to safely access the source view.
+    ///     </para>
+    ///     <para>
+    ///         For debugging/logging, use <see cref="WeakReferenceExtensions.ToIdentifyingString"/> extension method.
+    ///     </para>
+    /// </remarks>
+    public WeakReference<View>? Source { get; set; }
 
     /// <summary>
     ///     The binding that triggered the command.

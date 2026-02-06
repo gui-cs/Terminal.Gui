@@ -28,14 +28,14 @@ public record struct CommandContext : ICommandContext
     {
         Command = command;
         Binding = binding;
-        Source = source;
+        Source = source is not null ? new WeakReference<View> (source) : null;
     }
 
     /// <inheritdoc />
     public Command Command { get; set; }
 
     /// <inheritdoc />
-    public View? Source { get; set; }
+    public WeakReference<View>? Source { get; set; }
 
     /// <inheritdoc />
     public IInputBinding? Binding { get; set; }
