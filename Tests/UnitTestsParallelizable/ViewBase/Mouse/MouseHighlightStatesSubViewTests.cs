@@ -226,6 +226,68 @@ public class MouseHighlightStatesSubViewTests
     }
 
     /// <summary>
+    ///     Tests that when a SubView is disabled, clicking on it routes the event to the SuperView.
+    ///     A disabled SubView should not prevent the SuperView from grabbing the mouse.
+    /// </summary>
+
+    // Claude - Opus 4.6
+    [Theory]
+    [InlineData (MouseState.In)]
+    [InlineData (MouseState.Pressed)]
+    [InlineData (MouseState.In | MouseState.Pressed)]
+    public void MouseHighlightStates_DisabledSubView_DoesNotPreventSuperViewGrab (MouseState highlightState)
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        var superViewActivateCount = 0;
+        var subViewActivateCount = 0;
+
+        Runnable runnable = new ();
+
+        View superView = new ()
+        {
+            Id = "superView",
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            MouseHighlightStates = highlightState
+        };
+
+        superView.Activating += (_, _) => { superViewActivateCount++; };
+
+        View subView = new ()
+        {
+            Id = "disabledSubView",
+            X = 2,
+            Y = 2,
+            Width = 5,
+            Height = 5,
+            CanFocus = true,
+            Enabled = false
+        };
+
+        subView.Activating += (_, _) => { subViewActivateCount++; };
+
+        superView.Add (subView);
+        runnable.Add (superView);
+        app.Begin (runnable);
+
+        // Act: Click on the disabled SubView at screen position (3, 3)
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (3, 3), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (3, 3), Flags = MouseFlags.LeftButtonReleased });
+
+        // Assert: SuperView should receive the event since SubView is disabled
+        Assert.Equal (1, superViewActivateCount);
+        Assert.Equal (0, subViewActivateCount);
+
+        runnable.Dispose ();
+    }
+
+    /// <summary>
     ///     Tests that nested views (SuperView with MouseHighlightStates, SubView with MouseHighlightStates)
     ///     route events to the deepest view under the mouse.
     /// </summary>

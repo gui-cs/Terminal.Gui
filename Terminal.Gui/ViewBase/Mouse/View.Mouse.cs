@@ -572,21 +572,26 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        // Don't grab if a SubView at the mouse position can handle the event
-        // This ensures that SubViews receive their own mouse events even when the SuperView has MouseHighlightStates set
-        if (mouse.Position is { } pos && Viewport.Contains (pos))
+        // Don't grab if an enabled SubView at the mouse position can handle the event.
+        // CachedViewsUnderMouse is already updated by RaiseMouseEnterLeaveEvents before NewMouseEvent runs.
+        // Disabled views are included in the cache, so we must find the deepest enabled view.
+        if (App?.Mouse.CachedViewsUnderMouse is { Count: > 0 } cached)
         {
-            // Convert viewport-relative position to screen coordinates
-            Point screenPos = ViewportToScreen (pos);
+            View? deepestEnabledView = null;
 
-            // Get all views under this screen position - the deepest view is at the end of the list
-            List<View?> viewsUnderMouse = GetViewsUnderLocation (screenPos, ViewportSettingsFlags.TransparentMouse);
-            View? deepestView = viewsUnderMouse.LastOrDefault ();
-
-            // If the deepest view is a SubView of this view (not this view itself), don't grab
-            if (deepestView is { } && deepestView != this)
+            for (int i = cached.Count - 1; i >= 0; i--)
             {
-                // A SubView is under the cursor - let it handle its own events
+                if (cached [i] is { Enabled: true } candidate)
+                {
+                    deepestEnabledView = candidate;
+
+                    break;
+                }
+            }
+
+            if (deepestEnabledView is { } && deepestEnabledView != this)
+            {
+                // An enabled SubView is under the cursor - let it handle its own events
                 return false;
             }
         }
