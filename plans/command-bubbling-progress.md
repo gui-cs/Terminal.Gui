@@ -545,9 +545,149 @@ This branch implements a major refactoring of Terminal.Gui's command propagation
 
 ---
 
+---
+
+## Test Fix Session - 2026-02-06
+
+### Key Learnings
+
+#### 1. Command Return Value Semantics
+
+**CRITICAL UNDERSTANDING:**
+```
+- true  = command was HANDLED/CANCELLED - stop processing
+- false = command completed SUCCESSFULLY - continue processing
+- null  = command NOT FOUND
+```
+
+Many tests incorrectly expected `true` for successful command completion. The correct assertion is `Assert.False(result)` when a command completes successfully without being cancelled.
+
+**Affected patterns:**
+- `DefaultActivateHandler` returns `false` on success
+- `DefaultAcceptHandler` returns `false` on success
+- `DefaultHotKeyHandler` returns `false` on success
+
+#### 2. DefaultHotKeyHandler Behavior
+
+`DefaultHotKeyHandler` does NOT invoke Activate. It only:
+1. Calls `RaiseHandlingHotKey()` - raises the HandlingHotKey event
+2. Sets focus if `CanFocus` is true
+3. Returns `false`
+
+**Implication:** Views that want HotKey to change state (like CheckBox toggle) must override `OnHandlingHotKey` and invoke Activate themselves. By default, HotKey only sets focus.
+
+#### 3. RaiseActivating vs InvokeCommand(Command.Activate)
+
+**CRITICAL DISTINCTION:**
+- `RaiseActivating()` - Only raises the Activating event, does NOT call RaiseActivated
+- `InvokeCommand(Command.Activate)` - Goes through DefaultActivateHandler which calls BOTH RaiseActivating and RaiseActivated
+
+Code that only calls `RaiseActivating()` will NOT trigger:
+- The `Activated` event
+- `OnActivated` virtual method
+- Any Action handlers attached to Activated
+
+#### 4. Shortcut Command Forwarding Logic
+
+Shortcut's `OnActivating` has conditional forwarding logic:
+
+```
+IsFromCommandView(ctx)     → Forward to CommandView (came from CommandView)
+IsBindingFromShortcut(args) → Forward to CommandView (came from Shortcut/Key/Help binding)
+Direct InvokeCommand        → Does NOT forward to CommandView
+```
+
+**Key insight:** Direct `shortcut.InvokeCommand(Command.Activate)` does NOT forward to CommandView because neither `IsFromCommandView` nor `IsBindingFromShortcut` returns true when there's no binding context.
+
+#### 5. Button Mouse Bindings
+
+Button binds mouse events to Accept (NOT Activate):
+```csharp
+MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
+MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.Accept);
+```
+
+View base class binds:
+```csharp
+MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Activate);
+```
+
+**Implication:** Clicking a Button fires Accepting (not Activating). Tests expecting both were wrong.
+
+#### 6. CheckBox State Changes
+
+CheckBox changes state in `OnActivated()` (not OnActivating):
+```csharp
+protected override void OnActivated (ICommandContext? ctx)
+{
+    base.OnActivated (ctx);
+    AdvanceCheckState ();  // State change happens here
+}
+```
+
+So for CheckBox state to change:
+1. `Command.Activate` must be invoked
+2. Through `DefaultActivateHandler` (which calls RaiseActivated)
+3. NOT just through `RaiseActivating()`
+
+### Tests Fixed (16 total)
+
+#### ShortcutTests.cs (10 tests)
+| Old Test Name | New Test Name | Issue Fixed |
+|--------------|---------------|-------------|
+| Constructor_Defaults | Constructor_Defaults | Changed expected CommandView.Id from "_commandView" to "CommandView" |
+| Command_Accept_Raises_Accepting_Only | Command_Accept_Raises_Activating_Not_Accepting | OnAccepting calls RaiseActivating, returns true (prevents Accepting) |
+| Command_HotKey_Raises_Activating_And_HandlingHotKey | Command_HotKey_Raises_HandlingHotKey_Only | No binding = IsBindingFromShortcut false = no Activating |
+| Command_Accept_Executes_Action | Command_Accept_Does_Not_Execute_Action_Without_Binding | Direct InvokeCommand doesn't trigger Action |
+| Command_HotKey_Executes_Action | Command_HotKey_Does_Not_Execute_Action_Without_Binding | Same as above |
+| CheckBox_CommandView_MousePress_Changes_State | CheckBox_CommandView_MouseRelease_Changes_State | Wrong flag: LeftButtonPressed → LeftButtonReleased |
+| CheckBox_CanFocus_False_CommandView_Changes_State_On_Activate | CheckBox_CanFocus_False_Direct_InvokeCommand_Does_Not_Change_State | Direct InvokeCommand doesn't forward to CommandView |
+| CheckBox_CanFocus_True_CommandView_Changes_State_On_Activate | CheckBox_CanFocus_True_Direct_InvokeCommand_Does_Not_Change_State | Same as above |
+| Command_Command_Activate_Does_Not_Double_Bubble_To_Shortcut | Command_Activate_Direct_InvokeCommand_Raises_Activating_Once | Fixed CheckBox state expectation |
+| CommandView_Command_HotKey_Forwards_To_Activating | CommandView_Command_HotKey_Does_Not_Bubble_To_Shortcut | HotKey not in CommandsToBubbleUp |
+
+#### CheckBoxTests.cs (5 tests)
+| Test Name | Issue Fixed |
+|-----------|-------------|
+| CheckBox_Command_Activate_TogglesState | Changed `Assert.True(result)` to `Assert.False(result)` |
+| CheckBox_Command_HotKey_InvokesActivate → CheckBox_Command_HotKey_SetsFocus_DoesNotToggle | HotKey doesn't invoke Activate, only sets focus |
+| CheckBox_Space_TogglesState | Changed `Assert.True(result)` to `Assert.False(result)` |
+| Commands_Select | HotKey (T, Alt+E) doesn't change state, only Space does |
+| AllowCheckStateNone_Get_Set | Changed `Assert.True()` to `Assert.False()` for NewKeyDownEvent returns |
+
+#### ButtonTests.cs (1 test)
+| Test Name | Issue Fixed |
+|-----------|-------------|
+| LeftButtonClicked_Accepts | Click only fires Accepting (not Activating) - changed expectations |
+
+### Remaining Test Failures (30 tests)
+
+#### Button Tests (6 remaining)
+- Driver injection tests with pressed→released sequences need investigation
+- Tests expect both Activating AND Accepting to fire, but current bindings don't support that
+
+#### Menu Tests (6 remaining)
+- MenuItem, MenuBar, MenuBarItem Accept/HotKey tests
+- Similar pattern: return value assertions and event expectations
+
+#### Selector Tests (6 remaining)
+- OptionSelector, FlagSelector
+- HotKey and Activate forwarding expectations
+
+#### AllViews Tests (3 remaining)
+- Shortcut, MenuBarItem, MenuItem Accept behavior
+- Generic tests may have wrong assumptions
+
+#### Other Tests (9 remaining)
+- TextField, TextView, ComboBox, TreeView, Label, KeyBindings, Bar
+- Mixed issues with return values and event expectations
+
+---
+
 ## Next Steps
 
-1. **Implement recommended tests** (see above)
+1. **Fix remaining 30 test failures** following the patterns identified above
 2. **Update MEMORY.md** with lessons learned about command propagation
 3. **Consider performance profiling** for deeply nested view hierarchies
 4. **Review and update API documentation** for new patterns
@@ -563,5 +703,11 @@ This branch represents a significant improvement to Terminal.Gui's command syste
 - Deep hierarchy bubbling
 - New event model (Accepted/Activated)
 - View-specific behavioral changes
+
+The test fix session on 2026-02-06 identified critical misunderstandings in test expectations:
+1. Command return values (`false` = success, not `true`)
+2. HotKey default behavior (only sets focus)
+3. RaiseActivating vs full Activate flow
+4. Direct InvokeCommand vs binding-triggered commands
 
 The recommended test additions above should provide comprehensive coverage of the new functionality.
