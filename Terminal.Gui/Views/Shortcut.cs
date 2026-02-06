@@ -258,7 +258,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         KeyBinding? keyBinding = commandContext?.Binding as KeyBinding?;
 
-        string sourceTitle = commandContext?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "(null)";
+        string sourceTitle = commandContext?.TryGetSource (out View? sourceView) == true ? sourceView.Title : "(null)";
 
         Logging.Debug ($"{Title} ({sourceTitle}) Command: {commandContext?.Command}");
 

@@ -265,7 +265,7 @@ public sealed class UICatalogRunnable : Runnable
 
             _diagnosticFlagsSelector.Activating += (_, args) =>
                                                    {
-                                                       if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true)
+                                                       if (args.Context?.TryGetSource (out View? sourceView) == true)
                                                        {
                                                            _diagnosticFlags =
                                                                (ViewDiagnosticFlags)(int)sourceView.Data!; // (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;

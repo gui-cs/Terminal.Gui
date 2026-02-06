@@ -190,7 +190,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || !Buttons.Contains (sourceView))
+        if (!args.Context.TryGetSource (out View? sourceView) || !Buttons.Contains (sourceView))
         {
             return false;
         }

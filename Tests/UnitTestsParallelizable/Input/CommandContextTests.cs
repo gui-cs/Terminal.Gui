@@ -351,4 +351,85 @@ public class CommandContextTests
     }
 
     #endregion
+
+    #region TryGetSource Extension Method Tests
+
+    [Fact]
+    public void TryGetSource_WithValidWeakReference_ReturnsTrue ()
+    {
+        View sourceView = new () { Id = "testView" };
+        WeakReference<View> weakRef = new (sourceView);
+
+        bool result = weakRef.TryGetSource (out View? retrievedView);
+
+        Assert.True (result);
+        Assert.NotNull (retrievedView);
+        Assert.Equal (sourceView, retrievedView);
+        Assert.Equal ("testView", retrievedView!.Id);
+    }
+
+    [Fact]
+    public void TryGetSource_WithNullWeakReference_ReturnsFalse ()
+    {
+        WeakReference<View>? weakRef = null;
+
+        bool result = weakRef.TryGetSource (out View? retrievedView);
+
+        Assert.False (result);
+        Assert.Null (retrievedView);
+    }
+
+    [Fact]
+    public void CommandContext_TryGetSource_WithValidSource_ReturnsTrue ()
+    {
+        View sourceView = new () { Id = "contextSource" };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView) };
+
+        bool result = ctx.TryGetSource (out View? retrievedView);
+
+        Assert.True (result);
+        Assert.NotNull (retrievedView);
+        Assert.Equal (sourceView, retrievedView);
+        Assert.Equal ("contextSource", retrievedView!.Id);
+    }
+
+    [Fact]
+    public void CommandContext_TryGetSource_WithNullContext_ReturnsFalse ()
+    {
+        ICommandContext? ctx = null;
+
+        bool result = ctx.TryGetSource (out View? retrievedView);
+
+        Assert.False (result);
+        Assert.Null (retrievedView);
+    }
+
+    [Fact]
+    public void CommandContext_TryGetSource_WithNullSource_ReturnsFalse ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Source = null };
+
+        bool result = ctx.TryGetSource (out View? retrievedView);
+
+        Assert.False (result);
+        Assert.Null (retrievedView);
+    }
+
+    [Fact]
+    public void CommandContext_TryGetSource_CanBeUsedInPatternMatching ()
+    {
+        View sourceView = new Button { Id = "testButton" };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView) };
+
+        if (ctx.TryGetSource (out View? view) && view is Button button)
+        {
+            Assert.Equal ("testButton", button.Id);
+        }
+        else
+        {
+            Assert.Fail ("Should have retrieved Button from context");
+        }
+    }
+
+    #endregion
 }
