@@ -241,7 +241,7 @@ public partial class TextView
             ShowContextMenu (mouse.ScreenPosition);
         }
 
-        OnUnwrappedCursorPosition ();
+        RaiseUnwrappedCursorPositionChanged ();
         SetNeedsDraw ();
 
         return true;

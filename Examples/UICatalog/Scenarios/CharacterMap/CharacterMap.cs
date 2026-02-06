@@ -56,62 +56,58 @@ public class CharacterMap : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window top = new () { BorderStyle = LineStyle.None };
+        using Window top = new ();
+        top.BorderStyle = LineStyle.None;
 
-        _charMap = new CharMap
+        _categoryList = new TableView { X = Pos.AnchorEnd (), Height = Dim.Fill () };
+        _charMap = new CharMap { X = 0, Y = 1, Height = Dim.Fill (), Width = Dim.Fill (_categoryList!) };
+
+        MenuBar menu = new ()
         {
-            X = 0, Y = 1, Height = Dim.Fill ()
-
-            // SchemeName = "Base"
+            Width = Dim.Fill (_categoryList),
+            Menus =
+            [
+                new MenuBarItem (Strings.menuFile,
+                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.QuitKey}", () => _charMap?.App?.RequestStop ()) }),
+                new MenuBarItem ("_Options", [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()])
+            ]
         };
-        top.Add (_charMap);
 
-        var jumpLabel = new Label
+        Label jumpLabel = new () { X = Pos.Left (_categoryList), HotKeySpecifier = (Rune)'_', Text = "_Jump To:" };
+
+        TextField jumpEdit = new ()
         {
-            X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap), HotKeySpecifier = (Rune)'_', Text = "_Jump To:"
-
-            //SchemeName = "Dialog"
+            X = Pos.Right (jumpLabel) + 1,
+            Y = Pos.Top (jumpLabel),
+            Width = 17,
+            Height = 1,
+            Title = "e.g. 01BE3 or ✈"
         };
-        top.Add (jumpLabel);
-
-        var jumpEdit = new TextField
-        {
-            X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 17, Title = "e.g. 01BE3 or ✈"
-
-            //SchemeName = "Dialog"
-        };
-        top.Add (jumpEdit);
-
-        _charMap.ValueChanged += (_, args) =>
-                                             {
-                                                 if (Rune.IsValid (args.NewValue.Value))
-                                                 {
-                                                     jumpEdit.Text = args.NewValue.ToString ();
-                                                 }
-                                                 else
-                                                 {
-                                                     jumpEdit.Text = $"U+{args.NewValue.Value:x5}";
-                                                 }
-                                             };
 
         _errorLabel = new Label
         {
-            X = Pos.Right (jumpEdit) + 1,
-            Y = Pos.Y (_charMap),
+            X = Pos.Right (jumpEdit),
+            Y = Pos.Top (jumpLabel),
             SchemeName = "error",
             Text = "err",
             Visible = false
         };
-        top.Add (_errorLabel);
+        _categoryList.Y = Pos.Bottom (jumpLabel);
+
+        _charMap.ValueChanged += (_, args) =>
+                                 {
+                                     if (Rune.IsValid (args.NewValue.Value))
+                                     {
+                                         jumpEdit.Text = args.NewValue.ToString ();
+                                     }
+                                     else
+                                     {
+                                         jumpEdit.Text = $"U+{args.NewValue.Value:x5}";
+                                     }
+                                 };
 
         jumpEdit.Accepting += JumpEditOnAccept;
 
-        _categoryList = new TableView
-        {
-            X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill ()
-
-            //SchemeName = "Dialog"
-        };
         _categoryList.FullRowSelect = true;
         _categoryList.MultiSelect = false;
 
@@ -166,20 +162,7 @@ public class CharacterMap : Scenario
                                                  jumpEdit.Text = $"U+{_charMap.SelectedCodePoint:x5}";
                                              };
 
-        top.Add (_categoryList);
-
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem (Strings.menuFile,
-                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.QuitKey}", () => _charMap?.App?.RequestStop ()) }),
-                new MenuBarItem ("_Options", [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()])
-            ]
-        };
-        top.Add (menu);
-
-        _charMap.Width = Dim.Fill (Dim.Func (v => v!.Frame.Width, _categoryList));
+        top.Add (menu, _charMap, jumpLabel, jumpEdit, _errorLabel, _categoryList);
 
         _charMap.SelectedCodePoint = 0;
         _charMap.SetFocus ();
@@ -315,20 +298,10 @@ public class CharacterMap : Scenario
 
     private MenuItem CreateMenuShowWidth ()
     {
-        CheckBox cb = new ()
-        {
-            Title = "_Show Glyph Width",
-            Value = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
-        };
+        CheckBox cb = new () { Title = "_Show Glyph Width", Value = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None };
         var item = new MenuItem { CommandView = cb };
 
-        item.Action += () =>
-                       {
-                           if (_charMap is { })
-                           {
-                               _charMap.ShowGlyphWidths = cb.Value == CheckState.Checked;
-                           }
-                       };
+        item.Action += () => { _charMap?.ShowGlyphWidths = cb.Value == CheckState.Checked; };
 
         return item;
     }

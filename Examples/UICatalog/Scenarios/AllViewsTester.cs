@@ -40,7 +40,7 @@ public class AllViewsTester : Scenario
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
-                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
+                       .Select (t => new KeyValuePair<string, Type> (GetFormattedTypeName (t), t))
                        .ToDictionary (t => t.Key, t => t.Value);
 
         _classListView = new ListView
@@ -65,12 +65,13 @@ public class AllViewsTester : Scenario
                                            CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem!.Value]);
 
                                            // Force ViewToEdit to be the view and not a subview
-                                           if (_adornmentsEditor is not null)
+                                           if (_adornmentsEditor is null)
                                            {
-                                               _adornmentsEditor.AutoSelectSuperView = _curView;
-
-                                               _adornmentsEditor.ViewToEdit = _curView;
+                                               return;
                                            }
+                                           _adornmentsEditor.AutoSelectSuperView = _curView;
+
+                                           _adornmentsEditor.ViewToEdit = _curView;
                                        };
 
         _classListView.Accepting += (_, args) =>
@@ -161,22 +162,7 @@ public class AllViewsTester : Scenario
         };
         _eventLog.Border!.Thickness = new Thickness (1);
 
-        _layoutEditor.Width = Dim.Fill (Dim.Func (_ =>
-                                                  {
-                                                      if (_eventLog.NeedsLayout)
-                                                      {
-                                                          // We have two choices:
-                                                          // 1) Call Layout explicitly
-                                                          // 2) Throw LayoutException so Layout tries again
-                                                          // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-                                                          // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                                          _eventLog.Layout ();
-
-                                                          //throw new LayoutException ("_eventLog");
-                                                      }
-
-                                                      return _eventLog.Frame.Width;
-                                                  }));
+        _layoutEditor.Width = Dim.Fill (_eventLog);
 
         _hostPane = new FrameView
         {
@@ -214,35 +200,44 @@ public class AllViewsTester : Scenario
     {
         Debug.Assert (_curView is null);
 
-        // Skip RunnableWrapper types as they have generic constraints that cannot be satisfied
-        if (type.IsGenericType && type.GetGenericTypeDefinition ().Name.StartsWith ("RunnableWrapper"))
+        switch (type.IsGenericType)
         {
-            Logging.Warning ($"Cannot create an instance of {type.Name} because it is a RunnableWrapper with unsatisfiable generic constraints.");
+            // Skip RunnableWrapper types as they have generic constraints that cannot be satisfied
+            case true when type.GetGenericTypeDefinition ().Name.StartsWith ("RunnableWrapper", StringComparison.Ordinal):
+                Logging.Warning ($"Cannot create an instance of {type.Name} because it is a RunnableWrapper with unsatisfiable generic constraints.");
 
-            return;
-        }
+                return;
 
-        // If we are to create a generic Type
-        if (type.IsGenericType)
-        {
-            // For each of the <T> arguments
-            List<Type> typeArguments = [];
+            // Skip types with generic constraints that cannot be satisfied with object
+            case true when !CanSatisfyGenericConstraints (type):
+                Logging.Warning ($"Cannot create an instance of {type.Name} because it has generic constraints that cannot be satisfied.");
 
-            // use <object> or the original type if applicable
-            foreach (Type arg in type.GetGenericArguments ())
+                return;
+
+            // If we are to create a generic Type
+            case true:
             {
-                if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
-                {
-                    typeArguments.Add (arg);
-                }
-                else
-                {
-                    typeArguments.Add (typeof (object));
-                }
-            }
+                // For each of the <T> arguments
+                List<Type> typeArguments = [];
 
-            // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
-            type = type.MakeGenericType (typeArguments.ToArray ());
+                // use <object> or the original type if applicable
+                foreach (Type arg in type.GetGenericArguments ())
+                {
+                    if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                    {
+                        typeArguments.Add (arg);
+                    }
+                    else
+                    {
+                        typeArguments.Add (typeof (object));
+                    }
+                }
+
+                // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
+                type = type.MakeGenericType (typeArguments.ToArray ());
+
+                break;
+            }
         }
 
         // Ensure the type does not contain any generic parameters
@@ -285,19 +280,20 @@ public class AllViewsTester : Scenario
 
     private void DisposeCurrentView ()
     {
-        if (_curView != null)
+        if (_curView == null)
         {
-            _curView.Initialized -= CurrentView_Initialized;
-            _curView.SubViewsLaidOut -= CurrentView_LayoutComplete;
-            _hostPane!.Remove (_curView);
-            _layoutEditor!.ViewToEdit = null;
-            _viewportSettingsEditor!.ViewToEdit = null;
-            _arrangementEditor!.ViewToEdit = null;
-            _propertiesEditor!.ViewToEdit = null;
-
-            _curView.Dispose ();
-            _curView = null;
+            return;
         }
+        _curView.Initialized -= CurrentView_Initialized;
+        _curView.SubViewsLaidOut -= CurrentView_LayoutComplete;
+        _hostPane!.Remove (_curView);
+        _layoutEditor!.ViewToEdit = null;
+        _viewportSettingsEditor!.ViewToEdit = null;
+        _arrangementEditor!.ViewToEdit = null;
+        _propertiesEditor!.ViewToEdit = null;
+
+        _curView.Dispose ();
+        _curView = null;
     }
 
     private static List<Type> GetAllViewClassesCollection ()
@@ -309,6 +305,38 @@ public class AllViewsTester : Scenario
         types.Add (typeof (View));
 
         return types;
+    }
+
+    /// <summary>
+    ///     Checks if the generic type constraints can be satisfied when substituting object for reference type parameters.
+    /// </summary>
+    private static bool CanSatisfyGenericConstraints (Type type)
+    {
+        if (!type.IsGenericType)
+        {
+            return true;
+        }
+
+        Type genericTypeDef = type.GetGenericTypeDefinition ();
+        Type [] genericArgs = genericTypeDef.GetGenericArguments ();
+
+        return genericArgs.SelectMany (arg => arg.GetGenericParameterConstraints ()).All (constraint => !constraint.IsClass || constraint == typeof (object));
+    }
+
+    /// <summary>
+    ///     Gets a formatted type name, converting generic types like "FlagSelector`1" to "FlagSelector&lt;T&gt;".
+    /// </summary>
+    private static string GetFormattedTypeName (Type type)
+    {
+        if (!type.IsGenericType)
+        {
+            return type.Name;
+        }
+
+        string baseName = type.Name [..type.Name.IndexOf ('`')];
+        string [] typeParams = type.GetGenericArguments ().Select (t => t.Name).ToArray ();
+
+        return $"{baseName}<{string.Join (", ", typeParams)}>";
     }
 
     private void CurrentView_LayoutComplete (object? sender, LayoutEventArgs args) => UpdateHostTitle (_curView);
@@ -337,7 +365,7 @@ public class AllViewsTester : Scenario
 
     public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         for (var i = 0; i < GetAllViewClassesCollection ().Count; i++)
         {
