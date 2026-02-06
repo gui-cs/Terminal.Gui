@@ -183,13 +183,14 @@ public partial class TableView : View, IDesignable
         AddCommand (Command.Toggle,
                     ctx =>
                     {
-                        if (ToggleCurrentCellSelection () is true)
-                        {
-                            return RaiseActivating (ctx) is true;
-                        }
-
-                        return false;
+                        return ToggleCurrentCellSelection () is true;
                     });
+
+        AddCommand (Command.Activate,
+            ctx =>
+            {
+                    return RaiseActivating (ctx) is true;
+            });
 
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
