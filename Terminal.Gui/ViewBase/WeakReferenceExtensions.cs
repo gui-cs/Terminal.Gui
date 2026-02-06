@@ -19,4 +19,37 @@ public static class WeakReferenceExtensions
 
         return view.ToIdentifyingString ();
     }
+
+    /// <summary>
+    ///     Tries to get the source <see cref="View"/> from a <see cref="WeakReference{T}"/>.
+    /// </summary>
+    /// <param name="weakRef">The weak reference to a View.</param>
+    /// <param name="source">
+    ///     When this method returns, contains the target View if the weak reference is not null and the target is still alive;
+    ///     otherwise, null.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if the weak reference is not null and the target is still alive;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This is a convenience method to simplify the common pattern of checking a weak reference
+    ///         and retrieving its target. It's particularly useful with <see cref="ICommandContext.Source"/>.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///         if (commandContext.Source.TryGetSource(out View? view))
+    ///         {
+    ///             // use view
+    ///         }
+    ///         </code>
+    ///     </para>
+    /// </remarks>
+    public static bool TryGetSource (this WeakReference<View>? weakRef, out View? source)
+    {
+        source = null;
+        return weakRef?.TryGetTarget (out source) == true;
+    }
 }

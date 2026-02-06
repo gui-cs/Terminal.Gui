@@ -86,7 +86,7 @@ public class Menus : Scenario
                                                   }
 
                                                   string sourceText = "(null)";
-                                                  if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true)
+                                                  if (args.Context?.TryGetSource (out View? sourceView) == true)
                                                   {
                                                       sourceText = sourceView.Text;
                                                   }
@@ -267,12 +267,12 @@ public class Menus : Scenario
 
             menuBar.Accepted += (_, args) =>
                                 {
-                                    if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi || mi.CommandView != enableOverwriteMenuItemCb)
+                                    if (!(args.Context?.TryGetSource (out View? sourceView) == true) || sourceView is not MenuItem mi || mi.CommandView != enableOverwriteMenuItemCb)
                                     {
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context.Source.ToIdentifyingString ()}");
+                                    Logging.Debug ($"menuBar.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;
@@ -321,12 +321,12 @@ public class Menus : Scenario
 
             menuBar.Accepted += (_, args) =>
                                 {
-                                    if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi || mi.CommandView != editModeMenuItemCb)
+                                    if (!(args.Context?.TryGetSource (out View? sourceView) == true) || sourceView is not MenuItem mi || mi.CommandView != editModeMenuItemCb)
                                     {
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context.Source.ToIdentifyingString ()}");
+                                    Logging.Debug ($"menuBar.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;

@@ -621,11 +621,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         // Logging.Debug ($"{Title} ({e.Context?.Source.ToIdentifyingString ()}) Command: {e.Context?.Command}");
 
-        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem { SubMenu: null })
+        if (e.Context.TryGetSource (out View? sourceView) && sourceView is MenuItem { SubMenu: null })
         {
             HideAndRemoveSubMenu (_root);
         }
-        else if (e.Context?.Source?.TryGetTarget (out View? sourceView2) == true && sourceView2 is MenuItem { SubMenu: { } } menuItemWithSubMenu)
+        else if (e.Context.TryGetSource (out View? sourceView2) && sourceView2 is MenuItem { SubMenu: { } } menuItemWithSubMenu)
         {
             ShowSubMenu (menuItemWithSubMenu);
         }
@@ -668,7 +668,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
 
         // Only raise Accepted if the command came from one of our MenuItems
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true && GetMenuItemsOfAllSubMenus ().Contains (sourceView))
+        if (args.Context.TryGetSource (out View? sourceView) && GetMenuItemsOfAllSubMenus ().Contains (sourceView))
         {
             // Logging.Debug ($"{Title} - Calling RaiseAccepted {args.Context?.Command}");
             RaiseAccepted (args.Context);
