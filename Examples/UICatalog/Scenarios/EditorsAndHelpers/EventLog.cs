@@ -149,6 +149,7 @@ public class EventLog : ListView
 
     public void Log (string text)
     {
+        Logging.Debug (text);
         _eventSource.Add (text);
         MoveEnd ();
         SelectedItem = null;
