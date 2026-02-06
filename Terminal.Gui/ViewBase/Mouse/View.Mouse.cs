@@ -560,51 +560,6 @@ public partial class View // Mouse APIs
     #region Auto-Grab Lifecycle Helpers
 
     /// <summary>
-    ///     Gets the deepest visible SubView at the specified viewport-relative position.
-    ///     Returns <see langword="null"/> if no SubView is at the position.
-    /// </summary>
-    /// <param name="viewportPosition">Position relative to this view's Viewport.</param>
-    /// <returns>The deepest SubView at the position, or <see langword="null"/> if none found.</returns>
-    private View? GetDeepestSubviewAtPosition (Point viewportPosition)
-    {
-        // Recursively search through SubViews to find the deepest one at this position
-        View? deepestView = null;
-
-        foreach (View subview in SubViews)
-        {
-            if (!subview.Visible)
-            {
-                continue;
-            }
-
-            // Convert viewport position to SubView's coordinate space
-            if (subview.Viewport.Contains (viewportPosition))
-            {
-                // This SubView contains the point
-                deepestView = subview;
-
-                // Check if any of this SubView's SubViews are deeper
-                Point subviewPosition = new (
-                    viewportPosition.X - subview.Viewport.X,
-                    viewportPosition.Y - subview.Viewport.Y
-                );
-
-                View? deeperView = subview.GetDeepestSubviewAtPosition (subviewPosition);
-
-                if (deeperView is { })
-                {
-                    deepestView = deeperView;
-                }
-
-                // Since views are ordered, we found the deepest view in this area
-                break;
-            }
-        }
-
-        return deepestView;
-    }
-
-    /// <summary>
     ///     Handles the pressed event when auto-grab is enabled. Grabs the mouse, sets focus if needed,
     ///     and updates <see cref="MouseState"/>.
     /// </summary>
@@ -621,10 +576,15 @@ public partial class View // Mouse APIs
         // This ensures that SubViews receive their own mouse events even when the SuperView has MouseHighlightStates set
         if (mouse.Position is { } pos && Viewport.Contains (pos))
         {
-            // Check if there's a SubView at this position
-            View? subViewAtPosition = GetDeepestSubviewAtPosition (pos);
+            // Convert viewport-relative position to screen coordinates
+            Point screenPos = ViewportToScreen (pos);
 
-            if (subViewAtPosition is { } && subViewAtPosition != this)
+            // Get all views under this screen position - the deepest view is at the end of the list
+            List<View?> viewsUnderMouse = GetViewsUnderLocation (screenPos, ViewportSettingsFlags.TransparentMouse);
+            View? deepestView = viewsUnderMouse.LastOrDefault ();
+
+            // If the deepest view is a SubView of this view (not this view itself), don't grab
+            if (deepestView is { } && deepestView != this)
             {
                 // A SubView is under the cursor - let it handle its own events
                 return false;
