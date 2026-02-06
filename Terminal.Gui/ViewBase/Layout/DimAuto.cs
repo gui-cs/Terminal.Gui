@@ -38,6 +38,123 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
     /// <inheritdoc/>
     internal override bool IsFixed => true;
 
+    /// <summary>
+    /// Holds categorized views for single-pass processing.
+    /// Phase 1 and 2 Performance Optimization: Reduces iterations and allocations.
+    /// </summary>
+    private readonly struct ViewCategories
+    {
+        public List<View> NotDependent { get; init; }
+        public List<View> Centered { get; init; }
+        public List<View> Anchored { get; init; }
+        public List<View> PosViewBased { get; init; }
+        public List<View> DimViewBased { get; init; }
+        public List<View> DimAutoBased { get; init; }
+        public List<View> DimFillBased { get; init; }
+        public List<int> AlignGroupIds { get; init; }
+    }
+
+    /// <summary>
+    /// Categorizes views in a single pass to reduce iterations and allocations.
+    /// Phase 1 and 2 Performance Optimization.
+    /// </summary>
+    private ViewCategories CategorizeViews (IList<View> subViews, Dimension dimension, int superviewContentSize)
+    {
+        var categories = new ViewCategories
+        {
+            NotDependent = new List<View> (),
+            Centered = new List<View> (),
+            Anchored = new List<View> (),
+            PosViewBased = new List<View> (),
+            DimViewBased = new List<View> (),
+            DimAutoBased = new List<View> (),
+            DimFillBased = new List<View> (),
+            AlignGroupIds = new List<int> ()
+        };
+
+        HashSet<int> seenAlignGroupIds = new HashSet<int> ();
+
+        foreach (View v in subViews)
+        {
+            Pos pos = dimension == Dimension.Width ? v.X : v.Y;
+            Dim dim = dimension == Dimension.Width ? v.Width : v.Height;
+
+            // Check for not dependent views first (most common case)
+            if ((pos.IsFixed || dim.IsFixed) && !pos.DependsOnSuperViewContentSize && !dim.DependsOnSuperViewContentSize)
+            {
+                categories.NotDependent.Add (v);
+            }
+
+            // Check for centered views
+            if (pos.Has<PosCenter> (out _))
+            {
+                categories.Centered.Add (v);
+            }
+
+            // Check for anchored views
+            if (pos.Has<PosAnchorEnd> (out _))
+            {
+                categories.Anchored.Add (v);
+            }
+
+            // Check for PosView based views
+            if (pos.Has<PosView> (out _))
+            {
+                categories.PosViewBased.Add (v);
+            }
+
+            // Check for DimView based views
+            if (dim.Has<DimView> (out _))
+            {
+                categories.DimViewBased.Add (v);
+            }
+
+            // Check for DimAuto based views
+            if (dim.Has<DimAuto> (out _))
+            {
+                categories.DimAutoBased.Add (v);
+            }
+
+            // Check for DimFill based views that can contribute
+            if (dim.Has<DimFill> (out _) && dim.CanContributeToAutoSizing)
+            {
+                categories.DimFillBased.Add (v);
+            }
+
+            // Collect align group IDs
+            if (pos.Has (out PosAlign posAlign))
+            {
+                if (seenAlignGroupIds.Add (posAlign.GroupId))
+                {
+                    categories.AlignGroupIds.Add (posAlign.GroupId);
+                }
+            }
+        }
+
+        return categories;
+    }
+
+    /// <summary>
+    /// Calculates maximum size from a pre-categorized list of views.
+    /// Phase 1 and 2 Performance Optimization: Avoids redundant filtering.
+    /// </summary>
+    private int CalculateMaxSizeFromList (List<View> views, int max, Dimension dimension)
+    {
+        foreach (View v in views)
+        {
+            int newMax = dimension == Dimension.Width
+                             ? v.Frame.X + v.Width.Calculate (0, max, v, dimension)
+                             : v.Frame.Y + v.Height.Calculate (0, max, v, dimension);
+
+            if (newMax > max)
+            {
+                max = newMax;
+            }
+        }
+
+        return max;
+    }
+
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
         var textSize = 0;
@@ -95,17 +212,14 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             }
             else
             {
-                List<View> includedSubViews = us.InternalSubViews.ToList ();
+                // Phase 1 and 2 Optimization: Single-pass categorization to reduce iterations and allocations
+                // Work directly with the collection to avoid unnecessary ToList() allocation
+                
+                // Categorize views in a single pass
+                ViewCategories categories = CategorizeViews (us.InternalSubViews, dimension, superviewContentSize);
 
-                // Process views that are not dependent on SuperView content size
-                foreach (View notDependentSubView in GetViewsThatMatch (includedSubViews,
-                                                                        v => dimension == Dimension.Width
-                                                                                 ? (v.X.IsFixed || v.Width.IsFixed)
-                                                                                   && !v.X.DependsOnSuperViewContentSize
-                                                                                   && !v.Width.DependsOnSuperViewContentSize
-                                                                                 : (v.Y.IsFixed || v.Height.IsFixed)
-                                                                                   && !v.Y.DependsOnSuperViewContentSize
-                                                                                   && !v.Height.DependsOnSuperViewContentSize))
+                // Process not-dependent views
+                foreach (View notDependentSubView in categories.NotDependent)
                 {
                     notDependentSubView.SetRelativeLayout (us.GetContentSize ());
 
@@ -121,9 +235,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     }
                 }
 
+                // Process centered views
                 var maxCentered = 0;
 
-                foreach (View v in GetViewsThatHavePos<PosCenter> (dimension, us.InternalSubViews))
+                foreach (View v in categories.Centered)
                 {
                     maxCentered = dimension == Dimension.Width
                                       ? v.X.GetAnchor (0) + v.Width.Calculate (0, screenX4, v, dimension)
@@ -132,39 +247,21 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxCentered);
 
+                // Process aligned views
                 var maxAlign = 0;
 
-                List<int> groupIds = includedSubViews.Select (v =>
-                                                              {
-                                                                  return dimension switch
-                                                                         {
-                                                                             Dimension.Width when v.X.Has (out PosAlign posAlign) => posAlign.GroupId,
-                                                                             Dimension.Height when v.Y.Has (out PosAlign posAlign) => posAlign.GroupId,
-                                                                             _ => -1
-                                                                         };
-                                                              })
-                                                     .Distinct ()
-                                                     .ToList ();
-
-                foreach (int groupId in groupIds.Where (g => g != -1))
+                foreach (int groupId in categories.AlignGroupIds)
                 {
-                    List<PosAlign?> posAlignsInGroup = includedSubViews.Where (v => PosAlign.HasGroupId (v, dimension, groupId))
-                                                                       .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
-                                                                       .ToList ();
-
-                    if (posAlignsInGroup.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    maxAlign = PosAlign.CalculateMinDimension (groupId, includedSubViews, dimension);
+                    // Convert to IReadOnlyCollection for PosAlign API
+                    maxAlign = PosAlign.CalculateMinDimension (groupId, us.InternalSubViews.ToArray (), dimension);
                 }
 
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxAlign);
 
+                // Process anchored views
                 var maxAnchorEnd = 0;
 
-                foreach (View anchoredSubView in GetViewsThatHavePos<PosAnchorEnd> (dimension, includedSubViews))
+                foreach (View anchoredSubView in categories.Anchored)
                 {
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
                     if (dimension == Dimension.Width)
@@ -183,21 +280,15 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 maxCalculatedSize = Math.Max (maxCalculatedSize, maxAnchorEnd);
 
-                maxCalculatedSize = GetMaxSizePos<PosView> (maxCalculatedSize, dimension, includedSubViews);
-                maxCalculatedSize = GetMaxSizeDim<DimView> (maxCalculatedSize, dimension, includedSubViews);
-                maxCalculatedSize = GetMaxSizeDim<DimAuto> (maxCalculatedSize, dimension, includedSubViews);
+                // Process PosView, DimView, and DimAuto based views
+                maxCalculatedSize = CalculateMaxSizeFromList (categories.PosViewBased, maxCalculatedSize, dimension);
+                maxCalculatedSize = CalculateMaxSizeFromList (categories.DimViewBased, maxCalculatedSize, dimension);
+                maxCalculatedSize = CalculateMaxSizeFromList (categories.DimAutoBased, maxCalculatedSize, dimension);
 
-                // DimFill subviews contribute to auto-sizing only if they have MinimumContentDim or To set
                 // Process DimFill views that can contribute
-                foreach (View dimFillSubView in GetViewsThatHaveDim<DimFill> (dimension, us.InternalSubViews))
+                foreach (View dimFillSubView in categories.DimFillBased)
                 {
                     Dim dimFill = dimension == Dimension.Width ? dimFillSubView.Width : dimFillSubView.Height;
-
-                    // Skip if cannot contribute to auto-sizing
-                    if (!dimFill.CanContributeToAutoSizing)
-                    {
-                        continue;
-                    }
 
                     // Get the minimum contribution from the Dim itself
                     int minContribution = dimFill.GetMinimumContribution (0, maxCalculatedSize, dimFillSubView, dimension);
@@ -255,58 +346,6 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                                  };
 
         max += adornmentThickness;
-
-        return max;
-    }
-
-    // Helper methods to reduce code duplication and improve readability
-
-    private static List<View> GetViewsThatMatch (IList<View> subViews, Func<View, bool> predicate) => subViews.Where (predicate).ToList ();
-
-    private List<View> GetViewsThatHavePos<TPos> (Dimension dimension, IList<View> subViews) where TPos : Pos =>
-        dimension switch
-        {
-            Dimension.Width => subViews.Where (v => v.X.Has<TPos> (out _)).ToList (),
-            _ => subViews.Where (v => v.Y.Has<TPos> (out _)).ToList ()
-        };
-
-    private List<View> GetViewsThatHaveDim<TDim> (Dimension dimension, IList<View> subViews) where TDim : Dim =>
-        dimension switch
-        {
-            Dimension.Width => subViews.Where (v => v.Width.Has<TDim> (out _)).ToList (),
-            _ => subViews.Where (v => v.Height.Has<TDim> (out _)).ToList ()
-        };
-
-    private int GetMaxSizePos<TPos> (int max, Dimension dimension, IList<View> views) where TPos : Pos
-    {
-        foreach (View v in GetViewsThatHavePos<TPos> (dimension, views))
-        {
-            int newMax = dimension == Dimension.Width
-                             ? v.Frame.X + v.Width.Calculate (0, max, v, dimension)
-                             : v.Frame.Y + v.Height.Calculate (0, max, v, dimension);
-
-            if (newMax > max)
-            {
-                max = newMax;
-            }
-        }
-
-        return max;
-    }
-
-    private int GetMaxSizeDim<TDim> (int max, Dimension dimension, IList<View> views) where TDim : Dim
-    {
-        foreach (View v in GetViewsThatHaveDim<TDim> (dimension, views))
-        {
-            int newMax = dimension == Dimension.Width
-                             ? v.Frame.X + v.Width.Calculate (0, max, v, dimension)
-                             : v.Frame.Y + v.Height.Calculate (0, max, v, dimension);
-
-            if (newMax > max)
-            {
-                max = newMax;
-            }
-        }
 
         return max;
     }
