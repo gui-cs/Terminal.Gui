@@ -180,7 +180,7 @@ public partial class TableView : View, IDesignable
                     });
         AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)));
 
-        AddCommand (Command.Activate, // was Command.ToggleChecked
+        AddCommand (Command.Toggle,
                     ctx =>
                     {
                         if (ToggleCurrentCellSelection () is true)
