@@ -11,8 +11,8 @@ namespace UnitTests.ViewBaseTests.MouseTests;
 public class MouseHighlightStatesSubViewTests
 {
     /// <summary>
-    /// Tests that when a parent view has MouseHighlightStates = MouseState.In,
-    /// clicking on a subview should route the event to the subview, not the parent.
+    /// Tests that when a SuperView has MouseHighlightStates = MouseState.In,
+    /// clicking on a SubView should route the event to the SubView, not the SuperView.
     /// </summary>
     [Theory]
     [AutoInitShutdown]
@@ -22,12 +22,12 @@ public class MouseHighlightStatesSubViewTests
     public void MouseHighlightStates_DoesNotIntercept_SubView_Events (MouseState highlightState)
     {
         // Arrange
-        var parentActivateCount = 0;
+        var superViewActivateCount = 0;
         var subViewActivateCount = 0;
 
-        var parent = new View
+        View superView = new ()
         {
-            Id = "parent",
+            Id = "superView",
             X = 0,
             Y = 0,
             Width = 10,
@@ -35,9 +35,9 @@ public class MouseHighlightStatesSubViewTests
             MouseHighlightStates = highlightState
         };
 
-        parent.Activating += (s, e) => { parentActivateCount++; };
+        superView.Activating += (s, e) => { superViewActivateCount++; };
 
-        var subView = new View
+        View subView = new ()
         {
             Id = "subView",
             X = 2,
@@ -49,15 +49,15 @@ public class MouseHighlightStatesSubViewTests
 
         subView.Activating += (s, e) => { subViewActivateCount++; };
 
-        parent.Add (subView);
+        superView.Add (subView);
 
-        var top = new Runnable ();
-        top.Add (parent);
+        Runnable top = new ();
+        top.Add (superView);
 
         SessionToken rs = Application.Begin (top);
 
-        // Act: Click on the subview
-        // SubView is at screen position (2, 2) relative to parent at (0, 0)
+        // Act: Click on the SubView
+        // SubView is at screen position (2, 2) relative to SuperView at (0, 0)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonPressed });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonReleased });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonClicked });
@@ -65,9 +65,9 @@ public class MouseHighlightStatesSubViewTests
         // Need to process the event
         AutoInitShutdownAttribute.RunIteration ();
 
-        // Assert: SubView should receive the event, not parent
+        // Assert: SubView should receive the event, not SuperView
         Assert.Equal (1, subViewActivateCount);
-        Assert.Equal (0, parentActivateCount);
+        Assert.Equal (0, superViewActivateCount);
 
         // Cleanup
         Application.Mouse.UngrabMouse ();
@@ -75,8 +75,8 @@ public class MouseHighlightStatesSubViewTests
     }
 
     /// <summary>
-    /// Tests that when a parent view has MouseHighlightStates = MouseState.None (default),
-    /// clicking on a subview correctly routes the event to the subview.
+    /// Tests that when a SuperView has MouseHighlightStates = MouseState.None (default),
+    /// clicking on a SubView correctly routes the event to the SubView.
     /// This is the baseline behavior that should always work.
     /// </summary>
     [Fact]
@@ -84,12 +84,12 @@ public class MouseHighlightStatesSubViewTests
     public void MouseHighlightStates_None_DoesNotIntercept_SubView_Events ()
     {
         // Arrange
-        var parentActivateCount = 0;
+        var superViewActivateCount = 0;
         var subViewActivateCount = 0;
 
-        var parent = new View
+        View superView = new ()
         {
-            Id = "parent",
+            Id = "superView",
             X = 0,
             Y = 0,
             Width = 10,
@@ -97,9 +97,9 @@ public class MouseHighlightStatesSubViewTests
             MouseHighlightStates = MouseState.None // Explicit none
         };
 
-        parent.Activating += (s, e) => { parentActivateCount++; };
+        superView.Activating += (s, e) => { superViewActivateCount++; };
 
-        var subView = new View
+        View subView = new ()
         {
             Id = "subView",
             X = 2,
@@ -111,14 +111,14 @@ public class MouseHighlightStatesSubViewTests
 
         subView.Activating += (s, e) => { subViewActivateCount++; };
 
-        parent.Add (subView);
+        superView.Add (subView);
 
-        var top = new Runnable ();
-        top.Add (parent);
+        Runnable top = new ();
+        top.Add (superView);
 
         SessionToken rs = Application.Begin (top);
 
-        // Act: Click on the subview
+        // Act: Click on the SubView
         Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonPressed });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonReleased });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.LeftButtonClicked });
@@ -127,30 +127,30 @@ public class MouseHighlightStatesSubViewTests
 
         // Assert: SubView should receive the event
         Assert.Equal (1, subViewActivateCount);
-        // Parent may receive it via command bubbling, which is expected behavior
-        // Assert.Equal (0, parentActivateCount);
+        // SuperView may receive it via command bubbling, which is expected behavior
+        // Assert.Equal (0, superViewActivateCount);
 
         // Cleanup
         top.Dispose ();
     }
 
     /// <summary>
-    /// Tests that when clicking on the parent view (not on a subview),
-    /// the parent correctly receives the event even with MouseHighlightStates set.
+    /// Tests that when clicking on the SuperView (not on a SubView),
+    /// the SuperView correctly receives the event even with MouseHighlightStates set.
     /// </summary>
     [Theory]
     [AutoInitShutdown]
     [InlineData (MouseState.In)]
     [InlineData (MouseState.Pressed)]
-    public void MouseHighlightStates_Parent_Receives_Events_When_Not_On_SubView (MouseState highlightState)
+    public void MouseHighlightStates_SuperView_Receives_Events_When_Not_On_SubView (MouseState highlightState)
     {
         // Arrange
-        var parentActivateCount = 0;
+        var superViewActivateCount = 0;
         var subViewActivateCount = 0;
 
-        var parent = new View
+        View superView = new ()
         {
-            Id = "parent",
+            Id = "superView",
             X = 0,
             Y = 0,
             Width = 10,
@@ -158,9 +158,9 @@ public class MouseHighlightStatesSubViewTests
             MouseHighlightStates = highlightState
         };
 
-        parent.Activating += (s, e) => { parentActivateCount++; };
+        superView.Activating += (s, e) => { superViewActivateCount++; };
 
-        var subView = new View
+        View subView = new ()
         {
             Id = "subView",
             X = 2,
@@ -171,22 +171,22 @@ public class MouseHighlightStatesSubViewTests
 
         subView.Activating += (s, e) => { subViewActivateCount++; };
 
-        parent.Add (subView);
+        superView.Add (subView);
 
-        var top = new Runnable ();
-        top.Add (parent);
+        Runnable top = new ();
+        top.Add (superView);
 
         SessionToken rs = Application.Begin (top);
 
-        // Act: Click on the parent view (position 8,8 is outside the subview which is at 2,2 with size 5x5)
+        // Act: Click on the SuperView (position 8,8 is outside the SubView which is at 2,2 with size 5x5)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (8, 8), Flags = MouseFlags.LeftButtonPressed });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (8, 8), Flags = MouseFlags.LeftButtonReleased });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (8, 8), Flags = MouseFlags.LeftButtonClicked });
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        // Assert: Parent should receive the event
-        Assert.Equal (1, parentActivateCount);
+        // Assert: SuperView should receive the event
+        Assert.Equal (1, superViewActivateCount);
         Assert.Equal (0, subViewActivateCount);
 
         // Cleanup
@@ -201,7 +201,7 @@ public class MouseHighlightStatesSubViewTests
     /// Note: This test is currently disabled as Shortcut has a complex layout
     /// and the basic fix works for simple view hierarchies.
     /// </summary>
-    [Fact (Skip = "Shortcut has complex layout - core fix works for basic subview scenarios")]
+    [Fact (Skip = "Shortcut has complex layout - core fix works for basic SubView scenarios")]
     [AutoInitShutdown]
     public void Shortcut_With_MouseHighlightStates_In_Routes_To_CommandView ()
     {
@@ -209,7 +209,7 @@ public class MouseHighlightStatesSubViewTests
         var shortcutActivatingCount = 0;
         var checkBoxCheckedCount = 0;
 
-        var shortcut = new Shortcut
+        Shortcut shortcut = new ()
         {
             Key = Key.F1,
             Title = "Test",
@@ -219,17 +219,17 @@ public class MouseHighlightStatesSubViewTests
 
         shortcut.Activating += (s, e) => { shortcutActivatingCount++; };
 
-        var checkBox = shortcut.CommandView as CheckBox;
-        checkBox!.ValueChanged += (s, e) => { checkBoxCheckedCount++; };
+        CheckBox checkBox = (CheckBox)shortcut.CommandView;
+        checkBox.ValueChanged += (s, e) => { checkBoxCheckedCount++; };
 
-        var top = new Runnable ();
+        Runnable top = new ();
         top.Add (shortcut);
 
         SessionToken rs = Application.Begin (top);
 
         // Get the screen position of the CommandView
-        var commandViewScreenRect = shortcut.CommandView.FrameToScreen ();
-        var commandViewScreenPos = commandViewScreenRect.Location;
+        Rectangle commandViewScreenRect = shortcut.CommandView.FrameToScreen ();
+        Point commandViewScreenPos = commandViewScreenRect.Location;
 
         // Act: Click on the CommandView (CheckBox)
         Application.RaiseMouseEvent (new () { ScreenPosition = commandViewScreenPos, Flags = MouseFlags.LeftButtonPressed });
@@ -248,7 +248,7 @@ public class MouseHighlightStatesSubViewTests
     }
 
     /// <summary>
-    /// Tests that nested views (parent with MouseHighlightStates, subview with MouseHighlightStates)
+    /// Tests that nested views (SuperView with MouseHighlightStates, SubView with MouseHighlightStates)
     /// route events to the deepest view under the mouse.
     /// </summary>
     [Fact]
@@ -256,13 +256,13 @@ public class MouseHighlightStatesSubViewTests
     public void MouseHighlightStates_Nested_Routes_To_Deepest_View ()
     {
         // Arrange
-        var parentActivateCount = 0;
+        var superViewActivateCount = 0;
         var subView1ActivateCount = 0;
         var subView2ActivateCount = 0;
 
-        var parent = new View
+        View superView = new ()
         {
-            Id = "parent",
+            Id = "superView",
             X = 0,
             Y = 0,
             Width = 20,
@@ -270,9 +270,9 @@ public class MouseHighlightStatesSubViewTests
             MouseHighlightStates = MouseState.In
         };
 
-        parent.Activating += (s, e) => { parentActivateCount++; };
+        superView.Activating += (s, e) => { superViewActivateCount++; };
 
-        var subView1 = new View
+        View subView1 = new ()
         {
             Id = "subView1",
             X = 5,
@@ -284,7 +284,7 @@ public class MouseHighlightStatesSubViewTests
 
         subView1.Activating += (s, e) => { subView1ActivateCount++; };
 
-        var subView2 = new View
+        View subView2 = new ()
         {
             Id = "subView2",
             X = 2,
@@ -296,15 +296,15 @@ public class MouseHighlightStatesSubViewTests
 
         subView2.Activating += (s, e) => { subView2ActivateCount++; };
 
-        parent.Add (subView1);
+        superView.Add (subView1);
         subView1.Add (subView2);
 
-        var top = new Runnable ();
-        top.Add (parent);
+        Runnable top = new ();
+        top.Add (superView);
 
         SessionToken rs = Application.Begin (top);
 
-        // Act: Click on subView2 (screen position is parent(0,0) + subView1(5,5) + subView2(2,2) = 7,7)
+        // Act: Click on subView2 (screen position is SuperView(0,0) + subView1(5,5) + subView2(2,2) = 7,7)
         Application.RaiseMouseEvent (new () { ScreenPosition = new (7, 7), Flags = MouseFlags.LeftButtonPressed });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (7, 7), Flags = MouseFlags.LeftButtonReleased });
         Application.RaiseMouseEvent (new () { ScreenPosition = new (7, 7), Flags = MouseFlags.LeftButtonClicked });
@@ -314,7 +314,7 @@ public class MouseHighlightStatesSubViewTests
         // Assert: Only the deepest view (subView2) should receive the event
         Assert.Equal (1, subView2ActivateCount);
         Assert.Equal (0, subView1ActivateCount);
-        Assert.Equal (0, parentActivateCount);
+        Assert.Equal (0, superViewActivateCount);
 
         // Cleanup
         Application.Mouse.UngrabMouse ();
