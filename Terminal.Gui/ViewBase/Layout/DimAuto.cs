@@ -39,8 +39,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
     internal override bool IsFixed => true;
 
     /// <summary>
-    /// Holds categorized views for single-pass processing.
-    /// Phase 1 and 2 Performance Optimization: Reduces iterations and allocations.
+    ///     Holds categorized views for single-pass processing.
+    ///     Phase 1 and 2 Performance Optimization: Reduces iterations and allocations.
     /// </summary>
     private readonly struct ViewCategories
     {
@@ -55,24 +55,24 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
     }
 
     /// <summary>
-    /// Categorizes views in a single pass to reduce iterations and allocations.
-    /// Phase 1 and 2 Performance Optimization.
+    ///     Categorizes views in a single pass to reduce iterations and allocations.
+    ///     Phase 1 and 2 Performance Optimization.
     /// </summary>
-    private ViewCategories CategorizeViews (IList<View> subViews, Dimension dimension, int superviewContentSize)
+    private static ViewCategories CategorizeViews (IList<View> subViews, Dimension dimension, int superviewContentSize)
     {
-        var categories = new ViewCategories
+        ViewCategories categories = new ()
         {
-            NotDependent = new List<View> (),
-            Centered = new List<View> (),
-            Anchored = new List<View> (),
-            PosViewBased = new List<View> (),
-            DimViewBased = new List<View> (),
-            DimAutoBased = new List<View> (),
-            DimFillBased = new List<View> (),
-            AlignGroupIds = new List<int> ()
+            NotDependent = [],
+            Centered = [],
+            Anchored = [],
+            PosViewBased = [],
+            DimViewBased = [],
+            DimAutoBased = [],
+            DimFillBased = [],
+            AlignGroupIds = []
         };
 
-        HashSet<int> seenAlignGroupIds = new HashSet<int> ();
+        HashSet<int> seenAlignGroupIds = new ();
 
         foreach (View v in subViews)
         {
@@ -122,12 +122,14 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             }
 
             // Collect align group IDs
-            if (pos.Has (out PosAlign posAlign))
+            if (!pos.Has (out PosAlign posAlign))
             {
-                if (seenAlignGroupIds.Add (posAlign.GroupId))
-                {
-                    categories.AlignGroupIds.Add (posAlign.GroupId);
-                }
+                continue;
+            }
+
+            if (seenAlignGroupIds.Add (posAlign.GroupId))
+            {
+                categories.AlignGroupIds.Add (posAlign.GroupId);
             }
         }
 
@@ -135,10 +137,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
     }
 
     /// <summary>
-    /// Calculates maximum size from a pre-categorized list of views.
-    /// Phase 1 and 2 Performance Optimization: Avoids redundant filtering.
+    ///     Calculates maximum size from a pre-categorized list of views.
+    ///     Phase 1 and 2 Performance Optimization: Avoids redundant filtering.
     /// </summary>
-    private int CalculateMaxSizeFromList (List<View> views, int max, Dimension dimension)
+    private static int CalculateMaxSizeFromList (List<View> views, int max, Dimension dimension)
     {
         foreach (View v in views)
         {
@@ -155,6 +157,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         return max;
     }
 
+    /// <inheritdoc/>
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
     {
         var textSize = 0;
@@ -212,9 +215,9 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             }
             else
             {
-                // Phase 1 and 2 Optimization: Single-pass categorization to reduce iterations and allocations
+                // Single-pass categorization to reduce iterations and allocations
                 // Work directly with the collection to avoid unnecessary ToList() allocation
-                
+
                 // Categorize views in a single pass
                 ViewCategories categories = CategorizeViews (us.InternalSubViews, dimension, superviewContentSize);
 
@@ -264,14 +267,9 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 foreach (View anchoredSubView in categories.Anchored)
                 {
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
-                    if (dimension == Dimension.Width)
-                    {
-                        anchoredSubView.SetRelativeLayout (new Size (maxCalculatedSize, screenX4));
-                    }
-                    else
-                    {
-                        anchoredSubView.SetRelativeLayout (new Size (screenX4, maxCalculatedSize));
-                    }
+                    anchoredSubView.SetRelativeLayout (dimension == Dimension.Width
+                                                           ? new Size (maxCalculatedSize, screenX4)
+                                                           : new Size (screenX4, maxCalculatedSize));
 
                     maxAnchorEnd = dimension == Dimension.Width
                                        ? anchoredSubView.X.GetAnchor (maxCalculatedSize + anchoredSubView.Frame.Width)
