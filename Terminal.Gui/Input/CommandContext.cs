@@ -14,7 +14,8 @@
 ///         </code>
 ///     </para>
 /// </remarks>
-/// <seealso cref="View.InvokeCommand"/>.
+/// <seealso cref="View.InvokeCommand"/>
+/// .
 #pragma warning restore CS1574, CS0419 // XML comment has cref attribute that could not be resolved
 public record struct CommandContext : ICommandContext
 {
@@ -31,15 +32,15 @@ public record struct CommandContext : ICommandContext
         Source = source;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Command Command { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public WeakReference<View>? Source { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public IInputBinding? Binding { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString () => $"{Command} (Source={Source.ToIdentifyingString ()}, Binding={Binding})";
 }
