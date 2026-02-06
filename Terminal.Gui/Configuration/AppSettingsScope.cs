@@ -23,6 +23,8 @@ namespace Terminal.Gui.Configuration;
 ///    },
 ///  </code>
 /// </example>
+#pragma warning disable IL2026 // ScopeJsonConverter and Scope<T> are AOT-compatible for known scope types
 [JsonConverter (typeof (ScopeJsonConverter<AppSettingsScope>))]
 public class AppSettingsScope : Scope<AppSettingsScope>
+#pragma warning restore IL2026
 { }

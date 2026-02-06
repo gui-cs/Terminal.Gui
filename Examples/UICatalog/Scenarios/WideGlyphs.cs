@@ -14,11 +14,14 @@ public sealed class WideGlyphs : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
-        Application.Init ();
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -90,28 +93,15 @@ public sealed class WideGlyphs : Scenario
                     Rune codepoint = _codepoints [r, c];
                     if (codepoint != default (Rune))
                     {
-                        view.AddRune (c, r, codepoint);
+                        view.Move (c, r);
+                        Attribute attr = view.GetAttributeForRole (VisualRole.Normal);
+                        view.SetAttribute (attr with { Background = attr.Background + r * 5 });
+                        view.AddRune (codepoint);
                     }
                 }
             }
             e.DrawContext?.AddDrawnRectangle (view.Viewport);
         };
-
-        Line verticalLineAtEven = new ()
-        {
-            X = 10,
-            Orientation = Orientation.Vertical,
-            Length = Dim.Fill ()
-        };
-        appWindow.Add (verticalLineAtEven);
-
-        Line verticalLineAtOdd = new ()
-        {
-            X = 25,
-            Orientation = Orientation.Vertical,
-            Length = Dim.Fill ()
-        };
-        appWindow.Add (verticalLineAtOdd);
 
         View arrangeableViewAtEven = new ()
         {
@@ -124,13 +114,16 @@ public sealed class WideGlyphs : Scenario
             //BorderStyle = LineStyle.Dashed
         };
 
+        arrangeableViewAtEven.SetScheme (new () { Normal = new (Color.Black, Color.Green) });
+
         // Proves it's not LineCanvas related
-        arrangeableViewAtEven!.Border!.Thickness = new (1);
+        arrangeableViewAtEven.Border!.Thickness = new (1);
         arrangeableViewAtEven.Border.Add (new View () { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Even" });
         appWindow.Add (arrangeableViewAtEven);
 
-        View arrangeableViewAtOdd = new ()
+        Button arrangeableViewAtOdd = new ()
         {
+            Title = $"你 {Glyphs.Apple}",
             CanFocus = true,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             X = 31,
@@ -138,11 +131,15 @@ public sealed class WideGlyphs : Scenario
             Width = 15,
             Height = 5,
             BorderStyle = LineStyle.Dashed,
+            SchemeName = "error"
         };
-
+        arrangeableViewAtOdd.Accepting += (sender, _) =>
+                                          {
+                                              MessageBox.Query ((sender as View)?.App!, "Button Pressed", "You Pressed it!");
+                                          };
         appWindow.Add (arrangeableViewAtOdd);
 
-        var superView = new View
+        View superView = new ()
         {
             CanFocus = true,
             X = 30, // on an even column to start
@@ -150,17 +147,20 @@ public sealed class WideGlyphs : Scenario
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             BorderStyle = LineStyle.Single,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            ShadowStyle = ShadowStyle.Transparent,
         };
+        superView.Margin!.ShadowSize = superView.Margin!.ShadowSize with { Width = 2 };
+
 
         Rune codepoint = Glyphs.Apple;
 
         superView.DrawingContent += (s, e) =>
                                     {
-                                        var view = s as View;
-                                        for (var r = 0; r < view!.Viewport.Height; r++)
+                                        View? view = s as View;
+                                        for (int r = 0; r < view!.Viewport.Height; r++)
                                         {
-                                            for (var c = 0; c < view.Viewport.Width; c += 2)
+                                            for (int c = 0; c < view.Viewport.Width; c += 2)
                                             {
                                                 if (codepoint != default (Rune))
                                                 {
@@ -173,7 +173,7 @@ public sealed class WideGlyphs : Scenario
                                     };
         appWindow.Add (superView);
 
-        var viewWithBorderAtX0 = new View
+        View viewWithBorderAtX0 = new ()
         {
             Text = "viewWithBorderAtX0",
             BorderStyle = LineStyle.Dashed,
@@ -183,7 +183,7 @@ public sealed class WideGlyphs : Scenario
             Height = 3
         };
 
-        var viewWithBorderAtX1 = new View
+        View viewWithBorderAtX1 = new ()
         {
             Text = "viewWithBorderAtX1",
             BorderStyle = LineStyle.Dashed,
@@ -193,7 +193,7 @@ public sealed class WideGlyphs : Scenario
             Height = 3
         };
 
-        var viewWithBorderAtX2 = new View
+        View viewWithBorderAtX2 = new ()
         {
             Text = "viewWithBorderAtX2",
             BorderStyle = LineStyle.Dashed,
@@ -206,11 +206,7 @@ public sealed class WideGlyphs : Scenario
         superView.Add (viewWithBorderAtX0, viewWithBorderAtX1, viewWithBorderAtX2);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private Rune GetRandomWideCodepoint ()

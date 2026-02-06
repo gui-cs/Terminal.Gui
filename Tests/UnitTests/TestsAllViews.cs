@@ -6,7 +6,7 @@ namespace UnitTests;
 /// <summary>
 ///     Base class for tests that need to test all views.
 /// </summary>
-public class TestsAllViews : FakeDriverBase
+public class TestsAllViews : TestDriverBase
 {
     /// <summary>
     ///     Gets all view types.
@@ -94,7 +94,6 @@ public class TestsAllViews : FakeDriverBase
             }
 
             // Check if the type has required properties that can't be satisfied by Activator.CreateInstance
-            // This handles cases like RunnableWrapper which has a required WrappedView property
             if (HasRequiredProperties (type))
             {
                 Logging.Warning ($"Cannot create an instance of {type} because it has required properties that must be set.");

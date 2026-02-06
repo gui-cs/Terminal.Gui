@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View // Command APIs
 {
@@ -19,9 +18,8 @@ public partial class View // Command APIs
         AddCommand (Command.Accept, RaiseAccepting);
 
         // HotKey - SetFocus and raise HandlingHotKey
-        AddCommand (
-                    Command.HotKey,
-                    (ctx) =>
+        AddCommand (Command.HotKey,
+                    ctx =>
                     {
                         if (RaiseHandlingHotKey (ctx) is true)
                         {
@@ -36,8 +34,7 @@ public partial class View // Command APIs
                     });
 
         // Space or single-click - Raise Activating
-        AddCommand (
-                    Command.Activate,
+        AddCommand (Command.Activate,
                     ctx =>
                     {
                         if (RaiseActivating (ctx) is true)
@@ -69,7 +66,7 @@ public partial class View // Command APIs
     {
         CommandEventArgs args = new () { Context = ctx };
 
-        // For robustness' sake, even if the virtual method returns true, if the args 
+        // For robustness' sake, even if the virtual method returns true, if the args
         // indicate the event should be cancelled, we honor that.
         if (OnCommandNotBound (args) || args.Handled)
         {
@@ -89,7 +86,7 @@ public partial class View // Command APIs
     /// </summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnCommandNotBound (CommandEventArgs args) { return false; }
+    protected virtual bool OnCommandNotBound (CommandEventArgs args) => false;
 
     /// <summary>
     ///     Cancelable event raised when a command that has not been bound is invoked.
@@ -126,25 +123,25 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-        Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
+        //Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
+        //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
         args.Handled = OnAccepting (args) || args.Handled;
 
         if (!args.Handled && Accepting is { })
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
+            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
             Accepting?.Invoke (this, args);
         }
 
         // If Accepting was handled, raise Accepted (non-cancelable event)
         if (args.Handled)
         {
-            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling RaiseAccepted");
+            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling RaiseAccepted");
             RaiseAccepted (ctx);
         }
 
@@ -154,14 +151,14 @@ public partial class View // Command APIs
         if (!args.Handled)
         {
             // If there's an IsDefault peer view in SubViews, try it
-            View? isDefaultView = SuperView?.InternalSubViews.FirstOrDefault (v => v is Button { IsDefault: true });
+            View? isDefaultView = SuperView?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {
                 // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
                 // TODO: is generic?
 
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
+                //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
                 bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
 
                 if (handled == true)
@@ -172,7 +169,7 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
+                //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
 
                 return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
@@ -193,7 +190,7 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnAccepting (CommandEventArgs args) { return false; }
+    protected virtual bool OnAccepting (CommandEventArgs args) => false;
 
     /// <summary>
     ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has
@@ -227,18 +224,21 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not cancelled.
+    ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not
+    ///     cancelled.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Unlike <see cref="OnAccepting"/>, this method is called after the View has been accepted and cannot cancel the operation.
+    ///         Unlike <see cref="OnAccepting"/>, this method is called after the View has been accepted and cannot cancel the
+    ///         operation.
     ///     </para>
     /// </remarks>
     /// <param name="args">The event arguments.</param>
     protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
-    ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not cancelled.
+    ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not
+    ///     cancelled.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -251,7 +251,8 @@ public partial class View // Command APIs
     public event EventHandler<CommandEventArgs>? Accepted;
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state or preparing it for interaction.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state
+    ///     or preparing it for interaction.
     ///     Calls <see cref="OnActivating"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
     ///     event. The default <see cref="Command.Activate"/> handler calls this method.
     /// </summary>
@@ -284,16 +285,18 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state or preparing it for interaction.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state
+    ///     or preparing it for interaction.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> and return <see langword="true"/> to indicate the event was
     ///     handled and processing should stop.
     /// </summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnActivating (CommandEventArgs args) { return false; }
+    protected virtual bool OnActivating (CommandEventArgs args) => false;
 
     /// <summary>
-    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View
+    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the
+    ///     View
     ///     to change state or preparing it for interaction.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.
@@ -315,6 +318,7 @@ public partial class View // Command APIs
     protected bool? RaiseHandlingHotKey (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
+
         //Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // Best practice is to invoke the virtual method first.
@@ -337,7 +341,7 @@ public partial class View // Command APIs
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnHandlingHotKey (CommandEventArgs args) { return false; }
+    protected virtual bool OnHandlingHotKey (CommandEventArgs args) => false;
 
     /// <summary>
     ///     Cancelable event raised when the View is handling the user pressing the View's <see cref="HotKey"/>. Set
@@ -374,12 +378,13 @@ public partial class View // Command APIs
     ///         This version of AddCommand is for commands that require <see cref="ICommandContext"/>.
     ///     </para>
     ///     <para>
-    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
+    ///         See the Commands Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, CommandImplementation impl) { _commandImplementations [command] = impl; }
+    protected void AddCommand (Command command, CommandImplementation impl) => _commandImplementations [command] = impl;
 
     /// <summary>
     ///     <para>
@@ -398,130 +403,119 @@ public partial class View // Command APIs
     ///         <see cref="AddCommand(Command,CommandImplementation)"/>
     ///     </para>
     ///     <para>
-    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
+    ///         See the Commands Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, Func<bool?> impl) { _commandImplementations [command] = ctx => impl (); }
+    protected void AddCommand (Command command, Func<bool?> impl) => _commandImplementations [command] = _ => impl ();
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>
     /// <returns></returns>
-    public IEnumerable<Command> GetSupportedCommands () { return _commandImplementations.Keys; }
+    public IEnumerable<Command> GetSupportedCommands () => _commandImplementations.Keys;
 
-    /// <summary>
-    ///     Invokes the specified commands.
-    /// </summary>
-    /// <param name="commands">The set of commands to invoke.</param>
-    /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommands<TBindingType> (Command [] commands, TBindingType binding)
-    {
-        bool? toReturn = null;
-
-        foreach (Command command in commands)
+        /// <summary>
+        ///     Invokes the specified commands.
+        /// </summary>
+        /// <param name="commands">The set of commands to invoke.</param>
+        /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommands (Command [] commands, IInputBinding? binding)
         {
-            if (!_commandImplementations.ContainsKey (command))
+            bool? toReturn = null;
+
+            foreach (Command command in commands)
             {
-                Logging.Warning (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
+                if (!_commandImplementations.ContainsKey (command))
+                {
+                    Logging.Warning (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
+                }
+
+                // each command has its own return value
+                bool? thisReturn = InvokeCommand (command, binding);
+
+                // if we haven't got anything yet, the current command result should be used
+                toReturn ??= thisReturn;
+
+                // if ever see a true then that's what we will return
+                if (thisReturn ?? false)
+                {
+                    toReturn = true;
+                }
             }
 
-            // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, binding);
+            return toReturn;
+        }
 
-            // if we haven't got anything yet, the current command result should be used
-            toReturn ??= thisReturn;
-
-            // if ever see a true then that's what we will return
-            if (thisReturn ?? false)
+        /// <summary>
+        ///     Invokes the specified command.
+        /// </summary>
+        /// <param name="command">The command to invoke.</param>
+        /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommand (Command command, IInputBinding? binding)
+        {
+            if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
             {
-                toReturn = true;
+                _commandImplementations.TryGetValue (Command.NotBound, out implementation);
             }
+
+            return implementation! (new CommandContext { Command = command, Source = this, Binding = binding });
         }
 
-        return toReturn;
-    }
-
-    /// <summary>
-    ///     Invokes the specified command.
-    /// </summary>
-    /// <param name="command">The command to invoke.</param>
-    /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding)
-    {
-        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        /// <summary>
+        ///     Invokes the specified command.
+        /// </summary>
+        /// <param name="command">The command to invoke.</param>
+        /// <param name="ctx">The context to pass with the command.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommand (Command command, ICommandContext? ctx)
         {
-            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+            {
+                _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            }
+
+            return implementation! (ctx);
         }
 
-        return implementation! (
-                                new CommandContext<TBindingType>
-                                {
-                                    Command = command,
-                                    Source = this,
-                                    Binding = binding
-                                });
-    }
-
-    /// <summary>
-    ///     Invokes the specified command.
-    /// </summary>
-    /// <param name="command">The command to invoke.</param>
-    /// <param name="ctx">The context to pass with the command.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommand (Command command, ICommandContext? ctx)
-    {
-        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        /// <summary>
+        ///     Invokes the specified command without context.
+        /// </summary>
+        /// <param name="command">The command to invoke.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommand (Command command)
         {
-            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+            {
+                _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            }
+
+            return implementation! (new CommandContext { Command = command, Source = this, Binding = null });
         }
-
-        return implementation! (ctx);
     }
-
-    /// <summary>
-    ///     Invokes the specified command without context.
-    /// </summary>
-    /// <param name="command">The command to invoke.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommand (Command command)
-    {
-        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
-        {
-            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
-        }
-
-        return implementation! (
-                                new CommandContext<object>
-                                {
-                                    Command = command,
-                                    Source = this,
-                                    Binding = null
-                                });
-    }
-}

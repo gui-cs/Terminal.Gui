@@ -23,16 +23,18 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="inputQueue">Thread-safe queue for buffering raw console input</param>
     /// <param name="loop">The main application loop instance</param>
     /// <param name="componentFactory">Factory for creating driver-specific components (input, output, etc.)</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
     public MainLoopCoordinator (
         ITimedEvents timedEvents,
         ConcurrentQueue<TInputRecord> inputQueue,
         IApplicationMainLoop<TInputRecord> loop,
-        IComponentFactory<TInputRecord> componentFactory
+        IComponentFactory<TInputRecord> componentFactory,
+        ITimeProvider? timeProvider = null
     )
     {
         _timedEvents = timedEvents;
         _inputQueue = inputQueue;
-        _inputProcessor = componentFactory.CreateInputProcessor (_inputQueue);
+        _inputProcessor = componentFactory.CreateInputProcessor (_inputQueue, timeProvider);
         _loop = loop;
         _componentFactory = componentFactory;
     }
@@ -59,7 +61,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="app">The <see cref="IApplication"/> instance that is running the input loop.</param>
     public async Task StartInputTaskAsync (IApplication? app)
     {
-        Logging.Trace ("Booting... ()");
+        Logging.Trace ($"Booting... app: {app?.MainThreadId}");
 
         _inputTask = Task.Run (() => RunInput (app));
 
@@ -81,10 +83,10 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                 throw _inputTask.Exception;
             }
 
-            Logging.Critical ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            Logging.Critical ($"app: {app?.MainThreadId} Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
-        Logging.Trace ("Booting complete");
+        Logging.Trace ($"app: {app?.MainThreadId} Booting complete");
     }
 
     /// <inheritdoc/>
@@ -134,16 +136,24 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         if (_input != null && _output != null)
         {
             _driver = new (
+                           _componentFactory,
                            _inputProcessor,
                            _loop.OutputBuffer,
                            _output,
                            _loop.AnsiRequestScheduler,
                            _loop.SizeMonitor);
 
+            // Initialize the size monitor now that the driver is fully constructed
+            // This allows size monitors to set up platform-specific mechanisms:
+            // - ANSI queries (ANSIDriver)
+            // - Signal handlers (UnixDriver)
+            // - Console events (WindowsDriver)
+            _loop.SizeMonitor.Initialize(_driver);
+
             app!.Driver = _driver;
 
             _startupSemaphore.Release ();
-            Logging.Trace ($"Driver: _input: {_input}, _output: {_output}");
+            Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
         }
     }
 
@@ -175,24 +185,26 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                 _input.Run (_runCancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
-            { }
+            {
+                Logging.Trace ($"app: {app?.MainThreadId}Input loop canceled");
+            }
 
             _input.Dispose ();
         }
         catch (Exception e)
         {
-            Logging.Critical ($"Input loop crashed: {e}");
+            Logging.Critical ($"app: {app?.MainThreadId} Input loop crashed: {e}");
 
             throw;
         }
 
         if (_stopCalled)
         {
-            Logging.Information ("Input loop exited cleanly");
+            Logging.Trace ($"app: {app?.MainThreadId} Input loop exited cleanly");
         }
         else
         {
-            Logging.Critical ("Input loop exited early (stop not called)");
+            Logging.Critical ($"app: {app?.MainThreadId}Input loop exited early (stop not called)");
         }
     }
 }

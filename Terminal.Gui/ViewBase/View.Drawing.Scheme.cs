@@ -25,6 +25,7 @@ public partial class View
         set
         {
             CWPPropertyHelper.ChangeProperty (
+                                              this,
                                               ref _schemeName,
                                               value,
                                               OnSchemeNameChanging,
@@ -208,6 +209,7 @@ public partial class View
     public bool SetScheme (Scheme? scheme)
     {
         return CWPPropertyHelper.ChangeProperty (
+                                                 this,
                                                  ref _scheme,
                                                  scheme,
                                                  OnSettingScheme,

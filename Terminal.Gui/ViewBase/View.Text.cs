@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Text Property APIs
@@ -9,7 +7,7 @@ public partial class View // Text Property APIs
     /// <summary>
     ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
     /// </summary>
-    public void OnTextChanged () { TextChanged?.Invoke (this, EventArgs.Empty); }
+    public void OnTextChanged () => TextChanged?.Invoke (this, EventArgs.Empty);
 
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
@@ -22,12 +20,13 @@ public partial class View // Text Property APIs
         get => TextFormatter.PreserveTrailingSpaces;
         set
         {
-            if (TextFormatter.PreserveTrailingSpaces != value)
+            if (TextFormatter.PreserveTrailingSpaces == value)
             {
-                TextFormatter.PreserveTrailingSpaces = value;
-                TextFormatter.NeedsFormat = true;
-                SetNeedsLayout ();
+                return;
             }
+            TextFormatter.PreserveTrailingSpaces = value;
+            TextFormatter.NeedsFormat = true;
+            SetNeedsLayout ();
         }
     }
 
@@ -63,7 +62,6 @@ public partial class View // Text Property APIs
                 return;
             }
 
-            string old = _text;
             _text = value;
 
             UpdateTextFormatterText ();
@@ -72,7 +70,6 @@ public partial class View // Text Property APIs
         }
     }
 
-    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
     ///     redisplay the <see cref="View"/>.
@@ -84,7 +81,7 @@ public partial class View // Text Property APIs
     ///     </para>
     /// </remarks>
     /// <value>The text alignment.</value>
-    public virtual Alignment TextAlignment
+    public Alignment TextAlignment
     {
         get => TextFormatter.Alignment;
         set
@@ -100,7 +97,6 @@ public partial class View // Text Property APIs
     /// </summary>
     public event EventHandler? TextChanged;
 
-    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets the direction of the View's <see cref="Text"/>. Changing this property will redisplay the
     ///     <see cref="View"/>.
@@ -112,18 +108,13 @@ public partial class View // Text Property APIs
     ///     </para>
     /// </remarks>
     /// <value>The text direction.</value>
-    public virtual TextDirection TextDirection
-    {
-        get => TextFormatter.Direction;
-        set => UpdateTextDirection (value);
-    }
+    public TextDirection TextDirection { get => TextFormatter.Direction; set => UpdateTextDirection (value); }
 
     /// <summary>
     ///     Gets or sets the <see cref="Text.TextFormatter"/> used to format <see cref="Text"/>.
     /// </summary>
     public TextFormatter TextFormatter { get; init; } = new ();
 
-    // TODO: Make this non-virtual. Nobody overrides it.
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will
     ///     redisplay
@@ -136,7 +127,7 @@ public partial class View // Text Property APIs
     ///     </para>
     /// </remarks>
     /// <value>The vertical text alignment.</value>
-    public virtual Alignment VerticalTextAlignment
+    public Alignment VerticalTextAlignment
     {
         get => TextFormatter.VerticalAlignment;
         set
@@ -165,7 +156,8 @@ public partial class View // Text Property APIs
     ///     Internal API. Sets <see cref="TextFormatter"/>.Width/Height.
     /// </summary>
     /// <remarks>
-    ///     Use this API to set <see cref="Text.TextFormatter.ConstrainToWidth"/>/Height when the view has changed such that the
+    ///     Use this API to set <see cref="Text.TextFormatter.ConstrainToWidth"/>/Height when the view has changed such that
+    ///     the
     ///     size required to fit the text has changed.
     ///     changes.
     /// </remarks>
@@ -180,10 +172,8 @@ public partial class View // Text Property APIs
         Size? size = _contentSize;
 
         // Use _width & _height instead of Width & Height to avoid debug spew
-        var widthAuto = _width as DimAuto;
-        var heightAuto = _height as DimAuto;
 
-        if (widthAuto is { } && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
+        if (_width.Has (out DimAuto widthAuto) && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
         {
             TextFormatter.ConstrainToWidth = null;
         }
@@ -191,11 +181,13 @@ public partial class View // Text Property APIs
         {
             if (size is { })
             {
-                TextFormatter.ConstrainToWidth = size?.Width;
+                TextFormatter.ConstrainToWidth = size.Value.Width;
             }
         }
 
-        if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
+        // Use _width & _height instead of Width & Height to avoid debug spew
+
+        if (_height.Has (out DimAuto heightAuto) && heightAuto.Style.FastHasFlags (DimAutoStyle.Text))
         {
             TextFormatter.ConstrainToHeight = null;
         }
@@ -203,7 +195,7 @@ public partial class View // Text Property APIs
         {
             if (size is { })
             {
-                TextFormatter.ConstrainToHeight = size?.Height;
+                TextFormatter.ConstrainToHeight = size.Value.Height;
             }
         }
     }

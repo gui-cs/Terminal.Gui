@@ -13,74 +13,52 @@ public class ConfigurationEditor : Scenario
 {
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
+    private IApplication? _app;
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
-        Window? win = new ();
+        using Window win = new ();
+        win.BorderStyle = LineStyle.None;
 
-        _lenShortcut = new ()
-        {
-            Title = "",
-        };
+        _lenShortcut = new Shortcut { Title = "" };
 
-        Shortcut quitShortcut = new ()
-        {
-            Key = Application.QuitKey,
-            Title = $"Quit",
-            Action = Quit
-        };
+        Shortcut quitShortcut = new () { Key = Application.QuitKey, Title = "Quit", Action = Quit };
 
-        Shortcut reloadShortcut = new  ()
-        {
-            Key = Key.F5.WithShift,
-            Title = "Reload",
-        };
-        reloadShortcut.Accepting += (s, e) =>
+        Shortcut reloadShortcut = new () { Key = Key.F5.WithShift, Title = "Reload" };
+
+        reloadShortcut.Accepting += (_, e) =>
                                     {
                                         Reload ();
                                         e.Handled = true;
                                     };
 
-        Shortcut saveShortcut = new  ()
-        {
-            Key = Key.F4,
-            Title = "Save",
-            Action = Save
-        };
+        Shortcut saveShortcut = new () { Key = Key.F4, Title = "Save", Action = Save };
 
         StatusBar statusBar = new ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
 
-        _tabView = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (_ => statusBar.Frame.Height))
-        };
+        _tabView = new TabView { Width = Dim.Fill (), Height = Dim.Fill (to: statusBar) };
 
         win.Add (_tabView, statusBar);
 
-        win.IsModalChanged += (s, a) =>
-                      {
-                          Open ();
-                      };
+        win.IsModalChanged += (_, _) => { Open (); };
 
         ConfigurationManager.Applied += ConfigurationManagerOnApplied;
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
 
         return;
 
-        void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
-        {
-            Application.TopRunnableView?.SetNeedsDraw ();
-        }
+        void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e) => _app?.TopRunnableView?.SetNeedsDraw ();
     }
+
     public void Save ()
     {
-        if (Application.Navigation?.GetFocused () is ConfigTextView editor)
+        if (_app?.Navigation?.GetFocused () is ConfigTextView editor)
         {
             editor.Save ();
         }
@@ -91,35 +69,31 @@ public class ConfigurationEditor : Scenario
         foreach (KeyValuePair<ConfigLocations, string> config in ConfigurationManager.SourcesManager!.Sources)
         {
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
-            var fileInfo = new FileInfo (config.Value.Replace ("~", homeDir));
+            FileInfo fileInfo = new (config.Value.Replace ("~", homeDir));
 
-            var editor = new ConfigTextView
+            ConfigTextView editor = new ()
             {
-                Title = config.Value.StartsWith ("resource://") ? fileInfo.Name : config.Value,
+                Title = config.Value.StartsWith ("resource://", StringComparison.Ordinal) ? fileInfo.Name : config.Value,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
-                FileInfo = fileInfo,
+                FileInfo = fileInfo
             };
 
             if (config.Value == "HardCoded")
             {
                 editor.Title = "HardCoded";
-
             }
 
-            Tab tab = new ()
-            {
-                View = editor,
-                DisplayText = config.Key.ToString ()
-            };
+            Tab tab = new () { View = editor, DisplayText = config.Key.ToString () };
 
             _tabView!.AddTab (tab, false);
 
             editor.Read ();
 
-            editor.ContentsChanged += (sender, args) =>
+            editor.ContentsChanged += (_, _) =>
                                       {
                                           _lenShortcut!.Title = _lenShortcut!.Title.Replace ("*", "");
+
                                           if (editor.IsDirty)
                                           {
                                               _lenShortcut!.Title += "*";
@@ -129,60 +103,48 @@ public class ConfigurationEditor : Scenario
             _lenShortcut!.Title = $"{editor.Title}";
         }
 
-        _tabView!.SelectedTabChanged += (sender, args) =>
-                                       {
-                                           _lenShortcut!.Title = $"{args.NewTab.View!.Title}";
-                                       };
-
+        _tabView!.SelectedTabChanged += (_, args) => { _lenShortcut!.Title = $"{args.NewTab.View!.Title}"; };
     }
 
     private void Quit ()
     {
         foreach (ConfigTextView editor in _tabView!.Tabs.Select (v =>
-                                                                {
-                                                                    if (v.View is ConfigTextView ctv)
-                                                                    {
-                                                                        return ctv;
-                                                                    }
+                                                                 {
+                                                                     if (v.View is ConfigTextView ctv)
+                                                                     {
+                                                                         return ctv;
+                                                                     }
 
-                                                                    return null;
-                                                                }).Cast<ConfigTextView> ())
+                                                                     return null;
+                                                                 })
+                                                   .Cast<ConfigTextView> ())
         {
             if (!editor.IsDirty)
             {
                 continue;
             }
 
-            int? result = MessageBox.Query (editor?.App,
-                                           "Save Changes",
-                                           $"Save changes to {editor?.FileInfo!.Name}",
-                                           "_Yes",
-                                           "_No",
-                                           "_Cancel"
-                                          );
+            int? result = MessageBox.Query (editor.App!, "Save Changes", $"Save changes to {editor.FileInfo!.Name}", Strings.btnNo, Strings.btnYes);
 
             switch (result)
             {
-                case 0:
-                    editor?.Save ();
-
-                    break;
-
                 case 1:
-                    // user decided not save changes
+                    editor.Save ();
+
                     break;
-                case -1 or 2:
-                    // user cancelled
+
+                case 0:
+                    // user decided not save changes
                     return;
             }
         }
 
-        Application.RequestStop ();
+        _tabView?.App?.RequestStop ();
     }
 
-    private static void Reload ()
+    private void Reload ()
     {
-        if (Application.Navigation?.GetFocused () is ConfigTextView editor)
+        if (_app?.Navigation?.GetFocused () is ConfigTextView editor)
         {
             editor.Read ();
         }
@@ -190,10 +152,7 @@ public class ConfigurationEditor : Scenario
 
     private class ConfigTextView : TextView
     {
-        internal ConfigTextView ()
-        {
-            TabStop = TabBehavior.TabGroup;
-        }
+        internal ConfigTextView () => TabStop = TabBehavior.TabGroup;
 
         internal FileInfo? FileInfo { get; init; }
 
@@ -213,9 +172,7 @@ public class ConfigurationEditor : Scenario
 
             if (assembly != null)
             {
-                string? name = assembly
-                               .GetManifestResourceNames ()
-                               .FirstOrDefault (x => x.EndsWith ("config.json"));
+                string? name = assembly.GetManifestResourceNames ().FirstOrDefault (x => x.EndsWith ("config.json", StringComparison.Ordinal));
 
                 if (string.IsNullOrEmpty (name))
                 {
@@ -233,7 +190,7 @@ public class ConfigurationEditor : Scenario
 
             if (FileInfo!.FullName.Contains ("HardCoded"))
             {
-                Text = ConfigurationManager.GetHardCodedConfig ()!;
+                Text = ConfigurationManager.GetHardCodedConfig ();
                 ReadOnly = true;
                 Enabled = true;
             }
@@ -257,7 +214,8 @@ public class ConfigurationEditor : Scenario
             if (FileInfo!.FullName.Contains ("RuntimeConfig"))
             {
                 ConfigurationManager.RuntimeConfig = Text;
-                IsDirty = false;
+                ClearHistoryChanges ();
+
                 return;
             }
 
@@ -270,7 +228,7 @@ public class ConfigurationEditor : Scenario
             using StreamWriter writer = File.CreateText (FileInfo.FullName);
             writer.Write (Text);
             writer.Close ();
-            IsDirty = false;
+            ClearHistoryChanges ();
         }
     }
 }

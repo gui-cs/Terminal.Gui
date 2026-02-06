@@ -10,7 +10,7 @@ public class MarginTests (ITestOutputHelper output)
     public void Margin_Is_Transparent ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
@@ -43,7 +43,7 @@ public class MarginTests (ITestOutputHelper output)
     public void Margin_ViewPortSettings_Not_Transparent_Is_NotTransparent ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
@@ -133,4 +133,26 @@ MMM",
         Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent when ShadowStyle is Opaque..");
     }
 
+    [Fact]
+    public void Margin_Layouts_Correctly ()
+    {
+        View superview = new () { Width = 10, Height = 5 };
+        View view = new () { Width = 3, Height = 1, BorderStyle = LineStyle.Single };
+        view.Margin!.Thickness = new (1);
+        View view2 = new () { X = Pos.Right (view), Width = 3, Height = 1, BorderStyle = LineStyle.Single };
+        view2.Margin!.Thickness = new (1);
+        View view3 = new () { Y = Pos.Bottom (view), Width = 3, Height = 1, BorderStyle = LineStyle.Single };
+        view3.Margin!.Thickness = new (1);
+        superview.Add (view, view2, view3);
+
+        superview.LayoutSubViews ();
+
+        Assert.Equal (new (0, 0, 10, 5), superview.Frame);
+        Assert.Equal (new (0, 0, 3, 1), view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Viewport);
+        Assert.Equal (new (3, 0, 3, 1), view2.Frame);
+        Assert.Equal (Rectangle.Empty, view2.Viewport);
+        Assert.Equal (new (0, 1, 3, 1), view3.Frame);
+        Assert.Equal (Rectangle.Empty, view3.Viewport);
+    }
 }

@@ -1,8 +1,8 @@
-- name: Documentation
+- name: Deep Dives
   href: docs/
 
 - name: API Reference
-  href: api/
+  href: api/Terminal.Gui.App.yml
 
 - name: Source
   href: https://github.com/gui-cs/Terminal.Gui

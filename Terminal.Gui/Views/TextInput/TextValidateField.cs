@@ -1,13 +1,10 @@
-
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
 public class TextValidateField : View, IDesignable
 {
     private const int DEFAULT_LENGTH = 10;
-    private int _cursorPosition;
+
     private ITextValidateProvider? _provider;
 
     /// <summary>
@@ -19,72 +16,17 @@ public class TextValidateField : View, IDesignable
         CanFocus = true;
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.LeftStart,
-                    () =>
-                    {
-                        HomeKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.RightEnd,
-                    () =>
-                    {
-                        EndKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.DeleteCharRight,
-                    () =>
-                    {
-                        DeleteKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.DeleteCharLeft,
-                    () =>
-                    {
-                        BackspaceKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        CursorLeft ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Right,
-                    () =>
-                    {
-                        CursorRight ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LeftStart, () => HomeKeyHandler ());
+        AddCommand (Command.RightEnd, () => EndKeyHandler ());
+        AddCommand (Command.DeleteCharRight, () => DeleteKeyHandler ());
+        AddCommand (Command.DeleteCharLeft, () => BackspaceKeyHandler ());
+        AddCommand (Command.Left, () => CursorLeft ());
+        AddCommand (Command.Right, () => CursorRight ());
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
-
         KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -114,9 +56,7 @@ public class TextValidateField : View, IDesignable
 
             if (_provider!.Fixed)
             {
-                Width = _provider.DisplayText == string.Empty
-                            ? DEFAULT_LENGTH
-                            : _provider.DisplayText.Length;
+                Width = _provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length;
             }
 
             // HomeKeyHandler already call SetNeedsDisplay
@@ -125,17 +65,9 @@ public class TextValidateField : View, IDesignable
     }
 
     /// <summary>Text</summary>
-    public new string Text
+    public override string Text
     {
-        get
-        {
-            if (_provider is null)
-            {
-                return string.Empty;
-            }
-
-            return _provider.Text;
-        }
+        get => _provider is null ? string.Empty : _provider.Text;
         set
         {
             if (_provider is null)
@@ -149,26 +81,59 @@ public class TextValidateField : View, IDesignable
         }
     }
 
-    /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
-    {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
-        {
-            int c = _provider!.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
+    private int _insertionPoint;
 
-            if (_provider.Fixed == false && TextAlignment == Alignment.End && Text.Length > 0)
+    private int InsertionPoint
+    {
+        get => _insertionPoint;
+        set
+        {
+            if (_insertionPoint == value)
             {
-                c++;
+                return;
             }
 
-            _cursorPosition = c;
-            SetFocus ();
-            SetNeedsDraw ();
+            _insertionPoint = value;
+            (int left, _) = GetMargins (Viewport.Width);
 
-            return true;
+            // Fixed = true, is for inputs that have fixed width, like masked ones.
+            // Fixed = false, is for normal input.
+            // When it's right-aligned and it's a normal input, the cursor behaves differently.
+            int curPos;
+
+            if (_provider?.Fixed == false && TextAlignment == Alignment.End)
+            {
+                curPos = _insertionPoint + left - 1;
+            }
+            else
+            {
+                curPos = _insertionPoint + left;
+            }
+
+            Cursor = Cursor with { Position = ViewportToScreen (new Point (curPos, 0)), Style = CursorStyle.Default };
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnMouseEvent (Mouse mouse)
+    {
+        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        {
+            return false;
         }
 
-        return false;
+        int c = _provider!.Cursor (mouse.Position!.Value.X - GetMargins (Viewport.Width).left);
+
+        if (!_provider.Fixed && TextAlignment == Alignment.End && Text.Length > 0)
+        {
+            c++;
+        }
+
+        InsertionPoint = c;
+        SetFocus ();
+        SetNeedsDraw ();
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -201,9 +166,9 @@ public class TextValidateField : View, IDesignable
         SetAttribute (textColor);
 
         // Content
-        for (var i = 0; i < _provider.DisplayText.Length; i++)
+        foreach (char t in _provider.DisplayText)
         {
-            AddRune ((Rune)_provider.DisplayText [i]);
+            AddRune ((Rune)t);
         }
 
         // Right Margin
@@ -232,7 +197,7 @@ public class TextValidateField : View, IDesignable
 
         Rune rune = key.AsRune;
 
-        bool inserted = _provider.InsertAt ((char)rune.Value, _cursorPosition);
+        bool inserted = _provider.InsertAt ((char)rune.Value, InsertionPoint);
 
         if (inserted)
         {
@@ -244,41 +209,17 @@ public class TextValidateField : View, IDesignable
         return false;
     }
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        (int left, _) = GetMargins (Viewport.Width);
-
-        // Fixed = true, is for inputs that have fixed width, like masked ones.
-        // Fixed = false, is for normal input.
-        // When it's right-aligned and it's a normal input, the cursor behaves differently.
-        int curPos;
-
-        if (_provider?.Fixed == false && TextAlignment == Alignment.End)
-        {
-            curPos = _cursorPosition + left - 1;
-        }
-        else
-        {
-            curPos = _cursorPosition + left;
-        }
-
-        Move (curPos, 0);
-
-        return new (curPos, 0);
-    }
-
     /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>
     /// <returns></returns>
     private bool BackspaceKeyHandler ()
     {
-        if (_provider!.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
+        if (!_provider!.Fixed && TextAlignment == Alignment.End && InsertionPoint <= 1)
         {
             return false;
         }
 
-        _cursorPosition = _provider.CursorLeft (_cursorPosition);
-        _provider.Delete (_cursorPosition);
+        _insertionPoint = _provider.CursorLeft (InsertionPoint);
+        _provider.Delete (InsertionPoint);
         SetNeedsDraw ();
 
         return true;
@@ -293,11 +234,11 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        int current = _cursorPosition;
-        _cursorPosition = _provider.CursorLeft (_cursorPosition);
+        int current = _insertionPoint;
+        InsertionPoint = _provider.CursorLeft (InsertionPoint);
         SetNeedsDraw ();
 
-        return current != _cursorPosition;
+        return current != InsertionPoint;
     }
 
     /// <summary>Try to move the cursor to the right.</summary>
@@ -309,23 +250,23 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        int current = _cursorPosition;
-        _cursorPosition = _provider.CursorRight (_cursorPosition);
+        int current = InsertionPoint;
+        InsertionPoint = _provider.CursorRight (InsertionPoint);
         SetNeedsDraw ();
 
-        return current != _cursorPosition;
+        return current != InsertionPoint;
     }
 
     /// <summary>Deletes char at current position.</summary>
     /// <returns></returns>
     private bool DeleteKeyHandler ()
     {
-        if (_provider!.Fixed == false && TextAlignment == Alignment.End)
+        if (!_provider!.Fixed && TextAlignment == Alignment.End)
         {
-            _cursorPosition = _provider.CursorLeft (_cursorPosition);
+            InsertionPoint = _provider.CursorLeft (InsertionPoint);
         }
 
-        _provider.Delete (_cursorPosition);
+        _provider.Delete (InsertionPoint);
         SetNeedsDraw ();
 
         return true;
@@ -335,7 +276,7 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool EndKeyHandler ()
     {
-        _cursorPosition = _provider!.CursorEnd ();
+        InsertionPoint = _provider!.CursorEnd ();
         SetNeedsDraw ();
 
         return true;
@@ -362,13 +303,13 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool HomeKeyHandler ()
     {
-        _cursorPosition = _provider!.CursorStart ();
+        InsertionPoint = _provider!.CursorStart ();
         SetNeedsDraw ();
 
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         TextRegexProvider provider = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };

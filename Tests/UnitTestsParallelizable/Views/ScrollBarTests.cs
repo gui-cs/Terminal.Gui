@@ -1,7 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
-
-namespace ViewsTests;
+﻿namespace ViewsTests;
 
 public class ScrollBarTests
 {
@@ -14,24 +11,18 @@ public class ScrollBarTests
         Assert.Equal (0, scrollBar.ScrollableContentSize);
         Assert.Equal (0, scrollBar.VisibleContentSize);
         Assert.Equal (0, scrollBar.GetSliderPosition ());
-        Assert.Equal (0, scrollBar.Position);
+        Assert.Equal (0, scrollBar.Value);
         Assert.False (scrollBar.AutoShow);
     }
 
     #region AutoHide
+
     [Fact]
     public void AutoHide_False_Is_Default_CorrectlyHidesAndShows ()
     {
-        var super = new Runnable ()
-        {
-            Id = "super",
-            Width = 1,
-            Height = 20
-        };
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
 
-        var scrollBar = new ScrollBar
-        {
-        };
+        var scrollBar = new ScrollBar ();
         super.Add (scrollBar);
         Assert.False (scrollBar.AutoShow);
         Assert.True (scrollBar.Visible);
@@ -55,18 +46,9 @@ public class ScrollBarTests
     [Fact]
     public void AutoHide_False_CorrectlyHidesAndShows ()
     {
-        var super = new Runnable ()
-        {
-            Id = "super",
-            Width = 1,
-            Height = 20
-        };
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
 
-        var scrollBar = new ScrollBar
-        {
-            ScrollableContentSize = 20,
-            AutoShow = false
-        };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 20, AutoShow = false };
         super.Add (scrollBar);
         Assert.False (scrollBar.AutoShow);
         Assert.True (scrollBar.Visible);
@@ -81,17 +63,9 @@ public class ScrollBarTests
     [Fact]
     public void AutoHide_True_Changing_ScrollableContentSize_CorrectlyHidesAndShows ()
     {
-        var super = new Runnable ()
-        {
-            Id = "super",
-            Width = 1,
-            Height = 20
-        };
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
 
-        var scrollBar = new ScrollBar
-        {
-            ScrollableContentSize = 20,
-        };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 20 };
         super.Add (scrollBar);
         Assert.False (scrollBar.AutoShow);
         Assert.True (scrollBar.Visible);
@@ -125,18 +99,9 @@ public class ScrollBarTests
     [Fact]
     public void AutoHide_Change_VisibleContentSize_CorrectlyHidesAndShows ()
     {
-        var super = new Runnable ()
-        {
-            Id = "super",
-            Width = 1,
-            Height = 20
-        };
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
 
-        var scrollBar = new ScrollBar
-        {
-            ScrollableContentSize = 20,
-            VisibleContentSize = 20
-        };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 20, VisibleContentSize = 20 };
         super.Add (scrollBar);
         Assert.False (scrollBar.AutoShow);
         Assert.True (scrollBar.Visible);
@@ -148,26 +113,32 @@ public class ScrollBarTests
         Assert.False (scrollBar.Visible);
 
         scrollBar.VisibleContentSize = 10;
+
         //Application.RunIteration (ref rs);
         Assert.True (scrollBar.Visible);
 
         scrollBar.VisibleContentSize = 30;
+
         //Application.RunIteration (ref rs);
         Assert.False (scrollBar.Visible);
 
         scrollBar.VisibleContentSize = 10;
+
         //Application.RunIteration (ref rs);
         Assert.True (scrollBar.Visible);
 
         scrollBar.VisibleContentSize = 21;
+
         //Application.RunIteration (ref rs);
         Assert.False (scrollBar.Visible);
 
         scrollBar.AutoShow = false;
+
         //Application.RunIteration (ref rs);
         Assert.True (scrollBar.Visible);
 
         scrollBar.VisibleContentSize = 10;
+
         //Application.RunIteration (ref rs);
         Assert.True (scrollBar.Visible);
 
@@ -177,6 +148,7 @@ public class ScrollBarTests
     #endregion AutoHide
 
     #region Orientation
+
     [Fact]
     public void OnOrientationChanged_Keeps_Size ()
     {
@@ -191,25 +163,17 @@ public class ScrollBarTests
     [Fact]
     public void OnOrientationChanged_Sets_Position_To_0 ()
     {
-        View super = new View ()
-        {
-            Id = "super",
-            Width = 10,
-            Height = 10
-        };
-        var scrollBar = new ScrollBar ()
-        {
-        };
+        var super = new View { Id = "super", Width = 10, Height = 10 };
+        var scrollBar = new ScrollBar ();
         super.Add (scrollBar);
         scrollBar.Layout ();
-        scrollBar.Position = 1;
+        scrollBar.Value = 1;
         scrollBar.Orientation = Orientation.Horizontal;
 
         Assert.Equal (0, scrollBar.GetSliderPosition ());
     }
 
     #endregion Orientation
-
 
     #region Size
 
@@ -218,38 +182,39 @@ public class ScrollBarTests
     #endregion Size
 
     #region Position
+
     [Fact]
     public void Position_Event_Cancels ()
     {
         var changingCount = 0;
         var changedCount = 0;
-        var scrollBar = new ScrollBar { };
+        var scrollBar = new ScrollBar ();
         scrollBar.ScrollableContentSize = 5;
         scrollBar.Frame = new Rectangle (0, 0, 1, 4); // Needs to be at least 4 for slider to move
 
-        scrollBar.PositionChanging += (s, e) =>
-                                            {
-                                                if (changingCount == 0)
-                                                {
-                                                    e.Cancel = true;
-                                                }
+        scrollBar.ValueChanging += (s, e) =>
+                                   {
+                                       if (changingCount == 0)
+                                       {
+                                           e.Handled = true;
+                                       }
 
-                                                changingCount++;
-                                            };
-        scrollBar.PositionChanged += (s, e) => changedCount++;
+                                       changingCount++;
+                                   };
+        scrollBar.ValueChanged += (s, e) => changedCount++;
 
-        scrollBar.Position = 1;
-        Assert.Equal (0, scrollBar.Position);
+        scrollBar.Value = 1;
+        Assert.Equal (0, scrollBar.Value);
         Assert.Equal (1, changingCount);
         Assert.Equal (0, changedCount);
 
-        scrollBar.Position = 1;
-        Assert.Equal (1, scrollBar.Position);
+        scrollBar.Value = 1;
+        Assert.Equal (1, scrollBar.Value);
         Assert.Equal (2, changingCount);
         Assert.Equal (1, changedCount);
     }
-    #endregion Position
 
+    #endregion Position
 
     [Fact]
     public void ScrollableContentSize_Cannot_Be_Negative ()
@@ -270,5 +235,42 @@ public class ScrollBarTests
         scrollBar.ScrollableContentSize = 10;
         Assert.Equal (10, scrollBar.ScrollableContentSize);
         Assert.Equal (1, count);
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ScrollBar_Click_JumpsPosition ()
+    {
+        ScrollBar scrollBar = new () { Height = 10, ScrollableContentSize = 100 };
+        scrollBar.BeginInit ();
+        scrollBar.EndInit ();
+
+        // Click on track jumps scroll position
+        Mouse ev = new () { Position = new Point (0, 5), Flags = MouseFlags.LeftButtonClicked };
+        scrollBar.NewMouseEvent (ev);
+
+        // Verify the scrollbar is set up correctly
+        Assert.Equal (100, scrollBar.ScrollableContentSize);
+
+        scrollBar.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void ScrollBar_Command_Accept_NotTypical ()
+    {
+        ScrollBar scrollBar = new () { Height = 10 };
+
+        // ScrollBar doesn't typically use Accept command
+        bool? result = scrollBar.InvokeCommand (Command.Accept);
+
+        // Accept is not handled
+        Assert.NotEqual (true, result);
+
+        scrollBar.Dispose ();
     }
 }

@@ -1,5 +1,4 @@
-﻿#nullable enable
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace ViewsTests;
 
@@ -39,11 +38,7 @@ public class ShortcutTests
 
         //  0123456789
         // "   0  A "
-        shortcut = new ()
-        {
-            Key = Key.A,
-            HelpText = "0"
-        };
+        shortcut = new () { Key = Key.A, HelpText = "0" };
         shortcut.Layout ();
         Assert.Equal (8, shortcut.Frame.Width);
         Assert.Equal (1, shortcut.Frame.Height);
@@ -61,12 +56,7 @@ public class ShortcutTests
 
         //  0123456789
         // " C  0  A "
-        shortcut = new ()
-        {
-            Title = "C",
-            Key = Key.A,
-            HelpText = "0"
-        };
+        shortcut = new () { Title = "C", Key = Key.A, HelpText = "0" };
         shortcut.Layout ();
         Assert.Equal (9, shortcut.Frame.Width);
         Assert.Equal (1, shortcut.Frame.Height);
@@ -94,12 +84,7 @@ public class ShortcutTests
     [InlineData ("C", "H", KeyCode.K, 9)]
     public void NaturalSize (string command, string help, KeyCode key, int expectedWidth)
     {
-        var shortcut = new Shortcut
-        {
-            HelpText = help,
-            Key = key,
-            Title = command
-        };
+        var shortcut = new Shortcut { HelpText = help, Key = key, Title = command };
 
         shortcut.Layout ();
 
@@ -107,32 +92,17 @@ public class ShortcutTests
         // | C  H  K |
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new ()
-        {
-            HelpText = help,
-            Title = command,
-            Key = key
-        };
+        shortcut = new () { HelpText = help, Title = command, Key = key };
 
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new ()
-        {
-            HelpText = help,
-            Key = key,
-            Title = command
-        };
+        shortcut = new () { HelpText = help, Key = key, Title = command };
 
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new ()
-        {
-            Key = key,
-            HelpText = help,
-            Title = command
-        };
+        shortcut = new () { Key = key, HelpText = help, Title = command };
 
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
@@ -153,13 +123,7 @@ public class ShortcutTests
     [InlineData (11, 0, 5, 8)]
     public void Set_Width_Layouts_Correctly (int width, int expectedCmdX, int expectedHelpX, int expectedKeyX)
     {
-        var shortcut = new Shortcut
-        {
-            Width = width,
-            Title = "C",
-            Text = "H",
-            Key = Key.K
-        };
+        var shortcut = new Shortcut { Width = width, Title = "C", Text = "H", Key = Key.K };
         shortcut.Layout ();
 
         // 01234
@@ -187,36 +151,24 @@ public class ShortcutTests
     [Fact]
     public void CommandView_Text_And_Title_Track ()
     {
-        var shortcut = new Shortcut
-        {
-            Title = "T"
-        };
+        var shortcut = new Shortcut { Title = "T" };
 
         Assert.Equal (shortcut.Title, shortcut.CommandView.Text);
 
         shortcut = new ();
 
-        shortcut.CommandView = new ()
-        {
-            Text = "T"
-        };
+        shortcut.CommandView = new () { Text = "T" };
         Assert.Equal (shortcut.Title, shortcut.CommandView.Text);
     }
 
     [Fact]
     public void HelpText_And_Text_Are_The_Same ()
     {
-        var shortcut = new Shortcut
-        {
-            Text = "H"
-        };
+        var shortcut = new Shortcut { Text = "H" };
 
         Assert.Equal (shortcut.Text, shortcut.HelpText);
 
-        shortcut = new ()
-        {
-            HelpText = "H"
-        };
+        shortcut = new () { HelpText = "H" };
 
         Assert.Equal (shortcut.Text, shortcut.HelpText);
     }
@@ -226,10 +178,7 @@ public class ShortcutTests
     [InlineData (KeyCode.F1, "F1")]
     public void KeyView_Text_Tracks_Key (KeyCode key, string expected)
     {
-        var shortcut = new Shortcut
-        {
-            Key = key
-        };
+        var shortcut = new Shortcut { Key = key };
 
         Assert.Equal (expected, shortcut.KeyView.Text);
     }
@@ -299,7 +248,7 @@ public class ShortcutTests
     public void BindKeyToApplication_Can_Be_Set ()
     {
         IApplication? app = Application.Create ();
-        var shortcut = new Shortcut () { App = app };
+        var shortcut = new Shortcut { App = app };
 
         shortcut.BindKeyToApplication = true;
 
@@ -331,10 +280,7 @@ public class ShortcutTests
     [InlineData (Orientation.Vertical)]
     public void Orientation_SetsCorrectly (Orientation orientation)
     {
-        var shortcut = new Shortcut
-        {
-            Orientation = orientation
-        };
+        var shortcut = new Shortcut { Orientation = orientation };
 
         Assert.Equal (orientation, shortcut.Orientation);
     }
@@ -344,10 +290,7 @@ public class ShortcutTests
     [InlineData (AlignmentModes.EndToStart)]
     public void AlignmentModes_SetsCorrectly (AlignmentModes alignmentModes)
     {
-        var shortcut = new Shortcut
-        {
-            AlignmentModes = alignmentModes
-        };
+        var shortcut = new Shortcut { AlignmentModes = alignmentModes };
 
         Assert.Equal (alignmentModes, shortcut.AlignmentModes);
     }
@@ -357,10 +300,7 @@ public class ShortcutTests
     {
         var actionInvoked = false;
 
-        var shortcut = new Shortcut
-        {
-            Action = () => { actionInvoked = true; }
-        };
+        var shortcut = new Shortcut { Action = () => { actionInvoked = true; } };
 
         shortcut.Action.Invoke ();
 
@@ -462,21 +402,13 @@ public class ShortcutTests
         Runnable<bool> runnable = new ();
         app.Begin (runnable);
 
-        var shortcut = new Shortcut
-        {
-            Key = Key.A,
-            Text = "0",
-            CommandView = new CheckBox ()
-            {
-                Title = "_C"
-            },
-            CanFocus = canFocus
-        };
+        var shortcut = new Shortcut { Key = Key.A, Text = "0", CommandView = new CheckBox { Title = "_C" }, CanFocus = canFocus };
         runnable.Add (shortcut);
 
         Assert.Equal (canFocus, shortcut.HasFocus);
 
         var accepted = 0;
+
         shortcut.Accepting += (s, e) =>
                               {
                                   accepted++;
@@ -492,4 +424,98 @@ public class ShortcutTests
         Assert.Equal (expectedSelect, selected);
     }
 
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    // NOTE: Shortcut has unified handling - all three commands invoke DispatchCommand
+    [Fact]
+    public void Shortcut_AllCommands_InvokeSameDispatchCommand ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        var dispatchCount = 0;
+
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  dispatchCount++;
+                                  e.Handled = true;
+                              };
+
+        shortcut.InvokeCommand (Command.Activate);
+        shortcut.InvokeCommand (Command.Accept);
+        shortcut.InvokeCommand (Command.HotKey);
+
+        // All three should invoke the same DispatchCommand method
+        Assert.Equal (3, dispatchCount);
+
+        shortcut.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Shortcut_Command_Activate_DispatchesCommand ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        var acceptingFired = false;
+
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true;
+                              };
+
+        bool? result = shortcut.InvokeCommand (Command.Activate);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        shortcut.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Shortcut_Command_Accept_SameAsActivate ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        var acceptingFired = false;
+
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true;
+                              };
+
+        bool? result = shortcut.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        shortcut.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Shortcut_Command_HotKey_SameAsActivate ()
+    {
+        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        var acceptingFired = false;
+
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  acceptingFired = true;
+                                  e.Handled = true;
+                              };
+
+        bool? result = shortcut.InvokeCommand (Command.HotKey);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        shortcut.Dispose ();
+    }
 }

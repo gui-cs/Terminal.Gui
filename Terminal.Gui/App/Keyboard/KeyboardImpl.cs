@@ -145,9 +145,6 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     public event EventHandler<Key>? KeyDown;
 
     /// <inheritdoc/>
-    public event EventHandler<Key>? KeyUp;
-
-    /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
         // TODO: Add a way to ignore certain keys, esp for debugging.
@@ -176,7 +173,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         {
             if (App?.SessionStack is { })
             {
-                foreach (IRunnable? runnable in App.SessionStack.Select(r => r.Runnable))
+                foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
                 {
                     if (runnable is View view && view.NewKeyDownEvent (key))
                     {
@@ -203,42 +200,6 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         if (commandHandled is true)
         {
             return true;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public bool RaiseKeyUpEvent (Key key)
-    {
-        if (App?.Initialized != true)
-        {
-            return true;
-        }
-
-        KeyUp?.Invoke (this, key);
-
-        if (key.Handled)
-        {
-            return true;
-        }
-
-        // TODO: Add Popover support
-
-        if (App?.SessionStack is { })
-        {
-            foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
-            {
-                if (runnable is View view && view.NewKeyUpEvent (key))
-                {
-                    return true;
-                }
-
-                if (runnable!.IsModal)
-                {
-                    break;
-                }
-            }
         }
 
         return false;
@@ -284,14 +245,12 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     {
         if (!_commandImplementations.ContainsKey (command))
         {
-            throw new NotSupportedException (
-                                             @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by Application."
-                                            );
+            throw new NotSupportedException (@$"A KeyBinding exists for {command} ({key}) but that command is not supported by Application.");
         }
 
         if (_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
         {
-            CommandContext<KeyBinding> context = new (command, null, binding); // Create the context here
+            CommandContext context = new (command, null, binding); // Create the context here
 
             return implementation (context);
         }
@@ -304,67 +263,56 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         _commandImplementations.Clear ();
 
         // Things Application knows how to do
-        AddCommand (
-                    Command.Quit,
+        AddCommand (Command.Quit,
                     () =>
                     {
                         App?.RequestStop ();
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.Suspend,
+        AddCommand (Command.Suspend,
                     () =>
                     {
                         App?.Driver?.Suspend ();
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.NextTabStop,
-                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
+        AddCommand (Command.NextTabStop, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
 
-        AddCommand (
-                    Command.PreviousTabStop,
-                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
+        AddCommand (Command.PreviousTabStop, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
 
-        AddCommand (
-                    Command.NextTabGroup,
-                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
+        AddCommand (Command.NextTabGroup, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
 
-        AddCommand (
-                    Command.PreviousTabGroup,
-                    () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
+        AddCommand (Command.PreviousTabGroup, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
 
-        AddCommand (
-                    Command.Refresh,
+        AddCommand (Command.Refresh,
                     () =>
                     {
                         App?.LayoutAndDraw (true);
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.Arrange,
+        AddCommand (Command.Arrange,
                     () =>
                     {
                         View? viewToArrange = App?.Navigation?.GetFocused ();
 
                         // Go up the superview hierarchy and find the first that is not ViewArrangement.Fixed
-                        while (viewToArrange is { SuperView: { }, Arrangement: ViewArrangement.Fixed })
+                        while (viewToArrange is { Arrangement: ViewArrangement.Fixed })
                         {
-                            viewToArrange = viewToArrange.SuperView;
+                            viewToArrange = viewToArrange switch
+                            {
+                                Adornment adornmentView => adornmentView.Parent,
+                                _ => viewToArrange.SuperView
+                            };
                         }
 
                         if (viewToArrange is { })
                         {
-                            return viewToArrange.Border?.EnterArrangeMode (ViewArrangement.Fixed);
+                            return viewToArrange.Border?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
                         }
 
                         return false;
@@ -416,18 +364,18 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="f">The function.</param>
-    private void AddCommand (Command command, Func<bool?> f) { _commandImplementations [command] = ctx => f (); }
+    private void AddCommand (Command command, Func<bool?> f) => _commandImplementations [command] = ctx => f ();
 
-    private void OnArrangeKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { ArrangeKey = e.NewValue; }
+    private void OnArrangeKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => ArrangeKey = e.NewValue;
 
-    private void OnNextTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { NextTabGroupKey = e.NewValue; }
+    private void OnNextTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => NextTabGroupKey = e.NewValue;
 
-    private void OnNextTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { NextTabKey = e.NewValue; }
+    private void OnNextTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => NextTabKey = e.NewValue;
 
-    private void OnPrevTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { PrevTabGroupKey = e.NewValue; }
+    private void OnPrevTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => PrevTabGroupKey = e.NewValue;
 
-    private void OnPrevTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { PrevTabKey = e.NewValue; }
+    private void OnPrevTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => PrevTabKey = e.NewValue;
 
     // Event handlers for Application static property changes
-    private void OnQuitKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { QuitKey = e.NewValue; }
+    private void OnQuitKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => QuitKey = e.NewValue;
 }

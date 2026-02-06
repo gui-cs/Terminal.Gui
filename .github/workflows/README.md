@@ -56,12 +56,34 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 6. Uploads logs per-OS
 7. **Uploads coverage to Codecov only from Linux runner**
 
-### 4) Publish to NuGet (`.github/workflows/publish.yml`)
+### 4) Create Release (`.github/workflows/release.yml`)
+
+- **Triggers**: `workflow_dispatch` (manual trigger from GitHub Actions UI)
+- **Inputs**:
+  - `release_type`: Choose from `prealpha`, `alpha`, `beta`, `rc`, or `stable`
+  - `version_override`: (Optional) Specify exact version number, otherwise GitVersion calculates it
+- **Process**:
+  1. Checks out `v2_release` branch
+  2. Determines version using GitVersion or override
+  3. Creates annotated git tag (e.g., `v2.0.0-prealpha` or `v2.0.0`)
+  4. Creates release commit with message
+  5. Pushes tag and commit to repository
+  6. Creates GitHub Release (marked as pre-release if not stable)
+  7. Automatically triggers publish workflow (see below)
+- **Purpose**: Automates the release process to prevent manual errors
+
+### 5) Publish to NuGet (`.github/workflows/publish.yml`)
 
 - **Triggers**: push to `v2_release`, `v2_develop`, and tags `v*`(ignores `**.md`)
 - Uses GitVersion to compute SemVer, builds Release, packs with symbols, and pushes to NuGet.org using `NUGET_API_KEY`
+- **Automatically triggered** by the Create Release workflow when a new tag is pushed
+- **Additional actions on v2_release branch**:
+  - Delists old NuGet packages to keep package list clean:
+    - Keeps only the most recent `2.0.0-develop.*` package
+    - Keeps only the just-published `2.0.0-alpha.*` or `2.0.0-beta.*` package
+  - Triggers Terminal.Gui.templates repository update via repository_dispatch (requires `PAT_FOR_TEMPLATES` secret)
 
-### 5) Build and publish API docs (`.github/workflows/api-docs.yml`)
+### 6) Build and publish API docs (`.github/workflows/api-docs.yml`)
 
 - **Triggers**: push to `v1_release` and `v2_develop`
 - Builds DocFX site on Windows and deploys to GitHub Pages when `ref_name` is `v2_release` or `v2_develop`

@@ -31,10 +31,10 @@ public class StatusBar : Bar, IDesignable
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
-        SuperViewChanged += OnSuperViewChanged;
     }
 
-    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    /// <inheritdoc />
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> e)
     {
         if (SuperView is null)
         {
@@ -132,19 +132,19 @@ public class StatusBar : Bar, IDesignable
 
         Add (shortcut);
 
-        var button1 = new Button
+        var LeftButton = new Button
         {
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accepting += OnButtonClicked;
-        Add (button1);
+        LeftButton.Accepting += OnButtonClicked;
+        Add (LeftButton);
 
 #pragma warning disable TGUI001
         shortcut.Accepting += (_, e) =>
                               {
-                                  button1.Visible = !button1.Visible;
-                                  button1.Enabled = button1.Visible;
+                                  LeftButton.Visible = !LeftButton.Visible;
+                                  LeftButton.Enabled = LeftButton.Visible;
                                   e.Handled = false;
                               };
 #pragma warning restore TGUI001
@@ -156,17 +156,17 @@ public class StatusBar : Bar, IDesignable
             CanFocus = true
         });
 
-        var button2 = new Button
+        var MiddleButton = new Button
         {
             Text = "Or me!",
         };
-        button2.Accepting += (s, e) => App?.RequestStop ();
+        MiddleButton.Accepting += (s, e) => App?.RequestStop ();
 
-        Add (button2);
+        Add (MiddleButton);
 
         return true;
 
-        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App, "Hi", $"You clicked {sender}"); }
+        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App!, "Hi", $"You clicked {sender}"); }
     }
 
     /// <inheritdoc />
@@ -174,7 +174,6 @@ public class StatusBar : Bar, IDesignable
     {
         base.Dispose (disposing);
 
-        SuperViewChanged -= OnSuperViewChanged;
         ConfigurationManager.Applied -= OnConfigurationManagerApplied;
     }
 }

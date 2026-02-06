@@ -9,13 +9,14 @@ namespace ApplicationTests.Timeout;
 ///     These tests verify that timeouts fire correctly, can be added/removed,
 ///     handle exceptions properly, and work with Application.Run() calls.
 /// </summary>
+[Collection ("Application Timer Tests")]
 public class TimeoutTests
 {
     [Fact]
     public void AddTimeout_Callback_Can_Add_New_Timeout ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var firstFired = false;
         var secondFired = false;
@@ -76,7 +77,7 @@ public class TimeoutTests
     public void AddTimeout_Exception_In_Callback_Propagates ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var exceptionThrown = false;
 
@@ -120,7 +121,7 @@ public class TimeoutTests
     public void AddTimeout_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         uint timeoutTime = 100;
         var timeoutFired = false;
@@ -155,7 +156,7 @@ public class TimeoutTests
     public void AddTimeout_From_Background_Thread_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var timeoutFired = false;
         using var taskCompleted = new ManualResetEventSlim (false);
@@ -217,7 +218,7 @@ public class TimeoutTests
     public void AddTimeout_High_Frequency_All_Fire ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         const int TIMEOUT_COUNT = 50; // Reduced from 100 for performance
         var firedCount = 0;
@@ -268,7 +269,7 @@ public class TimeoutTests
     public void Long_Running_Callback_Delays_Subsequent_Timeouts ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var firstStarted = false;
         var secondFired = false;
@@ -333,7 +334,7 @@ public class TimeoutTests
     public void AddTimeout_Multiple_Fire_In_Order ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         List<int> executionOrder = new ();
 
@@ -397,7 +398,7 @@ public class TimeoutTests
     public void AddTimeout_Multiple_TimeSpan_Zero_All_Fire ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         const int TIMEOUT_COUNT = 10;
         var firedCount = 0;
@@ -448,7 +449,7 @@ public class TimeoutTests
     public void AddTimeout_Nested_Run_Parent_Timeout_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var parentTimeoutFired = false;
         var childTimeoutFired = false;
@@ -527,7 +528,7 @@ public class TimeoutTests
     public void AddTimeout_Repeating_Fires_Multiple_Times ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var fireCount = 0;
 
@@ -574,7 +575,7 @@ public class TimeoutTests
     public void AddTimeout_StopAfterFirstIteration_Immediate_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var timeoutFired = false;
 
@@ -598,7 +599,7 @@ public class TimeoutTests
     public void AddTimeout_TimeSpan_Zero_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         var timeoutFired = false;
 
         app.AddTimeout (
@@ -620,7 +621,7 @@ public class TimeoutTests
     public void RemoveTimeout_Already_Removed_Returns_False ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         object? token = app.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
 
@@ -637,7 +638,7 @@ public class TimeoutTests
     public void RemoveTimeout_Cancels_Timeout ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var timeoutFired = false;
 
@@ -689,7 +690,7 @@ public class TimeoutTests
     public void RemoveTimeout_Invalid_Token_Returns_False ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var fakeToken = new object ();
         bool removed = app.RemoveTimeout (fakeToken);
@@ -701,7 +702,7 @@ public class TimeoutTests
     public void TimedEvents_GetTimeout_Invalid_Token_Returns_Null ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var fakeToken = new object ();
         TimeSpan? actualTimeSpan = app.TimedEvents?.GetTimeout (fakeToken);
@@ -713,7 +714,7 @@ public class TimeoutTests
     public void TimedEvents_GetTimeout_Returns_Correct_TimeSpan ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         TimeSpan expectedTimeSpan = TimeSpan.FromMilliseconds (500);
         object? token = app.AddTimeout (expectedTimeSpan, () => false);
@@ -728,7 +729,7 @@ public class TimeoutTests
     public void TimedEvents_StopAll_Clears_Timeouts ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var firedCount = 0;
 
@@ -785,7 +786,7 @@ public class TimeoutTests
     public void TimedEvents_Timeouts_Property_Is_Thread_Safe ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         const int THREAD_COUNT = 10;
         var addedCount = 0;
@@ -859,7 +860,7 @@ public class TimeoutTests
     public void Invoke_Adds_Idle ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Runnable top = new ();
         SessionToken? rs = app.Begin (top);

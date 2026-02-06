@@ -17,14 +17,17 @@ public class TextAlignmentAndDirection : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window app = new ()
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
 
-        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
+        string txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
 
         SchemeManager.AddScheme ("TextAlignmentAndDirection1", new () { Normal = new (Color.Black, Color.Gray) });
         SchemeManager.AddScheme ("TextAlignmentAndDirection2", new () { Normal = new (Color.Black, Color.DarkGray) });
@@ -131,14 +134,14 @@ public class TextAlignmentAndDirection : Scenario
         singleLineLabels.Add (txtLabelHR);
         singleLineLabels.Add (txtLabelHJ);
 
-        app.Add (labelHL);
-        app.Add (txtLabelHL);
-        app.Add (labelHC);
-        app.Add (txtLabelHC);
-        app.Add (labelHR);
-        app.Add (txtLabelHR);
-        app.Add (labelHJ);
-        app.Add (txtLabelHJ);
+        window.Add (labelHL);
+        window.Add (txtLabelHL);
+        window.Add (labelHC);
+        window.Add (txtLabelHC);
+        window.Add (labelHR);
+        window.Add (txtLabelHR);
+        window.Add (labelHJ);
+        window.Add (txtLabelHJ);
 
         // Vertical Single-Line
 
@@ -255,14 +258,14 @@ public class TextAlignmentAndDirection : Scenario
         singleLineLabels.Add (txtLabelVB);
         singleLineLabels.Add (txtLabelVJ);
 
-        app.Add (labelVT);
-        app.Add (txtLabelVT);
-        app.Add (labelVM);
-        app.Add (txtLabelVM);
-        app.Add (labelVB);
-        app.Add (txtLabelVB);
-        app.Add (labelVJ);
-        app.Add (txtLabelVJ);
+        window.Add (labelVT);
+        window.Add (txtLabelVT);
+        window.Add (labelVM);
+        window.Add (txtLabelVM);
+        window.Add (labelVB);
+        window.Add (txtLabelVB);
+        window.Add (labelVJ);
+        window.Add (txtLabelVJ);
 
         // Multi-Line
 
@@ -421,7 +424,7 @@ public class TextAlignmentAndDirection : Scenario
         container.Add (txtLabelBC);
         container.Add (txtLabelBR);
 
-        app.Add (container);
+        window.Add (container);
 
         // Edit Text
 
@@ -443,7 +446,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        app.KeyUp += (s, m) =>
+        window.KeyDown += (_, _) =>
                      {
                          foreach (View v in singleLineLabels)
                          {
@@ -458,7 +461,7 @@ public class TextAlignmentAndDirection : Scenario
 
         editText.SetFocus ();
 
-        app.Add (label, editText);
+        window.Add (label, editText);
 
         // JUSTIFY CHECKBOX
 
@@ -471,7 +474,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Fill"
         };
 
-        app.Add (justifyCheckbox);
+        window.Add (justifyCheckbox);
 
         // JUSTIFY OPTIONS
 
@@ -484,11 +487,11 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.Result != CheckState.Checked);
+        justifyCheckbox.ValueChanging += (_, e) => ToggleJustify (e.NewValue != CheckState.Checked);
 
         justifyOptions.ValueChanged += (_, _) => { ToggleJustify (false, true); };
 
-        app.Add (justifyOptions);
+        window.Add (justifyOptions);
 
         // WRAP CHECKBOX
 
@@ -500,11 +503,11 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             Text = "Word Wrap"
         };
-        wrapCheckbox.CheckedState = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
+        wrapCheckbox.Value = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
 
-        wrapCheckbox.CheckedStateChanging += (s, e) =>
+        wrapCheckbox.ValueChanging += (s, e) =>
                                              {
-                                                 if (e.Result == CheckState.Checked)
+                                                 if (e.NewValue == CheckState.Checked)
                                                  {
                                                      foreach (View t in multiLineLabels)
                                                      {
@@ -520,7 +523,7 @@ public class TextAlignmentAndDirection : Scenario
                                                  }
                                              };
 
-        app.Add (wrapCheckbox);
+        window.Add (wrapCheckbox);
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
 
@@ -536,16 +539,16 @@ public class TextAlignmentAndDirection : Scenario
 
         directionOptions.ValueChanged += (s, ev) =>
                                          {
-                                             bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
+                                             bool justChecked = justifyCheckbox.Value == CheckState.Checked;
 
                                              if (justChecked)
                                              {
                                                  ToggleJustify (true);
                                              }
 
-                                             foreach (View v in multiLineLabels.Where (v => ev.Value is { }))
+                                             foreach (View v in multiLineLabels.Where (v => ev.NewValue is not null))
                                              {
-                                                 v.TextDirection = (TextDirection)ev.Value!.Value;
+                                                 v.TextDirection = (TextDirection)ev.NewValue!.Value;
                                              }
 
                                              if (justChecked)
@@ -554,11 +557,9 @@ public class TextAlignmentAndDirection : Scenario
                                              }
                                          };
 
-        app.Add (directionOptions);
+        window.Add (directionOptions);
 
-        Application.Run (app);
-        app.Dispose ();
-        Application.Shutdown ();
+        app.Run (window);
 
         // Be a good citizen and remove the schemes we added
         SchemeManager.RemoveScheme ("TextAlignmentAndDirection1");
