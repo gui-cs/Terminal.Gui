@@ -3,7 +3,6 @@
 
 using System.Collections.ObjectModel;
 using Terminal.Gui.App;
-using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
@@ -139,7 +138,7 @@ public sealed class ClineWindow : Runnable
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Source = new ChatMessageSource (_messages)
+            Source = new ListWrapper<ChatMessage> (_messages)
         };
 
         _taskLabel = new ()
@@ -360,13 +359,14 @@ public sealed class ClineWindow : Runnable
         };
 
         Label modelLabel = new () { Text = "Model:", X = 1, Y = 1 };
+        ObservableCollection<string> models = ["claude-opus-4-5-20251101", "claude-sonnet-4-20250514", "gpt-4o", "gpt-4o-mini"];
         ComboBox modelCombo = new ()
         {
             X = 15,
             Y = 1,
             Width = 30,
             Height = 5,
-            Source = new ListWrapper<string> (["claude-opus-4-5-20251101", "claude-sonnet-4-20250514", "gpt-4o", "gpt-4o-mini"])
+            Source = new ListWrapper<string> (models)
         };
         modelCombo.SelectedItem = 0;
 
@@ -602,63 +602,3 @@ public enum ContextType
     Error
 }
 
-/// <summary>
-/// Custom data source for chat messages with proper formatting.
-/// </summary>
-public class ChatMessageSource : IListDataSource
-{
-    private readonly ObservableCollection<ChatMessage> _messages;
-
-    public ChatMessageSource (ObservableCollection<ChatMessage> messages)
-    {
-        _messages = messages;
-        _messages.CollectionChanged += (_, _) => { };
-    }
-
-    public int Count => _messages.Count;
-
-    public int Length => _messages.Count > 0 ? _messages.Max (m => m.ToString ().Length) : 0;
-
-    public bool SuspendCollectionChangedEvent { get; set; }
-
-    public void Render (
-        ListView container,
-        ConsoleDriver driver,
-        bool selected,
-        int item,
-        int col,
-        int line,
-        int width,
-        int start = 0)
-    {
-        if (item < 0 || item >= _messages.Count)
-        {
-            return;
-        }
-
-        ChatMessage message = _messages [item];
-        string text = message.ToString ();
-
-        if (start > 0)
-        {
-            text = text.Length > start ? text [start..] : "";
-        }
-
-        if (text.Length > width)
-        {
-            text = text [..width];
-        }
-
-        driver.AddStr (text.PadRight (width));
-    }
-
-    public bool IsMarked (int item) => false;
-
-    public void SetMark (int item, bool value) { }
-
-    public object ToObject (int index) => index >= 0 && index < _messages.Count ? _messages [index] : null!;
-
-    public IList ToList () => _messages;
-
-    public void Dispose () { }
-}
