@@ -19,15 +19,10 @@ public interface ICommandContext
     /// <summary>
     ///     A weak reference to the View that was the source of the command invocation, if any.
     ///     (e.g. the view the user clicked on or the view that had focus when a key was pressed).
+    ///     Use <c>Source?.TryGetTarget(out View? view)</c> to safely access the source view.
     /// </summary>
     /// <remarks>
-    ///     <para>
-    ///         Uses <see cref="WeakReference{T}"/> to prevent memory leaks during command propagation.
-    ///         Use <see cref="WeakReference{T}.TryGetTarget"/> to safely access the source view.
-    ///     </para>
-    ///     <para>
-    ///         For debugging/logging, use <see cref="WeakReferenceExtensions.ToIdentifyingString"/> extension method.
-    ///     </para>
+    ///     Uses WeakReference to prevent memory leaks when views are disposed during command propagation.
     /// </remarks>
     public WeakReference<View>? Source { get; set; }
 

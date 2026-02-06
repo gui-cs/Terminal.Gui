@@ -84,7 +84,7 @@ public class ComboBox : View, IDesignable
         AddCommand (Command.Accept,
                     ctx =>
                     {
-                        if (ctx?.Source == _search)
+                        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true && sourceView == _search)
                         {
                             return null;
                         }
@@ -851,7 +851,7 @@ public class ComboBox : View, IDesignable
                 }
                 else if (isMousePositionValid)
                 {
-                    return RaiseAccepting (new CommandContext (Command.Accept, this, new InputBinding ())) == true;
+                    return RaiseAccepting (new CommandContext (Command.Accept, new WeakReference<View> (this), new InputBinding ())) == true;
                 }
                 else
                 {
