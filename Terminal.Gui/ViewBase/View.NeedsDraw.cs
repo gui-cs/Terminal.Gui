@@ -20,13 +20,9 @@ public partial class View
     ///         any part of the view's <see cref="Viewport"/> needs to be redrawn.
     ///     </para>
     /// </remarks>
-    public bool NeedsDraw =>
-        Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
+    public bool NeedsDraw => Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
 
-    /// <summary>
-    ///     Sets <see cref="NeedsDraw"/> to <see langword="true"/> indicating the <see cref="Viewport"/> of this View needs to
-    ///     be redrawn.
-    /// </summary>
+    /// <summary>Sets <see cref="NeedsDraw"/> to <see langword="true"/> indicating the <see cref="Viewport"/> of this View needs to be redrawn.</summary>
     /// <remarks>
     ///     If the view is not visible (<see cref="Visible"/> is <see langword="false"/>), this method
     ///     does nothing.
@@ -57,19 +53,6 @@ public partial class View
     /// <param name="viewPortRelativeRegion">The <see cref="Viewport"/>relative region that needs to be redrawn.</param>
     public void SetNeedsDraw (Rectangle viewPortRelativeRegion)
     {
-        // If we are at the top of the hierarchy, we're a runnable,
-        // and we need to ensure any other Runnables get redrawn.
-        if (App?.TopRunnableView == this && App is { })
-        {
-            //App?.ClearScreenNextIteration = true;
-            List<View?> runnables = [.. App?.SessionStack?.Select (r => r.Runnable as View).Where (v => v != this && v?.NeedsDraw == false)!];
-
-            foreach (View? runnable in runnables)
-            {
-                runnable?.SetNeedsDraw ();
-            }
-        }
-
         if (!Visible)
         {
             return;
@@ -85,7 +68,7 @@ public partial class View
             int y = Math.Min (Viewport.Y, viewPortRelativeRegion.Y);
             int w = Math.Max (Viewport.Width, viewPortRelativeRegion.Width);
             int h = Math.Max (Viewport.Height, viewPortRelativeRegion.Height);
-            NeedsDrawRect = new Rectangle (x, y, w, h);
+            NeedsDrawRect = new (x, y, w, h);
         }
 
         // Do not set on Margin - it will be drawn in a separate pass.
@@ -109,14 +92,13 @@ public partial class View
 
         foreach (View subview in InternalSubViews.Snapshot ())
         {
-            if (!subview.Frame.IntersectsWith (viewPortRelativeRegion))
+            if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
-                continue;
+                Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, viewPortRelativeRegion);
+                subviewRegion.X -= subview.Frame.X;
+                subviewRegion.Y -= subview.Frame.Y;
+                subview.SetNeedsDraw (subviewRegion);
             }
-            Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, viewPortRelativeRegion);
-            subviewRegion.X -= subview.Frame.X;
-            subviewRegion.Y -= subview.Frame.Y;
-            subview.SetNeedsDraw (subviewRegion);
         }
     }
 

@@ -33,46 +33,46 @@ public class ArrangementTests (ITestOutputHelper output)
 
         // Verify initial state
         Assert.NotNull (movableView.Border);
-        Assert.False (Application.Mouse.IsGrabbed (movableView.Border));
+        Assert.Null (Application.Mouse.MouseGrabView);
 
         // Simulate mouse press on the border to start dragging
-        var pressEvent = new Mouse
+        var pressEvent = new MouseEventArgs
         {
             Position = new (1, 0), // Top border area
-            Flags = MouseFlags.LeftButtonPressed
+            Flags = MouseFlags.Button1Pressed
         };
 
         bool? result = movableView.Border.NewMouseEvent (pressEvent);
 
         // The border should have grabbed the mouse
         Assert.True (result);
-        Assert.True (superView.App.Mouse.IsGrabbed (movableView.Border));
+        Assert.Equal (movableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate mouse drag
-        var dragEvent = new Mouse
+        var dragEvent = new MouseEventArgs
         {
             Position = new (5, 2),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
+            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         };
 
         result = movableView.Border.NewMouseEvent (dragEvent);
         Assert.True (result);
 
         // Mouse should still be grabbed
-        Assert.True (superView.App.Mouse.IsGrabbed (movableView.Border));
+        Assert.Equal (movableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate mouse release to end dragging
-        var releaseEvent = new Mouse
+        var releaseEvent = new MouseEventArgs
         {
             Position = new (5, 2),
-            Flags = MouseFlags.LeftButtonReleased
+            Flags = MouseFlags.Button1Released
         };
 
         result = movableView.Border.NewMouseEvent (releaseEvent);
         Assert.True (result);
 
         // Mouse should be released
-        Assert.False (superView.App.Mouse.IsGrabbed (movableView.Border));
+        Assert.Null (superView.App.Mouse.MouseGrabView);
     }
 
     [Fact]
@@ -101,45 +101,45 @@ public class ArrangementTests (ITestOutputHelper output)
 
         // Verify initial state
         Assert.NotNull (resizableView.Border);
-        Assert.False (Application.Mouse.IsGrabbed (resizableView.Border));
+        Assert.Null (Application.Mouse.MouseGrabView);
 
         // Calculate position on right border (border is at right edge)
         // Border.Frame.X is relative to parent, so we use coordinates relative to the border
-        var pressEvent = new Mouse
+        var pressEvent = new MouseEventArgs
         {
             Position = new (resizableView.Border.Frame.Width - 1, 5), // Right border area
-            Flags = MouseFlags.LeftButtonPressed
+            Flags = MouseFlags.Button1Pressed
         };
 
         bool? result = resizableView.Border.NewMouseEvent (pressEvent);
 
         // The border should have grabbed the mouse for resizing
         Assert.True (result);
-        Assert.True (superView.App.Mouse.IsGrabbed (resizableView.Border));
+        Assert.Equal (resizableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate dragging to resize
-        var dragEvent = new Mouse
+        var dragEvent = new MouseEventArgs
         {
             Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
+            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
         };
 
         result = resizableView.Border.NewMouseEvent (dragEvent);
         Assert.True (result);
-        Assert.True (superView.App.Mouse.IsGrabbed (resizableView.Border));
+        Assert.Equal (resizableView.Border, superView.App.Mouse.MouseGrabView);
 
         // Simulate mouse release
-        var releaseEvent = new Mouse
+        var releaseEvent = new MouseEventArgs
         {
             Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.LeftButtonReleased
+            Flags = MouseFlags.Button1Released
         };
 
         result = resizableView.Border.NewMouseEvent (releaseEvent);
         Assert.True (result);
 
         // Mouse should be released
-        Assert.False (superView.App.Mouse.IsGrabbed (resizableView.Border));
+        Assert.Null (superView.App.Mouse.MouseGrabView);
     }
 
     [Fact]
@@ -175,43 +175,43 @@ public class ArrangementTests (ITestOutputHelper output)
         superView.EndInit ();
 
         // Grab mouse on first view
-        var pressEvent1 = new Mouse
+        var pressEvent1 = new MouseEventArgs
         {
             Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonPressed
+            Flags = MouseFlags.Button1Pressed
         };
 
         view1.Border!.NewMouseEvent (pressEvent1);
-        Assert.True (superView.App.Mouse.IsGrabbed (view1.Border));
+        Assert.Equal (view1.Border, superView.App.Mouse.MouseGrabView);
 
         // Release on first view
-        var releaseEvent1 = new Mouse
+        var releaseEvent1 = new MouseEventArgs
         {
             Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonReleased
+            Flags = MouseFlags.Button1Released
         };
 
         view1.Border.NewMouseEvent (releaseEvent1);
-        Assert.False (Application.Mouse.IsGrabbed (view1.Border));
+        Assert.Null (Application.Mouse.MouseGrabView);
 
         // Grab mouse on second view
-        var pressEvent2 = new Mouse
+        var pressEvent2 = new MouseEventArgs
         {
             Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonPressed
+            Flags = MouseFlags.Button1Pressed
         };
 
         view2.Border!.NewMouseEvent (pressEvent2);
-        Assert.True (superView.App.Mouse.IsGrabbed (view2.Border));
+        Assert.Equal (view2.Border, superView.App.Mouse.MouseGrabView);
 
         // Release on second view
-        var releaseEvent2 = new Mouse
+        var releaseEvent2 = new MouseEventArgs
         {
             Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonReleased
+            Flags = MouseFlags.Button1Released
         };
 
         view2.Border.NewMouseEvent (releaseEvent2);
-        Assert.False (superView.App.Mouse.IsGrabbed (view2.Border));
+        Assert.Null (superView.App.Mouse.MouseGrabView);
     }
 }

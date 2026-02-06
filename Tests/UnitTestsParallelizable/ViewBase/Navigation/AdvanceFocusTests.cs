@@ -276,7 +276,7 @@ public class AdvanceFocusTests ()
     {
         // Create a simplified version of the hierarchy from CompoundCompound test
         // top
-        //  ├── topLeftButton, topMiddleButton
+        //  ├── topButton1, topButton2
         //  └── nestedContainer
         //       └── innerButton
 
@@ -288,16 +288,16 @@ public class AdvanceFocusTests ()
         };
 
         // Create top-level buttons
-        View topLeftButton = new ()
+        View topButton1 = new ()
         {
-            Id = "topLeftButton",
+            Id = "topButton1",
             CanFocus = true,
             TabStop = TabBehavior.TabStop
         };
 
-        View topMiddleButton = new ()
+        View topButton2 = new ()
         {
-            Id = "topMiddleButton",
+            Id = "topButton2",
             CanFocus = true,
             TabStop = TabBehavior.TabStop
         };
@@ -319,15 +319,15 @@ public class AdvanceFocusTests ()
 
         // Build the view hierarchy
         nestedContainer.Add (innerButton);
-        top.Add (topLeftButton, topMiddleButton, nestedContainer);
+        top.Add (topButton1, topButton2, nestedContainer);
 
-        // Initial focus on topLeftButton
-        topLeftButton.SetFocus ();
-        Assert.Equal (topLeftButton, top.Focused);
+        // Initial focus on topButton1
+        topButton1.SetFocus ();
+        Assert.Equal (topButton1, top.Focused);
 
-        // Advance focus to topMiddleButton
+        // Advance focus to topButton2
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        Assert.Equal (topMiddleButton, top.Focused);
+        Assert.Equal (topButton2, top.Focused);
 
         // Advance focus to innerButton
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
@@ -335,11 +335,11 @@ public class AdvanceFocusTests ()
         Assert.Equal (nestedContainer, top.Focused);
 
         // THIS IS WHERE THE BUG OCCURS
-        // Advancing focus from innerButton should go back to topLeftButton
+        // Advancing focus from innerButton should go back to topButton1
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // This assertion will fail with current implementation
-        Assert.Equal (topLeftButton, top.Focused);
+        Assert.Equal (topButton1, top.Focused);
 
         top.Dispose ();
     }

@@ -37,13 +37,13 @@ public class MouseBindingsTests
         var mouseBindings = new MouseBindings ();
         Command [] commands = [Command.Right, Command.Left];
 
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, commands);
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        mouseBindings.Add (MouseFlags.Button1Clicked, commands);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.Right, resultCommands);
         Assert.Contains (Command.Left, resultCommands);
 
-        mouseBindings.Add (MouseFlags.MiddleButtonClicked, commands);
-        resultCommands = mouseBindings.GetCommands (MouseFlags.MiddleButtonClicked);
+        mouseBindings.Add (MouseFlags.Button2Clicked, commands);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button2Clicked);
         Assert.Contains (Command.Right, resultCommands);
         Assert.Contains (Command.Left, resultCommands);
     }
@@ -53,19 +53,19 @@ public class MouseBindingsTests
     {
         var mouseBindings = new MouseBindings ();
         List<Command> commands = new ();
-        Assert.Throws<ArgumentException> (() => mouseBindings.Add (MouseFlags.LeftButtonClicked, commands.ToArray ()));
+        Assert.Throws<ArgumentException> (() => mouseBindings.Add (MouseFlags.Button1Clicked, commands.ToArray ()));
     }
 
     [Fact]
     public void Add_Single_Command_Adds ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.HotKey, resultCommands);
 
-        mouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
-        resultCommands = mouseBindings.GetCommands (MouseFlags.MiddleButtonClicked);
+        mouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button2Clicked);
         Assert.Contains (Command.HotKey, resultCommands);
     }
 
@@ -74,42 +74,42 @@ public class MouseBindingsTests
     public void Add_Throws_If_Exists ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept));
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.Button1Clicked, Command.Accept));
 
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.HotKey, resultCommands);
 
         mouseBindings = new ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept));
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.Button1Clicked, Command.Accept));
 
-        resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.HotKey, resultCommands);
 
         mouseBindings = new ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept));
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.Button1Clicked, Command.Accept));
 
-        resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.HotKey, resultCommands);
 
         mouseBindings = new ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
-        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.ScrollDown));
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.Accept);
+        Assert.Throws<InvalidOperationException> (() => mouseBindings.Add (MouseFlags.Button1Clicked, Command.ScrollDown));
 
-        resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.Accept, resultCommands);
 
         mouseBindings = new ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, new MouseBinding ([Command.HotKey], MouseFlags.LeftButtonClicked));
+        mouseBindings.Add (MouseFlags.Button1Clicked, new MouseBinding ([Command.HotKey], MouseFlags.Button1Clicked));
 
         Assert.Throws<InvalidOperationException> (
                                                   () => mouseBindings.Add (
-                                                                           MouseFlags.LeftButtonClicked,
-                                                                           new MouseBinding ([Command.Accept], MouseFlags.LeftButtonClicked)));
+                                                                           MouseFlags.Button1Clicked,
+                                                                           new MouseBinding ([Command.Accept], MouseFlags.Button1Clicked)));
 
-        resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.HotKey, resultCommands);
     }
 
@@ -118,11 +118,11 @@ public class MouseBindingsTests
     public void Clear_Clears ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
         mouseBindings.Clear ();
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Empty (resultCommands);
-        resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Empty (resultCommands);
     }
 
@@ -138,7 +138,7 @@ public class MouseBindingsTests
     public void Get_Binding_Not_Found_Throws ()
     {
         var mouseBindings = new MouseBindings ();
-        Assert.Throws<InvalidOperationException> (() => mouseBindings.Get (MouseFlags.LeftButtonClicked));
+        Assert.Throws<InvalidOperationException> (() => mouseBindings.Get (MouseFlags.Button1Clicked));
         Assert.Throws<InvalidOperationException> (() => mouseBindings.Get (MouseFlags.AllEvents));
     }
 
@@ -147,7 +147,7 @@ public class MouseBindingsTests
     public void GetCommands_Unknown_ReturnsEmpty ()
     {
         var mouseBindings = new MouseBindings ();
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Empty (resultCommands);
     }
 
@@ -155,8 +155,8 @@ public class MouseBindingsTests
     public void GetCommands_WithCommands_ReturnsCommands ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.HotKey, resultCommands);
     }
 
@@ -165,12 +165,12 @@ public class MouseBindingsTests
     {
         var mouseBindings = new MouseBindings ();
         Command [] commands = [Command.Right, Command.Left];
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, commands);
-        mouseBindings.Add (MouseFlags.MiddleButtonClicked, commands);
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        mouseBindings.Add (MouseFlags.Button1Clicked, commands);
+        mouseBindings.Add (MouseFlags.Button2Clicked, commands);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.Right, resultCommands);
         Assert.Contains (Command.Left, resultCommands);
-        resultCommands = mouseBindings.GetCommands (MouseFlags.MiddleButtonClicked);
+        resultCommands = mouseBindings.GetCommands (MouseFlags.Button2Clicked);
         Assert.Contains (Command.Right, resultCommands);
         Assert.Contains (Command.Left, resultCommands);
     }
@@ -180,8 +180,8 @@ public class MouseBindingsTests
     {
         var mouseBindings = new MouseBindings ();
         Command [] commands = [Command.Right, Command.Left];
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, commands);
-        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.LeftButtonClicked);
+        mouseBindings.Add (MouseFlags.Button1Clicked, commands);
+        Command [] resultCommands = mouseBindings.GetCommands (MouseFlags.Button1Clicked);
         Assert.Contains (Command.Right, resultCommands);
         Assert.Contains (Command.Left, resultCommands);
     }
@@ -191,26 +191,26 @@ public class MouseBindingsTests
     {
         var mouseBindings = new MouseBindings ();
         Command [] commands1 = [Command.Right, Command.Left];
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, commands1);
+        mouseBindings.Add (MouseFlags.Button1Clicked, commands1);
 
         Command [] commands2 = { Command.Up, Command.Down };
-        mouseBindings.Add (MouseFlags.MiddleButtonClicked, commands2);
+        mouseBindings.Add (MouseFlags.Button2Clicked, commands2);
 
         MouseFlags mouseFlags = mouseBindings.GetFirstFromCommands (commands1);
-        Assert.Equal (MouseFlags.LeftButtonClicked, mouseFlags);
+        Assert.Equal (MouseFlags.Button1Clicked, mouseFlags);
 
         mouseFlags = mouseBindings.GetFirstFromCommands (commands2);
-        Assert.Equal (MouseFlags.MiddleButtonClicked, mouseFlags);
+        Assert.Equal (MouseFlags.Button2Clicked, mouseFlags);
     }
 
     [Fact]
     public void GetMouseFlagsFromCommands_OneCommand ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Right);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.Right);
 
         MouseFlags mouseFlags = mouseBindings.GetFirstFromCommands (Command.Right);
-        Assert.Equal (MouseFlags.LeftButtonClicked, mouseFlags);
+        Assert.Equal (MouseFlags.Button1Clicked, mouseFlags);
     }
 
     // GetMouseFlagsFromCommands
@@ -225,31 +225,31 @@ public class MouseBindingsTests
     public void GetMouseFlagsFromCommands_WithCommands_ReturnsKey ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
         MouseFlags mouseFlags = mouseBindings.GetFirstFromCommands (Command.HotKey);
-        Assert.Equal (MouseFlags.LeftButtonClicked, mouseFlags);
+        Assert.Equal (MouseFlags.Button1Clicked, mouseFlags);
     }
 
     [Fact]
     public void ReplaceMouseFlags_Replaces ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        mouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
-        mouseBindings.Add (MouseFlags.RightButtonClicked, Command.HotKey);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        mouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
+        mouseBindings.Add (MouseFlags.Button3Clicked, Command.HotKey);
         mouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
 
-        mouseBindings.Replace (MouseFlags.LeftButtonClicked, MouseFlags.LeftButtonDoubleClicked);
-        Assert.Empty (mouseBindings.GetCommands (MouseFlags.LeftButtonClicked));
-        Assert.Contains (Command.HotKey, mouseBindings.GetCommands (MouseFlags.LeftButtonDoubleClicked));
+        mouseBindings.Replace (MouseFlags.Button1Clicked, MouseFlags.Button1DoubleClicked);
+        Assert.Empty (mouseBindings.GetCommands (MouseFlags.Button1Clicked));
+        Assert.Contains (Command.HotKey, mouseBindings.GetCommands (MouseFlags.Button1DoubleClicked));
 
-        mouseBindings.Replace (MouseFlags.MiddleButtonClicked, MouseFlags.MiddleButtonDoubleClicked);
-        Assert.Empty (mouseBindings.GetCommands (MouseFlags.MiddleButtonClicked));
-        Assert.Contains (Command.HotKey, mouseBindings.GetCommands (MouseFlags.MiddleButtonDoubleClicked));
+        mouseBindings.Replace (MouseFlags.Button2Clicked, MouseFlags.Button2DoubleClicked);
+        Assert.Empty (mouseBindings.GetCommands (MouseFlags.Button2Clicked));
+        Assert.Contains (Command.HotKey, mouseBindings.GetCommands (MouseFlags.Button2DoubleClicked));
 
-        mouseBindings.Replace (MouseFlags.RightButtonClicked, MouseFlags.RightButtonDoubleClicked);
-        Assert.Empty (mouseBindings.GetCommands (MouseFlags.RightButtonClicked));
-        Assert.Contains (Command.HotKey, mouseBindings.GetCommands (MouseFlags.RightButtonDoubleClicked));
+        mouseBindings.Replace (MouseFlags.Button3Clicked, MouseFlags.Button3DoubleClicked);
+        Assert.Empty (mouseBindings.GetCommands (MouseFlags.Button3Clicked));
+        Assert.Contains (Command.HotKey, mouseBindings.GetCommands (MouseFlags.Button3DoubleClicked));
 
         mouseBindings.Replace (MouseFlags.Button4Clicked, MouseFlags.Button4DoubleClicked);
         Assert.Empty (mouseBindings.GetCommands (MouseFlags.Button4Clicked));
@@ -260,28 +260,28 @@ public class MouseBindingsTests
     public void ReplaceMouseFlags_Replaces_Leaves_Old_Binding ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
-        mouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.Accept);
+        mouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
 
-        mouseBindings.Replace (mouseBindings.GetFirstFromCommands (Command.Accept), MouseFlags.RightButtonClicked);
-        Assert.Empty (mouseBindings.GetCommands (MouseFlags.LeftButtonClicked));
-        Assert.Contains (Command.Accept, mouseBindings.GetCommands (MouseFlags.RightButtonClicked));
+        mouseBindings.Replace (mouseBindings.GetFirstFromCommands (Command.Accept), MouseFlags.Button3Clicked);
+        Assert.Empty (mouseBindings.GetCommands (MouseFlags.Button1Clicked));
+        Assert.Contains (Command.Accept, mouseBindings.GetCommands (MouseFlags.Button3Clicked));
     }
 
     [Fact]
     public void ReplaceMouseFlags_Adds_If_DoesNotContain_Old ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Replace (MouseFlags.LeftButtonClicked, MouseFlags.MiddleButtonClicked);
-        Assert.True (mouseBindings.TryGet (MouseFlags.MiddleButtonClicked, out _));
+        mouseBindings.Replace (MouseFlags.Button1Clicked, MouseFlags.Button2Clicked);
+        Assert.True (mouseBindings.TryGet (MouseFlags.Button2Clicked, out _));
     }
 
     [Fact]
     public void ReplaceMouseFlags_Throws_If_New_Is_None ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        Assert.Throws<ArgumentException> (() => mouseBindings.Replace (MouseFlags.LeftButtonClicked, MouseFlags.None));
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        Assert.Throws<ArgumentException> (() => mouseBindings.Replace (MouseFlags.Button1Clicked, MouseFlags.None));
     }
 
     [Fact]
@@ -290,12 +290,12 @@ public class MouseBindingsTests
         var mouseBindings = new MouseBindings ();
         Command [] commands = [Command.Right, Command.Left];
 
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, commands);
-        MouseBinding binding = mouseBindings.Get (MouseFlags.LeftButtonClicked);
+        mouseBindings.Add (MouseFlags.Button1Clicked, commands);
+        MouseBinding binding = mouseBindings.Get (MouseFlags.Button1Clicked);
         Assert.Contains (Command.Right, binding.Commands);
         Assert.Contains (Command.Left, binding.Commands);
 
-        binding = mouseBindings.Get (MouseFlags.LeftButtonClicked);
+        binding = mouseBindings.Get (MouseFlags.Button1Clicked);
         Assert.Contains (Command.Right, binding.Commands);
         Assert.Contains (Command.Left, binding.Commands);
     }
@@ -305,8 +305,8 @@ public class MouseBindingsTests
     public void TryGet_Succeeds ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        bool result = mouseBindings.TryGet (MouseFlags.LeftButtonClicked, out MouseBinding _);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        bool result = mouseBindings.TryGet (MouseFlags.Button1Clicked, out MouseBinding _);
         Assert.True (result);
         ;
     }
@@ -315,7 +315,7 @@ public class MouseBindingsTests
     public void TryGet_Unknown_ReturnsFalse ()
     {
         var mouseBindings = new MouseBindings ();
-        bool result = mouseBindings.TryGet (MouseFlags.LeftButtonClicked, out MouseBinding _);
+        bool result = mouseBindings.TryGet (MouseFlags.Button1Clicked, out MouseBinding _);
         Assert.False (result);
     }
 
@@ -323,8 +323,8 @@ public class MouseBindingsTests
     public void TryGet_WithCommands_ReturnsTrue ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        bool result = mouseBindings.TryGet (MouseFlags.LeftButtonClicked, out MouseBinding bindings);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        bool result = mouseBindings.TryGet (MouseFlags.Button1Clicked, out MouseBinding bindings);
         Assert.True (result);
         Assert.Contains (Command.HotKey, bindings.Commands);
     }
@@ -333,11 +333,11 @@ public class MouseBindingsTests
     public void ReplaceCommands_Replaces ()
     {
         var mouseBindings = new MouseBindings ();
-        mouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
+        mouseBindings.Add (MouseFlags.Button1Clicked, Command.Accept);
 
-        mouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Refresh);
+        mouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Refresh);
 
-        bool result = mouseBindings.TryGet (MouseFlags.LeftButtonClicked, out MouseBinding bindings);
+        bool result = mouseBindings.TryGet (MouseFlags.Button1Clicked, out MouseBinding bindings);
         Assert.True (result);
         Assert.Contains (Command.Refresh, bindings.Commands);
     }

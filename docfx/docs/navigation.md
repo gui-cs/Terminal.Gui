@@ -13,7 +13,6 @@ This document covers Terminal.Gui's navigation system, which determines:
 
 * [Keyboard Deep Dive](keyboard.md)
 * [Mouse Deep Dive](mouse.md)
-* [Cursor Management](cursor.md)
 * [Lexicon & Taxonomy](lexicon.md)
 
 ## Lexicon & Taxonomy
@@ -40,17 +39,13 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 **Current Focus Indicator:**
 - Views with focus are rendered using their `ColorScheme.Focus` attribute
-- The most focused view (deepest in focus chain) may display a terminal cursor via `View.Cursor`
+- The focused view may display a cursor (for text input views)
 - Views in the focus chain (SuperViews of the focused view) also use focused styling
-- Only one terminal cursor is displayed at a time, managed by `ApplicationNavigation`
 
 **Navigation Cues:**
 - HotKeys are indicated by underlined characters in Labels, Buttons, and MenuItems
 - Tab order is generally left-to-right, top-to-bottom within containers
 - Focus indicators (such as highlight rectangles) show which view will receive input
-
-> [!TIP]
-> See [Cursor Management](cursor.md) for details on how views control cursor position and style.
 
 ### Changing Focus
 
@@ -79,14 +74,14 @@ The majority of the Terminal.Gui Navigation system is dedicated to enabling the 
 
 Terminal.Gui defines these keys for keyboard navigation:
 
-- `IKeyboard.NextTabStopKey` (`Key.Tab`) - Navigates to the next subview that is a `TabStop` (see below). If there is no next, the first subview that is a `TabStop` will gain focus.
-- `IKeyboard.PrevTabStopKey` (`Key.Tab.WithShift`) - Opposite of `IKeyboard.NextTabStopKey`.
-- `Key.CursorRight` - Operates identically to `IKeyboard.NextTabStopKey`.
-- `Key.CursorDown` - Operates identically to `IKeyboard.NextTabStopKey`.
-- `Key.CursorLeft` - Operates identically to `IKeyboard.PrevTabStopKey`.
-- `Key.CursorUp` - Operates identically to `IKeyboard.PrevTabStopKey`.
-- `IKeyboard.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view that is a `TabGroup` will gain focus.
-- `IKeyboard.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `IKeyboard.NextTabGroupKey`.
+- `Application.NextTabStopKey` (`Key.Tab`) - Navigates to the next subview that is a `TabStop` (see below). If there is no next, the first subview that is a `TabStop` will gain focus.
+- `Application.PrevTabStopKey` (`Key.Tab.WithShift`) - Opposite of `Application.NextTabStopKey`.
+- `Key.CursorRight` - Operates identically to `Application.NextTabStopKey`.
+- `Key.CursorDown` - Operates identically to `Application.NextTabStopKey`.
+- `Key.CursorLeft` - Operates identically to `Application.PrevTabStopKey`.
+- `Key.CursorUp` - Operates identically to `Application.PrevTabStopKey`.
+- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view that is a `TabGroup` will gain focus.
+- `Application.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `Application.NextTabGroupKey`.
 
 `F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators) conventions.
 
@@ -121,7 +116,7 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 HotKeys are defined using the `HotKey` property and are activated using `Alt+` the specified key:
 
 ```csharp
-var saveButton = new Button() { Text = Strings.cmdSave, HotKey = Key.S };
+var saveButton = new Button() { Text = "_Save", HotKey = Key.S };
 var exitButton = new Button() { Text = "E_xit", HotKey = Key.X };
 
 // Alt+S will activate save, Alt+X will activate exit, regardless of current focus
@@ -151,7 +146,7 @@ For this to work properly, there must be logic that removes the focus-cache used
 // Mouse click behavior
 view.MouseEvent += (sender, e) => 
 {
-    if (e.Flags.HasFlag(MouseFlags.LeftButtonClicked) && view.CanFocus)
+    if (e.Flags.HasFlag(MouseFlags.Button1Clicked) && view.CanFocus)
     {
         view.SetFocus();
         e.Handled = true;
@@ -170,13 +165,13 @@ view.MouseEnter += (sender, e) =>
 
 ## Application Level Navigation
 
-At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.Application.Navigation property.
+At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.App.Application.Navigation property.
 
-@Terminal.Gui.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
+@Terminal.Gui.App.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
 
-The @Terminal.Gui.ApplicationNavigation.FocusedChanged and @Terminal.Gui.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful for apps that want to override what view can be focused across an entire app. 
+The @Terminal.Gui.App.ApplicationNavigation.FocusedChanged and @Terminal.Gui.App.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful for apps that want to override what view can be focused across an entire app. 
 
-The @Terminal.Gui.ApplicationNavigation.AdvanceFocus method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
+The @Terminal.Gui.App.ApplicationNavigation.AdvanceFocus method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
 
 The implementation is simple:
 
@@ -189,22 +184,6 @@ This method is called from the `Command` handlers bound to the application-scope
 **Note:** When accessing from within a View, use `App?.Current` instead of `Application.TopRunnable` (which is obsolete).
 
 This method replaces about a dozen functions in v1 (scattered across `Application` and `Runnable`).
-
-### Cursor Management
-
-`ApplicationNavigation` also manages the terminal cursor. Each main loop iteration, `UpdateCursor()` is called to:
-
-1. Check if cursor update is needed (optimization via `GetCursorNeedsUpdate()`)
-2. Get the most focused view's `Cursor` property
-3. Validate the cursor position is within all ancestor viewport bounds
-4. Delegate to the driver via `SetCursor()`
-
-The cursor is only displayed for the **most focused view** (deepest in the focus chain). When focus changes, the cursor automatically updates to reflect the new focused view's cursor state.
-
-Views control their cursor through the `View.Cursor` property, not through `ApplicationNavigation` directly.
-
-> [!NOTE]
-> See [Cursor Management](cursor.md) for complete details on how views should set cursor position and style.
 
 ### Application Navigation Examples
 
@@ -235,9 +214,9 @@ Application.Navigation.AdvanceFocus(NavigationDirection.Backward, TabBehavior.Ta
 
 ## View Level Navigation
 
-@Terminal.Gui.View.AdvanceFocus is the primary method for developers to cause a view to gain or lose focus.
+@Terminal.Gui.ViewBase.View.AdvanceFocus is the primary method for developers to cause a view to gain or lose focus.
 
-Various events are raised when a View's focus is changing. For example, @Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged.
+Various events are raised when a View's focus is changing. For example, @Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged.
 
 ### View Focus Management
 
@@ -283,9 +262,9 @@ For keyboard navigation, the `TabStop` property is a filter for which views are 
 
 * `TabBehavior.NoStop` - Prevents the user from using keyboard navigation to cause view (and by definition its subviews) to gain focus. Note: The view can still be focused using code or the mouse.
 
-* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `IKeyboard.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.SubViews`).
+* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `Application.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.SubViews`).
 
-* `TabBehavior.TabGroup` - Indicates a View is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views in tiled scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, `Window` is a simple view designed to be a visible container of other views in overlapped scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `IKeyboard.Next/PrevGroupStopKey` will advance across all `TabGroup` views in the application (unless blocked by a `NoStop` SuperView).
+* `TabBehavior.TabGroup` - Indicates a View is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views in tiled scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, `Window` is a simple view designed to be a visible container of other views in overlapped scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `Application.Next/PrevGroupStopKey` will advance across all `TabGroup` views in the application (unless blocked by a `NoStop` SuperView).
 
 ### Focus Requirements Summary
 
@@ -434,7 +413,7 @@ container.Add(button);  // Does not automatically set CanFocus on container
 
 ## Knowing When a View's Focus is Changing
 
-@Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged are raised when a View's focus is changing.
+@Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged are raised when a View's focus is changing.
 
 ```csharp
 // Monitor focus changes
@@ -470,7 +449,7 @@ The following table summarizes how built-in views respond to various input metho
 | **Button** | 1 | No | Yes | 1 | OnSelect | Focus+OnAccept | Focus+OnAccept | HotKey | - | Select | No |
 | **CheckBox** | 3 | No | No | 1 | OnSelect+Advance | OnAccept | OnAccept | Select | - | Select | No |
 | **OptionSelector** | >1 | No | No | 2+ | Advance | SetValue+OnAccept | Focus+SetValue | SetFocus+SetCursor | - | SetFocus+SetCursor | No |
-| **LinearRange** | >1 | No | No | 1 | SetFocusedOption | SetFocusedOption+OnAccept | Focus | SetFocus+SetOption | - | SetFocus+SetOption | Yes |
+| **Slider** | >1 | No | No | 1 | SetFocusedOption | SetFocusedOption+OnAccept | Focus | SetFocus+SetOption | - | SetFocus+SetOption | Yes |
 | **ListView** | >1 | No | No | 1 | MarkUnMarkRow | OpenSelected+OnAccept | OnAccept | SetMark+OnSelectedChanged | OpenSelected+OnAccept | - | No |
 | **TextField** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | SelectAll | ContextMenu | No |
 | **TextView** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | - | ContextMenu | Yes |

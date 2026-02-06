@@ -52,7 +52,7 @@ public class SettingsScopeTests
 
         ThemeScope scope = dict [ThemeManager.DEFAULT_THEME_NAME];
         Assert.NotNull (scope);
-        Assert.Equal (MouseState.In | MouseState.Pressed | MouseState.PressedOutside, scope ["Button.DefaultMouseHighlightStates"].PropertyValue);
+        Assert.Equal (MouseState.In | MouseState.Pressed | MouseState.PressedOutside, scope ["Button.DefaultHighlightStates"].PropertyValue);
 
         RuntimeConfig = """
                         {
@@ -60,13 +60,13 @@ public class SettingsScopeTests
                                 {
                                   "Default": 
                                      {
-                                         "Button.DefaultMouseHighlightStates": "None"
+                                         "Button.DefaultHighlightStates": "None"
                                      }
                                 },
                                 {
                                   "NewTheme":
                                     {
-                                        "Button.DefaultMouseHighlightStates": "In"
+                                        "Button.DefaultHighlightStates": "In"
                                     }
                                 }                        
                             ]
@@ -77,8 +77,8 @@ public class SettingsScopeTests
 
         // assert
         Assert.Equal (2, ThemeManager.Themes!.Count);
-        Assert.Equal (MouseState.None, (MouseState)ThemeManager.GetCurrentTheme () ["Button.DefaultMouseHighlightStates"].PropertyValue!);
-        Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes ["NewTheme"] ["Button.DefaultMouseHighlightStates"].PropertyValue!);
+        Assert.Equal (MouseState.None, (MouseState)ThemeManager.GetCurrentTheme () ["Button.DefaultHighlightStates"].PropertyValue!);
+        Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes ["NewTheme"] ["Button.DefaultHighlightStates"].PropertyValue!);
 
         RuntimeConfig = """
                         {
@@ -86,7 +86,7 @@ public class SettingsScopeTests
                                 {
                                   "Default": 
                                      {
-                                         "Button.DefaultMouseHighlightStates": "Pressed"
+                                         "Button.DefaultHighlightStates": "Pressed"
                                      }
                                 }
                             ]
@@ -96,8 +96,8 @@ public class SettingsScopeTests
 
         // assert
         Assert.Equal (2, ThemeManager.Themes.Count);
-        Assert.Equal (MouseState.Pressed, (MouseState)ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Button.DefaultMouseHighlightStates"].PropertyValue!);
-        Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultMouseHighlightStates"].PropertyValue!);
+        Assert.Equal (MouseState.Pressed, (MouseState)ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME] ["Button.DefaultHighlightStates"].PropertyValue!);
+        Assert.Equal (MouseState.In, (MouseState)ThemeManager.Themes! ["NewTheme"] ["Button.DefaultHighlightStates"].PropertyValue!);
 
         // clean up
         Disable (true);
@@ -273,11 +273,11 @@ public class SettingsScopeTests
         // Arrange: Create a ThemeScope and verify a property exists
         var defaultThemeScope = new ThemeScope ();
         defaultThemeScope.LoadHardCodedDefaults ();
-        Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultMouseHighlightStates"));
+        Assert.True (defaultThemeScope.ContainsKey ("Button.DefaultHighlightStates"));
 
         var darkThemeScope = new ThemeScope ();
         darkThemeScope.LoadHardCodedDefaults ();
-        Assert.True (darkThemeScope.ContainsKey ("Button.DefaultMouseHighlightStates"));
+        Assert.True (darkThemeScope.ContainsKey ("Button.DefaultHighlightStates"));
 
         // Create a Themes list with two themes
         List<Dictionary<string, ThemeScope>> themesList =

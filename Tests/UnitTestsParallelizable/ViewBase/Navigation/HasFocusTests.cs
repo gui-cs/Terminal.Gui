@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Navigation;
 
-
+[Collection ("Global Test Setup")]
 public class HasFocusTests () : TestsAllViews
 {
 
@@ -86,7 +86,7 @@ public class HasFocusTests () : TestsAllViews
 
         view.NewKeyDownEvent (Key.Space);
         Assert.True (wasClicked);
-        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonClicked });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked });
         Assert.False (wasClicked);
         Assert.True (view.Enabled);
         Assert.True (view.CanFocus);
@@ -95,7 +95,7 @@ public class HasFocusTests () : TestsAllViews
         view.Enabled = false;
         view.NewKeyDownEvent (Key.Space);
         Assert.False (wasClicked);
-        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonClicked });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked });
         Assert.False (wasClicked);
         Assert.False (view.Enabled);
         Assert.True (view.CanFocus);

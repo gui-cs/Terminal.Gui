@@ -4,7 +4,7 @@ using static Terminal.Gui.ViewBase.Pos;
 
 namespace ViewBaseTests.Layout;
 
-public class PosCenterTests (ITestOutputHelper output) : TestDriverBase
+public class PosCenterTests (ITestOutputHelper output) : FakeDriverBase
 {
     private readonly ITestOutputHelper _output = output;
 
@@ -79,7 +79,7 @@ public class PosCenterTests (ITestOutputHelper output) : TestDriverBase
     [InlineData (10)]
     public void PosCenter_SubView_85_Percent_Height (int height)
     {
-        IDriver driver = CreateTestDriver (20, height);
+        IDriver driver = CreateFakeDriver (20, height);
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Driver = driver;
 
@@ -217,7 +217,7 @@ public class PosCenterTests (ITestOutputHelper output) : TestDriverBase
     [InlineData (10)]
     public void PosCenter_SubView_85_Percent_Width (int width)
     {
-        IDriver driver = CreateTestDriver (width, 7);
+        IDriver driver = CreateFakeDriver (width, 7);
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Driver = driver;
 

@@ -3,6 +3,7 @@ namespace Terminal.Gui.ViewBase;
 /// <summary>
 ///     Indicates the side for <see cref="Pos"/> operations.
 /// </summary>
+///
 public enum Side
 {
     /// <summary>

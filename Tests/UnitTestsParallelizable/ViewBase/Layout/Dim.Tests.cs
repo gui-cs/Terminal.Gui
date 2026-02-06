@@ -4,7 +4,7 @@ using static Terminal.Gui.ViewBase.Dim;
 
 namespace ViewBaseTests.Layout;
 
-
+[Collection ("Global Test Setup")]
 public class DimTests
 {
     [Fact]

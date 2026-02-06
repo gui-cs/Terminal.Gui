@@ -1,4 +1,5 @@
-namespace Terminal.Gui.Views;
+#nullable disable
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>Displays text at a given position (in screen space or graph space)</summary>
 public class TextAnnotation : IAnnotation
@@ -16,7 +17,7 @@ public class TextAnnotation : IAnnotation
     public Point? ScreenPosition { get; set; }
 
     /// <summary>Text to display on the graph</summary>
-    public required string Text { get; set; }
+    public string Text { get; set; }
 
     /// <summary>True to add text before plotting series.  Defaults to false</summary>
     public bool BeforeSeries { get; set; }
@@ -32,8 +33,8 @@ public class TextAnnotation : IAnnotation
             return;
         }
 
-        Point viewportPos = graph.GraphSpaceToViewport (GraphPosition);
-        DrawText (graph, viewportPos.X, viewportPos.Y);
+        Point screenPos = graph.GraphSpaceToScreen (GraphPosition);
+        DrawText (graph, screenPos.X, screenPos.Y);
     }
 
     /// <summary>
@@ -66,6 +67,13 @@ public class TextAnnotation : IAnnotation
             return;
         }
 
-        graph.AddStr (Text.Length < availableWidth ? Text : Text [..availableWidth]);
+        if (Text.Length < availableWidth)
+        {
+            graph.AddStr (Text);
+        }
+        else
+        {
+            graph.AddStr (Text.Substring (0, availableWidth));
+        }
     }
 }

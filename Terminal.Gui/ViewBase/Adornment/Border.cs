@@ -68,9 +68,7 @@ public partial class Border : Adornment
             {
                 DrawIndicator = new ()
                 {
-#if DEBUG
                     Id = "DrawIndicator",
-#endif
                     X = 1,
                     Style = new SpinnerStyle.Dots2 (),
                     SpinDelay = 0,
@@ -110,6 +108,11 @@ public partial class Border : Adornment
     {
         base.BeginInit ();
 
+        if (App is { })
+        {
+            App.Mouse.GrabbingMouse += Application_GrabbingMouse;
+        }
+
         if (Parent is null)
         {
             return;
@@ -117,7 +120,7 @@ public partial class Border : Adornment
 
         ShowHideDrawIndicator ();
 
-        MouseHighlightStates |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
+        HighlightStates |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
 
 #if SUBVIEW_BASED_BORDER
         if (Parent is { })

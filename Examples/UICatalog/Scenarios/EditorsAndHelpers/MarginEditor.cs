@@ -16,12 +16,12 @@ public class MarginEditor : AdornmentEditor
 
     private void MarginEditor_AdornmentChanged (object? sender, EventArgs e)
     {
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
             _optionsShadow!.Value = ((Margin)AdornmentToEdit).ShadowStyle;
         }
 
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
             _flagSelectorTransparent!.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
@@ -40,7 +40,7 @@ public class MarginEditor : AdornmentEditor
             AssignHotKeys = true
         };
 
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
             _optionsShadow.Value = ((Margin)AdornmentToEdit).ShadowStyle;
         }
@@ -64,11 +64,11 @@ public class MarginEditor : AdornmentEditor
 
         Add (_flagSelectorTransparent);
 
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
             _flagSelectorTransparent.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
 
-        _flagSelectorTransparent.ValueChanged += (_, args) => { ((Margin)AdornmentToEdit!).ViewportSettings = (ViewportSettingsFlags)args.NewValue!; };
+        _flagSelectorTransparent.ValueChanged += (_, args) => { ((Margin)AdornmentToEdit!).ViewportSettings = (ViewportSettingsFlags)args.Value!; };
     }
 }

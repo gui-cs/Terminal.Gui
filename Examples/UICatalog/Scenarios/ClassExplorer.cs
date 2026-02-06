@@ -15,20 +15,15 @@ public class ClassExplorer : Scenario
     private TextView? _textView;
     private TreeView<object>? _treeView;
 
-    private Window? _win;
-
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window win = new ()
+        Window win = new ()
         {
             Title = GetName (),
             BorderStyle = LineStyle.None
         };
-        _win = win;
 
         // MenuBar
         MenuBar menuBar = new ();
@@ -58,11 +53,11 @@ public class ClassExplorer : Scenario
         TreeViewTextFilter<object> filter = new (_treeView);
         _treeView.Filter = filter;
 
-        tfSearch.TextChanged += (_, _) =>
+        tfSearch.TextChanged += (s, e) =>
                                 {
                                     filter.Text = tfSearch.Text;
 
-                                    if (_treeView.SelectedObject is not null)
+                                    if (_treeView.SelectedObject is { })
                                     {
                                         _treeView.EnsureVisible (_treeView.SelectedObject);
                                     }
@@ -88,21 +83,21 @@ public class ClassExplorer : Scenario
         {
             Title = "_Include Private"
         };
-        _showPrivateCheckBox.ValueChanged += (_, _) => ShowPrivate ();
+        _showPrivateCheckBox.CheckedStateChanged += (s, e) => ShowPrivate ();
 
         _highlightModelTextOnlyCheckBox = new ()
         {
             Title = "_Highlight Model Text Only"
         };
-        _highlightModelTextOnlyCheckBox.ValueChanged += (_, _) => OnCheckHighlightModelTextOnly ();
+        _highlightModelTextOnlyCheckBox.CheckedStateChanged += (s, e) => OnCheckHighlightModelTextOnly ();
 
         menuBar.Add (
                      new MenuBarItem (
-                                      Strings.menuFile,
+                                      "_File",
                                       [
                                           new MenuItem
                                           {
-                                              Title = Strings.cmdQuit,
+                                              Title = "_Quit",
                                               Action = Quit
                                           }
                                       ]
@@ -144,10 +139,11 @@ public class ClassExplorer : Scenario
                     );
 
         // Add views in order of visual appearance
-        _win.Add (menuBar, lblSearch, tfSearch, _treeView, _textView);
+        win.Add (menuBar, lblSearch, tfSearch, _treeView, _textView);
 
-        app.Run (_win);
-        _win.Dispose ();
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private bool CanExpand (object arg) => arg is Assembly or Type or ShowForType;
@@ -181,7 +177,7 @@ public class ClassExplorer : Scenario
     }
 
     private BindingFlags GetFlags () =>
-        _showPrivateCheckBox?.Value == CheckState.Checked
+        _showPrivateCheckBox?.CheckedState == CheckState.Checked
             ? BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic
             : BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
@@ -211,11 +207,11 @@ public class ClassExplorer : Scenario
             return;
         }
 
-        _treeView.Style.HighlightModelTextOnly = _highlightModelTextOnlyCheckBox?.Value == CheckState.Checked;
+        _treeView.Style.HighlightModelTextOnly = _highlightModelTextOnlyCheckBox?.CheckedState == CheckState.Checked;
         _treeView.SetNeedsDraw ();
     }
 
-    private void Quit () { _win?.RequestStop (); }
+    private void Quit () { Application.RequestStop (); }
 
     private void ShowPrivate ()
     {

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace ViewBaseTests.MouseTests;
+namespace ViewBaseTests.Mouse;
 
 [Trait ("Category", "Input")]
 public class MouseEnterLeaveTests
@@ -63,7 +63,7 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouse = new Mouse ();
+        var mouseEvent = new MouseEventArgs ();
 
         var eventArgs = new CancelEventArgs ();
 
@@ -136,14 +136,14 @@ public class MouseEnterLeaveTests
             Enabled = true, Visible = true
         };
 
-        var mouse = new Mouse ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();
 
         // Assert
         Assert.True (view.OnMouseLeaveCalled);
-        Assert.False (mouse.Handled);
+        Assert.False (mouseEvent.Handled);
 
         // Cleanup
         view.Dispose ();
@@ -159,14 +159,14 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouse = new Mouse ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();
 
         // Assert
         Assert.True (view.OnMouseLeaveCalled);
-        Assert.False (mouse.Handled);
+        Assert.False (mouseEvent.Handled);
 
         // Cleanup
         view.Dispose ();
@@ -256,14 +256,14 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouse = new Mouse ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();
 
         // Assert
         Assert.True (view.MouseLeaveRaised);
-        Assert.False (mouse.Handled);
+        Assert.False (mouseEvent.Handled);
 
         // Cleanup
         view.Dispose ();
@@ -279,14 +279,14 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouse = new Mouse ();
+        var mouseEvent = new MouseEventArgs ();
 
         // Act
         view.NewMouseLeaveEvent ();
 
         // Assert
         Assert.True (view.MouseLeaveRaised);
-        Assert.False (mouse.Handled);
+        Assert.False (mouseEvent.Handled);
 
         // Cleanup
         view.Dispose ();

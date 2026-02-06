@@ -7,15 +7,12 @@ public class CombiningMarks : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
+        var top = new Runnable ();
 
-        using Runnable top = new ();
-
-        top.DrawingContent += (_, _) =>
+        top.DrawingContent += (s, e) =>
         {
-            int i = -1;
+            var i = -1;
             top.Move (0, ++i);
             top.AddStr ("Terminal.Gui supports all combining sequences that can be rendered as an unique grapheme.");
             top.Move (0, ++i);
@@ -59,9 +56,9 @@ public class CombiningMarks : Scenario
             top.Move (0, ++i);
             top.AddStr ("From now on we are using TextFormatter");
             TextFormatter tf = new () { Text = "[e\u0301\u0301\u0328]<- \"[e\\u0301\\u0301\\u0328]\" using TextFormatter." };
-            tf.Draw (driver: app.Driver, screen: new (0, ++i, tf.Text.Length, 1), normalColor: top.GetAttributeForRole (VisualRole.Normal), hotColor: top.GetAttributeForRole (VisualRole.Normal));
+            tf.Draw (driver: Application.Driver, screen: new (0, ++i, tf.Text.Length, 1), normalColor: top.GetAttributeForRole (VisualRole.Normal), hotColor: top.GetAttributeForRole (VisualRole.Normal));
             tf.Text = "[e\u0328\u0301]<- \"[e\\u0328\\u0301]\" using TextFormatter.";
-            tf.Draw (driver: app.Driver, screen: new (0, ++i, tf.Text.Length, 1), normalColor: top.GetAttributeForRole (VisualRole.Normal), hotColor: top.GetAttributeForRole (VisualRole.Normal));
+            tf.Draw (driver: Application.Driver, screen: new (0, ++i, tf.Text.Length, 1), normalColor: top.GetAttributeForRole (VisualRole.Normal), hotColor: top.GetAttributeForRole (VisualRole.Normal));
             i++;
             top.Move (0, ++i);
             top.AddStr ("From now on we are using Surrogate pairs with combining diacritics");
@@ -95,6 +92,8 @@ public class CombiningMarks : Scenario
             top.AddStr ("[\u1100\uD7B0]<- \"[\\u1100\\uD7B0]\" using AddStr.");
         };
 
-        app.Run (top);
+        Application.Run (top);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 }

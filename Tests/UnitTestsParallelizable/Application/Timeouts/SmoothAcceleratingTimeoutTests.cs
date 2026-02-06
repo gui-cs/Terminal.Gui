@@ -1,6 +1,5 @@
 ﻿namespace ApplicationTests.Timeout;
 
-[Collection ("Application Timer Tests")]
 public class SmoothAcceleratingTimeoutTests
 {
     [Fact]

@@ -1,9 +1,8 @@
-![v2 Beta Status](https://img.shields.io/github/milestones/progress-percent/gui-cs/Terminal.Gui/9)
-![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui)
-![Bugs](https://img.shields.io/github/issues/gui-cs/Terminal.Gui)
+[![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 [![codecov](https://codecov.io/gh/gui-cs/Terminal.Gui/graph/badge.svg?token=1Ac9gyGtrj)](https://codecov.io/gh/gui-cs/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/gui-cs/gui.cs.svg)](LICENSE)
+![Bugs](https://img.shields.io/github/issues/gui-cs/gui.cs/bug)
 
 # Terminal.Gui v2
 
@@ -12,7 +11,7 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 ![logo](docfx/images/logo.png)
 
 * **v2 Alpha** (Current): ![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui) - Recommended for new projects
-* **v1 (Legacy)**: ![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui) - Maintenance mode only
+* **v1 (Legacy)**: [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui) - Maintenance mode only
 
 > **Important:**
 > - **v1** is in maintenance mode - only critical bug fixes accepted
@@ -26,11 +25,13 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 Install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new TUI app, and run it:
 
 ```powershell
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
-dotnet new tui-simple -n myproj
+dotnet new --install Terminal.Gui.templates
+dotnet new tui -n myproj
 cd myproj
 dotnet run
 ```
+
+Press `Esc` to exit (the default [QuitKey](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.App.Application.html#Terminal_Gui_App_Application_QuitKey)).
 
 Run the comprehensive [UI Catalog](Examples/UICatalog) demo to explore all controls:
 
@@ -41,9 +42,7 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
 # Simple Example
 
 ```csharp
-using Terminal.Gui.App;
-using Terminal.Gui.ViewBase;
-using Terminal.Gui.Views;
+using Terminal.Gui;
 
 using IApplication app = Application.Create ();
 app.Init ();
@@ -114,17 +113,13 @@ dotnet add package Terminal.Gui --version "2.0.0-alpha.*"
 dotnet add package Terminal.Gui --version "2.0.0-develop.*"
 ```
 
-Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
-
-```powershell
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
-```
-
 ## v1 Legacy
 
 ```powershell
 dotnet add package Terminal.Gui --version "1.*"
 ```
+
+Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
 
 # Contributing
 

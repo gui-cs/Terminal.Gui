@@ -7,11 +7,9 @@ public class ChineseUI : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window win = new ()
+        var win = new Window
         {
             Title = GetQuitKeyAndName (),
             X = 0,
@@ -20,7 +18,7 @@ public class ChineseUI : Scenario
             Height = Dim.Fill ()
         };
 
-        FrameView buttonPanel = new ()
+        var buttonPanel = new FrameView
         {
             Title = "Command",
             X = 0,
@@ -30,12 +28,12 @@ public class ChineseUI : Scenario
         };
         win.Add (buttonPanel);
 
-        Button btn = new () { X = 1, Y = 1, Text = "\u4f60" }; // v1: A (Chinese: you)
+        var btn = new Button { X = 1, Y = 1, Text = "你" }; // v1: A
 
-        btn.Accepting += (s, _) =>
+        btn.Accepting += (s, e) =>
                       {
                           int? result = MessageBox.Query (
-                                                          (s as View)?.App!,
+                                                          (s as View)?.App,
                                                           "Confirm",
                                                          "Are you sure you want to quit ui?",
                                                          0,
@@ -45,16 +43,20 @@ public class ChineseUI : Scenario
 
                           if (result == 0)
                           {
-                              win.RequestStop ();
+                              Application.RequestStop ();
                           }
                       };
 
         buttonPanel.Add (
                          btn,
-                         new Button { X = 12, Y = 1, Text = "\u597d" }, // v1: B (Chinese: good)
-                         new Button { X = 22, Y = 1, Text = "\u5440" } // v1: C (Chinese: yeah)
+                         new Button { X = 12, Y = 1, Text = "好" }, // v1: B
+                         new Button { X = 22, Y = 1, Text = "呀" } // v1: C
                         );
 
-        app.Run (win);
+        Application.Run (win);
+
+        win.Dispose ();
+
+        Application.Shutdown ();
     }
 }

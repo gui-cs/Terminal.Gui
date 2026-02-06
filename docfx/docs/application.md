@@ -1,6 +1,6 @@
 # Application Architecture
 
-Terminal.Gui v2 uses an instance-based application architecture that decouples views from the global application state, enabling multiple application contexts, providing type-safe result handling, enabling testability.
+Terminal.Gui v2 uses an instance-based application architecture with the **IRunnable** interface pattern that decouples views from the global application state, improving testability, enabling multiple application contexts, and providing type-safe result handling.
 
 ## Key Features
 
@@ -22,14 +22,14 @@ graph TB
         Menu[MenuBar]
         Status[StatusBar]
         Content[Content View]
-        LeftButton[Button]
-        MiddleButton[Button]
+        Button1[Button]
+        Button2[Button]
         
         Top --> Menu
         Top --> Status
         Top --> Content
-        Content --> LeftButton
-        Content --> MiddleButton
+        Content --> Button1
+        Content --> Button2
     end
     
     subgraph Stack["app.SessionStack"]
@@ -142,6 +142,8 @@ public class View
 
 ### Accessing Application from Views
 
+**Recommended pattern:**
+
 ```csharp
 public class MyView : View
 {
@@ -156,6 +158,26 @@ public class MyView : View
         {
             // Work with sessions
         }
+    }
+}
+```
+
+**Alternative - dependency injection:**
+
+```csharp
+public class MyView : View
+{
+    private readonly IApplication _app;
+    
+    public MyView (IApplication app)
+    {
+        _app = app;
+        // Completely decoupled from obsolete static Application
+    }
+    
+    public void DoWork ()
+    {
+        _app.TopRunnable?.SetNeedsDraw ();
     }
 }
 ```
@@ -235,8 +257,6 @@ using (IApplication app = Application.Create ().Init ())
 }
 ```
 
-**NOTE**: The semantics of `view.Add (subView)` is such that ownership of the `subView` is controlled by `view` unless `view.Remove (subView)` is explicitly called.
-
 ### Creating Runnable Views
 
 Derive from `Runnable<TResult>` or implement `IRunnable<TResult>`:
@@ -302,14 +322,14 @@ protected override bool OnIsRunningChanging (bool oldValue, bool newValue)
         // Optionally cancel stop (e.g., unsaved changes)
         if (HasUnsavedChanges ())
         {
-            int? response = MessageBox.Query ("Save?", "Save changes?", Strings.btnNo, Strings.btnYes);
+            int response = MessageBox.Query ("Save?", "Save changes?", "Yes", "No", "Cancel");
             
-            if (response is null or 0)
+            if (response == 2)
             {
                 return true;  // Cancel stop
             }
-
-            if (response == 1)
+            
+            if (response == 0)
             {
                 Save ();
             }
@@ -573,10 +593,8 @@ object? result = app.Run<MyDialog> ().Shutdown ();
 When calling `Init()`, Terminal.Gui starts a dedicated input thread that continuously polls for console input. This thread must be stopped properly:
 
 ```csharp
-using Terminal.Gui.Drivers;
-
 IApplication app = Application.Create ();
-app.Init (DriverRegistry.Names.ANSI); // Input thread starts here
+app.Init ("fake"); // Input thread starts here
 
 // Input thread runs in background at ~50 polls/second (20ms throttle)
 
@@ -586,13 +604,11 @@ app.Dispose (); // Cancels input thread and waits for it to exit
 **Important for Tests**: Always dispose applications in tests to prevent thread leaks:
 
 ```csharp
-using Terminal.Gui.Drivers;
-
 [Fact]
 public void My_Test ()
 {
     using IApplication app = Application.Create ();
-    app.Init (DriverRegistry.Names.ANSI);
+    app.Init ("fake");
     
     // Test code here
     
@@ -680,15 +696,48 @@ app.End (token1);
 
 ## Driver Management
 
-### Discovering Available Drivers
+### ForceDriver Configuration Property
 
-Terminal.Gui provides AOT-friendly methods to discover available drivers through the **Driver Registry**:
+The `ForceDriver` property is a configuration property that allows you to specify which driver to use. It can be set via code or through the configuration system (e.g., `config.json`):
 
 ```csharp
-// Get all registered driver names (no reflection)
-IEnumerable<string> driverNames = Application.GetRegisteredDriverNames();
+// RECOMMENDED: Set on instance
+using (IApplication app = Application.Create ())
+{
+    app.ForceDriver = "fake";
+    app.Init ();
+}
 
-foreach (string name in driverNames)
+// ALTERNATIVE: Set on legacy static Application (obsolete)
+Application.ForceDriver = "dotnet";
+Application.Init ();
+```
+
+**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
+
+### ForceDriverChanged Event
+
+The static `Application.ForceDriverChanged` event is raised when the `ForceDriver` property changes:
+
+```csharp
+// ForceDriverChanged event (on legacy static Application)
+Application.ForceDriverChanged += (sender, e) =>
+{
+    Debug.WriteLine ($"Driver changed from '{e.OldValue}' to '{e.NewValue}'");
+};
+
+Application.ForceDriver = "fake";
+```
+
+### Getting Available Drivers
+
+You can query which driver types are available using `GetDriverTypes()`:
+
+```csharp
+// Get available driver types and names
+(List<Type?> types, List<string?> names) = Application.GetDriverTypes();
+
+foreach (string? name in names)
 {
     Debug.WriteLine($"Available driver: {name}");
 }
@@ -696,91 +745,10 @@ foreach (string name in driverNames)
 // Available driver: dotnet
 // Available driver: windows
 // Available driver: unix
-// Available driver: ansi
-
-// Get detailed driver information with metadata
-foreach (var descriptor in Application.GetRegisteredDrivers())
-{
-    Debug.WriteLine($"{descriptor.Name}: {descriptor.DisplayName}");
-    Debug.WriteLine($"  Description: {descriptor.Description}");
-    Debug.WriteLine($"  Platforms: {string.Join(", ", descriptor.SupportedPlatforms)}");
-}
-
-// Validate a driver name (useful for CLI argument validation)
-if (Application.IsDriverNameValid(userInput))
-{
-    app.Init(driverName: userInput);
-}
-else
-{
-    Console.WriteLine($"Invalid driver: {userInput}");
-    Console.WriteLine($"Valid options: {string.Join(", ", Application.GetRegisteredDriverNames())}");
-}
+// Available driver: fake
 ```
 
-**Type-Safe Constants:**
-
-Use `DriverRegistry.Names` for compile-time type safety:
-
-```csharp
-using Terminal.Gui.Drivers;
-
-// Type-safe driver names
-string ansi = DriverRegistry.Names.ANSI;      // "ansi"
-string windows = DriverRegistry.Names.WINDOWS; // "windows"
-string unix = DriverRegistry.Names.UNIX;       // "unix"
-string dotnet = DriverRegistry.Names.DOTNET;   // "dotnet"
-
-app.Init(driverName: DriverRegistry.Names.ANSI);
-```
-
-**Note**: The legacy `GetDriverTypes()` method is now obsolete. Use `GetRegisteredDriverNames()` or `GetRegisteredDrivers()` instead for AOT-friendly, reflection-free driver discovery. See [Drivers](drivers.md) for complete Driver Registry documentation.
-
-### ForceDriver Configuration Property
-
-The `ForceDriver` property is a configuration property that allows you to specify which driver to use. It can be set via code or through the configuration system (e.g., `config.json`):
-
-```csharp
-using Terminal.Gui.Drivers;
-
-// RECOMMENDED: Set on instance with type-safe constant
-using (IApplication app = Application.Create ())
-{
-    app.ForceDriver = DriverRegistry.Names.ANSI;
-    app.Init ();
-}
-
-// ALTERNATIVE: Set with string
-using (IApplication app = Application.Create ())
-{
-    app.ForceDriver = "ansi";
-    app.Init ();
-}
-
-// LEGACY: Set on static Application (obsolete)
-Application.ForceDriver = DriverRegistry.Names.DOTNET;
-Application.Init ();
-```
-
-**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"ansi"`
-
-For complete driver documentation including the Driver Registry pattern, see [Drivers](drivers.md).
-
-### ForceDriverChanged Event
-
-The static `Application.ForceDriverChanged` event is raised when the `ForceDriver` property changes:
-
-```csharp
-using Terminal.Gui.Drivers;
-
-// ForceDriverChanged event (on legacy static Application)
-Application.ForceDriverChanged += (sender, e) =>
-{
-    Debug.WriteLine ($"Driver changed from '{e.OldValue}' to '{e.NewValue}'");
-};
-
-Application.ForceDriver = DriverRegistry.Names.ANSI;
-```
+**Note**: This method uses reflection and is marked with `[RequiresUnreferencedCode]` for AOT compatibility considerations.
 
 ## View.Driver Property
 
@@ -826,14 +794,12 @@ public void MyView_DisplaysCorrectly ()
 ### Testing with Real Application
 
 ```csharp
-using Terminal.Gui.Drivers;
-
 [Fact]
 public void MyView_WorksWithRealApplication ()
 {
     using (IApplication app = Application.Create ())
     {
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
         
         MyView view = new ();
         Window top = new ();
@@ -909,6 +875,21 @@ public void Refresh ()
 }
 ```
 
+### DO: Override GetApp() for Custom Resolution
+
+```csharp
+// ✅ GOOD - Custom application resolution:
+public class SpecialView : View
+{
+    private IApplication? _customApp;
+    
+    public override IApplication? GetApp ()
+    {
+        return _customApp ?? base.GetApp ();
+    }
+}
+```
+
 ## Advanced Scenarios
 
 ### Multiple Applications
@@ -916,12 +897,10 @@ public void Refresh ()
 The instance-based architecture enables multiple applications:
 
 ```csharp
-using Terminal.Gui.Drivers;
-
 // Application 1
 using (IApplication app1 = Application.Create ())
 {
-    app1.Init (DriverRegistry.Names.ANSI);
+    app1.Init ("fake");
     Window top1 = new () { Title = "App 1" };
     // ... configure and run top1
 }
@@ -929,7 +908,7 @@ using (IApplication app1 = Application.Create ())
 // Application 2 (different driver!)
 using (IApplication app2 = Application.Create ())
 {
-    app2.Init (DriverRegistry.Names.ANSI);
+    app2.Init ("fake");
     Window top2 = new () { Title = "App 2" };
     // ... configure and run top2
 }

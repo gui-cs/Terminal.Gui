@@ -9,18 +9,15 @@ namespace Terminal.Gui.Drivers;
 public class WindowsComponentFactory : ComponentFactoryImpl<WindowsConsole.InputRecord>
 {
     /// <inheritdoc />
-    public override string? GetDriverName () => DriverRegistry.Names.WINDOWS;
-
-    /// <inheritdoc />
     public override IInput<WindowsConsole.InputRecord> CreateInput ()
     {
         return new WindowsInput ();
     }
 
     /// <inheritdoc />
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer, ITimeProvider? timeProvider = null)
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
     {
-        return new WindowsInputProcessor (inputBuffer, timeProvider);
+        return new WindowsInputProcessor (inputBuffer);
     }
 
     /// <inheritdoc />

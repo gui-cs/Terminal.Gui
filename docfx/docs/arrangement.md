@@ -21,7 +21,7 @@ See the [Layout Deep Dive](layout.md) for the broader layout system context.
 
 ## Overview
 
-The <xref:Terminal.Gui.ViewBase.View.Arrangement> property controls how users can arrange views within their <xref:Terminal.Gui.ViewBase.View.SuperView>. The [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) enum provides flags that can be combined to specify arrangement behavior.
+The [View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Arrangement) property controls how users can arrange views within their [SuperView](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SuperView). The [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) enum provides flags that can be combined to specify arrangement behavior.
 
 ### Arrangement Lexicon
 
@@ -123,7 +123,7 @@ var view2 = new View
 
 ## Arrange Mode (Interactive)
 
-**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via <xref:Terminal.Gui.App.Application.ArrangeKey>).
+**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)).
 
 ### Entering Arrange Mode
 
@@ -160,9 +160,9 @@ The [Border](~/api/Terminal.Gui.ViewBase.Border.yml) shows visual indicators bas
 
 For a View to be arrangeable:
 
-1. Must be part of a <xref:Terminal.Gui.ViewBase.View.SuperView>
+1. Must be part of a [SuperView](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SuperView)
 2. Position and dimensions must be independent of other SubViews
-3. Must have <xref:Terminal.Gui.ViewBase.View.Arrangement> flags set
+3. Must have [View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Arrangement) flags set
 4. Typically needs a [Border](~/api/Terminal.Gui.ViewBase.Border.yml) for mouse interaction
 
 ---
@@ -185,7 +185,7 @@ container.Add(view1, view2);
 
 **Characteristics:**
 - Default mode for most TUI applications
-- Views use [Pos](~/api/Terminal.Gui.ViewBase.Pos.yml) and [Dim](~/api/Terminal.Gui.ViewBase.Dim.yml) for relative positioning
+- Views use [Pos](~/api/Terminal.Gui.Pos.yml) and [Dim](~/api/Terminal.Gui.Dim.yml) for relative positioning
 - No Z-order management needed
 - More predictable layout behavior
 
@@ -247,7 +247,7 @@ var window = new Window
 ### Moving with Mouse
 
 - **Click and drag** the top [Border](~/api/Terminal.Gui.ViewBase.Border.yml) to move the view
-- The view's <xref:Terminal.Gui.ViewBase.View.Frame> updates as it moves
+- The view's [Frame](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Frame) updates as it moves
 - Release the mouse to complete the move
 
 ### Moving with Keyboard
@@ -289,7 +289,7 @@ var view = new View
 
 - **Click and drag** any enabled border edge
 - Resize indicators appear on hover
-- The view's <xref:Terminal.Gui.ViewBase.View.Width> and <xref:Terminal.Gui.ViewBase.View.Height> update
+- The view's [Width](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Width) and [Height](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Height) update
 
 ### Resizing with Keyboard
 
@@ -334,7 +334,7 @@ container.Add(leftPane, rightPane);
 
 **How it works:**
 - `rightPane` has [ViewArrangement.LeftResizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) - its left border is draggable
-- `leftPane` uses [Dim.Fill](~/api/Terminal.Gui.ViewBase.Dim.yml) with a function to fill remaining space
+- `leftPane` uses [Dim.Fill](~/api/Terminal.Gui.Dim.yml) with a function to fill remaining space
 - `SuperViewRendersLineCanvas = true` ensures proper line rendering
 - Only the left border is visible, acting as the splitter
 
@@ -376,15 +376,15 @@ See the [Multitasking Deep Dive](multitasking.md) for complete details on modal 
 ### What Makes a View Modal
 
 A view is modal when:
-- Run via `IApplication.Run`
-- Runnable.Modal == `true`
+- Run via [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Runnable_System_Func_System_Exception_System_Boolean__)
+- [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.yml#Terminal_Gui_Views_Runnable_Modal) = `true`
 
 ### Modal Characteristics
 
 - **Exclusive Input** - All keyboard and mouse input goes to the modal view
 - **Constrained Z-Order** - Modal view has Z-order of 1, everything else at 0
-- **Blocks Execution** - `IApplication.Run` blocks until <xref:Terminal.Gui.App.Application.RequestStop*> is called
-- **Own SessionToken** - Each modal view has its own [SessionToken](~/api/Terminal.Gui.App.SessionToken.yml)
+- **Blocks Execution** - `Application.Run` blocks until [Application.RequestStop](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_RequestStop_Terminal_Gui_Views_Runnable_) is called
+- **Own RunState** - Each modal view has its own [RunState](~/api/Terminal.Gui.App.RunState.yml)
 
 ### Modal View Types
 
@@ -424,7 +424,7 @@ Application.Run(dialog);
 
 ## Runnable Views
 
-**Runnable** views are those run via [Application.Run](~/api/Terminal.Gui.App.Application.yml). Each non-modal Runnable view operates as a self-contained "application" with its own [SessionToken](~/api/Terminal.Gui.App.SessionToken.yml).
+**Runnable** views are those run via [Application.Run](~/api/Terminal.Gui.App.Application.yml). Each non-modal Runnable view operates as a self-contained "application" with its own [RunState](~/api/Terminal.Gui.App.RunState.yml).
 
 See the [Multitasking Deep Dive](multitasking.md) for complete details.
 
@@ -441,7 +441,7 @@ Application.Run(runnable);
 ```
 
 **Characteristics:**
-- Has its own `SessionToken`
+- Has its own `RunState`
 - Events dispatched independently
 - Can run on separate threads
 - See `BackgroundWorkerCollection` for multi-threaded examples
@@ -524,9 +524,9 @@ container.Add(window1, window2);
 ```
 
 **Z-Order:**
-- Order in <xref:Terminal.Gui.ViewBase.View.SubViews> determines Z-order
+- Order in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SubViews) determines Z-order
 - Later views appear above earlier views
-- Use [View.BringSubviewToFront](~/api/Terminal.Gui.ViewBase.yml) to change Z-order
+- Use [View.BringSubviewToFront](~/api/Terminal.Gui.ViewBase.View.yml) to change Z-order
 
 **Navigation:**
 - `Tab` / `Shift+Tab` - Navigate within current overlapped view
@@ -542,10 +542,9 @@ container.Add(window1, window2);
 ```csharp
 using Terminal.Gui;
 
-using IApplication app = Application.Create();
-app.Init();
+Application.Init();
 
-Window window = new ()
+var window = new Window
 {
     Title = "Drag and Resize Me! (Ctrl+F5 for keyboard mode)",
     X = Pos.Center(),
@@ -556,7 +555,7 @@ Window window = new ()
     BorderStyle = LineStyle.Double
 };
 
-Label label = new ()
+var label = new Label
 {
     Text = "Try dragging the border with mouse\nor press Ctrl+F5!",
     X = Pos.Center(),
@@ -564,19 +563,18 @@ Label label = new ()
 };
 window.Add(label);
 
-app.Run(window);
-window.Dispose();
+Application.Run(window);
+Application.Shutdown();
 ```
 
 ### Example 2: Horizontal Resizable Splitter
 
 ```csharp
-using IApplication app = Application.Create();
-app.Init();
+Application.Init();
 
-Runnable top = new ();
+var top = new Runnable();
 
-FrameView leftPane = new ()
+var leftPane = new FrameView
 {
     Title = "Left Pane",
     X = 0,
@@ -585,7 +583,7 @@ FrameView leftPane = new ()
     Height = Dim.Fill()
 };
 
-FrameView rightPane = new ()
+var rightPane = new FrameView
 {
     Title = "Right Pane (drag left edge)",
     X = Pos.Right(leftPane) - 1,
@@ -599,22 +597,21 @@ rightPane.Border.Thickness = new Thickness(1, 0, 0, 0);
 
 top.Add(leftPane, rightPane);
 
-app.Run(top);
-top.Dispose();
+Application.Run(top);
+Application.Shutdown();
 ```
 
 ### Example 3: Overlapped Windows
 
 ```csharp
-using IApplication app = Application.Create();
-app.Init();
+Application.Init();
 
-Runnable desktop = new ()
-{
-    Arrangement = ViewArrangement.Overlapped
+var desktop = new Runnable 
+{ 
+    Arrangement = ViewArrangement.Overlapped 
 };
 
-Window window1 = new ()
+var window1 = new Window
 {
     Title = "Window 1",
     X = 5,
@@ -624,7 +621,7 @@ Window window1 = new ()
     Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
 };
 
-Window window2 = new ()
+var window2 = new Window
 {
     Title = "Window 2 (overlaps Window 1)",
     X = 15,
@@ -636,8 +633,8 @@ Window window2 = new ()
 
 desktop.Add(window1, window2);
 
-app.Run(desktop);
-desktop.Dispose();
+Application.Run(desktop);
+Application.Shutdown();
 ```
 
 ### Example 4: Custom Arrange Key
@@ -646,21 +643,16 @@ desktop.Dispose();
 using Terminal.Gui;
 using Terminal.Gui.Configuration;
 
-using IApplication app = Application.Create();
-
 // Change the arrange key
-app.Keyboard.ArrangeKey = Key.F2;
+Application.ArrangeKey = Key.F2;
 
-app.Init();
-
-Window window = new ()
+var window = new Window
 {
     Title = "Press F2 to enter arrange mode",
     Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
 };
 
-app.Run(window);
-window.Dispose();
+Application.Run(window);
 ```
 
 ---
@@ -672,12 +664,12 @@ window.Dispose();
 Arrangement only works when:
 
 1. **View has a SuperView** - Root views cannot be arranged
-2. **Independent Position/Size** - Views with [Pos.Align](~/api/Terminal.Gui.ViewBase.Pos.yml) or complex [Dim](~/api/Terminal.Gui.ViewBase.Dim.yml) constraints may not resize properly
+2. **Independent Position/Size** - Views with [Pos.Align](~/api/Terminal.Gui.Pos.yml) or complex [Dim](~/api/Terminal.Gui.Dim.yml) constraints may not resize properly
 3. **Border Required** - Mouse-based arrangement requires a visible [Border](~/api/Terminal.Gui.ViewBase.Border.yml)
 
 ### SuperViewRendersLineCanvas
 
-When creating splitters, set <xref:Terminal.Gui.ViewBase.View.SuperViewRendersLineCanvas> = `true`:
+When creating splitters, set [View.SuperViewRendersLineCanvas](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SuperViewRendersLineCanvas) = `true`:
 
 ```csharp
 rightPane.SuperViewRendersLineCanvas = true;
@@ -724,15 +716,15 @@ view.LayoutComplete += (s, e) =>
 - **[View Deep Dive](View.md)** - View base class
 - **[Multitasking Deep Dive](multitasking.md)** - Modal and runnable views
 - **[Drawing Deep Dive](drawing.md)** - LineCanvas and borders
-- **[Configuration Deep Dive](config.md)** - Configuring IKeyboard.ArrangeKey
+- **[Configuration Deep Dive](config.md)** - Configuring Application.ArrangeKey
 
 ### API Reference
 
-- <xref:Terminal.Gui.ViewBase.View.Arrangement>
+- [View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Arrangement)
 - [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)
 - [Border](~/api/Terminal.Gui.ViewBase.Border.yml)
-- <xref:Terminal.Gui.App.Application.ArrangeKey>
-- Runnable.Modal
+- [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)
+- [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.yml#Terminal_Gui_Views_Runnable_Modal)
 
 ### UICatalog Examples
 

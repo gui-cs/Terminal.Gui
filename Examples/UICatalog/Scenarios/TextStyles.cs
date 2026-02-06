@@ -11,14 +11,11 @@ public sealed class TextStyles : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-
         // Init
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ()
+        Window appWindow = new ()
         {
             Id = "appWindow",
             Title = GetQuitKeyAndName ()
@@ -42,14 +39,18 @@ public sealed class TextStyles : Scenario
         _drawDirectly = new ()
         {
             Title = "_Draw styled text directly using DrawingContent vs. Buttons",
-            Value = CheckState.UnChecked
+            CheckedState = CheckState.UnChecked
         };
 
         appWindow.Add (_drawDirectly);
         AddButtons (appWindow);
 
         // Run - Start the application.
-        app.Run (appWindow);
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     private void AddButtons (Window appWindow)
@@ -71,7 +72,7 @@ public sealed class TextStyles : Scenario
                 X = 0,
                 Y = y,
                 Title = $"{Enum.GetName (typeof (TextStyle), style)}",
-                Visible = _drawDirectly!.Value != CheckState.Checked
+                Visible = _drawDirectly!.CheckedState != CheckState.Checked
             };
 
             button.GettingAttributeForRole += (sender, args) =>
@@ -81,7 +82,7 @@ public sealed class TextStyles : Scenario
                                                       return;
                                                   }
 
-                                                  if (args.Result is not null)
+                                                  if (args.Result is { })
                                                   {
                                                       args.Result = args.Result.Value with { Style = style };
                                                   }
@@ -125,11 +126,11 @@ public sealed class TextStyles : Scenario
                 X = 0,
                 Y = y,
                 Text = $"[{string.Join (" | ", styleNames)}]",
-                Visible = _drawDirectly!.Value != CheckState.Checked
+                Visible = _drawDirectly!.CheckedState != CheckState.Checked
             };
             button.GettingAttributeForRole += (_, args) =>
                                               {
-                                                  if (args.Result is not null)
+                                                  if (args.Result is { })
                                                   {
                                                       args.Result = args.Result.Value with { Style = combination };
                                                   }
@@ -149,7 +150,7 @@ public sealed class TextStyles : Scenario
 
         foreach (Button view in sendingVioew.SubViews.OfType<Button> ())
         {
-            view.Visible = _drawDirectly!.Value != CheckState.Checked;
+            view.Visible = _drawDirectly!.CheckedState != CheckState.Checked;
         }
 
         e.Cancel = false;
@@ -157,7 +158,7 @@ public sealed class TextStyles : Scenario
 
     private void OnAppWindowOnDrawingContent (object? sender, DrawEventArgs args)
     {
-        if (sender is View { } sendingView && _drawDirectly!.Value == CheckState.Checked)
+        if (sender is View { } sendingView && _drawDirectly!.CheckedState == CheckState.Checked)
         {
             int y = 2 - args.NewViewport.Y; // Start drawing below the checkbox
 

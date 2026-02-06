@@ -10,7 +10,7 @@ namespace DrawingTests;
 ///
 /// Note: Tests that verify rendered output (Draw methods) require Application.Driver and remain in UnitTests as integration tests.
 /// </summary>
-public class RulerTests (ITestOutputHelper output) : TestDriverBase
+public class RulerTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -51,7 +51,7 @@ public class RulerTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Draw_Default ()
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var r = new Ruler ();
         r.Draw (driver: driver, location: Point.Empty);
@@ -61,7 +61,7 @@ public class RulerTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Draw_Horizontal ()
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var len = 15;
 
@@ -107,7 +107,7 @@ public class RulerTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Draw_Vertical ()
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var len = 15;
 

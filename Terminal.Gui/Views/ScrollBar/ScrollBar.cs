@@ -1,3 +1,7 @@
+
+
+using System.ComponentModel;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -24,7 +28,7 @@ namespace Terminal.Gui.Views;
 ///         By default, this view cannot be focused and does not support keyboard input.
 ///     </para>
 /// </remarks>
-public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
+public class ScrollBar : View, IOrientation, IDesignable
 {
     private readonly Button _decreaseButton;
     private readonly ScrollSlider _slider;
@@ -34,66 +38,67 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     public ScrollBar ()
     {
         // Set the default width and height based on the orientation - fill Viewport
-        Width = Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
+        Width = Dim.Auto (
+                          DimAutoStyle.Content,
+                          Dim.Func (_ => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
 
-        Height = Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
+        Height = Dim.Auto (
+                           DimAutoStyle.Content,
+                           Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
 
-        _decreaseButton = new Button
+        _decreaseButton = new ()
         {
             CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
+            WantContinuousButtonPressed = true
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
-        _slider = new ScrollSlider
+        _slider = new ()
         {
             SliderPadding = 2 // For the buttons
         };
         _slider.Scrolled += SliderOnScroll;
         _slider.PositionChanged += SliderOnPositionChanged;
 
-        _increaseButton = new Button
+        _increaseButton = new ()
         {
             CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
+            WantContinuousButtonPressed = true
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, _slider, _increaseButton);
 
         CanFocus = false;
 
-        // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new OrientationHelper (this); // Do not use object initializer!
+        _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
 
         // This sets the width/height etc...
         OnOrientationChanged (Orientation);
 
-        MouseHoldRepeat = MouseFlags.LeftButtonReleased;
-
         return;
 
         void OnDecreaseButtonOnAccept (object? s, CommandEventArgs e)
         {
-            Value -= Increment;
+            Position -= Increment;
             e.Handled = true;
         }
 
         void OnIncreaseButtonOnAccept (object? s, CommandEventArgs e)
         {
-            Value += Increment;
+            Position += Increment;
             e.Handled = true;
         }
     }
 
     /// <inheritdoc/>
-    protected override void OnFrameChanged (in Rectangle frame) => ShowHide ();
+    protected override void OnFrameChanged (in Rectangle frame) { ShowHide (); }
 
     private void ShowHide ()
     {
@@ -104,7 +109,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         _slider.VisibleContentSize = VisibleContentSize;
         _slider.Size = CalculateSliderSize ();
-        _sliderPosition = CalculateSliderPositionFromContentPosition (_value);
+        _sliderPosition = CalculateSliderPositionFromContentPosition (_position);
         _slider.Position = _sliderPosition.Value;
     }
 
@@ -153,7 +158,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     private readonly OrientationHelper _orientationHelper;
 
     /// <inheritdoc/>
-    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
+    public Orientation Orientation
+    {
+        get => _orientationHelper.Orientation;
+        set => _orientationHelper.Orientation = value;
+    }
 
 #pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
@@ -173,14 +182,14 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         _slider.Orientation = newOrientation;
         PositionSubViews ();
 
-        OrientationChanged?.Invoke (this, new EventArgs<Orientation> (newOrientation));
+        OrientationChanged?.Invoke (this, new (newOrientation));
     }
 
     #endregion
 
     /// <summary>
     ///     Gets or sets the amount each mouse wheel event, or click on the increment/decrement buttons, will
-    ///     incremenet/decrement the <see cref="Value"/>.
+    ///     incremenet/decrement the <see cref="Position"/>.
     /// </summary>
     /// <remarks>
     ///     The default is 1.
@@ -280,7 +289,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             }
 
             OnSizeChanged (value);
-            ScrollableContentSizeChanged?.Invoke (this, new EventArgs<int> (in value));
+            ScrollableContentSizeChanged?.Invoke (this, new (in value));
             SetNeedsLayout ();
         }
     }
@@ -291,103 +300,97 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// <summary>Raised when <see cref="ScrollableContentSize"/> has changed.</summary>
     public event EventHandler<EventArgs<int>>? ScrollableContentSizeChanged;
 
-    #region IValue<int> Implementation
+    #region Position
 
-    private int _value;
+    private int _position;
 
     /// <summary>
-    ///     Gets or sets the scroll position relative to <see cref="ScrollableContentSize"/>.
+    ///     Gets or sets the position of the slider relative to <see cref="ScrollableContentSize"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The scroll position is clamped to 0 and <see cref="ScrollableContentSize"/> minus
+    ///         The content position is clamped to 0 and <see cref="ScrollableContentSize"/> minus
     ///         <see cref="VisibleContentSize"/>.
     ///     </para>
     ///     <para>
-    ///         Setting will result in the <see cref="ValueChanging"/> and <see cref="ValueChanged"/>
+    ///         Setting will result in the <see cref="PositionChanging"/> and <see cref="PositionChanged"/>
     ///         events being raised.
     ///     </para>
     /// </remarks>
-    public int Value
+    public int Position
     {
-        get => _value;
+        get => _position;
         set
         {
-            if (value == _value || !Visible)
+            if (value == _position || !Visible)
             {
                 return;
             }
 
             // Clamp the value between 0 and Size - VisibleContentSize
-            int newValue = Math.Clamp (value, 0, Math.Max (0, ScrollableContentSize - VisibleContentSize));
-            NavigationDirection direction = newValue >= _value ? NavigationDirection.Forward : NavigationDirection.Backward;
+            int newContentPosition = Math.Clamp (value, 0, Math.Max (0, ScrollableContentSize - VisibleContentSize));
+            NavigationDirection direction = newContentPosition >= _position ? NavigationDirection.Forward : NavigationDirection.Backward;
 
-            int oldValue = _value;
-
-            ValueChangingEventArgs<int> changingArgs = new (oldValue, newValue);
-
-            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            if (OnPositionChanging (_position, newContentPosition))
             {
                 return;
             }
 
-            ValueChanging?.Invoke (this, changingArgs);
+            CancelEventArgs<int> args = new (ref _position, ref newContentPosition);
+            PositionChanging?.Invoke (this, args);
 
-            if (changingArgs.Handled)
+            if (args.Cancel)
             {
                 return;
             }
 
-            int distance = newValue - _value;
+            int distance = newContentPosition - _position;
 
-            if (_value == newValue)
+            if (_position == newContentPosition)
             {
                 return;
             }
 
-            _value = newValue;
+            _position = newContentPosition;
 
-            _sliderPosition = CalculateSliderPositionFromContentPosition (_value, direction);
+            _sliderPosition = CalculateSliderPositionFromContentPosition (_position, direction);
 
             if (_slider.Position != _sliderPosition)
             {
                 _slider.Position = _sliderPosition.Value;
             }
 
-            ValueChangedEventArgs<int> changedArgs = new (oldValue, _value);
-            OnValueChanged (changedArgs);
-            ValueChanged?.Invoke (this, changedArgs);
+            OnPositionChanged (_position);
+            PositionChanged?.Invoke (this, new (in _position));
 
             OnScrolled (distance);
-            Scrolled?.Invoke (this, new EventArgs<int> (in distance));
+            Scrolled?.Invoke (this, new (in distance));
             SetNeedsLayout ();
         }
     }
 
     /// <summary>
-    ///     Called when <see cref="Value"/> is changing. Return <see langword="true"/> to cancel the change.
+    ///     Called when <see cref="Position"/> is changing. Return true to cancel the change.
     /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<int> args) => false;
+    protected virtual bool OnPositionChanging (int currentPos, int newPos) { return false; }
 
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangingEventArgs<int>>? ValueChanging;
+    /// <summary>
+    ///     Raised when the <see cref="Position"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to
+    ///     <see langword="true"/> to prevent the position from being changed.
+    /// </summary>
+    public event EventHandler<CancelEventArgs<int>>? PositionChanging;
 
-    /// <summary>Called when <see cref="Value"/> has changed.</summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<int> args) { }
+    /// <summary>Called when <see cref="Position"/> has changed.</summary>
+    protected virtual void OnPositionChanged (int position) { }
 
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
+    /// <summary>Raised when the <see cref="Position"/> has changed.</summary>
+    public event EventHandler<EventArgs<int>>? PositionChanged;
 
-    /// <summary>Called when <see cref="Value"/> has changed. Indicates how much to scroll.</summary>
+    /// <summary>Called when <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
     protected virtual void OnScrolled (int distance) { }
 
-    /// <summary>Raised when the <see cref="Value"/> has changed. Indicates how much was scrolled.</summary>
+    /// <summary>Raised when the <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
     public event EventHandler<EventArgs<int>>? Scrolled;
-
-    #endregion
 
     /// <summary>
     ///     INTERNAL API (for unit tests) - Calculates the position within the <see cref="ScrollableContentSize"/> based on the
@@ -405,6 +408,8 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         return ScrollSlider.CalculateContentPosition (ScrollableContentSize, VisibleContentSize, sliderPosition, scrollBarSize - _slider.SliderPadding);
     }
+
+    #endregion ContentPosition
 
     #region Slider Management
 
@@ -439,8 +444,9 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             return;
         }
 
-        int calculatedSliderPos =
-            CalculateSliderPositionFromContentPosition (_value, e.Value >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
+        int calculatedSliderPos = CalculateSliderPositionFromContentPosition (
+                                                                              _position,
+                                                                              e.Value >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
 
         if (calculatedSliderPos == _sliderPosition)
         {
@@ -450,13 +456,13 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         int sliderScrolledAmount = e.Value;
         int calculatedPosition = CalculatePositionFromSliderPosition (calculatedSliderPos + sliderScrolledAmount);
 
-        Value = calculatedPosition;
+        Position = calculatedPosition;
     }
 
     /// <summary>
     ///     Gets or sets the position of the start of the Scroll slider, within the Viewport.
     /// </summary>
-    public int GetSliderPosition () => CalculateSliderPositionFromContentPosition (_value);
+    public int GetSliderPosition () { return CalculateSliderPositionFromContentPosition (_position); }
 
     private void RaiseSliderPositionChangeEvents (int? currentSliderPosition, int newSliderPosition)
     {
@@ -468,7 +474,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         _sliderPosition = newSliderPosition;
 
         OnSliderPositionChanged (newSliderPosition);
-        SliderPositionChanged?.Invoke (this, new EventArgs<int> (in newSliderPosition));
+        SliderPositionChanged?.Invoke (this, new (in newSliderPosition));
     }
 
     /// <summary>Called when the slider position has changed.</summary>
@@ -509,11 +515,18 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         return true;
     }
 
+    // TODO: Change this to work OnMouseEvent with continuouse press and grab so it's continous.
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
-        if (args.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
+        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        {
+            return base.OnActivating (args);
+        }
+
+        // Check if the mouse click is a single click
+        if (!mouseArgs.IsSingleClicked)
         {
             return base.OnActivating (args);
         }
@@ -524,12 +537,12 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         if (Orientation == Orientation.Vertical)
         {
             sliderCenter = 1 + _slider.Frame.Y + _slider.Frame.Height / 2;
-            distanceFromCenter = mouse.Position!.Value.Y - sliderCenter;
+            distanceFromCenter = mouseArgs.Position.Y - sliderCenter;
         }
         else
         {
             sliderCenter = 1 + _slider.Frame.X + _slider.Frame.Width / 2;
-            distanceFromCenter = mouse.Position!.Value.X - sliderCenter;
+            distanceFromCenter = mouseArgs.Position.X - sliderCenter;
         }
 
 #if PROPORTIONAL_SCROLL_JUMP
@@ -547,51 +560,51 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         // Adjust the content position based on the distance
         if (distanceFromCenter < 0)
         {
-            Value = Math.Max (0, Value - jump);
+            Position = Math.Max (0, Position - jump);
         }
         else
         {
-            Value = Math.Min (ScrollableContentSize - _slider.VisibleContentSize, Value + jump);
+            Position = Math.Min (ScrollableContentSize - _slider.VisibleContentSize, Position + jump);
         }
 
         return true;
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Mouse mouse)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
         if (SuperView is null)
         {
             return false;
         }
 
-        if (!mouse.IsWheel)
+        if (!mouseEvent.IsWheel)
         {
             return false;
         }
 
         if (Orientation == Orientation.Vertical)
         {
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
+            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledDown))
             {
-                Value += Increment;
+                Position += Increment;
             }
 
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
+            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledUp))
             {
-                Value -= Increment;
+                Position -= Increment;
             }
         }
         else
         {
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledRight))
+            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledRight))
             {
-                Value += Increment;
+                Position += Increment;
             }
 
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledLeft))
+            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledLeft))
             {
-                Value -= Increment;
+                Position -= Increment;
             }
         }
 
@@ -601,7 +614,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        OrientationChanged += (_, args) =>
+        OrientationChanged += (sender, args) =>
                               {
                                   if (args.Value == Orientation.Vertical)
                                   {

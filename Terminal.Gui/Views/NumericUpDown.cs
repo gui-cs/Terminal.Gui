@@ -10,7 +10,7 @@ namespace Terminal.Gui.Views;
 ///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
 ///     <see cref="decimal"/>. Attempting to use any other type will result in an <see cref="InvalidOperationException"/>.
 /// </remarks>
-public class NumericUpDown<T> : View, IValue<T> where T : notnull
+public class NumericUpDown<T> : View where T : notnull
 {
     private readonly Button _down;
 
@@ -37,7 +37,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             if (NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
             {
                 Increment = (T)helper!.One;
-                Value = (T)helper.Zero;
+                Value = (T)helper!.Zero;
             }
         }
 
@@ -51,7 +51,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             NoPadding = true,
             NoDecorations = true,
             Title = $"{Glyphs.DownArrow}",
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
+            WantContinuousButtonPressed = true,
             CanFocus = false,
             ShadowStyle = ShadowStyle.None,
         };
@@ -61,7 +61,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
             Y = Pos.Top (_down),
-            Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns ())),
+            Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns())),
             Height = 1,
             TextAlignment = Alignment.Center,
             CanFocus = true,
@@ -76,7 +76,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             NoPadding = true,
             NoDecorations = true,
             Title = $"{Glyphs.UpArrow}",
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
+            WantContinuousButtonPressed = true,
             CanFocus = false,
             ShadowStyle = ShadowStyle.None,
         };
@@ -152,7 +152,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         }
     }
 
-    private T? _value = default;
+    private T _value = default!;
 
     /// <summary>
     ///     Gets or sets the value that will be incremented or decremented.
@@ -160,63 +160,45 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
     /// <remarks>
     ///     <para>
     ///         <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events are raised when the value changes.
-    ///         Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
+    ///         The <see cref="ValueChanging"/> event can be canceled the change setting
+    ///         <see cref="HandledEventArgs"/><c>.Handled</c> to <see langword="true"/>.
     ///     </para>
     /// </remarks>
-    public T? Value
+    public T Value
     {
         get => _value;
         set
         {
-            if (EqualityComparer<T?>.Default.Equals (_value, value))
+            if (_value.Equals (value))
             {
                 return;
             }
 
-            T? oldValue = _value;
-            ValueChangingEventArgs<T?> changingArgs = new (oldValue, value);
+            T oldValue = value;
+            CancelEventArgs<T> args = new (in _value, ref value);
+            ValueChanging?.Invoke (this, args);
 
-            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            if (args.Cancel)
             {
                 return;
             }
 
-            ValueChanging?.Invoke (this, changingArgs);
-
-            if (changingArgs.Handled)
-            {
-                return;
-            }
-
-            _value = changingArgs.NewValue;
+            _value = value;
             SetText ();
-
-            ValueChangedEventArgs<T?> changedArgs = new (oldValue, _value);
-            OnValueChanged (changedArgs);
-            ValueChanged?.Invoke (this, changedArgs);
+            ValueChanged?.Invoke (this, new (in value));
         }
     }
 
     /// <summary>
-    ///     Raised when <see cref="Value"/> is about to change.
-    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
+    ///     Raised when the value is about to change. Set <see cref="CancelEventArgs{T}"/><c>.Cancel</c> to true to prevent the
+    ///     change.
     /// </summary>
-    public event EventHandler<ValueChangingEventArgs<T?>>? ValueChanging;
+    public event EventHandler<CancelEventArgs<T>>? ValueChanging;
 
     /// <summary>
-    ///     Raised when <see cref="Value"/> has changed.
+    ///     Raised when the value has changed.
     /// </summary>
-    public event EventHandler<ValueChangedEventArgs<T?>>? ValueChanged;
-
-    /// <summary>
-    ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
-    /// </summary>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<T?> args) => false;
-
-    /// <summary>
-    ///     Called after <see cref="Value"/> has changed.
-    /// </summary>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<T?> args) { }
+    public event EventHandler<EventArgs<T>>? ValueChanged;
 
     private string _format = "{0}";
 

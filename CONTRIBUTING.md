@@ -120,15 +120,16 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 **⚠️ CRITICAL - These rules MUST be followed in ALL new or modified code:**
 
-**AI or AI Agent Written or Modified Code MUST Follow these instructions**
-
-- Read and study `.editorconfig` and `Terminal.sln.DotSettings` to determine code style and formatting.
+- **Do NOT add formatting tools** - Use existing `.editorconfig` and `Terminal.sln.DotSettings`
 - Format code with:
   1. ReSharper/Rider (`Ctrl-E-C`)
   2. JetBrains CleanupCode CLI tool (free)
   3. Visual Studio (`Ctrl-K-D`) as fallback
-- Only format files you modify
-- Follow `.editorconfig` settings
+- **Only format files you modify**
+- Follow `.editorconfig` settings (e.g., braces on new lines, spaces after keywords)
+- 4-space indentation
+- No trailing whitespace
+- File-scoped namespaces
 - **ALWAYS use explicit types** - Never use `var` except for built-in simple types (`int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`)
   ```csharp
   // ✅ CORRECT - Explicit types
@@ -143,6 +144,7 @@ Welcome! This guide provides everything you need to know to contribute effective
   var args = new MouseEventArgs { Position = new Point(5, 5) };
   var views = new List<View?>();
   ```
+
 - **ALWAYS use target-typed `new ()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
   ```csharp
   // ✅ CORRECT - Target-typed new
@@ -153,21 +155,8 @@ Welcome! This guide provides everything you need to know to contribute effective
   View view = new View() { Width = 10 };
   MouseEventArgs args = new MouseEventArgs();
   ```
-- **ALWAYS** use collection initializers if possible:
-  ```csharp
-  // ✅ CORRECT - Collection initializer
-  List<View> views = [
-      new Button("OK"),
-      new Button("Cancel")
-  ];
-  
-  // ❌ WRONG - Adding items separately
-  List<View> views = new ();
-  views.Add(new Button("OK"));
-  views.Add(new Button("Cancel"));
-  ```
 
-**⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, documentation, and samples.**
+**⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, and samples.**
 
 ## Testing Requirements
 
@@ -184,8 +173,6 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 ### Test Patterns
 
-- **AI Created Tests MUST follow these patterns exactly.**
-- **Add comment indicating the test was AI generated** - e.g., `// CoPilot - ChatGPT v4`
 - **Make tests granular** - Each test should cover smallest area possible
 - Follow existing test patterns in respective test projects
 - **Avoid adding new tests to the `UnitTests` Project** - Make them parallelizable and add them to `UnitTests.Parallelizable`
@@ -254,7 +241,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 **`/Terminal.Gui/`** - Core library (496 C# files):
 - `App/` - Application lifecycle (`Application.cs` static class, `SessionToken`, `MainLoop`)
 - `Configuration/` - `ConfigurationManager` for settings
-- `Drivers/` - Console driver implementations (`dotnet`, `Windows`, `Unix`, `ansi`)
+- `Drivers/` - Console driver implementations (`Dotnet`, `Windows`, `Unix`, `Fake`)
 - `Drawing/` - Rendering system (attributes, colors, glyphs)
 - `Input/` - Keyboard and mouse input handling
 - `ViewBase/` - Core `View` class hierarchy and layout
@@ -292,28 +279,6 @@ Welcome! This guide provides everything you need to know to contribute effective
 - `v2_develop` - Default branch, active development
 - `v2_release` - Stable releases, matches NuGet
 - `v1_develop`, `v1_release` - Legacy v1 (maintenance only)
-
-## Release Process
-
-### Automated Release Workflow
-
-Releases are now automated using GitHub Actions to prevent manual errors. To create a release:
-
-1. **Navigate to Actions tab** in the GitHub repository
-2. **Select "Create Release" workflow** from the left sidebar
-3. **Click "Run workflow"** button
-4. **Configure release parameters:**
-   - **Branch:** Ensure `v2_release` is selected
-   - **Release type:** Choose from `prealpha`, `alpha`, `beta`, `rc`, or `stable`
-   - **Version override:** (Optional) Specify exact version (e.g., `2.0.0`), otherwise GitVersion calculates it automatically
-5. **Click "Run workflow"** to start the automated release process
-
-The workflow will:
-- Create an annotated git tag (e.g., `v2.0.0-prealpha` or `v2.0.0`)
-- Create a release commit on `v2_release`
-- Push the tag and commit to the repository
-- Create a GitHub Release
-- Automatically trigger the publish workflow to push the package to NuGet.org
 
 ## What NOT to Do
 

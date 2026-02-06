@@ -1,3 +1,4 @@
+
 using System.ComponentModel;
 
 namespace Terminal.Gui.ViewBase;
@@ -58,20 +59,22 @@ public record PosAlign : Pos
     /// <returns></returns>
     public static int CalculateMinDimension (int groupId, IReadOnlyCollection<View> views, Dimension dimension)
     {
-        var dimensionsSum = 0;
-
-        foreach (View view in views)
+        int dimensionsSum = 0;
+        foreach (var view in views)
         {
-            if (!HasGroupId (view, dimension, groupId))
-            {
+            if (!HasGroupId (view, dimension, groupId)) {
                 continue;
             }
 
-            PosAlign? posAlign = dimension == Dimension.Width ? view.X as PosAlign : view.Y as PosAlign;
+            PosAlign? posAlign = dimension == Dimension.Width
+                ? view.X as PosAlign
+                : view.Y as PosAlign;
 
             if (posAlign is { })
             {
-                dimensionsSum += dimension == Dimension.Width ? view.Frame.Width : view.Frame.Height;
+                dimensionsSum += dimension == Dimension.Width
+                    ? view.Frame.Width
+                    : view.Frame.Height;
             }
         }
 
@@ -79,13 +82,15 @@ public record PosAlign : Pos
         return dimensionsSum;
     }
 
-    internal static bool HasGroupId (View v, Dimension dimension, int groupId) =>
-        dimension switch
+    internal static bool HasGroupId (View v, Dimension dimension, int groupId)
+    {
+        return dimension switch
         {
-            Dimension.Width when v.X.Has (out PosAlign pos) => pos.GroupId == groupId,
-            Dimension.Height when v.Y.Has (out PosAlign pos) => pos.GroupId == groupId,
+            Dimension.Width when v.X.Has<PosAlign> (out PosAlign pos) => pos.GroupId == groupId,
+            Dimension.Height when v.Y.Has<PosAlign> (out PosAlign pos) => pos.GroupId == groupId,
             _ => false
         };
+    }
 
     /// <summary>
     ///     Gets the identifier of a set of views that should be aligned together. When only a single
@@ -94,7 +99,7 @@ public record PosAlign : Pos
     public int GroupId { get; init; }
 
     /// <inheritdoc/>
-    public override string ToString () => $"Align(alignment={Aligner.Alignment},modes={Aligner.AlignmentModes},groupId={GroupId})";
+    public override string ToString () { return $"Align(alignment={Aligner.Alignment},modes={Aligner.AlignmentModes},groupId={GroupId})"; }
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
@@ -103,7 +108,16 @@ public record PosAlign : Pos
             return _cachedLocation.Value;
         }
 
-        List<View> groupViews = us.SuperView is null ? [us] : us.SuperView!.SubViews.Snapshot ().Where (v => HasGroupId (v, dimension, GroupId)).ToList ();
+        IList<View>? groupViews;
+        if (us.SuperView is null)
+        {
+            groupViews = new List<View> ();
+            groupViews.Add (us);
+        }
+        else
+        {
+            groupViews = us.SuperView!.SubViews.Snapshot ().Where (v => HasGroupId (v, dimension, GroupId)).ToList ();
+        }
 
         AlignAndUpdateGroup (GroupId, groupViews, dimension, superviewDimension);
 
@@ -115,7 +129,7 @@ public record PosAlign : Pos
         return 0;
     }
 
-    internal override int GetAnchor (int width) => _cachedLocation ?? 0 - width;
+    internal override int GetAnchor (int width) { return _cachedLocation ?? 0 - width; }
 
     /// <summary>
     ///     Aligns the views in <paramref name="views"/> that have the same group ID as <paramref name="groupId"/>.
@@ -130,9 +144,9 @@ public record PosAlign : Pos
         List<int> dimensionsList = new ();
 
         // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-        List<PosAlign?> posAligns = views.Where (v => HasGroupId (v, dimension, groupId))
-                                         .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
-                                         .ToList ();
+        List<PosAlign?> posAligns = views.Where (v => PosAlign.HasGroupId (v, dimension, groupId))
+                                        .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
+                                        .ToList ();
 
         // PERF: We iterate over viewsInGroup multiple times here.
 
@@ -141,15 +155,17 @@ public record PosAlign : Pos
         // Update the dimensionList with the sizes of the views
         for (var index = 0; index < posAligns.Count; index++)
         {
-            if (posAligns [index] is null)
+            if (posAligns [index] is { })
             {
-                continue;
-            }
-            firstInGroup ??= posAligns [index]!.Aligner;
+                if (firstInGroup is null)
+                {
+                    firstInGroup = posAligns [index]!.Aligner;
+                }
 
-            dimensionsList.Add (dimension == Dimension.Width
-                                    ? views [index].Width.Calculate (0, size, views [index], dimension)
-                                    : views [index].Height.Calculate (0, size, views [index], dimension));
+                dimensionsList.Add (dimension == Dimension.Width 
+                                        ? views [index].Width!.Calculate(0, size, views [index], dimension) 
+                                        : views [index].Height!.Calculate (0, size, views [index], dimension));
+            }
         }
 
         if (firstInGroup is null)
@@ -173,10 +189,5 @@ public record PosAlign : Pos
         }
     }
 
-    internal override bool ReferencesOtherViews () => true;
-
-    /// <inheritdoc/>
-    internal override bool DependsOnSuperViewContentSize => true;
-
-    private void Aligner_PropertyChanged (object? sender, PropertyChangedEventArgs e) => _cachedLocation = null;
+    private void Aligner_PropertyChanged (object? sender, PropertyChangedEventArgs e) { _cachedLocation = null; }
 }

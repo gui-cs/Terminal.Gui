@@ -16,9 +16,4 @@ public class SixelToRender
     ///     gets or sets where to move the cursor to before outputting the <see cref="SixelData"/>.
     /// </summary>
     public Point ScreenPosition { get; set; }
-
-    /// <summary>
-    /// Gets or sets the unique identifier for this sixel render operation.
-    /// </summary>
-    public string? Id { get; set; }
 }

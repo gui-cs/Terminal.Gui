@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace TextTests;
 
-public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
+public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Theory]
     [InlineData ("")]
@@ -1145,7 +1145,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void NeedsFormat_Sets ()
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
         var testText = "test";
         var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
@@ -2973,8 +2973,8 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
 
     // ============================================================
     // MIGRATED TESTS FROM UnitTests/Text/TextFormatterTests.cs
-    // These tests now use CreateTestDriver() from ParallelizableBase
-    // instead of relying on Application.Driver via [SetupTestDriver]
+    // These tests now use CreateFakeDriver() from ParallelizableBase
+    // instead of relying on Application.Driver via [SetupFakeDriver]
     // ============================================================
 
     [Theory]
@@ -2991,7 +2991,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
     [InlineData ("ABC", 9, "   ABC")]
     public void Draw_Horizontal_Centered (string text, int width, string expectedText)
     {
-        var driver = CreateTestDriver (width > 0 ? width : 1, 1);
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
 
         TextFormatter tf = new ()
         {
@@ -3020,7 +3020,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
     [InlineData ("ABC ABC", 10, "ABC    ABC")]
     public void Draw_Horizontal_Justified (string text, int width, string expectedText)
     {
-        var driver = CreateTestDriver (width > 0 ? width : 1, 1);
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
 
         TextFormatter tf = new ()
         {
@@ -3046,7 +3046,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
     [InlineData ("ABC", 6, "ABC")]
     public void Draw_Horizontal_Left (string text, int width, string expectedText)
     {
-        var driver = CreateTestDriver (width > 0 ? width : 1, 1);
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
 
         TextFormatter tf = new ()
         {
@@ -3072,7 +3072,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
     [InlineData ("ABC", 6, "   ABC")]
     public void Draw_Horizontal_Right (string text, int width, string expectedText)
     {
-        var driver = CreateTestDriver (width > 0 ? width : 1, 1);
+        var driver = CreateFakeDriver (width > 0 ? width : 1, 1);
 
         TextFormatter tf = new ()
         {
@@ -3102,7 +3102,7 @@ ssb
                 )]
     public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
     {
-        var driver = CreateTestDriver ();
+        var driver = CreateFakeDriver ();
         var text = "Les Mise\u0328\u0301rables";
 
         var tf = new TextFormatter ();
@@ -3137,7 +3137,7 @@ ssb
         string expected
     )
     {
-        var driver = CreateTestDriver ();
+        var driver = CreateFakeDriver ();
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
 
@@ -3174,7 +3174,7 @@ ssb
         string expected
     )
     {
-        var driver = CreateTestDriver ();
+        var driver = CreateFakeDriver ();
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
@@ -3212,7 +3212,7 @@ ssb
         string expected
     )
     {
-        var driver = CreateTestDriver ();
+        var driver = CreateFakeDriver ();
 
         var text = "This is a \tTab";
         var tf = new TextFormatter ();

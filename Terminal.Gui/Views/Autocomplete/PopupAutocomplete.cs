@@ -97,10 +97,10 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the
     ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
-    /// <param name="mouse">The mouse event.</param>
+    /// <param name="me">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    public override bool OnMouseEvent (Mouse mouse, bool fromHost = false)
+    public override bool OnMouseEvent (MouseEventArgs me, bool fromHost = false)
     {
         if (fromHost)
         {
@@ -149,28 +149,28 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (mouse.Flags == MouseFlags.PositionReport)
+        if (me.Flags == MouseFlags.ReportMousePosition)
         {
-            RenderSelectedIdxByMouse (mouse);
+            RenderSelectedIdxByMouse (me);
 
             return true;
         }
 
-        if (mouse.Flags == MouseFlags.LeftButtonClicked)
+        if (me.Flags == MouseFlags.Button1Clicked)
         {
-            SelectedIdx = mouse.Position!.Value.Y - ScrollOffset;
+            SelectedIdx = me.Position.Y - ScrollOffset;
 
             return Select ();
         }
 
-        if (mouse.Flags == MouseFlags.WheeledDown)
+        if (me.Flags == MouseFlags.WheeledDown)
         {
             MoveDown ();
 
             return true;
         }
 
-        if (mouse.Flags == MouseFlags.WheeledUp)
+        if (me.Flags == MouseFlags.WheeledUp)
         {
             MoveUp ();
 
@@ -490,11 +490,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
     /// <summary>Render the current selection in the Autocomplete context menu by the mouse reporting.</summary>
     /// <param name="me"></param>
-    protected void RenderSelectedIdxByMouse (Mouse me)
+    protected void RenderSelectedIdxByMouse (MouseEventArgs me)
     {
-        if (SelectedIdx != me.Position!.Value.Y - ScrollOffset)
+        if (SelectedIdx != me.Position.Y - ScrollOffset)
         {
-            SelectedIdx = me.Position!.Value.Y - ScrollOffset;
+            SelectedIdx = me.Position.Y - ScrollOffset;
 
             if (LastPopupPos is { })
             {

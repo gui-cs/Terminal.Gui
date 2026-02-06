@@ -2,7 +2,7 @@
 namespace ViewBaseTests.Navigation;
 
 
-
+[Collection ("Global Test Setup")]
 public class CanFocusTests () : TestsAllViews
 {
     [Fact]

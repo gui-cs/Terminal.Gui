@@ -1,48 +1,30 @@
 ---
 uid: Terminal.Gui.Configuration
-summary: Configuration management, themes, and persistent settings.
+summary: The `Configuration` namespace provides comprehensive configuration management for Terminal.Gui applications.
 ---
 
-The `Configuration` namespace provides comprehensive configuration management for Terminal.Gui applications.
+@Terminal.Gui.Configuration provides a robust system for managing application settings, themes, and runtime configuration. This namespace includes the configuration manager, property attributes, and scoping mechanisms that allow applications to persist and load settings from various sources.
 
-## Key Types
+The configuration system supports multiple scopes (Settings, Themes, AppSettings) and sources (user directory, application directory, etc.), enabling flexible deployment and customization scenarios. It also provides theme inheritance and hot-reloading capabilities for dynamic configuration updates.
 
-- **ConfigurationManager** - Central system for loading and applying configuration
-- **ConfigurationPropertyAttribute** - Marks properties as configurable
-- **Scope** - Configuration contexts (Settings, Themes, AppSettings)
-- **ThemeManager** - Theme loading and application
+## Key Components
 
-## Configuration Scopes
+- **ConfigurationManager**: Central system for loading, applying, and managing configuration
+- **ConfigProperty**: Attribute for marking properties as configurable
+- **Scopes**: Settings, Theme, and AppSettings contexts
+- **Sources**: Multiple storage locations for configuration persistence
 
-| Scope | Purpose |
-|-------|---------|
-| Settings | Runtime behavior settings |
-| Themes | Visual styling and color schemes |
-| AppSettings | Application-specific settings |
-
-## Configuration Sources
-
-Configuration is loaded from multiple locations in priority order:
-
-1. Application directory (`appSettings.json`)
-2. User directory (`~/.tui/`)
-3. Environment variables
-4. Code-based defaults
-
-## Example
+## Example Usage
 
 ```csharp
-// Enable configuration from all sources
-ConfigurationManager.Enable (ConfigLocations.All);
-
-// Access theme
-ThemeManager.Theme = "Dark";
-
 // Mark a property as configurable
-[ConfigurationProperty (Scope = typeof (SettingsScope))]
-public static bool MyFeature { get; set; } = true;
+[ConfigProperty]
+public static bool MyFeatureEnabled { get; set; } = true;
+
+// Load configuration from default sources
+ConfigurationManager.Enable(ConfigLocations.All);
 ```
 
-## See Also
+## Deep Dive
 
-- [Configuration Deep Dive](~/docs/config.md)
+- [Configuration Management Deep Dive](~/docs/config.md) - Comprehensive configuration system documentation

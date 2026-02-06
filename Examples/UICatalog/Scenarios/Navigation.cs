@@ -1,5 +1,5 @@
-﻿
-// ReSharper disable AccessToModifiedClosure
+﻿using System.Text;
+using System.Timers;
 
 namespace UICatalog.Scenarios;
 
@@ -13,15 +13,15 @@ public class Navigation : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window window = new ();
-        window.Title = GetQuitKeyAndName ();
-        window.TabStop = TabBehavior.TabGroup;
+        Window app = new ()
+        {
+            Title = GetQuitKeyAndName (),
+            TabStop = TabBehavior.TabGroup
+        };
 
-        AdornmentsEditor adornmentsEditor = new ()
+        var adornmentsEditor = new AdornmentsEditor
         {
             X = 0,
             Y = 0,
@@ -29,18 +29,17 @@ public class Navigation : Scenario
             ShowViewIdentifier = true,
             TabStop = TabBehavior.NoStop
         };
-        window.Add (adornmentsEditor);
+        app.Add (adornmentsEditor);
 
-        ArrangementEditor arrangementEditor = new ()
+        var arrangementEditor = new ArrangementEditor ()
         {
             X = Pos.Right (adornmentsEditor),
             Y = 0,
-
             //Height = Dim.Fill(),
             AutoSelectViewToEdit = true,
             TabStop = TabBehavior.NoStop
         };
-        window.Add (arrangementEditor);
+        app.Add (arrangementEditor);
 
         FrameView testFrame = new ()
         {
@@ -51,10 +50,16 @@ public class Navigation : Scenario
             Height = Dim.Fill ()
         };
 
-        window.Add (testFrame);
 
-        Button button = new () { X = 0, Y = 0, Title = $"TopButton _{GetNextHotKey ()}" };
-        button.Accepting += (_, _) => MessageBox.Query (app, "hi", button.Title, Strings.btnOk);
+        app.Add (testFrame);
+
+        Button button = new ()
+        {
+            X = 0,
+            Y = 0,
+            Title = $"TopButton _{GetNextHotKey ()}"
+        };
+        button.Accepting += (sender, args) => MessageBox.Query (Application.Instance, "hi", button.Title, "_Ok");
 
         testFrame.Add (button);
 
@@ -102,7 +107,7 @@ public class Navigation : Scenario
         //                 };
         //timer.Start ();
 
-        app.Iteration += OnApplicationIteration;
+        Application.Iteration += OnApplicationIteration;
 
         View overlappedView2 = CreateOverlappedView (3, 8, 10);
 
@@ -114,44 +119,56 @@ public class Navigation : Scenario
 
         StatusBar statusBar = new ();
 
-        statusBar.Add (new Shortcut
-        {
-            Title = "Hide",
-            Text = "Hotkey",
-            Key = Key.F4,
-            Action = () =>
-                     {
-                         // TODO: move this logic into `View.ShowHide()` or similar
-                         overlappedView2.Visible = false;
-                         overlappedView2.Enabled = overlappedView2.Visible;
-                     }
-        });
+        statusBar.Add (
+                       new Shortcut
+                       {
+                           Title = "Hide",
+                           Text = "Hotkey",
+                           Key = Key.F4,
+                           Action = () =>
+                                    {
+                                        // TODO: move this logic into `View.ShowHide()` or similar
+                                        overlappedView2.Visible = false;
+                                        overlappedView2.Enabled = overlappedView2.Visible;
+                                    }
+                       });
 
-        statusBar.Add (new Shortcut
-        {
-            Title = "Toggle Hide",
-            Text = "App",
-            BindKeyToApplication = true,
-            Key = Key.F4.WithCtrl,
-            Action = () =>
-                     {
-                         // TODO: move this logic into `View.ShowHide()` or similar
-                         overlappedView2.Visible = !overlappedView2.Visible;
-                         overlappedView2.Enabled = overlappedView2.Visible;
+        statusBar.Add (
+                       new Shortcut
+                       {
+                           Title = "Toggle Hide",
+                           Text = "App",
+                           BindKeyToApplication = true,
+                           Key = Key.F4.WithCtrl,
+                           Action = () =>
+                                    {
+                                        // TODO: move this logic into `View.ShowHide()` or similar
+                                        overlappedView2.Visible = !overlappedView2.Visible;
+                                        overlappedView2.Enabled = overlappedView2.Visible;
 
-                         if (overlappedView2.Visible)
-                         {
-                             overlappedView2.SetFocus ();
-                         }
-                     }
-        });
+                                        if (overlappedView2.Visible)
+                                        {
+                                            overlappedView2.SetFocus ();
+                                        }
+                                    }
+                       });
         overlappedView2.Add (statusBar);
 
-        ColorPicker colorPicker = new () { Y = 12, Width = Dim.Fill (), Id = "colorPicker", Style = new () { ShowTextFields = true, ShowColorName = true } };
+        ColorPicker colorPicker = new ()
+        {
+            Y = 12,
+            Width = Dim.Fill (),
+            Id = "colorPicker",
+            Style = new ()
+            {
+                ShowTextFields = true,
+                ShowColorName = true
+            }
+        };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.Value = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
-        colorPicker.ValueChanged += ColorPickerColorChanged;
+        colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
+        colorPicker.ColorChanged += ColorPicker_ColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
 
@@ -172,7 +189,12 @@ public class Navigation : Scenario
         };
         testFrame.Add (datePicker);
 
-        button = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Title = $"TopButton _{GetNextHotKey ()}" };
+        button = new ()
+        {
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Title = $"TopButton _{GetNextHotKey ()}"
+        };
 
         testFrame.Add (button);
 
@@ -180,10 +202,11 @@ public class Navigation : Scenario
         arrangementEditor.AutoSelectSuperView = testFrame;
 
         testFrame.SetFocus ();
-        app.Run (window);
-        app.Iteration -= OnApplicationIteration;
-
+        Application.Run (app);
+        Application.Iteration -= OnApplicationIteration;
         // timer.Close ();
+        app.Dispose ();
+        Application.Shutdown ();
 
         return;
 
@@ -196,19 +219,18 @@ public class Navigation : Scenario
 
             progressBar.Fraction += 0.01f;
 
-            app.Invoke (_ => { });
+            Application.Invoke ((_) => { });
         }
 
-        void ColorPickerColorChanged (object sender, ValueChangedEventArgs<Color?> e) =>
-            testFrame.SetScheme (testFrame.GetScheme () with
-            {
-                Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.NewValue ?? Color.Black)
-            });
+        void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
+        {
+            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
+        }
     }
 
     private View CreateOverlappedView (int id, Pos x, Pos y)
     {
-        View overlapped = new ()
+        var overlapped = new View
         {
             X = x,
             Y = y,
@@ -224,10 +246,17 @@ public class Navigation : Scenario
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
         };
 
-        Button button = new () { Title = $"Button{id} _{GetNextHotKey ()}" };
+        Button button = new ()
+        {
+            Title = $"Button{id} _{GetNextHotKey ()}"
+        };
         overlapped.Add (button);
 
-        button = new () { Y = Pos.Bottom (button), Title = $"Button{id} _{GetNextHotKey ()}" };
+        button = new ()
+        {
+            Y = Pos.Bottom (button),
+            Title = $"Button{id} _{GetNextHotKey ()}"
+        };
         overlapped.Add (button);
 
         return overlapped;
@@ -235,7 +264,7 @@ public class Navigation : Scenario
 
     private View CreateTiledView (int id, Pos x, Pos y)
     {
-        View overlapped = new ()
+        var overlapped = new View
         {
             X = x,
             Y = y,
@@ -249,14 +278,23 @@ public class Navigation : Scenario
             Arrangement = ViewArrangement.Fixed
         };
 
-        Button button = new () { Title = $"Tiled Button{id} _{GetNextHotKey ()}", Y = 1 };
+        Button button = new ()
+        {
+            Title = $"Tiled Button{id} _{GetNextHotKey ()}",
+            Y = 1,
+        };
         overlapped.Add (button);
 
-        button = new () { Y = Pos.Bottom (button), Title = $"Tiled Button{id} _{GetNextHotKey ()}" };
+        button = new ()
+        {
+            Y = Pos.Bottom (button),
+            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
+        };
         overlapped.Add (button);
+
 
         return overlapped;
     }
 
-    private char GetNextHotKey () => (char)('A' + _hotkeyCount++);
+    private char GetNextHotKey () { return (char)('A' + _hotkeyCount++); }
 }

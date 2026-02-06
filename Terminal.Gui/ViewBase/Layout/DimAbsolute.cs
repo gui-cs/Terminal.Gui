@@ -18,9 +18,12 @@ public record DimAbsolute (int Size) : Dim
     public int Size { get; } = Size;
 
     /// <inheritdoc/>
-    public override string ToString () => $"Absolute({Size})";
+    public override string ToString () { return $"Absolute({Size})"; }
 
-    internal override int GetAnchor (int size) => Size;
+    internal override int GetAnchor (int size) { return Size; }
 
-    internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension) => Math.Max (GetAnchor (0), 0);
+    internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
+    {
+        return Math.Max (GetAnchor (0), 0);
+    }
 }

@@ -1,6 +1,5 @@
 namespace ApplicationTests.Popover;
 
-[Collection("Application Tests")]
 public class PopoverBaseImplTests
 {
     // Minimal concrete implementation for testing

@@ -1,6 +1,5 @@
 namespace ApplicationTests;
 
-[Collection("Application Tests")]
 public class ResultEventArgsTests
 {
     [Fact]

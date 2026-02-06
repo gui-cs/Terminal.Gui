@@ -520,7 +520,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         }
         super.Add (scrollBar);
 
-        scrollBar.Value = contentPosition;
+        scrollBar.Position = contentPosition;
 
         super.Layout ();
         super.Draw ();
@@ -530,8 +530,8 @@ public class ScrollBarTests (ITestOutputHelper output)
     #endregion Draw
 
     #region Mouse
-
-    [Theory (Skip = "Broken in #4474")]
+    
+    [Theory]
     [CombinatorialData]
     [AutoInitShutdown]
     public void Mouse_Click_DecrementButton_Decrements ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)
@@ -554,13 +554,13 @@ public class ScrollBarTests (ITestOutputHelper output)
         SessionToken rs = Application.Begin (top);
 
         // Scroll to end
-        scrollBar.Value = 19;
-        Assert.Equal (10, scrollBar.Value);
+        scrollBar.Position = 19;
+        Assert.Equal (10, scrollBar.Position);
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (4, scrollBar.GetSliderPosition ());
-        Assert.Equal (10, scrollBar.Value);
-        int initialPos = scrollBar.Value;
+        Assert.Equal (10, scrollBar.Position);
+        int initialPos = scrollBar.Position;
 
         Point btnPoint = orientation == Orientation.Vertical
                              ? new (0, 0)
@@ -569,18 +569,18 @@ public class ScrollBarTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new ()
         {
             ScreenPosition = btnPoint,
-            Flags = MouseFlags.LeftButtonClicked
+            Flags = MouseFlags.Button1Clicked
         });
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.Equal (initialPos - increment, scrollBar.Value);
+        Assert.Equal (initialPos - increment, scrollBar.Position);
 
         Application.ResetState (true);
     }
 
 
-    [Theory (Skip = "Broken in #4474")]
+    [Theory]
     [CombinatorialData]
     [AutoInitShutdown]
     public void Mouse_Click_IncrementButton_Increments ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)
@@ -603,12 +603,12 @@ public class ScrollBarTests (ITestOutputHelper output)
         SessionToken rs = Application.Begin (top);
 
         // Scroll to top
-        scrollBar.Value = 0;
+        scrollBar.Position = 0;
         AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (0, scrollBar.GetSliderPosition ());
-        Assert.Equal (0, scrollBar.Value);
-        int initialPos = scrollBar.Value;
+        Assert.Equal (0, scrollBar.Position);
+        int initialPos = scrollBar.Position;
 
         Point btnPoint = orientation == Orientation.Vertical
                              ? new (scrollBar.Frame.X, scrollBar.Frame.Height - 1)
@@ -617,11 +617,11 @@ public class ScrollBarTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new ()
         {
             ScreenPosition = btnPoint,
-            Flags = MouseFlags.LeftButtonClicked
+            Flags = MouseFlags.Button1Clicked
         });
         AutoInitShutdownAttribute.RunIteration ();
 
-        Assert.Equal (initialPos + increment, scrollBar.Value);
+        Assert.Equal (initialPos + increment, scrollBar.Position);
 
         Application.ResetState (true);
     }

@@ -10,7 +10,7 @@ public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Draw_Does_Not_Layout (Type viewType)
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 

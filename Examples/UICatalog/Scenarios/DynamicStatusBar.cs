@@ -14,10 +14,9 @@ public class DynamicStatusBar : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
-        app.Run<DynamicStatusBarSample> ();
+        Application.Init ();
+        Application.Run<DynamicStatusBarSample> ();
+        Application.Shutdown ();
     }
 
     public class Binding
@@ -80,7 +79,7 @@ public class DynamicStatusBar : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (Source.App!, "Binding Error", $"Binding failed: {ex}.", "Ok");
+                MessageBox.ErrorQuery (Application.Instance, "Binding Error", $"Binding failed: {ex}.", "Ok");
             }
         }
     }
@@ -141,7 +140,7 @@ public class DynamicStatusBar : Scenario
         public TextView TextAction { get; }
         public TextField TextShortcut { get; }
         public TextField TextTitle { get; }
-        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (App!, item.Title, item.Action, "Ok"); }
+        public Action CreateAction (DynamicStatusItem item) { return () => MessageBox.ErrorQuery (Application.Instance, item.Title, item.Action, "Ok"); }
 
         public void EditStatusItem (Shortcut statusItem)
         {
@@ -181,7 +180,6 @@ public class DynamicStatusBar : Scenario
 
             var btnOk = new Button { IsDefault = true, Text = "OK" };
 
-            Dialog dialog = new () { Title = "Enter the menu details." };
             btnOk.Accepting += (s, e) =>
                               {
                                   if (string.IsNullOrEmpty (TextTitle.Text))
@@ -192,7 +190,7 @@ public class DynamicStatusBar : Scenario
                                   {
 
                                       valid = true;
-                                      dialog.App?.RequestStop ();
+                                      Application.RequestStop ();
                                   }
                               };
             var btnCancel = new Button { Text = "Cancel" };
@@ -200,16 +198,16 @@ public class DynamicStatusBar : Scenario
             btnCancel.Accepting += (s, e) =>
                                   {
                                       TextTitle.Text = string.Empty;
-                                      dialog.App?.RequestStop ();
+                                      Application.RequestStop ();
                                   };
-            dialog.Buttons = [btnOk, btnCancel];
+            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 17, App?.Screen.Height) };
 
-            Width = Dim.Fill (0, minimumContentDim: 50);
-            Height = Dim.Fill (0, minimumContentDim: 10) - 2;
+            Width = Dim.Fill ();
+            Height = Dim.Fill () - 2;
             dialog.Add (this);
             TextTitle.SetFocus ();
-            TextTitle.InsertionPoint = TextTitle.Text.Length;
-            App?.Run (dialog);
+            TextTitle.CursorPosition = TextTitle.Text.Length;
+            Application.Run (dialog);
             dialog.Dispose ();
 
             return valid
@@ -378,7 +376,7 @@ public class DynamicStatusBar : Scenario
             btnCancel.Accepting += (s, e) => { SetFrameDetails (_currentEditStatusItem); };
             Add (btnCancel);
 
-            _lstItems.ValueChanged += (_, _) => { SetFrameDetails (); };
+            _lstItems.SelectedItemChanged += (s, e) => { SetFrameDetails (); };
 
             btnOk.Accepting += (s, e) =>
                               {

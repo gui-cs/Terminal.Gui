@@ -1,9 +1,10 @@
-﻿using System.Text;
+﻿#nullable enable
+using System.Text;
 using UnitTests;
 
 namespace ViewsTests;
 
-public class HexViewTests : TestDriverBase
+public class HexViewTests : FakeDriverBase
 {
     [Theory]
     [InlineData (0, 4)]
@@ -94,7 +95,7 @@ public class HexViewTests : TestDriverBase
 
         var readBuffer = new byte [hv.Source!.Length];
         hv.Source.Position = 0;
-        hv.Source.ReadExactly (readBuffer);
+        hv.Source.Read (readBuffer);
         Assert.Equal ("Fest", Encoding.Default.GetString (readBuffer));
 
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab)); // Move to left side
@@ -111,12 +112,13 @@ public class HexViewTests : TestDriverBase
 
         hv.ApplyEdits (original);
         original.Position = 0;
-        original.ReadExactly (buffer);
+        original.Read (buffer);
         copy.Position = 0;
-        copy.ReadExactly (readBuffer);
+        copy.Read (readBuffer);
         Assert.Equal ("Zest", Encoding.Default.GetString (buffer));
         Assert.Equal ("Zest", Encoding.Default.GetString (readBuffer));
         Assert.Equal (Encoding.Default.GetString (buffer), Encoding.Default.GetString (readBuffer));
+
     }
 
     [Fact]
@@ -359,6 +361,7 @@ public class HexViewTests : TestDriverBase
         hv.Source = new MemoryStream ();
         runnable.Layout ();
         Assert.Equal (0, hv.Address);
+
     }
 
     private const string MEM_STRING = "Hello world.\nThis is a test of the Emergency Broadcast System.\n";
@@ -399,54 +402,16 @@ public class HexViewTests : TestDriverBase
         public override bool CanWrite => baseStream.CanWrite;
         public override long Length => throw new NotSupportedException ();
 
-        public override long Position { get => baseStream.Position; set => throw new NotSupportedException (); }
+        public override long Position
+        {
+            get => baseStream.Position;
+            set => throw new NotSupportedException ();
+        }
 
-        public override void Flush () => baseStream.Flush ();
+        public override void Flush () { baseStream.Flush (); }
         public override int Read (byte [] buffer, int offset, int count) => baseStream.Read (buffer, offset, count);
         public override long Seek (long offset, SeekOrigin origin) => throw new NotImplementedException ();
-        public override void SetLength (long value) => throw new NotSupportedException ();
-        public override void Write (byte [] buffer, int offset, int count) => baseStream.Write (buffer, offset, count);
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void HexView_Click_PositionsCursor ()
-    {
-        HexView hexView = new () { Width = 20, Height = 5 };
-        hexView.Source = new MemoryStream ([1, 2, 3, 4, 5, 6, 7, 8]);
-        hexView.BeginInit ();
-        hexView.EndInit ();
-
-        // Click should position cursor (Activate via mouse)
-        Mouse ev = new () { Position = new Point (2, 0), Flags = MouseFlags.LeftButtonClicked };
-        hexView.NewMouseEvent (ev);
-
-        // Cursor should be positioned (verify command was processed)
-        Assert.True (hexView.HasFocus || !hexView.CanFocus);
-
-        hexView.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void HexView_DoubleClick_TogglesSide ()
-    {
-        HexView hexView = new () { Width = 20, Height = 5 };
-        hexView.Source = new MemoryStream ([1, 2, 3, 4, 5, 6, 7, 8]);
-        hexView.BeginInit ();
-        hexView.EndInit ();
-
-        // Double-click toggles between hex and text side
-        Mouse ev = new () { Position = new Point (2, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
-        hexView.NewMouseEvent (ev);
-
-        // Verify command was processed
-        Assert.True (hexView.HasFocus || !hexView.CanFocus);
-
-        hexView.Dispose ();
+        public override void SetLength (long value) { throw new NotSupportedException (); }
+        public override void Write (byte [] buffer, int offset, int count) { baseStream.Write (buffer, offset, count); }
     }
 }

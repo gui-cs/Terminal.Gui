@@ -21,8 +21,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
     /// <param name="forceDriver">
-    ///     Forces the specified driver to be used when Application.Init is called. If not specified ANSI Driver will be used.
-    ///     Only valid if
+    ///     Forces the specified driver ("windows", "dotnet", "unix", or "fake") to
+    ///     be used when Application.Init is called. If not specified FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
     public AutoInitShutdownAttribute (
@@ -63,7 +63,6 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 }
 #endif
             }
-
             //catch (Exception e)
             //{
             //    Debug.WriteLine ($"Application.Shutdown threw an exception after the test exited: {e}");
@@ -110,15 +109,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == DriverRegistry.Names.ANSI)
+            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
             {
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();
+
             }
             else
             {
                 Assert.Fail ("Specifying driver name not yet supported");
-
                 //Application.Init ((IDriver)Activator.CreateInstance (_forceDriver));
             }
         }
@@ -127,11 +126,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private bool _autoInit { get; }
 
     /// <summary>
-    ///     Runs a single iteration of the main loop (layout, draw, run timed events etc.)
+    /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)
     /// </summary>
     public static void RunIteration ()
     {
-        var a = (ApplicationImpl)ApplicationImpl.Instance;
+        ApplicationImpl a = (ApplicationImpl)ApplicationImpl.Instance;
         a.Coordinator?.RunIteration ();
     }
 }

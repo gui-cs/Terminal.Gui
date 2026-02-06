@@ -8,29 +8,25 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TableView")]
 public class ProcessTable : Scenario
 {
-    private TableView _tableView;
+    private TableView tableView;
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-
-        using IApplication app = Application.Create ();
-        app.Init ();
-
-        using Window win = new ()
+        Application.Init ();
+        var win = new Window
         {
             Title = GetName (),
             Y = 1, // menu
             Height = Dim.Fill (1) // status bar
         };
 
-        _tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         // First time
         CreateProcessTable ();
 
         // Then every second
-        app.AddTimeout (
+        Application.AddTimeout (
                                 TimeSpan.FromSeconds (1),
                                 () =>
                                 {
@@ -40,17 +36,19 @@ public class ProcessTable : Scenario
                                 }
                                );
 
-        win.Add (_tableView);
+        win.Add (tableView);
 
-        app.Run (win);
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private void CreateProcessTable ()
     {
-        int ro = _tableView.RowOffset;
-        int co = _tableView.ColumnOffset;
+        int ro = tableView.RowOffset;
+        int co = tableView.ColumnOffset;
 
-        _tableView.Table = new EnumerableTableSource<Process> (
+        tableView.Table = new EnumerableTableSource<Process> (
                                                               Process.GetProcesses (),
                                                               new Dictionary<string, Func<Process, object>>
                                                               {
@@ -62,8 +60,8 @@ public class ProcessTable : Scenario
                                                               }
                                                              );
 
-        _tableView.RowOffset = ro;
-        _tableView.ColumnOffset = co;
-        _tableView.EnsureValidScrollOffsets ();
+        tableView.RowOffset = ro;
+        tableView.ColumnOffset = co;
+        tableView.EnsureValidScrollOffsets ();
     }
 }

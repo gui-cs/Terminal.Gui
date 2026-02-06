@@ -40,7 +40,7 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
 
     public WindowsInput ()
     {
-        //Logging.Information ($"Creating {nameof (WindowsInput)}");
+        Logging.Logger.LogInformation ($"Creating {nameof (WindowsInput)}");
 
         try
         {
@@ -113,7 +113,6 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
         }
         catch (Exception)
         {
-            Logging.Error ($"Error reading console input, error code: {Marshal.GetLastWin32Error ()}.");
             return [];
         }
         finally

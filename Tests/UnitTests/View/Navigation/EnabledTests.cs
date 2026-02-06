@@ -35,7 +35,7 @@ public class EnabledTests
 
             win.NewKeyDownEvent (Key.Enter);
             Assert.True (wasClicked);
-            button.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonClicked });
+            button.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked });
             Assert.False (wasClicked);
             Assert.True (button.Enabled);
             Assert.True (button.CanFocus);
@@ -49,7 +49,7 @@ public class EnabledTests
             Assert.False (button.HasFocus);
             button.NewKeyDownEvent (Key.Enter);
             Assert.False (wasClicked);
-            button.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonClicked });
+            button.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked });
             Assert.False (wasClicked);
             Assert.False (button.Enabled);
             Assert.True (button.CanFocus);

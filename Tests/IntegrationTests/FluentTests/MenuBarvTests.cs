@@ -4,12 +4,12 @@ using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests;
+namespace IntegrationTests.FluentTests;
 
 /// <summary>
 ///     Tests for the MenuBar class
 /// </summary>
-public class MenuBarTests : TestsAllDrivers
+public class MenuBarTests
 {
     private readonly TextWriter _out;
 
@@ -20,10 +20,10 @@ public class MenuBarTests : TestsAllDrivers
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void Initializes_WithNoItems (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void Initializes_WithNoItems (TestDriver d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
+        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 // Create a menu bar with no items
@@ -36,26 +36,26 @@ public class MenuBarTests : TestsAllDrivers
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void Initializes_WithItems (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void Initializes_WithItems (TestDriver d)
     {
         MenuBarItem [] menuItems = [];
 
-        using TestContext c = With.A<Window> (80, 25, d, _out)
+        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 // Create items for the menu bar
                                                 menuItems =
                                                 [
                                                     new (
-                                                         Strings.menuFile,
+                                                         "_File",
                                                          [
-                                                             new MenuItem (Strings.cmdOpen, "Opens a file", () => { })
+                                                             new MenuItem ("_Open", "Opens a file", () => { })
                                                          ]),
                                                     new (
                                                          "_Edit",
                                                          [
-                                                             new MenuItem (Strings.cmdCopy, "Copies selection", () => { })
+                                                             new MenuItem ("_Copy", "Copies selection", () => { })
                                                          ])
                                                 ];
 
@@ -65,7 +65,7 @@ public class MenuBarTests : TestsAllDrivers
                                                 // First item should be the File menu
                                                 var fileMenu = menuBar.SubViews.ElementAt (0) as MenuBarItem;
                                                 Assert.NotNull (fileMenu);
-                                                Assert.Equal (Strings.menuFile, fileMenu.Title);
+                                                Assert.Equal ("_File", fileMenu.Title);
 
                                                 // Second item should be the Edit menu
                                                 var editMenu = menuBar.SubViews.ElementAt (1) as MenuBarItem;
@@ -75,10 +75,10 @@ public class MenuBarTests : TestsAllDrivers
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void AddsItems_WithMenusProperty (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void AddsItems_WithMenusProperty (TestDriver d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
+        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -86,7 +86,7 @@ public class MenuBarTests : TestsAllDrivers
                                                 // Set items through Menus property
                                                 menuBar.Menus =
                                                 [
-                                                    new (Strings.menuFile),
+                                                    new ("_File"),
                                                     new ("_Edit"),
                                                     new ("_View")
                                                 ];
@@ -96,10 +96,10 @@ public class MenuBarTests : TestsAllDrivers
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void ChangesKey_RaisesEvent (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void ChangesKey_RaisesEvent (TestDriver d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
+        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -133,13 +133,13 @@ public class MenuBarTests : TestsAllDrivers
 
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void DefaultKey_Activates (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void DefaultKey_Activates (TestDriver d)
     {
         MenuBar? menuBar = null;
         View? top = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((app) =>
                                             {
                                                 menuBar = new MenuBar ();
@@ -158,7 +158,7 @@ public class MenuBarTests : TestsAllDrivers
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (top?.App?.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .KeyDown (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .WaitIteration ()
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                      .AssertEqual ("_New file", top?.App?.Navigation!.GetFocused ()!.Title)
@@ -168,12 +168,12 @@ public class MenuBarTests : TestsAllDrivers
 
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void DefaultKey_DeActivates (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void DefaultKey_DeActivates (TestDriver d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -193,29 +193,29 @@ public class MenuBarTests : TestsAllDrivers
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .KeyDown (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                      .AssertEqual ("_New file", app?.Navigation!.GetFocused ()!.Title)
-                                     .KeyDown (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ());
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void ShowHidePopovers (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void ShowHidePopovers (TestDriver d)
     {
         IApplication? app = null;
-        using TestContext c = With.A<Window> (80, 25, d, _out)
+        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
                                                 // Create a menu bar with items that have submenus
                                                 var fileMenuItem = new MenuBarItem (
-                                                                                      Strings.menuFile,
+                                                                                      "_File",
                                                                                       [
-                                                                                          new MenuItem (Strings.cmdOpen, string.Empty, null),
-                                                                                          new MenuItem (Strings.cmdSave, string.Empty, null)
+                                                                                          new MenuItem ("_Open", string.Empty, null),
+                                                                                          new MenuItem ("_Save", string.Empty, null)
                                                                                       ]);
 
                                                 var menuBar = new MenuBar ([fileMenuItem]) { App = app };
@@ -259,10 +259,10 @@ public class MenuBarTests : TestsAllDrivers
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void EnableForDesign_CreatesMenuItems (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void EnableForDesign_CreatesMenuItems (TestDriver d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
+        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((app) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -279,9 +279,9 @@ public class MenuBarTests : TestsAllDrivers
                                                 Assert.True (menuBar.SubViews.Count > 0);
 
                                                 // Should have File, Edit and Help menus
-                                                View? fileMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuFile);
+                                                View? fileMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_File");
                                                 View? editMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_Edit");
-                                                View? helpMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuHelp);
+                                                View? helpMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_Help");
 
                                                 Assert.NotNull (fileMenu);
                                                 Assert.NotNull (editMenu);
@@ -291,13 +291,13 @@ public class MenuBarTests : TestsAllDrivers
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void Navigation_Left_Right_Wraps (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void Navigation_Left_Right_Wraps (TestDriver d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -308,36 +308,36 @@ public class MenuBarTests : TestsAllDrivers
                                             })
                                      .WaitIteration ()
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .KeyDown (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (menuBar?.IsOpen ())
                                      .AssertEqual ("_New file", app?.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                     .KeyDown (Key.CursorRight)
+                                     .EnqueueKeyEvent (Key.CursorRight)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .ScreenShot ("After right arrow", _out)
                                      .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
-                                     .KeyDown (Key.CursorRight)
+                                     .EnqueueKeyEvent (Key.CursorRight)
                                      .ScreenShot ("After second right arrow", _out)
                                      .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ("After third right arrow", _out)
-                                     .KeyDown (Key.CursorRight)
+                                     .EnqueueKeyEvent (Key.CursorRight)
                                      .ScreenShot ("After fourth right arrow", _out)
                                      .AssertEqual ("_New file", app?.Navigation?.GetFocused ()!.Title)
-                                     .KeyDown (Key.CursorLeft)
+                                     .EnqueueKeyEvent (Key.CursorLeft)
                                      .ScreenShot ("After left arrow", _out)
                                      .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title);
     }
 
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Restores_Focus_Correctly (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Restores_Focus_Correctly (TestDriver d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -356,25 +356,25 @@ public class MenuBarTests : TestsAllDrivers
                                             })
                                      .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .KeyDown (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .AssertEqual ("_New file", app.Navigation!.GetFocused ()!.Title)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (menuBar?.IsOpen ())
                                      .AssertEqual ("_New file", app?.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                     .KeyDown (Application.QuitKey)
+                                     .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ());
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Restores_Focus_Correctly (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Restores_Focus_Correctly (TestDriver d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Add (
                                            new View ()
                                            {
@@ -393,26 +393,26 @@ public class MenuBarTests : TestsAllDrivers
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .KeyDown (MenuBar.DefaultKey)
-                                     .KeyDown (Key.CursorRight)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (Key.CursorRight)
                                      .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (menuBar?.IsOpen ())
                                      .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                     .KeyDown (Application.QuitKey)
+                                     .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertIsNotType<MenuItem> (app?.Navigation?.GetFocused ());
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (TestDriver d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -432,23 +432,23 @@ public class MenuBarTests : TestsAllDrivers
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .KeyDown (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .AssertEqual ("_New file", app.Navigation!.GetFocused ()!.Title)
                                      .AssertTrue (app?.TopRunnable!.IsRunning)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                     .KeyDown (Application.QuitKey)
+                                     .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (app!.TopRunnable!.IsRunning);
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Does_Not_Quit_MenuBar_SuperView (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Does_Not_Quit_MenuBar_SuperView (TestDriver d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -463,7 +463,7 @@ public class MenuBarTests : TestsAllDrivers
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                IEnumerable<MenuItem> items = menuBar.GetMenuItemsWithTitle (Strings.cmdQuit);
+                                                IEnumerable<MenuItem> items = menuBar.GetMenuItemsWithTitle ("_Quit");
 
                                                 foreach (MenuItem item in items)
                                                 {
@@ -475,17 +475,17 @@ public class MenuBarTests : TestsAllDrivers
                                      .WaitIteration ()
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
                                      .ScreenShot ("MenuBar initial state", _out)
-                                     .KeyDown (MenuBar.DefaultKey)
+                                     .EnqueueKeyEvent (MenuBar.DefaultKey)
                                      .AssertEqual ("_New file", app?.Navigation!.GetFocused ()!.Title)
                                      .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                     .KeyDown (Application.QuitKey)
+                                     .EnqueueKeyEvent (Application.QuitKey)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void MenuBar_Not_Active_DoesNotEat_Space (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBar_Not_Active_DoesNotEat_Space (TestDriver d)
     {
         int spaceKeyDownCount = 0;
         View testView = new View ()
@@ -502,7 +502,7 @@ public class MenuBarTests : TestsAllDrivers
                                 }
                             };
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -513,13 +513,13 @@ public class MenuBarTests : TestsAllDrivers
                                      .Add (testView)
                                      .WaitIteration ()
                                      .Focus (testView)
-                                     .KeyDown (Key.Space)
+                                     .EnqueueKeyEvent (Key.Space)
                                      .AssertEqual (1, spaceKeyDownCount);
     }
 
     [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void MenuBar_Not_Active_DoesNotEat_Enter (string d)
+    [ClassData (typeof (TestDrivers))]
+    public void MenuBar_Not_Active_DoesNotEat_Enter (TestDriver d)
     {
         int enterKeyDownCount = 0;
         View testView = new View ()
@@ -536,7 +536,7 @@ public class MenuBarTests : TestsAllDrivers
                                 }
                             };
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
+        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -547,7 +547,7 @@ public class MenuBarTests : TestsAllDrivers
                                      .Add (testView)
                                      .WaitIteration ()
                                      .Focus (testView)
-                                     .KeyDown (Key.Enter)
+                                     .EnqueueKeyEvent (Key.Enter)
                                      .AssertEqual (1, enterKeyDownCount);
     }
 

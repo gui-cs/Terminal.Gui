@@ -6,12 +6,12 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Keyboard;
 
-
+[Collection ("Global Test Setup")]
 public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 {
     /// <summary>
     ///     This tests that when a new key down event is sent to the view  will fire the key-down related
-    ///     events: KeyDown and KeyDownNotHandled. 
+    ///     events: KeyDown and KeyDownNotHandled. Note that KeyUp is independent.
     /// </summary>
     [Theory]
     [MemberData (nameof (AllViewTypes))]
@@ -51,14 +51,47 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         view.Dispose ();
     }
 
+    /// <summary>
+    ///     This tests that when a new key up event is sent to the view the view will fire the 1 key-up related event:
+    ///     KeyUp
+    /// </summary>
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_NewKeyUpEvent_All_EventsFire (Type viewType)
+    {
+        var view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view == null)
+        {
+            output.WriteLine ($"ERROR: Generic view {viewType}");
+
+            return;
+        }
+
+        output.WriteLine ($"Testing {view.GetType ().Name}");
+
+        var keyUp = false;
+
+        view.KeyUp += (s, a) =>
+                      {
+                          a.Handled = true;
+                          keyUp = true;
+                      };
+
+        Assert.True (view.NewKeyUpEvent (Key.A)); // this will be true because the KeyUp event handled it
+        Assert.True (keyUp);
+        view.Dispose ();
+    }
+
     [Theory]
     [InlineData (true, false, false)]
     [InlineData (true, true, false)]
     [InlineData (true, true, true)]
-    public void NewKeyDownEvent_Raised_With_Only_Key_Modifiers (bool shift, bool alt, bool control)
+    public void NewKeyDownUpEvents_Events_Are_Raised_With_Only_Key_Modifiers (bool shift, bool alt, bool control)
     {
         var keyDown = false;
         var keyDownNotHandled = false;
+        var keyUp = false;
 
         var view = new OnNewKeyTestView ();
         view.CancelVirtualMethods = false;
@@ -75,6 +108,17 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         };
         view.KeyDownNotHandled += (s, e) => { keyDownNotHandled = true; };
 
+        view.KeyUp += (s, e) =>
+                      {
+                          Assert.Equal (KeyCode.Null, e.KeyCode & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask);
+                          Assert.Equal (shift, e.IsShift);
+                          Assert.Equal (alt, e.IsAlt);
+                          Assert.Equal (control, e.IsCtrl);
+                          Assert.False (keyUp);
+                          Assert.True (view.OnKeyUpCalled);
+                          keyUp = true;
+                      };
+
         view.NewKeyDownEvent (
                               new (
                                    KeyCode.Null
@@ -86,6 +130,17 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (keyDownNotHandled);
         Assert.True (view.OnKeyDownCalled);
         Assert.True (view.OnProcessKeyDownCalled);
+
+        view.NewKeyUpEvent (
+                            new (
+                                 KeyCode.Null
+                                 | (shift ? KeyCode.ShiftMask : 0)
+                                 | (alt ? KeyCode.AltMask : 0)
+                                 | (control ? KeyCode.CtrlMask : 0)
+                                )
+                           );
+        Assert.True (keyUp);
+        Assert.True (view.OnKeyUpCalled);
     }
 
     [Fact]
@@ -191,6 +246,32 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (view.OnProcessKeyDownCalled);
     }
 
+    [Fact]
+    public void NewKeyUpEvent_KeyUp_Handled_True_Stops_Processing ()
+    {
+        var keyUp = false;
+
+        var view = new OnNewKeyTestView ();
+        Assert.True (view.CanFocus);
+        view.CancelVirtualMethods = false;
+
+        view.KeyUp += (s, e) =>
+                      {
+                          Assert.Equal (KeyCode.A, e.KeyCode);
+                          Assert.False (keyUp);
+                          Assert.False (view.OnProcessKeyDownCalled);
+                          e.Handled = true;
+                          keyUp = true;
+                      };
+
+        view.NewKeyUpEvent (Key.A);
+        Assert.True (keyUp);
+
+        Assert.True (view.OnKeyUpCalled);
+        Assert.False (view.OnKeyDownCalled);
+        Assert.False (view.OnProcessKeyDownCalled);
+    }
+
     [Theory]
     [InlineData (null, null)]
     [InlineData (true, true)]
@@ -200,7 +281,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         var view = new KeyBindingsTestView ();
         view.CommandReturns = toReturn;
 
-        bool? result = view.InvokeCommandsBoundToKey (Key.A);
+        bool? result = view.InvokeCommands (Key.A);
         Assert.Equal (expected, result);
     }
 
@@ -224,11 +305,19 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         public bool CancelVirtualMethods { set; private get; }
         public bool OnKeyDownCalled { get; set; }
         public bool OnProcessKeyDownCalled { get; set; }
+        public bool OnKeyUpCalled { get; set; }
         public override string Text { get; set; }
 
         protected override bool OnKeyDown (Key keyEvent)
         {
             OnKeyDownCalled = true;
+
+            return CancelVirtualMethods;
+        }
+
+        public override bool OnKeyUp (Key keyEvent)
+        {
+            OnKeyUpCalled = true;
 
             return CancelVirtualMethods;
         }

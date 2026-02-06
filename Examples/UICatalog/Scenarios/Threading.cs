@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +9,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Threading")]
 public class Threading : Scenario
 {
-    private IApplication _app;
     private readonly ObservableCollection<string> _log = [];
     private Action _action;
     private Button _btnActionCancel;
@@ -32,13 +31,8 @@ public class Threading : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-
-        using IApplication app = Application.Create ();
-        app.Init ();
-        _app = app;
-
-        using Window win = new () { Title = GetQuitKeyAndName () };
+        Application.Init ();
+        var win = new Window { Title = GetQuitKeyAndName () };
         _action = LoadData;
 
         _lambda = async () =>
@@ -50,7 +44,7 @@ public class Threading : Scenario
                       await _itemsList.SetSourceAsync (items);
                   };
 
-        _handler = async (_, _) =>
+        _handler = async (s, e) =>
                    {
                        _itemsList.Source = null;
                        LogJob ("Loading task handler");
@@ -71,7 +65,7 @@ public class Threading : Scenario
                 };
 
         _btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
-        _btnActionCancel.Accepting += (_, _) => _app?.Invoke (CallLoadItemsAsync);
+        _btnActionCancel.Accepting += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
         win.Add (new Label { X = Pos.X (_btnActionCancel), Y = Pos.Y (_btnActionCancel) + 4, Text = "Data Items:" });
 
@@ -96,7 +90,7 @@ public class Threading : Scenario
             Source = new ListWrapper<string> (_log)
         };
 
-        TextField text = new () { X = 1, Y = 3, Width = 100, Text = "Type anything after press the button" };
+        var text = new TextField { X = 1, Y = 3, Width = 100, Text = "Type anything after press the button" };
 
         _btnLogarithmic = new Button ()
         {
@@ -127,25 +121,25 @@ public class Threading : Scenario
         };
 
 
-        Button btnAction = new () { X = 80, Y = 10, Text = "Load Data Action" };
-        btnAction.Accepting += (_, _) => _action.Invoke ();
-        Button btnLambda = new () { X = 80, Y = 12, Text = "Load Data Lambda" };
-        btnLambda.Accepting += (_, _) => _lambda.Invoke ();
-        Button btnHandler = new () { X = 80, Y = 14, Text = "Load Data Handler" };
-        btnHandler.Accepting += (_, _) => _handler.Invoke (null, EventArgs.Empty);
-        Button btnSync = new () { X = 80, Y = 16, Text = "Load Data Synchronous" };
-        btnSync.Accepting += (_, _) => _sync.Invoke ();
-        Button btnMethod = new () { X = 80, Y = 18, Text = "Load Data Method" };
-        btnMethod.Accepting += async (_, _) => await MethodAsync ();
-        Button btnClearData = new () { X = 80, Y = 20, Text = "Clear Data" };
+        var btnAction = new Button { X = 80, Y = 10, Text = "Load Data Action" };
+        btnAction.Accepting += (s, e) => _action.Invoke ();
+        var btnLambda = new Button { X = 80, Y = 12, Text = "Load Data Lambda" };
+        btnLambda.Accepting += (s, e) => _lambda.Invoke ();
+        var btnHandler = new Button { X = 80, Y = 14, Text = "Load Data Handler" };
+        btnHandler.Accepting += (s, e) => _handler.Invoke (null, EventArgs.Empty);
+        var btnSync = new Button { X = 80, Y = 16, Text = "Load Data Synchronous" };
+        btnSync.Accepting += (s, e) => _sync.Invoke ();
+        var btnMethod = new Button { X = 80, Y = 18, Text = "Load Data Method" };
+        btnMethod.Accepting += async (s, e) => await MethodAsync ();
+        var btnClearData = new Button { X = 80, Y = 20, Text = "Clear Data" };
 
-        btnClearData.Accepting += (_, _) =>
+        btnClearData.Accepting += (s, e) =>
                                 {
                                     _itemsList.Source = null;
                                     LogJob ("Cleaning Data");
                                 };
-        Button btnQuit = new () { X = 80, Y = 22, Text = "Quit" };
-        btnQuit.Accepting += (_, _) => win.RequestStop ();
+        var btnQuit = new Button { X = 80, Y = 22, Text = "Quit" };
+        btnQuit.Accepting += (s, e) => Application.RequestStop ();
 
         win.Add (
                  _itemsList,
@@ -165,15 +159,17 @@ public class Threading : Scenario
                  btnQuit
                 );
 
-        void WinLoaded (object sender, EventArgs args)
+        void Win_Loaded (object sender, EventArgs args)
         {
             _btnActionCancel.SetFocus ();
-            win.IsModalChanged -= WinLoaded;
+            win.IsModalChanged -= Win_Loaded;
         }
 
-        win.IsModalChanged += WinLoaded;
+        win.IsModalChanged += Win_Loaded;
 
-        app.Run (win);
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private bool LogTimeout ()
@@ -194,14 +190,14 @@ public class Threading : Scenario
         if (_timeoutObj != null)
         {
             _btnLogarithmic.Text = "Start Log Counter";
-            _app?.TimedEvents?.Remove (_timeoutObj);
+            Application.TimedEvents.Remove (_timeoutObj);
             _timeoutObj = null;
         }
         else
         {
             _btnLogarithmic.Text = "Stop Log Counter";
             _logarithmicTimeout = new LogarithmicTimeout (TimeSpan.FromMilliseconds (500), LogTimeout);
-            _timeoutObj = (_app?.TimedEvents!).Add (_logarithmicTimeout);
+            _timeoutObj = Application.TimedEvents.Add (_logarithmicTimeout);
         }
     }
 
@@ -210,14 +206,14 @@ public class Threading : Scenario
         if (_timeoutObjSmooth != null)
         {
             _btnSmooth.Text = "Start Smooth Counter";
-            _app?.TimedEvents?.Remove (_timeoutObjSmooth);
+            Application.TimedEvents.Remove (_timeoutObjSmooth);
             _timeoutObjSmooth = null;
         }
         else
         {
             _btnSmooth.Text = "Stop Smooth Counter";
             _smoothTimeout = new SmoothAcceleratingTimeout (TimeSpan.FromMilliseconds (500), TimeSpan.FromMilliseconds (50), 0.5, SmoothTimeout);
-            _timeoutObjSmooth = _app?.TimedEvents?.Add (_smoothTimeout);
+            _timeoutObjSmooth = Application.TimedEvents.Add (_smoothTimeout);
         }
     }
 

@@ -1,8 +1,8 @@
+
 #nullable enable
 namespace ApplicationTests;
 
 /// <summary>These tests focus on Application.SessionToken and the various ways it can be changed.</summary>
-[Collection("Application Tests")]
 public class SessionTokenTests
 {
     [Fact]

@@ -1,10 +1,9 @@
-namespace ApplicationTests.MouseTests;
+namespace ApplicationTests.Mouse;
 
 /// <summary>
 ///     Tests for the <see cref="IMouse"/> interface and <see cref="MouseImpl"/> implementation.
 ///     These tests demonstrate the decoupled mouse handling that enables parallel test execution.
 /// </summary>
-[Collection("Application Tests")]
 public class MouseTests
 {
     [Fact]
@@ -62,20 +61,20 @@ public class MouseTests
     public void Mouse_ResetState_ClearsEventAndCachedViews ()
     {
         // Arrange
-        MouseImpl mouseImpl = new ();
+        MouseImpl mouse = new ();
         var eventFired = false;
-        mouseImpl.MouseEvent += (sender, args) => eventFired = true;
-        mouseImpl.CachedViewsUnderMouse.Add (new View ());
+        mouse.MouseEvent += (sender, args) => eventFired = true;
+        mouse.CachedViewsUnderMouse.Add (new View ());
 
         // Act
-        mouseImpl.ResetState ();
+        mouse.ResetState ();
 
         // Assert - CachedViewsUnderMouse should be cleared
-        Assert.Empty (mouseImpl.CachedViewsUnderMouse);
+        Assert.Empty (mouse.CachedViewsUnderMouse);
 
         // Event handlers should be cleared
-        Mouse mouse = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
-        mouseImpl.RaiseMouseEvent (mouse);
+        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        mouse.RaiseMouseEvent (mouseEvent);
         Assert.False (eventFired, "Event should not fire after ResetState");
     }
 
@@ -83,42 +82,43 @@ public class MouseTests
     public void Mouse_RaiseMouseEvent_DoesNotUpdateLastPositionWhenNotInitialized ()
     {
         // Arrange
-        MouseImpl mouseImpl = new ();
-        Mouse mouse = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.LeftButtonPressed };
+        MouseImpl mouse = new ();
+        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.Button1Pressed };
 
         // Act - Application is not initialized, so LastMousePosition should not be set
-        mouseImpl.RaiseMouseEvent (mouse);
+        mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert
         // Since Application.Initialized is false, LastMousePosition should remain null
         // This behavior matches the original implementation
-        Assert.Null (mouseImpl.LastMousePosition);
+        Assert.Null (mouse.LastMousePosition);
     }
 
     [Fact]
     public void Mouse_MouseEvent_CanBeSubscribedAndUnsubscribed ()
     {
         // Arrange
-        MouseImpl mouseImpl = new ();
+        MouseImpl mouse = new ();
         var eventCount = 0;
-        EventHandler<Mouse> handler = (sender, args) => eventCount++;
+        EventHandler<MouseEventArgs> handler = (sender, args) => eventCount++;
 
         // Act - Subscribe
-        mouseImpl.MouseEvent += handler;
-        Mouse mouse = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
-        mouseImpl.RaiseMouseEvent (mouse);
+        mouse.MouseEvent += handler;
+        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert - Event fired once
         Assert.Equal (1, eventCount);
 
         // Act - Unsubscribe
-        mouseImpl.MouseEvent -= handler;
-        mouseImpl.RaiseMouseEvent (mouse);
+        mouse.MouseEvent -= handler;
+        mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert - Event count unchanged
         Assert.Equal (1, eventCount);
     }
-    
+
+
     /// <summary>
     ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With
     ///     Frames; Frame != Viewport
@@ -204,16 +204,16 @@ public class MouseTests
 
         application.TopRunnableView.Add (view);
 
-        var mouse = new Mouse { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.LeftButtonClicked };
+        var mouseEvent = new MouseEventArgs { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
         view.MouseEvent += (_s, e) =>
         {
-            Assert.Equal (expectedX, e.Position!.Value.X);
-            Assert.Equal (expectedY, e.Position!.Value.Y);
+            Assert.Equal (expectedX, e.Position.X);
+            Assert.Equal (expectedY, e.Position.Y);
             clickedCount += e.IsSingleDoubleOrTripleClicked ? 1 : 0;
         };
 
-        application.Mouse.RaiseMouseEvent (mouse);
+        application.Mouse.RaiseMouseEvent (mouseEvent);
         Assert.Equal (expectedClickedCount, clickedCount);
     }
 }

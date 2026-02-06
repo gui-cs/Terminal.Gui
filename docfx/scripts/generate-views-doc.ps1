@@ -100,15 +100,14 @@ foreach ($file in $viewFiles) {
             $tempFile = [System.IO.Path]::GetTempFileName()
             Write-Host "Running: dotnet run --project scripts/OutputView --view=$viewName --output=$tempFile" -ForegroundColor Cyan
             
-            dotnet run --project scripts/OutputView --view=$viewName --output=$tempFile --ansi --frame
+            dotnet run --project scripts/OutputView --view=$viewName --output=$tempFile
             
             if (Test-Path $tempFile) {
                 $output = Get-Content $tempFile -Raw
                 if ($output -and $output.Trim()) {
                     $lines = $output.Trim() -split "`n"
                     $trimmedLines = $lines | ForEach-Object { $_.TrimEnd() }
-                    #$viewOutput = "``````text" + "`n" + $($trimmedLines -join "`n") + "`n" + "``````"
-                    $viewOutput = "`n" + $($trimmedLines -join "`n") + "`n"
+                    $viewOutput = "``````text" + "`n" + $($trimmedLines -join "`n") + "`n" + "``````"
                 }
                 Write-Host "View output: $viewOutput" -ForegroundColor Blue
             } else {

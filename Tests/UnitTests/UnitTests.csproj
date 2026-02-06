@@ -27,11 +27,8 @@
 		<Optimize>true</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Remove="Application\Keyboard\**" />
 	  <Compile Remove="Drivers\**" />
-	  <EmbeddedResource Remove="Application\Keyboard\**" />
 	  <EmbeddedResource Remove="Drivers\**" />
-	  <None Remove="Application\Keyboard\**" />
 	  <None Remove="Drivers\**" />
 	</ItemGroup>
 	<ItemGroup>

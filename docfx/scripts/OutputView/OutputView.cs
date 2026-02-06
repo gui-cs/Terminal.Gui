@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using Terminal.Gui.App;
-using Terminal.Gui.Drivers;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
@@ -16,7 +15,7 @@ ConfigurationManager.RuntimeConfig = """
                                                      "Window.DefaultShadow": "None",
                                                      "Dialog.DefaultShadow": "None",
                                                      "Button.DefaultShadow": "None",
-                                                     "Menu.DefaultBorderStyle": "Single"
+                                                     "Menuv2.DefaultBorderStyle": "Single"
                                                  }
                                              }
                                          ]
@@ -30,8 +29,6 @@ string? viewName = null;
 string? outputFile = null;
 
 string [] commandArgs = Environment.GetCommandLineArgs ();
-bool ansi = false;
-bool addBorderFrame = false;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -51,14 +48,6 @@ for (var i = 0; i < commandArgs.Length; i++)
     {
         outputFile = commandArgs [i + 1];
     }
-    else if (commandArgs [i] == "--frame" || commandArgs [i] == "-f")
-    {
-        addBorderFrame = true;
-    }
-    else if (commandArgs [i] == "--ansi" || commandArgs [i] == "-a")
-    {
-        ansi = true;
-    }
 }
 
 if (string.IsNullOrEmpty (viewName))
@@ -69,41 +58,22 @@ if (string.IsNullOrEmpty (viewName))
 }
 
 ViewDemoWindow.ViewName = viewName;
-ViewDemoWindow.AddBorderFrame = addBorderFrame;
-
-IApplication app = Application.Create ();
-app.Init (DriverRegistry.Names.ANSI);
 
 // Force 16 colors and end after first iteration
-app.StopAfterFirstIteration = true;
-app.Driver!.Force16Colors = !ansi;
-app.Driver!.SetScreenSize (80, 20);
+Application.StopAfterFirstIteration = true;
 
-string? result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+var demoWindow = Application.Run<ViewDemoWindow> ();
+string? output = demoWindow.Output?.Trim ();
+demoWindow.Dispose ();
 
-if (result is { })
-{
-    Console.WriteLine (result);
+// Before the application exits, reset Terminal.Gui for clean shutdown
+Application.Shutdown ();
 
-    return;
-}
-
-// Run it again, since it set the Screen size to just fit
-app.Run<ViewDemoWindow> ().GetResult<string> ();
-
-string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
-app.Dispose ();
-
-if (string.IsNullOrEmpty (output))
+if (output is null)
 {
     Console.WriteLine (@"No output was generated.");
 
     return;
-}
-
-if (ansi)
-{
-    output = AnsiConsoleToHtml.AnsiConsole.ToHtml (output);
 }
 
 // Write to file or console
@@ -117,49 +87,37 @@ else
 }
 
 // Defines a top-level window with border and title
-internal class ViewDemoWindow : Runnable<string>
+public class ViewDemoWindow : Window
 {
     public static string? ViewName { get; set; }
+    public string? Output { get; set; }
 
     public ViewDemoWindow ()
     {
-        // Limit the size of the window to 80x20, which works good for most views
-        Width = 80;
+        // Limit the size of the window to 50x20, which works good for most views
+        Width = 50;
         Height = 20;
 
         // Use only white on black
         SetScheme (new (new Attribute (ColorName16.White, ColorName16.Black)));
         BorderStyle = LineStyle.None;
-    }
-
-    public static bool AddBorderFrame { get; set; }
-
-    /// <inheritdoc />
-    protected override void OnIsRunningChanged (bool newIsRunning)
-    {
-        base.OnIsRunningChanged (newIsRunning);
-
-        if (!newIsRunning)
-        {
-            return;
-        }
 
         // Convert ViewName to type that's in the Terminal.Gui assembly:
-        Type? type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
+        var type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
 
         if (type is null)
         {
-            Result = @$"`{ViewName}` type is not a valid Terminal.Gui View type.";
+            Console.WriteLine (@$"View {ViewName} type is invalid.");
 
             return;
         }
 
         // Create the view
-        View? view = CreateView (type);
+        View? view = CreateView (type!);
 
         if (view is null)
         {
-            Result = @$"`{ViewName}` could not be created.";
+            Console.WriteLine (@$"View {ViewName} could not be created.");
 
             return;
         }
@@ -167,10 +125,16 @@ internal class ViewDemoWindow : Runnable<string>
         // Initialize the view
         view.Initialized += ViewInitialized;
 
-        Add (view);
+        base.Add (view);
 
-        Layout ();
-        App?.Driver?.SetScreenSize (view.Frame.Width, view.Frame.Height);
+        // In normal apps, each iteration would call Application.LayoutAndDraw()
+        // but since we set Application.EndAfterFirstIteration = true, we need to
+        // call it manually here and capture the output
+        Application.Iteration += (sender, args) =>
+                                 {
+                                     Application.LayoutAndDraw ();
+                                     Output = Application.ToString ();
+                                 };
     }
 
     private static View? CreateView (Type type)
@@ -211,14 +175,14 @@ internal class ViewDemoWindow : Runnable<string>
 
         if (view is IDesignable designable)
         {
-            var demoText = "This is some demo text.";
-            designable.EnableForDesign (ref demoText);
+            var settingsEditorDemoText = "Demo Text";
+            designable.EnableForDesign (ref settingsEditorDemoText);
         }
         else
         {
-            view.Text = "This is some demo text.";
+            view.Text = "Demo Text";
+            view.Title = "_Demo Title";
         }
-        //view.Title = $"View: {type.Name}";
 
         return view;
     }
@@ -230,22 +194,17 @@ internal class ViewDemoWindow : Runnable<string>
             return;
         }
 
-        if (view.Width == Dim.Absolute (0))
+        if (view.Width == Dim.Absolute (0) || view.Width is null)
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == Dim.Absolute (0))
+        if (view.Height == Dim.Absolute (0) || view.Height is null)
         {
             view.Height = Dim.Fill ();
         }
 
         view.X = 0;
         view.Y = 0;
-
-        if (AddBorderFrame && view.BorderStyle == LineStyle.None)
-        {
-            view.BorderStyle = LineStyle.Dotted;
-        }
     }
 }

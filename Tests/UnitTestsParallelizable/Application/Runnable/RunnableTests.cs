@@ -1,12 +1,10 @@
 using Xunit.Abstractions;
-using Xunit;
 
 namespace ApplicationTests.RunnableTests;
 
 /// <summary>
 ///     Tests for IRunnable interface and Runnable base class.
 /// </summary>
-[Collection("Application Tests")]
 public class RunnableTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

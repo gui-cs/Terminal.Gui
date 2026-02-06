@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -38,8 +37,8 @@ public class ScenarioTests : TestsAllViews
             return;
         }
 
-        // Force a complete reset - use ResetModelUsageTracking to allow both models in tests
-        ApplicationImpl.ResetModelUsageTracking ();
+        // Force a complete reset
+        ApplicationImpl.SetInstance (null);
         CM.Disable (true);
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
@@ -64,43 +63,29 @@ public class ScenarioTests : TestsAllViews
         var iterationCount = 0;
         Key quitKey = Application.QuitKey;
 
-        // Track the current application instance for the modern model
-        IApplication? currentApp = null;
-
         // Track if we've already unsubscribed to prevent double-removal
         var iterationHandlerRemoved = false;
-
-        Exception? scenarioException = null;
 
         try
         {
             scenario = Activator.CreateInstance (scenarioType) as Scenario;
             scenarioName = scenario!.GetName ();
 
-            // Use thread-local events for modern instance-based model
-            Application.InstanceInitialized += OnInstanceInitialized;
-            Application.InstanceDisposed += OnInstanceDisposed;
+            Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-            Application.ForceDriver = DriverRegistry.Names.ANSI;
+            Application.ForceDriver = "FakeDriver";
             scenario!.Main ();
             Application.ForceDriver = string.Empty;
-        }
-        catch (Exception ex)
-        {
-            // Catch exceptions to prevent test host crashes
-            scenarioException = ex;
-            _output.WriteLine ($"Scenario '{scenarioName}' threw exception: {ex}");
         }
         finally
         {
             // Ensure cleanup happens regardless of how we exit
-            Application.InstanceInitialized -= OnInstanceInitialized;
-            Application.InstanceDisposed -= OnInstanceDisposed;
+            Application.InitializedChanged -= OnApplicationOnInitializedChanged;
 
             // Remove iteration handler if it wasn't removed
-            if (!iterationHandlerRemoved && currentApp is { })
+            if (!iterationHandlerRemoved)
             {
-                currentApp.Iteration -= OnApplicationOnIteration;
+                Application.Iteration -= OnApplicationOnIteration;
                 iterationHandlerRemoved = true;
             }
 
@@ -119,49 +104,33 @@ public class ScenarioTests : TestsAllViews
             _output.WriteLine ($"WARNING: Scenario '{scenarioName}' timed out after {abortTime}ms. This may indicate a performance issue on this runner.");
         }
 
-        Assert.True (shutdownGracefully,
+        Assert.True (
+                     shutdownGracefully,
                      $"Scenario '{scenarioName}' failed to quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. "
                      + $"TimeoutFired={timeoutFired}");
 
-        // Fail the test if an exception was thrown (but don't crash the test host)
-        Assert.Null (scenarioException);
-
 #if DEBUG_IDISPOSABLE
-        if (View.Instances.Count > 0)
-        {
-            foreach (View inst in View.Instances)
-            {
-                _output.WriteLine ($"Not Disposed: {inst.ToDebugString ()}");
-            }
-            Assert.Fail ("Views were not disposed properly.");
-        }
+        Assert.Empty (View.Instances);
 #endif
 
         return;
 
-        void OnInstanceInitialized (object? s, EventArgs<IApplication> a)
+        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
-            currentApp = a.Value;
-            currentApp.Iteration += OnApplicationOnIteration;
-            initialized = true;
-
-            // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
-            watchdogTimer = new Timer (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
-
-            _output.WriteLine ($"Initialized; shutdownGracefully == {shutdownGracefully}.");
-        }
-
-        void OnInstanceDisposed (object? s, EventArgs<IApplication> a)
-        {
-            // Unsubscribe from Iteration before shutdown assertions
-            if (!iterationHandlerRemoved && currentApp is { })
+            if (a.Value)
             {
-                currentApp.Iteration -= OnApplicationOnIteration;
-                iterationHandlerRemoved = true;
+                Application.Iteration += OnApplicationOnIteration;
+                initialized = true;
+
+                // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
+                watchdogTimer = new (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
+            }
+            else
+            {
+                shutdownGracefully = true;
             }
 
-            shutdownGracefully = true;
-            _output.WriteLine ($"Disposed; shutdownGracefully == {shutdownGracefully}.");
+            _output.WriteLine ($"Initialized == {a.Value}; shutdownGracefully == {shutdownGracefully}.");
         }
 
         // If the scenario doesn't close within abortTime ms, this will force it to quit
@@ -175,9 +144,9 @@ public class ScenarioTests : TestsAllViews
             // Just try to stop the application gracefully
             try
             {
-                if (currentApp?.Initialized == true)
+                if (Application.Initialized)
                 {
-                    currentApp.RequestStop ();
+                    Application.RequestStop ();
                 }
             }
             catch (Exception ex)
@@ -190,38 +159,36 @@ public class ScenarioTests : TestsAllViews
         {
             iterationCount++;
 
-            if (currentApp?.Initialized == true)
+            if (Application.Initialized)
             {
-                // Press QuitKey
-                quitKey = currentApp.Keyboard.QuitKey;
+                // Press QuitKey 
+                quitKey = Application.QuitKey;
                 _output.WriteLine ($"Attempting to quit with {quitKey} after {iterationCount} iterations.");
 
                 try
                 {
-                    currentApp.Keyboard.RaiseKeyDownEvent (quitKey);
+                    Application.RaiseKeyDownEvent (quitKey);
                 }
                 catch (Exception ex)
                 {
                     _output.WriteLine ($"Exception raising quit key: {ex.Message}");
                 }
 
-                currentApp.Iteration -= OnApplicationOnIteration;
+                Application.Iteration -= OnApplicationOnIteration;
                 iterationHandlerRemoved = true;
             }
         }
     }
 
     public static IEnumerable<object []> AllScenarioTypes =>
-        typeof (Scenario).Assembly.GetTypes ()
+        typeof (Scenario).Assembly
+                         .GetTypes ()
                          .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
                          .Select (type => new object [] { type });
 
     [Fact]
     public void Run_All_Views_Tester_Scenario ()
     {
-        // Reset model usage tracking to allow legacy static model in this test
-        ApplicationImpl.ResetModelUsageTracking ();
-
         // Disable any UIConfig settings
         ConfigurationManager.Disable (true);
 
@@ -236,7 +203,7 @@ public class ScenarioTests : TestsAllViews
         List<string> posNames = ["Percent", "AnchorEnd", "Center", "Absolute"];
         List<string> dimNames = ["Auto", "Percent", "Fill", "Absolute"];
 
-        Application.Init (DriverRegistry.Names.ANSI);
+        Application.Init ("fake");
 
         var top = new Runnable ();
 
@@ -259,9 +226,9 @@ public class ScenarioTests : TestsAllViews
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ShowMarks = false,
+            AllowsMarking = false,
             SchemeName = "Runnable",
-            Source = new ListWrapper<string> (new ObservableCollection<string> (viewClasses.Keys.ToList ()))
+            Source = new ListWrapper<string> (new (viewClasses.Keys.ToList ()))
         };
         leftPane.Add (classListView);
 
@@ -297,7 +264,7 @@ public class ScenarioTests : TestsAllViews
         locationFrame.Add (xOptionSelector);
 
         radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "Absolute(y)" };
-        label = new Label { X = Pos.Right (xOptionSelector) + 1, Y = 0, Text = "y:" };
+        label = new () { X = Pos.Right (xOptionSelector) + 1, Y = 0, Text = "y:" };
         locationFrame.Add (label);
         TextField yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{yVal}" };
         locationFrame.Add (yText);
@@ -314,7 +281,7 @@ public class ScenarioTests : TestsAllViews
         };
 
         radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Absolute(width)" };
-        label = new Label { X = 0, Y = 0, Text = "width:" };
+        label = new () { X = 0, Y = 0, Text = "width:" };
         sizeFrame.Add (label);
         OptionSelector wOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = radioItems };
         TextField wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{wVal}" };
@@ -322,7 +289,7 @@ public class ScenarioTests : TestsAllViews
         sizeFrame.Add (wOptionSelector);
 
         radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Absolute(height)" };
-        label = new Label { X = Pos.Right (wOptionSelector) + 1, Y = 0, Text = "height:" };
+        label = new () { X = Pos.Right (wOptionSelector) + 1, Y = 0, Text = "height:" };
         sizeFrame.Add (label);
         TextField hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{hVal}" };
         sizeFrame.Add (hText);
@@ -341,26 +308,22 @@ public class ScenarioTests : TestsAllViews
             SchemeName = "Dialog"
         };
 
-        classListView.Accepting += (s, a) =>
-                                   {
-                                       settingsPane.SetFocus ();
-                                       a.Handled = true;
-                                   };
+        classListView.OpenSelectedItem += (s, a) => { settingsPane.SetFocus (); };
 
-        classListView.ValueChanged += (_, _) =>
-                                      {
-                                          // Remove existing class, if any
-                                          if (curView is { })
-                                          {
-                                              curView.SubViewsLaidOut -= LayoutCompleteHandler;
-                                              hostPane.Remove (curView);
-                                              curView.Dispose ();
-                                              curView = null;
-                                              hostPane.FillRect (hostPane.Viewport);
-                                          }
+        classListView.SelectedItemChanged += (s, args) =>
+                                             {
+                                                 // Remove existing class, if any
+                                                 if (curView is { })
+                                                 {
+                                                     curView.SubViewsLaidOut -= LayoutCompleteHandler;
+                                                     hostPane.Remove (curView);
+                                                     curView.Dispose ();
+                                                     curView = null;
+                                                     hostPane.FillRect (hostPane.Viewport);
+                                                 }
 
-                                          curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem!.Value]);
-                                      };
+                                                 curView = CreateClass (viewClasses.Values.ToArray () [classListView.SelectedItem!.Value]);
+                                             };
 
         xOptionSelector.ValueChanged += (_, _) => DimPosChanged (curView);
 
@@ -444,7 +407,9 @@ public class ScenarioTests : TestsAllViews
 
                 if (curView is { })
                 {
-                    Assert.Equal (curView.GetType ().Name, viewClasses.Values.ToArray () [classListView.SelectedItem!.Value].Name);
+                    Assert.Equal (
+                                  curView.GetType ().Name,
+                                  viewClasses.Values.ToArray () [classListView.SelectedItem!.Value].Name);
                 }
             }
             else
@@ -468,17 +433,14 @@ public class ScenarioTests : TestsAllViews
                         view.X = Pos.Percent (xVal);
 
                         break;
-
                     case 1:
                         view.X = Pos.AnchorEnd (xVal);
 
                         break;
-
                     case 2:
                         view.X = Pos.Center ();
 
                         break;
-
                     case 3:
                         view.X = Pos.Absolute (xVal);
 
@@ -491,17 +453,14 @@ public class ScenarioTests : TestsAllViews
                         view.Y = Pos.Percent (yVal);
 
                         break;
-
                     case 1:
                         view.Y = Pos.AnchorEnd (yVal);
 
                         break;
-
                     case 2:
                         view.Y = Pos.Center ();
 
                         break;
-
                     case 3:
                         view.Y = Pos.Absolute (yVal);
 
@@ -514,12 +473,10 @@ public class ScenarioTests : TestsAllViews
                         view.Width = Dim.Percent (wVal);
 
                         break;
-
                     case 1:
                         view.Width = Dim.Fill (wVal);
 
                         break;
-
                     case 2:
                         view.Width = Dim.Absolute (wVal);
 
@@ -532,12 +489,10 @@ public class ScenarioTests : TestsAllViews
                         view.Height = Dim.Percent (hVal);
 
                         break;
-
                     case 1:
                         view.Height = Dim.Fill (hVal);
 
                         break;
-
                     case 2:
                         view.Height = Dim.Absolute (hVal);
 
@@ -581,7 +536,7 @@ public class ScenarioTests : TestsAllViews
             hText.Text = $"{view.Frame.Height}";
         }
 
-        void UpdateTitle (View? view) => hostPane.Title = $"{view!.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
+        void UpdateTitle (View? view) { hostPane.Title = $"{view!.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
 
         View? CreateClass (Type type)
         {
@@ -692,6 +647,6 @@ public class ScenarioTests : TestsAllViews
             return view;
         }
 
-        void LayoutCompleteHandler (object? sender, LayoutEventArgs args) => UpdateTitle (curView);
+        void LayoutCompleteHandler (object? sender, LayoutEventArgs args) { UpdateTitle (curView); }
     }
 }

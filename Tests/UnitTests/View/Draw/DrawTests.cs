@@ -903,6 +903,7 @@ At 0,0
         public DerivedView () { CanFocus = true; }
         public bool IsKeyDown { get; set; }
         public bool IsKeyPress { get; set; }
+        public bool IsKeyUp { get; set; }
         public override string Text { get; set; } = null!;
 
         protected override bool OnDrawingContent (DrawContext? context)
@@ -944,7 +945,14 @@ At 0,0
 
             return true;
         }
-        
+
+        public override bool OnKeyUp (Key keyEvent)
+        {
+            IsKeyUp = true;
+
+            return true;
+        }
+
         protected override bool OnKeyDownNotHandled (Key keyEvent)
         {
             IsKeyPress = true;

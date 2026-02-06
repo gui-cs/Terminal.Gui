@@ -71,14 +71,14 @@ public abstract class EditorBase : View
                 return;
             }
 
-            if (value is null && _viewToEdit is not null)
+            if (value is null && _viewToEdit is { })
             {
                 _viewToEdit.SubViewsLaidOut -= View_LayoutComplete;
             }
 
             _viewToEdit = value;
 
-            if (_viewToEdit is not null)
+            if (_viewToEdit is { })
             {
                 _viewToEdit.SubViewsLaidOut += View_LayoutComplete;
             }
@@ -127,20 +127,20 @@ public abstract class EditorBase : View
         ViewToEdit = App!.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, Mouse mouse)
+    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
     {
-        if (mouse.Flags != MouseFlags.LeftButtonClicked || !AutoSelectViewToEdit)
+        if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
         {
             return;
         }
 
-        if ((AutoSelectSuperView is not null && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position!.Value))
-            || FrameToScreen ().Contains (mouse.Position!.Value))
+        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (e.Position))
+            || FrameToScreen ().Contains (e.Position))
         {
             return;
         }
 
-        View? view = mouse.View;
+        View? view = e.View;
 
         if (view is null)
         {
@@ -158,23 +158,14 @@ public abstract class EditorBase : View
     }
 
     /// <inheritdoc />
-    protected override bool OnSuperViewChanging (ValueChangingEventArgs<View?> args)
+    protected override void Dispose (bool disposing)
     {
-        // Clean up event handlers before SuperView is set to null
-        // This ensures App is still accessible for proper cleanup
-        if (App is {})
+        if (disposing && App is {})
         {
             App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
             App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
         }
 
-        return base.OnSuperViewChanging (args);
-    }
-
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
-    {
-        // Event handlers are now cleaned up in OnSuperViewChanging
         base.Dispose (disposing);
     }
 }

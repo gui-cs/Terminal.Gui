@@ -11,18 +11,15 @@ public class UnicodeInMenu : Scenario
 {
     public override void Main ()
     {
-        string unicode =
+        var unicode =
             "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-        string gitString =
+        var gitString =
             $"gui.cs 糊 (hú) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
 
-        ConfigurationManager.Enable (ConfigLocations.All);
+        Application.Init ();
 
-        using IApplication app = Application.Create ();
-        app.Init ();
-
-        using Window appWindow = new ()
+        Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -51,7 +48,7 @@ public class UnicodeInMenu : Scenario
                                        new MenuItem
                                        {
                                            Title = "_Выход",
-                                           Action = () => appWindow.RequestStop ()
+                                           Action = () => Application.RequestStop ()
                                        }
                                    ]
                                   )
@@ -63,11 +60,11 @@ public class UnicodeInMenu : Scenario
                                    [
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdCopy
+                                           Title = "_Copy"
                                        },
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdCut
+                                           Title = "C_ut"
                                        },
                                        new MenuItem
                                        {
@@ -211,7 +208,7 @@ public class UnicodeInMenu : Scenario
                                        new (
                                             Application.QuitKey,
                                             "Выход",
-                                            () => appWindow.RequestStop ()
+                                            () => Application.RequestStop ()
                                            ),
                                        new (Key.F2, "Создать", null),
                                        new (Key.F3, "Со_хранить", null)
@@ -219,6 +216,8 @@ public class UnicodeInMenu : Scenario
                                   );
         appWindow.Add (statusBar);
 
-        app.Run (appWindow);
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+        Application.Shutdown ();
     }
 }

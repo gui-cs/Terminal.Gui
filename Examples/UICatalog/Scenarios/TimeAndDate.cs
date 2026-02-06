@@ -17,46 +17,42 @@ public class TimeAndDate : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-
-        using IApplication app = Application.Create ();
-        app.Init ();
-
-        using Window win = new () { Title = GetQuitKeyAndName () };
-        TimeField longTime = new ()
+        Application.Init ();
+        var win = new Window { Title = GetQuitKeyAndName () };
+        var longTime = new TimeField
         {
             X = Pos.Center (),
             Y = 2,
             IsShortFormat = false,
             ReadOnly = false,
-            Value = DateTime.Now.TimeOfDay
+            Time = DateTime.Now.TimeOfDay
         };
-        longTime.ValueChanged += TimeChanged;
+        longTime.TimeChanged += TimeChanged;
         win.Add (longTime);
 
-        TimeField shortTime = new ()
+        var shortTime = new TimeField
         {
             X = Pos.Center (),
             Y = Pos.Bottom (longTime) + 1,
             IsShortFormat = true,
             ReadOnly = false,
-            Value = DateTime.Now.TimeOfDay
+            Time = DateTime.Now.TimeOfDay
         };
-        shortTime.ValueChanged += TimeChanged;
+        shortTime.TimeChanged += TimeChanged;
         win.Add (shortTime);
 
-        DateField shortDate = new (DateTime.Now)
+        var shortDate = new DateField (DateTime.Now)
         {
             X = Pos.Center (), Y = Pos.Bottom (shortTime) + 1, ReadOnly = true
         };
-        shortDate.ValueChanged += DateChanged;
+        shortDate.DateChanged += DateChanged;
         win.Add (shortDate);
 
-        DateField longDate = new (DateTime.Now)
+        var longDate = new DateField (DateTime.Now)
         {
             X = Pos.Center (), Y = Pos.Bottom (shortDate) + 1, ReadOnly = false
         };
-        longDate.ValueChanged += DateChanged;
+        longDate.DateChanged += DateChanged;
         win.Add (longDate);
 
         _lblOldTime = new()
@@ -125,12 +121,12 @@ public class TimeAndDate : Scenario
         };
         win.Add (_lblDateFmt);
 
-        Button swapButton = new ()
+        var swapButton = new Button
         {
             X = Pos.Center (), Y = Pos.Bottom (win) - 5, Text = "Swap Long/Short & Read/Read Only"
         };
 
-        swapButton.Accepting += (_, _) =>
+        swapButton.Accepting += (s, e) =>
                              {
                                  longTime.ReadOnly = !longTime.ReadOnly;
                                  shortTime.ReadOnly = !shortTime.ReadOnly;
@@ -143,16 +139,18 @@ public class TimeAndDate : Scenario
                              };
         win.Add (swapButton);
 
-        app.Run (win);
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
-    private void DateChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
+    private void DateChanged (object? sender, EventArgs<DateTime> e)
     {
-        _lblNewDate!.Text = $"New Date: {e.NewValue}";
+        _lblNewDate!.Text = $"New Date: {e.Value}";
     }
 
-    private void TimeChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
+    private void TimeChanged (object? sender, EventArgs<TimeSpan> e)
     {
-        _lblNewTime!.Text = $"New Time: {e.NewValue}";
+        _lblNewTime!.Text = $"New Time: {e.Value}";
     }
 }

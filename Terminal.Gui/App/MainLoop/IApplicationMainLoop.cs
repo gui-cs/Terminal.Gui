@@ -67,7 +67,7 @@ public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRe
     /// </param>
     /// <param name="inputProcessor">
     ///     The <see cref="IInputProcessor"/> that translates raw input records (e.g., <see cref="ConsoleKeyInfo"/>) 
-    ///     into Terminal.Gui events (<see cref="Key"/>, <see cref="Mouse"/>) and raises them on the main UI thread.
+    ///     into Terminal.Gui events (<see cref="Key"/>, <see cref="MouseEventArgs"/>) and raises them on the main UI thread.
     /// </param>
     /// <param name="output">
     ///     The <see cref="IOutput"/> implementation responsible for rendering the <see cref="OutputBuffer"/> to the

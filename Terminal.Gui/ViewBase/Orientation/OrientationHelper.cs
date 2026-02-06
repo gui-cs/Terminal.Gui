@@ -19,7 +19,6 @@ namespace Terminal.Gui.ViewBase;
 /// 
 ///     public OrientedView ()
 ///     {
-///         // ReSharper disable once UseObjectOrCollectionInitializer
 ///         _orientationHelper = new (this);
 ///         Orientation = Orientation.Vertical;
 ///         _orientationHelper.OrientationChanging += (sender, e) =&gt; OrientationChanging?.Invoke (this, e);

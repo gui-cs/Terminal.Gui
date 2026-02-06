@@ -3,60 +3,9 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Parses ANSI mouse escape sequences into <see cref="Mouse"/> including support for button
-///     press/release, mouse wheel, and motion events.
+///     Parses mouse ansi escape sequences into <see cref="MouseEventArgs"/>
+///     including support for pressed, released and mouse wheel.
 /// </summary>
-/// <remarks>
-///     <para>
-///         This parser handles SGR (1006) extended mouse mode format: <c>ESC[&lt;button;x;yM/m</c>
-///         where 'M' indicates button press and 'm' indicates button release.
-///     </para>
-///     <para>
-///         <b>Prerequisites:</b> The terminal must have mouse tracking enabled via
-///         <see cref="EscSeqUtils.CSI_EnableMouseEvents"/>,
-///         which enables modes 1003 (any-event tracking), 1015 (URXVT), and 1006 (SGR format).
-///     </para>
-///     <para>
-///         <b>Common User Actions and ANSI Behavior:</b>
-///     </para>
-///     <list type="bullet">
-///         <item>
-///             <description>
-///                 <b>Click:</b> Terminal sends one press event (M) at button down, one release event (m) at button up.
-///                 No auto-repeat while held stationary.
-///             </description>
-///         </item>
-///         <item>
-///             <description>
-///                 <b>Drag:</b> Terminal sends one press event (M), multiple motion events with
-///                 <see cref="MouseFlags.PositionReport"/>
-///                 and the button flag set (e.g., button code 32-34 for drag), then one release event (m).
-///             </description>
-///         </item>
-///         <item>
-///             <description>
-///                 <b>Mouse Move (no button):</b> Terminal sends motion events with button code 35-63 and
-///                 <see cref="MouseFlags.PositionReport"/> flag (mode 1003 only).
-///             </description>
-///         </item>
-///         <item>
-///             <description>
-///                 <b>Scroll Wheel:</b> Terminal sends single events with button codes 64 (up) or 65 (down).
-///                 No press/release distinction - wheel events don't use M/m terminators.
-///             </description>
-///         </item>
-///         <item>
-///             <description>
-///                 <b>Horizontal Wheel:</b> Terminal sends button codes 68 (left) or 69 (right), typically with Shift
-///                 modifier.
-///             </description>
-///         </item>
-///     </list>
-///     <para>
-///         <b>Coordinate System:</b> ANSI uses 1-based coordinates where (1,1) is the top-left corner.
-///         This parser converts to 0-based coordinates for Terminal.Gui's internal representation.
-///     </para>
-/// </remarks>
 public class AnsiMouseParser
 {
     // Regex patterns for button press/release, wheel scroll, and mouse position reporting
@@ -67,11 +16,12 @@ public class AnsiMouseParser
     /// </summary>
     /// <param name="cur"></param>
     /// <returns></returns>
-    public bool IsMouse (string? cur) =>
-
+    public bool IsMouse (string? cur)
+    {
         // Typically in this format
         // ESC [ < {button_code};{x_pos};{y_pos}{final_byte}
-        cur!.EndsWith ('M') || cur.EndsWith ('m');
+        return cur!.EndsWith ('M') || cur.EndsWith ('m');
+    }
 
     /// <summary>
     ///     Parses a mouse ansi escape sequence into a mouse event. Returns null if input
@@ -79,54 +29,146 @@ public class AnsiMouseParser
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public Mouse? ProcessMouseInput (string? input)
+    public MouseEventArgs? ProcessMouseInput (string? input)
     {
         // Match mouse wheel events first
         Match match = _mouseEventPattern.Match (input!);
 
-        if (!match.Success)
+        if (match.Success)
         {
-            return null;
+            int buttonCode = int.Parse (match.Groups [1].Value);
+
+            // The top-left corner of the terminal corresponds to (1, 1) for both X (column) and Y (row) coordinates.
+            // ANSI standards and terminal conventions historically treat screen positions as 1 - based.
+
+            int x = int.Parse (match.Groups [2].Value) - 1;
+            int y = int.Parse (match.Groups [3].Value) - 1;
+            char terminator = match.Groups [4].Value.Single ();
+
+            var m = new MouseEventArgs
+            {
+                Position = new (x, y),
+                Flags = GetFlags (buttonCode, terminator)
+            };
+
+            //Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
+
+            return m;
         }
 
-        int buttonCode = int.Parse (match.Groups [1].Value);
-
-        // The top-left corner of the terminal corresponds to (1, 1) for both X (column) and Y (row) coordinates.
-        // ANSI standards and terminal conventions historically treat screen positions as 1 - based.
-
-        int x = int.Parse (match.Groups [2].Value) - 1;
-        int y = int.Parse (match.Groups [3].Value) - 1;
-        char terminator = match.Groups [4].Value.Single ();
-
-        Mouse m = new () { Timestamp = DateTime.Now, ScreenPosition = new Point (x, y), Flags = GetFlags (buttonCode, terminator) };
-
-        //Logging.Trace ($"{input} -> {m}");
-
-        return m;
+        // its some kind of odd mouse event that doesn't follow expected format?
+        return null;
     }
 
     private static MouseFlags GetFlags (int buttonCode, char terminator)
     {
-        MouseFlags buttonState = buttonCode switch
-                                 {
-                                     0 or 8 or 16 or 24 or 32 or 36 or 40 or 48 or 56 => terminator == 'M'
-                                                                                             ? MouseFlags.LeftButtonPressed
-                                                                                             : MouseFlags.LeftButtonReleased,
-                                     1 or 9 or 17 or 25 or 33 or 37 or 41 or 45 or 49 or 53 or 57 or 61 => terminator == 'M'
-                                         ? MouseFlags.MiddleButtonPressed
-                                         : MouseFlags.MiddleButtonReleased,
-                                     2 or 10 or 14 or 18 or 22 or 26 or 30 or 34 or 42 or 46 or 50 or 54 or 58 or 62 => terminator == 'M'
-                                         ? MouseFlags.RightButtonPressed
-                                         : MouseFlags.RightButtonReleased,
-                                     35 or 39 or 43 or 47 or 51 or 55 or 59 or 63 => MouseFlags.PositionReport,
-                                     64 => MouseFlags.WheeledUp,
-                                     65 => MouseFlags.WheeledDown,
-                                     68 or 72 or 80 => MouseFlags.WheeledLeft // Shift/Ctrl+WheeledUp
-                                    ,
-                                     69 or 73 or 81 => MouseFlags.WheeledRight // Shift/Ctrl+WheeledDown
-                                    ,
-                                     _ => 0
-                                 };
+        MouseFlags buttonState = 0;
+
+        switch (buttonCode)
+        {
+            case 0:
+            case 8:
+            case 16:
+            case 24:
+            case 32:
+            case 36:
+            case 40:
+            case 48:
+            case 56:
+                buttonState = terminator == 'M'
+                                  ? MouseFlags.Button1Pressed
+                                  : MouseFlags.Button1Released;
+
+                break;
+            case 1:
+            case 9:
+            case 17:
+            case 25:
+            case 33:
+            case 37:
+            case 41:
+            case 45:
+            case 49:
+            case 53:
+            case 57:
+            case 61:
+                buttonState = terminator == 'M'
+                                  ? MouseFlags.Button2Pressed
+                                  : MouseFlags.Button2Released;
+
+                break;
+            case 2:
+            case 10:
+            case 14:
+            case 18:
+            case 22:
+            case 26:
+            case 30:
+            case 34:
+            case 42:
+            case 46:
+            case 50:
+            case 54:
+            case 58:
+            case 62:
+                buttonState = terminator == 'M'
+                                  ? MouseFlags.Button3Pressed
+                                  : MouseFlags.Button3Released;
+
+                break;
+            case 35:
+            //// Needed for Windows OS
+            //if (isButtonPressed && c == 'm'
+            //	&& (lastMouseEvent.ButtonState == MouseFlags.Button1Pressed
+            //	|| lastMouseEvent.ButtonState == MouseFlags.Button2Pressed
+            //	|| lastMouseEvent.ButtonState == MouseFlags.Button3Pressed)) {
+
+            //	switch (lastMouseEvent.ButtonState) {
+            //	case MouseFlags.Button1Pressed:
+            //		buttonState = MouseFlags.Button1Released;
+            //		break;
+            //	case MouseFlags.Button2Pressed:
+            //		buttonState = MouseFlags.Button2Released;
+            //		break;
+            //	case MouseFlags.Button3Pressed:
+            //		buttonState = MouseFlags.Button3Released;
+            //		break;
+            //	}
+            //} else {
+            //	buttonState = MouseFlags.ReportMousePosition;
+            //}
+            //break;
+            case 39:
+            case 43:
+            case 47:
+            case 51:
+            case 55:
+            case 59:
+            case 63:
+                buttonState = MouseFlags.ReportMousePosition;
+
+                break;
+            case 64:
+                buttonState = MouseFlags.WheeledUp;
+
+                break;
+            case 65:
+                buttonState = MouseFlags.WheeledDown;
+
+                break;
+            case 68:
+            case 72:
+            case 80:
+                buttonState = MouseFlags.WheeledLeft; // Shift/Ctrl+WheeledUp
+
+                break;
+            case 69:
+            case 73:
+            case 81:
+                buttonState = MouseFlags.WheeledRight; // Shift/Ctrl+WheeledDown
+
+                break;
+        }
 
         // Modifiers.
         switch (buttonCode)
@@ -135,100 +177,86 @@ public class AnsiMouseParser
             case 9:
             case 10:
             case 43:
-                buttonState |= MouseFlags.Alt;
+                buttonState |= MouseFlags.ButtonAlt;
 
                 break;
-
             case 14:
             case 47:
-                buttonState |= MouseFlags.Alt | MouseFlags.Shift;
+                buttonState |= MouseFlags.ButtonAlt | MouseFlags.ButtonShift;
 
                 break;
-
             case 16:
             case 17:
             case 18:
             case 51:
-                buttonState |= MouseFlags.Ctrl;
+                buttonState |= MouseFlags.ButtonCtrl;
 
                 break;
-
             case 22:
             case 55:
-                buttonState |= MouseFlags.Ctrl | MouseFlags.Shift;
+                buttonState |= MouseFlags.ButtonCtrl | MouseFlags.ButtonShift;
 
                 break;
-
             case 24:
             case 25:
             case 26:
             case 59:
-                buttonState |= MouseFlags.Ctrl | MouseFlags.Alt;
+                buttonState |= MouseFlags.ButtonCtrl | MouseFlags.ButtonAlt;
 
                 break;
-
             case 30:
             case 63:
-                buttonState |= MouseFlags.Ctrl | MouseFlags.Shift | MouseFlags.Alt;
+                buttonState |= MouseFlags.ButtonCtrl | MouseFlags.ButtonShift | MouseFlags.ButtonAlt;
 
                 break;
-
             case 32:
             case 33:
             case 34:
-                buttonState |= MouseFlags.PositionReport;
+                buttonState |= MouseFlags.ReportMousePosition;
 
                 break;
-
             case 36:
             case 37:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Shift;
+                buttonState |= MouseFlags.ReportMousePosition | MouseFlags.ButtonShift;
 
                 break;
-
             case 39:
             case 68:
             case 69:
-                buttonState |= MouseFlags.Shift;
+                buttonState |= MouseFlags.ButtonShift;
 
                 break;
-
             case 40:
             case 41:
             case 42:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Alt;
+                buttonState |= MouseFlags.ReportMousePosition | MouseFlags.ButtonAlt;
 
                 break;
-
             case 45:
             case 46:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Alt | MouseFlags.Shift;
+                buttonState |= MouseFlags.ReportMousePosition | MouseFlags.ButtonAlt | MouseFlags.ButtonShift;
 
                 break;
-
             case 48:
             case 49:
             case 50:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl;
+                buttonState |= MouseFlags.ReportMousePosition | MouseFlags.ButtonCtrl;
 
                 break;
-
             case 53:
             case 54:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Shift;
+                buttonState |= MouseFlags.ReportMousePosition | MouseFlags.ButtonCtrl | MouseFlags.ButtonShift;
 
                 break;
-
             case 56:
             case 57:
             case 58:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Alt;
+                buttonState |= MouseFlags.ReportMousePosition | MouseFlags.ButtonCtrl | MouseFlags.ButtonAlt;
 
                 break;
-
             case 61:
             case 62:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Shift | MouseFlags.Alt;
+                buttonState |= MouseFlags.ReportMousePosition | MouseFlags.ButtonCtrl | MouseFlags.ButtonShift | MouseFlags.ButtonAlt;
 
                 break;
         }

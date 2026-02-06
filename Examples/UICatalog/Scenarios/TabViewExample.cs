@@ -18,12 +18,9 @@ public class TabViewExample : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
+        Application.Init ();
 
-        using IApplication app = Application.Create ();
-        app.Init ();
-
-        using Window appWindow = new ()
+        Window appWindow = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -111,7 +108,7 @@ public class TabViewExample : Scenario
                                 "This demos the tabs control\nSwitch between tabs using cursor keys.\nThis TextView has AllowsTab = false, so tab should nav too.",
                             Width = Dim.Fill (),
                             Height = Dim.Fill (),
-                            TabKeyAddsTab = false
+                            AllowsTab = false
                         }
                        );
 
@@ -148,33 +145,33 @@ public class TabViewExample : Scenario
         _miShowTopLineCheckBox = new ()
         {
             Title = "_Show Top Line",
-            Value = CheckState.Checked
+            CheckedState = CheckState.Checked
         };
-        _miShowTopLineCheckBox.ValueChanged += (_, _) => ShowTopLine ();
+        _miShowTopLineCheckBox.CheckedStateChanged += (s, e) => ShowTopLine ();
 
         _miShowBorderCheckBox = new ()
         {
             Title = "_Show Border",
-            Value = CheckState.Checked
+            CheckedState = CheckState.Checked
         };
-        _miShowBorderCheckBox.ValueChanged += (_, _) => ShowBorder ();
+        _miShowBorderCheckBox.CheckedStateChanged += (s, e) => ShowBorder ();
 
         _miTabsOnBottomCheckBox = new ()
         {
             Title = "_Tabs On Bottom"
         };
-        _miTabsOnBottomCheckBox.ValueChanged += (_, _) => SetTabsOnBottom ();
+        _miTabsOnBottomCheckBox.CheckedStateChanged += (s, e) => SetTabsOnBottom ();
 
         _miShowTabViewBorderCheckBox = new ()
         {
             Title = "_Show TabView Border",
-            Value = CheckState.Checked
+            CheckedState = CheckState.Checked
         };
-        _miShowTabViewBorderCheckBox.ValueChanged += (_, _) => ShowTabViewBorder ();
+        _miShowTabViewBorderCheckBox.CheckedStateChanged += (s, e) => ShowTabViewBorder ();
 
         menu.Add (
                   new MenuBarItem (
-                                   Strings.menuFile,
+                                   "_File",
                                    [
                                        new MenuItem
                                        {
@@ -186,7 +183,7 @@ public class TabViewExample : Scenario
                                            Title = "_Clear SelectedTab",
                                            Action = () =>
                                                     {
-                                                        if (_tabView is not null)
+                                                        if (_tabView is { })
                                                         {
                                                             _tabView.SelectedTab = null;
                                                         }
@@ -194,7 +191,7 @@ public class TabViewExample : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdQuit,
+                                           Title = "_Quit",
                                            Action = Quit
                                        }
                                    ]
@@ -227,7 +224,9 @@ public class TabViewExample : Scenario
 
         appWindow.Add (menu, _tabView, frameRight, frameBelow, statusBar);
 
-        app.Run (appWindow);
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+        Application.Shutdown ();
     }
 
     private void AddBlankTab () { _tabView?.AddTab (new (), false); }
@@ -276,7 +275,7 @@ public class TabViewExample : Scenario
         return interactiveTab;
     }
 
-    private void Quit () { _tabView?.App?.RequestStop (); }
+    private void Quit () { Application.RequestStop (); }
 
     private void SetTabsOnBottom ()
     {
@@ -285,7 +284,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.Style.TabsOnBottom = _miTabsOnBottomCheckBox.Value == CheckState.Checked;
+        _tabView.Style.TabsOnBottom = _miTabsOnBottomCheckBox.CheckedState == CheckState.Checked;
         _tabView.ApplyStyleChanges ();
     }
 
@@ -296,7 +295,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.Style.ShowBorder = _miShowBorderCheckBox.Value == CheckState.Checked;
+        _tabView.Style.ShowBorder = _miShowBorderCheckBox.CheckedState == CheckState.Checked;
         _tabView.ApplyStyleChanges ();
     }
 
@@ -307,7 +306,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.BorderStyle = _miShowTabViewBorderCheckBox.Value == CheckState.Checked
+        _tabView.BorderStyle = _miShowTabViewBorderCheckBox.CheckedState == CheckState.Checked
                                    ? LineStyle.Single
                                    : LineStyle.None;
         _tabView.ApplyStyleChanges ();
@@ -320,7 +319,7 @@ public class TabViewExample : Scenario
             return;
         }
 
-        _tabView.Style.ShowTopLine = _miShowTopLineCheckBox.Value == CheckState.Checked;
+        _tabView.Style.ShowTopLine = _miShowTopLineCheckBox.CheckedState == CheckState.Checked;
         _tabView.ApplyStyleChanges ();
     }
 }

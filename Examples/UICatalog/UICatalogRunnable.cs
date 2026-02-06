@@ -1,10 +1,12 @@
-﻿#nullable enable
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
+
+#nullable enable
 
 namespace UICatalog;
 
@@ -12,7 +14,7 @@ namespace UICatalog;
 ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on
 ///     the command line) and each time a Scenario ends.
 /// </summary>
-public sealed class UICatalogRunnable : Runnable
+public class UICatalogRunnable : Runnable
 {
     // When a scenario is run, the main app is killed. The static
     // members are cached so that when the scenario exits the
@@ -29,19 +31,16 @@ public sealed class UICatalogRunnable : Runnable
     public UICatalogRunnable ()
     {
         _diagnosticFlags = Diagnostics;
-        SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
-        ConfigurationManager.Applied += ConfigAppliedHandler;
-    }
 
-    /// <inheritdoc/>
-    public override void BeginInit ()
-    {
         _menuBar = CreateMenuBar ();
         _statusBar = CreateStatusBar ();
         _categoryList = CreateCategoryList ();
         _scenarioList = CreateScenarioList ();
 
         Add (_menuBar, _categoryList, _scenarioList, _statusBar);
+
+        IsModalChanged += IsModalChangedHandler;
+        IsRunningChanged += IsRunningChangedHandler;
 
         // Restore previous selections
         if (_categoryList.Source?.Count > 0)
@@ -54,69 +53,63 @@ public sealed class UICatalogRunnable : Runnable
         }
         _scenarioList.SelectedRow = _cachedScenarioIndex;
 
-        base.BeginInit ();
+        SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        ConfigurationManager.Applied += ConfigAppliedHandler;
     }
 
-    /// <inheritdoc/>
-    protected override void OnIsModalChanged (bool newIsModal)
+
+    private static bool _isFirstRunning = true;
+
+    private void IsModalChangedHandler (object? sender, EventArgs<bool> args)
     {
-        _disableMouseCb?.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
-
-        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App!.Driver!.GetVersionInfo ()}";
-
-        if (string.IsNullOrEmpty ((string?)Result))
+        if (!args.Value)
         {
+            return;
+        }
+
+        if (_disableMouseCb is { })
+        {
+            _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+        }
+
+        if (_shVersion is { })
+        {
+            _shVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {Application.Driver!.GetVersionInfo ()}";
+        }
+
+        if (CachedSelectedScenario != null)
+        {
+            CachedSelectedScenario = null;
             _isFirstRunning = false;
         }
 
         if (!_isFirstRunning)
         {
-            _scenarioList?.SetFocus ();
+            _scenarioList.SetFocus ();
         }
 
-        _categoryList?.EnsureSelectedItemVisible ();
-        _scenarioList?.EnsureSelectedCellIsVisible ();
+        if (_statusBar is { })
+        {
+            _statusBar.VisibleChanged += (s, e) => { ShowStatusBar = _statusBar.Visible; };
+        }
 
-        if (ShowStatusBar)
-        {
-            _statusBar!.Height = Dim.Auto ();
-        }
-        else
-        {
-            _statusBar!.Height = 0;
-        }
+        IsModalChanged -= IsModalChangedHandler;
+        _categoryList!.EnsureSelectedItemVisible ();
+        _scenarioList.EnsureSelectedCellIsVisible ();
     }
 
-    /// <inheritdoc/>
-    protected override void OnIsRunningChanged (bool newIsRunning)
+    private void IsRunningChangedHandler (object? sender, EventArgs<bool> args)
     {
-        if (newIsRunning)
+        if (!args.Value)
         {
-            // Show error dialog if any errors occurred during the scenario
-            if (!UICatalog.LogCapture.HasErrors)
-            {
-                return;
-            }
-
-            if (_scenarioList is { })
-            {
-                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
-            }
-
-            UICatalog.LogCapture.HasErrors = false;
-
-            return;
+            ConfigurationManager.Applied -= ConfigAppliedHandler;
+            IsRunningChanged -= IsRunningChangedHandler;
         }
-
-        ConfigurationManager.Applied -= ConfigAppliedHandler;
     }
-
-    // Track if this is the first time running the main UI Catalog screen
-    private static bool _isFirstRunning = true;
 
     #region MenuBar
 
-    private MenuBar? _menuBar;
+    private readonly MenuBar? _menuBar;
     private CheckBox? _force16ColorsMenuItemCb;
     private OptionSelector? _themesSelector;
     private OptionSelector? _topSchemesSelector;
@@ -126,43 +119,56 @@ public sealed class UICatalogRunnable : Runnable
 
     private MenuBar CreateMenuBar ()
     {
-        MenuBar menuBar = new ([
-                                   new MenuBarItem (Strings.menuFile,
-                                                    [
-                                                        new MenuItem
-                                                        {
-                                                            Title = Strings.cmdQuit,
-                                                            HelpText = "Quit UI Catalog",
-                                                            Key = Application.QuitKey,
-
-                                                            // By not specifying TargetView the Key Binding will be Application-level
-                                                            Command = Command.Quit
-                                                        }
-                                                    ]),
-                                   new MenuBarItem ("_Themes", CreateThemeMenuItems ()),
-                                   new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                                   new MenuBarItem ("_Logging", CreateLoggingMenuItems ()),
-                                   new MenuBarItem (Strings.menuHelp,
-                                                    [
-                                                        new MenuItem ("_Documentation",
-                                                                      "API docs",
-                                                                      () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
-                                                                      Key.F1),
-                                                        new MenuItem ("_README",
-                                                                      "Project readme",
-                                                                      () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
-                                                                      Key.F2),
-                                                        new MenuItem ("_About...",
-                                                                      "About UI Catalog",
-                                                                      () => MessageBox.Query (App!,
-                                                                                              "",
-                                                                                              GetAboutBoxMessage (),
-                                                                                              wrapMessage: false,
-                                                                                              buttons: Strings.btnOk),
-                                                                      Key.A.WithCtrl)
-                                                    ])
-                               ])
-        { Title = "menuBar", Id = "menuBar" };
+        MenuBar menuBar = new (
+                                 [
+                                     new (
+                                          "_File",
+                                          [
+                                              new MenuItem ()
+                                              {
+                                                  Title ="_Quit",
+                                                  HelpText = "Quit UI Catalog",
+                                                  Key = Application.QuitKey,
+                                                  // By not specifying TargetView the Key Binding will be Application-level
+                                                  Command = Command.Quit
+                                              }
+                                          ]),
+                                     new ("_Themes", CreateThemeMenuItems ()),
+                                     new ("Diag_nostics", CreateDiagnosticMenuItems ()),
+                                     new ("_Logging", CreateLoggingMenuItems ()),
+                                     new (
+                                          "_Help",
+                                          [
+                                              new MenuItem (
+                                                              "_Documentation",
+                                                              "API docs",
+                                                              () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
+                                                              Key.F1
+                                                             ),
+                                              new MenuItem (
+                                                              "_README",
+                                                              "Project readme",
+                                                              () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
+                                                              Key.F2
+                                                             ),
+                                              new MenuItem (
+                                                              "_About...",
+                                                              "About UI Catalog",
+                                                              () => MessageBox.Query (
+                                                                                      App,
+                                                                                      "",
+                                                                                      GetAboutBoxMessage (),
+                                                                                      wrapMessage: false,
+                                                                                      buttons: "_Ok"
+                                                                                     ),
+                                                              Key.A.WithCtrl
+                                                             )
+                                          ])
+                                 ])
+        {
+            Title = "menuBar",
+            Id = "menuBar"
+        };
 
         return menuBar;
 
@@ -170,77 +176,98 @@ public sealed class UICatalogRunnable : Runnable
         {
             List<View> menuItems = [];
 
-            _force16ColorsMenuItemCb = new CheckBox
+            _force16ColorsMenuItemCb = new ()
             {
                 Title = "Force _16 Colors",
-                Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-
+                CheckedState = Application.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
-                MouseHighlightStates = MouseState.None
+                HighlightStates = MouseState.None
             };
 
-            _force16ColorsMenuItemCb.ValueChanging += (_, args) =>
-                                                      {
-                                                          if (Driver.Force16Colors && args.NewValue == CheckState.UnChecked && !App!.Driver!.SupportsTrueColor)
-                                                          {
-                                                              args.Handled = true;
-                                                          }
-                                                      };
+            _force16ColorsMenuItemCb.CheckedStateChanging += (sender, args) =>
+                                                             {
+                                                                 if (Application.Driver!.Force16Colors
+                                                                     && args.Result == CheckState.UnChecked
+                                                                     && !Application.Driver!.SupportsTrueColor)
+                                                                 {
+                                                                     args.Handled = true;
+                                                                 }
+                                                             };
 
-            _force16ColorsMenuItemCb.ValueChanged += (_, args) =>
-                                                     {
-                                                         Driver.Force16Colors = args.NewValue == CheckState.Checked;
+            _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
+                                                            {
+                                                                Application.Driver!.Force16Colors = args.Value == CheckState.Checked;
 
-                                                         _force16ColorsShortcutCb!.Value = args.NewValue;
-                                                         SetNeedsDraw ();
-                                                     };
+                                                                _force16ColorsShortcutCb!.CheckedState = args.Value;
+                                                                SetNeedsDraw ();
+                                                            };
 
-            menuItems.Add (new MenuItem { CommandView = _force16ColorsMenuItemCb });
+            menuItems.Add (
+                           new MenuItem
+                           {
+                               CommandView = _force16ColorsMenuItemCb
+                           });
 
             menuItems.Add (new Line ());
 
             if (ConfigurationManager.IsEnabled)
             {
-                _themesSelector = new OptionSelector
+                _themesSelector = new ()
                 {
-                    // MouseHighlightStates = MouseState.In,
-                    CanFocus = true
-
+                    // HighlightStates = MouseState.In,
+                    CanFocus = true,
                     // InvertFocusAttribute = true
                 };
 
                 _themesSelector.ValueChanged += (_, args) =>
-                                                {
-                                                    if (args.NewValue is null)
-                                                    {
-                                                        return;
-                                                    }
-                                                    ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.NewValue];
-                                                };
+                                                 {
+                                                     if (args.Value is null)
+                                                     {
+                                                         return;
+                                                     }
+                                                     ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.Value];
 
-                var menuItem = new MenuItem { CommandView = _themesSelector, HelpText = "Cycle Through Themes", Key = Key.T.WithCtrl };
+                                                 };
+
+                var menuItem = new MenuItem
+                {
+                    CommandView = _themesSelector,
+                    HelpText = "Cycle Through Themes",
+                    Key = Key.T.WithCtrl
+                };
                 menuItems.Add (menuItem);
 
                 menuItems.Add (new Line ());
 
-                _topSchemesSelector = new OptionSelector ();
+                _topSchemesSelector = new ()
+                {
+                    //  HighlightStates = MouseState.In,
+                };
 
                 _topSchemesSelector.ValueChanged += (_, args) =>
                                                     {
-                                                        if (args.NewValue is null)
+                                                        if (args.Value is null)
                                                         {
                                                             return;
                                                         }
-                                                        CachedRunnableScheme = SchemeManager.GetSchemesForCurrentTheme ().Keys.ToArray () [(int)args.NewValue];
+                                                        CachedRunnableScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [(int)args.Value];
                                                         SchemeName = CachedRunnableScheme;
                                                         SetNeedsDraw ();
                                                     };
 
-                menuItem = new MenuItem
+                menuItem = new ()
                 {
                     Title = "Scheme for Runnable",
-                    SubMenu = new Menu ([new MenuItem { CommandView = _topSchemesSelector, HelpText = "Cycle Through schemes", Key = Key.S.WithCtrl }])
+                    SubMenu = new (
+                                   [
+                                       new ()
+                                       {
+                                           CommandView = _topSchemesSelector,
+                                           HelpText = "Cycle Through schemes",
+                                           Key = Key.S.WithCtrl
+                                       }
+                                   ])
                 };
                 menuItems.Add (menuItem);
 
@@ -248,7 +275,11 @@ public sealed class UICatalogRunnable : Runnable
             }
             else
             {
-                menuItems.Add (new MenuItem { Title = "Configuration Manager is not Enabled", Enabled = false });
+                menuItems.Add (new MenuItem ()
+                {
+                    Title = "Configuration Manager is not Enabled",
+                    Enabled = false
+                });
             }
 
             return menuItems.ToArray ();
@@ -258,49 +289,59 @@ public sealed class UICatalogRunnable : Runnable
         {
             List<View> menuItems = [];
 
-            _diagnosticFlagsSelector = new FlagSelector<ViewDiagnosticFlags> { Styles = SelectorStyles.ShowNoneFlag, CanFocus = true };
+            _diagnosticFlagsSelector = new ()
+            {
+                Styles = SelectorStyles.ShowNoneFlag,
+                CanFocus = true
+
+            };
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
             _diagnosticFlagsSelector.AssignHotKeys = true;
             _diagnosticFlagsSelector.Value = Diagnostics;
+            _diagnosticFlagsSelector.Activating += (sender, args) =>
+                                                  {
+                                                      _diagnosticFlags = (ViewDiagnosticFlags)((int)args.Context!.Source!.Data!);// (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                                      Diagnostics = _diagnosticFlags;
+                                                  };
 
-            _diagnosticFlagsSelector.Activating += (_, args) =>
-                                                   {
-                                                       _diagnosticFlags =
-                                                           (ViewDiagnosticFlags)(int)args.Context!.Source!
-                                                                                         .Data!; // (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                                                       Diagnostics = _diagnosticFlags;
-                                                   };
-
-            var diagFlagMenuItem = new MenuItem { CommandView = _diagnosticFlagsSelector, HelpText = "View Diagnostics" };
-
-            diagFlagMenuItem.Accepting += (_, _) =>
-                                          {
-                                              //_diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                                              //Diagnostics = _diagnosticFlags;
-                                              //args.Handled = true;
-                                          };
+            MenuItem diagFlagMenuItem = new MenuItem ()
+            {
+                CommandView = _diagnosticFlagsSelector,
+                HelpText = "View Diagnostics"
+            };
+            diagFlagMenuItem.Accepting += (sender, args) =>
+                                         {
+                                             //_diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                             //Diagnostics = _diagnosticFlags;
+                                             //args.Handled = true;
+                                         };
 
             menuItems.Add (diagFlagMenuItem);
 
             menuItems.Add (new Line ());
 
-            _disableMouseCb = new CheckBox
+            _disableMouseCb = new ()
             {
-                Title = "_Disable MouseEventArgs",
-                Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
-
+                Title = "_Disable Mouse",
+                CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
-                MouseHighlightStates = MouseState.None
+                HighlightStates = MouseState.None
             };
 
             //_disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
-            _disableMouseCb.Activating += (_, _) =>
-                                          {
-                                              App!.Mouse.IsMouseDisabled = !App!.Mouse.IsMouseDisabled;
-                                              _disableMouseCb.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.None;
-                                          };
-            menuItems.Add (new MenuItem { CommandView = _disableMouseCb, HelpText = "Disable MouseEventArgs" });
+            _disableMouseCb.Activating += (sender, args) =>
+                                         {
+                                             Application.IsMouseDisabled = !Application.IsMouseDisabled;
+                                             _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.None;
+
+                                         };
+            menuItems.Add (
+                           new MenuItem
+                           {
+                               CommandView = _disableMouseCb,
+                               HelpText = "Disable Mouse"
+                           });
 
             return menuItems.ToArray ();
         }
@@ -311,35 +352,43 @@ public sealed class UICatalogRunnable : Runnable
 
             LogLevel [] logLevels = Enum.GetValues<LogLevel> ();
 
-            _logLevelSelector = new OptionSelector
+            _logLevelSelector = new ()
             {
                 AssignHotKeys = true,
                 Labels = Enum.GetNames<LogLevel> (),
-                Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel))
-
-                // MouseHighlightStates = MouseState.In,
+                Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
+                // HighlightStates = MouseState.In,
             };
 
             _logLevelSelector.ValueChanged += (_, args) =>
-                                              {
-                                                  UICatalog.Options = UICatalog.Options with
-                                                  {
-                                                      DebugLogLevel = Enum.GetName (logLevels [args.NewValue!.Value])!
-                                                  };
+            {
+                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.Value!.Value])! };
 
-                                                  UICatalog.LogLevelSwitch.MinimumLevel =
-                                                      UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
-                                              };
+                UICatalog.LogLevelSwitch.MinimumLevel =
+                    UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
+            };
 
-            menuItems.Add (new MenuItem { CommandView = _logLevelSelector, HelpText = "Cycle Through Log Levels", Key = Key.L.WithCtrl });
+            menuItems.Add (
+                           new MenuItem
+                           {
+                               CommandView = _logLevelSelector,
+                               HelpText = "Cycle Through Log Levels",
+                               Key = Key.L.WithCtrl
+                           });
 
             // add a separator
             menuItems.Add (new Line ());
 
-            menuItems.Add (new MenuItem ("_Open Log Folder", string.Empty, () => OpenUrl (UICatalog.LOGFILE_LOCATION)));
+            menuItems.Add (
+                           new MenuItem (
+                                           "_Open Log Folder",
+                                           string.Empty,
+                                           () => OpenUrl (UICatalog.LOGFILE_LOCATION)
+                                          ));
 
             return menuItems.ToArray ()!;
         }
+
     }
 
     private void UpdateThemesMenu ()
@@ -372,7 +421,6 @@ public sealed class UICatalogRunnable : Runnable
         }
 
         int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedRunnableScheme!);
-
         // if the item is in bounds then select it
         if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
         {
@@ -384,10 +432,14 @@ public sealed class UICatalogRunnable : Runnable
 
     #region Scenario List
 
-    private TableView? _scenarioList;
+    private readonly TableView _scenarioList;
+
     private static int _cachedScenarioIndex;
 
     public static ObservableCollection<Scenario>? CachedScenarios { get; set; }
+
+    // If set, holds the scenario the user selected to run
+    public static Scenario? CachedSelectedScenario { get; set; }
 
     private TableView CreateScenarioList ()
     {
@@ -399,7 +451,8 @@ public sealed class UICatalogRunnable : Runnable
             X = Pos.Right (_categoryList!) - 1,
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Fill (),
-            Height = Dim.Height (_categoryList),
+            Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
+            //AllowsMarking = false,
             CanFocus = true,
             Title = "_Scenarios",
             BorderStyle = _categoryList!.BorderStyle,
@@ -431,8 +484,11 @@ public sealed class UICatalogRunnable : Runnable
          */
         int longestName = CachedScenarios!.Max (s => s.GetName ().Length);
 
-        scenarioList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
-        scenarioList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1 });
+        scenarioList.Style.ColumnStyles.Add (
+                                             0,
+                                             new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
+                                            );
+        scenarioList.Style.ColumnStyles.Add (1, new () { MaxWidth = 1 });
         scenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
         // TableView typically is a grid where nav keys are biased for moving left/right.
@@ -450,26 +506,38 @@ public sealed class UICatalogRunnable : Runnable
         return scenarioList;
     }
 
+
     /// <summary>Launches the selected scenario, setting the global _selectedScenario</summary>
-    /// <param name="sender"></param>
     /// <param name="e"></param>
     private void ScenarioView_OpenSelectedItem (object? sender, EventArgs? e)
     {
-        // Save selected item state
-        _cachedCategoryIndex = _categoryList!.SelectedItem;
-        _cachedScenarioIndex = _scenarioList!.SelectedRow;
+        if (CachedSelectedScenario is null)
+        {
+            // Save selected item state
+            _cachedCategoryIndex = _categoryList!.SelectedItem;
+            _cachedScenarioIndex = _scenarioList.SelectedRow;
 
-        // Set the Result to the selected scenario name
-        Result = (string)_scenarioList.Table [_scenarioList.SelectedRow, 0];
-        Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
-        App?.RequestStop ();
+            // Create new instance of scenario (even though Scenarios contains instances)
+            var selectedScenarioName = (string)_scenarioList.Table [_scenarioList.SelectedRow, 0];
+
+            CachedSelectedScenario = (Scenario)Activator.CreateInstance (
+                                                                         CachedScenarios!.FirstOrDefault (
+                                                                                                          s => s.GetName ()
+                                                                                                              == selectedScenarioName
+                                                                                                         )!
+                                                                                         .GetType ()
+                                                                        )!;
+
+            // Tell the main app to stop
+            Application.RequestStop ();
+        }
     }
 
     #endregion Scenario List
 
     #region Category List
 
-    private ListView? _categoryList;
+    private readonly ListView? _categoryList;
     private static int? _cachedCategoryIndex;
     public static ObservableCollection<string>? CachedCategories { get; set; }
 
@@ -481,22 +549,16 @@ public sealed class UICatalogRunnable : Runnable
             X = 0,
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Auto (),
-            Height = Dim.Fill (to: _statusBar!),
-
-            ShowMarks = false,
+            Height = Dim.Fill (Dim.Func (v => v!.Frame.Height, _statusBar)),
+            AllowsMarking = false,
             CanFocus = true,
             Title = "_Categories",
             BorderStyle = LineStyle.Rounded,
             SuperViewRendersLineCanvas = true,
             Source = new ListWrapper<string> (CachedCategories)
         };
-
-        categoryList.Accepting += (_, e) =>
-                                  {
-                                      _scenarioList!.SetFocus ();
-                                      e.Handled = true;
-                                  };
-        categoryList.ValueChanged += CategoryView_SelectedChanged;
+        categoryList.OpenSelectedItem += (s, a) => { _scenarioList!.SetFocus (); };
+        categoryList.SelectedItemChanged += CategoryView_SelectedChanged;
 
         // This enables the scrollbar by causing lazy instantiation to happen
         categoryList.VerticalScrollBar.AutoShow = true;
@@ -504,56 +566,44 @@ public sealed class UICatalogRunnable : Runnable
         return categoryList;
     }
 
-    private void CategoryView_SelectedChanged (object? sender, ValueChangedEventArgs<int?> e)
+    private void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)
     {
-        if (e.NewValue is null)
+        if (e is null or { Item: null })
         {
             return;
         }
-        string item = CachedCategories! [e.NewValue.Value];
+        string item = CachedCategories! [e.Item.Value];
         ObservableCollection<Scenario> newScenarioList;
 
-        if (e.NewValue == 0)
+        if (e.Item == 0)
         {
             // First category is "All"
             newScenarioList = CachedScenarios!;
         }
         else
         {
-            newScenarioList = new ObservableCollection<Scenario> (CachedScenarios!.Where (s => s.GetCategories ().Contains (item)).ToList ());
+            newScenarioList = new (CachedScenarios!.Where (s => s.GetCategories ().Contains (item)).ToList ());
         }
 
-        _scenarioList!.Table = new EnumerableTableSource<Scenario> (newScenarioList,
-                                                                    new Dictionary<string, Func<Scenario, object>>
-                                                                    {
-                                                                        { "Name", s => s.GetName () }, { "Description", s => s.GetDescription () }
-                                                                    });
+        _scenarioList.Table = new EnumerableTableSource<Scenario> (
+                                                                   newScenarioList,
+                                                                   new ()
+                                                                   {
+                                                                       { "Name", s => s.GetName () }, { "Description", s => s.GetDescription () }
+                                                                   }
+                                                                  );
+
     }
 
     #endregion Category List
 
     #region StatusBar
 
-    private StatusBar? _statusBar;
+    private readonly StatusBar? _statusBar;
 
     [ConfigurationProperty (Scope = typeof (AppSettingsScope), OmitClassName = true)]
     [JsonPropertyName ("UICatalog.StatusBar")]
-    public static bool ShowStatusBar
-    {
-        get => field;
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-            field = value;
-            StatusBarChanged?.Invoke (null, new ValueChangedEventArgs<bool> (!field, field));
-        }
-    } = true;
-
-    /// <summary>Raised when "UICatalog.StatusBar" changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<bool>>? StatusBarChanged;
+    public static bool ShowStatusBar { get; set; } = true;
 
     private Shortcut? _shQuit;
     private Shortcut? _shVersion;
@@ -561,23 +611,51 @@ public sealed class UICatalogRunnable : Runnable
 
     private StatusBar CreateStatusBar ()
     {
-        StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
-
-        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey };
-
-        _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
-
-        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false };
-
-        statusBarShortcut.Accepting += (_, args) =>
-                                       {
-                                           ShowStatusBar = !ShowStatusBar;
-                                           args.Handled = true;
-                                       };
-
-        _force16ColorsShortcutCb = new CheckBox
+        StatusBar statusBar = new ()
         {
-            Title = "16 color mode", Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked, CanFocus = true
+            Visible = ShowStatusBar,
+            AlignmentModes = AlignmentModes.IgnoreFirstOrLast,
+            CanFocus = false
+        };
+
+        // ReSharper disable All
+        statusBar.Height = Dim.Auto (
+                                     DimAutoStyle.Auto,
+                                     minimumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0),
+                                     maximumContentDim: Dim.Func (_ => statusBar.Visible ? 1 : 0));
+        // ReSharper restore All
+
+        _shQuit = new ()
+        {
+            CanFocus = false,
+            Title = "Quit",
+            Key = Application.QuitKey
+        };
+
+        _shVersion = new ()
+        {
+            Title = "Version Info",
+            CanFocus = false
+        };
+
+        var statusBarShortcut = new Shortcut
+        {
+            Key = Key.F10,
+            Title = "Show/Hide Status Bar",
+            CanFocus = false
+        };
+
+        statusBarShortcut.Accepting += (sender, args) =>
+        {
+            statusBar.Visible = !_statusBar!.Visible;
+            args.Handled = true;
+        };
+
+        _force16ColorsShortcutCb = new ()
+        {
+            Title = "16 color mode",
+            CheckedState = Application.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            CanFocus = true
         };
 
         Shortcut force16ColorsShortcut = new ()
@@ -589,35 +667,24 @@ public sealed class UICatalogRunnable : Runnable
             Key = Key.F7
         };
 
-        force16ColorsShortcut.Accepting += (_, args) =>
+        force16ColorsShortcut.Accepting += (sender, args) =>
                                            {
-                                               Driver.Force16Colors = !Driver.Force16Colors;
-                                               _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                                               Application.Driver.Force16Colors = !Application.Driver.Force16Colors;
+                                               _force16ColorsMenuItemCb!.CheckedState = Application.Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                                SetNeedsDraw ();
                                                args.Handled = true;
                                            };
-        statusBar.Add (_shQuit, statusBarShortcut, force16ColorsShortcut, _shVersion);
+        statusBar.Add (
+                       _shQuit,
+                       statusBarShortcut,
+                       force16ColorsShortcut,
+                       _shVersion
+                      );
 
         if (UICatalog.Options.DontEnableConfigurationManagement)
         {
-            statusBar.AddShortcutAt (statusBar.SubViews.ToList ().IndexOf (_shVersion), new Shortcut { Title = "CM is Disabled" });
+            statusBar.AddShortcutAt (statusBar.SubViews.ToList ().IndexOf (_shVersion), new Shortcut () { Title = "CM is Disabled" });
         }
-
-        StatusBarChanged += (_, args) =>
-                            {
-                                switch (args.NewValue)
-                                {
-                                    case true:
-                                        _statusBar!.Height = Dim.Auto ();
-
-                                        break;
-
-                                    case false:
-                                        _statusBar!.Height = 0;
-
-                                        break;
-                                }
-                            };
 
         return statusBar;
     }
@@ -635,15 +702,23 @@ public sealed class UICatalogRunnable : Runnable
 
         SchemeName = CachedRunnableScheme;
 
-        _shQuit?.Key = Application.QuitKey;
+        if (_shQuit is { })
+        {
+            _shQuit.Key = Application.QuitKey;
+        }
 
-        _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
-        _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+        if (_statusBar is { })
+        {
+            _statusBar.Visible = ShowStatusBar;
+        }
 
-        App.TopRunnableView?.SetNeedsDraw ();
+        _disableMouseCb!.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+        _force16ColorsShortcutCb!.CheckedState = Application.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+
+        Application.TopRunnableView?.SetNeedsDraw ();
     }
 
-    private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) => ConfigApplied ();
+    private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) { ConfigApplied (); }
 
     #endregion Configuration Manager
 
@@ -659,7 +734,8 @@ public sealed class UICatalogRunnable : Runnable
         msg.AppendLine ("UI Catalog: A comprehensive sample library and test app for");
         msg.AppendLine ();
 
-        msg.AppendLine ("""
+        msg.AppendLine (
+                        """
                          _______                  _             _   _____       _ 
                         |__   __|                (_)           | | / ____|     (_)
                            | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
@@ -670,66 +746,37 @@ public sealed class UICatalogRunnable : Runnable
         msg.AppendLine ();
         msg.AppendLine ("v2 - Pre-Alpha");
         msg.AppendLine ();
-        msg.Append ("https://github.com/gui-cs/Terminal.Gui");
+        msg.AppendLine ("https://github.com/gui-cs/Terminal.Gui");
 
         return msg.ToString ();
     }
 
     public static void OpenUrl (string url)
     {
-        if (PlatformDetection.IsWindows ())
+        if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             url = url.Replace ("&", "^&");
             Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
-        else if (PlatformDetection.IsMac ())
+        else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux))
         {
-            Process.Start ("open", url);
-        }
-        else if (PlatformDetection.IsLinux ())
-        {
-            using Process process = new ();
-
-            process.StartInfo = new ProcessStartInfo
+            using var process = new Process
             {
-                FileName = "xdg-open",
-                Arguments = url,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                UseShellExecute = false
+                StartInfo = new ()
+                {
+                    FileName = "xdg-open",
+                    Arguments = url,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                }
             };
             process.Start ();
         }
-    }
-
-    /// <summary>
-    ///     Shows a dialog displaying error logs from a scenario run.
-    /// </summary>
-    /// <param name="app"></param>
-    /// <param name="scenarioName">The name of the scenario that was run.</param>
-    /// <param name="logs">The captured log output.</param>
-    private static void ShowScenarioErrorsDialog (IApplication app, string scenarioName, string logs)
-    {
-        using Dialog dialog = new ();
-        dialog.Title = $"Errors in {scenarioName}";
-
-        ListView eventLog = new ()
+        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
         {
-            Width = Dim.Auto (),
-            Height = Dim.Auto (),
-            Source = new ListWrapper<string> (new ObservableCollection<string> (logs.Split ([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries))),
-            SelectedItem = 0,
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error)
-        };
-        eventLog.HorizontalScrollBar.AutoShow = true;
-        eventLog.VerticalScrollBar.AutoShow = true;
-
-        Button okButton = new () { Text = "OK" };
-
-        dialog.Add (eventLog);
-        dialog.AddButton (okButton);
-
-        app.Run (dialog);
+            Process.Start ("open", url);
+        }
     }
 }

@@ -14,20 +14,18 @@ public class Clipping : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window window = new ()
+        Window app = new ()
         {
             Title = GetQuitKeyAndName ()
 
             //BorderStyle = LineStyle.None
         };
 
-        window.DrawingContent += (_, e) =>
+        app.DrawingContent += (s, e) =>
                               {
-                                  window!.FillRect (window!.Viewport, Glyphs.Dot);
+                                  app!.FillRect (app!.Viewport, Glyphs.Dot);
                                   e.Cancel = true;
                               };
 
@@ -37,7 +35,7 @@ public class Clipping : Scenario
             Y = 0,
             AutoSelectViewToEdit = true
         };
-        window.Add (arrangementEditor);
+        app.Add (arrangementEditor);
 
         View tiledView1 = CreateTiledView (1, 0, 0);
 
@@ -68,11 +66,11 @@ public class Clipping : Scenario
         };
         tiledView2.Add (tiledProgressBar2);
 
-        window.Add (tiledView1);
-        window.Add (tiledView2);
+        app.Add (tiledView1);
+        app.Add (tiledView2);
 
         View tiledView3 = CreateTiledView (3, 8, 4);
-        window.Add (tiledView3);
+        app.Add (tiledView3);
 
         // View overlappedView1 = CreateOverlappedView (1, 30, 2);
 
@@ -98,15 +96,38 @@ public class Clipping : Scenario
             AutoReset = true
         };
 
-        progressTimer.Elapsed += (_, _) =>
+        progressTimer.Elapsed += (s, e) =>
                                  {
                                      tiledProgressBar1.Pulse ();
                                      tiledProgressBar2.Pulse ();
                                  };
 
         progressTimer.Start ();
-        app.Run (window);
+        Application.Run (app);
         progressTimer.Stop ();
+        app.Dispose ();
+        Application.Shutdown ();
+    }
+
+    private View CreateOverlappedView (int id, Pos x, Pos y)
+    {
+        var overlapped = new View
+        {
+            X = x,
+            Y = y,
+            Height = Dim.Auto (minimumContentDim: 4),
+            Width = Dim.Auto (minimumContentDim: 14),
+            Title = $"Overlapped{id} _{GetNextHotKey ()}",
+            SchemeName = SchemeManager.SchemesToSchemeName(Schemes.Runnable),
+            Id = $"Overlapped{id}",
+            ShadowStyle = ShadowStyle.Transparent,
+            BorderStyle = LineStyle.Double,
+            CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabGroup,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
+        };
+
+        return overlapped;
     }
 
     private View CreateTiledView (int id, Pos x, Pos y)

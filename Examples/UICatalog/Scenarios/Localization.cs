@@ -10,18 +10,16 @@ namespace UICatalog.Scenarios;
 public class Localization : Scenario
 {
     private CheckBox? _allowAnyCheckBox;
-    private IApplication? _app;
     private string []? _cultureInfoNameSource;
     private CultureInfo []? _cultureInfoSource;
     private OpenMode _currentOpenMode = OpenMode.File;
     private ComboBox? _languageComboBox;
-    private Window? _win;
     public CultureInfo CurrentCulture { get; private set; } = Thread.CurrentThread.CurrentUICulture;
 
     public void Quit ()
     {
         SetCulture (CultureInfo.InvariantCulture);
-        _win?.RequestStop ();
+        Application.RequestStop ();
     }
 
     public void SetCulture (CultureInfo culture)
@@ -31,28 +29,26 @@ public class Localization : Scenario
             return;
         }
 
-        if (!Equals (_cultureInfoSource [_languageComboBox.SelectedItem], culture))
+        if (_cultureInfoSource [_languageComboBox.SelectedItem] != culture)
         {
             _languageComboBox.SelectedItem = Array.IndexOf (_cultureInfoSource, culture);
         }
 
-        if (Equals (CurrentCulture, culture))
+        if (CurrentCulture == culture)
         {
             return;
         }
 
         CurrentCulture = culture;
         Thread.CurrentThread.CurrentUICulture = culture;
-        _app?.LayoutAndDraw ();
+        Application.LayoutAndDraw ();
     }
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        _app = Application.Create ();
-        _app.Init ();
+        Application.Init ();
 
-        _win = new ()
+        Window win = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -87,7 +83,7 @@ public class Localization : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   Strings.menuFile,
+                                   "_File",
                                    [
                                        new MenuBarItem (
                                                         "_Language",
@@ -95,7 +91,7 @@ public class Localization : Scenario
                                                        ),
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdQuit,
+                                           Title = "_Quit",
                                            Action = Quit
                                        }
                                    ]
@@ -109,7 +105,7 @@ public class Localization : Scenario
             Width = Dim.Fill (2),
             Text = "Please select a language."
         };
-        _win.Add (selectLanguageLabel);
+        win.Add (selectLanguageLabel);
 
         _languageComboBox = new ()
         {
@@ -123,7 +119,7 @@ public class Localization : Scenario
         };
         _languageComboBox.SetSource<string> (new (_cultureInfoNameSource));
         _languageComboBox.SelectedItemChanged += LanguageComboBox_SelectChanged;
-        _win.Add (_languageComboBox);
+        win.Add (_languageComboBox);
 
         Label textAndFileDialogLabel = new ()
         {
@@ -134,7 +130,7 @@ public class Localization : Scenario
             Text =
                 "Right click on the text field to open a context menu, click the button to open a file dialog.\r\nOpen mode will loop through 'File', 'Directory' and 'Mixed' as 'Open' or 'Save' button clicked."
         };
-        _win.Add (textAndFileDialogLabel);
+        win.Add (textAndFileDialogLabel);
 
         TextView textField = new ()
         {
@@ -143,16 +139,16 @@ public class Localization : Scenario
             Width = Dim.Fill (32),
             Height = 1
         };
-        _win.Add (textField);
+        win.Add (textField);
 
         _allowAnyCheckBox = new ()
         {
             X = Pos.Right (textField) + 1,
             Y = Pos.Bottom (textAndFileDialogLabel) + 1,
-            Value = CheckState.UnChecked,
+            CheckedState = CheckState.UnChecked,
             Text = "Allow any"
         };
-        _win.Add (_allowAnyCheckBox);
+        win.Add (_allowAnyCheckBox);
 
         Button openDialogButton = new ()
         {
@@ -160,8 +156,8 @@ public class Localization : Scenario
             Y = Pos.Bottom (textAndFileDialogLabel) + 1,
             Text = "Open"
         };
-        openDialogButton.Accepting += (_, _) => ShowFileDialog (false);
-        _win.Add (openDialogButton);
+        openDialogButton.Accepting += (sender, e) => ShowFileDialog (false);
+        win.Add (openDialogButton);
 
         Button saveDialogButton = new ()
         {
@@ -169,8 +165,8 @@ public class Localization : Scenario
             Y = Pos.Bottom (textAndFileDialogLabel) + 1,
             Text = "Save"
         };
-        saveDialogButton.Accepting += (_, _) => ShowFileDialog (true);
-        _win.Add (saveDialogButton);
+        saveDialogButton.Accepting += (sender, e) => ShowFileDialog (true);
+        win.Add (saveDialogButton);
 
         Label wizardLabel = new ()
         {
@@ -179,19 +175,19 @@ public class Localization : Scenario
             Width = Dim.Fill (2),
             Text = "Click the button to open a wizard."
         };
-        _win.Add (wizardLabel);
+        win.Add (wizardLabel);
 
         Button wizardButton = new () { X = 2, Y = Pos.Bottom (wizardLabel) + 1, Text = "Open _wizard" };
-        wizardButton.Accepting += (_, _) => ShowWizard ();
-        _win.Add (wizardButton);
+        wizardButton.Accepting += (sender, e) => ShowWizard ();
+        win.Add (wizardButton);
 
-        _win.IsRunningChanged += (_, _) => Quit ();
+        win.IsRunningChanged += (sender, e) => Quit ();
 
-        _win.Add (menu);
+        win.Add (menu);
 
-        _app.Run (_win);
-        _win.Dispose ();
-        _app.Dispose ();
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     public void ShowFileDialog (bool isSaveFile)
@@ -205,7 +201,7 @@ public class Localization : Scenario
 
         dialog.AllowedTypes =
         [
-            _allowAnyCheckBox.Value == CheckState.Checked
+            _allowAnyCheckBox.CheckedState == CheckState.Checked
                 ? new AllowedTypeAny ()
                 : new AllowedType ("Dynamic link library", ".dll"),
             new AllowedType ("Json", ".json"),
@@ -221,7 +217,7 @@ public class Localization : Scenario
             _currentOpenMode = OpenMode.File;
         }
 
-        _app?.Run (dialog);
+        Application.Run (dialog);
         dialog.Dispose ();
     }
 
@@ -231,7 +227,7 @@ public class Localization : Scenario
         wizard.AddStep (new () { HelpText = "Wizard first step" });
         wizard.AddStep (new () { HelpText = "Wizard step 2", NextButtonText = ">>> (_N)" });
         wizard.AddStep (new () { HelpText = "Wizard last step" });
-        _app?.Run (wizard);
+        Application.Run (wizard);
         wizard.Dispose ();
     }
 

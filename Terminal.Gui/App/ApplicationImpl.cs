@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -6,46 +8,21 @@ namespace Terminal.Gui.App;
 /// </summary>
 internal partial class ApplicationImpl : IApplication
 {
-    private readonly ITimeProvider _timeProvider;
-    private IInputInjector? _inputInjector;
-
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
     ///     events.
     /// </summary>
-    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    internal ApplicationImpl (ITimeProvider timeProvider)
+    internal ApplicationImpl ()
     {
-        _timeProvider = timeProvider;
-
-        // Initialize TimedEvents with the time provider for testable timing
-        TimedEvents = new TimedEvents (timeProvider);
-
-        ForceDriver = Application.ForceDriver;
-
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;
     }
 
     /// <summary>
-    ///     INTERNAL: Creates a new instance of the Application backend for legacy static model.
-    ///     Uses SystemTimeProvider and production mode by default.
-    /// </summary>
-    internal ApplicationImpl () : this (new SystemTimeProvider ()) { }
-
-    /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) : this () => _componentFactory = componentFactory;
-
-    /// <summary>
-    ///     INTERNAL: Creates a new instance of the Application backend for testing.
-    /// </summary>
-    /// <param name="componentFactory">The component factory.</param>
-    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider) : this (timeProvider) =>
-        _componentFactory = componentFactory;
+    internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
 
     private string? _driverName;
 
@@ -174,34 +151,11 @@ internal partial class ApplicationImpl : IApplication
     #region Screen and Driver
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard
-    {
-        get => Driver?.Clipboard;
-        set => Driver?.Clipboard = value;
-    }
+    public IClipboard? Clipboard => Driver?.Clipboard;
 
     #endregion Screen and Driver
 
-    #region Input (Mouse/Keyboard)
-
-    /// <inheritdoc/>
-    public IInputInjector GetInputInjector ()
-    {
-        if (_inputInjector is { })
-        {
-            return _inputInjector;
-        }
-
-        if (Driver is null)
-        {
-            throw new InvalidOperationException ("Driver not initialized. Call Init() first.");
-        }
-
-        IInputProcessor processor = Driver.GetInputProcessor ();
-        _inputInjector = new InputInjector (processor, _timeProvider);
-
-        return _inputInjector;
-    }
+    #region Keyboard
 
     private IKeyboard? _keyboard;
 
@@ -217,6 +171,10 @@ internal partial class ApplicationImpl : IApplication
         set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
     }
 
+    #endregion Keyboard
+
+    #region Mouse
+
     private IMouse? _mouse;
 
     /// <inheritdoc/>
@@ -231,32 +189,36 @@ internal partial class ApplicationImpl : IApplication
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion Input (Mouse/Keyboard)
+    #endregion Mouse
 
     #region Navigation and Popover
+
+    private ApplicationNavigation? _navigation;
 
     /// <inheritdoc/>
     public ApplicationNavigation? Navigation
     {
         get
         {
-            field ??= new ApplicationNavigation { App = this };
+            _navigation ??= new () { App = this };
 
-            return field;
+            return _navigation;
         }
-        set => field = value ?? throw new ArgumentNullException (nameof (value));
+        set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
     }
+
+    private ApplicationPopover? _popover;
 
     /// <inheritdoc/>
     public ApplicationPopover? Popover
     {
         get
         {
-            field ??= new ApplicationPopover { App = this };
+            _popover ??= new () { App = this };
 
-            return field;
+            return _popover;
         }
-        set;
+        set => _popover = value;
     }
 
     #endregion Navigation and Popover

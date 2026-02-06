@@ -28,41 +28,13 @@ namespace Terminal.Gui.App;
 ///     </para>
 /// </summary>
 /// <remarks>
-///     <para>
-///         By default, uses <see cref="Stopwatch.GetTimestamp"/> for high-resolution timing to provide microsecond-level
-///         precision and eliminate race conditions from timer resolution issues.
-///     </para>
-///     <para>
-///         For testing scenarios, an <see cref="ITimeProvider"/> can be injected via the constructor to enable
-///         virtual time control, allowing tests to run instantly without real delays.
-///     </para>
+///     Uses <see cref="Stopwatch.GetTimestamp"/> for high-resolution timing instead of <see cref="DateTime.UtcNow"/>
+///     to provide microsecond-level precision and eliminate race conditions from timer resolution issues.
 /// </remarks>
 public class TimedEvents : ITimedEvents
 {
     internal SortedList<long, Timeout> _timeouts = new ();
     private readonly object _timeoutsLockToken = new ();
-    private readonly ITimeProvider? _timeProvider;
-
-    /// <summary>
-    ///     Initializes a new instance of <see cref="TimedEvents"/> with the default system time provider.
-    /// </summary>
-    public TimedEvents () : this (null) { }
-
-    /// <summary>
-    ///     Initializes a new instance of <see cref="TimedEvents"/> with the specified time provider.
-    /// </summary>
-    /// <param name="timeProvider">
-    ///     The time provider to use for timing. If <see langword="null"/>, uses <see cref="Stopwatch.GetTimestamp"/>
-    ///     for high-resolution system time.
-    /// </param>
-    /// <remarks>
-    ///     For production use, pass <see langword="null"/> or omit to use the default high-resolution timing.
-    ///     For testing, pass a <see cref="VirtualTimeProvider"/> to enable deterministic time control.
-    /// </remarks>
-    public TimedEvents (ITimeProvider? timeProvider)
-    {
-        _timeProvider = timeProvider;
-    }
 
     /// <summary>
     ///     Gets the list of all timeouts sorted by the <see cref="TimeSpan"/> time ticks. A shorter limit time can be
@@ -74,20 +46,12 @@ public class TimedEvents : ITimedEvents
     public event EventHandler<TimeoutEventArgs>? Added;
 
     /// <summary>
-    ///     Gets the current timestamp in TimeSpan ticks (100-nanosecond units).
-    ///     Uses either the configured <see cref="ITimeProvider"/> or <see cref="Stopwatch.GetTimestamp"/>
-    ///     for high-resolution timing.
+    ///     Gets the current high-resolution timestamp in TimeSpan ticks.
+    ///     Uses <see cref="Stopwatch.GetTimestamp"/> for microsecond-level precision.
     /// </summary>
     /// <returns>Current timestamp in TimeSpan ticks (100-nanosecond units).</returns>
-    private long GetTimestampTicks ()
+    private static long GetTimestampTicks ()
     {
-        if (_timeProvider != null)
-        {
-            // Use ITimeProvider for testable, controllable time
-            return _timeProvider.Now.Ticks;
-        }
-
-        // Default: Use Stopwatch for high-resolution system time
         // Convert Stopwatch ticks to TimeSpan ticks (100-nanosecond units)
         // Stopwatch.Frequency gives ticks per second, so we need to scale appropriately
         // To avoid overflow, we perform the operation in double precision first and then cast to long.
@@ -254,11 +218,11 @@ public class TimedEvents : ITimedEvents
 
                 // Re-evaluate current time for each iteration
                 now = GetTimestampTicks ();
-
+                
                 // Check if the earliest timeout is due
                 scheduledTime = _timeouts.Keys [0];
-
-                if (scheduledTime > now)
+                
+                if (scheduledTime >= now)
                 {
                     // Earliest timeout is not yet due, we're done
                     break;
@@ -274,7 +238,7 @@ public class TimedEvents : ITimedEvents
             if (timeoutToExecute != null)
             {
                 bool repeat = timeoutToExecute.Callback! ();
-
+                
                 if (repeat)
                 {
                     AddTimeout (timeoutToExecute.Span, timeoutToExecute);

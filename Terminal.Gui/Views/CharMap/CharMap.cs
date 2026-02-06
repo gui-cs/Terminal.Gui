@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
@@ -10,14 +11,8 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     See <see href="../docs/CharacterMap.md"/> for details.
 /// </remarks>
-public class CharMap : View, IDesignable, IValue<Rune>
+public class CharMap : View, IDesignable
 {
-    /// <summary>
-    ///     Gets or sets the default cursor style.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
-
     private const int COLUMN_WIDTH = 3; // Width of each column of glyphs
     private const int HEADER_HEIGHT = 1; // Height of the header
 
@@ -32,6 +27,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
     public CharMap ()
     {
         CanFocus = true;
+        CursorVisibility = CursorVisibility.Default;
 
         AddCommand (Command.Up, commandContext => Move (commandContext, -16));
         AddCommand (Command.Down, commandContext => Move (commandContext, 16));
@@ -62,17 +58,16 @@ public class CharMap : View, IDesignable, IValue<Rune>
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
-        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
-        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Context);
+        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
         MouseBindings.Add (MouseFlags.WheeledRight, Command.ScrollRight);
 
         // Initial content size; height will be corrected by RebuildVisibleRows()
-        SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, HEADER_HEIGHT + _rowHeight));
+        SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, HEADER_HEIGHT + _rowHeight));
 
         // Set up the horizontal scrollbar. Turn off AutoShow since we do it manually.
         HorizontalScrollBar.AutoShow = false;
@@ -84,18 +79,19 @@ public class CharMap : View, IDesignable, IValue<Rune>
         HorizontalScrollBar.Y = Pos.AnchorEnd ();
         HorizontalScrollBar.Width = Dim.Fill (1);
 
-        // CharMap has fixed row labels on the left that don't scroll, with scrollable content to the right.
-        // The default viewport clamping (which prevents blank space) doesn't work well with this model,
-        // so we allow the viewport to extend beyond content bounds.
-        ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
-
         // We want the horizontal scrollbar to only show when needed.
         // We can't use ScrollBar.AutoShow because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
-        ViewportChanged += (_, _) =>
+        ViewportChanged += (sender, args) =>
                            {
-                               HorizontalScrollBar.Visible = Viewport.Width < GetContentSize ().Width;
-                               UpdateCursor ();
+                               if (Viewport.Width < GetContentSize ().Width)
+                               {
+                                   HorizontalScrollBar.Visible = true;
+                               }
+                               else
+                               {
+                                   HorizontalScrollBar.Visible = false;
+                               }
                            };
 
         // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
@@ -110,13 +106,11 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
         // Build initial visible rows (all rows with at least one valid codepoint)
         RebuildVisibleRows ();
-
-        Cursor = new Cursor { Style = DefaultCursorStyle };
     }
 
     // Visible rows management: each entry is the starting code point of a 16-wide row
-    private readonly List<int> _visibleRowStarts = [];
-    private readonly Dictionary<int, int> _rowStartToVisibleIndex = [];
+    private readonly List<int> _visibleRowStarts = new ();
+    private readonly Dictionary<int, int> _rowStartToVisibleIndex = new ();
 
     private void RebuildVisibleRows ()
     {
@@ -128,13 +122,12 @@ public class CharMap : View, IDesignable, IValue<Rune>
         for (var row = 0; row <= maxRow; row++)
         {
             int start = row * 16;
-            var anyValid = false;
-            var anyVisible = false;
+            bool anyValid = false;
+            bool anyVisible = false;
 
             for (var col = 0; col < 16; col++)
             {
                 int cp = start + col;
-
                 if (cp > RuneExtensions.MaxUnicodeCodePoint)
                 {
                     break;
@@ -151,16 +144,13 @@ public class CharMap : View, IDesignable, IValue<Rune>
                 {
                     // With no filter, a row is displayed if it has any valid codepoint
                     anyVisible = true;
-
                     break;
                 }
 
                 UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (cp);
-
                 if (cat == ShowUnicodeCategory.Value)
                 {
                     anyVisible = true;
-
                     break;
                 }
             }
@@ -173,7 +163,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         }
 
         // Update content size to match visible rows
-        SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, _visibleRowStarts.Count * _rowHeight + HEADER_HEIGHT));
+        SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, _visibleRowStarts.Count * _rowHeight + HEADER_HEIGHT));
 
         // Keep vertical scrollbar aligned with new content size
         VerticalScrollBar.ScrollableContentSize = GetContentSize ().Height;
@@ -181,8 +171,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     private int VisibleRowIndexForCodePoint (int codePoint)
     {
-        int start = codePoint / 16 * 16;
-
+        int start = (codePoint / 16) * 16;
         return _rowStartToVisibleIndex.GetValueOrDefault (start, -1);
     }
 
@@ -204,25 +193,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
                 return;
             }
 
-            int oldSelectedCodePoint = _selectedCodepoint;
             int newSelectedCodePoint = Math.Clamp (value, 0, MAX_CODE_POINT);
-
-            Rune oldValue = new (oldSelectedCodePoint);
-            Rune newValue = new (newSelectedCodePoint);
-
-            ValueChangingEventArgs<Rune> changingArgs = new (oldValue, newValue);
-
-            if (OnValueChanging (changingArgs) || changingArgs.Handled)
-            {
-                return;
-            }
-
-            ValueChanging?.Invoke (this, changingArgs);
-
-            if (changingArgs.Handled)
-            {
-                return;
-            }
 
             Point offsetToNewCursor = GetCursor (newSelectedCodePoint);
 
@@ -232,42 +203,14 @@ public class CharMap : View, IDesignable, IValue<Rune>
             ScrollToMakeCursorVisible (offsetToNewCursor);
 
             SetNeedsDraw ();
-            UpdateCursor ();
-
-            ValueChangedEventArgs<Rune> changedArgs = new (oldValue, new Rune (_selectedCodepoint));
-            OnValueChanged (changedArgs);
-            ValueChanged?.Invoke (this, changedArgs);
+            SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint));
         }
     }
 
-    #region IValue<Rune> Implementation
-
-    /// <inheritdoc/>
-    public Rune Value { get => new (SelectedCodePoint); set => SelectedCodePoint = value.Value; }
-
-    /// <inheritdoc/>
-    object? IValue.GetValue () => new Rune (SelectedCodePoint);
-
     /// <summary>
-    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> is changing.
+    ///     Raised when the selected code point changes.
     /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<Rune> args) => false;
-
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangingEventArgs<Rune>>? ValueChanging;
-
-    /// <summary>
-    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> has changed.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<Rune> args) { }
-
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<Rune>>? ValueChanged;
-
-    #endregion
+    public event EventHandler<EventArgs<int>>? SelectedCodePointChanged;
 
     /// <summary>
     ///     Gets or sets whether the number of columns each glyph is displayed.
@@ -278,7 +221,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
         set
         {
             _rowHeight = value ? 2 : 1;
-
             // height changed => content height depends on row height
             RebuildVisibleRows ();
             SetNeedsDraw ();
@@ -298,6 +240,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
             SelectedCodePoint = value;
         }
     }
+
 
     private UnicodeCategory? _showUnicodeCategory;
 
@@ -319,18 +262,15 @@ public class CharMap : View, IDesignable, IValue<Rune>
             RebuildVisibleRows ();
 
             // Ensure selection is on a visible row
-            int desiredRowStart = SelectedCodePoint / 16 * 16;
-
+            int desiredRowStart = (SelectedCodePoint / 16) * 16;
             if (!_rowStartToVisibleIndex.ContainsKey (desiredRowStart))
             {
                 // Find nearest visible row (prefer next; fallback to last)
                 int idx = _visibleRowStarts.FindIndex (s => s >= desiredRowStart);
-
                 if (idx < 0 && _visibleRowStarts.Count > 0)
                 {
                     idx = _visibleRowStarts.Count - 1;
                 }
-
                 if (idx >= 0)
                 {
                     SelectedCodePoint = _visibleRowStarts [idx];
@@ -341,8 +281,8 @@ public class CharMap : View, IDesignable, IValue<Rune>
         }
     }
 
-    private void CopyCodePoint () => App?.Clipboard?.SetClipboardData ($"U+{SelectedCodePoint:x5}");
-    private void CopyGlyph () => App?.Clipboard?.SetClipboardData ($"{new Rune (SelectedCodePoint)}");
+    private void CopyCodePoint () { App?.Clipboard?.SetClipboardData ($"U+{SelectedCodePoint:x5}"); }
+    private void CopyGlyph () { App?.Clipboard?.SetClipboardData ($"{new Rune (SelectedCodePoint)}"); }
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
     {
@@ -401,37 +341,58 @@ public class CharMap : View, IDesignable, IValue<Rune>
             return;
         }
 
-        UcdApiClient client = new ();
+        UcdApiClient? client = new ();
         var decResponse = string.Empty;
         var getCodePointError = string.Empty;
 
-        Dialog? waitIndicator = new () { Title = Strings.charMapCPInfoDlgTitle, Buttons = [new Button { Text = Strings.btnCancel }] };
+        Dialog? waitIndicator = new ()
+        {
+            Title = Strings.charMapCPInfoDlgTitle,
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 40,
+            Height = 10,
+            Buttons = [new () { Text = Strings.btnCancel }]
+        };
 
-        Label errorLabel = new () { Text = UcdApiClient.BaseUrl, X = 0, Y = 0, TextAlignment = Alignment.Center };
+        var errorLabel = new Label
+        {
+            Text = UcdApiClient.BaseUrl,
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (3),
+            TextAlignment = Alignment.Center
+        };
 
-        SpinnerView spinner = new () { X = Pos.Center (), Y = Pos.Bottom (errorLabel), Style = new SpinnerStyle.Aesthetic () };
+        var spinner = new SpinnerView
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (errorLabel),
+            Style = new SpinnerStyle.Aesthetic ()
+        };
         spinner.AutoSpin = true;
         waitIndicator.Add (errorLabel);
         waitIndicator.Add (spinner);
 
         waitIndicator.IsModalChanged += async (s, a) =>
-                                        {
-                                            if (!a.Value)
-                                            {
-                                                return;
-                                            }
+                               {
+                                   if (!a.Value)
+                                   {
+                                       return;
+                                   }
 
-                                            try
-                                            {
-                                                decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
-                                                App?.Invoke (_ => (s as Dialog)?.RequestStop ());
-                                            }
-                                            catch (HttpRequestException e)
-                                            {
-                                                getCodePointError = errorLabel.Text = e.Message;
-                                                App?.Invoke (_ => (s as Dialog)?.RequestStop ());
-                                            }
-                                        };
+                                   try
+                                   {
+                                       decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
+                                       App?.Invoke ((_) => (s as Dialog)?.RequestStop ());
+                                   }
+                                   catch (HttpRequestException e)
+                                   {
+                                       getCodePointError = errorLabel.Text = e.Message;
+                                       App?.Invoke ((_) => (s as Dialog)?.RequestStop ());
+                                   }
+                               };
         App?.Run (waitIndicator);
         waitIndicator.Dispose ();
 
@@ -449,7 +410,12 @@ public class CharMap : View, IDesignable, IValue<Rune>
                 name = nameElement.GetString ();
             }
 
-            decResponse = JsonSerializer.Serialize (document.RootElement, new JsonSerializerOptions { WriteIndented = true });
+            decResponse = JsonSerializer.Serialize (
+                                                    document.RootElement,
+                                                    new
+                                                        JsonSerializerOptions
+                                                    { WriteIndented = true }
+                                                   );
         }
         else
         {
@@ -458,58 +424,76 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
         var title = $"{ToCamelCase (name!)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
 
-        Button copyGlyph = new () { Text = Strings.charMapCopyGlyph };
-        Button copyCodepoint = new () { Text = Strings.charMapCopyCP };
-        Button cancel = new () { Text = Strings.btnCancel };
+        Button? copyGlyph = new () { Text = Strings.charMapCopyGlyph };
+        Button? copyCodepoint = new () { Text = Strings.charMapCopyCP };
+        Button? cancel = new () { Text = Strings.btnCancel };
 
-        using Dialog dlg = new ();
-        dlg.Buttons = [copyGlyph, copyCodepoint, cancel];
-        dlg.Title = title;
+        var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCodepoint, cancel] };
+
+        copyGlyph.Accepting += (s, a) =>
+                               {
+                                   CopyGlyph ();
+                                   dlg!.RequestStop ();
+                                   a.Handled = true;
+                               };
+
+        copyCodepoint.Accepting += (s, a) =>
+                                   {
+                                       CopyCodePoint ();
+                                       dlg!.RequestStop ();
+                                       a.Handled = true;
+                                   };
+
+        cancel.Accepting += (s, a) =>
+                            {
+                                dlg!.RequestStop ();
+                                a.Handled = true;
+                            };
 
         var rune = (Rune)SelectedCodePoint;
-        Label label = new () { Text = "IsAscii: ", X = 0, Y = 0 };
+        var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
         dlg.Add (label);
 
-        label = new Label { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
+        label = new () { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
         dlg.Add (label);
 
-        label = new Label { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label { Text = "Category: ", X = 0, Y = Pos.Bottom (label) };
+        label = new () { Text = "Category: ", X = 0, Y = Pos.Bottom (label) };
         dlg.Add (label);
         Span<char> utf16 = stackalloc char [2];
         int charCount = rune.EncodeToUtf16 (utf16);
@@ -518,42 +502,32 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // For most bidi characters, the first code unit is sufficient
         UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory (utf16 [0]);
 
-        label = new Label { Text = $"{category}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new () { Text = $"{category}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new Label
+        label = new ()
         {
-            Text = $"{Strings.charMapInfoDlgInfoLabel} {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:", X = 0, Y = Pos.Bottom (label)
+            Text =
+                $"{Strings.charMapInfoDlgInfoLabel} {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
+            X = 0,
+            Y = Pos.Bottom (label)
         };
         dlg.Add (label);
 
-        TextView json = new ()
+        var json = new TextView
         {
             X = 0,
             Y = Pos.Bottom (label),
-            Width = Dim.Fill (0, 60),
-            Height = Dim.Fill (0, 5),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (2),
             ReadOnly = true,
-            WordWrap = true,
             Text = decResponse
         };
 
         dlg.Add (json);
 
-        var result = App?.Run (dlg) as int?;
-
-        switch (result!)
-        {
-            case 0:
-                CopyGlyph ();
-
-                break;
-
-            case 1:
-                CopyCodePoint ();
-
-                break;
-        }
+        App?.Run (dlg);
+        dlg.Dispose ();
     }
 
     #endregion Details Dialog
@@ -566,39 +540,37 @@ public class CharMap : View, IDesignable, IValue<Rune>
         int x = codePoint % 16 * COLUMN_WIDTH + RowLabelWidth + 1 - Viewport.X;
 
         int visibleRowIndex = VisibleRowIndexForCodePoint (codePoint);
-
         if (visibleRowIndex < 0)
         {
             // If filtered out, stick to current Y to avoid jumping; caller will clamp
             int fallbackY = HEADER_HEIGHT - Viewport.Y;
-
-            return new Point (x, fallbackY);
+            return new (x, fallbackY);
         }
 
         int y = visibleRowIndex * _rowHeight + HEADER_HEIGHT - Viewport.Y;
 
-        return new Point (x, y);
+        return new (x, y);
     }
 
-    /// <summary>Updates the cursor position based on the selected code point.</summary>
-    /// <remarks>
-    ///     This method calculates the cursor position and calls <see cref="View.SetCursor"/>.
-    ///     The framework automatically handles hiding the cursor when the view loses focus.
-    /// </remarks>
-    private void UpdateCursor ()
+    /// <inheritdoc/>
+    public override Point? PositionCursor ()
     {
         Point cursor = GetCursor (SelectedCodePoint);
 
-        if (cursor.X >= RowLabelWidth && cursor.X < Viewport.Width && cursor.Y > 0 && cursor.Y < Viewport.Height)
+        if (HasFocus
+            && cursor.X >= RowLabelWidth
+            && cursor.X < Viewport.Width
+            && cursor.Y > 0
+            && cursor.Y < Viewport.Height)
         {
-            // Convert to Screen coordinates
-            Cursor = Cursor with { Position = ViewportToScreen (cursor) };
+            Move (cursor.X, cursor.Y);
         }
         else
         {
-            // Cursor is scrolled out of view
-            Cursor = Cursor with { Position = null };
+            return null;
         }
+
+        return cursor;
     }
 
     #endregion Cursor
@@ -623,7 +595,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // Clear the header area
         Move (0, 0);
         SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
-        AddStr (new string (' ', Viewport.Width));
+        AddStr (new (' ', Viewport.Width));
 
         int firstColumnX = RowLabelWidth - Viewport.X;
 
@@ -663,7 +635,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
             {
                 // No row at this y; clear label area and continue
                 Move (0, y);
-                AddStr (new string (' ', Viewport.Width));
+                AddStr (new (' ', Viewport.Width));
 
                 continue;
             }
@@ -686,7 +658,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
             }
             else
             {
-                AddStr (new string (' ', RowLabelWidth));
+                AddStr (new (' ', RowLabelWidth));
             }
 
             // Draw the row
@@ -715,16 +687,14 @@ public class CharMap : View, IDesignable, IValue<Rune>
                 if (scalar > MAX_CODE_POINT)
                 {
                     AddStr (" ");
-
                     if (visibleRow == selectedRowIndex && col == selectedCol)
                     {
                         SetAttributeForRole (VisualRole.Normal);
                     }
-
                     continue;
                 }
 
-                var grapheme = "?";
+                string grapheme = "?";
 
                 if (Rune.IsValid (scalar))
                 {
@@ -735,7 +705,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
                 // Compute visibility based on ShowUnicodeCategory
                 bool isVisible = Rune.IsValid (scalar);
-
                 if (isVisible && ShowUnicodeCategory.HasValue)
                 {
                     UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (scalar);
@@ -826,7 +795,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
                     AddStr (grapheme);
 
                     break;
-
                 case UnicodeCategory.OtherLetter:
                     AddStr (grapheme);
 
@@ -836,7 +804,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
                     }
 
                     break;
-
                 default:
 
                     // Draw the rune
@@ -846,11 +813,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
                     }
                     else
                     {
-                        throw new InvalidOperationException ($"The Rune \"{
-                            grapheme
-                        }\" (U+{
-                            Rune.GetRuneAt (grapheme, 0).Value
-                            :x6}) has zero width and no special-case UnicodeCategory logic applies.");
+                        throw new InvalidOperationException ($"The Rune \"{grapheme}\" (U+{Rune.GetRuneAt (grapheme, 0).Value:x6}) has zero width and no special-case UnicodeCategory logic applies.");
                     }
 
                     break;
@@ -886,10 +849,10 @@ public class CharMap : View, IDesignable, IValue<Rune>
     {
         Point position = GetCursor (SelectedCodePoint);
 
-        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
             // If the mouse is clicked on the headers, map it to the first glyph of the row/col
-            position = mouse.Position!.Value;
+            position = mouseCommandContext.Binding.MouseEventArgs.Position;
 
             if (position.Y == 0)
             {
@@ -934,14 +897,14 @@ public class CharMap : View, IDesignable, IValue<Rune>
             return true;
         }
 
-        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
             if (!HasFocus && CanFocus)
             {
                 SetFocus ();
             }
 
-            if (!TryGetCodePointFromPosition (mouse.Position!.Value, out int cp))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out int cp))
             {
                 return false;
             }
@@ -958,9 +921,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
     {
         int newCodePoint = SelectedCodePoint;
 
-        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
-            if (!TryGetCodePointFromPosition (mouse.Position!.Value, out newCodePoint))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out newCodePoint))
             {
                 return false;
             }
@@ -976,9 +939,10 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // This demonstrates how to create an ephemeral Popover; one that exists
         // ony as long as the popover is visible.
         // Note, for ephemeral Popovers, hotkeys are not supported.
-        PopoverMenu? contextMenu = new ([
-                                            new MenuItem (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
-                                            new MenuItem (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
+        PopoverMenu? contextMenu = new (
+                                        [
+                                            new (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
+                                            new (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
                                         ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
@@ -1004,7 +968,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
         if (visibleRow < 0 || visibleRow >= _visibleRowStarts.Count)
         {
             codePoint = 0;
-
             return false;
         }
 

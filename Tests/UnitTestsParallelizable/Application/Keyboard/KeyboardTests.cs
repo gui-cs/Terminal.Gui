@@ -7,7 +7,6 @@ namespace ApplicationTests.Keyboard;
 ///     Parallelizable tests for keyboard handling.
 ///     These tests use isolated instances of <see cref="IKeyboard"/> to avoid static state dependencies.
 /// </summary>
-[Collection("Application Tests")]
 public class KeyboardTests
 {
 
@@ -20,7 +19,7 @@ public class KeyboardTests
 
         Assert.Empty (app.Keyboard.KeyBindings.GetBindings ());
 
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
 
         Assert.NotEmpty (app.Keyboard.KeyBindings.GetBindings ());
 
@@ -154,6 +153,23 @@ public class KeyboardTests
 
         // Act
         keyboard.KeyDown += (sender, key) =>
+        {
+            eventRaised = true;
+        };
+
+        // Assert - event subscription doesn't throw
+        Assert.False (eventRaised); // Event hasn't been raised yet
+    }
+
+    [Fact]
+    public void KeyUp_Event_CanBeSubscribed ()
+    {
+        // Arrange
+        var keyboard = new KeyboardImpl ();
+        bool eventRaised = false;
+
+        // Act
+        keyboard.KeyUp += (sender, key) =>
         {
             eventRaised = true;
         };

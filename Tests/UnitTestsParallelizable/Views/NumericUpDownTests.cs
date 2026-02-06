@@ -52,7 +52,11 @@ public class NumericUpDownTests
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_int ()
     {
-        NumericUpDown<int> numericUpDown = new () { Value = 10, Increment = 2 };
+        NumericUpDown<int> numericUpDown = new()
+        {
+            Value = 10,
+            Increment = 2
+        };
 
         Assert.Equal (10, numericUpDown.Value);
         Assert.Equal (2, numericUpDown.Increment);
@@ -61,7 +65,11 @@ public class NumericUpDownTests
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_float ()
     {
-        NumericUpDown<float> numericUpDown = new () { Value = 10.5F, Increment = 2.5F };
+        NumericUpDown<float> numericUpDown = new()
+        {
+            Value = 10.5F,
+            Increment = 2.5F
+        };
 
         Assert.Equal (10.5F, numericUpDown.Value);
         Assert.Equal (2.5F, numericUpDown.Increment);
@@ -70,15 +78,21 @@ public class NumericUpDownTests
     [Fact]
     public void WhenCreatedWithCustomValues_ShouldHaveCustomValues_decimal ()
     {
-        NumericUpDown<decimal> numericUpDown = new () { Value = 10.5m, Increment = 2.5m };
+        NumericUpDown<decimal> numericUpDown = new ()
+        {
+            Value = 10.5m,
+            Increment = 2.5m
+        };
 
         Assert.Equal (10.5m, numericUpDown.Value);
         Assert.Equal (2.5m, numericUpDown.Increment);
     }
 
     [Fact]
-    public void WhenCreatedWithInvalidType_ShouldThrowInvalidOperationException () =>
+    public void WhenCreatedWithInvalidType_ShouldThrowInvalidOperationException ()
+    {
         Assert.Throws<InvalidOperationException> (() => new NumericUpDown<string> ());
+    }
 
     [Fact]
     public void WhenCreatedWithInvalidTypeObject_ShouldNotThrowInvalidOperationException ()
@@ -227,54 +241,5 @@ public class NumericUpDownTests
         numericUpDown.NewKeyDownEvent (Key.CursorDown);
 
         Assert.Equal (-1, numericUpDown.Value);
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void NumericUpDown_UpArrow_IncrementsValue ()
-    {
-        NumericUpDown<int> numericUpDown = new () { Value = 5 };
-
-        // Up arrow increments value via Command.Up
-        numericUpDown.NewKeyDownEvent (Key.CursorUp);
-
-        Assert.Equal (6, numericUpDown.Value);
-
-        numericUpDown.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void NumericUpDown_DownArrow_DecrementsValue ()
-    {
-        NumericUpDown<int> numericUpDown = new () { Value = 5 };
-
-        // Down arrow decrements value via Command.Down
-        numericUpDown.NewKeyDownEvent (Key.CursorDown);
-
-        Assert.Equal (4, numericUpDown.Value);
-
-        numericUpDown.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void NumericUpDown_ButtonAccept_ChangesValue ()
-    {
-        NumericUpDown<int> numericUpDown = new () { Value = 5, Width = 10, Height = 1 };
-        numericUpDown.BeginInit ();
-        numericUpDown.EndInit ();
-
-        // Internal buttons change value when accepting
-        // Verify the control is set up correctly
-        Assert.Equal (5, numericUpDown.Value);
-
-        numericUpDown.Dispose ();
     }
 }

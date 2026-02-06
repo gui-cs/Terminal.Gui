@@ -38,30 +38,6 @@ When you are finished using the modules, you can optionally unload the modules, 
 Remove-Module Terminal.Gui.PowerShell
 ```
 
-## Standalone Scripts
-
-### delist-nuget.ps1
-
-PowerShell script to delist old NuGet packages, keeping only the most recent versions.
-
-**Purpose**: Automatically clean up old pre-release packages from NuGet.org to keep the package list manageable.
-
-**Usage**:
-```powershell
-./delist-nuget.ps1 -ApiKey "your-nuget-api-key" [-JustPublishedVersion "2.0.0-alpha.1"]
-```
-
-**Parameters**:
-- `-ApiKey` (required): NuGet API key with package management permissions
-- `-JustPublishedVersion` (optional): Version that was just published (will be kept while others are delisted)
-
-**Behavior**:
-- **Develop packages** (`2.0.0-develop.*`): Keeps only the most recent, delists all others
-- **Alpha packages** (`2.0.0-alpha.*`): Keeps only the just-published version (or most recent if not specified)
-- **Beta packages** (`2.0.0-beta.*`): Keeps only the just-published version (or most recent if not specified)
-
-This script is automatically run by the `publish.yml` workflow when publishing from the `v2_release` branch.
-
 ### LICENSE
 MIT License
 

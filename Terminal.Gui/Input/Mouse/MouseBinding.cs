@@ -1,3 +1,5 @@
+
+
 namespace Terminal.Gui.Input;
 
 /// <summary>
@@ -14,29 +16,30 @@ public record struct MouseBinding : IInputBinding
     {
         Commands = commands;
 
-        MouseEvent = new Mouse { Timestamp = DateTime.Now, Flags = mouseFlags };
+        MouseEventArgs = new MouseEventArgs()
+        {
+            Flags = mouseFlags
+        };
     }
+
 
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
     /// <param name="args">The mouse event that triggered this binding.</param>
-    public MouseBinding (Command [] commands, Mouse args)
+    public MouseBinding (Command [] commands, MouseEventArgs args)
     {
         Commands = commands;
-        MouseEvent = args;
+        MouseEventArgs = args;
     }
 
     /// <summary>The commands this binding will invoke.</summary>
     public Command [] Commands { get; set; }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public object? Data { get; set; }
 
     /// <summary>
-    ///     The mouse event data associated with this binding.
+    ///     The mouse event arguments.
     /// </summary>
-    public Mouse? MouseEvent { get; set; }
-
-    /// <inheritdoc/>
-    public View? Source { get; set; }
+    public MouseEventArgs? MouseEventArgs { get; set; }
 }

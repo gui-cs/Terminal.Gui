@@ -1,5 +1,4 @@
 ﻿
-#nullable enable
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Date Picker", "Demonstrates how to use DatePicker class")]
@@ -9,17 +8,20 @@ public class DatePickers : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window window = new ();
-        window.Title = GetQuitKeyAndName ();
+        Window app = new ()
+        {
+            Title = GetQuitKeyAndName ()
+        };
 
         var datePicker = new DatePicker { Y = Pos.Center (), X = Pos.Center () };
 
-        window.Add (datePicker);
+        app.Add (datePicker);
 
-        app.Run (window);
+        Application.Run (app);
+        app.Dispose ();
+
+        Application.Shutdown ();
     }
 }

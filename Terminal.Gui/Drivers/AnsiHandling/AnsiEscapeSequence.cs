@@ -1,8 +1,8 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Describes an Ansi escape sequence. This is a 'blueprint'. If you
-///     want to send the sequence you should instead use <see cref="AnsiEscapeSequenceRequest"/>
+/// Describes an Ansi escape sequence. This is a 'blueprint'. If you
+/// want to send the sequence you should instead use <see cref="AnsiEscapeSequenceRequest"/>
 /// </summary>
 public class AnsiEscapeSequence
 {
@@ -33,6 +33,8 @@ public class AnsiEscapeSequence
     ///     </para>
     /// </summary>
     public required string? Terminator { get; init; }
+
+
 
     /// <summary>
     ///     The value expected in the response e.g.

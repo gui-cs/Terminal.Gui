@@ -2,7 +2,7 @@ using UnitTests;
 
 namespace ViewsTests;
 
-public class LineTests : TestDriverBase
+public class LineTests : FakeDriverBase
 {
     [Fact]
     public void Line_DefaultConstructor_Horizontal ()
@@ -65,50 +65,6 @@ public class LineTests : TestDriverBase
     }
 
     [Fact]
-    public void Line_ChangeOrientation_IsInitialized_UpdatesDimensions ()
-    {
-        var line = new Line { Orientation = Orientation.Horizontal, Width = Dim.Fill (), Height = 1 };
-
-        line.BeginInit ();
-        line.EndInit ();
-
-        Assert.Equal (Orientation.Horizontal, line.Orientation);
-        Assert.Equal (Dim.Fill (), line.Width);
-        Assert.Equal (1, line.Height);
-
-        line.Orientation = Orientation.Vertical;
-
-        Assert.Equal (Orientation.Vertical, line.Orientation);
-        Assert.Equal (1, line.Width);
-        Assert.Equal (Dim.Fill (), line.Height);
-
-        line.Orientation = Orientation.Horizontal;
-
-        Assert.Equal (Orientation.Horizontal, line.Orientation);
-        Assert.Equal (Dim.Fill (), line.Width);
-        Assert.Equal (1, line.Height);
-
-        // Change Length will update correct dimension based on orientation
-        line.Length = 10;
-
-        Assert.Equal (Orientation.Horizontal, line.Orientation);
-        Assert.Equal (10, line.Width);
-        Assert.Equal (1, line.Height);
-
-        line.Orientation = Orientation.Vertical;
-
-        Assert.Equal (Orientation.Vertical, line.Orientation);
-        Assert.Equal (1, line.Width);
-        Assert.Equal (10, line.Height);
-
-        line.Orientation = Orientation.Horizontal;
-
-        Assert.Equal (Orientation.Horizontal, line.Orientation);
-        Assert.Equal (10, line.Width);
-        Assert.Equal (1, line.Height);
-    }
-
-    [Fact]
     public void Line_Style_CanBeSet ()
     {
         var line = new Line { Style = LineStyle.Double };
@@ -133,7 +89,7 @@ public class LineTests : TestDriverBase
     [Fact]
     public void Line_DrawsCalled_Successfully ()
     {
-        var app = new Window () { Driver = CreateTestDriver () };
+        var app = new Window () { Driver = CreateFakeDriver () };
         var line = new Line { Y = 1, Width = 10 };
         app.Add (line);
 
@@ -149,7 +105,7 @@ public class LineTests : TestDriverBase
     [Fact]
     public void Line_WithBorder_DrawsSuccessfully ()
     {
-        var app = new Window { Driver = CreateTestDriver (), Width = 20, Height = 10, BorderStyle = LineStyle.Single };
+        var app = new Window { Driver = CreateFakeDriver (), Width = 20, Height = 10, BorderStyle = LineStyle.Single };
 
         // Add a line that intersects with the window border
         var line = new Line { X = 5, Y = 0, Height = Dim.Fill (), Orientation = Orientation.Vertical };
@@ -167,7 +123,7 @@ public class LineTests : TestDriverBase
     [Fact]
     public void Line_MultipleIntersecting_DrawsSuccessfully ()
     {
-        var app = new Window { Driver = CreateTestDriver (), Width = 30, Height = 15 };
+        var app = new Window { Driver = CreateFakeDriver (), Width = 30, Height = 15 };
 
         // Create intersecting lines
         var hLine = new Line { X = 5, Y = 5, Width = 15, Style = LineStyle.Single };
@@ -265,33 +221,6 @@ public class LineTests : TestDriverBase
         var line = new Line ();
         var container = new View { Width = 50, Height = 20 };
         container.Add (line);
-
-        // Start horizontal with custom dimensions
-        line.Orientation = Orientation.Horizontal;
-        line.Width = 30;
-        line.Height = 1;
-        container.Layout ();
-
-        Assert.Equal (30, line.Frame.Width);
-        Assert.Equal (1, line.Frame.Height);
-
-        // Change to vertical - dimensions should swap
-        line.Orientation = Orientation.Vertical;
-        container.Layout ();
-
-        Assert.Equal (1, line.Frame.Width);
-        Assert.Equal (30, line.Frame.Height); // Width became Height
-    }
-
-    [Fact]
-    public void Line_OrientationChange_IsInitialized_SwapsDimensions ()
-    {
-        var line = new Line ();
-        var container = new View { Width = 50, Height = 20 };
-        container.Add (line);
-
-        line.BeginInit ();
-        line.EndInit();
 
         // Start horizontal with custom dimensions
         line.Orientation = Orientation.Horizontal;

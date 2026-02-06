@@ -72,7 +72,7 @@ public class PosCombineTests (ITestOutputHelper output)
     public void PosCombine_Will_Throws ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
 
         var t = new Runnable ();
 
@@ -99,7 +99,7 @@ public class PosCombineTests (ITestOutputHelper output)
     public void PosCombine_Refs_SuperView_Throws ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
 
         var top = new Runnable ();
         var w = new Window { X = Left (top) + 2, Y = Top (top) + 2 };

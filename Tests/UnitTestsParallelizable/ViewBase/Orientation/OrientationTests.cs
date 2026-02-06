@@ -8,7 +8,6 @@ public class OrientationTests
 
         public CustomView ()
         {
-            // ReSharper disable once UseObjectOrCollectionInitializer
             _orientationHelper = new (this);
             Orientation = Orientation.Vertical;
             _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);

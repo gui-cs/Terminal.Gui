@@ -154,9 +154,9 @@ public class TheGenerator : IIncrementalGenerator
     {
         typeParams = string.Empty;
 
-        // Create the "this TestContext context" parameter
+        // Create the "this GuiTestContext context" parameter
         ParameterSyntax contextParam = SyntaxFactory.Parameter (SyntaxFactory.Identifier ("context"))
-                                                    .WithType (SyntaxFactory.ParseTypeName ("TestContext"))
+                                                    .WithType (SyntaxFactory.ParseTypeName ("GuiTestContext"))
                                                     .AddModifiers (SyntaxFactory.Token (SyntaxKind.ThisKeyword)); // Add the "this" keyword
 
         // Extract the parameter names (expected and actual)
@@ -182,8 +182,8 @@ public class TheGenerator : IIncrementalGenerator
 
         parameters.Insert (0, contextParam); // Insert 'context' as the first parameter
 
-        // Change the return type to TestContext
-        TypeSyntax returnType = SyntaxFactory.ParseTypeName ("TestContext");
+        // Change the return type to GuiTestContext
+        TypeSyntax returnType = SyntaxFactory.ParseTypeName ("GuiTestContext");
 
         // Change the method name to AssertEqual
         SyntaxToken newMethodName = SyntaxFactory.Identifier ($"Assert{methodName}");

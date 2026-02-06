@@ -9,7 +9,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
 
             // Act
             Assert.NotNull (Application.Popover);
@@ -27,7 +27,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
 
             // Act
             Assert.NotNull (Application.Popover);
@@ -50,7 +50,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
             Assert.NotNull (Application.Popover);
             Application.StopAfterFirstIteration = true;
 
@@ -78,7 +78,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
             Application.StopAfterFirstIteration = true;
 
             top = new ();
@@ -114,7 +114,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
 
             PopoverTestClass? popover = new ();
 
@@ -138,7 +138,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
 
             PopoverTestClass? popover = new ();
 
@@ -167,7 +167,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
 
             PopoverTestClass? popover = new ();
             Application.Popover?.Register (popover);
@@ -196,7 +196,7 @@ public class ApplicationPopoverTests
         {
             // Arrange
 
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
             Application.Begin (new Runnable ());
             PopoverTestClass? popover = new ();
 
@@ -219,7 +219,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
 
             Runnable<bool>? initialRunnable = new () { Id = "initialRunnable" };
             Application.Begin (initialRunnable);
@@ -270,7 +270,7 @@ public class ApplicationPopoverTests
         try
         {
             // Arrange
-            Application.Init (DriverRegistry.Names.ANSI);
+            Application.Init ("fake");
 
             Runnable<bool>? runnable = new ()
             {
@@ -331,12 +331,9 @@ public class ApplicationPopoverTests
         public List<Key> HandledKeys { get; } = [];
         public int NewCommandInvokeCount { get; private set; }
 
-#if DEBUG_IDISPOSABLE
         // NOTE: Hides the base DisposedCount property
         public new int DisposedCount { get; private set; }
-#else
-        public int DisposedCount { get; private set; }
-#endif
+
         public PopoverTestClass ()
         {
             CanFocus = true;

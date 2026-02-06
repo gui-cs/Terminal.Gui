@@ -52,13 +52,13 @@ public class ClipTests (ITestOutputHelper _output)
         Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
         // When we exit Draw, the view is excluded from the clip. So drawing at 0,0, is not valid and is clipped.
-        view.AddRune (0, 0, Glyphs.WideGlyphReplacement);
+        view.AddRune (0, 0, Rune.ReplacementChar);
         Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
-        view.AddRune (-1, -1, Glyphs.WideGlyphReplacement);
+        view.AddRune (-1, -1, Rune.ReplacementChar);
         Assert.Equal ("P", Application.Driver?.Contents! [1, 1].Grapheme);
 
-        view.AddRune (1, 1, Glyphs.WideGlyphReplacement);
+        view.AddRune (1, 1, Rune.ReplacementChar);
         Assert.Equal ("P", Application.Driver?.Contents! [3, 3].Grapheme);
     }
 

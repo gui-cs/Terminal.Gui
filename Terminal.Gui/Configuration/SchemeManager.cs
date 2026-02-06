@@ -31,9 +31,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     ///     <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
-#pragma warning disable IL2026 // DictionaryJsonConverter is AOT-compatible
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
-#pragma warning restore IL2026
     [UsedImplicitly]
     public static Dictionary<string, Scheme?>? Schemes
     {

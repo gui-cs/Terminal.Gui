@@ -19,10 +19,7 @@ public class Mazing : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
-
+        Application.Init ();
         _top = new ();
 
         _m = new ();
@@ -44,15 +41,15 @@ public class Mazing : Scenario
         // for an example.
         _top.CommandNotBound += TopCommandNotBound;
 
-        _top.DrawingContent += (sender, _) =>
+        _top.DrawingContent += (s, _) =>
                                {
-                                   if (sender is not Runnable top)
+                                   if (s is not Runnable top)
                                    {
                                        return;
                                    }
 
                                    // Build maze
-                                   LineCanvas lc = new (_m.BuildWallLinesFromMaze ());
+                                   var lc = new LineCanvas (_m.BuildWallLinesFromMaze ());
 
                                    // Print maze
                                    foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
@@ -91,7 +88,7 @@ public class Mazing : Scenario
                                    // Draw UI
                                    top.SetAttribute (top.GetAttributeForRole (VisualRole.Normal));
 
-                                   Gradient g = new ([new (Color.Red), new (Color.BrightGreen)], [10]);
+                                   var g = new Gradient ([new (Color.Red), new (Color.BrightGreen)], [10]);
                                    top.Move (_m.MazeWidth + 1, 0);
                                    top.AddStr ("Name: Sir Flibble");
                                    top.Move (_m.MazeWidth + 1, 1);
@@ -113,8 +110,10 @@ public class Mazing : Scenario
                                    }
                                };
 
-        app.Run (_top);
+        Application.Run (_top);
+
         _top.Dispose ();
+        Application.Shutdown ();
     }
 
     private void GenerateNpcs ()
@@ -172,7 +171,7 @@ public class Mazing : Scenario
                 if (_m.PlayerHp <= 0)
                 {
                     _message = "You died!";
-                    _top?.SetNeedsDraw (); // trigger redraw
+                    Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
                     _dead = true;
 
                     return; // Stop further action if dead
@@ -191,17 +190,17 @@ public class Mazing : Scenario
                 _message = string.Empty;
             }
 
-            _top?.SetNeedsDraw (); // trigger redraw
+            Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
         }
 
         // Optional win condition:
         if (_m.Player == _m.End)
         {
-            int hp = _m.PlayerHp;
+            var hp = _m.PlayerHp;
             _m = new (); // Generate a new maze
             _m.PlayerHp = hp;
             GenerateNpcs ();
-            _top?.SetNeedsDraw (); // trigger redraw
+            Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
         }
     }
 }

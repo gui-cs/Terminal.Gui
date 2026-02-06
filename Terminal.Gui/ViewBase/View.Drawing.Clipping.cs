@@ -29,12 +29,12 @@ public partial class View
     /// <param name="region"></param>
     public void SetClip (Region? region)
     {
-        if (Driver is null)
+        // BUGBUG: If region is null we should set the clip to null.
+        // BUGBUG: Fixing  this probably breaks other things.
+        if (Driver is { } && region is { })
         {
-            return;
+            Driver.Clip = region;
         }
-
-        Driver.Clip = region;
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public partial class View
         if (this is Adornment adornment && adornment.Thickness != Thickness.Empty)
         {
             // Ensure adornments can't draw outside their thickness
-            frameRegion.Exclude (adornment.Thickness.GetInside (FrameToScreen ()));
+            frameRegion.Exclude (adornment.Thickness.GetInside (FrameToScreen()));
         }
 
         SetClip (frameRegion);

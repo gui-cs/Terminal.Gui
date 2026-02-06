@@ -8,21 +8,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TextView")]
 public class Notepad : Scenario
 {
-    private IApplication? _app;
     private TabView? _focusedTabView;
     private int _numNewTabs = 1;
     private TabView? _tabView;
-    private Window? _topWindow;
     public Shortcut? LenShortcut { get; private set; }
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
-        _app = app;
+        Application.Init ();
 
-        _topWindow = new ()
+        Window top = new ()
         {
             BorderStyle = LineStyle.None,
         };
@@ -32,22 +27,22 @@ public class Notepad : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   Strings.menuFile,
+                                   "_File",
                                    [
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdNew,
+                                           Title = "_New",
                                            Key = Key.N.WithCtrl.WithAlt,
                                            Action = New
                                        },
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdOpen,
+                                           Title = "_Open",
                                            Action = Open
                                        },
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdSave,
+                                           Title = "_Save",
                                            Action = Save
                                        },
                                        new MenuItem
@@ -57,12 +52,12 @@ public class Notepad : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdClose,
+                                           Title = "_Close",
                                            Action = Close
                                        },
                                        new MenuItem
                                        {
-                                           Title = Strings.cmdQuit,
+                                           Title = "_Quit",
                                            Action = Quit
                                        }
                                    ]
@@ -76,7 +71,7 @@ public class Notepad : Scenario
                                        new MenuItem
                                        {
                                            Title = "_About",
-                                           Action = () => MessageBox.Query (app,  "Notepad", "About Notepad...", "Ok")
+                                           Action = () => MessageBox.Query (Application.Instance,  "Notepad", "About Notepad...", "Ok")
                                        }
                                    ]
                                   )
@@ -109,28 +104,29 @@ public class Notepad : Scenario
             AlignmentModes = AlignmentModes.IgnoreFirstOrLast
         };
 
-        _topWindow.Add (menu, _tabView, statusBar);
+        top.Add (menu, _tabView, statusBar);
 
         _focusedTabView = _tabView;
         _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
-        _tabView.HasFocusChanging += (_, _) => _focusedTabView = _tabView;
+        _tabView.HasFocusChanging += (s, e) => _focusedTabView = _tabView;
 
-        _topWindow.IsModalChanged += (_, e) =>
+        top.IsModalChanged += (s, e) =>
                      {
                          if (e.Value)
                          {
                              New ();
-                             LenShortcut.Title = $"Len:{_focusedTabView?.Text.Length ?? 0}";
+                             LenShortcut.Title = $"Len:{_focusedTabView?.Text?.Length ?? 0}";
                          }
                      };
 
-        app.Run (_topWindow);
-        _topWindow.Dispose ();
+        Application.Run (top);
+        top.Dispose ();
+        Application.Shutdown ();
     }
 
     public void Save ()
     {
-        if (_focusedTabView?.SelectedTab is not null)
+        if (_focusedTabView?.SelectedTab is { })
         {
             Save (_focusedTabView, _focusedTabView.SelectedTab);
         }
@@ -163,7 +159,7 @@ public class Notepad : Scenario
         }
 
         SaveDialog fd = new ();
-        _app?.Run (fd);
+        Application.Run (fd);
 
         if (string.IsNullOrWhiteSpace (fd.Path) || fd.Canceled)
         {
@@ -183,7 +179,7 @@ public class Notepad : Scenario
 
     private void Close ()
     {
-        if (_focusedTabView?.SelectedTab is not null)
+        if (_focusedTabView?.SelectedTab is { })
         {
             Close (_focusedTabView, _focusedTabView.SelectedTab);
         }
@@ -200,7 +196,7 @@ public class Notepad : Scenario
 
         if (tab.UnsavedChanges)
         {
-            int? result = MessageBox.Query (tv.App!,
+            int? result = MessageBox.Query (Application.Instance,
                                             "Save Changes",
                                             $"Save changes to {tab.Text.TrimEnd ('*')}",
                                             "Yes",
@@ -208,7 +204,7 @@ public class Notepad : Scenario
                                             "Cancel"
                                           );
 
-            if (result is null or 2)
+            if (result is null || result == 2)
             {
                 // user cancelled
                 return;
@@ -245,7 +241,7 @@ public class Notepad : Scenario
 
         tv.TabClicked += TabView_TabClicked;
         tv.SelectedTabChanged += TabView_SelectedTabChanged;
-        tv.HasFocusChanging += (_, _) => _focusedTabView = tv;
+        tv.HasFocusChanging += (s, e) => _focusedTabView = tv;
 
         return tv;
     }
@@ -256,7 +252,7 @@ public class Notepad : Scenario
     {
         OpenDialog open = new () { Title = "Open", AllowsMultipleSelection = true };
 
-        _app?.Run (open);
+        Application.Run (open);
 
         bool canceled = open.Canceled;
 
@@ -295,13 +291,13 @@ public class Notepad : Scenario
         _focusedTabView.AddTab (tab, true);
     }
 
-    private void Quit () { _topWindow?.RequestStop (); }
+    private void Quit () { Application.RequestStop (); }
 
     private void TabView_SelectedTabChanged (object? sender, TabChangedEventArgs e)
     {
-        if (LenShortcut is not null)
+        if (LenShortcut is { })
         {
-            LenShortcut.Title = $"Len:{e.NewTab?.View?.Text.Length ?? 0}";
+            LenShortcut.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
         }
 
         e.NewTab?.View?.SetFocus ();
@@ -310,7 +306,7 @@ public class Notepad : Scenario
     private void TabView_TabClicked (object? sender, TabMouseEventArgs e)
     {
         // we are only interested in right clicks
-        if (!e.MouseEvent.Flags.HasFlag (MouseFlags.RightButtonClicked))
+        if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
         {
             return;
         }
@@ -323,7 +319,7 @@ public class Notepad : Scenario
         }
         else
         {
-            TabView tv = (TabView)sender!;
+            var tv = (TabView)sender!;
 
             items =
             [
@@ -336,7 +332,7 @@ public class Notepad : Scenario
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        if (sender is TabView tabView && tabView.App?.Popover is not null)
+        if (sender is TabView tabView && tabView.App?.Popover is { })
         {
             tabView.App.Popover.Register (contextMenu);
         }
@@ -349,6 +345,7 @@ public class Notepad : Scenario
     private class OpenedFile (Notepad notepad) : Tab
     {
         private readonly Notepad _notepad = notepad;
+
         public OpenedFile CloneTo (TabView other)
         {
             OpenedFile newTab = new (_notepad) { DisplayText = Text, File = File };
@@ -376,7 +373,7 @@ public class Notepad : Scenario
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
                 Text = initialText,
-                TabKeyAddsTab = false
+                AllowsTab = false
             };
         }
 
@@ -390,7 +387,7 @@ public class Notepad : Scenario
             }
 
             // when user makes changes rename tab to indicate unsaved
-            textView.ContentsChanged += (_, _) =>
+            textView.ContentsChanged += (s, k) =>
                                         {
                                             // if current text doesn't match saved text
                                             bool areDiff = UnsavedChanges;
@@ -410,7 +407,7 @@ public class Notepad : Scenario
                                                 }
                                             }
 
-                                            if (_notepad.LenShortcut is not null)
+                                            if (_notepad.LenShortcut is { })
                                             {
                                                 _notepad.LenShortcut.Title = $"Len:{textView.Text.Length}";
                                             }
@@ -420,7 +417,7 @@ public class Notepad : Scenario
         /// <summary>The text of the tab the last time it was saved</summary>
         public string? SavedText { get; set; }
 
-        public bool UnsavedChanges => View is not null && !string.Equals (SavedText, View.Text);
+        public bool UnsavedChanges => View is { } && !string.Equals (SavedText, View.Text);
 
         internal void Save ()
         {

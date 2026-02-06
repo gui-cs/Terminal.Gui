@@ -1,44 +1,28 @@
 ---
 uid: Terminal.Gui.Drawing
-summary: Colors, attributes, text styling, and drawing primitives.
+summary: The `Drawing` namespace provides comprehensive text rendering, color management, and visual styling for Terminal.Gui applications.
 ---
 
-The `Drawing` namespace provides visual styling, color management, and drawing primitives for Terminal.Gui.
+@Terminal.Gui.Drawing contains the core drawing primitives and visual styling system for Terminal.Gui. This namespace handles everything from basic color and attribute management to complex line drawing and text formatting capabilities.
 
-## Key Types
+The drawing system supports both simple and advanced scenarios, including Unicode text rendering, automatic line joining for complex shapes, thickness-based adornments, and comprehensive color schemes with semantic visual roles.
 
-- **Attribute** - Foreground/background color and text style combination
-- **Color** - Terminal colors including TrueColor (24-bit) support
-- **Scheme** - Maps semantic visual roles to attributes
-- **LineCanvas** - Line drawing with automatic glyph joining
-- **Thickness** - Border and spacing dimensions
-- **Glyphs** - Standard drawing characters for UI elements
+## Key Components
 
-## Color Support
+- **Attribute**: Defines visual styling (foreground, background, text style)
+- **Color**: Terminal color support including TrueColor and named colors
+- **Scheme**: Maps semantic visual roles to concrete attributes
+- **LineCanvas**: Advanced line drawing with automatic glyph joining
+- **Thickness**: Framework for defining border and adornment widths
+- **Glyphs**: Standard set of drawing characters for UI elements
+
+## Example Usage 
 
 ```csharp
-// Named colors
-Color red = Color.Red;
+// Get the attribute for a Focused view
+Attribute? focusedAttribute = GetAttributeForRole(VisualRole.Focused);
 
-// TrueColor (24-bit RGB)
-Color custom = new (128, 64, 255);
-
-// Create an attribute
-Attribute attr = new (Color.White, Color.Blue);
+// Move to 5,5 and output a string with the focused attribute
+Move (5,5);
+AddStr("Hello");
 ```
-
-## Scheme System
-
-Schemes map semantic roles to visual attributes:
-
-| Role | Purpose |
-|------|---------|
-| Normal | Default appearance |
-| Focus | Focused view |
-| HotNormal | Hotkey indicator |
-| Disabled | Disabled state |
-
-## See Also
-
-- [Drawing Deep Dive](~/docs/drawing.md)
-- [Scheme Deep Dive](~/docs/scheme.md)

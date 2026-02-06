@@ -9,13 +9,6 @@ namespace Terminal.Gui.Drivers;
 public interface IComponentFactory
 {
     /// <summary>
-    ///     Gets the name of the driver this factory creates components for.
-    ///     This is the single source of truth for driver identification.
-    /// </summary>
-    /// <returns>The driver name (<see cref="DriverRegistry.Names"/>).</returns>
-    string? GetDriverName ();
-
-    /// <summary>
     ///     Create the <see cref="IOutput"/> class for the current driver implementation i.e. the class responsible for
     ///     rendering <see cref="IOutputBuffer"/> into the console.
     /// </summary>
@@ -45,16 +38,15 @@ public interface IComponentFactory<TInputRecord> : IComponentFactory
     /// <summary>
     ///     Creates the <see cref="InputProcessorImpl{T}"/> class for the current driver implementation i.e. the class
     ///     responsible for
-    ///     translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="Mouse"/>.
+    ///     translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="MouseEventArgs"/>.
     /// </summary>
     /// <param name="inputQueue">
     ///     The input queue containing raw console input events, populated by <see cref="IInput{TInputRecord}"/>
     ///     implementations on the input thread and
     ///     read by <see cref="IInputProcessor"/> on the main loop thread.
     /// </param>
-    /// <param name="timeProvider">Time provider for timestamps and timing control. If null, SystemTimeProvider is used.</param>
     /// <returns></returns>
-    IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputQueue, ITimeProvider? timeProvider = null);
+    IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputQueue);
 
     /// <summary>
     ///     Creates <see cref="ISizeMonitor"/> class for the current driver implementation i.e. the class responsible for

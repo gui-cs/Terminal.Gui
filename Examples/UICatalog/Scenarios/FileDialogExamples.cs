@@ -12,6 +12,7 @@ public class FileDialogExamples : Scenario
     private CheckBox _cbCaseSensitive;
     private CheckBox _cbDrivesOnlyInTree;
     private CheckBox _cbPreserveFilenameOnDirectoryChanges;
+    private CheckBox _cbFlipButtonOrder;
     private CheckBox _cbMustExist;
     private CheckBox _cbShowTreeBranchLines;
     private CheckBox _cbUseColors;
@@ -24,37 +25,34 @@ public class FileDialogExamples : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
         var y = 0;
         var x = 1;
-        using Window win = new ();
-        win.Title = GetQuitKeyAndName ();
+        var win = new Window { Title = GetQuitKeyAndName () };
 
-        _cbMustExist = new () { Value = CheckState.Checked, Y = y++, X = x, Text = "Must E_xist" };
+        _cbMustExist = new () { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Must E_xist" };
         win.Add (_cbMustExist);
 
         _cbUseColors = new ()
-        { Value = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
+            { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
         win.Add (_cbUseColors);
 
-        _cbCaseSensitive = new () { Value = CheckState.UnChecked, Y = y++, X = x, Text = "_Case Sensitive Search" };
+        _cbCaseSensitive = new () { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Case Sensitive Search" };
         win.Add (_cbCaseSensitive);
 
-        _cbAllowMultipleSelection = new () { Value = CheckState.UnChecked, Y = y++, X = x, Text = "_Multiple" };
+        _cbAllowMultipleSelection = new () { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Multiple" };
         win.Add (_cbAllowMultipleSelection);
 
-        _cbShowTreeBranchLines = new () { Value = CheckState.Checked, Y = y++, X = x, Text = "Tree Branch _Lines" };
+        _cbShowTreeBranchLines = new () { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Tree Branch _Lines" };
         win.Add (_cbShowTreeBranchLines);
 
-        _cbAlwaysTableShowHeaders = new () { Value = CheckState.Checked, Y = y++, X = x, Text = "Always Show _Headers" };
+        _cbAlwaysTableShowHeaders = new () { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Always Show _Headers" };
         win.Add (_cbAlwaysTableShowHeaders);
 
-        _cbDrivesOnlyInTree = new () { Value = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show _Drives" };
+        _cbDrivesOnlyInTree = new () { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Only Show _Drives" };
         win.Add (_cbDrivesOnlyInTree);
 
-        _cbPreserveFilenameOnDirectoryChanges = new () { Value = CheckState.UnChecked, Y = y++, X = x, Text = "Preserve Filename" };
+        _cbPreserveFilenameOnDirectoryChanges = new () { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "Preserve Filename" };
         win.Add (_cbPreserveFilenameOnDirectoryChanges);
 
         y = 0;
@@ -66,7 +64,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _osCaption = new () { X = x, Y = y };
-        _osCaption.Labels = [Strings.btnOk, Strings.cmdOpen, Strings.cmdSave];
+        _osCaption.Labels = ["_Ok", "O_pen", "_Save"];
         win.Add (_osCaption);
 
         y = 0;
@@ -78,7 +76,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
         _osOpenMode = new () { X = x, Y = y };
-        _osOpenMode.Labels = [Strings.menuFile, "D_irectory", "_Mixed"];
+        _osOpenMode.Labels = ["_File", "D_irectory", "_Mixed"];
         win.Add (_osOpenMode);
 
         y = 0;
@@ -122,17 +120,20 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x, Y = y++, Text = "_Cancel Text:" });
         _tbCancelButton = new () { X = x, Y = y++, Width = 12 };
         win.Add (_tbCancelButton);
+        _cbFlipButtonOrder = new () { X = x, Y = y++, Text = "Flip Ord_er" };
+        win.Add (_cbFlipButtonOrder);
+
         var btn = new Button { X = 1, Y = 9, IsDefault = true, Text = "Run Dialog" };
 
         win.Accepting += (s, e) =>
                          {
                              try
                              {
-                                 CreateDialog (app);
+                                 CreateDialog ();
                              }
                              catch (Exception ex)
                              {
-                                 MessageBox.ErrorQuery (app, "Error", ex.ToString (), Strings.btnOk);
+                                 MessageBox.ErrorQuery (Application.Instance, "Error", ex.ToString (), "_Ok");
                              }
                              finally
                              {
@@ -141,7 +142,9 @@ public class FileDialogExamples : Scenario
                          };
         win.Add (btn);
 
-        app.Run (win);
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
     private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e)
@@ -150,33 +153,36 @@ public class FileDialogExamples : Scenario
         {
             if (File.Exists (e.Dialog.Path))
             {
-                int? result = MessageBox.Query (e.Dialog.App!, "Overwrite?", "File already exists", Strings.btnNo, Strings.btnYes);
-                e.Cancel = result is 0 or null;
+                int? result = MessageBox.Query (Application.Instance, "Overwrite?", "File already exists", "_Yes", "_No");
+                e.Cancel = result == 1;
             }
         }
     }
 
-    private void CreateDialog (IApplication app)
+    private void CreateDialog ()
     {
-        if (_osOpenMode.Value is not null)
+        if (_osOpenMode.Value is { })
         {
-            using FileDialog fd = new ();
+            var fd = new FileDialog
+            {
+                OpenMode = Enum.Parse<OpenMode> (
+                                                 _osOpenMode.Labels
+                                                            .Select (l => TextFormatter.FindHotKey (l, _osOpenMode.HotKeySpecifier, out int hotPos, out Key _)
 
-            fd.OpenMode = Enum.Parse<OpenMode> (
-                                                _osOpenMode.Labels
-                                                           .Select (l => TextFormatter.FindHotKey (l, _osOpenMode.HotKeySpecifier, out int hotPos, out Key _)
+                                                                              // Remove the hotkey specifier at the found position
+                                                                              ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _osOpenMode.HotKeySpecifier)
 
-                                                                             // Remove the hotkey specifier at the found position
-                                                                             ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _osOpenMode.HotKeySpecifier)
+                                                                              // No hotkey found, return the label as is
+                                                                              : l)
+                                                            .ToArray () [_osOpenMode.Value.Value]
+                                                ),
+                MustExist = _cbMustExist.CheckedState == CheckState.Checked,
+                AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked
+            };
 
-                                                                             // No hotkey found, return the label as is
-                                                                             : l)
-                                                           .ToArray () [_osOpenMode.Value.Value]
-                                               );
-            fd.MustExist = _cbMustExist.Value == CheckState.Checked;
-            fd.AllowsMultipleSelection = _cbAllowMultipleSelection.Value == CheckState.Checked;
-
-            fd.Style.OkButtonText = _osCaption.Labels.ElementAt (_osCaption.Value!.Value);
+            fd.Style.OkButtonText =
+                _osCaption.Labels.Select (l => TextFormatter.RemoveHotKeySpecifier (l, 0, _osCaption.HotKeySpecifier)).ToArray ()
+                    [_osCaption.Value!.Value];
 
             // If Save style dialog then give them an overwrite prompt
             if (_osCaption.Value == 2)
@@ -187,24 +193,24 @@ public class FileDialogExamples : Scenario
             fd.Style.IconProvider.UseUnicodeCharacters = _osIcons.Value == 1;
             fd.Style.IconProvider.UseNerdIcons = _osIcons.Value == 2;
 
-            if (_cbCaseSensitive.Value == CheckState.Checked)
+            if (_cbCaseSensitive.CheckedState == CheckState.Checked)
             {
                 fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
             }
 
-            fd.Style.UseColors = _cbUseColors.Value == CheckState.Checked;
+            fd.Style.UseColors = _cbUseColors.CheckedState == CheckState.Checked;
 
-            fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.Value == CheckState.Checked;
-            fd.Style.TableStyle.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.Value == CheckState.Checked;
+            fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.CheckedState == CheckState.Checked;
+            fd.Style.TableStyle.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.CheckedState == CheckState.Checked;
 
             IDirectoryInfoFactory dirInfoFactory = new FileSystem ().DirectoryInfo;
 
-            if (_cbDrivesOnlyInTree.Value == CheckState.Checked)
+            if (_cbDrivesOnlyInTree.CheckedState == CheckState.Checked)
             {
                 fd.Style.TreeRootGetter = () => { return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k); };
             }
 
-            fd.Style.PreserveFilenameOnDirectoryChanges = _cbPreserveFilenameOnDirectoryChanges.Value == CheckState.Checked;
+            fd.Style.PreserveFilenameOnDirectoryChanges = _cbPreserveFilenameOnDirectoryChanges.CheckedState == CheckState.Checked;
 
             if (_osAllowedTypes.Value > 0)
             {
@@ -226,27 +232,43 @@ public class FileDialogExamples : Scenario
                 fd.Style.CancelButtonText = _tbCancelButton.Text;
             }
 
-            var result = app.Run (fd) as int?;
+            if (_cbFlipButtonOrder.CheckedState == CheckState.Checked)
+            {
+                fd.Style.FlipOkCancelButtonLayoutOrder = true;
+            }
 
+            Application.Run (fd);
+
+            bool canceled = fd.Canceled;
             IReadOnlyList<string> multiSelected = fd.MultiSelected;
             string path = fd.Path;
 
-            if (result is null or 1)
+            // This needs to be disposed before opening other runnable
+            fd.Dispose ();
+
+            if (canceled)
             {
-                MessageBox.Query (
-                                  app,
+                MessageBox.Query (Application.Instance,
                                   "Canceled",
                                   "You canceled navigation and did not pick anything",
-                                  Strings.btnOk
+                                  "Ok"
                                  );
             }
-            else if (_cbAllowMultipleSelection.Value == CheckState.Checked)
+            else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
             {
-                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)), Strings.btnOk);
+                MessageBox.Query (Application.Instance,
+                                  "Chosen!",
+                                  "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)),
+                                  "Ok"
+                                 );
             }
             else
             {
-                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + path, Strings.btnOk);
+                MessageBox.Query (Application.Instance,
+                                  "Chosen!",
+                                  "You chose:" + Environment.NewLine + path,
+                                  "Ok"
+                                 );
             }
         }
     }

@@ -22,7 +22,7 @@ namespace Terminal.Gui.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Strings {
+    internal class Strings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Terminal.Gui.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Terminal.Gui.Resources.Strings", typeof(Strings).Assembly);
@@ -51,7 +51,7 @@ namespace Terminal.Gui.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Cancel.
         /// </summary>
-        public static string btnCancel {
+        internal static string btnCancel {
             get {
                 return ResourceManager.GetString("btnCancel", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _No.
         /// </summary>
-        public static string btnNo {
+        internal static string btnNo {
             get {
                 return ResourceManager.GetString("btnNo", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _OK.
         /// </summary>
-        public static string btnOk {
+        internal static string btnOk {
             get {
                 return ResourceManager.GetString("btnOk", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to O_pen.
         /// </summary>
-        public static string btnOpen {
+        internal static string btnOpen {
             get {
                 return ResourceManager.GetString("btnOpen", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Save.
         /// </summary>
-        public static string btnSave {
+        internal static string btnSave {
             get {
                 return ResourceManager.GetString("btnSave", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Save _as.
         /// </summary>
-        public static string btnSaveAs {
+        internal static string btnSaveAs {
             get {
                 return ResourceManager.GetString("btnSaveAs", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Yes.
         /// </summary>
-        public static string btnYes {
+        internal static string btnYes {
             get {
                 return ResourceManager.GetString("btnYes", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Copy Code_point.
         /// </summary>
-        public static string charMapCopyCP {
+        internal static string charMapCopyCP {
             get {
                 return ResourceManager.GetString("charMapCopyCP", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Copy _Glyph.
         /// </summary>
-        public static string charMapCopyGlyph {
+        internal static string charMapCopyGlyph {
             get {
                 return ResourceManager.GetString("charMapCopyGlyph", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Getting Codepoint Information.
         /// </summary>
-        public static string charMapCPInfoDlgTitle {
+        internal static string charMapCPInfoDlgTitle {
             get {
                 return ResourceManager.GetString("charMapCPInfoDlgTitle", resourceCulture);
             }
@@ -153,196 +153,178 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Codepoint Information from.
         /// </summary>
-        public static string charMapInfoDlgInfoLabel {
+        internal static string charMapInfoDlgInfoLabel {
             get {
                 return ResourceManager.GetString("charMapInfoDlgInfoLabel", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Close.
-        /// </summary>
-        public static string cmdClose {
-            get {
-                return ResourceManager.GetString("cmdClose", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to _Copy.
         /// </summary>
-        public static string cmdCopy {
+        internal static string cmd_Copy {
             get {
-                return ResourceManager.GetString("cmdCopy", resourceCulture);
+                return ResourceManager.GetString("cmd.Copy", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Copy to clipboard.
         /// </summary>
-        public static string cmdCopyHelp {
+        internal static string cmd_Copy_Help {
             get {
-                return ResourceManager.GetString("cmdCopyHelp", resourceCulture);
+                return ResourceManager.GetString("cmd.Copy.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Cu_t.
         /// </summary>
-        public static string cmdCut {
+        internal static string cmd_Cut {
             get {
-                return ResourceManager.GetString("cmdCut", resourceCulture);
+                return ResourceManager.GetString("cmd.Cut", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Cut to clipboard.
         /// </summary>
-        public static string cmdCut_Help {
+        internal static string cmd_Cut_Help {
             get {
-                return ResourceManager.GetString("cmdCut.Help", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _Find.
-        /// </summary>
-        public static string cmdFind {
-            get {
-                return ResourceManager.GetString("cmdFind", resourceCulture);
+                return ResourceManager.GetString("cmd.Cut.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to _New file.
         /// </summary>
-        public static string cmdNew {
+        internal static string cmd_New {
             get {
-                return ResourceManager.GetString("cmdNew", resourceCulture);
+                return ResourceManager.GetString("cmd.New", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to New file.
         /// </summary>
-        public static string cmdNewHelp {
+        internal static string cmd_New_Help {
             get {
-                return ResourceManager.GetString("cmdNewHelp", resourceCulture);
+                return ResourceManager.GetString("cmd.New.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to _Open....
         /// </summary>
-        public static string cmdOpen {
+        internal static string cmd_Open {
             get {
-                return ResourceManager.GetString("cmdOpen", resourceCulture);
+                return ResourceManager.GetString("cmd.Open", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Open a file.
         /// </summary>
-        public static string cmdOpen_Help {
+        internal static string cmd_Open_Help {
             get {
-                return ResourceManager.GetString("cmdOpen.Help", resourceCulture);
+                return ResourceManager.GetString("cmd.Open.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to _Paste.
         /// </summary>
-        public static string cmdPaste {
+        internal static string cmd_Paste {
             get {
-                return ResourceManager.GetString("cmdPaste", resourceCulture);
+                return ResourceManager.GetString("cmd.Paste", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Paste from clipboard.
         /// </summary>
-        public static string cmdPasteHelp {
+        internal static string cmd_Paste_Help {
             get {
-                return ResourceManager.GetString("cmdPasteHelp", resourceCulture);
+                return ResourceManager.GetString("cmd.Paste.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to E_xit.
         /// </summary>
-        public static string cmdQuit {
+        internal static string cmd_Quit {
             get {
-                return ResourceManager.GetString("cmdQuit", resourceCulture);
+                return ResourceManager.GetString("cmd.Quit", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
-        public static string cmdQuitHelp {
+        internal static string cmd_Quit_Help {
             get {
-                return ResourceManager.GetString("cmdQuitHelp", resourceCulture);
+                return ResourceManager.GetString("cmd.Quit.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to _Save.
         /// </summary>
-        public static string cmdSave {
+        internal static string cmd_Save {
             get {
-                return ResourceManager.GetString("cmdSave", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save _As....
-        /// </summary>
-        public static string cmdSaveAs {
-            get {
-                return ResourceManager.GetString("cmdSaveAs", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save file as.
-        /// </summary>
-        public static string cmdSaveAsHelp {
-            get {
-                return ResourceManager.GetString("cmdSaveAsHelp", resourceCulture);
+                return ResourceManager.GetString("cmd.Save", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
-        public static string cmdSaveHelp {
+        internal static string cmd_Save_Help {
             get {
-                return ResourceManager.GetString("cmdSaveHelp", resourceCulture);
+                return ResourceManager.GetString("cmd.Save.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save _As....
+        /// </summary>
+        internal static string cmd_SaveAs {
+            get {
+                return ResourceManager.GetString("cmd.SaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save file as.
+        /// </summary>
+        internal static string cmd_SaveAs_Help {
+            get {
+                return ResourceManager.GetString("cmd.SaveAs.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to _Select all.
         /// </summary>
-        public static string cmdSelectAll {
+        internal static string cmd_SelectAll {
             get {
-                return ResourceManager.GetString("cmdSelectAll", resourceCulture);
+                return ResourceManager.GetString("cmd.SelectAll", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Select all.
         /// </summary>
-        public static string cmdSelectAllHelp {
+        internal static string cmd_SelectAll_Help {
             get {
-                return ResourceManager.GetString("cmdSelectAllHelp", resourceCulture);
+                return ResourceManager.GetString("cmd.SelectAll.Help", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Co_lors.
         /// </summary>
-        public static string ctxColors {
+        internal static string ctxColors {
             get {
                 return ResourceManager.GetString("ctxColors", resourceCulture);
             }
@@ -351,7 +333,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Copy.
         /// </summary>
-        public static string ctxCopy {
+        internal static string ctxCopy {
             get {
                 return ResourceManager.GetString("ctxCopy", resourceCulture);
             }
@@ -360,7 +342,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Cu_t.
         /// </summary>
-        public static string ctxCut {
+        internal static string ctxCut {
             get {
                 return ResourceManager.GetString("ctxCut", resourceCulture);
             }
@@ -369,7 +351,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Delete All.
         /// </summary>
-        public static string ctxDeleteAll {
+        internal static string ctxDeleteAll {
             get {
                 return ResourceManager.GetString("ctxDeleteAll", resourceCulture);
             }
@@ -378,7 +360,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Paste.
         /// </summary>
-        public static string ctxPaste {
+        internal static string ctxPaste {
             get {
                 return ResourceManager.GetString("ctxPaste", resourceCulture);
             }
@@ -387,7 +369,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Redo.
         /// </summary>
-        public static string ctxRedo {
+        internal static string ctxRedo {
             get {
                 return ResourceManager.GetString("ctxRedo", resourceCulture);
             }
@@ -396,7 +378,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Select All.
         /// </summary>
-        public static string ctxSelectAll {
+        internal static string ctxSelectAll {
             get {
                 return ResourceManager.GetString("ctxSelectAll", resourceCulture);
             }
@@ -405,7 +387,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Undo.
         /// </summary>
-        public static string ctxUndo {
+        internal static string ctxUndo {
             get {
                 return ResourceManager.GetString("ctxUndo", resourceCulture);
             }
@@ -414,7 +396,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Date Picker.
         /// </summary>
-        public static string dpTitle {
+        internal static string dpTitle {
             get {
                 return ResourceManager.GetString("dpTitle", resourceCulture);
             }
@@ -423,7 +405,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
-        public static string error {
+        internal static string error {
             get {
                 return ResourceManager.GetString("error", resourceCulture);
             }
@@ -432,7 +414,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to failed getting.
         /// </summary>
-        public static string failedGetting {
+        internal static string failedGetting {
             get {
                 return ResourceManager.GetString("failedGetting", resourceCulture);
             }
@@ -441,7 +423,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Any Files.
         /// </summary>
-        public static string fdAnyFiles {
+        internal static string fdAnyFiles {
             get {
                 return ResourceManager.GetString("fdAnyFiles", resourceCulture);
             }
@@ -450,7 +432,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Delete.
         /// </summary>
-        public static string fdCtxDelete {
+        internal static string fdCtxDelete {
             get {
                 return ResourceManager.GetString("fdCtxDelete", resourceCulture);
             }
@@ -459,7 +441,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Hide {0}.
         /// </summary>
-        public static string fdCtxHide {
+        internal static string fdCtxHide {
             get {
                 return ResourceManager.GetString("fdCtxHide", resourceCulture);
             }
@@ -468,7 +450,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _New.
         /// </summary>
-        public static string fdCtxNew {
+        internal static string fdCtxNew {
             get {
                 return ResourceManager.GetString("fdCtxNew", resourceCulture);
             }
@@ -477,7 +459,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Rename.
         /// </summary>
-        public static string fdCtxRename {
+        internal static string fdCtxRename {
             get {
                 return ResourceManager.GetString("fdCtxRename", resourceCulture);
             }
@@ -486,7 +468,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Sort {0} ASC.
         /// </summary>
-        public static string fdCtxSortAsc {
+        internal static string fdCtxSortAsc {
             get {
                 return ResourceManager.GetString("fdCtxSortAsc", resourceCulture);
             }
@@ -495,7 +477,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Sort {0} DESC.
         /// </summary>
-        public static string fdCtxSortDesc {
+        internal static string fdCtxSortDesc {
             get {
                 return ResourceManager.GetString("fdCtxSortDesc", resourceCulture);
             }
@@ -504,7 +486,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to delete &apos;{0}&apos;? This operation is permanent.
         /// </summary>
-        public static string fdDeleteBody {
+        internal static string fdDeleteBody {
             get {
                 return ResourceManager.GetString("fdDeleteBody", resourceCulture);
             }
@@ -513,7 +495,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Delete Failed.
         /// </summary>
-        public static string fdDeleteFailedTitle {
+        internal static string fdDeleteFailedTitle {
             get {
                 return ResourceManager.GetString("fdDeleteFailedTitle", resourceCulture);
             }
@@ -522,7 +504,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Delete {0}.
         /// </summary>
-        public static string fdDeleteTitle {
+        internal static string fdDeleteTitle {
             get {
                 return ResourceManager.GetString("fdDeleteTitle", resourceCulture);
             }
@@ -531,7 +513,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Directory.
         /// </summary>
-        public static string fdDirectory {
+        internal static string fdDirectory {
             get {
                 return ResourceManager.GetString("fdDirectory", resourceCulture);
             }
@@ -540,7 +522,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Directory already exists with that name.
         /// </summary>
-        public static string fdDirectoryAlreadyExistsFeedback {
+        internal static string fdDirectoryAlreadyExistsFeedback {
             get {
                 return ResourceManager.GetString("fdDirectoryAlreadyExistsFeedback", resourceCulture);
             }
@@ -549,7 +531,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Must select an existing directory.
         /// </summary>
-        public static string fdDirectoryMustExistFeedback {
+        internal static string fdDirectoryMustExistFeedback {
             get {
                 return ResourceManager.GetString("fdDirectoryMustExistFeedback", resourceCulture);
             }
@@ -558,7 +540,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Existing.
         /// </summary>
-        public static string fdExisting {
+        internal static string fdExisting {
             get {
                 return ResourceManager.GetString("fdExisting", resourceCulture);
             }
@@ -567,7 +549,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to File.
         /// </summary>
-        public static string fdFile {
+        internal static string fdFile {
             get {
                 return ResourceManager.GetString("fdFile", resourceCulture);
             }
@@ -576,7 +558,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to File already exists with that name.
         /// </summary>
-        public static string fdFileAlreadyExistsFeedback {
+        internal static string fdFileAlreadyExistsFeedback {
             get {
                 return ResourceManager.GetString("fdFileAlreadyExistsFeedback", resourceCulture);
             }
@@ -585,7 +567,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Must select an existing file.
         /// </summary>
-        public static string fdFileMustExistFeedback {
+        internal static string fdFileMustExistFeedback {
             get {
                 return ResourceManager.GetString("fdFileMustExistFeedback", resourceCulture);
             }
@@ -594,7 +576,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Filename.
         /// </summary>
-        public static string fdFilename {
+        internal static string fdFilename {
             get {
                 return ResourceManager.GetString("fdFilename", resourceCulture);
             }
@@ -603,7 +585,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Must select an existing file or directory.
         /// </summary>
-        public static string fdFileOrDirectoryMustExistFeedback {
+        internal static string fdFileOrDirectoryMustExistFeedback {
             get {
                 return ResourceManager.GetString("fdFileOrDirectoryMustExistFeedback", resourceCulture);
             }
@@ -612,7 +594,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Modified.
         /// </summary>
-        public static string fdModified {
+        internal static string fdModified {
             get {
                 return ResourceManager.GetString("fdModified", resourceCulture);
             }
@@ -621,7 +603,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to New Failed.
         /// </summary>
-        public static string fdNewFailed {
+        internal static string fdNewFailed {
             get {
                 return ResourceManager.GetString("fdNewFailed", resourceCulture);
             }
@@ -630,7 +612,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to New Folder.
         /// </summary>
-        public static string fdNewTitle {
+        internal static string fdNewTitle {
             get {
                 return ResourceManager.GetString("fdNewTitle", resourceCulture);
             }
@@ -639,7 +621,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Open.
         /// </summary>
-        public static string fdOpen {
+        internal static string fdOpen {
             get {
                 return ResourceManager.GetString("fdOpen", resourceCulture);
             }
@@ -648,7 +630,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Enter Path.
         /// </summary>
-        public static string fdPathCaption {
+        internal static string fdPathCaption {
             get {
                 return ResourceManager.GetString("fdPathCaption", resourceCulture);
             }
@@ -657,7 +639,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Rename Failed.
         /// </summary>
-        public static string fdRenameFailedTitle {
+        internal static string fdRenameFailedTitle {
             get {
                 return ResourceManager.GetString("fdRenameFailedTitle", resourceCulture);
             }
@@ -666,7 +648,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Name:.
         /// </summary>
-        public static string fdRenamePrompt {
+        internal static string fdRenamePrompt {
             get {
                 return ResourceManager.GetString("fdRenamePrompt", resourceCulture);
             }
@@ -675,7 +657,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Rename.
         /// </summary>
-        public static string fdRenameTitle {
+        internal static string fdRenameTitle {
             get {
                 return ResourceManager.GetString("fdRenameTitle", resourceCulture);
             }
@@ -684,7 +666,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
-        public static string fdSave {
+        internal static string fdSave {
             get {
                 return ResourceManager.GetString("fdSave", resourceCulture);
             }
@@ -693,7 +675,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Save as.
         /// </summary>
-        public static string fdSaveAs {
+        internal static string fdSaveAs {
             get {
                 return ResourceManager.GetString("fdSaveAs", resourceCulture);
             }
@@ -702,7 +684,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Find.
         /// </summary>
-        public static string fdSearchCaption {
+        internal static string fdSearchCaption {
             get {
                 return ResourceManager.GetString("fdSearchCaption", resourceCulture);
             }
@@ -711,7 +693,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Select folder.
         /// </summary>
-        public static string fdSelectFolder {
+        internal static string fdSelectFolder {
             get {
                 return ResourceManager.GetString("fdSelectFolder", resourceCulture);
             }
@@ -720,7 +702,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Select Mixed.
         /// </summary>
-        public static string fdSelectMixed {
+        internal static string fdSelectMixed {
             get {
                 return ResourceManager.GetString("fdSelectMixed", resourceCulture);
             }
@@ -729,7 +711,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Size.
         /// </summary>
-        public static string fdSize {
+        internal static string fdSize {
             get {
                 return ResourceManager.GetString("fdSize", resourceCulture);
             }
@@ -738,7 +720,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Tree.
         /// </summary>
-        public static string fdTree {
+        internal static string fdTree {
             get {
                 return ResourceManager.GetString("fdTree", resourceCulture);
             }
@@ -747,7 +729,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Type.
         /// </summary>
-        public static string fdType {
+        internal static string fdType {
             get {
                 return ResourceManager.GetString("fdType", resourceCulture);
             }
@@ -756,43 +738,16 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Wrong file type.
         /// </summary>
-        public static string fdWrongFileTypeFeedback {
+        internal static string fdWrongFileTypeFeedback {
             get {
                 return ResourceManager.GetString("fdWrongFileTypeFeedback", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Edit.
-        /// </summary>
-        public static string menuEdit {
-            get {
-                return ResourceManager.GetString("menuEdit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _File.
-        /// </summary>
-        public static string menuFile {
-            get {
-                return ResourceManager.GetString("menuFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _Help.
-        /// </summary>
-        public static string menuHelp {
-            get {
-                return ResourceManager.GetString("menuHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to _Back.
         /// </summary>
-        public static string wzBack {
+        internal static string wzBack {
             get {
                 return ResourceManager.GetString("wzBack", resourceCulture);
             }
@@ -801,7 +756,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Fi_nish.
         /// </summary>
-        public static string wzFinish {
+        internal static string wzFinish {
             get {
                 return ResourceManager.GetString("wzFinish", resourceCulture);
             }
@@ -810,7 +765,7 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to _Next....
         /// </summary>
-        public static string wzNext {
+        internal static string wzNext {
             get {
                 return ResourceManager.GetString("wzNext", resourceCulture);
             }

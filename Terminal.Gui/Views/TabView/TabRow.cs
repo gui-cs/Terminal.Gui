@@ -45,12 +45,12 @@ internal class TabRow : View
         Add (_rightScrollIndicator, _leftScrollIndicator);
     }
 
-    protected override bool OnMouseEvent (Mouse me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         View? parent = me.View is Adornment adornment ? adornment.Parent : me.View;
         Tab? hit = parent as Tab;
 
-        if (me.IsPressed)
+        if (me.IsSingleClicked)
         {
             _host.OnTabClicked (new TabMouseEventArgs (hit!, me));
 
@@ -71,12 +71,12 @@ internal class TabRow : View
             SetFocus ();
         }
 
-        if (me is { IsPressed: false, IsWheel: false })
+        if (me is { IsSingleDoubleOrTripleClicked: false, IsWheel: false })
         {
             return false;
         }
 
-        if (me.IsPressed || me.IsWheel)
+        if (me.IsSingleDoubleOrTripleClicked || me.IsWheel)
         {
             var scrollIndicatorHit = 0;
 

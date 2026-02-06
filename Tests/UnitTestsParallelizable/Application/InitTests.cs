@@ -7,7 +7,6 @@ namespace ApplicationTests.Init;
 ///     These tests ensure the fragile state management logic is robust and catches regressions.
 ///     Tests work directly with ApplicationImpl instances to avoid global Application state issues.
 /// </summary>
-[Collection("Application Tests")]
 public class InitTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
@@ -16,10 +15,10 @@ public class InitTests (ITestOutputHelper output)
     public void Init_Unbalanced_Throws ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
 
         Assert.Throws<InvalidOperationException> (() =>
-                                                      app.Init (DriverRegistry.Names.ANSI)
+                                                      app.Init ("fake")
                                                  );
     }
 
@@ -39,9 +38,16 @@ public class InitTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
 
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
 
         app.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+        // Validate there are no outstanding Responder-based instances 
+        // after cleanup
+        // Note: We can't check View.Instances in parallel tests as it's a static field
+        // that would be shared across parallel test runs
+#endif
     }
 
     [Fact]
@@ -54,7 +60,7 @@ public class InitTests (ITestOutputHelper output)
 
         app.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        app.Init (driverName: DriverRegistry.Names.ANSI);
+        app.Init (driverName: "fake");
         Assert.True (initialized);
         Assert.False (Dispose);
 
@@ -88,7 +94,7 @@ public class InitTests (ITestOutputHelper output)
         app.Keyboard.QuitKey = Key.Q;
         Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
 
         Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
@@ -100,19 +106,11 @@ public class InitTests (ITestOutputHelper output)
     {
         using IApplication app = Application.Create ();
 
-        app.ForceDriver = DriverRegistry.Names.ANSI;
+        app.ForceDriver = "fake";
         // Note: Init() without params picks up driver configuration
         app.Init ();
 
-        Assert.Equal (DriverRegistry.Names.ANSI, app.Driver!.GetName ());
-    }
-
-    [Fact]
-    public void Init_Invalid_DriverName_Throws ()
-    {
-        using IApplication app = Application.Create ();
-        Assert.Throws<ArgumentException> (() => app.Init ("nonexistent_driver"));
-        Assert.Throws<ArgumentException> (() => app.Init ("fake"));
+        Assert.Equal ("fake", app.Driver!.GetName ());
     }
 
     [Fact]
@@ -121,7 +119,7 @@ public class InitTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
 
         // Init the app
-        app.Init (driverName: DriverRegistry.Names.ANSI);
+        app.Init (driverName: "fake");
 
         // Verify initialized
         Assert.True (app.Initialized);
@@ -135,7 +133,7 @@ public class InitTests (ITestOutputHelper output)
 
         // Create a new instance and set values
         app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("fake");
 
         app.StopAfterFirstIteration = true;
         app.Keyboard.PrevTabGroupKey = Key.A;
@@ -158,6 +156,7 @@ public class InitTests (ITestOutputHelper output)
 
             // Public Properties
             Assert.Null (application.TopRunnableView);
+            Assert.Null (application.Mouse.MouseGrabView);
             Assert.Null (application.Driver);
             Assert.False (application.StopAfterFirstIteration);
 

@@ -1,4 +1,4 @@
-﻿namespace ViewBaseTests.Layout;
+﻿namespace ViewBaseTests;
 
 public partial class DimAutoTests
 {

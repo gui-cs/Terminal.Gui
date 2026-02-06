@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui.ViewBase;
+﻿
+namespace Terminal.Gui.ViewBase;
 
 public partial class View // Adornments
 {
@@ -157,7 +158,7 @@ public partial class View // Adornments
     /// <summary>
     ///     Called when the <see cref="BorderStyle"/> has changed.
     /// </summary>
-    protected virtual bool OnBorderStyleChanged () => false;
+    protected virtual bool OnBorderStyleChanged () { return false; }
 
     /// <summary>
     ///     Fired when the <see cref="BorderStyle"/> has changed.
@@ -229,7 +230,7 @@ public partial class View // Adornments
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
     public Thickness GetAdornmentsThickness ()
     {
-        var result = Thickness.Empty;
+        Thickness result = Thickness.Empty;
 
         if (Margin is { })
         {

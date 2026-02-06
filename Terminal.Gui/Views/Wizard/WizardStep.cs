@@ -1,74 +1,108 @@
+
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A single step in a <see cref="Wizard"/>. Can contain arbitrary <see cref="View"/>s and display help text
-///     in the right <see cref="Padding"/>.
+///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is
+///     divided horizontally in two. On the left is the content view where <see cref="View"/>s can be added,  On the right
+///     is the help for the step. Set <see cref="WizardStep.HelpText"/> to set the help text. If the help text is empty the
+///     help pane will not be shown. If there are no Views added to the WizardStep the <see cref="HelpText"/> (if not
+///     empty) will fill the wizard step.
 /// </summary>
 /// <remarks>
-///     Do not set <see cref="Button.IsDefault"/> on added buttons (conflicts with Wizard navigation).
-///     Use <see cref="View.VisibleChanged"/> or <see cref="Wizard.StepChanged"/> to detect when this step becomes active.
-///     Set <see cref="View.Enabled"/> to control whether the step is shown.
+///     If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
+///     with the Next button of the Wizard. Subscribe to the <see cref="View.VisibleChanged"/> event to be notified when
+///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
+///     user, set <see cref="View.Enabled"/>.
 /// </remarks>
-public class WizardStep : View, IDesignable
+public class WizardStep : View
 {
+    // The contentView works like the ContentView in FrameView.
+    private readonly View _contentView = new ()
+    {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
+        Id = "WizardStep._contentView"
+    };
     private readonly TextView _helpTextView = new ()
     {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
         ReadOnly = true,
         WordWrap = true,
-        X = Pos.AnchorEnd () + 1,
-        Height = Dim.Fill (),
-#if DEBUG
+        AllowsTab = false,
         Id = "WizardStep._helpTextView"
-#endif
     };
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="WizardStep"/> class.
+    ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     public WizardStep ()
     {
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
-        Width = Dim.Fill ();
-        Height = Dim.Fill ();
-    }
+        BorderStyle = LineStyle.None;
 
-    /// <inheritdoc/>
-    public override void EndInit ()
-    {
-        // Help text goes in the right Padding
-        // TODO: Enable built-in scrollbars for the help text view once TextView supports
-        //_helpTextView.VerticalScrollBar.AutoShow = true;
-        //_helpTextView.HorizontalScrollBar.AutoShow = true;
-        _helpTextView.Width = Dim.Func (_ => CalculateHelpPaddingWidth ());
+        base.Add (_contentView);
 
-        Padding?.Add (_helpTextView);
+        base.Add (_helpTextView);
 
+        // BUGBUG: v2 - Disabling scrolling for now
+        //var scrollBar = new ScrollBarView (helpTextView, true);
+
+        //scrollBar.ChangedPosition += (s,e) => {
+        //	helpTextView.TopRow = scrollBar.Position;
+        //	if (helpTextView.TopRow != scrollBar.Position) {
+        //		scrollBar.Position = helpTextView.TopRow;
+        //	}
+        //	helpTextView.SetNeedsDraw ();
+        //};
+
+        //scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+        //	helpTextView.LeftColumn = scrollBar.OtherScrollBarView.Position;
+        //	if (helpTextView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
+        //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
+        //	}
+        //	helpTextView.SetNeedsDraw ();
+        //};
+
+        //scrollBar.VisibleChanged += (s,e) => {
+        //	if (scrollBar.Visible && helpTextView.RightOffset == 0) {
+        //		helpTextView.RightOffset = 1;
+        //	} else if (!scrollBar.Visible && helpTextView.RightOffset == 1) {
+        //		helpTextView.RightOffset = 0;
+        //	}
+        //};
+
+        //scrollBar.OtherScrollBarView.VisibleChanged += (s,e) => {
+        //	if (scrollBar.OtherScrollBarView.Visible && helpTextView.BottomOffset == 0) {
+        //		helpTextView.BottomOffset = 1;
+        //	} else if (!scrollBar.OtherScrollBarView.Visible && helpTextView.BottomOffset == 1) {
+        //		helpTextView.BottomOffset = 0;
+        //	}
+        //};
+
+        //helpTextView.DrawContent += (s,e) => {
+        //	scrollBar.Size = helpTextView.Lines;
+        //	scrollBar.Position = helpTextView.TopRow;
+        //	if (scrollBar.OtherScrollBarView is { }) {
+        //		scrollBar.OtherScrollBarView.Size = helpTextView.Maxlength;
+        //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
+        //	}
+        //	scrollBar.LayoutSubViews ();
+        //	scrollBar.Refresh ();
+        //};
+        //base.Add (scrollBar);
         ShowHide ();
-        base.EndInit ();
     }
 
-    /// <summary>The text for the Back button. Defaults to "Back".</summary>
+    /// <summary>Sets or gets the text for the back button. The back button will only be visible on steps after the first step.</summary>
+    /// <remarks>The default text is "Back"</remarks>
     public string BackButtonText { get; set; } = string.Empty;
 
-    /// <summary>Calculates the width for the help text padding based on the current frame width.</summary>
-    private int CalculateHelpPaddingWidth () => 25;
-
-    /// <inheritdoc/>
-    protected override void OnFrameChanged (in Rectangle frame)
-    {
-        base.OnFrameChanged (frame);
-
-        // Update padding thickness when frame changes
-        if (Padding is { } && _helpTextView.Text.Length > 0)
-        {
-            Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
-        }
-    }
-
     /// <summary>
-    ///     The help text displayed in the right <see cref="Padding"/>.
-    ///     If empty, the right padding is hidden and content fills the entire step.
+    ///     Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty the help
+    ///     pane will not be visible and the content will fill the entire WizardStep.
     /// </summary>
     /// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
     public string HelpText
@@ -77,82 +111,98 @@ public class WizardStep : View, IDesignable
         set
         {
             _helpTextView.Text = value;
-            _helpTextView.MoveHome ();
             ShowHide ();
+            SetNeedsDraw ();
         }
     }
 
-    /// <summary>The text for the Next/Finish button. Defaults to "Next..." or "Finish" based on position.</summary>
+    /// <summary>Sets or gets the text for the next/finish button.</summary>
+    /// <remarks>The default text is "Next..." if the Pane is not the last pane. Otherwise it is "Finish"</remarks>
     public string NextButtonText { get; set; } = string.Empty;
+
+    /// <summary>Add the specified <see cref="View"/> to the <see cref="WizardStep"/>.</summary>
+    /// <param name="view"><see cref="View"/> to add to this container</param>
+    public override View Add (View? view)
+    {
+        _contentView.Add (view);
+
+        if (view!.CanFocus)
+        {
+            CanFocus = true;
+        }
+
+        ShowHide ();
+
+        return view;
+    }
+
+    /// <summary>Removes a <see cref="View"/> from <see cref="WizardStep"/>.</summary>
+    /// <remarks></remarks>
+    public override View? Remove (View? view)
+    {
+        SetNeedsDraw ();
+        View? container = view?.SuperView;
+
+        if (container == this)
+        {
+            base.Remove (view);
+        }
+        else
+        {
+            container?.Remove (view);
+        }
+
+        if (_contentView.InternalSubViews.Count < 1)
+        {
+            CanFocus = false;
+        }
+
+        ShowHide ();
+
+        return view;
+    }
+
+    /// <summary>Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.</summary>
+    /// <remarks></remarks>
+    public override IReadOnlyCollection<View> RemoveAll ()
+    {
+        IReadOnlyCollection<View> removed = _contentView.RemoveAll ();
+        ShowHide ();
+
+        return removed;
+    }
 
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>
     internal void ShowHide ()
     {
-        // Check if views are available (might be null during disposal)
-        if (Padding is null)
-        {
-            return;
-        }
+        _contentView.Height = Dim.Fill ();
+        _helpTextView.Height = Dim.Height(_contentView);
+        _helpTextView.Width = Dim.Fill ();
 
-        if (_helpTextView.Text.Length > 0)
+        if (_contentView.InternalSubViews?.Count > 0)
         {
-            // Help text goes in right Padding - set thickness based on current frame width
-            Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
-
-            _helpTextView.Visible = true;
-            _helpTextView.Enabled = true;
+            if (_helpTextView.Text.Length > 0)
+            {
+                _contentView.Width = Dim.Percent (70);
+                _helpTextView.X = Pos.Right (_contentView);
+                _helpTextView.Width = Dim.Fill ();
+            }
+            else
+            {
+                _contentView.Width = Dim.Fill ();
+            }
         }
         else
         {
-            // No help text - no right padding needed
-            Padding.Thickness = Padding.Thickness with { Right = 0 };
+            if (_helpTextView.Text.Length > 0)
+            {
+                _helpTextView.X = 0;
+            }
 
-            _helpTextView.Visible = false;
-            _helpTextView.Enabled = false;
+            // Error - no pane shown
         }
 
-        SetNeedsLayout ();
-    }
-
-    bool IDesignable.EnableForDesign ()
-    {
-        Title = "Example Step";
-
-        Label label = new ()
-        {
-            Title = "_Enter Text:"
-        };
-
-        TextField textField = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Width = 20
-        };
-        Add (label, textField);
-
-        label = new ()
-        {
-            Title = "    _A List:",
-            Y = Pos.Bottom (label) + 1
-        };
-
-        ListView listView = new ()
-        {
-            BorderStyle = LineStyle.Dashed,
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Height = Dim.Auto (),
-            Width = 10,
-            Source = new ListWrapper<string> (["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"]),
-            SelectedItem = 0
-        };
-        Add (label, listView);
-
-        HelpText = """
-                   This is some help text for the WizardStep. 
-                   You can provide instructions or information to guide the user through this step of the wizard.
-                   """;
-
-        return true;
+        _contentView.Visible = _contentView.InternalSubViews?.Count > 0;
+        _helpTextView.Visible = _helpTextView.Text.Length > 0;
     }
 } // end of WizardStep class

@@ -24,7 +24,7 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _nextTabGroupKey;
             _nextTabGroupKey = value;
-            NextTabGroupKeyChanged?.Invoke (null, new (oldValue, _nextTabGroupKey));
+            NextTabGroupKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _nextTabGroupKey));
         }
     }
 
@@ -42,12 +42,31 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _nextTabKey;
             _nextTabKey = value;
-            NextTabKeyChanged?.Invoke (null, new (oldValue, _nextTabKey));
+            NextTabKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _nextTabKey));
         }
     }
 
     /// <summary>Raised when <see cref="NextTabKey"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<Key>>? NextTabKeyChanged;
+
+    /// <summary>
+    ///     Raised when the user releases a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Unix) do not support firing the
+    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+    ///     <para>Fired after <see cref="KeyDown"/>.</para>
+    /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static event EventHandler<Key>? KeyUp
+    {
+        add => ApplicationImpl.Instance.Keyboard.KeyUp += value;
+        remove => ApplicationImpl.Instance.Keyboard.KeyUp -= value;
+    }
 
     private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrides
 
@@ -60,7 +79,7 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _prevTabGroupKey;
             _prevTabGroupKey = value;
-            PrevTabGroupKeyChanged?.Invoke (null, new (oldValue, _prevTabGroupKey));
+            PrevTabGroupKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _prevTabGroupKey));
         }
     }
 
@@ -78,7 +97,7 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _prevTabKey;
             _prevTabKey = value;
-            PrevTabKeyChanged?.Invoke (null, new (oldValue, _prevTabKey));
+            PrevTabKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _prevTabKey));
         }
     }
 

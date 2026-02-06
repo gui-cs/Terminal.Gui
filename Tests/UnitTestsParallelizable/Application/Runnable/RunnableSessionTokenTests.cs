@@ -1,12 +1,10 @@
 using Xunit.Abstractions;
-using Xunit;
 
 namespace ApplicationTests.RunnableTests;
 
 /// <summary>
 ///     Tests for RunnableSessionToken class.
 /// </summary>
-[Collection("Application Tests")]
 public class RunnableSessionTokenTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

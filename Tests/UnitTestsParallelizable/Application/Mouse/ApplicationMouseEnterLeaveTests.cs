@@ -1,10 +1,9 @@
 #nullable enable
 using System.ComponentModel;
 
-namespace ApplicationTests.MouseTests;
+namespace ApplicationTests.Mouse;
 
 [Trait ("Category", "Input")]
-[Collection("Application Tests")]
 public class ApplicationMouseEnterLeaveTests
 {
     private class TestView : View
@@ -52,7 +51,7 @@ public class ApplicationMouseEnterLeaveTests
         var mousePosition = new Point (1, 1);
         List<View?> currentViewsUnderMouse = [view];
 
-        var mouse = new Mouse
+        var mouseEvent = new MouseEventArgs
         {
             Position = mousePosition,
             ScreenPosition = mousePosition
@@ -87,7 +86,7 @@ public class ApplicationMouseEnterLeaveTests
         runnable.Add (view);
         var mousePosition = new Point (0, 0);
         List<View?> currentViewsUnderMouse = new ();
-        var mouse = new Mouse ();
+        var mouseEvent = new MouseEventArgs ();
 
         app.Mouse.CachedViewsUnderMouse.Clear ();
         app.Mouse.CachedViewsUnderMouse.Add (view);
@@ -197,7 +196,7 @@ public class ApplicationMouseEnterLeaveTests
         runnable.Add (view);
         var mousePosition = new Point (0, 0);
         List<View?> currentViewsUnderMouse = new ();
-        var mouse = new Mouse ();
+        var mouseEvent = new MouseEventArgs ();
 
         app.Mouse.CachedViewsUnderMouse.Clear ();
 

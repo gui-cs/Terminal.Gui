@@ -4,7 +4,7 @@ using UnitTests;
 
 namespace DrawingTests;
 
-public class AttributeTests : TestDriverBase
+public class AttributeTests : FakeDriverBase
 {
     [Fact]
     public void Constructor_ParsesNamedColorsAndStyle ()
@@ -105,7 +105,7 @@ public class AttributeTests : TestDriverBase
     [Fact]
     public void Constructors_Construct ()
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         // Test parameterless constructor
         var attr = new Attribute ();
@@ -259,7 +259,7 @@ public class AttributeTests : TestDriverBase
     [Fact]
     public void Make_Creates ()
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
 
         var fg = new Color ();
         fg = new (Color.Red);

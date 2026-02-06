@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace ViewBaseTests.Adornments;
+namespace ViewBaseTests.Arrangement;
 
 
 public class ArrangementTests (ITestOutputHelper output)
@@ -692,6 +692,14 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         var window = new Window ();
         Assert.True (window.Arrangement.HasFlag (ViewArrangement.Overlapped));
+    }
+
+    [Fact]
+    public void Dialog_DefaultsToMovableAndOverlapped ()
+    {
+        var dialog = new Dialog ();
+        Assert.True (dialog.Arrangement.HasFlag (ViewArrangement.Movable));
+        Assert.True (dialog.Arrangement.HasFlag (ViewArrangement.Overlapped));
     }
 
     [Fact]

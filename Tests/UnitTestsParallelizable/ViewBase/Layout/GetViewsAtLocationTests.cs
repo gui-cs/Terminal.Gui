@@ -1,4 +1,6 @@
-﻿namespace ViewBaseTests.Layout;
+﻿#nullable enable
+
+namespace ViewBaseTests.Layout;
 
 [Trait ("Category", "Layout")]
 public class GetViewsAtLocationTests
@@ -451,17 +453,23 @@ public class GetViewsAtLocationTests
     [InlineData (1, 1, 1, 1, 1, 8, 8, new [] { "Top", "Padding" })]
     [InlineData (1, 1, 1, 1, 1, 9, 9, new [] { "Top", "Border" })]
     [InlineData (1, 1, 1, 1, 1, 10, 10, new string [] { })] //margin is ViewportSettings.TransparentToMouse
-    public void Top_Adornments_Returns_Correct_View (int frameX,
-                                                     int frameY,
-                                                     int marginThickness,
-                                                     int borderThickness,
-                                                     int paddingThickness,
-                                                     int testX,
-                                                     int testY,
-                                                     string [] expectedViewsFound)
+    public void Top_Adornments_Returns_Correct_View (
+        int frameX,
+        int frameY,
+        int marginThickness,
+        int borderThickness,
+        int paddingThickness,
+        int testX,
+        int testY,
+        string [] expectedViewsFound
+    )
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Id = "Top", Frame = new (frameX, frameY, 10, 10) };
+        Runnable<bool>? runnable = new ()
+        {
+            Id = "Top",
+            Frame = new (frameX, frameY, 10, 10)
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
         runnable.Margin!.Thickness = new (marginThickness);
@@ -495,7 +503,10 @@ public class GetViewsAtLocationTests
     public void Returns_Top_If_No_SubViews (int testX, int testY)
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Frame = new (0, 0, 10, 10) };
+        Runnable<bool>? runnable = new ()
+        {
+            Frame = new (0, 0, 10, 10)
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
@@ -516,7 +527,10 @@ public class GetViewsAtLocationTests
     [InlineData (2, 2)]
     public void Returns_Start_If_No_SubViews (int testX, int testY)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
@@ -535,11 +549,18 @@ public class GetViewsAtLocationTests
     [InlineData (5, 6, true)]
     public void Returns_Correct_If_SubViews (int testX, int testY, bool expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
-        var subview = new View { X = 1, Y = 2, Width = 5, Height = 5 };
+        var subview = new View
+        {
+            X = 1, Y = 2,
+            Width = 5, Height = 5
+        };
         runnable.Add (subview);
 
         View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
@@ -558,14 +579,15 @@ public class GetViewsAtLocationTests
     [InlineData (5, 6, false)]
     public void Returns_Null_If_SubView_NotVisible (int testX, int testY, bool expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
 
         var subview = new View
         {
-            X = 1,
-            Y = 2,
-            Width = 5,
-            Height = 5,
+            X = 1, Y = 2,
+            Width = 5, Height = 5,
             Visible = false
         };
         runnable.Add (subview);
@@ -586,9 +608,17 @@ public class GetViewsAtLocationTests
     [InlineData (5, 6, false)]
     public void Returns_Null_If_Not_Visible_And_SubView_Visible (int testX, int testY, bool expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10, Visible = false };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10,
+            Visible = false
+        };
 
-        var subview = new View { X = 1, Y = 2, Width = 5, Height = 5 };
+        var subview = new View
+        {
+            X = 1, Y = 2,
+            Width = 5, Height = 5
+        };
         runnable.Add (subview);
         subview.Visible = true;
         Assert.True (subview.Visible);
@@ -612,12 +642,19 @@ public class GetViewsAtLocationTests
     [InlineData (6, 7, true)]
     public void Returns_Correct_If_Start_Has_Adornments (int testX, int testY, bool expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
         runnable.Margin!.Thickness = new (1);
 
-        var subview = new View { X = 1, Y = 2, Width = 5, Height = 5 };
+        var subview = new View
+        {
+            X = 1, Y = 2,
+            Width = 5, Height = 5
+        };
         runnable.Add (subview);
 
         View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
@@ -639,15 +676,18 @@ public class GetViewsAtLocationTests
     {
         Runnable<bool>? runnable = new ()
         {
-            Width = 10,
-            Height = 10,
-            ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation | ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize
+            Width = 10, Height = 10,
+            ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation
         };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
         runnable.Viewport = new (offset, offset, 10, 10);
 
-        var subview = new View { X = 1, Y = 1, Width = 2, Height = 2 };
+        var subview = new View
+        {
+            X = 1, Y = 1,
+            Width = 2, Height = 2
+        };
         runnable.Add (subview);
 
         View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
@@ -668,12 +708,19 @@ public class GetViewsAtLocationTests
     [InlineData (6, 7, false)]
     public void Returns_Correct_If_Start_Has_Adornment_WithSubView (int testX, int testY, bool expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
         runnable.Padding!.Thickness = new (1);
 
-        var subview = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
+        var subview = new View
+        {
+            X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1),
+            Width = 1, Height = 1
+        };
         runnable.Padding.Add (subview);
 
         View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
@@ -694,7 +741,11 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool>? runnable = new () { Id = "Top", Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Id = "Top",
+            Width = 10, Height = 10
+        };
         app.Begin (runnable);
 
         runnable.Margin!.Thickness = new (1);
@@ -707,10 +758,8 @@ public class GetViewsAtLocationTests
         var subview = new View
         {
             Id = "SubView",
-            X = 1,
-            Y = 1,
-            Width = 1,
-            Height = 1
+            X = 1, Y = 1,
+            Width = 1, Height = 1
         };
         runnable.Add (subview);
 
@@ -734,17 +783,19 @@ public class GetViewsAtLocationTests
     [InlineData (2, 3, new [] { "Top", "subview" })]
     public void Returns_Correct_If_SubView_Has_Adornments (int testX, int testY, string [] expectedViewsFound)
     {
-        Runnable<bool>? runnable = new () { Id = "Top", Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Id = "Top",
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
         var subview = new View
         {
             Id = "subview",
-            X = 1,
-            Y = 2,
-            Width = 5,
-            Height = 5
+            X = 1, Y = 2,
+            Width = 5, Height = 5
         };
         subview.Border!.Thickness = new (1);
         subview.Border!.Id = "border";
@@ -770,17 +821,19 @@ public class GetViewsAtLocationTests
     [InlineData (2, 3, new [] { "Top", "subview" })]
     public void Returns_Correct_If_SubView_Has_Adornments_With_TransparentMouse (int testX, int testY, string [] expectedViewsFound)
     {
-        Runnable<bool>? runnable = new () { Id = "Top", Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Id = "Top",
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
         var subview = new View
         {
             Id = "subview",
-            X = 1,
-            Y = 2,
-            Width = 5,
-            Height = 5
+            X = 1, Y = 2,
+            Width = 5, Height = 5
         };
         subview.Border!.Thickness = new (1);
         subview.Border!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
@@ -807,17 +860,30 @@ public class GetViewsAtLocationTests
     [InlineData (5, 5, true)]
     public void Returns_Correct_If_SubView_Has_Adornment_WithSubView (int testX, int testY, bool expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
         // A subview with + Padding
-        var subview = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+        var subview = new View
+        {
+            X = 1, Y = 1,
+            Width = 5, Height = 5
+        };
         subview.Padding!.Thickness = new (1);
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
-        var paddingSubView = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
+        var paddingSubView = new View
+        {
+            X = Pos.AnchorEnd (1),
+            Y = Pos.AnchorEnd (1),
+            Width = 1,
+            Height = 1
+        };
         subview.Padding.Add (paddingSubView);
         runnable.Add (subview);
 
@@ -840,12 +906,19 @@ public class GetViewsAtLocationTests
     [InlineData (5, 5, true)]
     public void Returns_Correct_If_SubView_Is_Scrolled_And_Has_Adornment_WithSubView (int testX, int testY, bool expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
         // A subview with + Padding
-        var subview = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+        var subview = new View
+        {
+            X = 1, Y = 1,
+            Width = 5, Height = 5
+        };
         subview.Padding!.Thickness = new (1);
 
         // Scroll the subview
@@ -854,7 +927,13 @@ public class GetViewsAtLocationTests
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
-        var paddingSubView = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
+        var paddingSubView = new View
+        {
+            X = Pos.AnchorEnd (1),
+            Y = Pos.AnchorEnd (1),
+            Width = 1,
+            Height = 1
+        };
         subview.Padding.Add (paddingSubView);
         runnable.Add (subview);
 
@@ -876,7 +955,10 @@ public class GetViewsAtLocationTests
     [InlineData (5, 5, 2)]
     public void Returns_Correct_With_NestedSubViews (int testX, int testY, int expectedSubViewFound)
     {
-        Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
+        Runnable<bool>? runnable = new ()
+        {
+            Width = 10, Height = 10
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
@@ -885,7 +967,11 @@ public class GetViewsAtLocationTests
 
         for (var i = 0; i < numSubViews; i++)
         {
-            var subview = new View { X = 1, Y = 1, Width = 5, Height = 5 };
+            var subview = new View
+            {
+                X = 1, Y = 1,
+                Width = 5, Height = 5
+            };
             subviews.Add (subview);
 
             if (i > 0)
@@ -914,7 +1000,11 @@ public class GetViewsAtLocationTests
     public void Tiled_SubViews (int mouseX, int mouseY, string [] viewIdStrings)
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Frame = new (0, 0, 10, 10), Id = "top" };
+        Runnable<bool>? runnable = new ()
+        {
+            Frame = new (0, 0, 10, 10),
+            Id = "top"
+        };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
@@ -963,7 +1053,11 @@ public class GetViewsAtLocationTests
     public void Popover (int mouseX, int mouseY, string [] viewIdStrings)
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Frame = new (0, 0, 10, 10), Id = "top" };
+        Runnable<bool>? runnable = new ()
+        {
+            Frame = new (0, 0, 10, 10),
+            Id = "top"
+        };
 
         IApplication? app = Application.Create ();
         app.Begin (runnable);
@@ -1005,9 +1099,17 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new ()
+        {
+            Id = "topRunnable",
+            Frame = new (0, 0, 20, 20)
+        };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
+        Runnable<bool> secondaryRunnable = new ()
+        {
+            Id = "secondaryRunnable",
+            Frame = new (5, 5, 10, 10)
+        };
         secondaryRunnable.Margin!.Thickness = new (1);
         secondaryRunnable.Layout ();
 
@@ -1027,9 +1129,17 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new ()
+        {
+            Id = "topRunnable",
+            Frame = new (0, 0, 20, 20)
+        };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
+        Runnable<bool> secondaryRunnable = new ()
+        {
+            Id = "secondaryRunnable",
+            Frame = new (5, 5, 10, 10)
+        };
         secondaryRunnable.Margin!.Thickness = new (1);
         secondaryRunnable.Layout ();
 
@@ -1049,9 +1159,17 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new ()
+        {
+            Id = "topRunnable",
+            Frame = new (0, 0, 20, 20)
+        };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
+        Runnable<bool> secondaryRunnable = new ()
+        {
+            Id = "secondaryRunnable",
+            Frame = new (5, 5, 10, 10)
+        };
         secondaryRunnable.Margin!.Thickness = new (1);
 
         app.Begin (runnable);
@@ -1079,9 +1197,17 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new ()
+        {
+            Id = "topRunnable",
+            Frame = new (0, 0, 20, 20)
+        };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
+        Runnable<bool> secondaryRunnable = new ()
+        {
+            Id = "secondaryRunnable",
+            Frame = new (5, 5, 10, 10)
+        };
         secondaryRunnable.Margin!.Thickness = new (1);
         secondaryRunnable.Layout ();
 

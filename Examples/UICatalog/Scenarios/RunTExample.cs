@@ -7,16 +7,15 @@ public class RunTExample : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-
-        using IApplication app = Application.Create ();
-        app.Init ();
-
-        app.Run<ExampleWindow> ();
+        // No need to call Init if Application.Run<T> is used
+        Application.Run<ExampleWindow> ();
+        Application.Shutdown ();
     }
 
     public class ExampleWindow : Window
     {
+        private readonly TextField _usernameText;
+
         public ExampleWindow ()
         {
             Title = $"Example App ({Application.QuitKey} to quit)";
@@ -24,13 +23,13 @@ public class RunTExample : Scenario
             // Create input components and labels
             var usernameLabel = new Label { Text = "Username:" };
 
-            TextField usernameText = new()
+            _usernameText = new()
             {
                 // Position text field adjacent to the label
-                X = Pos.Right (usernameLabel) + 1, Width
+                X = Pos.Right (usernameLabel) + 1,
 
-                    // Fill remaining horizontal space
-                    = Dim.Fill ()
+                // Fill remaining horizontal space
+                Width = Dim.Fill ()
             };
 
             var passwordLabel = new Label
@@ -43,7 +42,7 @@ public class RunTExample : Scenario
                 Secret = true,
 
                 // align with the text box above
-                X = Pos.Left (usernameText),
+                X = Pos.Left (_usernameText),
                 Y = Pos.Top (passwordLabel),
                 Width = Dim.Fill ()
             };
@@ -60,16 +59,16 @@ public class RunTExample : Scenario
             };
 
             // When login button is clicked display a message popup
-            btnLogin.Accepting += (_, _) =>
+            btnLogin.Accepting += (s, e) =>
                                {
-                                   if (usernameText.Text == "admin" && passwordText.Text == "password")
+                                   if (_usernameText.Text == "admin" && passwordText.Text == "password")
                                    {
-                                       MessageBox.Query (App!, "Login Successful", $"Username: {usernameText.Text}", "Ok");
+                                       MessageBox.Query (App, "Login Successful", $"Username: {_usernameText.Text}", "Ok");
                                        App?.RequestStop ();
                                    }
                                    else
                                    {
-                                       MessageBox.ErrorQuery (App!,
+                                       MessageBox.ErrorQuery (App,
                                                               "Error Logging In",
                                                               "Incorrect username or password (hint: admin/password)",
                                                               "Ok"
@@ -78,7 +77,7 @@ public class RunTExample : Scenario
                                };
 
             // Add the views to the Window
-            Add (usernameLabel, usernameText, passwordLabel, passwordText, btnLogin);
+            Add (usernameLabel, _usernameText, passwordLabel, passwordText, btnLogin);
         }
     }
 }

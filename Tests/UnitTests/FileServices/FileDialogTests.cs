@@ -35,7 +35,7 @@ public class FileDialogTests ()
         FileDialog dlg = GetInitializedFileDialog ();
         TextField tf = dlg.SubViews.OfType<TextField> ().First (t => t.HasFocus);
         tf.ClearAllSelection ();
-        tf.InsertionPoint = tf.Text.Length;
+        tf.CursorPosition = tf.Text.Length;
         Assert.True (tf.HasFocus);
 
         SendSlash ();
@@ -107,7 +107,7 @@ public class FileDialogTests ()
         Assert.IsType<TextField> (dlg.MostFocused);
         Assert.Same (tf, dlg.MostFocused);
 
-        Assert.Equal (Strings.cmdFind, tf.Title);
+        Assert.Equal ("_Find", tf.Title);
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
@@ -185,6 +185,7 @@ public class FileDialogTests ()
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
+
         var tv = GetTableView (dlg);
         tv.SetFocus ();
 
@@ -205,7 +206,7 @@ public class FileDialogTests ()
         }
         else
         {
-            Application.RaiseKeyDownEvent (Key.O.WithAlt);
+            Application.RaiseKeyDownEvent ('O');
         }
 
         Assert.False (dlg.Canceled);
@@ -738,7 +739,7 @@ public class FileDialogTests ()
                 ForceFocus (tb);
 
                 tb.Text = "/bob/fish";
-                tb.InsertionPoint = tb.Text.Length;
+                tb.CursorPosition = tb.Text.Length;
                 tb.GenerateSuggestions (null, "fish", "fishes");
 
                 // should not report success for autocompletion because we already have that exact
@@ -753,7 +754,7 @@ public class FileDialogTests ()
                 ForceFocus (tb);
 
                 tb.Text = @"/bob/fi";
-                tb.InsertionPoint = tb.Text.Length;
+                tb.CursorPosition = tb.Text.Length;
                 tb.GenerateSuggestions (null, "fish", "fishes");
 
                 Assert.True (tb.AcceptSelectionIfAny ());

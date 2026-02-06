@@ -1,3 +1,5 @@
+
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Displays graphs (bar, scatter, etc...) with flexible labels, scaling, and scrolling</summary>
@@ -104,20 +106,14 @@ public class GraphView : View, IDesignable
     public Attribute? GraphColor { get; set; }
 
     /// <summary>
-    ///     Amount of space (in viewport columns) to reserve on the bottom of the graph for axis labels and legends.
-    ///     Graph content (<see cref="Series"/>) will not be rendered in this internal margin area, but axis labels may be.
-    ///     This is separate from the View's <see cref="View.Margin"/>, <see cref="View.Border"/>, and
-    ///     <see cref="View.Padding"/> adornments,
-    ///     which create space outside the viewport.
+    ///     Amount of space to leave on bottom of the graph. Graph content (<see cref="Series"/>) will not be rendered in
+    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
     /// </summary>
     public uint MarginBottom { get; set; }
 
     /// <summary>
-    ///     Amount of space (in viewport columns) to reserve on the left of the graph for axis labels.
-    ///     Graph content (<see cref="Series"/>) will not be rendered in this internal margin area, but axis labels may be.
-    ///     This is separate from the View's <see cref="View.Margin"/>, <see cref="View.Border"/>, and
-    ///     <see cref="View.Padding"/> adornments,
-    ///     which create space outside the viewport.
+    ///     Amount of space to leave on left of the graph. Graph content (<see cref="Series"/>) will not be rendered in
+    ///     margins but axis labels may be. Use <see cref="Padding"/> to add a margin outside of the GraphView.
     /// </summary>
     public uint MarginLeft { get; set; }
 
@@ -129,7 +125,7 @@ public class GraphView : View, IDesignable
     public PointF ScrollOffset { get; set; } = new (0, 0);
 
     /// <summary>Collection of data series that are rendered in the graph.</summary>
-    public List<ISeries> Series { get; } = [];
+    public List<ISeries> Series { get; } = new ();
 
     #region Bresenham's line algorithm
 
@@ -182,18 +178,16 @@ public class GraphView : View, IDesignable
 
     #endregion
 
-    /// <summary>Calculates the viewport-relative location for a given point in graph space.</summary>
+    /// <summary>Calculates the screen location for a given point in graph space. Bear in mind these may be off screen.</summary>
     /// <param name="location">
     ///     Point in graph space that may or may not be represented in the visible area of graph currently
     ///     presented.  E.g. 0,0 for origin.
     /// </param>
     /// <returns>
-    ///     Viewport-relative position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note
-    ///     that
-    ///     this can be outside the current content area of the view. Viewport-relative coordinates have (0,0) at the top-left
-    ///     of the View's content area (after accounting for Border, Margin, and Padding).
+    ///     Screen position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that
+    ///     this can be outside the current content area of the view.
     /// </returns>
-    public Point GraphSpaceToViewport (PointF location)
+    public Point GraphSpaceToScreen (PointF location)
     {
         return new (
                     (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
@@ -265,7 +259,7 @@ public class GraphView : View, IDesignable
 
         var drawBounds = new Rectangle ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
 
-        RectangleF graphSpace = ViewportToGraphSpace (drawBounds);
+        RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
 
         foreach (ISeries s in Series.ToArray ())
         {
@@ -308,11 +302,11 @@ public class GraphView : View, IDesignable
         SetNeedsDraw ();
     }
 
-    /// <summary>Returns the section of the graph that is represented by the given viewport-relative position.</summary>
-    /// <param name="col">Column in viewport-relative coordinates.</param>
-    /// <param name="row">Row in viewport-relative coordinates.</param>
-    /// <returns>The rectangle in graph space that corresponds to the viewport cell at the given position.</returns>
-    public RectangleF ViewportToGraphSpace (int col, int row)
+    /// <summary>Returns the section of the graph that is represented by the given screen position.</summary>
+    /// <param name="col"></param>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    public RectangleF ScreenToGraphSpace (int col, int row)
     {
         return new (
                     ScrollOffset.X + (col - MarginLeft) * CellSize.X,
@@ -322,15 +316,15 @@ public class GraphView : View, IDesignable
                    );
     }
 
-    /// <summary>Returns the section of the graph that is represented by the viewport-relative area.</summary>
-    /// <param name="viewportArea">Rectangle in viewport-relative coordinates.</param>
-    /// <returns>The rectangle in graph space that corresponds to the viewport area.</returns>
-    public RectangleF ViewportToGraphSpace (Rectangle viewportArea)
+    /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
+    /// <param name="screenArea"></param>
+    /// <returns></returns>
+    public RectangleF ScreenToGraphSpace (Rectangle screenArea)
     {
         // get position of the bottom left
-        RectangleF pos = ViewportToGraphSpace (viewportArea.Left, viewportArea.Bottom - 1);
+        RectangleF pos = ScreenToGraphSpace (screenArea.Left, screenArea.Bottom - 1);
 
-        return pos with { Width = viewportArea.Width * CellSize.X, Height = viewportArea.Height * CellSize.Y };
+        return pos with { Width = screenArea.Width * CellSize.X, Height = screenArea.Height * CellSize.Y };
     }
 
     /// <summary>

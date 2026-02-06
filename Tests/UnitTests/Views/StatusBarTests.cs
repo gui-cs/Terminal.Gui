@@ -116,7 +116,7 @@ public class StatusBarTests
             {
                 Assert.Equal ("Quiting...", msg);
                 msg = "";
-                sb.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+                sb.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
             }
             else
             {

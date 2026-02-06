@@ -44,7 +44,7 @@ internal class FakeVAxis : VerticalAxis
 
 #endregion
 
-public class GraphViewTests : TestDriverBase
+public class GraphViewTests : FakeDriverBase
 {
     /// <summary>
     ///     A cell size of 0 would result in mapping all graph space into the same cell of the console.  Since
@@ -76,7 +76,7 @@ public class GraphViewTests : TestDriverBase
     {
         var gv = new GraphView ()
         {
-            Driver = Application.Driver ?? CreateTestDriver ()
+            Driver = Application.Driver ?? CreateFakeDriver ()
         };
         gv.BeginInit ();
         gv.EndInit ();
@@ -95,7 +95,7 @@ public class GraphViewTests : TestDriverBase
     ///     that rectangle of graph space maps back to the same row/col of the graph that was fed in
     /// </summary>
     [Fact]
-    public void TestReversing_ViewportToGraphSpace ()
+    public void TestReversing_ScreenToGraphSpace ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -117,13 +117,13 @@ public class GraphViewTests : TestDriverBase
         {
             for (var y = 0; y < gv.Viewport.Height; y++)
             {
-                RectangleF graphSpace = gv.ViewportToGraphSpace (x, y);
+                RectangleF graphSpace = gv.ScreenToGraphSpace (x, y);
 
                 // See 
                 // https://en.wikipedia.org/wiki/Machine_epsilon
                 var epsilon = 0.0001f;
 
-                Point p = gv.GraphSpaceToViewport (
+                Point p = gv.GraphSpaceToScreen (
                                                  new PointF (
                                                              graphSpace.Left + epsilon,
                                                              graphSpace.Top + epsilon
@@ -132,7 +132,7 @@ public class GraphViewTests : TestDriverBase
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
-                p = gv.GraphSpaceToViewport (
+                p = gv.GraphSpaceToScreen (
                                            new PointF (
                                                        graphSpace.Right - epsilon,
                                                        graphSpace.Top + epsilon
@@ -141,7 +141,7 @@ public class GraphViewTests : TestDriverBase
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
-                p = gv.GraphSpaceToViewport (
+                p = gv.GraphSpaceToScreen (
                                            new PointF (
                                                        graphSpace.Left + epsilon,
                                                        graphSpace.Bottom - epsilon
@@ -150,7 +150,7 @@ public class GraphViewTests : TestDriverBase
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
-                p = gv.GraphSpaceToViewport (
+                p = gv.GraphSpaceToScreen (
                                            new PointF (
                                                        graphSpace.Right - epsilon,
                                                        graphSpace.Bottom - epsilon
@@ -165,7 +165,7 @@ public class GraphViewTests : TestDriverBase
     #region Screen to Graph Tests
 
     [Fact]
-    public void ViewportToGraphSpace_DefaultCellSize ()
+    public void ScreenToGraphSpace_DefaultCellSize ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -174,20 +174,20 @@ public class GraphViewTests : TestDriverBase
         gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
-        RectangleF botLeft = gv.ViewportToGraphSpace (0, 9);
+        RectangleF botLeft = gv.ScreenToGraphSpace (0, 9);
         Assert.Equal (0, botLeft.X);
         Assert.Equal (0, botLeft.Y);
         Assert.Equal (1, botLeft.Width);
         Assert.Equal (1, botLeft.Height);
 
         // up 2 rows of the console and along 1 col
-        RectangleF up2along1 = gv.ViewportToGraphSpace (1, 7);
+        RectangleF up2along1 = gv.ScreenToGraphSpace (1, 7);
         Assert.Equal (1, up2along1.X);
         Assert.Equal (2, up2along1.Y);
     }
 
     [Fact]
-    public void ViewportToGraphSpace_DefaultCellSize_WithMargin ()
+    public void ScreenToGraphSpace_DefaultCellSize_WithMargin ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -196,7 +196,7 @@ public class GraphViewTests : TestDriverBase
         gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
-        RectangleF botLeft = gv.ViewportToGraphSpace (0, 9);
+        RectangleF botLeft = gv.ScreenToGraphSpace (0, 9);
         Assert.Equal (0, botLeft.X);
         Assert.Equal (0, botLeft.Y);
         Assert.Equal (1, botLeft.Width);
@@ -204,7 +204,7 @@ public class GraphViewTests : TestDriverBase
 
         gv.MarginLeft = 1;
 
-        botLeft = gv.ViewportToGraphSpace (0, 9);
+        botLeft = gv.ScreenToGraphSpace (0, 9);
 
         // Origin should be at 1,9 now to leave a margin of 1
         // so screen position 0,9 would be data space -1,0
@@ -216,7 +216,7 @@ public class GraphViewTests : TestDriverBase
         gv.MarginLeft = 1;
         gv.MarginBottom = 1;
 
-        botLeft = gv.ViewportToGraphSpace (0, 9);
+        botLeft = gv.ScreenToGraphSpace (0, 9);
 
         // Origin should be at 1,0 (to leave a margin of 1 in both sides)
         // so screen position 0,9 would be data space -1,-1
@@ -227,7 +227,7 @@ public class GraphViewTests : TestDriverBase
     }
 
     [Fact]
-    public void ViewportToGraphSpace_CustomCellSize ()
+    public void ScreenToGraphSpace_CustomCellSize ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -240,14 +240,14 @@ public class GraphViewTests : TestDriverBase
 
         // origin should be bottom left 
         // (note that y=10 is actually overspilling the control, the last row is 9)
-        RectangleF botLeft = gv.ViewportToGraphSpace (0, 9);
+        RectangleF botLeft = gv.ScreenToGraphSpace (0, 9);
         Assert.Equal (0, botLeft.X);
         Assert.Equal (0, botLeft.Y);
         Assert.Equal (0.25f, botLeft.Width);
         Assert.Equal (5, botLeft.Height);
 
         // up 2 rows of the console and along 1 col
-        RectangleF up2along1 = gv.ViewportToGraphSpace (1, 7);
+        RectangleF up2along1 = gv.ScreenToGraphSpace (1, 7);
         Assert.Equal (0.25f, up2along1.X);
         Assert.Equal (10, up2along1.Y);
         Assert.Equal (0.25f, botLeft.Width);
@@ -259,7 +259,7 @@ public class GraphViewTests : TestDriverBase
     #region Graph to Screen Tests
 
     [Fact]
-    public void GraphSpaceToViewport_DefaultCellSize ()
+    public void GraphSpaceToScreen_DefaultCellSize ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -268,18 +268,18 @@ public class GraphViewTests : TestDriverBase
         gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
-        Point botLeft = gv.GraphSpaceToViewport (new PointF (0, 0));
+        Point botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
         Assert.Equal (0, botLeft.X);
         Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left
 
         // along 2 and up 1 in graph space
-        Point along2up1 = gv.GraphSpaceToViewport (new PointF (2, 1));
+        Point along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
         Assert.Equal (2, along2up1.X);
         Assert.Equal (8, along2up1.Y);
     }
 
     [Fact]
-    public void GraphSpaceToViewport_DefaultCellSize_WithMargin ()
+    public void GraphSpaceToScreen_DefaultCellSize_WithMargin ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -288,14 +288,14 @@ public class GraphViewTests : TestDriverBase
         gv.Viewport = new Rectangle (0, 0, 20, 10);
 
         // origin should be bottom left
-        Point botLeft = gv.GraphSpaceToViewport (new PointF (0, 0));
+        Point botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
         Assert.Equal (0, botLeft.X);
         Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left
 
         gv.MarginLeft = 1;
 
         // With a margin of 1 the origin should be at x=1 y= 9
-        botLeft = gv.GraphSpaceToViewport (new PointF (0, 0));
+        botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
         Assert.Equal (1, botLeft.X);
         Assert.Equal (9, botLeft.Y); // row 9 of the view is the bottom left
 
@@ -303,13 +303,13 @@ public class GraphViewTests : TestDriverBase
         gv.MarginBottom = 1;
 
         // With a margin of 1 in both directions the origin should be at x=1 y= 9
-        botLeft = gv.GraphSpaceToViewport (new PointF (0, 0));
+        botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
         Assert.Equal (1, botLeft.X);
         Assert.Equal (8, botLeft.Y); // row 8 of the view is the bottom left up 1 cell
     }
 
     [Fact]
-    public void GraphSpaceToViewport_ScrollOffset ()
+    public void GraphSpaceToScreen_ScrollOffset ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -321,18 +321,18 @@ public class GraphViewTests : TestDriverBase
         gv.ScrollOffset = new PointF (-5, -5);
 
         // origin should be right in the middle of the control
-        Point botLeft = gv.GraphSpaceToViewport (new PointF (0, 0));
+        Point botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
         Assert.Equal (5, botLeft.X);
         Assert.Equal (4, botLeft.Y);
 
         // along 2 and up 1 in graph space
-        Point along2up1 = gv.GraphSpaceToViewport (new PointF (2, 1));
+        Point along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
         Assert.Equal (7, along2up1.X);
         Assert.Equal (3, along2up1.Y);
     }
 
     [Fact]
-    public void GraphSpaceToViewport_CustomCellSize ()
+    public void GraphSpaceToScreen_CustomCellSize ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -345,35 +345,35 @@ public class GraphViewTests : TestDriverBase
         gv.CellSize = new PointF (0.25f, 5);
 
         // origin should be bottom left
-        Point botLeft = gv.GraphSpaceToViewport (new PointF (0, 0));
+        Point botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
         Assert.Equal (0, botLeft.X);
 
         // row 9 of the view is the bottom left (height is 10 so 0,1,2,3..9)
         Assert.Equal (9, botLeft.Y);
 
         // along 2 and up 1 in graph space
-        Point along2up1 = gv.GraphSpaceToViewport (new PointF (2, 1));
+        Point along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
         Assert.Equal (8, along2up1.X);
         Assert.Equal (9, along2up1.Y);
 
         // Y value 4 should be rendered in bottom most row
-        Assert.Equal (9, gv.GraphSpaceToViewport (new PointF (2, 4)).Y);
+        Assert.Equal (9, gv.GraphSpaceToScreen (new PointF (2, 4)).Y);
 
         // Cell height is 5 so this is the first point of graph space that should
         // be rendered in the graph in next row up (row 9)
-        Assert.Equal (8, gv.GraphSpaceToViewport (new PointF (2, 5)).Y);
+        Assert.Equal (8, gv.GraphSpaceToScreen (new PointF (2, 5)).Y);
 
         // More boundary testing for this cell size
-        Assert.Equal (8, gv.GraphSpaceToViewport (new PointF (2, 6)).Y);
-        Assert.Equal (8, gv.GraphSpaceToViewport (new PointF (2, 7)).Y);
-        Assert.Equal (8, gv.GraphSpaceToViewport (new PointF (2, 8)).Y);
-        Assert.Equal (8, gv.GraphSpaceToViewport (new PointF (2, 9)).Y);
-        Assert.Equal (7, gv.GraphSpaceToViewport (new PointF (2, 10)).Y);
-        Assert.Equal (7, gv.GraphSpaceToViewport (new PointF (2, 11)).Y);
+        Assert.Equal (8, gv.GraphSpaceToScreen (new PointF (2, 6)).Y);
+        Assert.Equal (8, gv.GraphSpaceToScreen (new PointF (2, 7)).Y);
+        Assert.Equal (8, gv.GraphSpaceToScreen (new PointF (2, 8)).Y);
+        Assert.Equal (8, gv.GraphSpaceToScreen (new PointF (2, 9)).Y);
+        Assert.Equal (7, gv.GraphSpaceToScreen (new PointF (2, 10)).Y);
+        Assert.Equal (7, gv.GraphSpaceToScreen (new PointF (2, 11)).Y);
     }
 
     [Fact]
-    public void GraphSpaceToViewport_CustomCellSize_WithScrollOffset ()
+    public void GraphSpaceToScreen_CustomCellSize_WithScrollOffset ()
     {
         var gv = new GraphView ();
         gv.BeginInit ();
@@ -389,22 +389,22 @@ public class GraphViewTests : TestDriverBase
         gv.ScrollOffset = new PointF (-1, -10);
 
         // origin should be in the lower left (but not right at the bottom)
-        Point botLeft = gv.GraphSpaceToViewport (new PointF (0, 0));
+        Point botLeft = gv.GraphSpaceToScreen (new PointF (0, 0));
         Assert.Equal (4, botLeft.X);
         Assert.Equal (7, botLeft.Y);
 
         // along 2 and up 1 in graph space
-        Point along2up1 = gv.GraphSpaceToViewport (new PointF (2, 1));
+        Point along2up1 = gv.GraphSpaceToScreen (new PointF (2, 1));
         Assert.Equal (12, along2up1.X);
         Assert.Equal (7, along2up1.Y);
 
         // More boundary testing for this cell size/offset
-        Assert.Equal (6, gv.GraphSpaceToViewport (new PointF (2, 6)).Y);
-        Assert.Equal (6, gv.GraphSpaceToViewport (new PointF (2, 7)).Y);
-        Assert.Equal (6, gv.GraphSpaceToViewport (new PointF (2, 8)).Y);
-        Assert.Equal (6, gv.GraphSpaceToViewport (new PointF (2, 9)).Y);
-        Assert.Equal (5, gv.GraphSpaceToViewport (new PointF (2, 10)).Y);
-        Assert.Equal (5, gv.GraphSpaceToViewport (new PointF (2, 11)).Y);
+        Assert.Equal (6, gv.GraphSpaceToScreen (new PointF (2, 6)).Y);
+        Assert.Equal (6, gv.GraphSpaceToScreen (new PointF (2, 7)).Y);
+        Assert.Equal (6, gv.GraphSpaceToScreen (new PointF (2, 8)).Y);
+        Assert.Equal (6, gv.GraphSpaceToScreen (new PointF (2, 9)).Y);
+        Assert.Equal (5, gv.GraphSpaceToScreen (new PointF (2, 10)).Y);
+        Assert.Equal (5, gv.GraphSpaceToScreen (new PointF (2, 11)).Y);
     }
 
     #endregion
@@ -683,13 +683,13 @@ public class MultiBarSeriesTests
     }
 }
 
-public class BarSeriesTests : TestDriverBase
+public class BarSeriesTests : FakeDriverBase
 {
     [Fact]
     public void TestOneLongOneShortHorizontalBars_WithOffset ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
-        graph.Driver = CreateTestDriver ();
+        graph.Driver = CreateFakeDriver ();
         graph.Draw ();
 
         // no bars
@@ -1643,121 +1643,5 @@ public class AxisIncrementToRenderTests
         Assert.Equal (Orientation.Horizontal, render.Orientation);
         Assert.Equal (1, render.ScreenLocation);
         Assert.Equal (6.6f, render.Value);
-    }
-}
-
-public class GraphViewBorderTests : TestDriverBase
-{
-    private readonly ITestOutputHelper _output;
-    public GraphViewBorderTests (ITestOutputHelper output) { _output = output; }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void GraphView_WithBorder_RendersCorrectly ()
-    {
-        // Copilot - ChatGPT v4
-        // This test reproduces the issue where GraphView assumes Frame == Bounds
-        // When a border is added, the graph content should be drawn inside the border,
-        // not overlapping it.
-
-        GraphView gv = new ()
-        {
-            X = 0,
-            Y = 0,
-            Width = 12,
-            Height = 7,
-            BorderStyle = LineStyle.Single,
-            Driver = Application.Driver
-        };
-
-        gv.BeginInit ();
-        gv.EndInit ();
-
-        // Add some simple data
-        gv.Series.Add (
-                       new ScatterSeries
-                       {
-                           Points = new List<PointF>
-                           {
-                               new (1, 1),
-                               new (2, 2),
-                               new (3, 3)
-                           }
-                       }
-                      );
-
-        gv.MarginBottom = 1;
-        gv.MarginLeft = 1;
-
-        gv.Draw ();
-
-        // The border should be intact with corners properly drawn
-        // The graph content should not overwrite the border
-        // With BorderStyle.Single, the viewport shrinks by 1 on each side
-        // Then with MarginLeft=1 and MarginBottom=1, the graph data area starts at (2,1) in the View's frame
-        string expected =
-            @"
-┌──────────┐
-│ │  ∙     │
-│ ┤ ∙      │
-│ ┤∙       │
-│0┼┬┬┬┬┬┬┬┬│
-│ 0    5   │
-└──────────┘";
-
-        DriverAssert.AssertDriverContentsAre (expected, _output);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void GraphView_Legend_WithBorder_UsesViewportNotFrame ()
-    {
-        // Copilot - ChatGPT v4
-        // This test verifies that when GraphView has adornments (border/margin/padding),
-        // legends and other annotations positioned using Viewport.Width work correctly.
-
-        GraphView gv = new ()
-        {
-            X = 0,
-            Y = 0,
-            Width = 30,
-            Height = 10,
-            BorderStyle = LineStyle.Single,
-            Driver = Application.Driver
-        };
-
-        gv.BeginInit ();
-        gv.EndInit ();
-
-        // Add some data
-        gv.Series.Add (
-                       new ScatterSeries
-                       {
-                           Points = new List<PointF> { new (1, 1), new (2, 2) }
-                       }
-                      );
-
-        gv.MarginBottom = 1;
-        gv.MarginLeft = 1;
-
-        // WITH border: Viewport.Width == 28 (30 - 2), Frame.Width == 30
-        // Legend positioned at Viewport.Width - 10 should work correctly
-
-        LegendAnnotation legend = new (new (gv.Viewport.Width - 10, 0, 10, 3));
-        legend.AddEntry (new GraphCellToRender ((Rune)'#'), "Test");
-        gv.Annotations.Add (legend);
-
-        gv.Draw ();
-
-        // Verify the test runs without crashing
-        // The GraphView should render with its border intact and the legend positioned correctly inside
-        Assert.NotNull (gv);
-        Assert.Equal (28, gv.Viewport.Width); // 30 - 2 (for borders)
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 }

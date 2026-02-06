@@ -39,13 +39,14 @@ public class SaveDialog : FileDialog
     ///     <see cref="SaveDialog"/>.
     /// </summary>
     /// <value>The name of the file.</value>
-    public string FileName => ((IRunnable)this).Result is null || Result == 1 ? null : Path;
+    public string FileName => Canceled ? null : Path;
 
     /// <summary>Gets the default title for the <see cref="SaveDialog"/>.</summary>
     /// <returns></returns>
     protected override string GetDefaultTitle ()
     {
-        List<string> titleParts = [Strings.fdSave];
+        List<string> titleParts = [Strings.fdSave]
+            ;
 
         if (MustExist)
         {

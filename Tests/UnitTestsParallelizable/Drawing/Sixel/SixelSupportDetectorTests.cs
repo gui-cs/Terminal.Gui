@@ -105,16 +105,15 @@ public class SixelSupportDetectorTests
     {
         // Arrange
         var responseReceived = false;
-        var output = new AnsiOutput ();
+        var output = new FakeOutput ();
         output.IsLegacyConsole = isLegacyConsole;
 
         Mock<DriverImpl> driverMock = new (
                                            MockBehavior.Strict,
-                                           new AnsiComponentFactory (),
-                                           new AnsiInputProcessor (null!),
+                                           new FakeInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,
-                                           new AnsiRequestScheduler (new AnsiResponseParser (new SystemTimeProvider ())),
+                                           new AnsiRequestScheduler (new AnsiResponseParser ()),
                                            new SizeMonitorImpl (output)
                                           );
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
@@ -173,16 +172,15 @@ public class SixelSupportDetectorTests
     {
         // Arrange
         var responseReceived = false;
-        var output = new AnsiOutput ();
+        var output = new FakeOutput ();
         output.IsLegacyConsole = isLegacyConsole;
 
         Mock<DriverImpl> driverMock = new (
                                            MockBehavior.Strict,
-                                           new AnsiComponentFactory (),
-                                           new AnsiInputProcessor (null!),
+                                           new FakeInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,
-                                           new AnsiRequestScheduler (new AnsiResponseParser (new SystemTimeProvider ())),
+                                           new AnsiRequestScheduler (new AnsiResponseParser ()),
                                            new SizeMonitorImpl (output)
                                           );
 

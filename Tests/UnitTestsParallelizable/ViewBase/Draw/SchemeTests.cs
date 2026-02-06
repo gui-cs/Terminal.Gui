@@ -5,7 +5,7 @@ using Xunit;
 namespace ViewBaseTests.Drawing;
 
 [Trait ("Category", "View.Scheme")]
-public class SchemeTests : TestDriverBase
+public class SchemeTests : FakeDriverBase
 {
 
     [Fact]
@@ -64,7 +64,7 @@ public class SchemeTests : TestDriverBase
     public void GetAttribute_ReturnsCorrectAttribute_Via_Mock ()
     {
         var view = new View { SchemeName = "Base" };
-        view.Driver = CreateTestDriver ();
+        view.Driver = CreateFakeDriver ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         // Act
@@ -104,7 +104,7 @@ public class SchemeTests : TestDriverBase
     public void SetAttributeForRole_SetsCorrectAttribute ()
     {
         var view = new View { SchemeName = "Base" };
-        view.Driver = CreateTestDriver ();
+        view.Driver = CreateFakeDriver ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         var previousAttribute = view.SetAttributeForRole (VisualRole.Focus);

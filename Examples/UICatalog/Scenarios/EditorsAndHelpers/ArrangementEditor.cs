@@ -16,11 +16,14 @@ public sealed class ArrangementEditor : EditorBase
         Add (_arrangementSelector);
     }
 
-    private readonly FlagSelector<ViewArrangement> _arrangementSelector = new () { Orientation = Orientation.Vertical };
+    private readonly FlagSelector<ViewArrangement> _arrangementSelector = new ()
+    {
+        Orientation = Orientation.Vertical
+    };
 
     protected override void OnViewToEditChanged ()
     {
-        _arrangementSelector.Enabled = ViewToEdit is { } and not Adornment;
+        _arrangementSelector.Enabled = ViewToEdit is not Adornment;
 
         _arrangementSelector.ValueChanged -= ArrangementFlagsOnValueChanged;
 
@@ -35,25 +38,24 @@ public sealed class ArrangementEditor : EditorBase
 
     private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<ViewArrangement?> e)
     {
-        if (ViewToEdit is null || e.Value is null)
+        if (ViewToEdit is { } && e.Value is { })
         {
-            return;
-        }
-        ViewToEdit.Arrangement = (ViewArrangement)e.Value;
+            ViewToEdit.Arrangement = (ViewArrangement)e.Value;
 
-        if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
-        {
-            ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
-            ViewToEdit.SchemeName = "Runnable";
-        }
-        else
-        {
-            ViewToEdit.ShadowStyle = ShadowStyle.None;
-            ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
-        }
+            if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
+            {
+                ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
+                ViewToEdit.SchemeName = "Runnable";
+            }
+            else
+            {
+                ViewToEdit.ShadowStyle = ShadowStyle.None;
+                ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
+            }
 
-        ViewToEdit.BorderStyle = ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable) ? LineStyle.Double : LineStyle.Single;
+            ViewToEdit.BorderStyle = ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable) ? LineStyle.Double : LineStyle.Single;
+        }
     }
 
-    private void ArrangementEditor_Initialized (object? sender, EventArgs e) => _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
+    private void ArrangementEditor_Initialized (object? sender, EventArgs e) { _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged; }
 }

@@ -6,7 +6,7 @@ namespace UnitTests.ViewsTests;
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests
 {
-    [Theory (Skip = "Broken in #4474")]
+    [Theory]
 
     //  0123456789
     // " C  0  A "
@@ -41,7 +41,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (x, 0),
-                                      Flags = MouseFlags.LeftButtonClicked
+                                      Flags = MouseFlags.Button1Clicked
                                   });
 
         Assert.Equal (expectedAccepted, accepted);
@@ -50,7 +50,7 @@ public class ShortcutTests
         Application.ResetState (true);
     }
 
-    [Theory (Skip = "Broken in #4474")]
+    [Theory]
 
     //  0123456789
     // " C  0  A "
@@ -101,7 +101,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
-                                      Flags = MouseFlags.LeftButtonClicked
+                                      Flags = MouseFlags.Button1Clicked
                                   });
 
         Assert.Equal (expectedShortcutAccepted, shortcutAcceptCount);
@@ -113,7 +113,8 @@ public class ShortcutTests
         Application.ResetState (true);
     }
 
-    [Theory (Skip = "Broken in #4474")]
+    [Theory]
+
     //  0123456789
     // " C  0  A "
     [InlineData (-1, 0, 0)]
@@ -157,7 +158,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
-                                      Flags = MouseFlags.LeftButtonClicked
+                                      Flags = MouseFlags.Button1Clicked
                                   });
 
         Assert.Equal (expectedAccept, accepted);
@@ -167,7 +168,7 @@ public class ShortcutTests
         Application.ResetState (true);
     }
 
-    [Theory (Skip = "Broken in #4474")]
+    [Theory]
 
     //  01234567890
     // " ☑C  0  A "
@@ -232,7 +233,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
-                                      Flags = MouseFlags.LeftButtonClicked
+                                      Flags = MouseFlags.Button1Clicked
                                   });
 
         Assert.Equal (expectedAccepted, accepted);

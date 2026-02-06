@@ -1,3 +1,4 @@
+#nullable enable
 namespace ViewsTests;
 
 /// <summary>
@@ -11,7 +12,7 @@ public class SelectorBaseTests
     [Fact]
     public void Constructor_SetsDefaults ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         Assert.True (selector.CanFocus);
         Assert.Equal (Dim.Auto (DimAutoStyle.Content), selector.Width);
@@ -33,7 +34,7 @@ public class SelectorBaseTests
     [Fact]
     public void Value_Set_ValidValue_UpdatesValue ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         selector.Value = 1;
@@ -44,7 +45,7 @@ public class SelectorBaseTests
     [Fact]
     public void Value_Set_InvalidValue_ThrowsArgumentOutOfRangeException ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         Assert.Throws<ArgumentOutOfRangeException> (() => selector.Value = 5);
@@ -54,7 +55,7 @@ public class SelectorBaseTests
     [Fact]
     public void Value_Set_Null_Succeeds ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         selector.Value = null;
@@ -65,12 +66,12 @@ public class SelectorBaseTests
     [Fact]
     public void Value_Set_SameValue_DoesNotRaiseEvent ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
         selector.Value = 1;
 
         var eventRaisedCount = 0;
-        selector.ValueChanged += (_, _) => eventRaisedCount++;
+        selector.ValueChanged += (s, e) => eventRaisedCount++;
 
         selector.Value = 1; // Set to same value
 
@@ -80,11 +81,11 @@ public class SelectorBaseTests
     [Fact]
     public void Value_Changed_RaisesValueChangedEvent ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         int? capturedValue = null;
-        selector.ValueChanged += (_, e) => capturedValue = e.NewValue;
+        selector.ValueChanged += (s, e) => capturedValue = e.Value;
 
         selector.Value = 1;
 
@@ -98,7 +99,7 @@ public class SelectorBaseTests
     [Fact]
     public void Values_Get_WhenNull_ReturnsSequentialValues ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2", "Option3"];
 
         IReadOnlyList<int>? values = selector.Values;
@@ -111,7 +112,7 @@ public class SelectorBaseTests
     [Fact]
     public void Values_Set_UpdatesValues ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         selector.Values = [10, 20];
@@ -122,7 +123,7 @@ public class SelectorBaseTests
     [Fact]
     public void Values_Set_SetsDefaultValue ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Value = null;
         selector.Labels = ["Option1", "Option2"];
 
@@ -138,7 +139,7 @@ public class SelectorBaseTests
     [Fact]
     public void Labels_Set_CreatesSubViews ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         selector.Labels = ["Option1", "Option2"];
 
@@ -148,7 +149,7 @@ public class SelectorBaseTests
     [Fact]
     public void Labels_Set_Null_RemovesSubViews ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         selector.Labels = null;
@@ -159,7 +160,7 @@ public class SelectorBaseTests
     [Fact]
     public void Labels_Values_CountMismatch_DoesNotCreateSubViews ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         selector.Values = [0, 1, 2];
         selector.Labels = ["Option1", "Option2"]; // Mismatch
@@ -174,7 +175,7 @@ public class SelectorBaseTests
     [Fact]
     public void SetValuesAndLabels_FromEnum_SetsValuesAndLabels ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         selector.SetValuesAndLabels<SelectorStyles> ();
 
@@ -187,12 +188,12 @@ public class SelectorBaseTests
     [Fact]
     public void SetValuesAndLabels_SetsCorrectIntegerValues ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         selector.SetValuesAndLabels<SelectorStyles> ();
 
         // Verify values match enum integer values
-        List<int> expectedValues = Enum.GetValues<SelectorStyles> ().Select (e => (int)e).ToList ();
+        var expectedValues = Enum.GetValues<SelectorStyles> ().Select (e => (int)e).ToList ();
         Assert.Equal (expectedValues, selector.Values);
     }
 
@@ -203,7 +204,7 @@ public class SelectorBaseTests
     [Fact]
     public void Styles_Set_None_NoExtraSubViews ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         selector.Styles = SelectorStyles.None;
@@ -215,7 +216,7 @@ public class SelectorBaseTests
     [Fact]
     public void Styles_Set_ShowValue_AddsValueField ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         selector.Styles = SelectorStyles.ShowValue;
@@ -228,7 +229,7 @@ public class SelectorBaseTests
     [Fact]
     public void Styles_Set_ShowValue_ValueFieldDisplaysCurrentValue ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
         selector.Value = 1;
 
@@ -242,7 +243,7 @@ public class SelectorBaseTests
     [Fact]
     public void Styles_Set_ShowValue_ValueFieldUpdatesOnValueChange ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
         selector.Styles = SelectorStyles.ShowValue;
 
@@ -256,7 +257,7 @@ public class SelectorBaseTests
     [Fact]
     public void Styles_Set_SameValue_DoesNotRecreateSubViews ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
         selector.Styles = SelectorStyles.ShowValue;
 
@@ -304,7 +305,7 @@ public class SelectorBaseTests
         selector.Labels = ["Option1", "Option2", "Option3"];
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
-        List<Key> hotKeys = checkBoxes.Select (cb => cb.HotKey).ToList ();
+        var hotKeys = checkBoxes.Select (cb => cb.HotKey).ToList ();
         Assert.Equal (3, hotKeys.Distinct ().Count ()); // All unique
     }
 
@@ -328,7 +329,6 @@ public class SelectorBaseTests
         selector.Labels = ["_Alt Option", "Option2"];
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
-
         // Should use 'A' from "_Alt"
         Assert.Equal (Key.A, checkBoxes [0].HotKey);
     }
@@ -346,7 +346,6 @@ public class SelectorBaseTests
         selector.Labels = ["Option1", "Option2"];
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
-
         // Should skip 'O' and use next available character
         Assert.NotEqual (Key.O, checkBoxes [0].HotKey);
     }
@@ -375,7 +374,7 @@ public class SelectorBaseTests
     [Fact]
     public void Orientation_Vertical_CheckBoxesStackedVertically ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
         selector.Orientation = Orientation.Vertical;
         selector.Layout ();
@@ -388,7 +387,7 @@ public class SelectorBaseTests
     [Fact]
     public void Orientation_Horizontal_CheckBoxesArrangedHorizontally ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
         selector.Orientation = Orientation.Horizontal;
         selector.Layout ();
@@ -402,7 +401,7 @@ public class SelectorBaseTests
     [Fact]
     public void Orientation_Change_TriggersLayout ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
         selector.Layout ();
 
@@ -424,7 +423,7 @@ public class SelectorBaseTests
     [Fact]
     public void HorizontalSpace_Default_Is2 ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         Assert.Equal (2, selector.HorizontalSpace);
     }
@@ -438,7 +437,6 @@ public class SelectorBaseTests
         selector.Layout ();
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
-
         // HorizontalSpace is applied via Margin.Thickness.Right
         int spacing2 = checkBoxes [0].Margin!.Thickness.Right;
 
@@ -460,7 +458,6 @@ public class SelectorBaseTests
         selector.Layout ();
 
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
-
         // In vertical mode, checkboxes should be at same X
         Assert.Equal (checkBoxes [0].Frame.X, checkBoxes [1].Frame.X);
     }
@@ -472,7 +469,7 @@ public class SelectorBaseTests
     [Fact]
     public void DoubleClickAccepts_Default_IsTrue ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         Assert.True (selector.DoubleClickAccepts);
     }
@@ -485,10 +482,11 @@ public class SelectorBaseTests
         selector.Layout ();
 
         var acceptCount = 0;
-        selector.Accepting += (_, _) => acceptCount++;
+        selector.Accepting += (s, e) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new Mouse { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal (1, acceptCount);
     }
@@ -501,10 +499,11 @@ public class SelectorBaseTests
         selector.Layout ();
 
         var acceptCount = 0;
-        selector.Accepting += (_, _) => acceptCount++;
+        selector.Accepting += (s, e) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new Mouse { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
 
         Assert.Equal (0, acceptCount);
     }
@@ -516,7 +515,7 @@ public class SelectorBaseTests
     [Fact]
     public void CreateSubViews_RemovesOldSubViewsAndCreatesNew ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         int oldCount = selector.SubViews.Count;
@@ -531,7 +530,7 @@ public class SelectorBaseTests
     [Fact]
     public void CreateSubViews_SetsCheckBoxProperties ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         selector.Labels = ["Test Option"];
         selector.Values = [42];
@@ -550,11 +549,11 @@ public class SelectorBaseTests
     [Fact]
     public void HotKey_Command_DoesNotFireAccept ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         var acceptCount = 0;
-        selector.Accepting += (_, _) => acceptCount++;
+        selector.Accepting += (s, e) => acceptCount++;
 
         selector.InvokeCommand (Command.HotKey);
 
@@ -564,11 +563,11 @@ public class SelectorBaseTests
     [Fact]
     public void Accept_Command_FiresAccept ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
         selector.Labels = ["Option1", "Option2"];
 
         var acceptCount = 0;
-        selector.Accepting += (_, _) => acceptCount++;
+        selector.Accepting += (s, e) => acceptCount++;
 
         selector.InvokeCommand (Command.Accept);
 
@@ -582,7 +581,7 @@ public class SelectorBaseTests
     [Fact]
     public void EmptyLabels_CreatesNoSubViews ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         selector.Labels = [];
 
@@ -592,56 +591,13 @@ public class SelectorBaseTests
     [Fact]
     public void Value_WithNoLabels_CanBeSet ()
     {
-        OptionSelector selector = new ();
+        var selector = new OptionSelector ();
 
         // This should work even without labels
-        Exception? exception = Record.Exception (() => selector.Value = null);
+        var exception = Record.Exception (() => selector.Value = null);
 
         Assert.Null (exception);
         Assert.Null (selector.Value);
-    }
-
-    #endregion
-
-    #region Navigation Keys
-
-    [Theory]
-    [InlineData (SelectorStyles.None)]
-    [InlineData (SelectorStyles.ShowNoneFlag)]
-    [InlineData (SelectorStyles.ShowAllFlag)]
-    [InlineData (SelectorStyles.ShowValue)]
-    [InlineData (SelectorStyles.All)]
-    public void Navigation_Keys_Move_Out_And_Into_Not_Within (SelectorStyles selectorStyles)
-    {
-        using IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
-        using Runnable runnable = new ();
-        var view1 = new View { CanFocus = true };
-        var selector = new OptionSelector { Styles = selectorStyles };
-        List<string> options = ["Option1", "Option2", "Option3"];
-        selector.Labels = options;
-        var view2 = new View { CanFocus = true };
-        runnable.Add (view1, selector, view2);
-
-        app.Begin (runnable);
-
-        // Set focus to view1
-        view1.SetFocus ();
-
-        // Invoke Tab command to move focus to selector
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
-        Assert.True (selector.HasFocus);
-
-        // Invoke Tab command again to move focus to view2
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
-        Assert.True (view2.HasFocus);
-
-        // Now test Shift+Tab to move focus back to selector
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
-        Assert.True (selector.HasFocus);
-
-        // Finally, Shift+Tab again to move focus back to view1
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
-        Assert.True (view1.HasFocus);
     }
 
     #endregion

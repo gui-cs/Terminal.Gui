@@ -41,22 +41,15 @@ public record DimView : Dim
         return $"View({Dimension},{Target})";
     }
 
-    internal override int GetAnchor (int size) =>
-        Dimension switch
-        {
-            Dimension.Height => Target!.Frame.Height,
-            Dimension.Width => Target!.Frame.Width,
-            _ => 0
-        };
-
-    internal override bool ReferencesOtherViews () => true;
-
-    /// <inheritdoc/>
-    internal override IEnumerable<View> GetReferencedViews ()
+    internal override int GetAnchor (int size)
     {
-        if (Target is { })
-        {
-            yield return Target;
-        }
+        return Dimension switch
+               {
+                   Dimension.Height => Target!.Frame.Height,
+                   Dimension.Width => Target!.Frame.Width,
+                   _ => 0
+               };
     }
+
+    internal override bool ReferencesOtherViews () { return true; }
 }

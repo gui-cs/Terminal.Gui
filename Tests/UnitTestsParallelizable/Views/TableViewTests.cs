@@ -1,4 +1,5 @@
 ﻿using System.Data;
+#nullable enable
 using JetBrains.Annotations;
 
 namespace ViewsTests;
@@ -73,6 +74,7 @@ public class TableViewTests
 
         Assert.Same (tf2, tableView.App!.TopRunnableView!.MostFocused);
         Assert.True (tf2.HasFocus);
+
     }
 
     [Fact]
@@ -223,102 +225,5 @@ public class TableViewTests
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
         Assert.True (tableView.NewKeyDownEvent (Key.C));
         Assert.Equal (5, tableView.SelectedRow);
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void TableView_Command_Activate_TogglesSelection ()
-    {
-        var dt = new DataTable ();
-        dt.Columns.Add ("Col1");
-        dt.Rows.Add ("Data1");
-        dt.Rows.Add ("Data2");
-
-        TableView tableView = new () { Table = new DataTableSource (dt) };
-        tableView.BeginInit ();
-        tableView.EndInit ();
-
-        // Space toggles cell selection (Activate command)
-        // Note: Returns false because RaiseActivating has no subscribers
-        // but the selection is still toggled
-        bool? result = tableView.InvokeCommand (Command.Activate);
-
-        // Command toggles selection but returns false (event not handled)
-        Assert.False (result);
-
-        tableView.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void TableView_Command_Accept_FiresCellActivated ()
-    {
-        var dt = new DataTable ();
-        dt.Columns.Add ("Col1");
-        dt.Rows.Add ("Data1");
-
-        TableView tableView = new () { Table = new DataTableSource (dt) };
-        var cellActivatedFired = false;
-
-        tableView.CellActivated += (_, _) => cellActivatedFired = true;
-
-        bool? result = tableView.InvokeCommand (Command.Accept);
-
-        Assert.True (cellActivatedFired);
-        Assert.True (result);
-
-        tableView.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void TableView_Space_TogglesSelection ()
-    {
-        var dt = new DataTable ();
-        dt.Columns.Add ("Col1");
-        dt.Rows.Add ("Data1");
-
-        TableView tableView = new () { Table = new DataTableSource (dt) };
-        tableView.BeginInit ();
-        tableView.EndInit ();
-
-        // Space triggers cell toggle (selection is toggled even though return value is false)
-        // This is because TableView.Activate returns false when no Activating handler sets Handled=true
-        bool? result = tableView.NewKeyDownEvent (Key.Space);
-
-        // Returns false because there's no handler that sets Handled=true
-        Assert.False (result);
-
-        tableView.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void TableView_Enter_FiresCellActivated ()
-    {
-        var dt = new DataTable ();
-        dt.Columns.Add ("Col1");
-        dt.Rows.Add ("Data1");
-
-        TableView tableView = new () { Table = new DataTableSource (dt) };
-        var cellActivatedFired = false;
-
-        tableView.CellActivated += (_, _) => cellActivatedFired = true;
-
-        // Enter should trigger CellActivated via Accept command
-        bool? result = tableView.NewKeyDownEvent (Key.Enter);
-
-        Assert.True (cellActivatedFired);
-        Assert.True (result);
-
-        tableView.Dispose ();
     }
 }

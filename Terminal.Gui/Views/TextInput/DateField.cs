@@ -1,100 +1,25 @@
+
+
+//
+// DateField.cs: text entry for date
+//
+// Author: Barry Nolte
+//
+// Licensed under the MIT license
+//
+
 using System.Globalization;
 
 namespace Terminal.Gui.Views;
 
-/// <summary>
-///     Provides date editing functionality with specialized cursor behavior for date entry.
-/// </summary>
-/// <remarks>
-///     <para>
-///         DateField extends <see cref="TextField"/> with date-specific cursor behavior:
-///         <list type="bullet">
-///             <item>
-///                 <description>Cursor positions are constrained to valid digit positions (skipping separators)</description>
-///             </item>
-///             <item>
-///                 <description>Position 0 is reserved for a leading space; valid cursor range is [1, FormatLength]</description>
-///             </item>
-///             <item>
-///                 <description>Numeric input replaces characters in-place rather than inserting</description>
-///             </item>
-///             <item>
-///                 <description>Delete operations replace digits with '0' rather than removing characters</description>
-///             </item>
-///         </list>
-///     </para>
-///     <para>
-///         <b>Cursor Position Model:</b>
-///         <list type="bullet">
-///             <item>
-///                 <description>
-///                     <see cref="TextField.InsertionPoint"/>: Inherited, but constrained by the override to [1,
-///                     FormatLength]
-///                 </description>
-///             </item>
-///             <item>
-///                 <description><see cref="AdjustInsertionPoint"/>: Adjusts cursor to skip over date separator characters</description>
-///             </item>
-///             <item>
-///                 <description>
-///                     <see cref="IncrementInsertionPoint"/>/<see cref="DecrementInsertionPoint"/>: Move cursor while
-///                     respecting separator positions
-///                 </description>
-///             </item>
-///         </list>
-///     </para>
-///     <para>
-///         <b>Example:</b> For format "MM/dd/yyyy" with text " 01/15/2024":
-///         <list type="bullet">
-///             <item>
-///                 <description>Position 0: Leading space (not user-accessible)</description>
-///             </item>
-///             <item>
-///                 <description>Positions 1-2: Month digits (01)</description>
-///             </item>
-///             <item>
-///                 <description>Position 3: Separator '/' (cursor skips over)</description>
-///             </item>
-///             <item>
-///                 <description>Positions 4-5: Day digits (15)</description>
-///             </item>
-///             <item>
-///                 <description>Position 6: Separator '/' (cursor skips over)</description>
-///             </item>
-///             <item>
-///                 <description>Positions 7-10: Year digits (2024)</description>
-///             </item>
-///         </list>
-///     </para>
-/// </remarks>
-public class DateField : TextField, IValue<DateTime?>
+/// <summary>Provides date editing functionality with mouse support.</summary>
+public class DateField : TextField
 {
-    /// <summary>
-    ///     Unicode Right-to-Left Mark character, used to handle RTL date formats in some cultures.
-    ///     This character is stripped from display text to ensure consistent cursor positioning.
-    /// </summary>
     private const string RIGHT_TO_LEFT_MARK = "\u200f";
 
-    /// <summary>
-    ///     The fixed width of the date field (12 characters: 1 leading space + 10 date characters + 1 trailing).
-    /// </summary>
     private readonly int _dateFieldLength = 12;
-
-    /// <summary>
-    ///     The current date value being edited. Setting this updates the display text.
-    /// </summary>
     private DateTime? _date;
-
-    /// <summary>
-    ///     The date format string with a leading space (e.g., " MM/dd/yyyy").
-    ///     The leading space provides a visual buffer and keeps cursor position 0 inaccessible.
-    /// </summary>
     private string? _format;
-
-    /// <summary>
-    ///     The date separator character for the current culture (e.g., "/", "-", or ".").
-    ///     The cursor automatically skips over these positions during navigation.
-    /// </summary>
     private string? _separator;
 
     /// <summary>Initializes a new instance of <see cref="DateField"/>.</summary>
@@ -119,54 +44,20 @@ public class DateField : TextField, IValue<DateTime?>
             _culture = value ?? CultureInfo.CurrentCulture;
             _separator = GetDataSeparator (_culture.DateTimeFormat.DateSeparator);
             _format = " " + StandardizeDateFormat (_culture.DateTimeFormat.ShortDatePattern);
-            Text = Value?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
+            Text = Date?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "");
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the cursor position within the date field, constrained to valid digit positions.
-    /// </summary>
-    /// <value>
-    ///     The cursor position, clamped to the range [1, FormatLength]. Unlike <see cref="TextField.InsertionPoint"/>,
-    ///     position 0 is not accessible because it contains a leading space.
-    /// </value>
-    /// <remarks>
-    ///     <para>
-    ///         This override constrains the cursor to valid editing positions within the date format:
-    ///         <list type="bullet">
-    ///             <item>
-    ///                 <description>Minimum position is 1 (first digit of the date)</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>Maximum position is FormatLength (last digit of the year)</description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    ///     <para>
-    ///         <b>Note:</b> This property only enforces bounds; it does not skip separator characters.
-    ///         Use <see cref="AdjustInsertionPoint"/> after setting to ensure the cursor is on a digit position.
-    ///     </para>
-    /// </remarks>
-    /// <seealso cref="AdjustInsertionPoint"/>
-    public override int InsertionPoint { get => base.InsertionPoint; set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1); }
+    /// <inheritdoc/>
+    public override int CursorPosition
+    {
+        get => base.CursorPosition;
+        set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1);
+    }
 
-    /// <summary>
-    ///     Gets the length of the date format string (excluding the leading space), which represents
-    ///     the maximum valid cursor position.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         For a standard 10-character date format like "MM/dd/yyyy", this returns 10.
-    ///         The valid cursor range is [1, FormatLength], where position 1 is the first digit
-    ///         and FormatLength is the last digit.
-    ///     </para>
-    /// </remarks>
-    private int FormatLength => StandardizeDateFormat (_format).Trim ().Length;
-
-    #region IValue<DateTime?> Implementation
-
-    /// <summary>Gets or sets the date value of the <see cref="DateField"/>.</summary>
-    public new DateTime? Value
+    /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
+    /// <remarks></remarks>
+    public DateTime? Date
     {
         get => _date;
         set
@@ -176,110 +67,75 @@ public class DateField : TextField, IValue<DateTime?>
                 return;
             }
 
-            DateTime? oldValue = _date;
-
-            if (oldValue == value)
-            {
-                return;
-            }
-
-            ValueChangingEventArgs<DateTime?> changingArgs = new (oldValue, value);
-
-            if (OnValueChanging (changingArgs) || changingArgs.Handled)
-            {
-                return;
-            }
-
-            ValueChanging?.Invoke (this, changingArgs);
-
-            if (changingArgs.Handled)
-            {
-                return;
-            }
-
+            DateTime? oldData = _date;
             _date = value;
 
-            if (_format is null)
+            if (_format is { })
             {
-                return;
+                Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ()))
+                            .Replace (RIGHT_TO_LEFT_MARK, "");
+                EventArgs<DateTime> args = new (value!.Value);
+
+                if (oldData != value)
+                {
+                    OnDateChanged (args);
+                    DateChanged?.Invoke (this, args);
+                }
             }
-
-            Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ())).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
-
-            ValueChangedEventArgs<DateTime?> changedArgs = new (oldValue, _date);
-            OnValueChanged (changedArgs);
-            ValueChanged?.Invoke (this, changedArgs);
         }
     }
 
-    /// <inheritdoc/>
-    object? IValue.GetValue () => _date;
+    private int FormatLength => StandardizeDateFormat (_format).Trim ().Length;
 
-    /// <summary>
-    ///     Called when the <see cref="DateField"/> <see cref="Value"/> is changing.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<DateTime?> args) => false;
+    /// <summary>DateChanged event, raised when the <see cref="Date"/> property has changed.</summary>
+    /// <remarks>This event is raised when the <see cref="Date"/> property changes.</remarks>
+    /// <remarks>The passed event arguments containing the old value, new value, and format string.</remarks>
+    public event EventHandler<EventArgs<DateTime>>? DateChanged;
 
     /// <inheritdoc/>
-    public new event EventHandler<ValueChangingEventArgs<DateTime?>>? ValueChanging;
-
-    /// <summary>
-    ///     Called when the <see cref="DateField"/> <see cref="Value"/> has changed.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<DateTime?> args) { }
-
-    /// <inheritdoc/>
-    public new event EventHandler<ValueChangedEventArgs<DateTime?>>? ValueChanged;
-
-    #endregion
-
-    /// <inheritdoc/>
-    public override bool DeleteCharLeft (bool useOldCursorPos)
+    public override void DeleteCharLeft (bool useOldCursorPos = true)
     {
         if (ReadOnly)
         {
-            return false;
+            return;
         }
 
         ClearAllSelection ();
         SetText ((Rune)'0');
-        DecrementInsertionPoint ();
-
-        return true;
+        DecCursorPosition ();
     }
 
     /// <inheritdoc/>
-    public override bool DeleteCharRight ()
+    public override void DeleteCharRight ()
     {
         if (ReadOnly)
         {
-            return false;
+            return;
         }
 
         ClearAllSelection ();
         SetText ((Rune)'0');
-
-        return true;
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Mouse mouse)
+    protected override bool OnMouseEvent (MouseEventArgs ev)
     {
-        if (base.OnMouseEvent (mouse) || mouse.Handled)
+        if (base.OnMouseEvent (ev) || ev.Handled)
         {
             return true;
         }
 
-        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            AdjustInsertionPoint (mouse.Position!.Value.X);
+            AdjCursorPosition (ev.Position.X);
         }
 
-        return mouse.Handled;
+        return ev.Handled;
     }
+
+    /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>
+    /// <param name="args">Event arguments</param>
+    protected virtual void OnDateChanged (EventArgs<DateTime> args) {  }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key a)
@@ -291,7 +147,7 @@ public class DateField : TextField, IValue<DateTime?>
             {
                 if (SetText ((Rune)a))
                 {
-                    IncrementInsertionPoint ();
+                    IncCursorPosition ();
                 }
             }
 
@@ -301,46 +157,10 @@ public class DateField : TextField, IValue<DateTime?>
         return false;
     }
 
-    /// <summary>
-    ///     Adjusts the cursor position to ensure it lands on a valid digit position, skipping separator characters.
-    /// </summary>
-    /// <param name="point">The desired cursor position.</param>
-    /// <param name="increment">
-    ///     If true, skip separators by moving right; if false, skip by moving left.
-    ///     This determines the direction of adjustment when the cursor lands on a separator.
-    /// </param>
-    /// <remarks>
-    ///     <para>
-    ///         This method performs two adjustments:
-    ///         <list type="number">
-    ///             <item>
-    ///                 <description>Clamps <paramref name="point"/> to valid bounds [1, FormatLength]</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>
-    ///                     If the cursor is on a separator character, moves it in the specified direction until it
-    ///                     reaches a digit
-    ///                 </description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    ///     <para>
-    ///         <b>Example:</b> For date " 01/15/2024" with separator '/':
-    ///         <list type="bullet">
-    ///             <item>
-    ///                 <description>AdjustInsertionPoint(3, true) → cursor moves to position 4 (first digit of day)</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>AdjustInsertionPoint(3, false) → cursor moves to position 2 (last digit of month)</description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    /// </remarks>
-    private void AdjustInsertionPoint (int point, bool increment = true)
+    private void AdjCursorPosition (int point, bool increment = true)
     {
         int newPoint = point;
 
-        // Clamp to valid bounds
         if (point > FormatLength)
         {
             newPoint = FormatLength;
@@ -353,19 +173,18 @@ public class DateField : TextField, IValue<DateTime?>
 
         if (newPoint != point)
         {
-            InsertionPoint = newPoint;
+            CursorPosition = newPoint;
         }
 
-        // Skip over separator characters in the specified direction
-        while (InsertionPoint < Text.GetColumns () - 1 && Text [InsertionPoint].ToString () == _separator)
+        while (CursorPosition < Text.GetColumns () - 1 && Text [CursorPosition].ToString () == _separator)
         {
             if (increment)
             {
-                InsertionPoint++;
+                CursorPosition++;
             }
             else
             {
-                InsertionPoint--;
+                CursorPosition--;
             }
         }
     }
@@ -396,7 +215,7 @@ public class DateField : TextField, IValue<DateTime?>
             spaces += FormatLength;
             string trimmedText = e.Result [..spaces];
             spaces -= FormatLength;
-            trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
+            trimmedText = trimmedText.Replace (new (' ', spaces), " ");
             var date = Convert.ToDateTime (trimmedText).ToString (_format!.Trim ());
 
             if ($" {date}" != e.Result)
@@ -405,7 +224,7 @@ public class DateField : TextField, IValue<DateTime?>
                 e.Result = $" {date}".Replace (RIGHT_TO_LEFT_MARK, "");
             }
 
-            AdjustInsertionPoint (InsertionPoint);
+            AdjCursorPosition (CursorPosition);
         }
         catch (Exception)
         {
@@ -413,29 +232,17 @@ public class DateField : TextField, IValue<DateTime?>
         }
     }
 
-    /// <summary>
-    ///     Decrements the cursor position by one, skipping over separator characters.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This method moves the cursor left by one position, then calls <see cref="AdjustInsertionPoint"/>
-    ///         with <c>increment=false</c> to skip over any separator that might be at the new position.
-    ///     </para>
-    ///     <para>
-    ///         The cursor will not move below position 1 (the first digit position).
-    ///     </para>
-    /// </remarks>
-    private void DecrementInsertionPoint ()
+    private void DecCursorPosition ()
     {
-        if (InsertionPoint <= 1)
+        if (CursorPosition <= 1)
         {
-            InsertionPoint = 1;
+            CursorPosition = 1;
 
             return;
         }
 
-        InsertionPoint--;
-        AdjustInsertionPoint (InsertionPoint, false);
+        CursorPosition--;
+        AdjCursorPosition (CursorPosition, false);
     }
 
     private string GetDataSeparator (string separator)
@@ -495,35 +302,23 @@ public class DateField : TextField, IValue<DateTime?>
         return idx;
     }
 
-    /// <summary>
-    ///     Increments the cursor position by one, skipping over separator characters.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This method moves the cursor right by one position, then calls <see cref="AdjustInsertionPoint"/>
-    ///         with <c>increment=true</c> to skip over any separator that might be at the new position.
-    ///     </para>
-    ///     <para>
-    ///         The cursor will not move beyond FormatLength (the last digit position).
-    ///     </para>
-    /// </remarks>
-    private void IncrementInsertionPoint ()
+    private void IncCursorPosition ()
     {
-        if (InsertionPoint >= FormatLength)
+        if (CursorPosition >= FormatLength)
         {
-            InsertionPoint = FormatLength;
+            CursorPosition = FormatLength;
 
             return;
         }
 
-        InsertionPoint++;
-        AdjustInsertionPoint (InsertionPoint);
+        CursorPosition++;
+        AdjCursorPosition (CursorPosition);
     }
 
     private new bool MoveEnd ()
     {
         ClearAllSelection ();
-        InsertionPoint = FormatLength;
+        CursorPosition = FormatLength;
 
         return true;
     }
@@ -532,7 +327,7 @@ public class DateField : TextField, IValue<DateTime?>
     {
         // Home, C-A
         ClearAllSelection ();
-        InsertionPoint = 1;
+        CursorPosition = 1;
 
         return true;
     }
@@ -540,7 +335,7 @@ public class DateField : TextField, IValue<DateTime?>
     private bool MoveLeft ()
     {
         ClearAllSelection ();
-        DecrementInsertionPoint ();
+        DecCursorPosition ();
 
         return true;
     }
@@ -548,7 +343,7 @@ public class DateField : TextField, IValue<DateTime?>
     private bool MoveRight ()
     {
         ClearAllSelection ();
-        IncrementInsertionPoint ();
+        IncCursorPosition ();
 
         return true;
     }
@@ -582,33 +377,37 @@ public class DateField : TextField, IValue<DateTime?>
             }
         }
 
-        return new string (fmtText);
+        return new (fmtText);
     }
 
     private void SetInitialProperties (DateTime date)
     {
         _format = $" {StandardizeDateFormat (Culture!.DateTimeFormat.ShortDatePattern)}";
         _separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
-        Value = date;
-        InsertionPoint = 1;
+        Date = date;
+        CursorPosition = 1;
         TextChanging += OnTextChanging;
 
         // Things this view knows how to do
-        AddCommand (Command.DeleteCharRight,
+        AddCommand (
+                    Command.DeleteCharRight,
                     () =>
                     {
                         DeleteCharRight ();
 
                         return true;
-                    });
+                    }
+                   );
 
-        AddCommand (Command.DeleteCharLeft,
+        AddCommand (
+                    Command.DeleteCharLeft,
                     () =>
                     {
                         DeleteCharLeft (false);
 
                         return true;
-                    });
+                    }
+                   );
         AddCommand (Command.LeftStart, () => MoveHome ());
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
@@ -639,27 +438,31 @@ public class DateField : TextField, IValue<DateTime?>
 
     private bool SetText (Rune key)
     {
-        if (InsertionPoint > FormatLength)
+        if (CursorPosition > FormatLength)
         {
-            InsertionPoint = FormatLength;
+            CursorPosition = FormatLength;
 
             return false;
         }
 
-        if (InsertionPoint < 1)
+        if (CursorPosition < 1)
         {
-            InsertionPoint = 1;
+            CursorPosition = 1;
 
             return false;
         }
 
         List<Rune> text = Text.EnumerateRunes ().ToList ();
-        List<Rune> newText = text.GetRange (0, InsertionPoint);
+        List<Rune> newText = text.GetRange (0, CursorPosition);
         newText.Add (key);
 
-        if (InsertionPoint < FormatLength)
+        if (CursorPosition < FormatLength)
         {
-            newText = [.. newText, .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))];
+            newText =
+            [
+                .. newText,
+                .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+            ];
         }
 
         return SetText (StringExtensions.ToString (newText));
@@ -746,7 +549,7 @@ public class DateField : TextField, IValue<DateTime?>
             return false;
         }
 
-        Value = date;
+        Date = date;
 
         return true;
     }
@@ -754,36 +557,38 @@ public class DateField : TextField, IValue<DateTime?>
     // Converts various date formats to a uniform 10-character format.
     // This aids in simplifying the handling of single-digit months and days,
     // and reduces the number of distinct date formats to maintain.
-    private static string StandardizeDateFormat (string? format) =>
-        format switch
-        {
-            "MM/dd/yyyy" => "MM/dd/yyyy",
-            "yyyy-MM-dd" => "yyyy-MM-dd",
-            "yyyy/MM/dd" => "yyyy/MM/dd",
-            "dd/MM/yyyy" => "dd/MM/yyyy",
-            "d?/M?/yyyy" => "dd/MM/yyyy",
-            "dd.MM.yyyy" => "dd.MM.yyyy",
-            "dd-MM-yyyy" => "dd-MM-yyyy",
-            "dd/MM yyyy" => "dd/MM/yyyy",
-            "d. M. yyyy" => "dd.MM.yyyy",
-            "yyyy.MM.dd" => "yyyy.MM.dd",
-            "g yyyy/M/d" => "yyyy/MM/dd",
-            "d/M/yyyy" => "dd/MM/yyyy",
-            "d?/M?/yyyy g" => "dd/MM/yyyy",
-            "d-M-yyyy" => "dd-MM-yyyy",
-            "d.MM.yyyy" => "dd.MM.yyyy",
-            "d.MM.yyyy '?'." => "dd.MM.yyyy",
-            "M/d/yyyy" => "MM/dd/yyyy",
-            "d. M. yyyy." => "dd.MM.yyyy",
-            "d.M.yyyy." => "dd.MM.yyyy",
-            "g yyyy-MM-dd" => "yyyy-MM-dd",
-            "d.M.yyyy" => "dd.MM.yyyy",
-            "d/MM/yyyy" => "dd/MM/yyyy",
-            "yyyy/M/d" => "yyyy/MM/dd",
-            "dd. MM. yyyy." => "dd.MM.yyyy",
-            "yyyy. MM. dd." => "yyyy.MM.dd",
-            "yyyy. M. d." => "yyyy.MM.dd",
-            "d. MM. yyyy" => "dd.MM.yyyy",
-            _ => "dd/MM/yyyy"
-        };
+    private static string StandardizeDateFormat (string? format)
+    {
+        return format switch
+               {
+                   "MM/dd/yyyy" => "MM/dd/yyyy",
+                   "yyyy-MM-dd" => "yyyy-MM-dd",
+                   "yyyy/MM/dd" => "yyyy/MM/dd",
+                   "dd/MM/yyyy" => "dd/MM/yyyy",
+                   "d?/M?/yyyy" => "dd/MM/yyyy",
+                   "dd.MM.yyyy" => "dd.MM.yyyy",
+                   "dd-MM-yyyy" => "dd-MM-yyyy",
+                   "dd/MM yyyy" => "dd/MM/yyyy",
+                   "d. M. yyyy" => "dd.MM.yyyy",
+                   "yyyy.MM.dd" => "yyyy.MM.dd",
+                   "g yyyy/M/d" => "yyyy/MM/dd",
+                   "d/M/yyyy" => "dd/MM/yyyy",
+                   "d?/M?/yyyy g" => "dd/MM/yyyy",
+                   "d-M-yyyy" => "dd-MM-yyyy",
+                   "d.MM.yyyy" => "dd.MM.yyyy",
+                   "d.MM.yyyy '?'." => "dd.MM.yyyy",
+                   "M/d/yyyy" => "MM/dd/yyyy",
+                   "d. M. yyyy." => "dd.MM.yyyy",
+                   "d.M.yyyy." => "dd.MM.yyyy",
+                   "g yyyy-MM-dd" => "yyyy-MM-dd",
+                   "d.M.yyyy" => "dd.MM.yyyy",
+                   "d/MM/yyyy" => "dd/MM/yyyy",
+                   "yyyy/M/d" => "yyyy/MM/dd",
+                   "dd. MM. yyyy." => "dd.MM.yyyy",
+                   "yyyy. MM. dd." => "yyyy.MM.dd",
+                   "yyyy. M. d." => "yyyy.MM.dd",
+                   "d. MM. yyyy" => "dd.MM.yyyy",
+                   _ => "dd/MM/yyyy"
+               };
+    }
 }

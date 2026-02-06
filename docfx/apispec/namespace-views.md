@@ -1,45 +1,11 @@
 ---
 uid: Terminal.Gui.Views
-summary: Built-in UI controls and widgets.
+summary: The `Views` namespace contains the complete collection of built-in UI controls and widgets.
 ---
 
-The `Views` namespace contains the complete collection of built-in UI controls derived from @Terminal.Gui.ViewBase.View.
+@Terminal.Gui.Views provides a comprehensive set of pre-built user interface controls, derived from @Terminal.Gui.ViewBase.View, that cover common application needs. From simple labels and buttons to complex data grids and tree views, this namespace contains production-ready controls with consistent behavior, theming, and accessibility support.
 
-## Control Categories
+All Views in this namespace are built on the @Terminal.Gui.ViewBase.View foundation and inherit the complete feature set including adornments, scrolling, focus management, and user arrangement capabilities.
 
-**Basic Controls**
-- Label, Button, CheckBox, RadioGroup, ProgressBar
-
-**Text Input**
-- TextField, TextView, AutocompleteTextField
-
-**Data Display**
-- ListView, TableView, TreeView
-
-**Containers**
-- Window, Dialog, FrameView, TabView, TileView
-
-**Selection**
-- OptionSeletor, FlagSelector, ColorPicker, DatePicker, Slider, NumericUpDown
-
-**Menus & Navigation**
-- MenuBar, ContextMenu, StatusBar, Shortcut
-
-**Dialogs**
-- Prompt, MessageBox, FileDialog, OpenDialog, SaveDialog, Wizard
-
-**Specialized**
-- CharMap, HexView, GraphView, LineView, ScrollBarView
-
-All views inherit:
-- Adornments (Margin, Border, Padding)
-- Built-in scrolling
-- Focus management
-- Keyboard/mouse bindings
-- User arrangement (Movable, Resizable)
-
-## See Also
-
-- [Views Overview](~/docs/views.md) - Complete list with examples
-- [View Deep Dive](~/docs/View.md) - Base view architecture
+For a complete list of all views with examples, see the [List of Views](~/docs/views.md) page.
 

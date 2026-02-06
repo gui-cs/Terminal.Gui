@@ -1,5 +1,4 @@
 using Xunit.Abstractions;
-using Xunit;
 
 namespace ApplicationTests.Timeout;
 
@@ -8,7 +7,6 @@ namespace ApplicationTests.Timeout;
 ///     These tests verify that timeouts scheduled in a parent run loop continue to fire
 ///     correctly when a nested modal dialog is shown via Application.Run().
 /// </summary>
-[Collection("Application Tests")]
 public class NestedRunTimeoutTests (ITestOutputHelper output)
 {
     [Fact]
@@ -16,7 +14,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("FakeDriver");
 
         List<string> executionOrder = new ();
 
@@ -150,7 +148,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
         // Arrange
         using IApplication? app = Application.Create ();
 
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("FakeDriver");
 
         var timeoutFired = false;
         var nestedRunStarted = false;
@@ -237,7 +235,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
         // Arrange
         using IApplication? app = Application.Create ();
 
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("FakeDriver");
 
         // Create a simple window for the main run loop
         var mainWindow = new Window { Title = "Main Window" };
@@ -273,7 +271,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
 
         // Arrange
         using IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("FakeDriver");
 
         // Schedule a safety timeout that will ensure the app quits if test hangs
         var safetyRequestStopTimeoutFired = false;
@@ -374,7 +372,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
 
         // Arrange
         using IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init ("FakeDriver");
 
         var enterFired = false;
         var escFired = false;

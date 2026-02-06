@@ -19,18 +19,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 10.x
-        dotnet-quality: 'ga'
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build Terminal.Gui Release
-      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-restore
-
     - name: DocFX Build
       working-directory: docfx
       run: |

@@ -8,16 +8,15 @@ public sealed class Selectors : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-
         // Init
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ();
-        appWindow.Title = GetQuitKeyAndName ();
-        appWindow.BorderStyle = LineStyle.None;
+        Window appWindow = new ()
+        {
+            Title = GetQuitKeyAndName (),
+            BorderStyle = LineStyle.None
+        };
 
         FrameView? optionSelectorsFrame = null;
         FrameView? flagSelectorsFrame = null;
@@ -36,7 +35,7 @@ public sealed class Selectors : Scenario
             X = Pos.Right (orientationSelector) + 1,
             Orientation = Orientation.Horizontal,
             BorderStyle = LineStyle.Dotted,
-            Title = "Selector St_yles"
+            Title = "Selector St_yles",
         };
         stylesSelector.ValueChanged += StylesSelectorOnValueChanged;
 
@@ -47,7 +46,7 @@ public sealed class Selectors : Scenario
             Width = 11,
             Title = "H_. Space",
             Value = stylesSelector.HorizontalSpace,
-            BorderStyle = LineStyle.Dotted
+            BorderStyle = LineStyle.Dotted,
         };
         horizontalSpace.ValueChanging += HorizontalSpaceOnValueChanging;
 
@@ -56,20 +55,20 @@ public sealed class Selectors : Scenario
             X = Pos.Right (horizontalSpace) + 1,
             Y = Pos.Top (horizontalSpace),
             Title = "Border _& Title",
-            Value = CheckState.Checked,
-            BorderStyle = LineStyle.Dotted
+            CheckedState = CheckState.Checked,
+            BorderStyle = LineStyle.Dotted,
         };
-        showBorderAndTitle.ValueChanged += ShowBorderAndTitleOnValueChanged;
+        showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
 
         CheckBox canFocus = new ()
         {
             X = Pos.Right (showBorderAndTitle) + 1,
             Y = Pos.Top (horizontalSpace),
             Title = "_CanFocus",
-            Value = CheckState.Checked,
-            BorderStyle = LineStyle.Dotted
+            CheckedState = CheckState.Checked,
+            BorderStyle = LineStyle.Dotted,
         };
-        canFocus.ValueChanged += CanFocusOnValueChanged;
+        canFocus.CheckedStateChanged += CanFocusOnCheckedStateChanged;
 
         optionSelectorsFrame = new ()
         {
@@ -77,8 +76,14 @@ public sealed class Selectors : Scenario
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
             Title = "O_ptionSelectors",
-            TabStop = TabBehavior.TabStop
+            TabStop = TabBehavior.TabStop,
+            //InvertFocusAttribute = true
         };
+        optionSelectorsFrame.ClearingViewport += (sender, args) =>
+                                                 {
+                                                     //               optionSelectorsFrame.SetAttributeForRole (optionSelectorsFrame.HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                                                 };
+
 
         Label label = new ()
         {
@@ -94,7 +99,7 @@ public sealed class Selectors : Scenario
             AssignHotKeys = true,
             Labels = ["Option _1 (0)", "Option _2 (1)", "Option _3 (5) 你", "Option _Quattro (4) 你"],
             Values = [0, 1, 5, 4],
-            Arrangement = ViewArrangement.Resizable
+            Arrangement = ViewArrangement.Resizable,
         };
         optionSelectorsFrame.Add (label, optionSelector);
 
@@ -111,7 +116,7 @@ public sealed class Selectors : Scenario
             Title = "<Vi_sualRole>",
             BorderStyle = LineStyle.Dotted,
             UsedHotKeys = optionSelector.UsedHotKeys,
-            AssignHotKeys = true
+            AssignHotKeys = true,
         };
 
         optionSelectorsFrame.Add (label, optionSelectorT);
@@ -134,6 +139,7 @@ public sealed class Selectors : Scenario
         FlagSelector flagSelector = new ()
         {
             X = Pos.Right (label) + 1,
+            UsedHotKeys = optionSelectorT.UsedHotKeys,
             BorderStyle = LineStyle.Dotted,
             Title = "FlagSe_lector (uint)",
             AssignHotKeys = true,
@@ -173,12 +179,19 @@ public sealed class Selectors : Scenario
             Value = View.Diagnostics
         };
         flagSelectorsFrame.Add (label, flagSelectorT);
-        flagSelectorT.ValueChanged += (_, a) => { View.Diagnostics = (ViewDiagnosticFlags)a.Value!; };
+        flagSelectorT.ValueChanged += (s, a) =>
+                                      {
+                                          View.Diagnostics = (ViewDiagnosticFlags)a.Value!;
+                                      };
 
         appWindow.Add (orientationSelector, stylesSelector, horizontalSpace, showBorderAndTitle, canFocus, optionSelectorsFrame, flagSelectorsFrame);
 
         // Run - Start the application.
-        app.Run (appWindow);
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
 
         return;
 
@@ -190,7 +203,6 @@ public sealed class Selectors : Scenario
             }
 
             List<SelectorBase> selectors = GetAllSelectors ();
-
             foreach (SelectorBase selector in selectors)
             {
                 selector.Orientation = s.Value!.Value;
@@ -212,12 +224,11 @@ public sealed class Selectors : Scenario
             }
         }
 
-        void HorizontalSpaceOnValueChanging (object? sender, ValueChangingEventArgs<int> e)
+        void HorizontalSpaceOnValueChanging (object? sender, CancelEventArgs<int> e)
         {
-            if (sender is not NumericUpDown<int> || e.NewValue < 0)
+            if (sender is not NumericUpDown<int> upDown || e.NewValue < 0)
             {
-                e.Handled = true;
-
+                e.Cancel = true;
                 return;
             }
 
@@ -229,7 +240,8 @@ public sealed class Selectors : Scenario
             }
         }
 
-        void ShowBorderAndTitleOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> e)
+
+        void ShowBorderAndTitleOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
         {
             if (sender is not CheckBox cb)
             {
@@ -240,11 +252,11 @@ public sealed class Selectors : Scenario
 
             foreach (SelectorBase selector in selectors)
             {
-                selector.Border!.Thickness = cb.Value == CheckState.Checked ? new (1) : new Thickness (0);
+                selector.Border!.Thickness = cb.CheckedState == CheckState.Checked ? new (1) : new Thickness (0);
             }
         }
 
-        void CanFocusOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> e)
+        void CanFocusOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
         {
             if (sender is not CheckBox cb)
             {
@@ -255,21 +267,21 @@ public sealed class Selectors : Scenario
 
             foreach (SelectorBase selector in selectors)
             {
-                selector.CanFocus = cb.Value == CheckState.Checked;
+                selector.CanFocus = cb.CheckedState == CheckState.Checked;
             }
         }
 
         List<SelectorBase> GetAllSelectors ()
         {
             List<SelectorBase> optionSelectors = [];
-
             // ReSharper disable once AccessToModifiedClosure
             optionSelectors.AddRange (optionSelectorsFrame!.SubViews.OfType<SelectorBase> ());
-
             // ReSharper disable once AccessToModifiedClosure
             optionSelectors.AddRange (flagSelectorsFrame!.SubViews.OfType<FlagSelector> ());
 
             return optionSelectors;
         }
     }
+
+
 }

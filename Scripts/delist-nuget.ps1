@@ -1,101 +1,31 @@
+$apiKey = ""  # Replace with your actual API key
+# Unlist all packages matching "2.0.0-v2-develop.*"
 # PowerShell script to unlist NuGet packages using dotnet CLI
-# This script delists old develop and alpha packages while keeping the most recent ones
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$ApiKey,
-    
-    [Parameter(Mandatory=$false)]
-    [string]$JustPublishedVersion = ""
-)
-
 $packageId = "terminal.gui"  # Ensure this is the correct package name (case-sensitive)
+$packagePattern = "^2\.0\.0-develop\..*$"  # Regex pattern for filtering versions
 $nugetSource = "https://api.nuget.org/v3/index.json"
 
-# Fetch ONLY listed package versions from NuGet Autocomplete API
-$nugetApiUrl = "https://api-v2v3search-0.nuget.org/autocomplete?id=$packageId&prerelease=true&semVerLevel=2.0.0"
-Write-Host "Fetching listed package versions for '$packageId'..."
+# Fetch package versions from NuGet API
+$nugetApiUrl = "https://api.nuget.org/v3-flatcontainer/$packageId/index.json"
+Write-Host "Fetching package versions for '$packageId'..."
 
 try {
     $versionsResponse = Invoke-RestMethod -Uri $nugetApiUrl
-    $allVersions = $versionsResponse.data
+    $matchingVersions = $versionsResponse.versions | Where-Object { $_ -match $packagePattern }
 } catch {
     Write-Host "Error fetching package versions: $_"
+    exit 1
+}
+
+if ($matchingVersions.Count -eq 0) {
+    Write-Host "No matching packages found for '$packageId' with pattern '$packagePattern'."
     exit 0
 }
 
-Write-Host "Found $($allVersions.Count) listed versions."
-
-# Function to parse version and extract numeric parts for comparison
-function Get-VersionSortKey {
-    param([string]$version)
-    
-    # Extract the numeric part after the last dot for prerelease versions
-    # E.g., "2.0.0-develop.123" -> 123, "2.0.0-alpha.5" -> 5
-    if ($version -match '[-.](\d+)$') {
-        return [int]$matches[1]
-    }
-    return 0
+# Unlist each matching package version
+foreach ($version in $matchingVersions) {
+    Write-Host "Unlisting package: $packageId - $version"
+    dotnet nuget delete $packageId $version --source $nugetSource --api-key $apiKey --non-interactive
 }
-
-# Function to process package versions with a specific pattern
-function Process-PackageVersions {
-    param(
-        [string]$Pattern,
-        [string]$PackageType,
-        [array]$AllVersions,
-        [string]$JustPublished = ""
-    )
-    
-    $matchingVersions = $AllVersions | Where-Object { $_ -match $Pattern }
-    
-    if ($matchingVersions.Count -eq 0) {
-        Write-Host "No $PackageType versions found."
-        return
-    }
-    
-    # Determine which version to keep
-    $toKeep = $null
-    $toUnlist = @()
-    
-    if ($JustPublished -ne "" -and $JustPublished -match $Pattern) {
-        # Keep the just-published version
-        $toKeep = $JustPublished
-        $toUnlist = $matchingVersions | Where-Object { $_ -ne $JustPublished }
-        
-        if ($toUnlist.Count -gt 0) {
-            Write-Host "Found $($matchingVersions.Count) $PackageType versions. Keeping just-published: $toKeep"
-        } else {
-            Write-Host "Found $($matchingVersions.Count) $PackageType versions. Just-published version is the only one."
-            return
-        }
-    } else {
-        # Keep the most recent version
-        if ($matchingVersions.Count -eq 1) {
-            Write-Host "Found 1 $PackageType version. Nothing to unlist."
-            return
-        }
-        
-        $sortedVersions = $matchingVersions | Sort-Object { Get-VersionSortKey $_ } -Descending
-        $toKeep = $sortedVersions[0]
-        $toUnlist = $sortedVersions | Select-Object -Skip 1
-        
-        Write-Host "Found $($matchingVersions.Count) $PackageType versions. Keeping most recent: $toKeep"
-    }
-    
-    # Delist versions
-    foreach ($version in $toUnlist) {
-        Write-Host "Unlisting $PackageType package: $packageId - $version"
-        dotnet nuget delete $packageId $version --source $nugetSource --api-key $ApiKey --non-interactive
-    }
-}
-
-# Process develop packages - keep only the most recent
-Process-PackageVersions -Pattern "^2\.0\.0-develop\..*$" -PackageType "develop" -AllVersions $allVersions
-
-# Process alpha packages - keep only the just-published one or most recent
-Process-PackageVersions -Pattern "^2\.0\.0-alpha\..*$" -PackageType "alpha" -AllVersions $allVersions -JustPublished $JustPublishedVersion
-
-# Process beta packages - keep only the just-published one or most recent (for future use)
-Process-PackageVersions -Pattern "^2\.0\.0-beta\..*$" -PackageType "beta" -AllVersions $allVersions -JustPublished $JustPublishedVersion
 
 Write-Host "Operation complete."

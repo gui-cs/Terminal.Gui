@@ -33,24 +33,12 @@ public class SixelEncoder
 
    */
 
-    // SIXEL requires rows which are multiples of 6 px high
-    private const int PIXEL_HIGH = 6;
-
     /// <summary>
     ///     Gets or sets the quantizer responsible for building a representative
     ///     limited color palette for images and for mapping novel colors in
     ///     images to their closest palette color
     /// </summary>
     public ColorQuantizer Quantizer { get; set; } = new ();
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to avoid bottom scroll.
-    ///     When <see langword="true"/> and height is grater than PIXEL_HIGH (6), the encoder will subtract one sixel band
-    ///     (PIXEL_HIGH (6) rows).
-    ///     This can be used to avoid forcing the terminal to scroll when dumping sixel output starting at the bottom row.
-    ///     Default is <see langword="false"/>.
-    /// </summary>
-    public bool AvoidBottomScroll { get; set; } = false;
 
     /// <summary>
     ///     Encode the given bitmap into sixel encoding
@@ -79,18 +67,18 @@ public class SixelEncoder
     private string WriteSixel (Color [,] pixels)
     {
         var sb = new StringBuilder ();
-        int height = GetPixelsHeight (pixels);
+        int height = pixels.GetLength (1);
         int width = pixels.GetLength (0);
 
         // Iterate over each 'row' of the image. Because each sixel write operation
         // outputs a screen area 6 pixels high (and 1+ across) we must process the image
         // 6 'y' units at once (1 band)
-        for (var y = 0; y < height; y += PIXEL_HIGH)
+        for (var y = 0; y < height; y += 6)
         {
-            sb.Append (ProcessBand (pixels, y, Math.Min (PIXEL_HIGH, height - y), width));
+            sb.Append (ProcessBand (pixels, y, Math.Min (6, height - y), width));
 
             // Line separator between bands
-            if (y + PIXEL_HIGH < height) // Only add separator if not the last band
+            if (y + 6 < height) // Only add separator if not the last band
             {
                 // This completes the drawing of the current line of sixel and
                 // returns the 'cursor' to beginning next line, newly drawn sixel
@@ -236,7 +224,7 @@ public class SixelEncoder
     private string GetFillArea (Color [,] pixels)
     {
         int widthInChars = pixels.GetLength (0);
-        int heightInChars = GetPixelsHeight (pixels);
+        int heightInChars = pixels.GetLength (1);
 
         return $"{widthInChars};{heightInChars}";
     }
@@ -244,7 +232,7 @@ public class SixelEncoder
     private bool AnyHasAlphaOfZero (Color [,] pixels)
     {
         int width = pixels.GetLength (0);
-        int height = GetPixelsHeight (pixels);
+        int height = pixels.GetLength (1);
 
         // Loop through each pixel in the 2D array
         for (var x = 0; x < width; x++)
@@ -260,45 +248,5 @@ public class SixelEncoder
         }
 
         return false; // No pixel with A of 0 was found
-    }
-
-    private int GetPixelsHeight (Color [,] pixels)
-    {
-        int height = pixels.GetLength (1);
-
-        if (AvoidBottomScroll && height > PIXEL_HIGH)
-        {
-            height -= PIXEL_HIGH;
-        }
-
-        return height;
-    }
-
-    /// <summary>
-    ///     Calculates the renderable height in pixels for sixel output based on the
-    ///     maximum available cell height and the vertical pixel density per cell.
-    /// </summary>
-    /// <param name="maxSizeHeight">The maximum available height expressed in character cells.</param>
-    /// <param name="pixelsPerCellY">The number of vertical pixels represented by a single character cell.</param>
-    /// <returns>
-    ///     The total height, in pixels, that can be safely rendered without causing the console buffer to scroll.
-    /// </returns>
-    /// <remarks>
-    ///     Sixel graphics are encoded in vertical bands of six pixels. When
-    ///     <see cref="AvoidBottomScroll"/> is enabled and the available height exceeds
-    ///     a single sixel band, the cell height is rounded down to the nearest multiple
-    ///     of six to ensure that no partial sixel band is emitted at the bottom of the
-    ///     console. This prevents unintended upward scrolling of the console buffer.
-    /// </remarks>
-    public int GetHeightInPixels (int maxSizeHeight, int pixelsPerCellY)
-    {
-        int pixelHeight = maxSizeHeight * pixelsPerCellY;
-
-        if (AvoidBottomScroll)
-        {
-            pixelHeight -= pixelHeight % 6;
-        }
-
-        return pixelHeight;
     }
 }

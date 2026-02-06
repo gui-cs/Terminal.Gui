@@ -1,3 +1,5 @@
+
+
 //
 // DatePicker.cs: DatePicker control
 //
@@ -10,7 +12,7 @@ using System.Globalization;
 namespace Terminal.Gui.Views;
 
 /// <summary>Lets the user pick a date from a visual calendar.</summary>
-public class DatePicker : View, IValue<DateTime>
+public class DatePicker : View
 {
     private TableView? _calendar;
     private DateTime _date;
@@ -21,10 +23,10 @@ public class DatePicker : View, IValue<DateTime>
     private DataTable? _table;
 
     /// <summary>Initializes a new instance of <see cref="DatePicker"/>.</summary>
-    public DatePicker () => SetInitialProperties (DateTime.Now);
+    public DatePicker () { SetInitialProperties (DateTime.Now); }
 
     /// <summary>Initializes a new instance of <see cref="DatePicker"/> with the specified date.</summary>
-    public DatePicker (DateTime date) => SetInitialProperties (date);
+    public DatePicker (DateTime date) { SetInitialProperties (date); }
 
     /// <summary>CultureInfo for date. The default is CultureInfo.CurrentCulture.</summary>
     public CultureInfo? Culture
@@ -35,84 +37,21 @@ public class DatePicker : View, IValue<DateTime>
             if (value is { })
             {
                 CultureInfo.CurrentCulture = value;
-                Text = Value.ToString (Format);
+                Text = Date.ToString (Format);
             }
         }
     }
 
-    /// <inheritdoc/>
-    public override string Text
-    {
-        get => Value.ToString (Format);
-        set
-        {
-            if (DateTime.TryParse (value, out DateTime result))
-            {
-                Value = result;
-            }
-        }
-    }
-
-    #region IValue<DateTime> Implementation
-
-    /// <summary>Gets or sets the date value of the <see cref="DatePicker"/>.</summary>
-    public DateTime Value
+    /// <summary>Get or set the date.</summary>
+    public DateTime Date
     {
         get => _date;
         set
         {
-            DateTime oldValue = _date;
-
-            if (oldValue == value)
-            {
-                return;
-            }
-
-            ValueChangingEventArgs<DateTime> changingArgs = new (oldValue, value);
-
-            if (OnValueChanging (changingArgs) || changingArgs.Handled)
-            {
-                return;
-            }
-
-            ValueChanging?.Invoke (this, changingArgs);
-
-            if (changingArgs.Handled)
-            {
-                return;
-            }
-
             _date = value;
-
-            ValueChangedEventArgs<DateTime> changedArgs = new (oldValue, _date);
-            OnValueChanged (changedArgs);
-            ValueChanged?.Invoke (this, changedArgs);
+            Text = _date.ToString (Format);
         }
     }
-
-    /// <inheritdoc/>
-    object? IValue.GetValue () => _date;
-
-    /// <summary>
-    ///     Called when the <see cref="DatePicker"/> <see cref="Value"/> is changing.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<DateTime> args) => false;
-
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangingEventArgs<DateTime>>? ValueChanging;
-
-    /// <summary>
-    ///     Called when the <see cref="DatePicker"/> <see cref="Value"/> has changed.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<DateTime> args) { }
-
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<DateTime>>? ValueChanged;
-
-    #endregion
 
     private string Format => StandardizeDateFormat (Culture?.DateTimeFormat.ShortDatePattern);
 
@@ -130,19 +69,19 @@ public class DatePicker : View, IValue<DateTime>
 
     private void ChangeDayDate (int day)
     {
-        Value = new DateTime (Value.Year, Value.Month, day);
-        _dateField!.Value = Value;
+        _date = new (_date.Year, _date.Month, day);
+        _dateField!.Date = _date;
         CreateCalendar ();
     }
 
-    private void CreateCalendar () => _calendar!.Table = new DataTableSource (_table = CreateDataTable (Value.Month, Value.Year));
+    private void CreateCalendar () { _calendar!.Table = new DataTableSource (_table = CreateDataTable (_date.Month, _date.Year)); }
 
     private DataTable CreateDataTable (int month, int year)
     {
-        _table = new DataTable ();
+        _table = new ();
         GenerateCalendarLabels ();
         int amountOfDaysInMonth = DateTime.DaysInMonth (year, month);
-        DateTime dateValue = new (year, month, 1);
+        DateTime dateValue = new DateTime (year, month, 1);
         DayOfWeek dayOfWeek = dateValue.DayOfWeek;
 
         _table.Rows.Add (new object [6]);
@@ -169,21 +108,16 @@ public class DatePicker : View, IValue<DateTime>
         return _table;
     }
 
-    private void DateField_ValueChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
+    private void DateField_DateChanged (object? sender, EventArgs<DateTime> e)
     {
-        if (!e.NewValue.HasValue)
+        Date = e.Value;
+
+        if (e.Value.Date.Day != _date.Day)
         {
-            return;
+            SelectDayOnCalendar (e.Value.Day);
         }
 
-        Value = e.NewValue.Value;
-
-        if (e.NewValue.Value.Day != Value.Day)
-        {
-            SelectDayOnCalendar (e.NewValue.Value.Day);
-        }
-
-        if (Value.Month == DateTime.MinValue.Month && Value.Year == DateTime.MinValue.Year)
+        if (_date.Month == DateTime.MinValue.Month && _date.Year == DateTime.MinValue.Year)
         {
             _previousMonthButton!.Enabled = false;
         }
@@ -192,7 +126,7 @@ public class DatePicker : View, IValue<DateTime>
             _previousMonthButton!.Enabled = true;
         }
 
-        if (Value.Month == DateTime.MaxValue.Month && Value.Year == DateTime.MaxValue.Year)
+        if (_date.Month == DateTime.MaxValue.Month && _date.Year == DateTime.MaxValue.Year)
         {
             _nextMonthButton!.Enabled = false;
         }
@@ -202,7 +136,7 @@ public class DatePicker : View, IValue<DateTime>
         }
 
         CreateCalendar ();
-        SelectDayOnCalendar (Value.Day);
+        SelectDayOnCalendar (_date.Day);
     }
 
     private void GenerateCalendarLabels ()
@@ -211,15 +145,18 @@ public class DatePicker : View, IValue<DateTime>
 
         for (var i = 0; i < 7; i++)
         {
-            string abbreviatedDayName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i);
+            string abbreviatedDayName =
+                CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i);
 
-            _calendar.Style.ColumnStyles.Add (i,
-                                              new ColumnStyle
+            _calendar.Style.ColumnStyles.Add (
+                                              i,
+                                              new()
                                               {
                                                   MaxWidth = abbreviatedDayName.Length,
                                                   MinWidth = abbreviatedDayName.Length,
                                                   MinAcceptableWidth = abbreviatedDayName.Length
-                                              });
+                                              }
+                                             );
             _table!.Columns.Add (abbreviatedDayName);
         }
 
@@ -227,8 +164,8 @@ public class DatePicker : View, IValue<DateTime>
         _calendar.Width = _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7;
     }
 
-    private static string GetBackButtonText () => Glyphs.LeftArrow + Glyphs.LeftArrow.ToString ();
-    private static string GetForwardButtonText () => Glyphs.RightArrow + Glyphs.RightArrow.ToString ();
+    private static string GetBackButtonText () { return Glyphs.LeftArrow + Glyphs.LeftArrow.ToString (); }
+    private static string GetForwardButtonText () { return Glyphs.RightArrow + Glyphs.RightArrow.ToString (); }
 
     private void SelectDayOnCalendar (int day)
     {
@@ -248,23 +185,29 @@ public class DatePicker : View, IValue<DateTime>
 
     private void SetInitialProperties (DateTime date)
     {
-        Value = date;
+        _date = date;
         BorderStyle = LineStyle.Single;
-        Value = date;
-        _dateLabel = new Label { X = 0, Y = 0, Text = "Date: " };
+        Date = date;
+        _dateLabel = new() { X = 0, Y = 0, Text = "Date: " };
         CanFocus = true;
 
-        _calendar = new TableView
+        _calendar = new()
         {
             Id = "_calendar",
             X = 0,
             Y = Pos.Bottom (_dateLabel),
             Height = 11,
-            Style = new TableStyle { ShowHeaders = true, ShowHorizontalBottomline = true, ShowVerticalCellLines = true, ExpandLastColumn = true },
+            Style = new()
+            {
+                ShowHeaders = true,
+                ShowHorizontalBottomline = true,
+                ShowVerticalCellLines = true,
+                ExpandLastColumn = true
+            },
             MultiSelect = false
         };
 
-        _dateField = new DateField (DateTime.Now)
+        _dateField = new (DateTime.Now)
         {
             Id = "_dateField",
             X = Pos.Right (_dateLabel),
@@ -274,28 +217,28 @@ public class DatePicker : View, IValue<DateTime>
             Culture = Culture
         };
 
-        _previousMonthButton = new Button
+        _previousMonthButton = new()
         {
             Id = "_previousMonthButton",
             X = Pos.Center () - 2,
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,
             Text = GetBackButtonText (),
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
+            WantContinuousButtonPressed = true,
             NoPadding = true,
             NoDecorations = true,
             ShadowStyle = ShadowStyle.None
         };
         _previousMonthButton.Accepting += (_, _) => AdjustMonth (-1);
 
-        _nextMonthButton = new Button
+        _nextMonthButton = new()
         {
             Id = "_nextMonthButton",
             X = Pos.Right (_previousMonthButton) + 2,
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,
             Text = GetForwardButtonText (),
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
+            WantContinuousButtonPressed = true,
             NoPadding = true,
             NoDecorations = true,
             ShadowStyle = ShadowStyle.None
@@ -304,7 +247,7 @@ public class DatePicker : View, IValue<DateTime>
         _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);
 
         CreateCalendar ();
-        SelectDayOnCalendar (Value.Day);
+        SelectDayOnCalendar (_date.Day);
 
         _calendar.CellActivated += (_, e) =>
                                    {
@@ -319,57 +262,59 @@ public class DatePicker : View, IValue<DateTime>
 
                                        ChangeDayDate (day);
                                        SelectDayOnCalendar (day);
-                                       Text = Value.ToString (Format);
+                                       Text = _date.ToString (Format);
                                    };
 
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        _dateField.ValueChanged += DateField_ValueChanged;
+        _dateField.DateChanged += DateField_DateChanged;
 
         Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
     }
 
     private void AdjustMonth (int offset)
     {
-        Value = Value.AddMonths (offset);
+        Date = _date.AddMonths (offset);
         CreateCalendar ();
-        _dateField!.Value = Value;
+        _dateField!.Date = Date;
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingText () => true;
+    protected override bool OnDrawingText () { return true; }
 
-    private static string StandardizeDateFormat (string? format) =>
-        format switch
-        {
-            "MM/dd/yyyy" => "MM/dd/yyyy",
-            "yyyy-MM-dd" => "yyyy-MM-dd",
-            "yyyy/MM/dd" => "yyyy/MM/dd",
-            "dd/MM/yyyy" => "dd/MM/yyyy",
-            "d?/M?/yyyy" => "dd/MM/yyyy",
-            "dd.MM.yyyy" => "dd.MM.yyyy",
-            "dd-MM-yyyy" => "dd-MM-yyyy",
-            "dd/MM yyyy" => "dd/MM/yyyy",
-            "d. M. yyyy" => "dd.MM.yyyy",
-            "yyyy.MM.dd" => "yyyy.MM.dd",
-            "g yyyy/M/d" => "yyyy/MM/dd",
-            "d/M/yyyy" => "dd/MM/yyyy",
-            "d?/M?/yyyy g" => "dd/MM/yyyy",
-            "d-M-yyyy" => "dd-MM-yyyy",
-            "d.MM.yyyy" => "dd.MM.yyyy",
-            "d.MM.yyyy '?'." => "dd.MM.yyyy",
-            "M/d/yyyy" => "MM/dd/yyyy",
-            "d. M. yyyy." => "dd.MM.yyyy",
-            "d.M.yyyy." => "dd.MM.yyyy",
-            "g yyyy-MM-dd" => "yyyy-MM-dd",
-            "d.M.yyyy" => "dd.MM.yyyy",
-            "d/MM/yyyy" => "dd/MM/yyyy",
-            "yyyy/M/d" => "yyyy/MM/dd",
-            "dd. MM. yyyy." => "dd.MM.yyyy",
-            "yyyy. MM. dd." => "yyyy.MM.dd",
-            "yyyy. M. d." => "yyyy.MM.dd",
-            "d. MM. yyyy" => "dd.MM.yyyy",
-            _ => "dd/MM/yyyy"
-        };
+    private static string StandardizeDateFormat (string? format)
+    {
+        return format switch
+               {
+                   "MM/dd/yyyy" => "MM/dd/yyyy",
+                   "yyyy-MM-dd" => "yyyy-MM-dd",
+                   "yyyy/MM/dd" => "yyyy/MM/dd",
+                   "dd/MM/yyyy" => "dd/MM/yyyy",
+                   "d?/M?/yyyy" => "dd/MM/yyyy",
+                   "dd.MM.yyyy" => "dd.MM.yyyy",
+                   "dd-MM-yyyy" => "dd-MM-yyyy",
+                   "dd/MM yyyy" => "dd/MM/yyyy",
+                   "d. M. yyyy" => "dd.MM.yyyy",
+                   "yyyy.MM.dd" => "yyyy.MM.dd",
+                   "g yyyy/M/d" => "yyyy/MM/dd",
+                   "d/M/yyyy" => "dd/MM/yyyy",
+                   "d?/M?/yyyy g" => "dd/MM/yyyy",
+                   "d-M-yyyy" => "dd-MM-yyyy",
+                   "d.MM.yyyy" => "dd.MM.yyyy",
+                   "d.MM.yyyy '?'." => "dd.MM.yyyy",
+                   "M/d/yyyy" => "MM/dd/yyyy",
+                   "d. M. yyyy." => "dd.MM.yyyy",
+                   "d.M.yyyy." => "dd.MM.yyyy",
+                   "g yyyy-MM-dd" => "yyyy-MM-dd",
+                   "d.M.yyyy" => "dd.MM.yyyy",
+                   "d/MM/yyyy" => "dd/MM/yyyy",
+                   "yyyy/M/d" => "yyyy/MM/dd",
+                   "dd. MM. yyyy." => "dd.MM.yyyy",
+                   "yyyy. MM. dd." => "yyyy.MM.dd",
+                   "yyyy. M. d." => "yyyy.MM.dd",
+                   "d. MM. yyyy" => "dd.MM.yyyy",
+                   _ => "dd/MM/yyyy"
+               };
+    }
 }

@@ -10,29 +10,27 @@ public class ComboBoxIteration : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
         ObservableCollection<string> items = ["one", "two", "three"];
 
-        using Window win = new () { Title = GetQuitKeyAndName () };
-        Label lbListView = new () { Width = 10, Height = 1 };
+        var win = new Window { Title = GetQuitKeyAndName () };
+        var lbListView = new Label { Width = 10, Height = 1 };
         win.Add (lbListView);
 
-        ListView listview = new ()
+        var listview = new ListView
         {
             Y = Pos.Bottom (lbListView) + 1, Width = 10, Height = Dim.Fill (2), Source = new ListWrapper<string> (items)
         };
         win.Add (listview);
 
-        Label lbComboBox = new ()
+        var lbComboBox = new Label
         {
             SchemeName = "Runnable",
             X = Pos.Right (lbListView) + 1,
             Width = Dim.Percent (40)
         };
 
-        ComboBox comboBox = new ()
+        var comboBox = new ComboBox
         {
             X = Pos.Right (listview) + 1,
             Y = Pos.Bottom (lbListView) + 1,
@@ -42,26 +40,26 @@ public class ComboBoxIteration : Scenario
         };
         comboBox.SetSource (items);
 
-        listview.ValueChanged += (_, e) =>
-                                 {
-                                     lbListView.Text = items [e.NewValue!.Value];
-                                     comboBox.SelectedItem = e.NewValue.Value;
-                                 };
+        listview.SelectedItemChanged += (s, e) =>
+                                        {
+                                            lbListView.Text = items [e.Item!.Value];
+                                            comboBox.SelectedItem = e.Item.Value;
+                                        };
 
-        comboBox.SelectedItemChanged += (_, text) =>
+        comboBox.SelectedItemChanged += (sender, text) =>
                                         {
                                             if (text.Item != -1)
                                             {
-                                                lbComboBox.Text = text.Value!.ToString ()!;
+                                                lbComboBox.Text = text.Value.ToString ();
                                                 listview.SelectedItem = text.Item;
                                             }
                                         };
         win.Add (lbComboBox, comboBox);
         win.Add (new TextField { X = Pos.Right (listview) + 1, Y = Pos.Top (comboBox) + 3, Height = 1, Width = 20 });
 
-        Button btnTwo = new () { X = Pos.Right (comboBox) + 1, Text = "Two" };
+        var btnTwo = new Button { X = Pos.Right (comboBox) + 1, Text = "Two" };
 
-        btnTwo.Accepting += (_, _) =>
+        btnTwo.Accepting += (s, e) =>
                           {
                               items = ["one", "two"];
                               comboBox.SetSource (items);
@@ -70,17 +68,19 @@ public class ComboBoxIteration : Scenario
                           };
         win.Add (btnTwo);
 
-        Button btnThree = new () { X = Pos.Right (comboBox) + 1, Y = Pos.Top (comboBox), Text = "Three" };
+        var btnThree = new Button { X = Pos.Right (comboBox) + 1, Y = Pos.Top (comboBox), Text = "Three" };
 
-        btnThree.Accepting += (_, _) =>
+        btnThree.Accepting += (s, e) =>
                             {
-                                items = ["one", "two", "three"];
+                                items =["one", "two", "three"];
                                 comboBox.SetSource (items);
                                 listview.SetSource (items);
                                 listview.SelectedItem = 0;
                             };
         win.Add (btnThree);
 
-        app.Run (win);
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

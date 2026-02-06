@@ -210,6 +210,7 @@ public class GetViewsUnderLocationForRootTests
     }
 
     [Theory]
+    [InlineData ("Margin")]
     [InlineData ("Border")]
     [InlineData ("Padding")]
     public void Returns_Subview_Of_Adornment (string adornmentType)
@@ -270,6 +271,7 @@ public class GetViewsUnderLocationForRootTests
 
 
     [Theory]
+    [InlineData ("Margin")]
     [InlineData ("Border")]
     [InlineData ("Padding")]
     public void Returns_OnlyParentsSuperView_Of_Adornment_If_TransparentMouse (string adornmentType)

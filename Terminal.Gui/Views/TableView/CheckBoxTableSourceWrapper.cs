@@ -1,5 +1,5 @@
 #nullable disable
-
+﻿
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -156,18 +156,18 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     private void TableView_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
         {
             return;
         }
 
         // we only care about clicks (not movements)
-        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if (!mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             return;
         }
 
-        Point? hit = tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? headerIfAny);
+        Point? hit = tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? headerIfAny);
 
         if (headerIfAny.HasValue && headerIfAny.Value == 0)
         {
@@ -198,4 +198,5 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             tableView.SetNeedsDraw ();
         }
     }
+#nullable restore
 }

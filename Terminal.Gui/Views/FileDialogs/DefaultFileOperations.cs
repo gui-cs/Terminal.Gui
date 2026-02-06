@@ -19,10 +19,11 @@ public class DefaultFileOperations : IFileOperations
         string adjective = d.Name;
 
         int? result = MessageBox.Query (app,
-                                        string.Format (Strings.fdDeleteTitle, adjective),
-                                        string.Format (Strings.fdDeleteBody, adjective),
-                                        Strings.btnYes,
-                                        Strings.btnNo);
+                                       string.Format (Strings.fdDeleteTitle, adjective),
+                                       string.Format (Strings.fdDeleteBody, adjective),
+                                       Strings.btnYes,
+                                       Strings.btnNo
+                                      );
 
         try
         {
@@ -57,7 +58,7 @@ public class DefaultFileOperations : IFileOperations
             return null;
         }
 
-        if (Prompt (app, Strings.fdRenameTitle, toRename.Name, out string newName))
+        if (Prompt (Strings.fdRenameTitle, toRename.Name, out string newName))
         {
             if (!string.IsNullOrWhiteSpace (newName))
             {
@@ -65,7 +66,13 @@ public class DefaultFileOperations : IFileOperations
                 {
                     if (toRename is IFileInfo f)
                     {
-                        IFileInfo newLocation = fileSystem.FileInfo.New (Path.Combine (f.Directory.FullName, newName));
+                        IFileInfo newLocation =
+                            fileSystem.FileInfo.New (
+                                                     Path.Combine (
+                                                                   f.Directory.FullName,
+                                                                   newName
+                                                                  )
+                                                    );
                         f.MoveTo (newLocation.FullName);
 
                         return newLocation;
@@ -74,7 +81,13 @@ public class DefaultFileOperations : IFileOperations
                     {
                         var d = (IDirectoryInfo)toRename;
 
-                        IDirectoryInfo newLocation = fileSystem.DirectoryInfo.New (Path.Combine (d.Parent.FullName, newName));
+                        IDirectoryInfo newLocation =
+                            fileSystem.DirectoryInfo.New (
+                                                          Path.Combine (
+                                                                        d.Parent.FullName,
+                                                                        newName
+                                                                       )
+                                                         );
                         d.MoveTo (newLocation.FullName);
 
                         return newLocation;
@@ -82,7 +95,7 @@ public class DefaultFileOperations : IFileOperations
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, ex.Message, Strings.btnOk);
+                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, ex.Message, "Ok");
                 }
             }
         }
@@ -93,58 +106,57 @@ public class DefaultFileOperations : IFileOperations
     /// <inheritdoc/>
     public IFileSystemInfo New (IApplication app, IFileSystem fileSystem, IDirectoryInfo inDirectory)
     {
-        var tv = new TextField { Width = Dim.Fill (0, 50), Height = 1 };
-        string result = app?.TopRunnable?.Prompt<TextField, string> (tv, beginInitHandler: prompt => { prompt.Title = Strings.fdNewTitle; });
-
-        if (string.IsNullOrWhiteSpace (result))
+        if (Prompt (Strings.fdNewTitle, "", out string named))
         {
-            return null;
-        }
+            if (!string.IsNullOrWhiteSpace (named))
+            {
+                try
+                {
+                    IDirectoryInfo newDir =
+                        fileSystem.DirectoryInfo.New (
+                                                      Path.Combine (inDirectory.FullName, named)
+                                                     );
+                    newDir.Create ();
 
-        try
-        {
-            IDirectoryInfo newDir = fileSystem.DirectoryInfo.New (Path.Combine (inDirectory.FullName, result));
-            newDir.Create ();
-
-            return newDir;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.ErrorQuery (app, Strings.fdNewFailed, ex.Message, Strings.btnOk);
+                    return newDir;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.ErrorQuery (app, Strings.fdNewFailed, ex.Message, "Ok");
+                }
+            }
         }
 
         return null;
     }
 
-    private bool Prompt (IApplication app, string title, string defaultText, out string result)
+    private bool Prompt (string title, string defaultText, out string result)
     {
         var confirm = false;
         var btnOk = new Button { IsDefault = true, Text = Strings.btnOk };
 
         btnOk.Accepting += (s, e) =>
-                           {
-                               confirm = true;
-                               (s as View)?.App?.RequestStop ();
-
-                               // When Accepting is handled, set e.Handled to true to prevent further processing.
-                               e.Handled = true;
-                           };
+                         {
+                             confirm = true;
+                             (s as View)?.App?.RequestStop ();
+                             // When Accepting is handled, set e.Handled to true to prevent further processing.
+                             e.Handled = true;
+                         };
         var btnCancel = new Button { Text = Strings.btnCancel };
 
         btnCancel.Accepting += (s, e) =>
-                               {
-                                   confirm = false;
-                                   (s as View)?.App?.RequestStop ();
-
-                                   // When Accepting is handled, set e.Handled to true to prevent further processing.
-                                   e.Handled = true;
-                               };
+                             {
+                                 confirm = false;
+                                 (s as View)?.App?.RequestStop ();
+                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
+                                 e.Handled = true;
+                             };
 
         var lbl = new Label { Text = Strings.fdRenamePrompt };
-        var tf = new TextField { X = Pos.Right (lbl) + 1, Width = Dim.Fill (0, 50), Height = 1, Text = defaultText };
+        var tf = new TextField { X = Pos.Right (lbl), Width = Dim.Fill (), Text = defaultText };
         tf.SelectAll ();
 
-        var dlg = new Dialog { Title = title };
+        var dlg = new Dialog { Title = title, Width = Dim.Percent (50), Height = 4 };
         dlg.Add (lbl);
         dlg.Add (tf);
 
@@ -153,7 +165,7 @@ public class DefaultFileOperations : IFileOperations
         dlg.AddButton (btnOk);
         dlg.AddButton (btnCancel);
 
-        app.Run (dlg);
+        Application.Run (dlg);
         dlg.Dispose ();
 
         result = tf.Text;

@@ -1,5 +1,8 @@
-﻿#nullable enable
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace UICatalog.Scenarios;
 
@@ -10,31 +13,31 @@ public class Buttons : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window main = new ();
-        main.Title = GetQuitKeyAndName ();
+        Window main = new ()
+        {
+            Title = GetQuitKeyAndName ()
+        };
 
         // Add a label & text field so we can demo IsDefault
-        Label editLabel = new () { X = 0, Y = 0, Text = "TextField (to demo IsDefault):" };
+        var editLabel = new Label { X = 0, Y = 0, Text = "TextField (to demo IsDefault):" };
         main.Add (editLabel);
 
-        // Add a TextField using Absolute layout.
-        TextField edit = new () { X = 31, Width = 15, HotKey = Key.Y.WithAlt };
+        // Add a TextField using Absolute layout. 
+        var edit = new TextField { X = 31, Width = 15, HotKey = Key.Y.WithAlt };
         main.Add (edit);
 
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
-        Button defaultButton = new () { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = Strings.cmdQuit };
+        var defaultButton = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
 
         main.Add (defaultButton);
 
         // Note we handle Accept on main, not defaultButton
-        main.Accepting += (s, _) => (s as View)?.App!.RequestStop ();
+        main.Accepting += (s, e) => Application.RequestStop ();
 
-        Button swapButton = new ()
+        var swapButton = new Button
         {
             X = 50,
             Width = 45,
@@ -43,41 +46,47 @@ public class Buttons : Scenario
             SchemeName = "Error"
         };
 
-        swapButton.Accepting += (_, e) =>
-                                {
-                                    e.Handled = !swapButton.IsDefault;
-                                    defaultButton.IsDefault = !defaultButton.IsDefault;
-                                    swapButton.IsDefault = !swapButton.IsDefault;
-                                };
+        swapButton.Accepting += (s, e) =>
+                             {
+                                 e.Handled = !swapButton.IsDefault;
+                                 defaultButton.IsDefault = !defaultButton.IsDefault;
+                                 swapButton.IsDefault = !swapButton.IsDefault;
+                             };
 
         defaultButton.Accepting += (s, e) =>
-                                   {
-                                       e.Handled = !defaultButton.IsDefault;
+                                {
+                                    e.Handled = !defaultButton.IsDefault;
 
-                                       if (e.Handled)
-                                       {
-                                           MessageBox.ErrorQuery (
-                                                                  (s as View)?.App!,
-                                                                  "Error",
-                                                                  "This button is no longer the Quit button; the Swap Default button is.",
-                                                                  Strings.btnOk);
-                                       }
-                                   };
+                                    if (e.Handled)
+                                    {
+                                        MessageBox.ErrorQuery ((s as View)?.App, "Error", "This button is no longer the Quit button; the Swap Default button is.", "_Ok");
+                                    }
+                                };
         main.Add (swapButton);
 
-        Label colorButtonsLabel = new () { X = 0, Y = Pos.Bottom (swapButton) + 1, Text = "Color Buttons: " };
+        static void DoMessage (Button button, string txt)
+        {
+            button.Accepting += (s, e) =>
+                             {
+                                 string btnText = button.Text;
+                                 MessageBox.Query ((s as View)?.App, "Message", $"Did you click {txt}?", "Yes", "No");
+                                 e.Handled = true;
+                             };
+        }
+
+        var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom (swapButton) + 1, Text = "Color Buttons: " };
         main.Add (colorButtonsLabel);
 
         View prev = colorButtonsLabel;
 
-        foreach (KeyValuePair<string, Scheme?> scheme in SchemeManager.GetSchemesForCurrentTheme ())
+        foreach (KeyValuePair<string, Scheme> scheme in SchemeManager.GetSchemesForCurrentTheme ())
         {
-            Button colorButton = new ()
+            var colorButton = new Button
             {
                 X = Pos.Right (prev),
                 Y = Pos.Y (colorButtonsLabel),
                 Text = $"_{scheme.Key}",
-                SchemeName = scheme.Key
+                SchemeName = scheme.Key,
             };
             DoMessage (colorButton, colorButton.Text);
             main.Add (colorButton);
@@ -99,62 +108,59 @@ public class Buttons : Scenario
 
         // Note the 'N' in 'Newline' will be the hotkey
         main.Add (
-                  button = new () { X = 2, Y = Pos.Bottom (button), Height = 2, Text = "a Newline\nin the button" }
+                  button = new () { X = 2, Y = Pos.Bottom (button) + 1, Height = 2, Text = "a Newline\nin the button" }
                  );
-
         button.Accepting += (s, e) =>
-                            {
-                                MessageBox.Query ((s as View)?.App!, "Message", "Is There A Question?", Strings.btnNo, Strings.btnYes);
-                                e.Handled = true;
-                            };
+                         {
+                             MessageBox.Query ((s as View)?.App, "Message", "Question?", "Yes", "No");
+                             e.Handled = true;
+                         };
 
-        var textChanger = new Button { X = 2, Y = Pos.Bottom (button), Text = "Te_xt Changer" };
+        var textChanger = new Button { X = 2, Y = Pos.Bottom (button) + 1, Text = "Te_xt Changer" };
         main.Add (textChanger);
-
-        textChanger.Accepting += (_, e) =>
-                                 {
-                                     textChanger.Text += "!";
-                                     e.Handled = true;
-                                 };
+        textChanger.Accepting += (s, e) =>
+                              {
+                                  textChanger.Text += "!";
+                                  e.Handled = true;
+                              };
 
         main.Add (
                   button = new ()
                   {
                       X = Pos.Right (textChanger) + 2,
                       Y = Pos.Y (textChanger),
-                      Text = """This will move as "Text Changer" grows"""
+                      Text = "Lets see if this will move as \"Text Changer\" grows"
                   }
                  );
+        button.Accepting += (sender, args) => { args.Handled = true; };
 
-        button.Accepting += (_, args) => { args.Handled = true; };
-
-        Button removeButton = new ()
+        var removeButton = new Button
         {
-            X = 2, Y = Pos.Bottom (button),
+            X = 2, Y = Pos.Bottom (button) + 1,
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error),
-            Title = "Press to remove this button"
+            Text = "Remove this button"
         };
         main.Add (removeButton);
 
         // This in interesting test case because `moveBtn` and below are laid out relative to this one!
-        removeButton.Accepting += (_, e) =>
-                                  {
-                                      removeButton.Visible = false;
-                                      e.Handled = true;
-                                  };
+        removeButton.Accepting += (s, e) =>
+                               {
+                                   removeButton.Visible = false;
+                                   e.Handled = true;
+                               };
 
-        FrameView computedFrame = new ()
+        var computedFrame = new FrameView
         {
             X = 0,
-            Y = Pos.Bottom (removeButton),
+            Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Percent (50),
             Height = 6,
-            Title = "Frame (Width = 50%)"
+            Title = "Computed Layout"
         };
         main.Add (computedFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
-        Button moveBtn = new ()
+        var moveBtn = new Button
         {
             X = 0,
             Y = Pos.Center () - 1,
@@ -163,82 +169,88 @@ public class Buttons : Scenario
             Text = "Move This \u263b Button v_ia Pos"
         };
 
-        moveBtn.Accepting += (_, e) =>
-                             {
-                                 moveBtn.X = moveBtn.Frame.X + 5;
-                                 e.Handled = true;
-                             };
+        moveBtn.Accepting += (s, e) =>
+                          {
+                              moveBtn.X = moveBtn.Frame.X + 5;
+                              e.Handled = true;
+                          };
         computedFrame.Add (moveBtn);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
-        Button sizeBtn = new ()
+        var sizeBtn = new Button
         {
             Y = Pos.Center () + 1,
             X = 0,
             Width = 30,
             Text = "Grow This \u263a Button _via Pos",
-            SchemeName = "Error"
+            SchemeName = "Error",
         };
 
-        sizeBtn.Accepting += (_, e) =>
-                             {
-                                 sizeBtn.Width = sizeBtn.Frame.Width + 5;
-                                 e.Handled = true;
-                             };
+        sizeBtn.Accepting += (s, e) =>
+                          {
+                              sizeBtn.Width = sizeBtn.Frame.Width + 5;
+                              e.Handled = true;
+                          };
         computedFrame.Add (sizeBtn);
 
-        FrameView absoluteFrame = new ()
+        var absoluteFrame = new FrameView
         {
             X = Pos.Right (computedFrame),
-            Y = Pos.Top (computedFrame),
+            Y = Pos.Bottom (removeButton) + 1,
             Width = Dim.Fill (),
-            Height = Dim.Height (computedFrame),
-            Title = "Frame (Width = Fill)"
+            Height = 6,
+            Title = "Absolute Layout"
         };
         main.Add (absoluteFrame);
 
         // Demonstrates how changing the View.Frame property can move Views
-        Button moveBtnA = new () { SchemeName = "Error", Text = "Move This Button via Frame" };
+        var moveBtnA = new Button { SchemeName = "Error", Text = "Move This Button via Frame" };
 
-        moveBtnA.Accepting += (_, e) =>
-                              {
-                                  moveBtnA.Frame = moveBtnA.Frame with { X = moveBtnA.Frame.X + 5 };
-                                  e.Handled = true;
-                              };
+        moveBtnA.Accepting += (s, e) =>
+                           {
+                               moveBtnA.Frame = new (
+                                                     moveBtnA.Frame.X + 5,
+                                                     moveBtnA.Frame.Y,
+                                                     moveBtnA.Frame.Width,
+                                                     moveBtnA.Frame.Height
+                                                    );
+                               e.Handled = true;
+                           };
         absoluteFrame.Add (moveBtnA);
 
         // Demonstrates how changing the View.Frame property can SIZE Views (#583)
-        Button sizeBtnA = new ()
+        var sizeBtnA = new Button
         {
-            Y = 2, SchemeName = "Error", Text = " ~  s  gui.cs   main ↑_10 = Сохранить"
+            Y = 2, SchemeName = "Error", Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
         };
 
-        sizeBtnA.Accepting += (_, e) =>
-                              {
-                                  sizeBtnA.Frame = sizeBtnA.Frame with { Width = sizeBtnA.Frame.Width + 5 };
-                                  e.Handled = true;
-                              };
+        sizeBtnA.Accepting += (s, e) =>
+                           {
+                               sizeBtnA.Frame = new (
+                                                     sizeBtnA.Frame.X,
+                                                     sizeBtnA.Frame.Y,
+                                                     sizeBtnA.Frame.Width + 5,
+                                                     sizeBtnA.Frame.Height
+                                                    );
+                               e.Handled = true;
+                           };
         absoluteFrame.Add (sizeBtnA);
 
-        Label label = new ()
+        var label = new Label
         {
-            X = 2, Y = Pos.Bottom (computedFrame),
-
-            // ReSharper disable once StringLiteralTypo
-            Text = "Text Ali_gnment (changes all buttons): "
+            X = 2, Y = Pos.Bottom (computedFrame) + 1,
+            Text = "Text Ali_gnment (changes the four buttons above): "
         };
         main.Add (label);
 
         OptionSelector<Alignment> osAlignment = new ()
         {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = 20,
+            X = 4,
+            Y = Pos.Bottom (label) + 1,
             Value = Alignment.Center,
             AssignHotKeys = true,
             Title = "_9 OptionSelector",
-            BorderStyle = LineStyle.Dotted
-
+            BorderStyle = LineStyle.Dotted,
             // CanFocus = false
         };
         main.Add (osAlignment);
@@ -275,211 +287,143 @@ public class Buttons : Scenario
             return start + '_' + StringExtensions.ToString (runes.GetRange (i, runes.Count - i));
         }
 
-        Button moveHotKeyBtn = new ()
+        var mhkb = "Click to Change th_is Button's Hotkey";
+
+        var moveHotKeyBtn = new Button
         {
             X = 2,
-            Y = Pos.Bottom (osAlignment),
+            Y = Pos.Bottom (osAlignment) + 1,
             Width = Dim.Width (computedFrame) - 2,
             SchemeName = "Runnable",
-            Text = "Click to Change th_is Button's Hotkey"
+            Text = mhkb
         };
-
-        moveHotKeyBtn.Accepting += (_, e) =>
-                                   {
-                                       moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
-                                       e.Handled = true;
-                                   };
+        moveHotKeyBtn.Accepting += (s, e) =>
+                                {
+                                    moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
+                                    e.Handled = true;
+                                };
         main.Add (moveHotKeyBtn);
 
-        Button moveUnicodeHotKeyBtn = new ()
+        var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
+
+        var moveUnicodeHotKeyBtn = new Button
         {
             X = Pos.Left (absoluteFrame) + 1,
-            Y = Pos.Bottom (osAlignment),
+            Y = Pos.Bottom (osAlignment) + 1,
             Width = Dim.Width (absoluteFrame) - 2,
             SchemeName = "Runnable",
-            Text = " ~  s  gui.cs   main ↑10 = Сохранить"
+            Text = muhkb
         };
-
-        moveUnicodeHotKeyBtn.Accepting += (_, e) =>
-                                          {
-                                              moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
-                                              e.Handled = true;
-                                          };
+        moveUnicodeHotKeyBtn.Accepting += (s, e) =>
+                                       {
+                                           moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
+                                           e.Handled = true;
+                                       };
         main.Add (moveUnicodeHotKeyBtn);
 
-        osAlignment.ValueChanged += (_, args) =>
+        osAlignment.ValueChanged += (s, args) =>
                                     {
                                         if (args.Value is null)
                                         {
                                             return;
                                         }
 
-                                        // ReSharper disable once AccessToDisposedClosure
-                                        SetTextAlignmentForAllButtons (main, args.Value.Value);
+                                        Alignment newValue = args.Value.Value;
+                                        moveBtn.TextAlignment = newValue;
+                                        sizeBtn.TextAlignment = newValue;
+                                        moveBtnA.TextAlignment = newValue;
+                                        sizeBtnA.TextAlignment = newValue;
+                                        moveHotKeyBtn.TextAlignment = newValue;
+                                        moveUnicodeHotKeyBtn.TextAlignment = newValue;
                                     };
 
         label = new ()
         {
             X = 0,
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
-            Title = "Numeric Up/Down (press-and-_hold):"
+            Title = "_Numeric Up/Down (press-and-hold):",
         };
 
-        NumericUpDown<int> numericUpDown = new ()
+        var numericUpDown = new NumericUpDown<int>
         {
             Value = 69,
             X = Pos.Right (label) + 1,
-            Y = Pos.Top (label)
+            Y = Pos.Top (label),
         };
-        numericUpDown.ValueChanged += NumericUpDownValueChanged;
+        numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
 
-        void NumericUpDownValueChanged (object? sender, ValueChangedEventArgs<int> e) { }
+        void NumericUpDown_ValueChanged (object sender, EventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
         label = new ()
         {
             X = 0,
-            Y = Pos.Bottom (numericUpDown),
-
-            // ReSharper disable once StringLiteralTypo
-            Title = "No Repea_t:"
+            Y = Pos.Bottom (numericUpDown) + 1,
+            Title = "_No Repeat:"
         };
         var noRepeatAcceptCount = 0;
 
-        Button noRepeatButton = new ()
+        var noRepeatButton = new Button
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accepting Count: {noRepeatAcceptCount}",
-            MouseHoldRepeat = null
+            Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
+            WantContinuousButtonPressed = false
         };
-
-        noRepeatButton.Accepting += (_, e) =>
-                                    {
-                                        noRepeatButton.Title = $"Accepting Count: {++noRepeatAcceptCount}";
-                                        Logging.Trace ("noRepeatButton Button Pressed");
-                                        e.Handled = true;
-                                    };
+        noRepeatButton.Accepting += (s, e) =>
+                                 {
+                                     noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
+                                     e.Handled = true;
+                                 };
         main.Add (label, noRepeatButton);
 
         label = new ()
         {
-            X = Pos.Right (noRepeatButton) + 1,
-            Y = Pos.Top (label),
-            Title = "N_o Repeat (no highlight):"
-        };
-        var noRepeatNoHighlightAcceptCount = 0;
-
-        Button noRepeatNoHighlight = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Title = $"Accepting Count: {noRepeatNoHighlightAcceptCount}",
-            MouseHoldRepeat = null,
-            MouseHighlightStates = MouseState.None
-        };
-
-        noRepeatNoHighlight.Accepting += (_, e) =>
-                                         {
-                                             noRepeatNoHighlight.Title = $"Accepting Count: {++noRepeatNoHighlightAcceptCount}";
-                                             Logging.Trace ("noRepeatNoHighlight Button Pressed");
-                                             e.Handled = true;
-                                         };
-        main.Add (label, noRepeatNoHighlight);
-
-        label = new ()
-        {
             X = 0,
-            Y = Pos.Bottom (noRepeatNoHighlight),
-            Title = "Repeat (_press-and-hold):"
+            Y = Pos.Bottom (label) + 1,
+            Title = "_Repeat (press-and-hold):"
         };
+        var acceptCount = 0;
 
-        var repeatButtonAcceptingCount = 0;
-
-        Button repeatButton = new ()
+        var repeatButton = new Button
         {
             Id = "repeatButton",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accepting Co_unt: {repeatButtonAcceptingCount}",
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
+            Title = $"Accept Co_unt: {acceptCount}",
+            WantContinuousButtonPressed = true
         };
+        repeatButton.Accepting += (s, e) =>
+                               {
+                                   repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
+                                   e.Handled = true;
+                               };
 
-        repeatButton.Accepting += (_, e) =>
-                                  {
-                                      repeatButton.Title = $"Accepting Co_unt: {++repeatButtonAcceptingCount}";
-                                      e.Handled = true;
-                                  };
-
-        CheckBox enableCb = new ()
+        var enableCB = new CheckBox
         {
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
-            Value = CheckState.Checked
+            CheckedState = CheckState.Checked
         };
-        enableCb.ValueChanging += (_, _) => { repeatButton.Enabled = !repeatButton.Enabled; };
-        main.Add (label, repeatButton, enableCb);
+        enableCB.CheckedStateChanging += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        main.Add (label, repeatButton, enableCB);
 
-        NumericUpDown<int> decNumericUpDown = new ()
+        var decNumericUpDown = new NumericUpDown<int>
         {
-            // ReSharper disable once StringLiteralTypo
-            Title = "Hexadecima_l",
             Value = 911,
             Increment = 1,
             Format = "{0:X}",
             X = 0,
-            Y = Pos.Bottom (repeatButton),
-            BorderStyle = LineStyle.Single,
-            Width = 15
+            Y = Pos.Bottom (enableCB) + 1,
         };
 
         main.Add (decNumericUpDown);
 
-        app.Run (main);
-
-        return;
-
-        static void DoMessage (Button button, string txt)
-        {
-            button.Accepting += (s, e) =>
-                                {
-                                    MessageBox.Query ((s as View)?.App!, "Message", $"Did you click {txt}?", Strings.btnNo, Strings.btnYes);
-                                    e.Handled = true;
-                                };
-        }
-    }
-
-    private static void SetTextAlignmentForAllButtons (View root, Alignment alignment)
-    {
-        foreach (Button button in GetAllSubViewsOfType<Button> (root))
-        {
-            button.TextAlignment = alignment;
-        }
-    }
-
-    /// <summary>
-    ///     Recursively finds all subviews of a specified type in the view hierarchy.
-    /// </summary>
-    /// <typeparam name="T">The type of views to find.</typeparam>
-    /// <param name="view">The root view to start searching from.</param>
-    /// <returns>An all matching subviews.</returns>
-    private static IEnumerable<T> GetAllSubViewsOfType<T> (View view) where T : View
-    {
-        foreach (View subview in view.SubViews)
-        {
-            // If this subview is of the requested type, yield it
-            if (subview is T matchingView)
-            {
-                yield return matchingView;
-            }
-
-            // Recursively search this subview's children
-            foreach (T child in GetAllSubViewsOfType<T> (subview))
-            {
-                yield return child;
-            }
-        }
+        Application.Run (main);
+        main.Dispose ();
+        Application.Shutdown ();
     }
 }
+

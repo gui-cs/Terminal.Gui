@@ -61,7 +61,7 @@ public class AppendAutocomplete : AutocompleteBase
     }
 
     /// <inheritdoc/>
-    public override bool OnMouseEvent (Mouse me, bool fromHost = false) { return false; }
+    public override bool OnMouseEvent (MouseEventArgs me, bool fromHost = false) { return false; }
 
     /// <inheritdoc/>
     public override bool ProcessKey (Key a)
@@ -196,5 +196,5 @@ public class AppendAutocomplete : AutocompleteBase
     ///     to see auto-complete (i.e. focused and cursor in right place).
     /// </summary>
     /// <returns></returns>
-    private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && _textField.HasFocus && _textField.InsertionPointIsAtEnd (); }
+    private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && _textField.HasFocus && _textField.CursorIsAtEnd (); }
 }

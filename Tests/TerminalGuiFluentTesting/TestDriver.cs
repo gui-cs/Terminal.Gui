@@ -21,7 +21,7 @@ public enum TestDriver
     Unix,
 
     /// <summary>
-    ///     The ANSI driver with simulation I/O but core driver classes
+    ///     The Fake driver that does not use any core driver classes
     /// </summary>
-    ANSI
+    Fake
 }

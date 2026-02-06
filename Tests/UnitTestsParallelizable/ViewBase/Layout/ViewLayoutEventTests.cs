@@ -1,4 +1,5 @@
 #nullable enable
+using UnitTests.Parallelizable;
 
 namespace ViewBaseTests.Layout;
 
@@ -211,7 +212,6 @@ public class ViewLayoutEventTests
         container.Add (view);
         container.Layout ();
         Assert.Equal (25, view.Frame.Width);
-        Assert.Equal (widthInChangedEvent, view.Frame.Width);
     }
 
     [Fact]
@@ -233,54 +233,6 @@ public class ViewLayoutEventTests
         container.Add (view);
         container.Layout ();
         Assert.Equal (30, view.Frame.Height);
-        Assert.Equal (heightInChangedEvent, view.Frame.Height);
-    }
-
-    [Fact]
-    public void View_SubViewLayout_SubViewsLaidOut_Events_Fires_EvenWidthOrHeightIsZero ()
-    {
-        var container = new View () { Width = 20, Height = 10 };
-        var view = new View () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
-        container.Add (view);
-        bool eventSubViewLayoutFired = false;
-        bool eventSubViewsLaidOutFired = false;
-        Size? oldValue = null;
-
-        view.SubViewLayout += (_, args) =>
-                              {
-                                  eventSubViewLayoutFired = true;
-                                  oldValue = args.OldContentSize;
-                              };
-
-        view.SubViewsLaidOut += (_, args) =>
-                                {
-                                    eventSubViewsLaidOutFired = true;
-                                    oldValue = args.OldContentSize;
-                                };
-
-        container.Layout ();
-
-        Assert.True (eventSubViewLayoutFired);
-        Assert.True (eventSubViewsLaidOutFired);
-        Assert.Equal (new Size (18, 8), oldValue);
-
-        eventSubViewLayoutFired = false;
-        eventSubViewsLaidOutFired = false;
-        oldValue = null;
-
-        container.Width = 1;
-        Assert.True (eventSubViewLayoutFired);
-        Assert.True (eventSubViewsLaidOutFired);
-        Assert.Equal (new Size (0, 8), oldValue);
-
-        eventSubViewLayoutFired = false;
-        eventSubViewsLaidOutFired = false;
-        oldValue = null;
-
-        container.Height = 1;
-        Assert.True (eventSubViewLayoutFired);
-        Assert.True (eventSubViewsLaidOutFired);
-        Assert.Equal (new Size (0, 0), oldValue);
     }
 
     private class TestView : View

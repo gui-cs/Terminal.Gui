@@ -2,8 +2,6 @@
 global using Color = Terminal.Gui.Drawing.Color;
 global using CM = Terminal.Gui.Configuration.ConfigurationManager;
 global using Terminal.Gui.App;
-global using Terminal.Gui.Time;
-global using Terminal.Gui.Testing;
 global using Terminal.Gui.Drivers;
 global using Terminal.Gui.Input;
 global using Terminal.Gui.Configuration;

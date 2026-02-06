@@ -25,7 +25,7 @@ public class EventLog : ListView
                                   return 0;
                               }
 
-                              return Math.Min (SuperView!.Viewport.Width / 3, MaxItemLength + GetAdornmentsThickness ().Horizontal);
+                              return Math.Min (SuperView!.Viewport.Width / 3, MaxLength + GetAdornmentsThickness ().Horizontal);
                           });
         Height = Dim.Fill ();
 
@@ -69,7 +69,7 @@ public class EventLog : ListView
 
             _viewToLog = value;
 
-            if (_viewToLog is not null)
+            if (_viewToLog is { })
             {
                 _viewToLog.Initialized += (s, _) =>
                                           {
@@ -77,6 +77,7 @@ public class EventLog : ListView
                                               Log ($"Initialized: {GetIdentifyingString (sender)}");
                                           };
 
+                _viewToLog.MouseWheel += (_, args) => { Log ($"MouseWheel: {args}"); };
                 _viewToLog.HandlingHotKey += (_, args) => { Log ($"HandlingHotKey: {args.Context}"); };
                 _viewToLog.Activating += (_, args) => { Log ($"Activating: {args.Context}"); };
                 _viewToLog.Accepting += (_, args) => { Log ($"Accepting: {args.Context}"); };

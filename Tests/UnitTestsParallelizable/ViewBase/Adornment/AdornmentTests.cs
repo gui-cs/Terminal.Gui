@@ -1,7 +1,7 @@
 ﻿#nullable enable
 namespace ViewBaseTests.Adornments;
 
-
+[Collection ("Global Test Setup")]
 public class AdornmentTests
 {
     //private class TestView : View

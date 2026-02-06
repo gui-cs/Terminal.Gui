@@ -8,14 +8,11 @@ public sealed class Transparent : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-
         // Init
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ()
+        Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
         };
@@ -34,7 +31,7 @@ public sealed class Transparent : Scenario
 
                                         e.Cancel = true;
                                     };
-        ViewportSettingsEditor viewportSettingsEditor = new ()
+        ViewportSettingsEditor viewportSettingsEditor = new ViewportSettingsEditor ()
         {
             Y = Pos.AnchorEnd (),
             //X = Pos.Right (adornmentsEditor),
@@ -42,7 +39,7 @@ public sealed class Transparent : Scenario
         };
         appWindow.Add (viewportSettingsEditor);
 
-        Button appButton = new ()
+        Button appButton = new Button ()
         {
             X = 10,
             Y = 4,
@@ -50,12 +47,12 @@ public sealed class Transparent : Scenario
         };
         appButton.Accepting += (sender, args) =>
                                {
-                                   MessageBox.Query ((sender as View)?.App!, "AppButton", "Transparency is cool!", Strings.btnOk);
+                                   MessageBox.Query ((sender as View)?.App, "AppButton", "Transparency is cool!", "_Ok");
                                    args.Handled = true;
                                };
         appWindow.Add (appButton);
 
-        TransparentView tv = new ()
+        var tv = new TransparentView ()
         {
             X = 2,
             Y = 2,
@@ -63,17 +60,21 @@ public sealed class Transparent : Scenario
             Height = Dim.Fill (10)
         };
 
-        appWindow.ViewportChanged += (_, _) =>
+        appWindow.ViewportChanged += (sender, args) =>
                                       {
                                           // Little hack to convert the Dim.Fill to actual size
                                           // So resizing works
-                                          tv.Width = appWindow.Frame.Width - 10;
-                                          tv.Height = appWindow.Frame.Height - 10;
+                                          tv.Width = appWindow!.Frame.Width - 10;
+                                          tv.Height = appWindow!.Frame.Height - 10;
                                       };
         appWindow.Add (tv);
 
         // Run - Start the application.
-        app.Run (appWindow);
+        Application.Run (appWindow);
+        appWindow.Dispose ();
+
+        // Shutdown - Calling Application.Shutdown is required.
+        Application.Shutdown ();
     }
 
     public class TransparentView : FrameView
@@ -87,7 +88,7 @@ public sealed class Transparent : Scenario
             BorderStyle = LineStyle.RoundedDotted;
             SchemeName = "Base";
 
-            View transparentSubView = new ()
+            var transparentSubView = new View ()
             {
                 Text = "Sizable/Movable SubView with border and shadow.",
                 Id = "transparentSubView",
@@ -102,20 +103,20 @@ public sealed class Transparent : Scenario
             transparentSubView.Border!.Thickness = new (1, 1, 1, 1);
             transparentSubView.SchemeName = "Dialog";
 
-            Button button = new ()
+            Button button = new Button ()
             {
                 Title = "_Opaque Shadow",
                 X = Pos.Center (),
                 Y = 2,
                 SchemeName = "Dialog",
             };
-            button.Accepting += (_, args) =>
+            button.Accepting += (sender, args) =>
                                 {
-                                    MessageBox.Query (App!, "Clicked!", "Button in Transparent View", Strings.btnOk);
+                                    MessageBox.Query (App, "Clicked!", "Button in Transparent View", "_Ok");
                                     args.Handled = true;
                                 };
 
-            Shortcut shortcut = new ()
+            var shortcut = new Shortcut ()
             {
                 Id = "shortcut",
                 X = Pos.Center (),
@@ -126,17 +127,17 @@ public sealed class Transparent : Scenario
                 SchemeName = "Base"
             };
 
-            button.ClearingViewport += (_, args) =>
+            button.ClearingViewport += (sender, args) =>
                                        {
                                            args.Cancel = true;
                                        };
 
-            // Subscribe to DrawingContent event to draw "TUI"
+            // Subscribe to DrawingContent event to draw "TUI" 
             DrawingContent += TransparentView_DrawingContent;
 
-            Add (button);
-            Add (shortcut);
-            Add (transparentSubView);
+            base.Add (button);
+            base.Add (shortcut);
+            base.Add (transparentSubView);
 
             Padding!.Thickness = new (1);
             Padding.Text = "This is the Padding";
@@ -170,7 +171,7 @@ public sealed class Transparent : Scenario
             FillRect (iStem, Glyphs.BlackCircle);
             FillRect (iBottom, Glyphs.BlackCircle);
 
-            Region tuiRegion = new (ViewportToScreen (tTop));
+            Region tuiRegion = new Region (ViewportToScreen (tTop));
             tuiRegion.Union (ViewportToScreen (tStem));
             tuiRegion.Union (ViewportToScreen (uLeft));
             tuiRegion.Union (ViewportToScreen (uBottom));
@@ -207,7 +208,7 @@ public sealed class Transparent : Scenario
             FillRect (iStem, Glyphs.BlackCircle);
 
             // Register the drawn region for "Hi" to enable transparency effects
-            Region hiRegion = new (ViewportToScreen (hLeft));
+            Region hiRegion = new Region (ViewportToScreen (hLeft));
             hiRegion.Union (ViewportToScreen (hMiddle));
             hiRegion.Union (ViewportToScreen (hRight));
             hiRegion.Union (ViewportToScreen (iDot));
@@ -220,7 +221,7 @@ public sealed class Transparent : Scenario
 
         protected override bool OnRenderingLineCanvas ()
         {
-            // Draw "dotnet" using LineCanvas
+            // Draw "dotnet" using LineCanvas 
             Point screenPos = ViewportToScreen (new Point (7, 16));
             DrawDotnet (LineCanvas, screenPos.X, screenPos.Y, LineStyle.Single, GetAttributeForRole (VisualRole.Normal));
 
@@ -231,7 +232,7 @@ public sealed class Transparent : Scenario
         protected override bool OnClearingViewport () { return false; }
 
         /// <inheritdoc />
-        protected override bool OnMouseEvent (Mouse mouse) { return false; }
+        protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
 
 
         /// <summary>

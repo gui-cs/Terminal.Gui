@@ -5,8 +5,8 @@ Paste these commands into your favorite terminal on Windows, Mac, or Linux. This
 (Press `Esc` to exit the app)
 
 ```ps1
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
-dotnet new tui-simple -n myproj
+dotnet new --install Terminal.Gui.templates
+dotnet new tui -n myproj
 cd myproj
 dotnet run
 ```
@@ -21,11 +21,7 @@ dotnet add package Terminal.Gui
 
 ## Using the Templates
 
-Use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
-
-```ps1
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
-```
+Use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
 
 ## Sample Usage in C#
 

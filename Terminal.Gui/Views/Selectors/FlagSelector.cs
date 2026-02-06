@@ -18,11 +18,10 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class FlagSelector : SelectorBase, IDesignable
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
-
         if (view is not CheckBox checkbox)
         {
             return;
@@ -30,26 +29,26 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.RadioStyle = false;
 
-        checkbox.ValueChanging += OnCheckboxOnValueChanging;
-        checkbox.ValueChanged += OnCheckboxOnValueChanged;
+        checkbox.CheckedStateChanging += OnCheckboxOnCheckedStateChanging;
+        checkbox.CheckedStateChanged += OnCheckboxOnCheckedStateChanged;
         checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
-    private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
+    private void OnCheckboxOnCheckedStateChanging (object? sender, ResultEventArgs<CheckState> args)
     {
         if (sender is not CheckBox checkbox)
         {
             return;
         }
 
-        if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
+        if (checkbox.CheckedState == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
             args.Handled = true;
         }
     }
 
-    private void OnCheckboxOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> args)
+    private void OnCheckboxOnCheckedStateChanged (object? sender, EventArgs<CheckState> args)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -58,9 +57,9 @@ public class FlagSelector : SelectorBase, IDesignable
 
         int newValue = Value ?? 0;
 
-        if (checkbox.Value == CheckState.Checked)
+        if (checkbox.CheckedState == CheckState.Checked)
         {
-            if ((int)checkbox.Data! == 0)
+            if ((int)checkbox.Data! == default!)
             {
                 newValue = 0;
             }
@@ -114,7 +113,7 @@ public class FlagSelector : SelectorBase, IDesignable
     private int? _value;
 
     /// <summary>
-    ///     Gets or sets the value of the selected flags.
+    /// Gets or sets the value of the selected flags.
     /// </summary>
     public override int? Value
     {
@@ -127,13 +126,6 @@ public class FlagSelector : SelectorBase, IDesignable
             }
 
             int? previousValue = _value;
-
-            // Raise ValueChanging (cancellable) - use base class implementation
-            if (RaiseValueChanging (previousValue, value))
-            {
-                return;
-            }
-
             _value = value;
 
             if (_value is null)
@@ -146,7 +138,7 @@ public class FlagSelector : SelectorBase, IDesignable
                 UpdateChecked ();
             }
 
-            RaiseValueChanged (previousValue, _value);
+            RaiseValueChanged (previousValue);
         }
     }
 
@@ -154,10 +146,9 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         // Uncheck ONLY the None checkbox (Data == 0)
         _updatingChecked = true;
-
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! == 0))
         {
-            cb.Value = CheckState.UnChecked;
+            cb.CheckedState = CheckState.UnChecked;
         }
         _updatingChecked = false;
     }
@@ -166,17 +157,16 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         // Uncheck all NON-None checkboxes (Data != 0)
         _updatingChecked = true;
-
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? null!) != 0))
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? default!) != default!))
         {
-            cb.Value = CheckState.UnChecked;
+            cb.CheckedState = CheckState.UnChecked;
         }
         _updatingChecked = false;
     }
 
-    private bool _updatingChecked;
+    private bool _updatingChecked = false;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public override void UpdateChecked ()
     {
         if (_updatingChecked)
@@ -184,7 +174,6 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
         _updatingChecked = true;
-
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             var flag = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
@@ -192,18 +181,18 @@ public class FlagSelector : SelectorBase, IDesignable
             // If this flag is set in Value, check the checkbox. Otherwise, uncheck it.
             if (flag == 0)
             {
-                cb.Value = Value != 0 ? CheckState.UnChecked : CheckState.Checked;
+                cb.CheckedState = (Value != 0) ? CheckState.UnChecked : CheckState.Checked;
             }
             else
             {
-                cb.Value = (Value & flag) == flag ? CheckState.Checked : CheckState.UnChecked;
+                cb.CheckedState = (Value & flag) == flag ? CheckState.Checked : CheckState.UnChecked;
             }
         }
 
         _updatingChecked = false;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnCreatingSubViews ()
     {
         // FlagSelector supports a "None" check box; add it
@@ -213,7 +202,7 @@ public class FlagSelector : SelectorBase, IDesignable
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     protected override void OnCreatedSubViews ()
     {
         // If the values include 0, and ShowNoneFlag is not specified, remove the "None" check box
@@ -235,17 +224,16 @@ public class FlagSelector : SelectorBase, IDesignable
         Styles = SelectorStyles.All;
         AssignHotKeys = true;
         SetValuesAndLabels<SelectorStyles> ();
-
         Labels = Enum.GetValues<SelectorStyles> ()
-                     .Select (l => l switch
+                     .Select (
+                              l => l switch
                                    {
                                        SelectorStyles.None => "No Style",
                                        SelectorStyles.ShowNoneFlag => "Show None Value Style",
                                        SelectorStyles.ShowValue => "Show Value Editor Style",
                                        SelectorStyles.All => "All Styles",
                                        _ => l.ToString ()
-                                   })
-                     .ToList ();
+                                   }).ToList ();
 
         return true;
     }

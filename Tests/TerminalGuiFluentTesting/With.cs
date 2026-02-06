@@ -11,16 +11,15 @@ public static class With
     /// </summary>
     /// <param name="width"></param>
     /// <param name="height"></param>
-    /// <param name="driverName"></param>
+    /// <param name="testDriver">Which v2 testDriver to use for the test</param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static TestContext A<T> (int width, int height, string driverName, TextWriter? logWriter = null) where T : IRunnable, new()
+    public static GuiTestContext A<T> (int width, int height, TestDriver testDriver, TextWriter? logWriter = null) where T : IRunnable, new()
     {
         return new (() => new T ()
         {
             //Id = $"{typeof (T).Name}"
-        }, width, height,
-        driverName, logWriter, Timeout);
+        }, width, height, testDriver, logWriter, Timeout);
     }
 
     /// <summary>
@@ -29,12 +28,12 @@ public static class With
     /// <param name="runnableFactory"></param>
     /// <param name="width"></param>
     /// <param name="height"></param>
-    /// <param name="driverName"></param>
+    /// <param name="testDriver"></param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static TestContext A (Func<IRunnable> runnableFactory, int width, int height, string driverName, TextWriter? logWriter = null)
+    public static GuiTestContext A (Func<IRunnable> runnableFactory, int width, int height, TestDriver testDriver, TextWriter? logWriter = null)
     {
-        return new (runnableFactory, width, height, driverName, logWriter, Timeout);
+        return new (runnableFactory, width, height, testDriver, logWriter, Timeout);
     }
     /// <summary>
     ///     The global timeout to allow for any given application to run for before shutting down.

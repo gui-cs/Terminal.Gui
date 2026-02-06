@@ -5,26 +5,33 @@ namespace Terminal.Gui.Views;
 ///     Each option is represented by a checkbox, but only one can be selected at a time.
 ///     <see cref="OptionSelector"/> provides a non-type-safe version.
 /// </summary>
-public sealed class OptionSelector<TEnum> : OptionSelector, IValue where TEnum : struct, Enum
+public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct, Enum
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="OptionSelector{TEnum}"/> class.
     /// </summary>
-    public OptionSelector () => Labels = Enum.GetValues<TEnum> ().Select (f => f.ToString ()).ToArray ();
+    public OptionSelector ()
+    {
+        base.Labels = Enum.GetValues<TEnum> ().Select (f => f.ToString ()).ToArray (); ;
+    }
 
     /// <summary>
     ///     Gets or sets the value of the selected option.
     /// </summary>
     public new TEnum? Value
     {
-        get => base.Value.HasValue ? (TEnum)Enum.ToObject (typeof (TEnum), base.Value.Value) : null;
+        get => base.Value.HasValue ? (TEnum)Enum.ToObject (typeof (TEnum), base.Value.Value) : (TEnum?)null;
         set => base.Value = value.HasValue ? Convert.ToInt32 (value.Value) : null;
     }
 
     /// <summary>
     ///     Prevents calling the base Values property setter with arbitrary values.
     /// </summary>
-    public override IReadOnlyList<int>? Values { get => base.Values; set => throw new InvalidOperationException ("Setting Values directly is not allowed."); }
+    public override IReadOnlyList<int>? Values
+    {
+        get => base.Values;
+        set => throw new InvalidOperationException ("Setting Values directly is not allowed.");
+    }
 
     /// <summary>
     ///     Raised when <see cref="Value"/> has changed. Provides the new value as <typeparamref name="TEnum"/>?.
@@ -40,9 +47,6 @@ public sealed class OptionSelector<TEnum> : OptionSelector, IValue where TEnum :
 
         TEnum? newValue = value.HasValue ? (TEnum)Enum.ToObject (typeof (TEnum), value.Value) : null;
 
-        ValueChanged?.Invoke (this, new EventArgs<TEnum?> (newValue));
+        ValueChanged?.Invoke (this, new (newValue));
     }
-
-    /// <inheritdoc/>
-    object? IValue.GetValue () => Value;
 }

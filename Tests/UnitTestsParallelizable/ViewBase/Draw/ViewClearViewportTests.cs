@@ -4,12 +4,12 @@ using UnitTests;
 
 namespace ViewBaseTests.Viewport;
 
-public class ViewClearViewportTests () : TestDriverBase
+public class ViewClearViewportTests () : FakeDriverBase
 {
     [Fact]
     public void ClearViewport_FillsViewportArea ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -44,7 +44,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearViewport_WithClearContentOnly_LimitsToVisibleContent ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -99,7 +99,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearViewport_SetsNeedsDraw ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -126,7 +126,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearViewport_WithTransparentFlag_DoesNotClear ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -162,7 +162,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearingViewport_Event_Raised ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         bool eventRaised = false;
@@ -196,7 +196,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearedViewport_Event_Raised ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         bool eventRaised = false;
@@ -223,7 +223,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void OnClearingViewport_CanPreventClear ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         bool clearedCalled = false;
@@ -251,7 +251,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearViewport_EmptyViewport_DoesNotThrow ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -278,7 +278,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearViewport_WithScrolledViewport_ClearsCorrectArea ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -317,7 +317,7 @@ public class ViewClearViewportTests () : TestDriverBase
     [Fact]
     public void ClearViewport_WithClearContentOnly_AndScrolledViewport_ClearsOnlyVisibleContent ()
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateFakeDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View

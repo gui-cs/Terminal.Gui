@@ -3,8 +3,8 @@
 namespace ViewBaseTests.Viewport;
 
 /// <summary>
-///     Test the <see cref="View.Viewport"/>.
-///     DOES NOT TEST Adornment.Viewport methods. Those are in ./Adornment/ViewportTests.cs
+/// Test the <see cref="View.Viewport"/>.
+/// DOES NOT TEST Adornment.Viewport methods. Those are in ./Adornment/ViewportTests.cs
 /// </summary>
 /// <param name="output"></param>
 public class ViewportTests (ITestOutputHelper output)
@@ -25,7 +25,7 @@ public class ViewportTests (ITestOutputHelper output)
         view.EndInit ();
 
         // Act
-        Rectangle bounds = view.Viewport;
+        var bounds = view.Viewport;
 
         // Assert
         Assert.Equal (10, bounds.Width);
@@ -37,24 +37,44 @@ public class ViewportTests (ITestOutputHelper output)
     [InlineData (-1, 0, 11)]
     [InlineData (10, 0, 0)]
     [InlineData (11, 0, 0)]
+
     [InlineData (0, 1, 6)]
     [InlineData (1, 1, 5)]
     [InlineData (-1, 1, 7)]
     [InlineData (10, 1, 0)]
     [InlineData (11, 1, 0)]
+
     public void Get_Viewport_NestedSuperView_WithAdornments (int frameX, int borderThickness, int expectedW)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
-        var superSuperView = new View { X = 0, Y = 0, Height = 10, Width = 10 };
+        var superSuperView = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Height = 10,
+            Width = 10,
+        };
         superSuperView.Border!.Thickness = new Thickness (borderThickness);
 
-        var superView = new View { X = 0, Y = 0, Height = Dim.Fill (), Width = Dim.Fill () };
+        var superView = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Fill ()
+        };
         superView.Border!.Thickness = new Thickness (borderThickness);
 
         superSuperView.Add (superView);
 
-        var view = new View { X = frameX, Y = 0, Height = Dim.Fill (), Width = Dim.Fill () };
+        var view = new View ()
+        {
+            X = frameX,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Fill ()
+        };
 
         superView.Add (view);
         superSuperView.BeginInit ();
@@ -62,11 +82,13 @@ public class ViewportTests (ITestOutputHelper output)
         superSuperView.LayoutSubViews ();
 
         // Act
-        Rectangle bounds = view.Viewport;
+        var bounds = view.Viewport;
 
         // Assert
         Assert.Equal (expectedW, bounds.Width);
     }
+
+
 
     [Theory]
     [InlineData (0, 0, 10)]
@@ -74,6 +96,7 @@ public class ViewportTests (ITestOutputHelper output)
     [InlineData (-1, 0, 11)]
     [InlineData (10, 0, 0)]
     [InlineData (11, 0, 0)]
+
     [InlineData (0, 1, 4)]
     [InlineData (1, 1, 3)]
     [InlineData (-1, 1, 5)]
@@ -83,15 +106,33 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
-        var superSuperView = new View { X = 0, Y = 0, Height = 10, Width = 10 };
+        var superSuperView = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Height = 10,
+            Width = 10,
+        };
         superSuperView.Border!.Thickness = new Thickness (borderThickness);
 
-        var superView = new View { X = 0, Y = 0, Height = Dim.Fill (), Width = Dim.Fill () };
+        var superView = new View ()
+        {
+            X = 0,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Fill ()
+        };
         superView.Border!.Thickness = new Thickness (borderThickness);
 
         superSuperView.Add (superView);
 
-        var view = new View { X = frameX, Y = 0, Height = Dim.Fill (), Width = Dim.Fill () };
+        var view = new View ()
+        {
+            X = frameX,
+            Y = 0,
+            Height = Dim.Fill (),
+            Width = Dim.Fill ()
+        };
         view.Border!.Thickness = new Thickness (borderThickness);
 
         superView.Add (view);
@@ -100,7 +141,7 @@ public class ViewportTests (ITestOutputHelper output)
         superSuperView.LayoutSubViews ();
 
         // Act
-        Rectangle bounds = view.Viewport;
+        var bounds = view.Viewport;
 
         // Assert
         Assert.Equal (expectedW, bounds.Width);
@@ -117,13 +158,13 @@ public class ViewportTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation | ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize
+            ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation
         };
         view.Layout ();
 
         Assert.Equal (new Rectangle (0, 0, 10, 10), view.Frame);
 
-        var testRect = new Rectangle (0, 0, 1, 1);
+        Rectangle testRect = new Rectangle (0, 0, 1, 1);
         Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
         view.Viewport = view.Viewport with { Location = new Point (xOffset, yOffset) };
         Assert.Equal (new Rectangle (xOffset, yOffset, 10, 10), view.Viewport);
@@ -186,13 +227,17 @@ public class ViewportTests (ITestOutputHelper output)
 
     [Theory]
     [InlineData (0, 0, 10, 10, 0, 0)]
-    [InlineData (10, 0, 10, 10, 0, 0)] // 0 because without AllowXPlusWidthGreaterThanContentWidth, X is clamped so X + Width <= ContentSize.Width
-    [InlineData (0, 10, 10, 10, 0, 0)]
-    [InlineData (10, 10, 10, 10, 0, 0)]
+    [InlineData (10, 0, 10, 10, 9, 0)] // 9 because without AllowGreaterThanContentWidth, the location is clamped to size - 1
+    [InlineData (0, 10, 10, 10, 0, 9)]
+    [InlineData (10, 10, 10, 10, 9, 9)]
     public void Set_Viewport_ValidValue_UpdatesViewport (int viewWidth, int viewHeight, int viewportX, int viewportY, int expectedX, int expectedY)
     {
         // Arrange
-        var view = new View { Width = viewWidth, Height = viewHeight };
+        var view = new View ()
+        {
+            Width = viewWidth,
+            Height = viewHeight,
+        };
         view.Layout ();
         var newViewport = new Rectangle (viewportX, viewportY, viewWidth, viewHeight);
 
@@ -205,15 +250,14 @@ public class ViewportTests (ITestOutputHelper output)
 
     [Theory]
     [CombinatorialData]
-    public void Set_Viewport_ValidValue_UpdatesViewport_AllowLocationGreaterThanContentSize ([CombinatorialRange (0, 5)] int viewWidth,
-                                                                                             [CombinatorialRange (0, 5)] int viewHeight)
+    public void Set_Viewport_ValidValue_UpdatesViewport_AllowLocationGreaterThanContentSize ([CombinatorialRange (0, 5)] int viewWidth, [CombinatorialRange (0, 5)] int viewHeight)
     {
         // Arrange
-        var view = new View
+        var view = new View ()
         {
             Width = viewWidth,
             Height = viewHeight,
-            ViewportSettings = ViewportSettingsFlags.AllowLocationGreaterThanContentSize | ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize
+            ViewportSettings = ViewportSettingsFlags.AllowLocationGreaterThanContentSize
         };
         var newViewport = new Rectangle (10, 10, viewWidth, viewHeight);
 
@@ -246,7 +290,7 @@ public class ViewportTests (ITestOutputHelper output)
         // Arrange
         var view = new View ();
         var newViewport = new Rectangle (-10, -10, 100, 100);
-        view.ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation | ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
+        view.ViewportSettings = ViewportSettingsFlags.AllowNegativeLocation;
 
         // Act
         view.Viewport = newViewport;
@@ -275,7 +319,13 @@ public class ViewportTests (ITestOutputHelper output)
     [InlineData (1, 1)]
     public void GetViewportOffset_Returns_Offset_From_Frame (int adornmentThickness, int expectedOffset)
     {
-        View view = new () { X = 1, Y = 1, Width = 10, Height = 10 };
+        View view = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 10,
+            Height = 10
+        };
         view.BeginInit ();
         view.EndInit ();
         view.Margin!.Thickness = new (adornmentThickness);
@@ -286,7 +336,11 @@ public class ViewportTests (ITestOutputHelper output)
     [Fact]
     public void ContentSize_Tracks_ViewportSize_If_Not_Set ()
     {
-        View view = new () { Width = 1, Height = 1 };
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1
+        };
         Assert.True (view.ContentSizeTracksViewport);
         Assert.Equal (view.Viewport.Size, view.GetContentSize ());
     }
@@ -294,7 +348,11 @@ public class ViewportTests (ITestOutputHelper output)
     [Fact]
     public void ContentSize_Ignores_ViewportSize_If_Set ()
     {
-        View view = new () { Width = 1, Height = 1 };
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
         view.SetContentSize (new Size (5, 5));
         Assert.False (view.ContentSizeTracksViewport);
         Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
@@ -303,17 +361,26 @@ public class ViewportTests (ITestOutputHelper output)
     [Fact]
     public void ContentSize_Tracks_ViewportSize_If_ContentSizeTracksViewport_Is_True ()
     {
-        View view = new () { Width = 1, Height = 1 };
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
         view.SetContentSize (new Size (5, 5));
         view.Viewport = new (0, 0, 10, 10);
         view.ContentSizeTracksViewport = true;
         Assert.Equal (view.Viewport.Size, view.GetContentSize ());
     }
 
+
     [Fact]
     public void ContentSize_Ignores_ViewportSize_If_ContentSizeTracksViewport_Is_False ()
     {
-        View view = new () { Width = 1, Height = 1 };
+        View view = new ()
+        {
+            Width = 1,
+            Height = 1,
+        };
         view.SetContentSize (new Size (5, 5));
         view.Viewport = new (0, 0, 10, 10);
         view.ContentSizeTracksViewport = false;
@@ -325,7 +392,10 @@ public class ViewportTests (ITestOutputHelper output)
         public int OnViewportChangedCallCount { get; private set; }
         public int ViewportChangedEventCallCount { get; private set; }
 
-        public TestViewportEventsView () => ViewportChanged += (sender, args) => ViewportChangedEventCallCount++;
+        public TestViewportEventsView ()
+        {
+            ViewportChanged += (sender, args) => ViewportChangedEventCallCount++;
+        }
 
         protected override void OnViewportChanged (DrawEventArgs e)
         {
@@ -404,157 +474,4 @@ public class ViewportTests (ITestOutputHelper output)
         Assert.Equal (2, view.ViewportChangedEventCallCount);
     }
 
-    #region AllowXPlusWidthGreaterThanContentWidth and AllowYPlusHeightGreaterThanContentHeight tests
-
-    [Fact]
-    public void Set_Viewport_X_ClampsToPreventBlankSpace_ByDefault ()
-    {
-        // Arrange - View with content that fits exactly in viewport
-        var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // Content larger than viewport
-        view.Layout ();
-
-        // Act - Try to set viewport X such that X + Width > ContentSize.Width
-        // X=15, Width=10, ContentSize.Width=20 -> 15+10=25 > 20, should clamp to X=10
-        view.Viewport = view.Viewport with { X = 15 };
-
-        // Assert - Should be clamped so X + Width = ContentSize.Width
-        Assert.Equal (10, view.Viewport.X); // 10 + 10 = 20 = ContentSize.Width
-    }
-
-    [Fact]
-    public void Set_Viewport_Y_ClampsToPreventBlankSpace_ByDefault ()
-    {
-        // Arrange - View with content that fits exactly in viewport
-        var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // Content larger than viewport
-        view.Layout ();
-
-        // Act - Try to set viewport Y such that Y + Height > ContentSize.Height
-        // Y=15, Height=10, ContentSize.Height=20 -> 15+10=25 > 20, should clamp to Y=10
-        view.Viewport = view.Viewport with { Y = 15 };
-
-        // Assert - Should be clamped so Y + Height = ContentSize.Height
-        Assert.Equal (10, view.Viewport.Y); // 10 + 10 = 20 = ContentSize.Height
-    }
-
-    [Fact]
-    public void Set_Viewport_X_AllowsOverscroll_WhenFlagSet ()
-    {
-        // Arrange
-        var view = new View { Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth };
-        view.SetContentSize (new (20, 20));
-        view.Layout ();
-
-        // Act - Set viewport X such that X + Width > ContentSize.Width
-        view.Viewport = view.Viewport with { X = 15 };
-
-        // Assert - Should NOT be clamped because flag is set
-        Assert.Equal (15, view.Viewport.X);
-    }
-
-    [Fact]
-    public void Set_Viewport_Y_AllowsOverscroll_WhenFlagSet ()
-    {
-        // Arrange
-        var view = new View { Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight };
-        view.SetContentSize (new (20, 20));
-        view.Layout ();
-
-        // Act - Set viewport Y such that Y + Height > ContentSize.Height
-        view.Viewport = view.Viewport with { Y = 15 };
-
-        // Assert - Should NOT be clamped because flag is set
-        Assert.Equal (15, view.Viewport.Y);
-    }
-
-    [Fact]
-    public void Set_Viewport_Location_AllowsOverscroll_WhenCombinedFlagSet ()
-    {
-        // Arrange
-        var view = new View { Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize };
-        view.SetContentSize (new (20, 20));
-        view.Layout ();
-
-        // Act - Set viewport location such that X + Width and Y + Height exceed content size
-        view.Viewport = view.Viewport with { X = 15, Y = 15 };
-
-        // Assert - Neither should be clamped because combined flag is set
-        Assert.Equal (15, view.Viewport.X);
-        Assert.Equal (15, view.Viewport.Y);
-    }
-
-    [Fact]
-    public void Set_Viewport_X_ClampsCorrectly_WhenViewportSizeEqualsContentSize ()
-    {
-        // Arrange - ContentSize tracks Viewport (default behavior)
-        var view = new View { Width = 10, Height = 10 };
-        view.Layout ();
-
-        // ContentSize = Viewport.Size = 10x10
-
-        // Act - Try to set positive viewport X 
-        // X=1, Width=10, ContentSize.Width=10 -> 1+10=11 > 10, should clamp to X=0
-        view.Viewport = view.Viewport with { X = 1 };
-
-        // Assert - Should be clamped to 0
-        Assert.Equal (0, view.Viewport.X);
-    }
-
-    [Fact]
-    public void Set_Viewport_Y_ClampsCorrectly_WhenViewportSizeEqualsContentSize ()
-    {
-        // Arrange - ContentSize tracks Viewport (default behavior)
-        var view = new View { Width = 10, Height = 10 };
-        view.Layout ();
-
-        // ContentSize = Viewport.Size = 10x10
-
-        // Act - Try to set positive viewport Y
-        // Y=1, Height=10, ContentSize.Height=10 -> 1+10=11 > 10, should clamp to Y=0
-        view.Viewport = view.Viewport with { Y = 1 };
-
-        // Assert - Should be clamped to 0
-        Assert.Equal (0, view.Viewport.Y);
-    }
-
-    [Theory]
-    [InlineData (0, 0)] // No scroll - no clamping needed
-    [InlineData (5, 5)] // Mid-scroll - within bounds
-    [InlineData (10, 10)] // Max scroll - exactly at bound
-    [InlineData (15, 10)] // Over-scroll - clamped to max
-    public void Set_Viewport_X_ClampsToMaxValidValue (int requestedX, int expectedX)
-    {
-        // Arrange - ContentSize larger than Viewport
-        var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // ContentSize.Width = 20, Viewport.Width = 10
-        view.Layout ();
-
-        // Act
-        view.Viewport = view.Viewport with { X = requestedX };
-
-        // Assert - Max valid X is ContentSize.Width - Viewport.Width = 20 - 10 = 10
-        Assert.Equal (expectedX, view.Viewport.X);
-    }
-
-    [Theory]
-    [InlineData (0, 0)] // No scroll - no clamping needed
-    [InlineData (5, 5)] // Mid-scroll - within bounds
-    [InlineData (10, 10)] // Max scroll - exactly at bound
-    [InlineData (15, 10)] // Over-scroll - clamped to max
-    public void Set_Viewport_Y_ClampsToMaxValidValue (int requestedY, int expectedY)
-    {
-        // Arrange - ContentSize larger than Viewport
-        var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // ContentSize.Height = 20, Viewport.Height = 10
-        view.Layout ();
-
-        // Act
-        view.Viewport = view.Viewport with { Y = requestedY };
-
-        // Assert - Max valid Y is ContentSize.Height - Viewport.Height = 20 - 10 = 10
-        Assert.Equal (expectedY, view.Viewport.Y);
-    }
-
-    #endregion
 }

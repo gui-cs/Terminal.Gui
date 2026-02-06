@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text;
 using ColorHelper;
 using SixLabors.ImageSharp;
@@ -58,85 +58,81 @@ public class Images : Scenario
     // Start by assuming no support
     private SixelSupportResult _sixelSupportResult = new ();
     private CheckBox _cbSupportsSixel;
-    private IApplication _app;
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
-        _app = app;
+        Application.Init ();
 
-        _win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        _win = new () { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
-        bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
+        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
 
-        Tab tabBasic = new ()
+        var tabBasic = new Tab
         {
             DisplayText = "Basic"
         };
 
-        _tabSixel = new Tab
+        _tabSixel = new ()
         {
             DisplayText = "Sixel"
         };
 
-        Label lblDriverName = new () { X = 0, Y = 0, Text = $"Driver is {app.Driver?.GetType ().Name}" };
+        var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver?.GetType ().Name}" };
         _win.Add (lblDriverName);
 
-        CheckBox cbSupportsTrueColor = new ()
+        var cbSupportsTrueColor = new CheckBox
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 0,
-            Value = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
             Text = "supports true color "
         };
         _win.Add (cbSupportsTrueColor);
 
-        _cbSupportsSixel = new CheckBox
+        _cbSupportsSixel = new()
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 1,
-            Value = CheckState.UnChecked,
+            CheckedState = CheckState.UnChecked,
             Text = "Supports Sixel"
         };
 
-        Label lblSupportsSixel = new ()
+        var lblSupportsSixel = new Label
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = Pos.Bottom (_cbSupportsSixel),
             Text = "(Check if your terminal supports Sixel)"
         };
 
-        /*        Value = _sixelSupportResult.IsSupported
+        /*        CheckedState = _sixelSupportResult.IsSupported
                                    ? CheckState.Checked
                                    : CheckState.UnChecked;*/
 
-        _cbSupportsSixel.ValueChanging += (_, e) =>
+        _cbSupportsSixel.CheckedStateChanging += (s, e) =>
                                                  {
-                                                     _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
-                                                     SetupSixelSupported (e.NewValue == CheckState.Checked);
+                                                     _sixelSupportResult.IsSupported = e.Result == CheckState.Checked;
+                                                     SetupSixelSupported (e.Result == CheckState.Checked);
                                                      ApplyShowTabViewHack ();
                                                  };
 
         _win.Add (_cbSupportsSixel);
 
-        CheckBox cbUseTrueColor = new ()
+        var cbUseTrueColor = new CheckBox
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
-            Value = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.ValueChanging += (_, evt) => Driver.Force16Colors = evt.NewValue == CheckState.UnChecked;
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => Driver.Force16Colors = evt.Result == CheckState.UnChecked;
         _win.Add (cbUseTrueColor);
 
-        Button btnOpenImage = new () { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
+        var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         _win.Add (btnOpenImage);
 
-        _tabView = new TabView
+        _tabView = new ()
         {
             Y = Pos.Bottom (lblSupportsSixel), Width = Dim.Fill (), Height = Dim.Fill ()
         };
@@ -147,7 +143,7 @@ public class Images : Scenario
         BuildBasicTab (tabBasic);
         BuildSixelTab ();
 
-        SetupSixelSupported (_cbSupportsSixel.Value == CheckState.Checked);
+        SetupSixelSupported (_cbSupportsSixel.CheckedState == CheckState.Checked);
 
         btnOpenImage.Accepting += OpenImage;
 
@@ -155,54 +151,19 @@ public class Images : Scenario
         _win.Add (_tabView);
 
         // Start trying to detect sixel support
-        SixelSupportDetector sixelSupportDetector = new (app.Driver);
+        var sixelSupportDetector = new SixelSupportDetector (Application.Driver);
         sixelSupportDetector.Detect (UpdateSixelSupportState);
 
-        _win.SubViewsLaidOut += Win_SubViewsLaidOut;
-        app.Run (_win);
+        Application.Run (_win);
         _win.Dispose ();
-    }
-
-    private Size _winSize;
-
-    private void Win_SubViewsLaidOut (object sender, LayoutEventArgs e)
-    {
-        if (_winSize == e.OldContentSize)
-        {
-            return;
-        }
-
-        _winSize = e.OldContentSize;
-
-        if (_fireSixel is { })
-        {
-            SixelToRender sixelToRender = null;
-            _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out sixelToRender);
-
-            if (sixelToRender is { Id: "sixelImage" })
-            {
-                _app.Driver?.GetOutput ().GetSixels ().Enqueue (_sixelImage);
-
-                if (_app.Driver?.GetOutput ().GetSixels ().Count > 1)
-                {
-                    _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out _);
-                }
-            }
-
-            GenerateSixelFire (false);
-
-            if (!string.IsNullOrEmpty (_fireSixel.SixelData))
-            {
-                _app.Driver?.GetOutput ().GetSixels ().Enqueue (_fireSixel);
-            }
-        }
+        Application.Shutdown ();
     }
 
     private void UpdateSixelSupportState (SixelSupportResult newResult)
     {
         _sixelSupportResult = newResult;
 
-        _cbSupportsSixel.Value = newResult.IsSupported ? CheckState.Checked : CheckState.UnChecked;
+        _cbSupportsSixel.CheckedState = newResult.IsSupported ? CheckState.Checked : CheckState.UnChecked;
         _pxX.Value = _sixelSupportResult.Resolution.Width;
         _pxY.Value = _sixelSupportResult.Resolution.Height;
     }
@@ -222,7 +183,7 @@ public class Images : Scenario
 
         if (!_sixelSupportResult.SupportsTransparency)
         {
-            if (MessageBox.Query (_app!,
+            if (MessageBox.Query (Application.Instance,
                                   "Transparency Not Supported",
                                   "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
                                   "Yes",
@@ -233,24 +194,14 @@ public class Images : Scenario
             }
         }
 
-        _winSize = _win.Viewport.Size;
-
-        GenerateSixelFire (true);
-    }
-
-    private void GenerateSixelFire (bool addTimeout)
-    {
-        _fire = new DoomFire (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
-        _fireEncoder = new SixelEncoder { AvoidBottomScroll = true };
+        _fire = new (_win.Frame.Width * _pxX.Value, _win.Frame.Height * _pxY.Value);
+        _fireEncoder = new ();
         _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
         _fireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
 
         _fireFrameCounter = 0;
 
-        if (addTimeout)
-        {
-            _app?.AddTimeout (TimeSpan.FromMilliseconds (30), AdvanceFireTimerCallback);
-        }
+        Application.AddTimeout (TimeSpan.FromMilliseconds (30), AdvanceFireTimerCallback);
     }
 
     private bool AdvanceFireTimerCallback ()
@@ -269,18 +220,19 @@ public class Images : Scenario
 
         // TODO: Static way of doing this, suboptimal
         // ConcurrentQueue doesn't support Remove, so we update the existing object
-        string sixelFireData = _fireEncoder.EncodeSixel (bmp);
-
         if (_fireSixel == null)
         {
-            _fireSixel = new SixelToRender { SixelData = sixelFireData, ScreenPosition = new Point (0, 0), Id = "fireSixel" };
-
-            _app.Driver?.GetOutput ().GetSixels ().Enqueue (_fireSixel);
+            _fireSixel = new ()
+            {
+                SixelData = _fireEncoder.EncodeSixel (bmp),
+                ScreenPosition = new (0, 0)
+            };
+            Application.GetSixels ().Enqueue (_fireSixel);
         }
         else
         {
-            _fireSixel.SixelData = sixelFireData;
-            _fireSixel.ScreenPosition = new Point (0, 0);
+            _fireSixel.SixelData = _fireEncoder.EncodeSixel (bmp);
+            _fireSixel.ScreenPosition = new (0, 0);
         }
 
         _win.SetNeedsDraw ();
@@ -300,10 +252,13 @@ public class Images : Scenario
 
     private void OpenImage (object sender, CommandEventArgs e)
     {
-        OpenDialog ofd = new () { Title = "Open Image", AllowsMultipleSelection = false };
-        _app?.Run (ofd);
+        var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
+        Application.Run (ofd);
 
-        Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
+        if (ofd.Path is { })
+        {
+            Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
+        }
 
         if (ofd.Canceled)
         {
@@ -334,14 +289,14 @@ public class Images : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (_app!, "Could not open file", ex.Message, "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "Could not open file", ex.Message, "Ok");
 
             return;
         }
 
         _imageView.SetImage (img);
         ApplyShowTabViewHack ();
-        _app?.LayoutAndDraw ();
+        Application.LayoutAndDraw ();
     }
 
     private void ApplyShowTabViewHack ()
@@ -349,13 +304,13 @@ public class Images : Scenario
         // TODO HACK: This hack seems to be required to make tabview actually refresh itself
         _tabView.SetNeedsDraw ();
         Tab orig = _tabView.SelectedTab;
-        _tabView.SelectedTab = _tabView.Tabs.Except ([orig]).ElementAt (0);
+        _tabView.SelectedTab = _tabView.Tabs.Except (new [] { orig }).ElementAt (0);
         _tabView.SelectedTab = orig;
     }
 
     private void BuildBasicTab (Tab tabBasic)
     {
-        _imageView = new ImageView
+        _imageView = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -367,14 +322,14 @@ public class Images : Scenario
 
     private void BuildSixelTab ()
     {
-        _sixelSupported = new View
+        _sixelSupported = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             CanFocus = true
         };
 
-        _sixelNotSupported = new View
+        _sixelNotSupported = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -391,16 +346,16 @@ public class Images : Scenario
                                     VerticalTextAlignment = Alignment.Center
                                 });
 
-        _sixelView = new View
+        _sixelView = new ()
         {
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Dotted
         };
-        _sixelView.SubViewsLaidOut += SixelView_SubViewsLaidOut;
+
         _sixelSupported.Add (_sixelView);
 
-        Button btnSixel = new ()
+        var btnSixel = new Button
         {
             X = Pos.Right (_sixelView),
             Y = 0,
@@ -409,7 +364,7 @@ public class Images : Scenario
         btnSixel.Accepting += OutputSixelButtonClick;
         _sixelSupported.Add (btnSixel);
 
-        Button btnStartFire = new ()
+        var btnStartFire = new Button
         {
             X = Pos.Right (_sixelView),
             Y = Pos.Bottom (btnSixel),
@@ -418,35 +373,35 @@ public class Images : Scenario
         btnStartFire.Accepting += BtnStartFireOnAccept;
         _sixelSupported.Add (btnStartFire);
 
-        Label lblPxX = new ()
+        var lblPxX = new Label
         {
             X = Pos.Right (_sixelView),
             Y = Pos.Bottom (btnStartFire) + 1,
             Text = "Pixels per Col:"
         };
 
-        _pxX = new NumericUpDown
+        _pxX = new ()
         {
             X = Pos.Right (lblPxX),
             Y = Pos.Bottom (btnStartFire) + 1,
             Value = _sixelSupportResult.Resolution.Width
         };
 
-        Label lblPxY = new ()
+        var lblPxY = new Label
         {
             X = lblPxX.X,
             Y = Pos.Bottom (_pxX),
             Text = "Pixels per Row:"
         };
 
-        _pxY = new NumericUpDown
+        _pxY = new ()
         {
             X = Pos.Right (lblPxY),
             Y = Pos.Bottom (_pxX),
             Value = _sixelSupportResult.Resolution.Height
         };
 
-        Label l1 = new ()
+        var l1 = new Label
         {
             Text = "Palette Building Algorithm",
             Width = Dim.Auto (),
@@ -454,7 +409,7 @@ public class Images : Scenario
             Y = Pos.Bottom (_pxY) + 1
         };
 
-        _osPaletteBuilder = new OptionSelector
+        _osPaletteBuilder = new ()
         {
             Labels =
             [
@@ -466,21 +421,21 @@ public class Images : Scenario
             Value = 1
         };
 
-        _popularityThreshold = new NumericUpDown
+        _popularityThreshold = new ()
         {
             X = Pos.Right (_osPaletteBuilder) + 1,
             Y = Pos.Top (_osPaletteBuilder),
             Value = 8
         };
 
-        Label lblPopThreshold = new ()
+        var lblPopThreshold = new Label
         {
             Text = "(threshold)",
             X = Pos.Right (_popularityThreshold),
             Y = Pos.Top (_popularityThreshold)
         };
 
-        Label l2 = new ()
+        var l2 = new Label
         {
             Text = "Color Distance Algorithm",
             Width = Dim.Auto (),
@@ -488,13 +443,13 @@ public class Images : Scenario
             Y = Pos.Bottom (_osPaletteBuilder) + 1
         };
 
-        _osDistanceAlgorithm = new OptionSelector
+        _osDistanceAlgorithm = new ()
         {
-            Labels =
-            [
+            Labels = new []
+            {
                 "Euclidian",
                 "CIE76"
-            ],
+            },
             X = Pos.Right (_sixelView) + 2,
             Y = Pos.Bottom (l2)
         };
@@ -511,43 +466,7 @@ public class Images : Scenario
         _sixelSupported.Add (_popularityThreshold);
         _sixelSupported.Add (lblPopThreshold);
 
-        // This is already handled by the OutputBase
-        //_sixelView.DrawingContent += SixelViewOnDrawingContent;
-    }
-
-    private Size _sixelImageSize;
-
-    private void SixelView_SubViewsLaidOut (object sender, LayoutEventArgs e)
-    {
-        if (_sixelImageSize == e.OldContentSize)
-        {
-            return;
-        }
-
-        _sixelImageSize = e.OldContentSize;
-
-        if (_sixelImage is { })
-        {
-            SixelToRender sixelToRender = null;
-            _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out sixelToRender);
-
-            if (sixelToRender is { Id: "fireSixel" })
-            {
-                _app.Driver?.GetOutput ().GetSixels ().Enqueue (_fireSixel);
-
-                if (_app.Driver?.GetOutput ().GetSixels ().Count > 1)
-                {
-                    _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out _);
-                }
-            }
-
-            GenerateSixelImage (false);
-
-            if (!string.IsNullOrEmpty (_sixelImage.SixelData))
-            {
-                _app.Driver?.GetOutput ().GetSixels ().Enqueue (_sixelImage);
-            }
-        }
+        _sixelView.DrawingContent += SixelViewOnDrawingContent;
     }
 
     private IPaletteBuilder GetPaletteBuilder ()
@@ -574,31 +493,28 @@ public class Images : Scenario
     {
         if (_imageView.FullResImage == null)
         {
-            MessageBox.Query (_app!, "No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
+            MessageBox.Query (Application.Instance, "No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
 
             return;
         }
 
-        _sixelImageSize = _sixelView.Viewport.Size;
+        _screenLocationForSixel = _sixelView.FrameToScreen ().Location;
 
-        GenerateSixelImage (true);
-    }
-
-    private void GenerateSixelImage (bool openDialog)
-    {
-        _screenLocationForSixel = _sixelView.ViewportToScreen ().Location;
-
-        _encodedSixelData = GenerateSixelData (_imageView.FullResImage,
-                                               _sixelView.Viewport.Size,
+        _encodedSixelData = GenerateSixelData (
+                                               _imageView.FullResImage,
+                                               _sixelView.Frame.Size,
                                                _pxX.Value,
-                                               _pxY.Value,
-                                               openDialog);
+                                               _pxY.Value);
 
         if (_sixelImage == null)
         {
-            _sixelImage = new SixelToRender { SixelData = _encodedSixelData, ScreenPosition = _screenLocationForSixel, Id = "sixelImage"};
+            _sixelImage = new ()
+            {
+                SixelData = _encodedSixelData,
+                ScreenPosition = _screenLocationForSixel
+            };
 
-            _app.Driver?.GetOutput ().GetSixels ().Enqueue (_sixelImage);
+            Application.GetSixels ().Enqueue (_sixelImage);
         }
         else
         {
@@ -609,30 +525,35 @@ public class Images : Scenario
         _sixelView.SetNeedsDraw ();
     }
 
-    //private void SixelViewOnDrawingContent (object sender, DrawEventArgs e)
-    //{
-    //    if (!string.IsNullOrWhiteSpace (_encodedSixelData))
-    //    {
-    //        // Does not work (see https://github.com/gui-cs/Terminal.Gui/issues/3763)
-    //        _app.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
-    //        _app.Driver?.AddStr (_encodedSixelData);
-
-    //        // Works in DotNetDriver but results in screen flicker when moving mouse but vanish instantly
-    //        Console.SetCursorPosition (_screenLocationForSixel.X, _screenLocationForSixel.Y);
-    //        Console.Write (_encodedSixelData);
-    //    }
-    //}
-
-    public string GenerateSixelData (Image<Rgba32> fullResImage, Size maxSize, int pixelsPerCellX, int pixelsPerCellY, bool openDialog)
+    private void SixelViewOnDrawingContent (object sender, DrawEventArgs e)
     {
-        SixelEncoder encoder = new ();
+        if (!string.IsNullOrWhiteSpace (_encodedSixelData))
+        {
+            // Does not work (see https://github.com/gui-cs/Terminal.Gui/issues/3763)
+            // Application.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
+            // Application.Driver?.AddStr (_encodedSixelData);
+
+            // Works in DotNetDriver but results in screen flicker when moving mouse but vanish instantly
+            // Console.SetCursorPosition (_screenLocationForSixel.X, _screenLocationForSixel.Y);
+            // Console.Write (_encodedSixelData);
+        }
+    }
+
+    public string GenerateSixelData (
+        Image<Rgba32> fullResImage,
+        Size maxSize,
+        int pixelsPerCellX,
+        int pixelsPerCellY
+    )
+    {
+        var encoder = new SixelEncoder ();
         encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
         encoder.Quantizer.PaletteBuildingAlgorithm = GetPaletteBuilder ();
         encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();
 
         // Calculate the target size in pixels based on console units
         int targetWidthInPixels = maxSize.Width * pixelsPerCellX;
-        int targetHeightInPixels = encoder.GetHeightInPixels (maxSize.Height, pixelsPerCellY);
+        int targetHeightInPixels = maxSize.Height * pixelsPerCellY;
 
         // Get the original image dimensions
         int originalWidth = fullResImage.Width;
@@ -641,27 +562,30 @@ public class Images : Scenario
         // Use the helper function to get the resized dimensions while maintaining the aspect ratio
         Size newSize = CalculateAspectRatioFit (originalWidth, originalHeight, targetWidthInPixels, targetHeightInPixels);
 
-        if (newSize == Size.Empty)
-        {
-            return string.Empty;
-        }
-
         // Resize the image to match the console size
         Image<Rgba32> resizedImage = fullResImage.Clone (x => x.Resize (newSize.Width, newSize.Height));
 
         string encoded = encoder.EncodeSixel (ConvertToColorArray (resizedImage));
 
-        if (openDialog)
+        var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
+
+        var dlg = new Dialog
         {
-            PaletteView pv = new (encoder.Quantizer.Palette.ToList ());
+            Title = "Palette (Esc to close)",
+            Width = Dim.Fill (2),
+            Height = Dim.Fill (1)
+        };
 
-            Dialog dlg = new () { Title = "Palette", Buttons = [new Button { Title = Strings.btnOk }] };
+        var btn = new Button
+        {
+            Text = "Ok"
+        };
 
-            dlg.Add (pv);
-            _app?.Run (dlg);
-
-            dlg.Dispose ();
-        }
+        btn.Accepting += (s, e) => Application.RequestStop ();
+        dlg.Add (pv);
+        dlg.AddButton (btn);
+        Application.Run (dlg);
+        dlg.Dispose ();
 
         return encoded;
     }
@@ -676,11 +600,11 @@ public class Images : Scenario
         double scale = Math.Min (widthScale, heightScale);
 
         // Calculate the new width and height while keeping the aspect ratio
-        int newWidth = (int)(originalWidth * scale);
-        int newHeight = (int)(originalHeight * scale);
+        var newWidth = (int)(originalWidth * scale);
+        var newHeight = (int)(originalHeight * scale);
 
         // Return the new size as a Size object
-        return new Size (newWidth, newHeight);
+        return new (newWidth, newHeight);
     }
 
     public static Color [,] ConvertToColorArray (Image<Rgba32> image)
@@ -690,12 +614,12 @@ public class Images : Scenario
         Color [,] colors = new Color [width, height];
 
         // Loop through each pixel and convert Rgba32 to Terminal.Gui color
-        for (int x = 0; x < width; x++)
+        for (var x = 0; x < width; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (var y = 0; y < height; y++)
             {
                 Rgba32 pixel = image [x, y];
-                colors [x, y] = new Color (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
+                colors [x, y] = new (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
             }
         }
 
@@ -722,18 +646,18 @@ public class Images : Scenario
                 _matchSize = FullResImage.Clone (x => x.Resize (Viewport.Width, Viewport.Height));
             }
 
-            for (int y = 0; y < Viewport.Height; y++)
+            for (var y = 0; y < Viewport.Height; y++)
             {
-                for (int x = 0; x < Viewport.Width; x++)
+                for (var x = 0; x < Viewport.Width; x++)
                 {
                     Rgba32 rgb = _matchSize [x, y];
 
                     Attribute attr = _cache.GetOrAdd (
                                                       rgb,
-                                                      rgba32 => new Attribute (
-                                                                               new Color (),
-                                                                               new Color (rgba32.R, rgba32.G, rgba32.B)
-                                                                              )
+                                                      rgb => new (
+                                                                  new Color (),
+                                                                  new Color (rgb.R, rgb.G, rgb.B)
+                                                                 )
                                                      );
 
                     SetAttribute (attr);
@@ -757,17 +681,17 @@ public class Images : Scenario
 
         public PaletteView (List<Color> palette)
         {
-            _palette = palette ?? [];
-            Width = Dim.Fill (0, minimumContentDim: 50);
-            Height = Dim.Fill (0, minimumContentDim: 10);
+            _palette = palette ?? new List<Color> ();
+            Width = Dim.Fill ();
+            Height = Dim.Fill ();
         }
 
         // Automatically calculates rows and columns based on the available bounds
-        private (int columns, int rows) CalculateGridSize (Rectangle viewport)
+        private (int columns, int rows) CalculateGridSize (Rectangle bounds)
         {
             // Characters are twice as wide as they are tall, so use 2:1 width-to-height ratio
-            int availableWidth = viewport.Width / 2; // Each color block is 2 character wide
-            int availableHeight = viewport.Height;
+            int availableWidth = Viewport.Width / 2; // Each color block is 2 character wide
+            int availableHeight = Viewport.Height;
 
             int numColors = _palette.Count;
 
@@ -776,7 +700,6 @@ public class Images : Scenario
             int rows = (numColors + columns - 1) / columns; // Ceiling division for rows
 
             // Ensure we do not exceed the available height
-            // ReSharper disable once InvertIf
             if (rows > availableHeight)
             {
                 rows = availableHeight;
@@ -797,21 +720,22 @@ public class Images : Scenario
             (int columns, int rows) = CalculateGridSize (Viewport);
 
             // Draw the colors in the palette
-            for (int i = 0; i < _palette.Count && i < columns * rows; i++)
+            for (var i = 0; i < _palette.Count && i < columns * rows; i++)
             {
                 int row = i / columns;
                 int col = i % columns;
 
                 // Calculate position in the grid
                 int x = col * 2; // Each color block takes up 2 horizontal spaces
+                int y = row;
 
                 // Set the color attribute for the block
-                SetAttribute (new Attribute (_palette [i], _palette [i]));
+                SetAttribute (new (_palette [i], _palette [i]));
 
                 // Draw the block (2 characters wide per block)
-                for (int dx = 0; dx < 2; dx++) // Fill the width of the block
+                for (var dx = 0; dx < 2; dx++) // Fill the width of the block
                 {
-                    AddRune (x + dx, row, (Rune)' ');
+                    AddRune (x + dx, y, (Rune)' ');
                 }
             }
 
@@ -820,30 +744,32 @@ public class Images : Scenario
     }
 }
 
-internal class ConstPalette (Color [] palette) : IPaletteBuilder
+internal class ConstPalette : IPaletteBuilder
 {
-    private readonly List<Color> _palette = palette.ToList ();
+    private readonly List<Color> _palette;
+
+    public ConstPalette (Color [] palette) { _palette = palette.ToList (); }
 
     /// <inheritdoc/>
-    public List<Color> BuildPalette (List<Color> colors, int maxColors) => _palette;
+    public List<Color> BuildPalette (List<Color> colors, int maxColors) { return _palette; }
 }
 
 public abstract class LabColorDistance : IColorDistance
 {
     // Reference white point for D65 illuminant (can be moved to constants)
-    private const double REF_X = 95.047;
-    private const double REF_Y = 100.000;
-    private const double REF_Z = 108.883;
+    private const double RefX = 95.047;
+    private const double RefY = 100.000;
+    private const double RefZ = 108.883;
 
     // Conversion from RGB to Lab
     protected LabColor RgbToLab (Color c)
     {
-        XYZ xyz = ColorConverter.RgbToXyz (new RGB (c.R, c.G, c.B));
+        XYZ xyz = ColorConverter.RgbToXyz (new (c.R, c.G, c.B));
 
         // Normalize XYZ values by reference white point
-        double x = xyz.X / REF_X;
-        double y = xyz.Y / REF_Y;
-        double z = xyz.Z / REF_Z;
+        double x = xyz.X / RefX;
+        double y = xyz.Y / RefY;
+        double z = xyz.Z / RefZ;
 
         // Apply the nonlinear transformation for Lab
         x = x > 0.008856 ? Math.Pow (x, 1.0 / 3.0) : 7.787 * x + 16.0 / 116.0;
@@ -855,15 +781,22 @@ public abstract class LabColorDistance : IColorDistance
         double a = 500.0 * (x - y);
         double b = 200.0 * (y - z);
 
-        return new LabColor (l, a, b);
+        return new (l, a, b);
     }
 
     // LabColor class encapsulating L, A, and B values
-    protected class LabColor (double l, double a, double b)
+    protected class LabColor
     {
-        public double L { get; } = l;
-        public double A { get; } = a;
-        public double B { get; } = b;
+        public double L { get; }
+        public double A { get; }
+        public double B { get; }
+
+        public LabColor (double l, double a, double b)
+        {
+            L = l;
+            A = a;
+            B = b;
+        }
     }
 
     /// <inheritdoc/>
@@ -891,13 +824,13 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
 {
     private readonly IColorDistance _colorDistance;
 
-    public MedianCutPaletteBuilder (IColorDistance colorDistance) => _colorDistance = colorDistance;
+    public MedianCutPaletteBuilder (IColorDistance colorDistance) { _colorDistance = colorDistance; }
 
     public List<Color> BuildPalette (List<Color> colors, int maxColors)
     {
         if (colors == null || colors.Count == 0 || maxColors <= 0)
         {
-            return [];
+            return new ();
         }
 
         return MedianCut (colors, maxColors);
@@ -905,12 +838,12 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
 
     private List<Color> MedianCut (List<Color> colors, int maxColors)
     {
-        List<List<Color>> cubes = [colors];
+        List<List<Color>> cubes = new () { colors };
 
         // Recursively split color regions
         while (cubes.Count < maxColors)
         {
-            bool added = false;
+            var added = false;
             cubes.Sort ((a, b) => Volume (a).CompareTo (Volume (b)));
 
             List<Color> largestCube = cubes.Last ();
@@ -961,7 +894,7 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
     // Splits the cube based on the largest color component range
     private (List<Color>, List<Color>) SplitCube (List<Color> cube)
     {
-        (int component, int _) = FindLargestRange (cube);
+        (int component, int range) = FindLargestRange (cube);
 
         // Sort by the largest color range component (either R, G, or B)
         cube.Sort (
@@ -1008,11 +941,11 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
 
     private Color AverageColor (List<Color> cube)
     {
-        byte avgR = (byte)cube.Average (c => c.R);
-        byte avgG = (byte)cube.Average (c => c.G);
-        byte avgB = (byte)cube.Average (c => c.B);
+        var avgR = (byte)cube.Average (c => c.R);
+        var avgG = (byte)cube.Average (c => c.G);
+        var avgB = (byte)cube.Average (c => c.B);
 
-        return new Color (avgR, avgG, avgB);
+        return new (avgR, avgG, avgB);
     }
 
     private int Volume (List<Color> cube)
@@ -1058,30 +991,30 @@ public class DoomFire
         _palette = new Color [37]; // Using 37 colors as per the original Doom fire palette scale.
 
         // First color is transparent black
-        _palette [0] = new Color (0, 0, 0, 0); // Transparent black (ARGB)
+        _palette [0] = new (0, 0, 0, 0); // Transparent black (ARGB)
 
         // The rest of the palette is fire colors
-        for (int i = 1; i < 37; i++)
+        for (var i = 1; i < 37; i++)
         {
-            byte r = (byte)Math.Min (255, i * 7);
-            byte g = (byte)Math.Min (255, i * 5);
-            byte b = (byte)Math.Min (255, i * 2);
-            _palette [i] = new Color (r, g, b); // Full opacity
+            var r = (byte)Math.Min (255, i * 7);
+            var g = (byte)Math.Min (255, i * 5);
+            var b = (byte)Math.Min (255, i * 2);
+            _palette [i] = new (r, g, b); // Full opacity
         }
     }
 
     public void InitializeFire ()
     {
         // Set the bottom row to full intensity (simulate the base of the fire).
-        for (int x = 0; x < _width; x++)
+        for (var x = 0; x < _width; x++)
         {
             _firePixels [x, _height - 1] = _palette [36]; // Max intensity fire.
         }
 
         // Set the rest of the pixels to black (transparent).
-        for (int y = 0; y < _height - 1; y++)
+        for (var y = 0; y < _height - 1; y++)
         {
-            for (int x = 0; x < _width; x++)
+            for (var x = 0; x < _width; x++)
             {
                 _firePixels [x, y] = _palette [0]; // Transparent black
             }
@@ -1091,23 +1024,25 @@ public class DoomFire
     public void AdvanceFrame ()
     {
         // Process every pixel except the bottom row
-        for (int x = 0; x < _width; x++)
+        for (var x = 0; x < _width; x++)
         {
-            for (int y = 1; y < _height; y++) // Skip the last row (which is always max intensity)
+            for (var y = 1; y < _height; y++) // Skip the last row (which is always max intensity)
             {
+                int srcX = x;
+                int srcY = y;
                 int dstY = y - 1;
 
                 // Spread fire upwards with randomness
                 int decay = _random.Next (0, 2);
-                int dstX = x + _random.Next (-1, 2);
+                int dstX = srcX + _random.Next (-1, 2);
 
                 if (dstX < 0 || dstX >= _width) // Prevent out of bounds
                 {
-                    dstX = x;
+                    dstX = srcX;
                 }
 
                 // Get the fire color from below and reduce its intensity
-                Color srcColor = _firePixels [x, y];
+                Color srcColor = _firePixels [srcX, srcY];
                 int intensity = Array.IndexOf (_palette, srcColor) - decay;
 
                 if (intensity < 0)

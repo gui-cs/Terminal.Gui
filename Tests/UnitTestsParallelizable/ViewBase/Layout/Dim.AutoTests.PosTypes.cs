@@ -1,4 +1,6 @@
-﻿namespace ViewBaseTests.Layout;
+﻿using UnitTests.Parallelizable;
+
+namespace ViewBaseTests.Layout;
 
 public partial class DimAutoTests
 {

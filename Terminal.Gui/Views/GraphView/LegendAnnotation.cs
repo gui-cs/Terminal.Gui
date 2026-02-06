@@ -1,12 +1,13 @@
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Used by <see cref="GraphView"/> to render symbol definitions in a graph, e.g. colors and their meanings
+///     Used by <see cref="GraphView"/> to render smbol definitions in a graph, e.g. colors and their meanings
 /// </summary>
 public class LegendAnnotation : View, IAnnotation
 {
     /// <summary>Ordered collection of entries that are rendered in the legend.</summary>
-    private readonly List<Tuple<GraphCellToRender, string>> _entries = [];
+    private readonly List<Tuple<GraphCellToRender, string>> _entries = new ();
 
     /// <summary>Creates a new empty legend at the empty screen coordinates.</summary>
     public LegendAnnotation () : this (Rectangle.Empty) { }
@@ -28,13 +29,13 @@ public class LegendAnnotation : View, IAnnotation
     /// <summary>Returns false i.e. Legends render after series</summary>
     public bool BeforeSeries => false;
 
-    // BUGBUG: Legend annotations are subviews. But for some reason they are rendered directly in OnDrawContent
-    // BUGBUG: instead of just being normal subviews. They get rendered as blank rects, and thus we disable subview drawing.
+    // BUGBUG: Legend annotations are subviews. But for some reason the are rendered directly in OnDrawContent 
+    // BUGBUG: instead of just being normal subviews. They get rendered as blank rects and thus we disable subview drawing.
     /// <inheritdoc/>
     protected override bool OnDrawingText () { return true; }
 
-    // BUGBUG: Legend annotations are subviews. But for some reason they are rendered directly in OnDrawContent
-    // BUGBUG: instead of just being normal subviews. They get rendered as blank rects, and thus we disable subview drawing.
+    // BUGBUG: Legend annotations are subviews. But for some reason the are rendered directly in OnDrawContent 
+    // BUGBUG: instead of just being normal subviews. They get rendered as blank rects and thus we disable subview drawing.
     /// <inheritdoc/>
     protected override bool OnClearingViewport () { return true; }
 
@@ -45,7 +46,7 @@ public class LegendAnnotation : View, IAnnotation
         if (!IsInitialized)
         {
             // BUGBUG: We should be getting a visual role here?
-            SetScheme (new () { Normal = GetCurrentAttribute () });
+            SetScheme (new () { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default });
             graph.Add (this);
         }
 
@@ -80,7 +81,7 @@ public class LegendAnnotation : View, IAnnotation
             Move (1, linesDrawn);
 
             string str = TextFormatter.ClipOrPad (entry.Item2, Viewport.Width - 1);
-            AddStr (str);
+            Application.Driver?.AddStr (str);
 
             linesDrawn++;
 

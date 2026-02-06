@@ -29,28 +29,32 @@ public class Aligner : INotifyPropertyChanged
         }
     }
 
+    private AlignmentModes _alignmentMode = AlignmentModes.StartToEnd;
+
     /// <summary>
     ///     Gets or sets the modes controlling <see cref="Alignment"/>.
     /// </summary>
     public AlignmentModes AlignmentModes
     {
-        get;
+        get => _alignmentMode;
         set
         {
-            field = value;
+            _alignmentMode = value;
             PropertyChanged?.Invoke (this, new (nameof (AlignmentModes)));
         }
-    } = AlignmentModes.StartToEnd;
+    }
+
+    private int _containerSize;
 
     /// <summary>
     ///     The size of the container.
     /// </summary>
     public int ContainerSize
     {
-        get;
+        get => _containerSize;
         set
         {
-            field = value;
+            _containerSize = value;
             PropertyChanged?.Invoke (this, new (nameof (ContainerSize)));
         }
     }
@@ -65,7 +69,7 @@ public class Aligner : INotifyPropertyChanged
     /// </summary>
     /// <param name="sizes">The sizes of the items to align.</param>
     /// <returns>The locations of the items, from left/top to right/bottom.</returns>
-    public int [] Align (int [] sizes) => Align (Alignment, AlignmentModes, ContainerSize, sizes);
+    public int [] Align (int [] sizes) { return Align (Alignment, AlignmentModes, ContainerSize, sizes); }
 
     /// <summary>
     ///     Takes a list of item sizes and returns a list of the  positions of those items when aligned within
@@ -84,8 +88,7 @@ public class Aligner : INotifyPropertyChanged
             return [];
         }
 
-        int [] sizesCopy = sizes;
-
+        var sizesCopy = sizes;
         if (alignmentMode.FastHasFlags (AlignmentModes.EndToStart))
         {
             sizesCopy = sizes.Reverse ().ToArray ();
@@ -107,7 +110,6 @@ public class Aligner : INotifyPropertyChanged
         }
 
         AlignmentModes mode = alignmentMode & ~AlignmentModes.AddSpaceBetweenItems; // copy to avoid modifying the original
-
         switch (alignment)
         {
             case Alignment.Start:
@@ -123,7 +125,7 @@ public class Aligner : INotifyPropertyChanged
                         return End (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
 
                     case AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast:
-                        return IgnoreFirst (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
+                        return IgnoreFirst (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray (); ;
                 }
 
                 break;
@@ -141,14 +143,13 @@ public class Aligner : INotifyPropertyChanged
                         return Start (in sizesCopy, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
 
                     case AlignmentModes.EndToStart | AlignmentModes.IgnoreFirstOrLast:
-                        return IgnoreLast (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray ();
+                        return IgnoreLast (in sizesCopy, containerSize, totalItemsSize, maxSpaceBetweenItems, spacesToGive).Reverse ().ToArray (); ;
                 }
 
                 break;
 
             case Alignment.Center:
                 mode &= ~AlignmentModes.IgnoreFirstOrLast;
-
                 switch (mode)
                 {
                     case AlignmentModes.StartToEnd:
@@ -162,7 +163,6 @@ public class Aligner : INotifyPropertyChanged
 
             case Alignment.Fill:
                 mode &= ~AlignmentModes.IgnoreFirstOrLast;
-
                 switch (mode)
                 {
                     case AlignmentModes.StartToEnd:
@@ -205,77 +205,80 @@ public class Aligner : INotifyPropertyChanged
         return positions;
     }
 
-    internal static int [] IgnoreFirst (ref readonly int [] sizes, int containerSize, int totalItemsSize, int maxSpaceBetweenItems, int spacesToGive)
-    {
-        var positions = new int [sizes.Length]; // positions of the items. the return value.
-
-        switch (sizes.Length)
-        {
-            case > 1:
-            {
-                var currentPosition = 0;
-                positions [0] = currentPosition; // first item is flush left
-
-                for (int i = sizes.Length - 1; i >= 0; i--)
-                {
-                    CheckSizeCannotBeNegative (i, in sizes);
-
-                    if (i == sizes.Length - 1)
-                    {
-                        // start at right
-                        currentPosition = Math.Max (totalItemsSize, containerSize) - sizes [i];
-                        positions [i] = currentPosition;
-                    }
-
-                    if (i >= sizes.Length - 1 || i <= 0)
-                    {
-                        continue;
-                    }
-                    int spaceBefore = spacesToGive-- > 0 ? maxSpaceBetweenItems : 0;
-
-                    positions [i] = currentPosition - sizes [i] - spaceBefore;
-                    currentPosition = positions [i];
-                }
-
-                break;
-            }
-
-            case 1:
-                CheckSizeCannotBeNegative (0, in sizes);
-                positions [0] = 0; // single item is flush left
-
-                break;
-        }
-
-        return positions;
-    }
-
-    internal static int [] IgnoreLast (ref readonly int [] sizes, int containerSize, int totalItemsSize, int maxSpaceBetweenItems, int spacesToGive)
+    internal static int [] IgnoreFirst (
+        ref readonly int [] sizes,
+        int containerSize,
+        int totalItemsSize,
+        int maxSpaceBetweenItems,
+        int spacesToGive
+    )
     {
         var positions = new int [sizes.Length]; // positions of the items. the return value.
 
         if (sizes.Length > 1)
         {
             var currentPosition = 0;
+            positions [0] = currentPosition; // first item is flush left
 
+            for (int i = sizes.Length - 1; i >= 0; i--)
+            {
+                CheckSizeCannotBeNegative (i, in sizes);
+
+                if (i == sizes.Length - 1)
+                {
+                    // start at right
+                    currentPosition = Math.Max (totalItemsSize, containerSize) - sizes [i];
+                    positions [i] = currentPosition;
+                }
+
+                if (i < sizes.Length - 1 && i > 0)
+                {
+                    int spaceBefore = spacesToGive-- > 0 ? maxSpaceBetweenItems : 0;
+
+                    positions [i] = currentPosition - sizes [i] - spaceBefore;
+                    currentPosition = positions [i];
+                }
+            }
+        }
+        else if (sizes.Length == 1)
+        {
+            CheckSizeCannotBeNegative (0, in sizes);
+            positions [0] = 0; // single item is flush left
+        }
+
+        return positions;
+    }
+
+    internal static int [] IgnoreLast (
+        ref readonly int [] sizes,
+        int containerSize,
+        int totalItemsSize,
+        int maxSpaceBetweenItems,
+        int spacesToGive
+    )
+    {
+        var positions = new int [sizes.Length]; // positions of the items. the return value.
+
+        if (sizes.Length > 1)
+        {
+            var currentPosition = 0;
             if (totalItemsSize > containerSize)
             {
                 // Don't allow negative positions
-                currentPosition = int.Max (0, containerSize - totalItemsSize - spacesToGive);
+                currentPosition = int.Max(0, containerSize - totalItemsSize - spacesToGive);
             }
 
             for (var i = 0; i < sizes.Length; i++)
             {
                 CheckSizeCannotBeNegative (i, in sizes);
 
-                if (i >= sizes.Length - 1)
+                if (i < sizes.Length - 1)
                 {
-                    continue;
-                }
-                int spaceBefore = spacesToGive-- > 0 ? maxSpaceBetweenItems : 0;
+                    int spaceBefore = spacesToGive-- > 0 ? maxSpaceBetweenItems : 0;
 
-                positions [i] = currentPosition;
-                currentPosition += sizes [i] + spaceBefore;
+                    positions [i] = currentPosition;
+                    currentPosition += sizes [i] + spaceBefore;
+                }
             }
 
             positions [sizes.Length - 1] = containerSize - sizes [^1];

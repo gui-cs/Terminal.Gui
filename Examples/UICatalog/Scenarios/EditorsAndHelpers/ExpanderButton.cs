@@ -42,7 +42,7 @@ public class ExpanderButton : Button
 
         Orientation = Orientation.Vertical;
 
-        MouseHighlightStates = MouseState.In;
+        HighlightStates = MouseState.In;
 
         Initialized += ExpanderButton_Initialized;
 

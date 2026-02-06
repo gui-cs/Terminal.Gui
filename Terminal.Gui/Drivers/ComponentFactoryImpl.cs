@@ -8,13 +8,10 @@ namespace Terminal.Gui.Drivers;
 public abstract class ComponentFactoryImpl<TInputRecord> : IComponentFactory<TInputRecord> where TInputRecord : struct
 {
     /// <inheritdoc />
-    public abstract string? GetDriverName ();
-
-    /// <inheritdoc />
     public abstract IInput<TInputRecord> CreateInput ();
 
     /// <inheritdoc />
-    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputBuffer, ITimeProvider? timeProvider = null);
+    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputBuffer);
 
     /// <inheritdoc />
     public virtual ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)

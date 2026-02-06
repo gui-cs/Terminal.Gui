@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class ScrollSliderTests (ITestOutputHelper output) : TestDriverBase
+public class ScrollSliderTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Constructor_Initializes_Correctly ()
@@ -987,7 +987,7 @@ public class ScrollSliderTests (ITestOutputHelper output) : TestDriverBase
 └──────────┘")]
     public void Draws_Correctly (int superViewportWidth, int superViewportHeight, int sliderSize, int position, Orientation orientation, string expected)
     {
-        IDriver driver = CreateTestDriver ();
+        IDriver driver = CreateFakeDriver ();
         var super = new Window
         {
             Driver = driver,

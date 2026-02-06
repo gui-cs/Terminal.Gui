@@ -20,11 +20,9 @@ public class AnimationScenario : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window win = new ()
+        var win = new Window
         {
             Title = GetQuitKeyAndName (),
             X = 0,
@@ -52,7 +50,9 @@ public class AnimationScenario : Scenario
         // Start the animation after the window is initialized
         win.Initialized += OnWinOnInitialized;
 
-        app.Run (win);
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 
 
@@ -78,7 +78,7 @@ public class AnimationScenario : Scenario
         if (!f.Exists)
         {
             Debug.WriteLine ($"Could not find {f.FullName}");
-            MessageBox.ErrorQuery (_imageView?.App!, "Could not find gif", $"Could not find\n{f.FullName}", "Ok");
+            MessageBox.ErrorQuery (_imageView?.App, "Could not find gif", $"Could not find\n{f.FullName}", "Ok");
 
             return;
         }
@@ -88,14 +88,14 @@ public class AnimationScenario : Scenario
         Task.Run (
                   () =>
                   {
-                      while (_imageView?.App?.Initialized == true)
+                      while (Application.Initialized)
                       {
                           // When updating from a Thread/Task always use Invoke
-                          _imageView?.App?.Invoke (
+                          Application.Invoke (
                                               (_) =>
                                               {
-                                                  _imageView?.NextFrame ();
-                                                  _imageView?.SetNeedsDraw ();
+                                                  _imageView.NextFrame ();
+                                                  _imageView.SetNeedsDraw ();
                                               });
 
                           Task.Delay (100).Wait ();
@@ -198,7 +198,7 @@ public class AnimationScenario : Scenario
                 int newSize = Math.Min (Viewport.Width, Viewport.Height);
 
                 // generate one
-                if (_matchSizes is not null && imgFull is not null)
+                if (_matchSizes is { } && imgFull is { })
                 {
                     _matchSizes [_currentFrame] = imgScaled = imgFull.Clone (
                                                                              x => x.Resize (
@@ -209,7 +209,7 @@ public class AnimationScenario : Scenario
                 }
             }
 
-            if (braille == null && _brailleCache is not null)
+            if (braille == null && _brailleCache is { })
             {
                 _brailleCache [_currentFrame] = braille = GetBraille (_matchSizes? [_currentFrame]!);
             }

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui.ViewBase;
+﻿
+namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
@@ -31,13 +32,7 @@ public partial class View
     ///         <see cref="GetContentSize ()"/> to determine the size
     ///         of the view.
     ///     </para>
-    ///     <para>
-    ///         This method follows the Cancellable Work Pattern (CWP). The <see cref="ContentSizeChanging"/> event
-    ///         is raised before the change, and <see cref="ContentSizeChanged"/> is raised after.
-    ///     </para>
     /// </remarks>
-    /// <seealso cref="ContentSizeChanging"/>
-    /// <seealso cref="ContentSizeChanged"/>
     public void SetContentSize (Size? contentSize)
     {
         if (contentSize is { } && (contentSize.Value.Width < 0 || contentSize.Value.Height < 0))
@@ -45,35 +40,29 @@ public partial class View
             throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
         }
 
-        CWPPropertyHelper.ChangeProperty (this,
-                                          ref _contentSize,
-                                          contentSize,
-                                          OnContentSizeChanging,
-                                          ContentSizeChanging,
-                                          _ => SetNeedsLayout (),
-                                          OnContentSizeChanged,
-                                          ContentSizeChanged,
-                                          out Size? _);
+        if (contentSize == _contentSize)
+        {
+            return;
+        }
+
+        _contentSize = contentSize;
+        OnContentSizeChanged (new (_contentSize));
     }
 
     /// <summary>
     ///     Gets the size of the View's content.
     /// </summary>
-    /// <remarks>
-    ///     a>
+    /// <remarks>a>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has no visible
-    ///         subviews, <see cref="GetContentSize ()"/> will return the
+    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has no visible subviews, <see cref="GetContentSize ()"/> will return the
     ///         size of
     ///         <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
-    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, this function will return the
-    ///         Viewport size.
+    ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, this function will return the Viewport size.
     ///     </para>
     ///     <para>
     ///         If set <see cref="Viewport"/> describes the portion of the content currently visible to the user. This enables
@@ -86,30 +75,87 @@ public partial class View
     /// </remarks>
     /// <returns>
     ///     If the content size was not explicitly set by <see cref="SetContentSize"/>, <see cref="GetContentSize ()"/> will
-    ///     return the size of the <see cref="Viewport"/> and <see cref="ContentSizeTracksViewport"/> will be
-    ///     <see langword="true"/>.
+    ///     return the size of the <see cref="Viewport"/> and <see cref="ContentSizeTracksViewport"/> will be <see langword="true"/>.
     /// </returns>
-    public Size GetContentSize () => _contentSize ?? Viewport.Size;
+    public Size GetContentSize () { return _contentSize ?? Viewport.Size; }
 
     /// <summary>
-    ///     Gets the minimum number of columns required for all the View's SubViews to fit in the content area.
+    ///     Gets the number of rows required for all the View's SubViews.
     /// </summary>
     /// <returns></returns>
-    public int GetWidthRequiredForSubViews () =>
+    public int GetWidthRequiredForSubViews ()
+    {
+        int max = GetContentSize ().Width;
 
-        // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
-        // we want the content size only.
-        Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width) - GetAdornmentsThickness ().Horizontal;
+        // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
+        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        {
+            return max;
+        }
+
+        if (max == 0)
+        {
+            max = Viewport.Width;
+        }
+
+        // Iterate through all subviews to calculate the maximum height
+        foreach (View subView in InternalSubViews)
+        {
+            if (subView.Width is { })
+            {
+                //if (subView.Height is DimAbsolute)
+                //{
+                //    max = Math.Max (max, subView.Height.GetAnchor (0));
+                //}
+                //else
+                {
+                    max = Math.Max (max, subView.X.GetAnchor (0) + subView.Width.Calculate (0, max, subView, Dimension.Width));
+                }
+            }
+        }
+
+        // Return the calculated maximum content size
+        return max;
+    }
 
     /// <summary>
-    ///     Gets the minimum number of rows required for all the View's SubViews to fit in the content area.
+    ///     Gets the number of rows required for all the View's SubViews.
     /// </summary>
     /// <returns></returns>
-    public int GetHeightRequiredForSubViews () =>
+    public int GetHeightRequiredForSubViews ()
+    {
+        int max = GetContentSize ().Height;
 
-        // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
-        // we want the content size only.
-        Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height) - GetAdornmentsThickness ().Vertical;
+        // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
+        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        {
+            return max;
+        }
+
+        if (max == 0)
+        {
+            max = Viewport.Height;
+        }
+
+        // Iterate through all subviews to calculate the maximum height
+        foreach (View subView in InternalSubViews)
+        {
+            if (subView.Height is { })
+            {
+                //if (subView.Height is DimAbsolute)
+                //{
+                //    max = Math.Max (max, subView.Height.GetAnchor (0));
+                //}
+                //else
+                {
+                    max = Math.Max (max, subView.Y.GetAnchor (0) + subView.Height.Calculate (0, max, subView, Dimension.Height));
+                }
+            }
+        }
+
+        // Return the calculated maximum content size
+        return max;
+    }
 
     /// <summary>
     ///     Gets or sets a value indicating whether the view's content size tracks the <see cref="Viewport"/>'s
@@ -117,8 +163,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <list type="bullet">
     ///         <listheader>
@@ -147,8 +192,7 @@ public partial class View
     ///             </term>
     ///             <description>
     ///                 <para>
-    ///                     The return value of <see cref="GetContentSize ()"/> is independent of <see cref="Viewport"/> and
-    ///                     <see cref="Viewport"/>
+    ///                     The return value of <see cref="GetContentSize ()"/> is independent of <see cref="Viewport"/> and <see cref="Viewport"/>
     ///                     describes the portion of the content currently visible to the user enabling content scrolling.
     ///                 </para>
     ///                 <para>
@@ -161,72 +205,33 @@ public partial class View
     ///         </item>
     ///     </list>
     /// </remarks>
-    public bool ContentSizeTracksViewport { get => _contentSize is null; set => _contentSize = value ? null : _contentSize; }
+    public bool ContentSizeTracksViewport
+    {
+        get => _contentSize is null;
+        set => _contentSize = value ? null : _contentSize;
+    }
 
     /// <summary>
-    ///     Called before the content size changes, allowing subclasses to cancel or modify the change.
+    ///     Called when <see cref="GetContentSize ()"/> has changed.
     /// </summary>
-    /// <param name="args">The event arguments containing the current and proposed new content size.</param>
-    /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnContentSizeChanging (ValueChangingEventArgs<Size?> args) => false;
+    /// <param name="e"></param>
+    /// <returns></returns>
+    protected bool? OnContentSizeChanged (SizeChangedEventArgs e)
+    {
+        ContentSizeChanged?.Invoke (this, e);
+
+        if (e.Cancel != true)
+        {
+            SetNeedsLayout ();
+        }
+
+        return e.Cancel;
+    }
 
     /// <summary>
-    ///     Called after the content size has changed.
+    ///     Event raised when the <see cref="GetContentSize ()"/> changes.
     /// </summary>
-    /// <param name="args">The event arguments containing the old and new content size.</param>
-    protected virtual void OnContentSizeChanged (ValueChangedEventArgs<Size?> args) { }
-
-    /// <summary>
-    ///     Raised before the content size changes, allowing handlers to modify or cancel the change.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Set <see cref="ValueChangingEventArgs{T}.Handled"/> to true to cancel the change or modify
-    ///         <see cref="ValueChangingEventArgs{T}.NewValue"/> to adjust the proposed value.
-    ///     </para>
-    ///     <para>
-    ///         This event follows the Cancellable Work Pattern (CWP). See the
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
-    ///         for more information.
-    ///     </para>
-    /// </remarks>
-    /// <example>
-    ///     <code>
-    ///         view.ContentSizeChanging += (sender, args) =>
-    ///         {
-    ///             if (args.NewValue?.Width > 1000)
-    ///             {
-    ///                 args.Handled = true;
-    ///                 Console.WriteLine("Content size too large, change cancelled.");
-    ///             }
-    ///         };
-    ///     </code>
-    /// </example>
-    public event EventHandler<ValueChangingEventArgs<Size?>>? ContentSizeChanging;
-
-    /// <summary>
-    ///     Raised after the content size has changed, notifying handlers of the completed change.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Provides the old and new content size via <see cref="ValueChangedEventArgs{T}.OldValue"/> and
-    ///         <see cref="ValueChangedEventArgs{T}.NewValue"/>, which may be null.
-    ///     </para>
-    ///     <para>
-    ///         This event follows the Cancellable Work Pattern (CWP). See the
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
-    ///         for more information.
-    ///     </para>
-    /// </remarks>
-    /// <example>
-    ///     <code>
-    ///         view.ContentSizeChanged += (sender, args) =>
-    ///         {
-    ///             Console.WriteLine($"Content size changed from {args.OldValue} to {args.NewValue}.");
-    ///         };
-    ///     </code>
-    /// </example>
-    public event EventHandler<ValueChangedEventArgs<Size?>>? ContentSizeChanged;
+    public event EventHandler<SizeChangedEventArgs>? ContentSizeChanged;
 
     /// <summary>
     ///     Converts a Content-relative location to a Screen-relative location.
@@ -307,8 +312,7 @@ public partial class View
     /// </value>
     /// <remarks>
     ///     <para>
-    ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         See the View Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Positive values for the location indicate the visible area is offset into (down-and-right) the View's virtual
@@ -346,19 +350,26 @@ public partial class View
 
             Thickness thickness = GetAdornmentsThickness ();
 
-            return new (_viewportLocation, new (Math.Max (0, Frame.Size.Width - thickness.Horizontal), Math.Max (0, Frame.Size.Height - thickness.Vertical)));
+            return new (
+                        _viewportLocation,
+                        new (
+                             Math.Max (0, Frame.Size.Width - thickness.Horizontal),
+                             Math.Max (0, Frame.Size.Height - thickness.Vertical)
+                            ));
         }
         set => SetViewport (value);
     }
 
     private void SetViewport (Rectangle viewport)
     {
-        Rectangle oldViewport = new (_viewportLocation, Viewport.Size);
+        Rectangle oldViewport = viewport;
         ApplySettings (ref viewport);
 
         Thickness thickness = GetAdornmentsThickness ();
 
-        Size newSize = new (viewport.Size.Width + thickness.Horizontal, viewport.Size.Height + thickness.Vertical);
+        Size newSize = new (
+                            viewport.Size.Width + thickness.Horizontal,
+                            viewport.Size.Height + thickness.Vertical);
 
         if (newSize == Frame.Size)
         {
@@ -368,9 +379,10 @@ public partial class View
             {
                 _viewportLocation = viewport.Location;
                 SetNeedsLayout ();
+                //SetNeedsDraw();
+                //SetSubViewNeedsDraw();
             }
 
-            // QUESTION: Shouldn't this be inside the if statement above?
             RaiseViewportChangedEvent (oldViewport);
 
             return;
@@ -379,7 +391,10 @@ public partial class View
         _viewportLocation = viewport.Location;
 
         // Update the Frame because we made it bigger or smaller which impacts subviews.
-        Frame = Frame with { Size = newSize };
+        Frame = Frame with
+        {
+            Size = newSize
+        };
 
         // Note, setting the Frame will cause ViewportChanged to be raised.
 
@@ -395,15 +410,7 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth))
-            {
-                if (newViewport.X + newViewport.Width > GetContentSize ().Width)
-                {
-                    newViewport.X = GetContentSize ().Width - newViewport.Width;
-                }
-            }
-
-            // IMPORTANT: Check for negative location AFTER checking for location greater than content size
+            // IMPORTANT: Check for negative location AFTER checking for location greater than content width
             if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX))
             {
                 if (newViewport.X < 0)
@@ -428,26 +435,18 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight))
+            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeYWhenHeightGreaterThanContentHeight))
             {
-                if (newViewport.Y + newViewport.Height > GetContentSize ().Height)
-                {
-                    newViewport.Y = GetContentSize ().Height - newViewport.Height;
-                }
-            }
-
-            // IMPORTANT: Check for negative location AFTER checking for location greater than content size
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY))
-            {
-                if (newViewport.Y < 0)
+                if (Viewport.Height > GetContentSize ().Height)
                 {
                     newViewport.Y = 0;
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeYWhenHeightGreaterThanContentHeight))
+            // IMPORTANT: Check for negative location AFTER checking for location greater than content width
+            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY))
             {
-                if (Viewport.Height > GetContentSize ().Height)
+                if (newViewport.Y < 0)
                 {
                     newViewport.Y = 0;
                 }
@@ -457,18 +456,7 @@ public partial class View
 
     private void RaiseViewportChangedEvent (Rectangle oldViewport)
     {
-        if (Cursor.IsVisible)
-        {
-            // Adjust the cursor if visible
-            int deltaX = oldViewport.X - Viewport.X;
-            int deltaY = oldViewport.Y - Viewport.Y;
-
-            Point currentCursorPos = ScreenToViewport (Cursor.Position!.Value);
-
-            SetCursor (Cursor with { Position = ViewportToScreen (new Point (currentCursorPos.X + deltaX, currentCursorPos.Y + deltaY)) });
-        }
-
-        DrawEventArgs args = new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
+        var args = new DrawEventArgs (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
         OnViewportChanged (args);
         ViewportChanged?.Invoke (this, args);
     }
@@ -493,7 +481,7 @@ public partial class View
     /// </remarks>
     /// <param name="viewport">Viewport-relative location and size.</param>
     /// <returns>Screen-relative location and size.</returns>
-    public Rectangle ViewportToScreen (in Rectangle viewport) => viewport with { Location = ViewportToScreen (viewport.Location) };
+    public Rectangle ViewportToScreen (in Rectangle viewport) { return viewport with { Location = ViewportToScreen (viewport.Location) }; }
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location to a screen-relative location.
@@ -547,7 +535,7 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetViewportOffsetFromFrame () => Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location;
+    public Point GetViewportOffsetFromFrame () { return Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location; }
 
     /// <summary>
     ///     Scrolls the view vertically by the specified number of rows.
@@ -581,7 +569,7 @@ public partial class View
     /// <returns><see langword="true"/> if the <see cref="Viewport"/> was changed.</returns>
     public bool? ScrollHorizontal (int cols)
     {
-        if (GetContentSize () == Size.Empty || GetContentSize ().Width == Viewport.Size.Width)
+        if (GetContentSize () == Size.Empty || GetContentSize () == Viewport.Size)
         {
             return false;
         }

@@ -28,8 +28,6 @@ public class AutocompleteTests (ITestOutputHelper output)
             Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
             top.SetNeedsDraw ();
             AutoInitShutdownAttribute.RunIteration ();
-            Assert.Equal (i + 1, tv.InsertionPoint.X);
-            Assert.Equal (i + 1, tv.Cursor.Position!.Value.X);
 
             if (i < 4 || i > 5)
             {
@@ -53,7 +51,7 @@ This a long line and against TextView.
 
         Assert.True (
                      tv.NewMouseEvent (
-                                       new () { Position = new (6, 0), Flags = MouseFlags.LeftButtonPressed }
+                                       new () { Position = new (6, 0), Flags = MouseFlags.Button1Pressed }
                                       )
                     );
         top.SetNeedsDraw ();
@@ -171,7 +169,7 @@ This an long line and against TextView.",
         top.Add (tv);
         Application.Begin (top);
 
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
+        Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.NotNull (tv.Autocomplete);
         var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
 
@@ -190,7 +188,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -199,7 +197,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -208,7 +206,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -217,7 +215,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -226,7 +224,7 @@ This an long line and against TextView.",
         Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
         top.Draw ();
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [0].Replacement);
         Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
@@ -236,20 +234,20 @@ This an long line and against TextView.",
         top.Draw ();
         Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.CloseKey)));
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
         Assert.Equal (3, g.AllSuggestions.Count);
         Assert.False (tv.Autocomplete.Visible);
-
+        tv.PositionCursor ();
         Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.Reopen)));
         Assert.Equal ("F Fortunately super feature.", tv.Text);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal (3, g.AllSuggestions.Count);
-
         Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.SelectionKey)));
+        tv.PositionCursor ();
         Assert.Equal ("Fortunately Fortunately super feature.", tv.Text);
-        Assert.Equal (new (11, 0), tv.InsertionPoint);
+        Assert.Equal (new (11, 0), tv.CursorPosition);
         Assert.Empty (tv.Autocomplete.Suggestions);
         Assert.Equal (3, g.AllSuggestions.Count);
         Assert.False (tv.Autocomplete.Visible);

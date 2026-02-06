@@ -1,49 +1,53 @@
-﻿#nullable enable
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Dialogs", "Demonstrates how to use the Dialog and Dialog<TResult> classes")]
+[ScenarioMetadata ("Dialogs", "Demonstrates how to the Dialog class")]
 [ScenarioCategory ("Dialogs")]
 public class Dialogs : Scenario
 {
-    private const int WIDE_CODE_POINT = '你';
+    private static readonly int CODE_POINT = '你'; // We know this is a wide char
 
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
 
-        using Window mainWindow = new ();
-        mainWindow.Title = GetQuitKeyAndName ();
+        Window app = new ()
+        {
+            Title = GetQuitKeyAndName ()
+        };
 
-        FrameView frame = new ()
+        var frame = new FrameView
         {
             TabStop = TabBehavior.TabStop, // FrameView normally sets to TabGroup
             X = Pos.Center (),
             Y = 1,
             Width = Dim.Percent (75),
             Height = Dim.Auto (DimAutoStyle.Content),
-            Title = "Dialog Options",
-            Arrangement = ViewArrangement.Resizable,
-            AssignHotKeys = true
+            Title = "Dialog Options"
         };
 
-        Label numButtonsLabel = new () { X = 0, TextAlignment = Alignment.End, Text = "Number of Buttons:" };
+        var numButtonsLabel = new Label
+        {
+            X = 0,
+            TextAlignment = Alignment.End,
+            Text = "_Number of Buttons:"
+        };
 
-        Label label = new ()
+        var label = new Label
         {
             X = 0,
             Y = 0,
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Width:"
+            Text = "_Width:"
         };
         frame.Add (label);
 
-        TextField widthEdit = new ()
+        var widthEdit = new TextField
         {
             X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Top (label),
@@ -53,18 +57,18 @@ public class Dialogs : Scenario
         };
         frame.Add (widthEdit);
 
-        label = new Label
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Height:"
+            Text = "_Height:"
         };
         frame.Add (label);
 
-        TextField heightEdit = new ()
+        var heightEdit = new TextField
         {
             X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Top (label),
@@ -74,38 +78,49 @@ public class Dialogs : Scenario
         };
         frame.Add (heightEdit);
 
-        frame.Add (new Label { X = Pos.Right (widthEdit) + 2, Y = Pos.Top (widthEdit), Text = "If width is 0, the dimension will sized to fit the content." });
+        frame.Add (
+                   new Label
+                   {
+                       X = Pos.Right (widthEdit) + 2,
+                       Y = Pos.Top (widthEdit),
+                       Text = $"If width is 0, the dimension will be greater than {Dialog.DefaultMinimumWidth}%."
+                   }
+                  );
 
-        frame.Add (new Label
-        {
-            X = Pos.Right (heightEdit) + 2, Y = Pos.Top (heightEdit), Text = "If height is 0, the dimension will sized to fit the content."
-        });
+        frame.Add (
+                   new Label
+                   {
+                       X = Pos.Right (heightEdit) + 2,
+                       Y = Pos.Top (heightEdit),
+                       Text = $"If height is 0, the dimension will be greater {Dialog.DefaultMinimumHeight}%."
+                   }
+                  );
 
-        label = new Label
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Title:"
+            Text = "_Title:"
         };
         frame.Add (label);
 
-        TextField titleEdit = new ()
+        var titleEdit = new TextField
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Fill (),
             Height = 1,
-            Text = "Dialog Title"
+            Text = "Title"
         };
         frame.Add (titleEdit);
 
         numButtonsLabel.Y = Pos.Bottom (label);
         frame.Add (numButtonsLabel);
 
-        TextField numButtonsEdit = new ()
+        var numButtonsEdit = new TextField
         {
             X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Top (numButtonsLabel),
@@ -115,24 +130,24 @@ public class Dialogs : Scenario
         };
         frame.Add (numButtonsEdit);
 
-        CheckBox glyphsNotWords = new ()
+        var glyphsNotWords = new CheckBox
         {
             X = Pos.Right (numButtonsLabel) + 1,
             Y = Pos.Bottom (numButtonsLabel),
             TextAlignment = Alignment.End,
-            Text = $"Add {char.ConvertFromUtf32 (WIDE_CODE_POINT)} to button text to stress wide char support",
-            Value = CheckState.UnChecked
+            Text = $"_Add {char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
+            CheckedState = CheckState.UnChecked
         };
         frame.Add (glyphsNotWords);
 
-        label = new Label
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (glyphsNotWords),
             Width = Dim.Width (numButtonsLabel),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "Button Alignment:"
+            Text = "Button A_lignment:"
         };
         frame.Add (label);
 
@@ -140,8 +155,7 @@ public class Dialogs : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = "Align",
-            UsedHotKeys = frame.UsedHotKeys,
+            Title = "Ali_gn",
             AssignHotKeys = true
         };
         frame.Add (alignmentOptionSelector);
@@ -149,372 +163,247 @@ public class Dialogs : Scenario
 
         frame.ValidatePosDim = true;
 
-        mainWindow.Add (frame);
+        app.Add (frame);
 
-        label = new Label
+        label = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (frame) + 4,
-            TextAlignment = Alignment.End,
-            HotKeySpecifier = (Rune)'\xffff',
-            Text = "Button Pressed:"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 4, TextAlignment = Alignment.End, Text = "Button Pressed:"
         };
-        mainWindow.Add (label);
+        app.Add (label);
 
-        View buttonPressedLabel = new ()
+        var buttonPressedLabel = new Label
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (frame) + 5,
-            SchemeName = "Error",
-            Text = " ",
-            Height = Dim.Auto (),
-            Width = Dim.Auto ()
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 5, SchemeName = "Error", Text = " "
         };
 
-        Button showDialogButton = new () { X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "Show Dialog" };
-
-        showDialogButton.Accepting += (s, e) =>
-                                      {
-                                          using Dialog? dlg = CreateDemoDialog (widthEdit,
-                                                                                heightEdit,
-                                                                                titleEdit,
-                                                                                numButtonsEdit,
-                                                                                glyphsNotWords,
-                                                                                alignmentOptionSelector);
-
-                                          if (dlg is null)
-                                          {
-                                              MessageBox.ErrorQuery ((s as View)!.App!, "Error", "Could not create Dialog. Invalid options.", Strings.btnOk);
-                                          }
-                                          else
-                                          {
-                                              if (app.Run (dlg) is int result)
-                                              {
-                                                  buttonPressedLabel.Text = $"Button {(int?)result} pressed.";
-                                              }
-                                              else
-                                              {
-                                                  buttonPressedLabel.Text = "Dialog canceled.";
-                                              }
-
-                                              e.Handled = true;
-                                          }
-                                      };
-
-        mainWindow.Add (showDialogButton, buttonPressedLabel);
-
-        // --- Dialog<TResult> Demo ---
-        // Demonstrates using Dialog<Color> to return a typed result instead of a button index
-
-        Button showColorDialogButton = new ()
+        var showDialogButton = new Button
         {
-            X = Pos.Center (), Y = Pos.Bottom (buttonPressedLabel) + 2, Text = "Show Color Dialog<Color>"
+            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Dialog"
         };
-        mainWindow.Add (showColorDialogButton);
 
-        View colorLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (showColorDialogButton),
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            Text = "Dialog<T> Demo - Selected Color:"
-        };
-        mainWindow.Add (colorLabel);
+        app.Accepting += (s, e) =>
+                                   {
+                                       Dialog dlg = CreateDemoDialog (
+                                                                      widthEdit,
+                                                                      heightEdit,
+                                                                      titleEdit,
+                                                                      numButtonsEdit,
+                                                                      glyphsNotWords,
+                                                                      alignmentOptionSelector,
+                                                                      buttonPressedLabel
+                                                                     );
+                                       Application.Run (dlg);
+                                       dlg.Dispose ();
+                                       e.Handled = true;
+                                   };
 
-        View selectedColorLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (colorLabel),
-            Height = 1,
-            Width = 15,
-            TextAlignment = Alignment.Center,
-            SchemeName = "Error"
-        };
-        mainWindow.Add (selectedColorLabel);
-        selectedColorLabel.SetScheme (new Scheme { Normal = new Attribute (StandardColor.White, StandardColor.OrangeRed) });
-        selectedColorLabel.Text = selectedColorLabel.GetScheme ().Normal.Background.ToString ();
+        app.Add (showDialogButton);
 
-        showColorDialogButton.Accepting += (_, e) =>
-                                           {
-                                               using ColorPickerDialog colorDialog =
-                                                   new (selectedColorLabel.GetScheme ().Normal.Background);
-                                               colorDialog.ButtonAlignment = alignmentOptionSelector.Value.Value;
+        app.Add (buttonPressedLabel);
 
-                                               // Run the dialog and get the typed result
+        Application.Run (app);
+        app.Dispose ();
 
-                                               if (app.Run (colorDialog) is Color result)
-                                               {
-                                                   selectedColorLabel.Text = result.ToString ();
-
-                                                   selectedColorLabel.SetScheme (new Scheme
-                                                   {
-                                                       Normal = new Attribute (selectedColorLabel.GetScheme ()
-                                                               .Normal.Foreground,
-                                                           result)
-                                                   });
-                                               }
-                                               else
-                                               {
-                                                   selectedColorLabel.Text = "Canceled";
-                                               }
-
-                                               e.Handled = true;
-                                           };
-
-        // --- Prompt Demo ---
-        // Demonstrates using Prompt<TView, TResult> with extension methods
-        // This is a simpler alternative to creating custom Dialog<TResult> subclasses
-
-        Button showPromptDialogButton = new ()
-        {
-            X = Pos.Center (), Y = Pos.Bottom (selectedColorLabel) + 2, Text = "Prompt<AttributePicker, Attribute>"
-        };
-        mainWindow.Add (showPromptDialogButton);
-
-        View promptAttributeLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (showPromptDialogButton),
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            Text = "Prompt Demo - Selected Attribute:"
-        };
-        mainWindow.Add (promptAttributeLabel);
-
-        View promptSelectedAttributeLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (promptAttributeLabel),
-            Height = 1,
-            Width = Dim.Auto (),
-            TextAlignment = Alignment.Center,
-            SchemeName = "Error"
-        };
-        mainWindow.Add (promptSelectedAttributeLabel);
-
-        promptSelectedAttributeLabel.SetScheme (new Scheme
-        {
-            Normal = new Attribute (StandardColor.White, StandardColor.Cyan)
-        });
-        promptSelectedAttributeLabel.Text = promptSelectedAttributeLabel.GetScheme ().Normal.Background.ToString ();
-
-        void OnShowPromptDialogButtonOnAccepting (object? _, CommandEventArgs e)
-        {
-            // Use the Prompt extension method - much simpler than custom Dialog<T>!
-            // mainWindow is an IRunnable so we can call Prompt on it
-            Attribute? result =
-                mainWindow.Prompt<AttributePicker, Attribute?> (input: promptSelectedAttributeLabel.GetScheme ().Normal,
-                                                                beginInitHandler: prompt =>
-                                                                {
-                                                                    // Customize the Prompt dialog
-                                                                    prompt.Title = "Pick an Attribute";
-                                                                });
-
-            if (result is { } attribute)
-            {
-                promptSelectedAttributeLabel.Text = attribute.ToString ();
-                Scheme updatedScheme = promptAttributeLabel.GetScheme () with { Normal = attribute };
-                promptSelectedAttributeLabel.SetScheme (updatedScheme);
-            }
-            else
-            {
-                promptSelectedAttributeLabel.Text = "Canceled";
-            }
-
-            e.Handled = true;
-        }
-
-        showPromptDialogButton.Accepting += OnShowPromptDialogButtonOnAccepting;
-
-        mainWindow.UsedHotKeys = frame.UsedHotKeys;
-        mainWindow.AssignHotKeys = true;
-
-        app.Run (mainWindow);
+        Application.Shutdown ();
     }
 
-    private static Dialog? CreateDemoDialog (TextField widthEdit,
-                                             TextField heightEdit,
-                                             TextField titleEdit,
-                                             TextField numButtonsEdit,
-                                             CheckBox glyphsNotWords,
-                                             OptionSelector alignmentGroup)
+    private Dialog CreateDemoDialog (
+        TextField widthEdit,
+        TextField heightEdit,
+        TextField titleEdit,
+        TextField numButtonsEdit,
+        CheckBox glyphsNotWords,
+        OptionSelector alignmentGroup,
+        Label buttonPressedLabel
+    )
     {
-        if (!int.TryParse (widthEdit.Text, out int width)
-            || !int.TryParse (heightEdit.Text, out int height)
-            || !int.TryParse (numButtonsEdit.Text, out int numButtons))
+        Dialog dialog = null;
+
+        try
         {
-            return null;
-        }
+            var width = 0;
+            int.TryParse (widthEdit.Text, out width);
+            var height = 0;
+            int.TryParse (heightEdit.Text, out height);
+            var numButtons = 3;
+            int.TryParse (numButtonsEdit.Text, out numButtons);
 
-        // Add the buttons that go on the bottom of the dialog
-        List<Button> dlgButtons = [];
+            List<Button> buttons = new ();
+            int clicked = -1;
 
-        for (var i = 0; i < numButtons; i++)
-        {
-            int buttonId = i;
-            Button button;
-
-            if (glyphsNotWords.Value == CheckState.Checked)
+            for (var i = 0; i < numButtons; i++)
             {
-                buttonId = i;
+                int buttonId = i;
+                Button button = null;
 
-                button = new Button { Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + WIDE_CODE_POINT) };
+                if (glyphsNotWords.CheckedState == CheckState.Checked)
+                {
+                    buttonId = i;
+
+                    button = new ()
+                    {
+                        Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
+                        IsDefault = buttonId == 0
+                    };
+                }
+                else
+                {
+                    button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                }
+
+                button.Accepting += (s, e) =>
+                                 {
+                                     clicked = buttonId;
+                                     e.Handled = true;
+                                     Application.RequestStop ();
+                                 };
+                buttons.Add (button);
             }
-            else
+
+            // This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
+            // the buttons are laid out correctly
+            dialog = new ()
             {
-                button = new Button { Text = "_" + NumberToWords.Convert (buttonId) };
+                Title = titleEdit.Text,
+                Text = "Dialog Text",
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [0..]),
+
+                Buttons = buttons.ToArray ()
+            };
+
+            if (width != 0)
+            {
+                dialog.Width = width;
+            }
+            if (height != 0)
+            {
+                dialog.Height = height;
             }
 
-            dlgButtons.Add (button);
+            var add = new Button
+            {
+                X = Pos.Center (),
+                Y = Pos.Center () - 1,
+                Text = "_Add a button"
+            };
+
+            add.Accepting += (s, e) =>
+                          {
+                              int buttonId = buttons.Count;
+                              Button button;
+
+                              if (glyphsNotWords.CheckedState == CheckState.Checked)
+                              {
+                                  button = new ()
+                                  {
+                                      Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
+                                      IsDefault = buttonId == 0
+                                  };
+                              }
+                              else
+                              {
+                                  button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                              }
+
+                              button.Accepting += (s, e) =>
+                                               {
+                                                   clicked = buttonId;
+                                                   Application.RequestStop ();
+                                                   e.Handled = true;
+                                               };
+                              buttons.Add (button);
+                              dialog.AddButton (button);
+
+                              //if (buttons.Count > 1)
+                              //{
+                              //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
+                              //}
+                              e.Handled = true;
+                          };
+            dialog.Add (add);
+
+            var addChar = new Button
+            {
+                X = Pos.Center (),
+                Y = Pos.Center () + 1,
+                Text = $"A_dd a {char.ConvertFromUtf32 (CODE_POINT)} to each button. This text is really long for a reason."
+            };
+
+            addChar.Accepting += (s, e) =>
+                              {
+                                  foreach (Button button in buttons)
+                                  {
+                                      button.Text += char.ConvertFromUtf32 (CODE_POINT);
+                                  }
+
+                                  e.Handled = true;
+                              };
+            dialog.Add (addChar);
+
+            dialog.IsRunningChanged += (s, e) =>
+                                       {
+                                           if (!e.Value)
+                                           {
+                                               buttonPressedLabel.Text = $"{clicked}";
+                                           }
+                                       };
         }
-
-        // This tests dynamically adding buttons; ensuring the dialog resizes if needed and
-        // the buttons are laid out correctly
-        Dialog dialog = new ()
+        catch (FormatException)
         {
-            Title = titleEdit.Text,
-            ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [alignmentGroup.Value!.Value] [..]),
-            Buttons = dlgButtons.ToArray ()
-        };
-
-        Label label = new () { Title = "_Enter text:" };
-        dialog.Add (label);
-
-        TextField textField = new () { Y = Pos.Bottom (label), Width = Dim.Fill (0, 60), Text = new string ("0123456789").Repeat (6)! };
-        dialog.Add (textField);
-
-        CheckBox checkBox = new () { Title = "_Check Me", Y = Pos.Bottom (textField), Value = CheckState.UnChecked };
-        dialog.Add (checkBox);
-
-        OptionSelector<Schemes> optionSelector = new () { Y = Pos.Bottom (checkBox), Value = Schemes.Error, AssignHotKeys = true };
-        dialog.Add (optionSelector);
-
-        FrameView frame = new ()
-        {
-            Title = "Frame (Fill)",
-            X = Pos.Right (checkBox) + 1,
-            Y = Pos.Bottom (textField),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (0, 1)
-        };
-        dialog.Add (frame);
-
-        Button addButtonButton = new () { Title = "_Add Button", X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
-        dialog.Add (addButtonButton);
-
-        addButtonButton.Accepting += (_, e) =>
-                                     {
-                                         int newButtonId = dialog.Buttons.Length;
-
-                                         Button newButton = new () { Text = "_" + NumberToWords.Convert (newButtonId) };
-                                         dialog.AddButton (newButton);
-                                         e.Handled = true;
-                                     };
-
-        if (width != 0)
-        {
-            dialog.Width = width;
-        }
-
-        if (height != 0)
-        {
-            dialog.Height = height;
+            buttonPressedLabel.Text = "Invalid Options";
         }
 
         return dialog;
     }
 
-    /// <summary>
-    ///     Example of a custom Dialog that returns a <see cref="Color"/> instead of a button index.
-    ///     This demonstrates how to use <see cref="Dialog{TResult}"/> to create type-safe dialogs.
-    /// </summary>
-    private sealed class ColorPickerDialog : Dialog<Color>
+    public override List<Key> GetDemoKeyStrokes ()
     {
-        private readonly ColorPicker _colorPicker;
+        var keys = new List<Key> ();
 
-        public ColorPickerDialog (Color initialColor)
-        {
-            Title = "Pick a Color";
+        keys.Add (Key.D6);
+        keys.Add (Key.D5);
 
-            _colorPicker = new ColorPicker
-            {
-                Value = initialColor,
-                Style = new ColorPickerStyle { ShowColorName = true, ShowTextFields = true },
-                Width = Dim.Fill (0, 48),
-                AssignHotKeys = true
-            };
-            Add (_colorPicker);
-            _colorPicker.ApplyStyleChanges ();
+        keys.Add (Key.Tab);
+        keys.Add (Key.D2);
+        keys.Add (Key.D0);
 
-            // Add Cancel and OK buttons
-            AddButton (new Button { Text = "_Cancel" });
-            AddButton (new Button { Text = "_OK" });
-        }
-
-        /// <inheritdoc/>
-        protected override bool OnAccepting (CommandEventArgs args)
-        {
-            if (base.OnAccepting (args))
-            {
-                return true;
-            }
-
-            Result = _colorPicker.Value!.Value;
-
-            return false;
-        }
-    }
-
-    public override List<Key> GetDemoKeyStrokes (IApplication? app)
-    {
-        List<Key> keys = [Key.D6, Key.D5, Key.Tab, Key.D2, Key.D0, Key.Enter];
-
-        for (var i = 0; i < 5; i++)
+        keys.Add (Key.Enter);
+        for (int i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
-
         keys.Add (Key.Enter);
 
         keys.Add (Key.S.WithAlt);
         keys.Add (Key.Enter);
-
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
-
         keys.Add (Key.Enter);
 
         keys.Add (Key.E.WithAlt);
         keys.Add (Key.Enter);
-
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
-
         keys.Add (Key.Enter);
 
         keys.Add (Key.C.WithAlt);
         keys.Add (Key.Enter);
-
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
-
         keys.Add (Key.Enter);
 
         keys.Add (Key.F.WithAlt);
         keys.Add (Key.Enter);
-
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
-
         keys.Add (Key.Enter);
 
         return keys;

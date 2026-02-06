@@ -22,7 +22,7 @@ public class WizardTests
         wizard.AddStep (step1);
 
         var finishedFired = false;
-        wizard.Accepting += (s, args) => { finishedFired = true; };
+        wizard.Finished += (s, args) => { finishedFired = true; };
 
         var isRunningChangedFired = false;
         wizard.IsRunningChanged += (s, e) => { isRunningChangedFired = true; };
@@ -46,7 +46,7 @@ public class WizardTests
         wizard.AddStep (step2);
 
         finishedFired = false;
-        wizard.Accepting += (s, args) => { finishedFired = true; };
+        wizard.Finished += (s, args) => { finishedFired = true; };
 
         isRunningChangedFired = false;
         wizard.IsRunningChanged += (s, e) => { isRunningChangedFired = true; };
@@ -79,7 +79,7 @@ public class WizardTests
         step1.Enabled = false;
 
         finishedFired = false;
-        wizard.Accepting += (s, args) => { finishedFired = true; };
+        wizard.Finished += (s, args) => { finishedFired = true; };
 
         isRunningChangedFired = false;
         wizard.IsRunningChanged += (s, e) => { isRunningChangedFired = true; };
@@ -437,7 +437,7 @@ public class WizardTests
     // this test is needed because Wizard overrides Dialog's title behavior ("Title - StepTitle")
     public void Setting_Title_Works ()
     {
-        IDriver d = Application.Driver;
+        var d = Application.Driver;
 
         var title = "1234";
         var stepTitle = " - ABCD";

@@ -55,9 +55,8 @@ class Program
     {
         // Enable configuration with all sources
         ConfigurationManager.Enable(ConfigLocations.All);
-
-        using IApplication app = Application.Create();
-        app.Init();
+        
+        Application.Init();
         // ... rest of app
     }
 }
@@ -145,45 +144,40 @@ Configuration is loaded from multiple locations with increasing precedence (high
    - Settings in `Terminal.Gui.dll` resources (`Terminal.Gui.Resources.config.json`)
    - Defines default themes and settings for the library
 
-3. **[ConfigLocations.AppResources](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
+3. **[ConfigLocations.Runtime](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
+   - Settings in [ConfigurationManager.RuntimeConfig](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_RuntimeConfig) string property
+   - In-memory configuration without files
+
+4. **[ConfigLocations.AppResources](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
    - App-specific resources (`MyApp.Resources.config.json` or `Resources/config.json`)
    - Embedded in the application assembly
 
-4. **[ConfigLocations.GlobalHome](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
-   - Global file in user's home directory (`~/.tui/config.json`)
-
-5. **[ConfigLocations.GlobalCurrent](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
-   - Global file in current directory (`./.tui/config.json`)
-
-6. **[ConfigLocations.AppHome](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
+5. **[ConfigLocations.AppHome](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
    - App-specific file in user's home directory (`~/.tui/MyApp.config.json`)
 
-7. **[ConfigLocations.AppCurrent](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
+6. **[ConfigLocations.AppCurrent](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
    - App-specific file in current directory (`./.tui/MyApp.config.json`)
 
-8. **[ConfigLocations.Env](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
-   - Settings from the `TUI_CONFIG` environment variable
-   - Useful for container environments and CI/CD pipelines
+7. **[ConfigLocations.GlobalHome](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)**
+   - Global file in user's home directory (`~/.tui/config.json`)
 
-9. **[ConfigLocations.Runtime](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)** (Highest Precedence)
-   - Settings in <xref:Terminal.Gui.Configuration.ConfigurationManager.RuntimeConfig> string property
-   - In-memory configuration without files
+8. **[ConfigLocations.GlobalCurrent](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)** (Highest Precedence)
+   - Global file in current directory (`./.tui/config.json`)
 
 ### Precedence Diagram
 
 ```mermaid
 graph TD
     A[1. Hard-coded Defaults] --> B[2. Library Resources]
-    B --> C[3. App Resources]
-    C --> D[4. Global Home Directory]
-    D --> E[5. Global Current Directory]
-    E --> F[6. App Home Directory]
-    F --> G[7. App Current Directory]
-    G --> H[8. Environment Variable TUI_CONFIG]
-    H --> I[9. Runtime Config - Highest Priority]
+    B --> C[3. Runtime Config]
+    C --> D[4. App Resources]
+    D --> E[5. App Home Directory]
+    E --> F[6. App Current Directory]
+    F --> G[7. Global Home Directory]
+    G --> H[8. Global Current Directory]
     
     style A fill:#f9f9f9
-    style I fill:#90EE90
+    style H fill:#90EE90
 ```
 
 ### File Locations
@@ -195,15 +189,6 @@ graph TD
 **App-Specific Settings** (`AppName.config.json`):
 - Windows: `C:\Users\username\.tui\UICatalog.config.json`
 - macOS/Linux: `~/.tui/UICatalog.config.json` or `./.tui/UICatalog.config.json`
-
-**Environment Variable** (`TUI_CONFIG`):
-```bash
-# Linux/macOS
-export TUI_CONFIG='{"Application.QuitKey": "Ctrl+Q"}'
-
-# Windows PowerShell
-$env:TUI_CONFIG='{"Application.QuitKey": "Ctrl+Q"}'
-```
 
 ---
 
@@ -412,7 +397,7 @@ This:
 
 ### Granular Control
 
-For more control, use ConfigurationManager.Load and <xref:Terminal.Gui.Configuration.ConfigurationManager.Apply> separately:
+For more control, use [Load](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_Load_Terminal_Gui_Configuration_ConfigLocations_) and [Apply](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_Apply) separately:
 
 ```csharp
 // Enable without loading
@@ -504,10 +489,10 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
   "Application.Force16Colors": false,
   "Application.IsMouseDisabled": false,
   "Application.ArrangeKey": "Ctrl+F5",
-  "IKeyboard.NextTabKey": "Tab",
-  "IKeyboard.PrevTabKey": "Shift+Tab",
-  "IKeyboard.NextTabGroupKey": "F6",
-  "IKeyboard.PrevTabGroupKey": "Shift+F6",
+  "Application.NextTabKey": "Tab",
+  "Application.PrevTabKey": "Shift+Tab",
+  "Application.NextTabGroupKey": "F6",
+  "Application.PrevTabGroupKey": "Shift+F6",
   "Key.Separator": "+"
 }
 ```
@@ -721,20 +706,27 @@ All configuration files must conform to the JSON schema:
 }
 ```
 
+### Complete Example
+
+See the default configuration file:
+
+[!code-json[config.json](../../Terminal.Gui/Resources/config.json)]
+
+---
+
 ## Best Practices
 
 ### For Application Developers
 
 **1. Enable Early**
 
-Enable ConfigurationManager at the start of `Main()`, before creating the application:
+Enable ConfigurationManager at the start of `Main()`, before `Application.Init()`:
 
 ```csharp
 static void Main()
 {
     ConfigurationManager.Enable(ConfigLocations.All);
-    using IApplication app = Application.Create();
-    app.Init();
+    Application.Init();
     // ...
 }
 ```

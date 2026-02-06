@@ -13,9 +13,7 @@ public class ListsAndCombos : Scenario
 {
     public override void Main ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
+        Application.Init ();
         //TODO: Duplicated code in Demo.cs Consider moving to shared assembly
         ObservableCollection<string> items = [];
 
@@ -33,9 +31,9 @@ public class ListsAndCombos : Scenario
             }
         }
 
-        using Window win = new () { Title = GetQuitKeyAndName () };
+        var win = new Window { Title = GetQuitKeyAndName () };
         // ListView
-        Label lbListView = new ()
+        var lbListView = new Label
         {
             SchemeName = "Runnable",
             X = 0,
@@ -44,7 +42,7 @@ public class ListsAndCombos : Scenario
             Text = "Listview"
         };
 
-        ListView listview = new ()
+        var listview = new ListView
         {
             X = 0,
             Y = Pos.Bottom (lbListView) + 2,
@@ -52,13 +50,7 @@ public class ListsAndCombos : Scenario
             Width = Dim.Percent (40),
             Source = new ListWrapper<string> (items)
         };
-        listview.ValueChanged += (_, e) =>
-                                 {
-                                     if (e.NewValue is { })
-                                     {
-                                         lbListView.Text = items [e.NewValue.Value];
-                                     }
-                                 };
+        listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem.Value];
         win.Add (lbListView, listview);
 
         //var scrollBar = new ScrollBarView (listview, true);
@@ -97,7 +89,7 @@ public class ListsAndCombos : Scenario
         //                        };
 
         // ComboBox
-        Label lbComboBox = new ()
+        var lbComboBox = new Label
         {
             SchemeName = "Runnable",
             X = Pos.Right (lbListView) + 1,
@@ -106,7 +98,7 @@ public class ListsAndCombos : Scenario
             Text = "ComboBox"
         };
 
-        ComboBox comboBox = new ()
+        var comboBox = new ComboBox
         {
             X = Pos.Right (listview) + 1,
             Y = Pos.Bottom (lbListView) + 1,
@@ -115,13 +107,7 @@ public class ListsAndCombos : Scenario
         };
         comboBox.SetSource (items);
 
-        comboBox.SelectedItemChanged += (_, text) =>
-                                        {
-                                            if (text.Value is { })
-                                            {
-                                                lbComboBox.Text = text.Value.ToString () ?? string.Empty;
-                                            }
-                                        };
+        comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();
         win.Add (lbComboBox, comboBox);
 
         //var scrollBarCbx = new ScrollBarView (comboBox.SubViews.ElementAt (1), true);
@@ -159,17 +145,19 @@ public class ListsAndCombos : Scenario
         //                            scrollBarCbx.Refresh ();
         //                        };
 
-        Button btnMoveUp = new () { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
-        btnMoveUp.Accepting += (_, _) => { listview.MoveUp (); };
+        var btnMoveUp = new Button { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
+        btnMoveUp.Accepting += (s, e) => { listview.MoveUp (); };
 
-        Button btnMoveDown = new ()
+        var btnMoveDown = new Button
         {
             X = Pos.Right (btnMoveUp) + 1, Y = Pos.Bottom (lbListView), Text = "Move _Down"
         };
-        btnMoveDown.Accepting += (_, _) => { listview.MoveDown (); };
+        btnMoveDown.Accepting += (s, e) => { listview.MoveDown (); };
 
         win.Add (btnMoveUp, btnMoveDown);
 
-        app.Run (win);
+        Application.Run (win);
+        win.Dispose ();
+        Application.Shutdown ();
     }
 }

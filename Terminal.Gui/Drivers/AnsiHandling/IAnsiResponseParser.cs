@@ -2,7 +2,7 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     When implemented in a derived class, allows watching an input stream of characters
-///     (i.e. console input) for ANSI response sequences (mouse, cursor, query responses etc.).
+///     (i.e. console input) for ANSI response sequences (mouse input, cursor, query responses etc.).
 /// </summary>
 public interface IAnsiResponseParser
 {
@@ -18,7 +18,6 @@ public interface IAnsiResponseParser
     ///     sent an ANSI request out).
     /// </summary>
     /// <param name="terminator">The terminator you expect to see on response.</param>
-    /// <param name="value">The value you expect to see on response.</param>
     /// <param name="response">Callback to invoke when the response is seen in console input.</param>
     /// <param name="abandoned"></param>
     /// <param name="persistent">
@@ -30,16 +29,15 @@ public interface IAnsiResponseParser
     ///     that already has one.
     ///     exists.
     /// </exception>
-    void ExpectResponse (string? terminator, string? value, Action<string?> response, Action? abandoned, bool persistent);
+    void ExpectResponse (string? terminator, Action<string?> response, Action? abandoned, bool persistent);
 
     /// <summary>
     ///     Returns true if there is an existing expectation (i.e. we are waiting a response
     ///     from console) for the given <paramref name="terminator"/>.
     /// </summary>
     /// <param name="terminator"></param>
-    /// <param name="value"></param>
     /// <returns></returns>
-    bool IsExpecting (string? terminator, string? value);
+    bool IsExpecting (string? terminator);
 
     /// <summary>
     ///     Removes callback and expectation that we will get a response for the
@@ -47,10 +45,9 @@ public interface IAnsiResponseParser
     ///     requests e.g. if you want to send a different one with the same terminator.
     /// </summary>
     /// <param name="requestTerminator"></param>
-    /// <param name="value"></param>
     /// <param name="persistent">
     ///     <see langword="true"/> if you want to remove a persistent
     ///     request listener.
     /// </param>
-    void StopExpecting (string? requestTerminator, string? value, bool persistent);
+    void StopExpecting (string? requestTerminator, bool persistent);
 }

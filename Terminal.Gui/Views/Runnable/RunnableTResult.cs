@@ -3,15 +3,7 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     Base implementation of <see cref="IRunnable{TResult}"/> for views that can be run as blocking sessions.
 /// </summary>
-/// <typeparam name="TResult">
-///     The type of result data returned when the session completes.
-///     <para>
-///         <strong>Important:</strong> Use nullable types (e.g., <c>Color?</c>, <c>int?</c>, <c>string?</c>)
-///         so that <see langword="null"/> can indicate cancellation. Using non-nullable value types
-///         (e.g., <c>Color</c>, <c>int</c>) will return their default values on cancellation, making
-///         it impossible to distinguish cancellation from a valid result.
-///     </para>
-/// </typeparam>
+/// <typeparam name="TResult">The type of result data returned when the session completes.</typeparam>
 /// <remarks>
 ///     <para>
 ///         Views can derive from this class or implement <see cref="IRunnable{TResult}"/> directly.
@@ -40,24 +32,21 @@ public class Runnable<TResult> : Runnable, IRunnable<TResult>
     /// <inheritdoc/>
     public new TResult? Result
     {
-        get => base.Result is null ? default (TResult?) : (TResult)base.Result;
+        get => base.Result is TResult typedValue ? typedValue : default;
         set => base.Result = value;
     }
 
     /// <summary>
-    ///     Override to handle state changes when starting or stopping.
+    ///     Override to clear typed result when starting.
     ///     Called by base <see cref="Runnable.RaiseIsRunningChanging"/> before events are raised.
     /// </summary>
-    /// <remarks>
-    ///     The base class <see cref="Runnable.RaiseIsRunningChanging"/> already clears <c>Result</c>
-    ///     to <see langword="null"/> when starting. This allows callers to detect cancellation by
-    ///     checking if <c>Result</c> is <see langword="null"/> after the session ends.
-    /// </remarks>
     protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
-        // NOTE: Do NOT set Result = default here. The base class already sets base.Result = null
-        // when starting (newIsRunning = true). For value types, default(T) is a valid value
-        // (e.g., 0 for int), which would prevent callers from detecting cancellation.
+        // Clear previous typed result when starting
+        if (newIsRunning)
+        {
+            Result = default;
+        }
 
         // Call base implementation to allow further customization
         return base.OnIsRunningChanging (oldIsRunning, newIsRunning);

@@ -135,7 +135,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
     [AutoInitShutdown]
-    public void ShadowStyle_LeftButtonPressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
+    public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
         var superView = new View
         {
@@ -148,7 +148,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             Text = "0123",
-            MouseHighlightStates = MouseState.Pressed,
+            HighlightStates = MouseState.Pressed,
             ShadowStyle = style,
             CanFocus = true
         };
@@ -158,13 +158,13 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.EndInit ();
 
         Thickness origThickness = view.Margin!.Thickness;
-        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonPressed, Position = new (0, 0) });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (0, 0) });
         Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
 
-        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonReleased, Position = new (0, 0) });
+        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (0, 0) });
         Assert.Equal (origThickness, view.Margin.Thickness);
 
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
+        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
 }

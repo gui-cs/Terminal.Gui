@@ -398,7 +398,7 @@ public class InputBindingsThreadSafetyTests
                                      {
                                          try
                                          {
-                                             MouseFlags flags = MouseFlags.LeftButtonClicked | (MouseFlags)(threadId * 1000 + j);
+                                             MouseFlags flags = MouseFlags.Button1Clicked | (MouseFlags)(threadId * 1000 + j);
                                              mouseBindings.Add (flags, Command.Accept);
                                          }
                                          catch (InvalidOperationException)

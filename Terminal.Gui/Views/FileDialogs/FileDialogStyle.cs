@@ -1,5 +1,5 @@
 #nullable disable
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
 using static System.Environment;
@@ -87,6 +87,12 @@ public class FileDialogStyle
     ///     <see cref="OpenMode.Mixed"/> and <see cref="FileDialog.MustExist"/> is <see langword="true"/>.
     /// </summary>
     public string FileOrDirectoryMustExistFeedback { get; set; } = Strings.fdFileOrDirectoryMustExistFeedback;
+
+    /// <summary>
+    ///     Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults to false (Ok button then Cancel
+    ///     button). Set to true to show Cancel button on left then Ok button instead.
+    /// </summary>
+    public bool FlipOkCancelButtonLayoutOrder { get; set; }
 
     /// <summary>Gets or sets the class responsible for determining which symbol to use to represent files and directories.</summary>
     public FileSystemIconProvider IconProvider { get; set; } = new ();
