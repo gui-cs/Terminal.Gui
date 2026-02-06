@@ -69,4 +69,7 @@ public record PosView : Pos
     {
         yield return Target;
     }
+
+    /// <inheritdoc/>
+    internal override bool RequiresTargetLayout => true;
 }
