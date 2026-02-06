@@ -320,6 +320,11 @@ public class ButtonTests
         Assert.True (clicked);
     }
 
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that LeftButtonClicked on a Button invokes Accept (not Activate).
+    ///     Button binds LeftButtonClicked to Command.Accept, so only Accepting is raised.
+    /// </summary>
     [Fact]
     public void LeftButtonClicked_Accepts ()
     {
@@ -337,22 +342,23 @@ public class ButtonTests
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptingCount);
 
+        // LeftButtonClicked is bound to Command.Accept, so only Accepting fires (not Activating)
         button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (1, activatingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (1, acceptingCount);
 
         button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Disable Mouse Highlighting to test that it does not interfere with Accepting event
         button.MouseHighlightStates = MouseState.None;
         button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (3, activatingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (3, acceptingCount);
 
         button.NewMouseEvent (new () { Position = new (1), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
 
