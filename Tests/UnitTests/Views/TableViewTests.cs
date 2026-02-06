@@ -3062,7 +3062,7 @@ A B C
         Assert.Equal (0, selectedCell.Y);
 
         // Toggle Select
-        tableView.NewKeyDownEvent (Key.Space);
+        Assert.True (tableView.NewKeyDownEvent (Key.Space));
         TableSelection m = tableView.MultiSelectedRegions.Single ();
         Assert.True (m.IsToggled);
         Assert.Equal (1, m.Origin.X);
@@ -3109,6 +3109,38 @@ A B C
         selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
         Assert.Equal (0, selectedCell.Y);
+    }
+
+    /// <summary>
+    /// Tests that when multi select is off the user cannot toggle
+    /// and importantly that the Space key does not get consumed.
+    /// </summary>
+    [Fact]
+    public void TestToggleCells_MultiSelect_Off_ToggleDoesNothing ()
+    {
+        // 2 row table
+        TableView tableView = GetABCDEFTableView (out DataTable dt);
+        tableView.LayoutSubViews ();
+        dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+        tableView.MultiSelect = false;
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
+
+        Point selectedCell = tableView.GetAllSelectedCells ().Single ();
+        Assert.Equal (0, selectedCell.X);
+        Assert.Equal (0, selectedCell.Y);
+
+        // Go Right
+        tableView.NewKeyDownEvent (Key.CursorRight);
+
+        selectedCell = tableView.GetAllSelectedCells ().Single ();
+        Assert.Equal (1, selectedCell.X);
+        Assert.Equal (0, selectedCell.Y);
+
+        // Toggle Select Should do nothing because MultiSelect is off
+        Assert.False(tableView.NewKeyDownEvent (Key.Space));
+
+        Assert.Empty(tableView.MultiSelectedRegions);
     }
 
     [Fact]
