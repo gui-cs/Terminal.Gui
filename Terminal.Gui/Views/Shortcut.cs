@@ -70,7 +70,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        MouseHighlightStates = MouseState.None;
+        MouseHighlightStates = MouseState.In;
         CanFocus = true;
 
         Border?.Settings &= ~BorderSettings.Title;
