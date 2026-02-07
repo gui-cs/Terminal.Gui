@@ -395,21 +395,12 @@ public class Shortcuts : Scenario
 
         bgColorShortcut.Activating += (s, args) =>
                                   {
-                                      // if the source of the event is the commandview (colorpicker)
-                                      if (args.Context is { Source: { } } && args.Context.Source.TryGetTarget (out View? source))
+                                      // Cycle colors only if activating didn't come from the commandview
+                                      if (args.Context.TryGetSource (out View? ctxSource) == true && ctxSource is ColorPicker16)
                                       {
-                                          // and it's the colorpicker, then do nothing. Prevent cycling
-                                          if (source == bgColor)
-                                          {
-                                              //args.Handled = true;
-                                          }
+
                                       }
                                   };
-
-        bgColor.ValueChanging += (sendingView, args) =>
-                                 {
-
-                                 };
 
         bgColor.ValueChanged += (sendingView, args) =>
                                                             {
