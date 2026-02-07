@@ -225,6 +225,9 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             // Reset to default
             HelpView.Margin!.Thickness = GetMarginThickness ();
+
+            // Margin must be transparent to mouse, so clicks pass through to Shortcut
+            HelpView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
     }
 
@@ -289,6 +292,7 @@ public class Shortcut : View, IOrientation, IDesignable
         if (IsFromCommandView (args.Context))
         {
             Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsFromCommandView");
+
             // The user did something in the CommandView (e.g., clicked on it or pressed its hotkey). We got here because CommandsToBubbleUp
             // includes Command.Activate, so the event bubbled up to Shortcut.
             // We're going to cancel the CommandView's Activating and raise our own so that the Shortcut gets focus and can update its state if needed.
@@ -301,6 +305,7 @@ public class Shortcut : View, IOrientation, IDesignable
             // TODO: Make API for CommandsToBubbleUp richer. Support adding & removing commands
             IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
             CommandsToBubbleUp = [];
+
             if (CommandView.InvokeCommand (Command.Activate, context) is true)
             {
                 // This is not expected;
@@ -549,18 +554,6 @@ public class Shortcut : View, IOrientation, IDesignable
         return false;
     }
 
-    // Helper to check if command was invoked from the Shortcut
-    private bool IsInvocationFromShortcut (CommandEventArgs e)
-    {
-        // Source == this means the event originated from clicking on Shortcut (not CommandView)
-        if (e.Context?.Source?.TryGetTarget (out View? contextSource) is true && contextSource == this)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     // Helper to check if command originated from Shortcut, the HelpView, or the KeyView mouse or keyboard binding
     private bool IsBindingFromShortcut (CommandEventArgs e)
     {
@@ -575,12 +568,7 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         // Source == this means the event originated from clicking on Shortcut (not CommandView)
-        if (e.Context?.Binding?.Source is { } sourceView && sourceView == this)
-        {
-            return true;
-        }
-
-        return false;
+        return e.Context?.Binding?.Source is { } sourceView && sourceView == this;
     }
 
     // Helper to check if command context originated from the CommandView
@@ -597,8 +585,8 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             CommandView.Margin!.Thickness = GetMarginThickness ();
 
-            // strip off ViewportSettings.TransparentMouse
-            CommandView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
+            // Margin must be transparent to mouse, so clicks pass through to Shortcut
+            CommandView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
 
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -660,8 +648,8 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             HelpView.Margin!.Thickness = GetMarginThickness ();
 
-            // strip off ViewportSettings.TransparentMouse
-            HelpView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
+            // Margin must be transparent to mouse, so clicks pass through to Shortcut
+            HelpView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -786,8 +774,8 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             KeyView.Margin!.Thickness = GetMarginThickness ();
 
-            // strip off ViewportSettings.TransparentMouse
-            KeyView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
+            // Margin must be transparent to mouse, so clicks pass through to Shortcut
+            KeyView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);

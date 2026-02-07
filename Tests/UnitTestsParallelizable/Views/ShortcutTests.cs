@@ -28,8 +28,7 @@ public class ShortcutTests
         public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
         public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
-        private void OnValueChanging (int? oldValue, int? newValue) =>
-            ValueChanging?.Invoke (this, new ValueChangingEventArgs<int?> (oldValue, newValue));
+        private void OnValueChanging (int? oldValue, int? newValue) => ValueChanging?.Invoke (this, new ValueChangingEventArgs<int?> (oldValue, newValue));
 
         private void OnValueChanged (int? oldValue, int? newValue)
         {
@@ -1060,5 +1059,53 @@ public class ShortcutTests
         // Assert - Should NOT be marked as handled, custom logic SHOULD run
         Assert.False (handledWhenFromCommandView);
         Assert.True (customLogicExecuted);
+    }
+
+    // Claude - Haiku 4.5
+    /// <summary>
+    ///     Verifies that clicking anywhere across the entire width of a Shortcut causes activation,
+    ///     including clicks in gaps between CommandView, HelpView, and KeyView.
+    /// </summary>
+    [Fact]
+    public void Click_Anywhere_On_Shortcut_Causes_Activation ()
+    {
+        // Arrange
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F1;
+        shortcut.HelpText = "Help text";
+        shortcut.Title = "Command";
+        shortcut.Width = 40; // Wide enough to create gaps between subviews
+        shortcut.Height = 1;
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var activatingCount = 0;
+
+        shortcut.Activating += (_, _) => { activatingCount++; };
+
+        // Verify layout created gaps
+        Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
+        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
+        Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
+
+        // Act & Assert - Click at various X positions across the entire width
+        for (var x = 0; x < shortcut.Frame.Width; x++)
+        {
+            int expectedCount = activatingCount + 1;
+
+            // Simulate mouse click at position x
+            app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (x, 0)));
+
+            Assert.True (activatingCount == expectedCount,
+                         $"Click at X={x} should activate the Shortcut. Expected: {expectedCount}, Actual: {activatingCount}");
+        }
     }
 }
