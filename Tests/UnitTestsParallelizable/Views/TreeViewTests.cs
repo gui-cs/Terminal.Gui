@@ -6,7 +6,7 @@ namespace ViewsTests;
 public class TreeViewTests
 {
     [Fact]
-    public void TreeView_CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
+    public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
         var tree = new TreeView ();
 
@@ -43,7 +43,7 @@ public class TreeViewTests
     // This test verifies current behavior which may change per issue #4473
     // NOTE: TreeView is a special case - both Activate and Accept invoke the same handler
     [Fact]
-    public void TreeView_Command_Activate_SameAsAccept ()
+    public void Command_Activate_SameAsAccept ()
     {
         TreeView treeView = new ();
         TreeNode root = new () { Text = "Root" };
@@ -75,7 +75,7 @@ public class TreeViewTests
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TreeView_Command_Accept_ActivatesNode ()
+    public void Command_Accept_ActivatesNode ()
     {
         TreeView treeView = new ();
         TreeNode root = new () { Text = "Root" };
@@ -98,20 +98,17 @@ public class TreeViewTests
         treeView.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TreeView_Command_HotKey_SetsFocus ()
+    public void Command_HotKey_SetsFocus ()
     {
-        TreeView treeView = new ();
-        TreeNode root = new () { Text = "Root" };
-        treeView.AddObject (root);
+        TreeView treeView = new () { Text = "Test" };
+        treeView.BeginInit ();
+        treeView.EndInit ();
+        Assert.False (treeView.HasFocus);
 
-        bool? result = treeView.InvokeCommand (Command.HotKey);
+        treeView.InvokeCommand (Command.HotKey);
 
-        // HotKey returns true
-        Assert.True (result);
+        Assert.True (treeView.HasFocus);
 
         treeView.Dispose ();
     }
