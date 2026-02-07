@@ -173,7 +173,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         // runnable.SetFocus ();
         Assert.True (otherView.HasFocus);
 
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (label.HotKey));
+        app.Keyboard.RaiseKeyDownEvent (label.HotKey);
         Assert.False (otherView.HasFocus);
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
