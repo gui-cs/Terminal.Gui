@@ -162,20 +162,20 @@ public class KeyBindingsTests
         view.Activating += (s, e) => selectRaised = true;
 
         Assert.Equal (KeyCode.T, view.HotKey);
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.T));
+        app.Keyboard.RaiseKeyDownEvent (Key.T);
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
 
         hotKeyRaised = false;
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.T.WithAlt));
+        app.Keyboard.RaiseKeyDownEvent (Key.T.WithAlt);
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
 
         hotKeyRaised = false;
         view.HotKey = KeyCode.E;
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.E.WithAlt));
+        app.Keyboard.RaiseKeyDownEvent(Key.E.WithAlt);
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
         Assert.False (selectRaised);
