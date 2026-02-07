@@ -796,22 +796,17 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal ("Test", tf.Text); // Should be same due to polymorphism
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextField_Command_Activate_PositionsCursor ()
+    public void TextField_Command_Activate_SetsFocus ()
     {
         TextField textField = new () { Text = "Test", Width = 10 };
         textField.BeginInit ();
         textField.EndInit ();
+        Assert.False (textField.HasFocus);
 
-        // Activate via Command.Activate is handled for clicks positioning cursor
-        // We test the command is handled
-        bool? result = textField.InvokeCommand (Command.Activate);
+        textField.InvokeCommand (Command.Activate);
 
-        // Command should be handled (returns true)
-        Assert.True (result);
+        Assert.True (textField.HasFocus);
 
         textField.Dispose ();
     }
@@ -846,11 +841,13 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     public void TextField_Command_HotKey_SetsFocus ()
     {
         TextField textField = new () { Text = "Test" };
+        textField.BeginInit ();
+        textField.EndInit ();
+        Assert.False (textField.HasFocus);
 
-        bool? result = textField.InvokeCommand (Command.HotKey);
+        textField.InvokeCommand (Command.HotKey);
 
-        // HotKey should return true (handled)
-        Assert.True (result);
+        Assert.True (textField.HasFocus);
 
         textField.Dispose ();
     }
