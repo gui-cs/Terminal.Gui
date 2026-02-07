@@ -554,23 +554,42 @@ public class TreeViewFileSystem : Scenario
                 _fileInfo = value;
                 StringBuilder? sb = null;
 
-                if (_fileInfo is IFileInfo f)
+                try
                 {
-                    Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
-                    sb = new StringBuilder ();
-                    sb.AppendLine ($"Path:\n {f.FullName}\n");
-                    sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
-                    sb.AppendLine ($"Modified:\n {f.LastWriteTime}\n");
-                    sb.AppendLine ($"Created:\n {f.CreationTime}");
-                }
+                    if (_fileInfo is IFileInfo f)
+                    {
+                        Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
+                        sb = new StringBuilder ();
+                        sb.AppendLine ($"Path:\n {f.FullName}\n");
+                        sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
+                        sb.AppendLine ($"Modified:\n {f.LastWriteTime}\n");
+                        sb.AppendLine ($"Created:\n {f.CreationTime}");
+                    }
 
-                if (_fileInfo is IDirectoryInfo dir)
+                    if (_fileInfo is IDirectoryInfo dir)
+                    {
+                        Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
+                        sb = new StringBuilder ();
+                        sb.AppendLine ($"Path:\n {dir.FullName}\n");
+                        sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
+                        sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
+                    }
+                }
+                catch (IOException ioe)
                 {
-                    Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
+                    if (_fileInfo is IFileInfo f)
+                    {
+                        Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
+                    }
+
+                    if (_fileInfo is IDirectoryInfo dir)
+                    {
+                        Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
+                    }
+
                     sb = new StringBuilder ();
-                    sb.AppendLine ($"Path:\n {dir.FullName}\n");
-                    sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
-                    sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
+                    sb.AppendLine ($"Path:\n {_fileInfo.FullName}\n");
+                    sb.AppendLine ($"Exception:\n {ioe.Message}");
                 }
 
                 Text = sb?.ToString () ?? string.Empty;
