@@ -797,7 +797,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void TextField_Command_Activate_SetsFocus ()
+    public void Command_Activate_SetsFocus ()
     {
         TextField textField = new () { Text = "Test", Width = 10 };
         textField.BeginInit ();
@@ -815,7 +815,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextField_Command_Accept_RaisesAccepting ()
+    public void Command_Accept_RaisesAccepting ()
     {
         TextField textField = new () { Text = "Test" };
         var acceptingFired = false;
@@ -835,7 +835,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void TextField_Command_HotKey_SetsFocus ()
+    public void Command_HotKey_SetsFocus ()
     {
         TextField textField = new () { Text = "Test" };
         textField.BeginInit ();
@@ -853,7 +853,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextField_Enter_RaisesAccepting ()
+    public void Enter_RaisesAccepting ()
     {
         TextField textField = new () { Text = "Test" };
         var acceptingFired = false;
