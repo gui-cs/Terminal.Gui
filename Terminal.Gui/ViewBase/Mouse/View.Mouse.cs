@@ -572,6 +572,30 @@ public partial class View // Mouse APIs
             return false;
         }
 
+        // Don't grab if an enabled SubView at the mouse position can handle the event.
+        // CachedViewsUnderMouse is already updated by RaiseMouseEnterLeaveEvents before NewMouseEvent runs.
+        // Disabled views are included in the cache, so we must find the deepest enabled view.
+        if (App?.Mouse.CachedViewsUnderMouse is { Count: > 0 } cached)
+        {
+            View? deepestEnabledView = null;
+
+            for (int i = cached.Count - 1; i >= 0; i--)
+            {
+                if (cached [i] is { Enabled: true } candidate)
+                {
+                    deepestEnabledView = candidate;
+
+                    break;
+                }
+            }
+
+            if (deepestEnabledView is { } && deepestEnabledView != this)
+            {
+                // An enabled SubView is under the cursor - let it handle its own events
+                return false;
+            }
+        }
+
         // If the user has just pressed the mouse, grab the mouse and set focus
         if (App is null || !App.Mouse.IsGrabbed (this))
         {
