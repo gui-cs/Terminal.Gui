@@ -510,3 +510,70 @@ The distinction is important:
 - **Activate**: Changes state (e.g., toggles CheckBox)
 
 This is why pressing the CommandView's hotkey doesn't toggle a CheckBox, but clicking does.
+
+## How To
+
+### Handle Activation Differently Based on Source
+
+You may want to implement different behavior depending on whether the user activated the `CommandView` directly (e.g., clicked on it) or activated other parts of the `Shortcut` (e.g., pressed the hotkey or clicked elsewhere). Use `args.Context.TryGetSource()` in the `Activating` event handler to determine the activation source.
+
+**Use Case:** A color picker where clicking the picker opens a dialog, but pressing the shortcut key cycles through colors.
+
+```csharp
+ColorPicker16 bgColor = new () { Id = "bgColorCP", BoxHeight = 1, BoxWidth = 1 };
+
+Shortcut bgColorShortcut = new ()
+{
+    Id = "bgColor",
+    Key = Key.F9,
+    HelpText = "Cycles BG Color",
+    CommandView = bgColor
+};
+
+bgColorShortcut.Activating += (s, args) =>
+{
+    // Check if activation came from the CommandView itself
+    if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColorShortcut.CommandView)
+    {
+        // User clicked directly on the ColorPicker16
+        // Mark as handled to allow the ColorPicker16's normal behavior (open dialog)
+        args.Handled = true;
+    }
+    else
+    {
+        // User pressed F9 or clicked elsewhere on the Shortcut
+        // Cycle through colors instead
+        if (bgColor.SelectedColor == ColorName16.White)
+        {
+            bgColor.SelectedColor = ColorName16.Black;
+
+            return;
+        }
+
+        bgColor.SelectedColor++;
+    }
+};
+
+// Handle the color change
+bgColor.ValueChanged += (sendingView, args) =>
+{
+    // Update the application's color scheme when color changes
+    _app!.TopRunnableView!.SetScheme (
+        new Scheme (_app.TopRunnableView.GetScheme ())
+        {
+            Normal = new Attribute (
+                _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Foreground,
+                args.NewValue,
+                _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Style
+            )
+        }
+    );
+};
+```
+
+**Key Points:**
+
+- `args.Context.TryGetSource (out View? ctxSource)` retrieves the view that initiated the activation
+- Compare `ctxSource` with `bgColorShortcut.CommandView` to determine if activation came from the CommandView
+- When activation is from the CommandView, set `args.Handled = true` to prevent further processing and allow the CommandView's default behavior
+- When activation is from elsewhere (hotkey, other clicks), implement custom logic (e.g., cycling values)

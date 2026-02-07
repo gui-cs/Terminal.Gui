@@ -64,11 +64,12 @@ public class Shortcuts : Scenario
 
         ((CheckBox)alignKeysShortcut.CommandView).ValueChanging += (_, a) =>
                                                                    {
-                                                                       if (alignKeysShortcut.CommandView is CheckBox cb)
+                                                                       if (alignKeysShortcut.CommandView is not CheckBox)
                                                                        {
-                                                                           bool align = a.NewValue == CheckState.Checked;
-                                                                           AlignKeys (align);
+                                                                           return;
                                                                        }
+                                                                       bool align = a.NewValue == CheckState.Checked;
+                                                                       AlignKeys (align);
                                                                    };
 
         _app?.TopRunnableView.Add (alignKeysShortcut);
@@ -85,24 +86,24 @@ public class Shortcuts : Scenario
         };
 
         ((CheckBox)commandFirstShortcut.CommandView).ValueChanged += (_, eventArgs) =>
-                                                                      {
-                                                                          if (commandFirstShortcut.CommandView is not CheckBox cb)
-                                                                          {
-                                                                              return;
-                                                                          }
+                                                                     {
+                                                                         if (commandFirstShortcut.CommandView is not CheckBox cb)
+                                                                         {
+                                                                             return;
+                                                                         }
 
-                                                                          foreach (Shortcut peer in _app!.TopRunnableView!.SubViews.OfType<Shortcut> ())
-                                                                          {
-                                                                              if (eventArgs.NewValue == CheckState.Checked)
-                                                                              {
-                                                                                  peer.AlignmentModes &= ~AlignmentModes.EndToStart;
-                                                                              }
-                                                                              else
-                                                                              {
-                                                                                  peer.AlignmentModes |= AlignmentModes.EndToStart;
-                                                                              }
-                                                                          }
-                                                                      };
+                                                                         foreach (Shortcut peer in _app!.TopRunnableView!.SubViews.OfType<Shortcut> ())
+                                                                         {
+                                                                             if (eventArgs.NewValue == CheckState.Checked)
+                                                                             {
+                                                                                 peer.AlignmentModes &= ~AlignmentModes.EndToStart;
+                                                                             }
+                                                                             else
+                                                                             {
+                                                                                 peer.AlignmentModes |= AlignmentModes.EndToStart;
+                                                                             }
+                                                                         }
+                                                                     };
 
         ((CheckBox)commandFirstShortcut.CommandView).Value =
             commandFirstShortcut.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.UnChecked : CheckState.Checked;
@@ -121,13 +122,13 @@ public class Shortcuts : Scenario
         };
 
         canFocusShortcut.Activated += (s, args) =>
-                                       {
-                                           if ((s as Shortcut)?.CommandView is not CheckBox cb)
-                                           {
-                                               return;
-                                           }
-                                           SetCommandViewsCanFocus (cb.Value == CheckState.Checked);
-                                       };
+                                      {
+                                          if ((s as Shortcut)?.CommandView is not CheckBox cb)
+                                          {
+                                              return;
+                                          }
+                                          SetCommandViewsCanFocus (cb.Value == CheckState.Checked);
+                                      };
         _app?.TopRunnableView.Add (canFocusShortcut);
 
         var appShortcut = new Shortcut
@@ -175,9 +176,9 @@ public class Shortcuts : Scenario
             Key = Key.F2,
             Width = Dim.Fill (eventLog),
             CommandView = new OptionSelector<Orientation>
-            {
-                Id = "optionSelectorOS", Orientation = Orientation.Vertical, MouseHighlightStates = MouseState.None
-            }
+                {
+                    Id = "optionSelectorOS", Orientation = Orientation.Vertical, MouseHighlightStates = MouseState.None
+                }
         };
 
         _app?.TopRunnableView.Add (optionSelectorShortcut);
@@ -203,7 +204,11 @@ public class Shortcuts : Scenario
                                                                             {
                                                                                 if (send is LinearRange<string> lr)
                                                                                 {
-                                                                                    eventLog.Log ($"OptionsChanged: {lr.GetType ().Name} - {string.Join (",", lr.GetSetOptions ())}");
+                                                                                    eventLog.Log ($"OptionsChanged: {
+                                                                                        lr.GetType ().Name
+                                                                                    } - {
+                                                                                        string.Join (",", lr.GetSetOptions ())
+                                                                                    }");
                                                                                 }
                                                                             };
 
@@ -370,57 +375,59 @@ public class Shortcuts : Scenario
 
         _app?.TopRunnableView.Add (textFieldShortcut);
 
-        var bgColorShortcut = new Shortcut
+        // Set the CommandView to a ColorPicker16. This demonstrates how to support handling direct value changes
+        // when the user activates the CommandView and cycling the value if the user activates any other part
+        // of the Shortcut. The trick is to mark the Activating event as handled if the source of the command
+        // was the CommandView.
+        ColorPicker16 bgColor = new () { Id = "bgColorCP", BoxHeight = 1, BoxWidth = 1 };
+
+        Shortcut bgColorShortcut = new ()
         {
             Id = "bgColor",
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.AnchorEnd (),
             Key = Key.F9,
-            HelpText = "Cycles BG Color"
+            HelpText = "Cycles BG Color",
+            CommandView = bgColor
         };
 
-        var bgColor = new ColorPicker16 { Id = "bgColorCP", BoxHeight = 1, BoxWidth = 1 };
-
-        bgColorShortcut.Action += () =>
+        bgColorShortcut.Activating += (s, args) =>
                                       {
-                                          if (bgColor.SelectedColor == ColorName16.White)
+                                          // Cycle colors only if activating didn't come from the CommandView
+                                          if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColorShortcut.CommandView)
                                           {
-                                              bgColor.SelectedColor = ColorName16.Black;
-
-                                              return;
+                                              args.Handled = true;
                                           }
+                                          else
+                                          {
+                                              if (bgColor.SelectedColor == ColorName16.White)
+                                              {
+                                                  bgColor.SelectedColor = ColorName16.Black;
 
-                                          bgColor.SelectedColor++;
+                                                  return;
+                                              }
+
+                                              bgColor.SelectedColor++;
+                                          }
                                       };
 
-        bgColorShortcut.Activating += (s, args) =>
-                                  {
-                                      // Cycle colors only if activating didn't come from the commandview
-                                      if (args.Context.TryGetSource (out View? ctxSource) == true && ctxSource is ColorPicker16)
-                                      {
-
-                                      }
-                                  };
-
         bgColor.ValueChanged += (sendingView, args) =>
-                                                            {
-                                                                if (sendingView is { })
-                                                                {
-                                                                    _app!.TopRunnableView!.SetScheme (new Scheme (_app.TopRunnableView.GetScheme ())
-                                                                    {
-                                                                        Normal =
-                                                                            new Attribute (_app.TopRunnableView
-                                                                                               .GetAttributeForRole (VisualRole.Normal)
-                                                                                               .Foreground,
-                                                                                           args.NewValue,
-                                                                                           _app.TopRunnableView
-                                                                                               .GetAttributeForRole (VisualRole.Normal)
-                                                                                               .Style)
-                                                                    });
-                                                                }
-                                                            };
-        bgColorShortcut.CommandView = bgColor;
-
+                                {
+                                    if (sendingView is { })
+                                    {
+                                        _app!.TopRunnableView!.SetScheme (new Scheme (_app.TopRunnableView.GetScheme ())
+                                        {
+                                            Normal =
+                                                new Attribute (_app.TopRunnableView
+                                                                   .GetAttributeForRole (VisualRole.Normal)
+                                                                   .Foreground,
+                                                               args.NewValue,
+                                                               _app.TopRunnableView
+                                                                   .GetAttributeForRole (VisualRole.Normal)
+                                                                   .Style)
+                                        });
+                                    }
+                                };
         _app?.TopRunnableView.Add (bgColorShortcut);
 
         var appQuitShortcut = new Shortcut
@@ -468,10 +475,11 @@ public class Shortcuts : Scenario
                 {
                     //peer.CanFocus = canFocus;
                     peer.CommandView.CanFocus = canFocus;
+
                     //peer.SetFocus ();
                 }
             }
-            canFocusShortcut.HelpText = $"Sets all CommandView's .CanFocus ({(canFocus)})";
+            canFocusShortcut.HelpText = $"Sets all CommandView's .CanFocus ({canFocus})";
         }
 
         void AlignKeys (bool align)

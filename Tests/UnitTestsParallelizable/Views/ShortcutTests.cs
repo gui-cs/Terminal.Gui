@@ -5,6 +5,39 @@ namespace ViewsTests;
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests
 {
+    // Test view for Shortcut tests
+    private sealed class ShortcutTestView : View, IValue<int?>
+    {
+        public int? Value
+        {
+            get;
+            set
+            {
+                if (field == value)
+                {
+                    return;
+                }
+                int? oldValue = field;
+                field = value;
+                OnValueChanging (oldValue, value);
+                OnValueChanged (oldValue, value);
+            }
+        }
+
+        public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+        private void OnValueChanging (int? oldValue, int? newValue) =>
+            ValueChanging?.Invoke (this, new ValueChangingEventArgs<int?> (oldValue, newValue));
+
+        private void OnValueChanged (int? oldValue, int? newValue)
+        {
+            ValueChanged?.Invoke (this, new ValueChangedEventArgs<int?> (oldValue, newValue));
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, newValue));
+        }
+    }
+
     [Fact]
     public void Constructor_Defaults ()
     {
@@ -95,7 +128,7 @@ public class ShortcutTests
     [Fact]
     public void Size_Defaults ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
         shortcut.Layout ();
 
         Assert.Equal (2, shortcut.Frame.Width);
@@ -203,22 +236,22 @@ public class ShortcutTests
         shortcut.Layout ();
 
         // 01234
-        // -C--K 
+        // -C--K
 
         // 012345
-        // -C--K- 
+        // -C--K-
 
         // 0123456
-        // -C-H-K- 
+        // -C-H-K-
 
         // 01234567
-        // -C--H-K- 
+        // -C--H-K-
 
         // 012345678
-        // -C--H--K- 
+        // -C--H--K-
 
         // 0123456789
-        // -C--H--K- 
+        // -C--H--K-
         Assert.Equal (expectedCmdX, shortcut.CommandView.Frame.X);
         Assert.Equal (expectedHelpX, shortcut.HelpView.Frame.X);
         Assert.Equal (expectedKeyX, shortcut.KeyView.Frame.X);
@@ -263,7 +296,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Defaults_To_Empty ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         Assert.Equal (Key.Empty, shortcut.Key);
     }
@@ -271,7 +304,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Can_Be_Set ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         shortcut.Key = Key.F1;
 
@@ -281,7 +314,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Can_Be_Set_To_Empty ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         shortcut.Key = Key.Empty;
 
@@ -291,7 +324,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Set_Binds_Key_To_CommandView_Accept ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         shortcut.Key = Key.F1;
 
@@ -301,7 +334,7 @@ public class ShortcutTests
     [Fact]
     public void Key_Changing_Removes_Previous_Binding ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         shortcut.Key = Key.A;
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
@@ -315,7 +348,7 @@ public class ShortcutTests
     [Fact]
     public void BindKeyToApplication_Defaults_To_HotKey ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         Assert.False (shortcut.BindKeyToApplication);
     }
@@ -323,8 +356,8 @@ public class ShortcutTests
     [Fact]
     public void BindKeyToApplication_Can_Be_Set ()
     {
-        IApplication? app = Application.Create ();
-        var shortcut = new Shortcut { App = app };
+        IApplication app = Application.Create ();
+        Shortcut shortcut = new () { App = app };
 
         shortcut.BindKeyToApplication = true;
 
@@ -334,7 +367,7 @@ public class ShortcutTests
     [Fact]
     public void BindKeyToApplication_Changing_Adjusts_KeyBindings ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         shortcut.Key = Key.A;
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
@@ -386,7 +419,7 @@ public class ShortcutTests
     [Fact]
     public void SubView_Visibility_Controlled_By_Removal ()
     {
-        var shortcut = new Shortcut ();
+        Shortcut shortcut = new ();
 
         Assert.True (shortcut.CommandView.Visible);
         Assert.Contains (shortcut.CommandView, shortcut.SubViews);
@@ -474,25 +507,25 @@ public class ShortcutTests
     [InlineData (false, KeyCode.F1, 0, 0)]
     public void KeyDown_CheckBox_Raises_Accepted_Selected (bool canFocus, KeyCode key, int expectedAccept, int expectedSelect)
     {
-        IApplication? app = Application.Create ();
+        IApplication app = Application.Create ();
         Runnable<bool> runnable = new ();
         app.Begin (runnable);
 
-        var shortcut = new Shortcut { Key = Key.A, Text = "0", CommandView = new CheckBox { Title = "_C" }, CanFocus = canFocus };
+        Shortcut shortcut = new () { Key = Key.A, Text = "0", CommandView = new CheckBox { Title = "_C" }, CanFocus = canFocus };
         runnable.Add (shortcut);
 
         Assert.Equal (canFocus, shortcut.HasFocus);
 
         var accepted = 0;
 
-        shortcut.Accepting += (s, e) =>
+        shortcut.Accepting += (_, e) =>
                               {
                                   accepted++;
                                   e.Handled = true;
                               };
 
         var selected = 0;
-        shortcut.Activating += (s, e) => selected++;
+        shortcut.Activating += (_, _) => selected++;
 
         app.Keyboard.RaiseKeyDownEvent (key);
 
@@ -607,6 +640,7 @@ public class ShortcutTests
         // Arrange
         CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
+        // BUGBUG: This test tests nothing.
         Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
@@ -633,6 +667,7 @@ public class ShortcutTests
         // Arrange
         CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
+        // BUGBUG: This test tests nothing.
         Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
@@ -801,13 +836,13 @@ public class ShortcutTests
         Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
         var activatingFired = false;
 
-        shortcut.Activating += (_, e) => { activatingFired = true; };
+        shortcut.Activating += (_, _) => { activatingFired = true; };
 
         var acceptingFired = false;
-        shortcut.Accepting += (_, e) => { acceptingFired = true; };
+        shortcut.Accepting += (_, _) => { acceptingFired = true; };
 
         var handlingHotKeyFired = false;
-        shortcut.HandlingHotKey += (_, e) => { handlingHotKeyFired = true; };
+        shortcut.HandlingHotKey += (_, _) => { handlingHotKeyFired = true; };
 
         shortcut.InvokeCommand (Command.Activate);
 
@@ -828,16 +863,18 @@ public class ShortcutTests
     [Fact]
     public void Command_Accept_Raises_Activating_Not_Accepting ()
     {
-        using Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        using Shortcut shortcut = new ();
+        shortcut.Title = "Test";
+        shortcut.Key = Key.T.WithCtrl;
         var activatingFired = false;
 
-        shortcut.Activating += (_, e) => { activatingFired = true; };
+        shortcut.Activating += (_, _) => { activatingFired = true; };
 
         var acceptingFired = false;
-        shortcut.Accepting += (_, e) => { acceptingFired = true; };
+        shortcut.Accepting += (_, _) => { acceptingFired = true; };
 
         var handlingHotKeyFired = false;
-        shortcut.HandlingHotKey += (_, e) => { handlingHotKeyFired = true; };
+        shortcut.HandlingHotKey += (_, _) => { handlingHotKeyFired = true; };
 
         shortcut.InvokeCommand (Command.Accept);
 
@@ -857,16 +894,18 @@ public class ShortcutTests
     [Fact]
     public void Command_HotKey_Raises_HandlingHotKey_Only ()
     {
-        using Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
+        using Shortcut shortcut = new ();
+        shortcut.Title = "Test";
+        shortcut.Key = Key.T.WithCtrl;
         var activatingFired = false;
 
-        shortcut.Activating += (_, e) => { activatingFired = true; };
+        shortcut.Activating += (_, _) => { activatingFired = true; };
 
         var acceptingFired = false;
-        shortcut.Accepting += (_, e) => { acceptingFired = true; };
+        shortcut.Accepting += (_, _) => { acceptingFired = true; };
 
         var handlingHotKeyFired = false;
-        shortcut.HandlingHotKey += (_, e) => { handlingHotKeyFired = true; };
+        shortcut.HandlingHotKey += (_, _) => { handlingHotKeyFired = true; };
 
         shortcut.InvokeCommand (Command.HotKey);
 
@@ -921,5 +960,107 @@ public class ShortcutTests
         Assert.False (actionFired);
 
         shortcut.Dispose ();
+    }
+
+    // Claude - Haiku 4.5
+    /// <summary>
+    ///     Verifies that Context.TryGetSource() can be used in Activating event handlers to determine
+    ///     if the activation came from the CommandView itself.
+    ///     This pattern (shown in Shortcuts.cs:374) allows different handling based on the activation source.
+    /// </summary>
+    [Fact]
+    public void Activating_Context_TryGetSource_Identifies_CommandView_Activation ()
+    {
+        // Arrange
+        using ShortcutTestView commandView = new ();
+        commandView.Text = "Command";
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F9;
+        shortcut.HelpText = "Test";
+        shortcut.CommandView = commandView;
+
+        View? capturedSource = null;
+        var activatingFired = 0;
+
+        shortcut.Activating += (_, args) =>
+                               {
+                                   // ReSharper disable once AccessToModifiedClosure
+                                   activatingFired++;
+                                   args.Context.TryGetSource (out capturedSource);
+                               };
+
+        // Act 1 - Activate the CommandView directly (simulates clicking on the CommandView)
+        commandView.InvokeCommand (Command.Activate);
+
+        // Assert - The source should be the CommandView
+        Assert.Equal (1, activatingFired);
+        Assert.NotNull (capturedSource);
+        Assert.Same (commandView, capturedSource);
+
+        // Reset
+        capturedSource = null;
+        activatingFired = 0;
+
+        // Act 2 - Activate the Shortcut directly (not through CommandView)
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Assert - The source should be the Shortcut when activating it directly
+        Assert.Equal (1, activatingFired);
+        Assert.NotNull (capturedSource);
+        Assert.Same (shortcut, capturedSource);
+    }
+
+    // Claude - Haiku 4.5
+    /// <summary>
+    ///     Demonstrates the pattern from Shortcuts.cs:374 where Activating event is marked as Handled
+    ///     when activation comes from the CommandView, but custom logic runs otherwise.
+    /// </summary>
+    [Fact]
+    public void Activating_Can_Handle_Differently_Based_On_CommandView_Source ()
+    {
+        // Arrange
+        using ShortcutTestView commandView = new ();
+        commandView.Text = "Command";
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F9;
+        shortcut.HelpText = "Cycles value";
+        shortcut.CommandView = commandView;
+
+        var customLogicExecuted = false;
+        var handledWhenFromCommandView = false;
+
+        shortcut.Activating += (_, args) =>
+                               {
+                                   // Pattern from Shortcuts.cs:374 - check if activation came from CommandView
+                                   if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == shortcut.CommandView)
+                                   {
+                                       // Mark as handled when coming from CommandView
+                                       args.Handled = true;
+                                       handledWhenFromCommandView = true;
+                                   }
+                                   else
+                                   {
+                                       // Execute custom logic when NOT from CommandView
+                                       customLogicExecuted = true;
+                                   }
+                               };
+
+        // Act 1 - Activate the CommandView directly
+        commandView.InvokeCommand (Command.Activate);
+
+        // Assert - Should be marked as handled, custom logic should NOT run
+        Assert.True (handledWhenFromCommandView);
+        Assert.False (customLogicExecuted);
+
+        // Reset
+        handledWhenFromCommandView = false;
+        customLogicExecuted = false;
+
+        // Act 2 - Activate the Shortcut directly (not through CommandView)
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Assert - Should NOT be marked as handled, custom logic SHOULD run
+        Assert.False (handledWhenFromCommandView);
+        Assert.True (customLogicExecuted);
     }
 }
