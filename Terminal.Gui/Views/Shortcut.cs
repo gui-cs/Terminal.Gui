@@ -394,15 +394,7 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        if (IsBindingFromShortcut (args))
-        {
-            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - RaisingActivating");
-            RaiseActivating (args.Context);
-
-            // ignore handled; allow HandlingHotKey to be raised
-        }
-
-        return args.Handled;
+        return OnActivating (args);
     }
 
     /// <inheritdoc/>

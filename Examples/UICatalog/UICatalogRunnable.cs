@@ -566,7 +566,7 @@ public sealed class UICatalogRunnable : Runnable
         StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
 
         // This demonstrates a shortcut that invokes RequestStop to quit the app
-        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey/*, Action = RequestStop*/ };
+        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey, Action = RequestStop };
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 

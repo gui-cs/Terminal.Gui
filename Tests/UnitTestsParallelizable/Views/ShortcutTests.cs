@@ -894,9 +894,7 @@ public class ShortcutTests
     [Fact]
     public void Command_HotKey_Raises_HandlingHotKey_Only ()
     {
-        using Shortcut shortcut = new ();
-        shortcut.Title = "Test";
-        shortcut.Key = Key.T.WithCtrl;
+        using Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
         var activatingFired = false;
 
         shortcut.Activating += (_, _) => { activatingFired = true; };

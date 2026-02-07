@@ -222,6 +222,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                     return null;
                 }
 
+                binding.Source = binding.Target;
+
                 handled = binding.Target?.InvokeCommands (binding.Commands, binding);
             }
             else

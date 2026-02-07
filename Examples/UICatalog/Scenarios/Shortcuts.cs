@@ -136,20 +136,14 @@ public class Shortcuts : Scenario
             Id = "appShortcut",
             X = 0,
             Y = Pos.Bottom (canFocusShortcut),
-            Width = Dim.Fill (eventLog),
+            Width = 50,
             Title = "A_pp Shortcut",
             Key = Key.F1,
-            Text = "Width is DimFill",
+            Text = "Width is 50",
             BindKeyToApplication = true
         };
 
-        //_app?.TopRunnableView.CommandsToBubbleUp = [Command.Accept, Command.Activate];
-
-        appShortcut.Accepting += (_, args) =>
-                                 {
-                                     args.Handled = true;
-                                     MessageBox.Query (_app!, "App Shortcut", "You activated the App scoped shortcut!", Strings.btnOk);
-                                 };
+        appShortcut.Activated += (_, args) => { MessageBox.Query (_app!, "App Shortcut", "You activated the App scoped shortcut!", Strings.btnOk); };
 
         _app?.TopRunnableView.Add (appShortcut);
 
@@ -163,7 +157,7 @@ public class Shortcuts : Scenario
             CommandView = new Button { Id = "buttonBtn", Title = "_Button", ShadowStyle = ShadowStyle.None },
             Key = Key.K
         };
-        buttonShortcut.Accepting += Button_Clicked;
+        buttonShortcut.Activated += ButtonShortcutOnActivated;
 
         _app?.TopRunnableView.Add (buttonShortcut);
 
@@ -315,16 +309,16 @@ public class Shortcuts : Scenario
         _app?.TopRunnableView.Add (framedShortcut);
 
         // Horizontal
-        var progressShortcut = new Shortcut
+        Shortcut progressShortcut = new ()
         {
             Id = "progress",
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.AnchorEnd () - 1,
             Key = Key.F7,
-            HelpText = "Horizontal"
+            HelpText = "Cycle style"
         };
 
-        progressShortcut.CommandView = new ProgressBar
+        ProgressBar progressBar = new ()
         {
             Id = "progressPB",
             Text = "Progress",
@@ -334,9 +328,7 @@ public class Shortcuts : Scenario
             Height = 1,
             ProgressBarStyle = ProgressBarStyle.Continuous
         };
-        progressShortcut.CommandView.Width = 10;
-        progressShortcut.CommandView.Height = 1;
-        progressShortcut.CommandView.CanFocus = false;
+        progressShortcut.CommandView = progressBar;
 
         Timer timer = new (10) { AutoReset = true };
 
@@ -356,6 +348,12 @@ public class Shortcuts : Scenario
                          };
         timer.Start ();
 
+        progressShortcut.Action = () =>
+                                  {
+                                      progressBar.ProgressBarFormat = progressBar.ProgressBarFormat == ProgressBarFormat.Simple
+                                                                          ? ProgressBarFormat.SimplePlusPercentage
+                                                                          : ProgressBarFormat.Simple;
+                                  };
         _app?.TopRunnableView.Add (progressShortcut);
 
         var textField = new TextField { Id = "textFieldTF", Text = "Edit me", Width = 14, Height = 1 };
@@ -370,8 +368,8 @@ public class Shortcuts : Scenario
             CommandView = textField,
             MouseHighlightStates = MouseState.None
         };
-        textField.MouseHighlightStates = MouseState.None;
-        textField.CanFocus = false;
+
+        textFieldShortcut.Activated += (o, args) => { MessageBox.Query (_app!, "Hi", $"You entered \"{textField.Text}\"", Strings.btnOk); };
 
         _app?.TopRunnableView.Add (textFieldShortcut);
 
@@ -430,28 +428,17 @@ public class Shortcuts : Scenario
                                 };
         _app?.TopRunnableView.Add (bgColorShortcut);
 
-        var appQuitShortcut = new Shortcut
+        Shortcut appQuitShortcut = new ()
         {
             Id = "appQuit",
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.AnchorEnd () - 1,
-            Key = Key.Esc,
+            Key = Key.Esc.WithShift,
             BindKeyToApplication = true,
-            Title = "Quit",
-            HelpText = "App Scope"
+            Title = "_Quit",
+            HelpText = "App Scope",
+            Action = () => _app?.RequestStop ()
         };
-
-        appQuitShortcut.Activating += (sendingView, args) =>
-                                      {
-                                          args.Handled = true;
-                                          (sendingView as View)?.App?.RequestStop ();
-                                      };
-
-        appQuitShortcut.Accepting += (sendingView, args) =>
-                                     {
-                                         args.Handled = true;
-                                         (sendingView as View)?.App?.RequestStop ();
-                                     };
 
         _app!.TopRunnableView!.Add (appQuitShortcut);
 
@@ -502,10 +489,8 @@ public class Shortcuts : Scenario
         }
     }
 
-    private void Button_Clicked (object? sender, CommandEventArgs e)
+    private void ButtonShortcutOnActivated (object? sender, EventArgs<ICommandContext?> e)
     {
-        e.Handled = true;
-
         if (sender is View view)
         {
             MessageBox.Query (view.App!, "Hi", $"You clicked {view.Text}", Strings.btnOk);
