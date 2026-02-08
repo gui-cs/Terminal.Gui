@@ -422,6 +422,14 @@ public class TableEditor : Scenario
                                                                 _tableView!.Style.ShowVerticalCellLines = state;
                                                                 _tableView!.Update ();
                                                             }),
+                                    CreateCheckBoxMenuItem ("VerticalHeaderLines",
+                                                            "_VerticalHeaderLines",
+                                                            _tableView!.Style.ShowVerticalHeaderLines,
+                                                            state =>
+                                                            {
+                                                                _tableView!.Style.ShowVerticalHeaderLines = state;
+                                                                _tableView!.Update ();
+                                                            }),
                                     CreateCheckBoxMenuItem ("ExpandLastColumn",
                                                             "_ExpandLastColumn",
                                                             _tableView!.Style.ExpandLastColumn,
@@ -444,6 +452,23 @@ public class TableEditor : Scenario
                                                             state =>
                                                             {
                                                                 _tableView!.Style.SmoothHorizontalScrolling = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("ScrollBarsAuto",
+                                                            "_ScrollBarsAuto",
+                                                            _tableView!.HorizontalScrollBar.AutoShow || _tableView.VerticalScrollBar.AutoShow,
+                                                            state =>
+                                                            {
+                                                                _tableView!.HorizontalScrollBar.AutoShow = state;
+                                                                _tableView!.VerticalScrollBar.AutoShow = state;
+                                                                _tableView!.Update ();
+                                                            }),
+                                    CreateCheckBoxMenuItem ("UseAllRowsForContentCalculation",
+                                                            "_UseAllRowsForContentCalculation",
+                                                            _tableView!.UseAllRowsForContentCalculation,
+                                                            state =>
+                                                            {
+                                                                _tableView!.UseAllRowsForContentCalculation = state;
                                                                 _tableView!.Update ();
                                                             }),
                                     new MenuItem

@@ -64,6 +64,7 @@ public class TableViewTest : Scenario
             ("ShowHorizontalBottomline", () => tableView.Style.ShowHorizontalBottomline, b => tableView.Style.ShowHorizontalBottomline = b),
             ("ExpandLastColumn", () => tableView.Style.ExpandLastColumn, b => tableView.Style.ExpandLastColumn = b),
             ("FullRowSelect", () => tableView.FullRowSelect, b => tableView.FullRowSelect = b),
+            ("UseAllRowsForContentCalculation", () => tableView.UseAllRowsForContentCalculation, b => tableView.UseAllRowsForContentCalculation = b),
             ("MinAcceptableWidth (limit col 6 = 15)", () => tableView.Style.ColumnStyles[6].MinAcceptableWidth < TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH, b => tableView.Style.ColumnStyles[6].MinAcceptableWidth = b ? 15 : TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH),
         ];
 
@@ -92,14 +93,7 @@ public class TableViewTest : Scenario
             optionsView.Add (cb);
         }
 
-        RedrawLabel redrawLabel = new RedrawLabel()
-        {
-            X = 0, Y = 15,
-            Width = 10,
-            Height = 1,
-        };
-
-        win.Add (optionsView, redrawLabel, tableView);
+        win.Add (optionsView, tableView);
 
         app.Run (win);
     }

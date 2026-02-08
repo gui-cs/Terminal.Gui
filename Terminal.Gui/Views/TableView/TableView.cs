@@ -641,11 +641,12 @@ public partial class TableView : View, IDesignable
     ///     Returns the maximum of the <paramref name="col"/> name and the maximum length of data that will be rendered
     ///     starting at <see cref="RowOffset"/> and rendering <paramref name="rowsToRender"/>
     /// </summary>
-    /// <param name="col"></param>
-    /// <param name="rowsToRender"></param>
+    /// <param name="col">ColumnIndex</param>
     /// <param name="colStyle"></param>
+    /// <param name="startRow">index of first row</param>
+    /// <param name="rowsToRender">Count of rows to inspect</param>
     /// <returns></returns>
-    private int CalculateMaxCellWidth (int col, ColumnStyle colStyle)
+    private int CalculateMaxCellWidth (int col, ColumnStyle colStyle, int startRow, int rowsToRender)
     {
         int spaceRequired = _table.ColumnNames [col].EnumerateRunes ().Sum (c => c.GetColumns ());
 
@@ -655,7 +656,7 @@ public partial class TableView : View, IDesignable
             return spaceRequired;
         }
 
-        for (int i = 0; i < Table.Rows; i++)
+        for (int i = startRow; i < startRow + rowsToRender; i++)
         {
             // expand required space if cell is bigger than the last biggest cell or header
             spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).EnumerateRunes ().Sum (c => c.GetColumns ()));
@@ -703,8 +704,9 @@ public partial class TableView : View, IDesignable
     private Size? CalculateContentSize ()
     {
         var contentSize = new Size (0, 0);
-
-        contentSize.Height += GetHeaderHeightIfAny () + Table?.Rows ?? 0;
+        var headerHeight = GetHeaderHeightIfAny ();
+        var headerHeightVisible = CurrentHeaderHeightVisible ();
+        contentSize.Height += headerHeight + Table?.Rows ?? 0;
 
         if (Style.ShowHorizontalBottomline)
         {
@@ -717,22 +719,33 @@ public partial class TableView : View, IDesignable
 
         if (Table != null)
         {
-            List<(int colIdx, ColumnStyle colStyle)> visibleColumns = Enumerable.Range (0, Table.Columns)
+            List<(int colIdx, ColumnStyle colStyle)> nonHiddenColumns = Enumerable.Range (0, Table.Columns)
                                                                                 .Select(c => (colIdx: c, colStyle: Style.GetColumnStyleIfAny (c)))
                                                                                 .Where (e => e.colStyle?.Visible != false)
                                                                                 .ToList();
 
-            int lastColIdx = visibleColumns.Any ()
-                                 ? visibleColumns.Last ().colIdx
+            int lastColIdx = nonHiddenColumns.Any ()
+                                 ? nonHiddenColumns.Last ().colIdx
                                  : -1;
 
             //right border
             contentSize.Width += (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
 
-            // Calculate the content size based on the table's data
-            foreach ((int colIdx, ColumnStyle colStyle) in visibleColumns)
+            int startRow = 0;
+            int rowsToRender = Table.Rows;
+            if (!UseAllRowsForContentCalculation)
             {
-                int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle) + padding;
+                startRow = Style.AlwaysShowHeaders
+                    ? Viewport.Y
+                    : Math.Max (Viewport.Y - headerHeight, 0);
+
+                rowsToRender = Math.Min(Viewport.Height - headerHeightVisible, Table.Rows);
+            }
+
+            // Calculate the content size based on the table's data
+            foreach ((int colIdx, ColumnStyle colStyle) in nonHiddenColumns)
+            {
+                int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle, startRow, rowsToRender) + padding;
                 int colWidth = maxContentSize + padding;
 
                 if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)

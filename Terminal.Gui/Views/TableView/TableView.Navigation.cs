@@ -27,6 +27,16 @@ public partial class TableView
         }
     }
 
+    public bool UseAllRowsForContentCalculation
+    {
+        get => field;
+        set
+        {
+            field = value;
+            RefreshContentSize ();
+        }
+    }
+
     /// <summary>
     /// Recalculates and updates the content size based on the current state.
     /// </summary>
@@ -41,8 +51,11 @@ public partial class TableView
     protected override void OnViewportChanged (DrawEventArgs e)
     {
         base.OnViewportChanged (e);
-        if (e.OldViewport.Size != e.NewViewport.Size)
+        if (e.OldViewport.Size != e.NewViewport.Size ||
+            !UseAllRowsForContentCalculation && e.OldViewport.Y != e.NewViewport.Y)
+        {
             RefreshContentSize (); //mainly needed only for ExpandLastColumn?!
+        }
     }
 
     /// <inheritdoc />
