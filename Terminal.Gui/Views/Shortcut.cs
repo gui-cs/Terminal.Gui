@@ -258,7 +258,9 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         KeyBinding? keyBinding = commandContext?.Binding as KeyBinding?;
 
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
+        string sourceTitle = commandContext?.TryGetSource (out View? sourceView) == true ? sourceView.Title : "(null)";
+
+        Logging.Debug ($"{Title} ({sourceTitle}) Command: {commandContext?.Command}");
 
         if (keyBinding is { } kb && kb.Data != this)
         {
@@ -267,12 +269,12 @@ public class Shortcut : View, IOrientation, IDesignable
             // If this causes CommandView to raise Accept, we eat it
             KeyBinding updatedBinding = kb with { Data = this };
 
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
+            Logging.Debug ($"{Title} ({sourceTitle}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
             CommandView.InvokeCommand (Command.Activate, updatedBinding);
         }
 
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
+        Logging.Debug ($"{Title} ({sourceTitle}) - RaiseActivating ...");
 
         if (RaiseActivating (commandContext) is true)
         {
@@ -282,7 +284,7 @@ public class Shortcut : View, IOrientation, IDesignable
         if (CanFocus && SuperView is { CanFocus: true })
         {
             // The default HotKey handler sets Focus
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - SetFocus...");
+            Logging.Debug ($"{Title} ({sourceTitle}) - SetFocus...");
             SetFocus ();
         }
 
@@ -290,10 +292,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (commandContext is { Source: null })
         {
-            commandContext.Source = this;
+            commandContext.Source = new WeakReference<View> (this);
         }
 
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Calling RaiseAccepting...");
+        Logging.Debug ($"{Title} ({sourceTitle}) - Calling RaiseAccepting...");
         cancel = RaiseAccepting (commandContext) is true;
 
         if (cancel)
@@ -303,7 +305,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (Action is { })
         {
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoke Action...");
+            Logging.Debug ($"{Title} ({sourceTitle}) - Invoke Action...");
             Action.Invoke ();
 
             // Assume if there's a subscriber to Action, it's handled.

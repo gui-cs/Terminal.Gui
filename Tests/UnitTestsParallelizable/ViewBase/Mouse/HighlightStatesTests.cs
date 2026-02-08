@@ -13,7 +13,15 @@ public class HighlightStatesTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
 
         using Runnable runnable = new ();
-        View view = new () { X = 0, Y = 0, Width = 10, Height = 10, MouseHighlightStates = mouseState };
+
+        View view = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            MouseHighlightStates = mouseState
+        };
 
         List<MouseFlags> receivedFlags = [];
         view.MouseEvent += MouseEventHandler;
@@ -29,10 +37,12 @@ public class HighlightStatesTests (ITestOutputHelper output)
         IInputInjector injector = app.GetInputInjector ();
 
         // First click at T+0
-        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+        injector.InjectMouse (new Mouse
+                              {
+                                  ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100)
+                              },
                               options);
 
         // Assert
@@ -45,7 +55,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         return;
 
-        void MouseEventHandler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
+        void MouseEventHandler (object? s, Mouse e) => receivedFlags.Add (e.Flags);
     }
 
     [Theory]
@@ -56,7 +66,15 @@ public class HighlightStatesTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
 
         using Runnable runnable = new ();
-        View view = new () { X = 0, Y = 0, Width = 10, Height = 10, MouseHighlightStates = mouseState };
+
+        View view = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            MouseHighlightStates = mouseState
+        };
 
         var activateCount = 0;
         view.Activating += (_, _) => activateCount++;
@@ -72,10 +90,12 @@ public class HighlightStatesTests (ITestOutputHelper output)
         IInputInjector injector = app.GetInputInjector ();
 
         // First click at T+0
-        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+        injector.InjectMouse (new Mouse
+                              {
+                                  ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100)
+                              },
                               options);
 
         // Assert
@@ -94,7 +114,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Attribute highlight = new (ColorName16.Blue, ColorName16.Black, TextStyle.Italic);
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
-        superview.SetScheme (new () { Focus = focus, Highlight = highlight });
+        superview.SetScheme (new Scheme { Focus = focus, Highlight = highlight });
         View view = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hi |", MouseHighlightStates = MouseState.In };
         superview.Add (view);
 
@@ -107,7 +127,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre ("| Hi |", output, app.Driver);
 
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 0), Flags = MouseFlags.PositionReport });
         app.LayoutAndDraw ();
 
         for (var i = 0; i < app.Driver?.Cols; i++)
@@ -132,7 +152,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Attribute highlight = new (ColorName16.Blue, ColorName16.Black, TextStyle.Italic);
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
-        superview.SetScheme (new () { Focus = focus, Highlight = highlight });
+        superview.SetScheme (new Scheme { Focus = focus, Highlight = highlight });
         View view = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hi |", MouseHighlightStates = MouseState.In };
         superview.Add (view);
 
@@ -142,7 +162,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Attribute highlight2 = new (ColorName16.Red, ColorName16.Yellow, TextStyle.Italic);
 
         Runnable modalSuperview = new () { Y = 1, Width = 9, Height = 4, BorderStyle = LineStyle.Single };
-        modalSuperview.SetScheme (new () { Normal = normal, Highlight = highlight2 });
+        modalSuperview.SetScheme (new Scheme { Normal = normal, Highlight = highlight2 });
         View view2 = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hey |", MouseHighlightStates = MouseState.In };
         modalSuperview.Add (view2);
 
@@ -158,8 +178,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
             Assert.Equal (normal, app.Driver.Contents? [2, i].Attribute);
         }
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               | Hi |
                                               ┌───────┐
                                               │| Hey |│
@@ -169,7 +188,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
 
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (2, 2), Flags = MouseFlags.PositionReport });
         app.LayoutAndDraw ();
 
         for (var i = 0; i < app.Driver?.Cols; i++)
@@ -182,8 +201,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
             Assert.Equal (highlight2, app.Driver?.Contents? [2, i].Attribute);
         }
 
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               | Hi |
                                               ┌───────┐
                                               │| Hey |│
@@ -239,7 +257,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Assert.Equal (MouseState.None, view2.MouseState);
 
         // Press mouse button on view1
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // view1 should have Pressed state (may also have In)
         Assert.True (view1.MouseState.HasFlag (MouseState.Pressed));
@@ -249,28 +267,28 @@ public class HighlightStatesTests (ITestOutputHelper output)
         view2States.Clear ();
 
         // Move mouse over view2 while still holding the button down
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 0), Flags = MouseFlags.PositionReport });
 
         // view2 should NOT be highlighted
         Assert.Equal (MouseState.None, view2.MouseState);
         Assert.Empty (view2States);
 
         // Move mouse within view2 to a different position (still holding button)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (20, 1), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (20, 1), Flags = MouseFlags.PositionReport });
 
         // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
         Assert.Equal (MouseState.None, view2.MouseState);
         Assert.Empty (view2States);
 
         // Move mouse out of view2 (into empty space)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 2), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 2), Flags = MouseFlags.PositionReport });
 
         // view2 should still be None
         Assert.Equal (MouseState.None, view2.MouseState);
         Assert.Empty (view2States);
 
         // Move back into view2 at different position (still holding button)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (25, 2), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (25, 2), Flags = MouseFlags.PositionReport });
 
         // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
         Assert.Equal (MouseState.None, view2.MouseState);
@@ -324,7 +342,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Assert.Equal (MouseState.None, view2.MouseState);
 
         // Press mouse button on view1
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // view1 should have Pressed state (may also have In)
         Assert.True (view1.MouseState.HasFlag (MouseState.Pressed));
@@ -334,28 +352,28 @@ public class HighlightStatesTests (ITestOutputHelper output)
         view2States.Clear ();
 
         // Move mouse over view2 while still holding the button down
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 0), Flags = MouseFlags.PositionReport });
 
         // view2 should NOT be highlighted
         Assert.Equal (MouseState.None, view2.MouseState);
         Assert.Empty (view2States);
 
         // Move mouse within view2 to a different position (still holding button)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (20, 1), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (20, 1), Flags = MouseFlags.PositionReport });
 
         // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
         Assert.Equal (MouseState.None, view2.MouseState);
         Assert.Empty (view2States);
 
         // Move mouse out of view2 (into empty space)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 2), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 2), Flags = MouseFlags.PositionReport });
 
         // view2 should still be None
         Assert.Equal (MouseState.None, view2.MouseState);
         Assert.Empty (view2States);
 
         // Move back into view2 at different position (still holding button)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (25, 2), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (25, 2), Flags = MouseFlags.PositionReport });
 
         // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
         Assert.Equal (MouseState.None, view2.MouseState);
@@ -405,20 +423,20 @@ public class HighlightStatesTests (ITestOutputHelper output)
         app.Begin (runnable);
 
         // Press on view1
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // Drag to view2
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 0), Flags = MouseFlags.PositionReport });
 
         // view2 should not be highlighted during drag
         Assert.Equal (MouseState.None, view2.MouseState);
         Assert.Empty (view2States);
 
         // Release button while over view2
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 0), Flags = MouseFlags.LeftButtonReleased });
 
         // Send Clicked event (this is what triggers ungrab)
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.LeftButtonClicked });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 0), Flags = MouseFlags.LeftButtonClicked });
 
         // After clicked (which ungrabs), view2 should get MouseState.In (mouse is now over it and no button is pressed)
         Assert.Equal (MouseState.In, view2.MouseState);
@@ -477,7 +495,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         app.Begin (runnable);
 
         // Press on view1
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // Verify view1 grabbed the mouse
         Assert.True (app.Mouse.IsGrabbed (view1));
@@ -487,7 +505,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         view2EnterCalled = false;
 
         // Drag to view2 position (15, 0) - button still held
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 0), Flags = MouseFlags.PositionReport });
 
         // CRITICAL: view2 should NOT receive MouseEnter event
         Assert.False (view2EnterCalled, "view2 received MouseEnter event during drag from view1");
@@ -495,7 +513,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Assert.Equal (MouseState.None, view2.MouseState);
 
         // Move WITHIN view2 to position (15, 1) - still holding button
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 1), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 1), Flags = MouseFlags.PositionReport });
 
         // CRITICAL: view2 should STILL not receive any events
         Assert.False (view2EnterCalled, "view2 received MouseEnter event while dragging within it");
@@ -503,7 +521,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Assert.Equal (MouseState.None, view2.MouseState);
 
         // Move OUT of view2 back to view1 area - still holding button
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 0), Flags = MouseFlags.PositionReport });
 
         // view2 should still have no events (it was never "in" so no "leave")
         Assert.False (view2EnterCalled);
@@ -511,7 +529,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Assert.Equal (MouseState.None, view2.MouseState);
 
         // Move BACK into view2 - still holding button
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (15, 0), Flags = MouseFlags.PositionReport });
 
         // CRITICAL: view2 should STILL not receive any events
         Assert.False (view2EnterCalled, "view2 received MouseEnter event when re-entering during drag");
