@@ -26,7 +26,7 @@ public partial class TableView : View, IDesignable
 
     /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
-    public TableView (ITableSource table) : this () => Table = table;
+    public TableView (ITableSource table) : this () { Table = table; }
 
     /// <summary>
     ///     Initializes a <see cref="TableView"/> class. Set the

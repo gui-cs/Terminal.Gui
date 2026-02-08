@@ -55,9 +55,15 @@ public partial class TableView
                 └────────────────────┴──────────┴───────────┴──────────────┴─────────┘
             */
 
+            bool ShouldRenderNextHeaderLine ()
+            {
+                //is the header line not scrolled or shall it always be shown? and do we have space to render it?
+                return (Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height;
+            }
+
             if (Style.ShowHorizontalHeaderOverline)
             {
-                if ((Viewport.Y <= line || Style.AlwaysShowHeaders) && line < Viewport.Height)
+                if (ShouldRenderNextHeaderLine())
                 {
                     RenderHeaderOverline (line, availableWidth, columnsToRender);
                     line++;
@@ -67,7 +73,7 @@ public partial class TableView
 
             if (Style.ShowHeaders)
             {
-                if ((Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height)
+                if (ShouldRenderNextHeaderLine())
                 {
                     RenderHeaderMidline (line, availableWidth, columnsToRender);
                     line++;
@@ -77,7 +83,7 @@ public partial class TableView
 
             if (Style.ShowHorizontalHeaderUnderline)
             {
-                if ((Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height)
+                if (ShouldRenderNextHeaderLine())
                 {
                     RenderHeaderUnderline (line, availableWidth, columnsToRender);
                     line++;
@@ -128,12 +134,10 @@ public partial class TableView
     ///     <see cref="ColumnStyle.ColorGetter"/>. For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>.
     /// </summary>
-    /// <param name="ypos">the x value where to render the cell (absolute value in context of GetContentSize)</param>
-    /// <param name="xpos">the y value where to render the cell (absolute value in context of GetContentSize)</param>
     /// <param name="cellAttribute"></param>
     /// <param name="render"></param>
     /// <param name="isPrimaryCell"></param>
-    protected virtual void RenderCell (int xpos, int ypos, Attribute cellAttribute, string render, bool isPrimaryCell)
+    protected virtual void RenderCell (Attribute cellAttribute, string render, bool isPrimaryCell)
     {
         // If the cell is the selected col/row then draw the first rune in inverted colors
         // this allows the user to track which cell is the active one during a multi cell
@@ -147,7 +151,7 @@ public partial class TableView
 
             // invert the color of the current cell for the first character
             SetAttribute (new Attribute (cellAttribute.Foreground, cellAttribute.Background, TextStyle.Reverse));
-            RenderRune (xpos, ypos, (Rune) render [0]);
+            AddRune (render [0]);
 
             if (render.Length <= 1)
             {
@@ -155,12 +159,12 @@ public partial class TableView
             }
 
             SetAttribute (cellAttribute);
-            RenderStr (xpos, ypos, render [1..]);
+            AddStr (render [1..]);
         }
         else
         {
             SetAttribute (cellAttribute);
-            RenderStr (xpos, ypos, render);
+            AddStr (render);
         }
     }
 
@@ -210,35 +214,6 @@ public partial class TableView
         }
     }
 
-    /// <summary>
-    /// renders the text but does clipping if needed
-    /// </summary>
-    /// <param name="col">col is absolute, see GetContentSize</param>
-    /// <param name="row"></param>
-    /// <param name="text"></param>
-    private void RenderStr (int col, int row, string text)
-    {
-        // check if within visible viewport
-        if (col + text.Length >= Viewport.X && col < Viewport.Right)
-        {
-            var x = col - Viewport.X;
-
-            if (x < 0)
-            {
-                text = text [-x..];
-                x = 0;
-            }
-            var clipEnd = (col + text.Length) - Viewport.Right;
-
-            if (clipEnd > 0)
-            {
-                text = text [..^clipEnd];
-            }
-
-            AddStr (x, row, text);
-        }
-    }
-
     private void RenderHeaderMidline (int row, int availableWidth, ColumnToRender [] columnsToRender)
     {
         // Renders something like:
@@ -257,8 +232,8 @@ public partial class TableView
             ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
             string colName = _table.ColumnNames [current.Column];
             RenderSeparator (current.X - 1, row, true);
-
-            RenderStr (current.X, row, TruncateOrPad (colName, colName, current.Width, colStyle));
+            Move (current.X - Viewport.X, row);
+            AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
 
             if (!Style.ExpandLastColumn && current.IsVeryLast)
             {
@@ -414,7 +389,8 @@ public partial class TableView
 
             // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
             bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
-            RenderCell (current.X, row, cellColor, render, isPrimaryCell);
+            Move (current.X - Viewport.X, row);
+            RenderCell (cellColor, render, isPrimaryCell);
 
             // Reset scheme to normal for drawing separators if we drew text with custom scheme
             if (scheme != rowScheme)

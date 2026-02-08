@@ -41,7 +41,8 @@ public partial class TableView
     protected override void OnViewportChanged (DrawEventArgs e)
     {
         base.OnViewportChanged (e);
-        RefreshContentSize (); //mainly needed only for ExpandLastColumn?!
+        if (e.OldViewport.Size != e.NewViewport.Size)
+            RefreshContentSize (); //mainly needed only for ExpandLastColumn?!
     }
 
     /// <inheritdoc />

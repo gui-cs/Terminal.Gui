@@ -34,8 +34,10 @@ public class TableViewTest : Scenario
             Y = 0, X = 0,
             Width = Dim.Fill (), Height = Dim.Auto(),
             BorderStyle = LineStyle.Single,
-            Title = "Options"
+            Title = "Options",
         };
+
+        View.Diagnostics = ViewDiagnosticFlags.DrawIndicator;
 
         tableView = new TableView
         {
