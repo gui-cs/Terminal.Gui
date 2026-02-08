@@ -37,7 +37,7 @@ public partial class TableView
         _scrollLeftPoint = null;
 
         // What columns to render at what X offset in viewport
-        ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
+        ColumnToRender [] cellInfos = NonHiddenCellInfos ();
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         // invalidate current row (prevents scrolling around leaving old characters in the frame
@@ -65,7 +65,7 @@ public partial class TableView
             {
                 if (ShouldRenderNextHeaderLine())
                 {
-                    RenderHeaderOverline (line, availableWidth, columnsToRender);
+                    RenderHeaderOverline (line, availableWidth, cellInfos);
                     line++;
                 }
                 headerLinesHandled++;
@@ -75,7 +75,7 @@ public partial class TableView
             {
                 if (ShouldRenderNextHeaderLine())
                 {
-                    RenderHeaderMidline (line, availableWidth, columnsToRender);
+                    RenderHeaderMidline (line, availableWidth, cellInfos);
                     line++;
                 }
                 headerLinesHandled++;
@@ -85,7 +85,7 @@ public partial class TableView
             {
                 if (ShouldRenderNextHeaderLine())
                 {
-                    RenderHeaderUnderline (line, availableWidth, columnsToRender);
+                    RenderHeaderUnderline (line, availableWidth, cellInfos);
                     line++;
                 }
                 headerLinesHandled++;
@@ -115,13 +115,13 @@ public partial class TableView
             {
                 if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline)
                 {
-                    RenderBottomLine (line, availableWidth, columnsToRender);
+                    RenderBottomLine (line, availableWidth, cellInfos);
                 }
 
                 continue;
             }
 
-            RenderRow (line, rowToRender, columnsToRender);
+            RenderRow (line, rowToRender, cellInfos);
         }
 
         return true;

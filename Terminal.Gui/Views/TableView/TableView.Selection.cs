@@ -132,10 +132,10 @@ public partial class TableView
             return;
         }
 
-        ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
+        ColumnToRender [] cellInfos = NonHiddenCellInfos ();
         int headerHeight = GetHeaderHeightIfAny ();
 
-        var selectedColToRender = columnsToRender.FirstOrDefault (c => c.Column == SelectedColumn);
+        var selectedColToRender = cellInfos.FirstOrDefault (c => c.Column == SelectedColumn);
 
         if (SelectedColumn < 0 || selectedColToRender == null || SelectedRow < 0 || SelectedRow >= Table.Rows)
         {
@@ -171,8 +171,10 @@ public partial class TableView
             Viewport = Viewport with {Y = Viewport.Y + (SelectedRow - rowEnd)};
         }
 
-        var colStart = columnsToRender.FirstOrDefault (c => c.X + c.Width - 1 > Viewport.Left);
-        var colEnd = columnsToRender.LastOrDefault (c => c.X < Viewport.Right);
+        //first column that is visible from start
+        var colStart = cellInfos.FirstOrDefault (c => c.X - 1 > Viewport.Left);
+        //last column that is visible (at least the start)
+        var colEnd = cellInfos.LastOrDefault (c => c.X < Viewport.Right);
 
         if (colEnd is not null && SelectedColumn >= colEnd.Column)
         {

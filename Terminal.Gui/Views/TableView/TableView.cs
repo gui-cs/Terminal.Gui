@@ -352,6 +352,8 @@ public partial class TableView : View, IDesignable
         }
     }
 
+    private ColumnToRender[] _columnsToRenderCache = null;
+
     /// <summary>
     ///     This event is raised when a cell is activated e.g. by double-clicking or pressing
     ///     <see cref="CellActivationKey"/>
@@ -375,9 +377,9 @@ public partial class TableView : View, IDesignable
             return null;
         }
 
-        IEnumerable<ColumnToRender> viewPort = CalculateViewport (Viewport);
+        ColumnToRender [] cellInfos = NonHiddenCellInfos ();
         int headerHeight = GetHeaderHeightIfAny ();
-        ColumnToRender colHit = viewPort.FirstOrDefault (c => c.Column == tableColumn);
+        ColumnToRender colHit = cellInfos.FirstOrDefault (c => c.Column == tableColumn);
 
         // current column is outside the scroll area
         if (colHit is null)
@@ -518,12 +520,12 @@ public partial class TableView : View, IDesignable
             return null;
         }
 
-        IEnumerable<ColumnToRender> viewPort = CalculateViewport (Viewport);
+        ColumnToRender [] cellInfos = NonHiddenCellInfos ();
         int rowIdx;
         ColumnToRender col;
 
         var currentHeaderHeightVisible = CurrentHeaderHeightVisible ();
-        col = viewPort.LastOrDefault (c => c.X <= clientX + Viewport.X);
+        col = cellInfos.LastOrDefault (c => c.X <= clientX + Viewport.X);
         offsetX = clientX + Viewport.X - col?.X;
 
         if (clientY < currentHeaderHeightVisible)
@@ -685,116 +687,17 @@ public partial class TableView : View, IDesignable
     }
 
     /// <summary>
-    ///     Calculates which columns should be rendered given the <paramref name="bounds"/> in which to display and the
-    ///     <see cref="ColumnOffset"/>
+    ///     Returns the cells that shall be shown (all cells except the hidden ones)
     /// </summary>
-    /// <param name="bounds"></param>
-    /// <param name="padding"></param>
     /// <returns></returns>
-    private IEnumerable<ColumnToRender> CalculateViewport (Rectangle bounds, int padding = 1)
+    private ColumnToRender [] NonHiddenCellInfos ()
     {
-        if (TableIsNullOrInvisible ())
+        if (TableIsNullOrInvisible () || _columnsToRenderCache == null || !_columnsToRenderCache.Any ())
         {
-            return Enumerable.Empty<ColumnToRender> ();
+            return Array.Empty<ColumnToRender> ();
         }
 
-        bounds = new Rectangle (new Point (0, 0), GetContentSize ());
-
-        List<ColumnToRender> toReturn = new ();
-        var usedSpace = 0;
-
-        // if horizontal space is required at the start of the line (before the first header)
-        if (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines)
-        {
-            usedSpace += 1;
-        }
-
-        int availableHorizontalSpace = bounds.Width;
-
-        var first = true;
-        int lastColumn = Table.Columns - 1;
-
-        // TODO : Maybe just a for loop?
-        foreach (int col in Enumerable.Range (0, Table.Columns))
-        {
-            int startingIdxForCurrentHeader = usedSpace;
-            ColumnStyle colStyle = Style.GetColumnStyleIfAny (col);
-
-            // if column is not being rendered
-            if (colStyle?.Visible == false)
-            {
-                // do not add it to the returned columns
-                continue;
-            }
-
-            // is there enough space for this column (and it's data)?
-            int colWidth = CalculateMaxCellWidth (col, colStyle) + padding;
-
-            if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
-            {
-                if (MinCellWidth > MaxCellWidth)
-                {
-                    colWidth = MaxCellWidth + padding;
-                }
-                else
-                {
-                    colWidth = MinCellWidth + padding;
-                }
-            }
-
-            // there is not enough space for this columns
-            // visible content
-            if (usedSpace + colWidth > availableHorizontalSpace)
-            {
-                var showColumn = false;
-
-                // if this column accepts flexible width rendering and
-                // is therefore happy rendering into less space
-                if (colStyle is {MinAcceptableWidth: > 0}
-                    && // is there enough space to meet the MinAcceptableWidth
-                    availableHorizontalSpace - usedSpace >= colStyle.MinAcceptableWidth)
-                {
-                    // show column and use whatever space is
-                    // left for rendering it
-                    showColumn = true;
-                    colWidth = availableHorizontalSpace - usedSpace;
-                }
-
-                // If it's the only column we are able to render then
-                // accept it anyway (that must be one massively wide column!)
-                if (first)
-                {
-                    showColumn = true;
-                }
-
-                // no special exceptions and we are out of space
-                // so stop accepting new columns for the render area
-                if (!showColumn)
-                {
-                    break;
-                }
-            }
-
-            usedSpace += colWidth;
-
-            // required for if we end up here because first == true i.e. we have a single massive width (overspilling bounds) column to present
-            colWidth = Math.Min (availableHorizontalSpace, colWidth);
-            bool isVeryLast = lastColumn == col;
-
-            // there is space
-            toReturn.Add (new ColumnToRender (col, startingIdxForCurrentHeader, colWidth, isVeryLast));
-            first = false;
-        }
-
-        if (!Style.ExpandLastColumn)
-        {
-            return toReturn;
-        }
-
-        ColumnToRender last = toReturn.Last ();
-        last.Width = Math.Max (last.Width, availableHorizontalSpace - last.X);
-
-        return toReturn;
+        return _columnsToRenderCache;
     }
 
     private Size? CalculateContentSize ()
@@ -810,22 +713,27 @@ public partial class TableView : View, IDesignable
 
         // we assume that padding is 0 here
         var padding = 0;
+        var columnsToRender = new List<ColumnToRender> ();
 
         if (Table != null)
         {
+            List<(int colIdx, ColumnStyle colStyle)> visibleColumns = Enumerable.Range (0, Table.Columns)
+                                                                                .Select(c => (colIdx: c, colStyle: Style.GetColumnStyleIfAny (c)))
+                                                                                .Where (e => e.colStyle?.Visible != false)
+                                                                                .ToList();
+
+            int lastColIdx = visibleColumns.Any ()
+                                 ? visibleColumns.Last ().colIdx
+                                 : -1;
+
+            //right border
+            contentSize.Width += (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
+
             // Calculate the content size based on the table's data
-            foreach (int col in Enumerable.Range (0, Table.Columns))
+            foreach ((int colIdx, ColumnStyle colStyle) in visibleColumns)
             {
-                ColumnStyle colStyle = Style.GetColumnStyleIfAny (col);
-
-                // if column is not being rendered
-                if (colStyle?.Visible == false)
-                {
-                    // do not calculate space for invisible columns
-                    continue;
-                }
-
-                int colWidth = CalculateMaxCellWidth (col, colStyle) + padding;
+                int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle) + padding;
+                int colWidth = maxContentSize + padding;
 
                 if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
                 {
@@ -842,25 +750,38 @@ public partial class TableView : View, IDesignable
                 // ToDo: MinAcceptableWidth handling?
                 // if (colStyle is { MinAcceptableWidth: > 0 }
 
+                bool isVeryLast = colIdx == lastColIdx;
+
+                if (isVeryLast)
+                {
+                    //remaining space for last column
+                    int remainingSpace = Viewport.Width - contentSize.Width - (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
+                    if (Style.ExpandLastColumn && colWidth < remainingSpace)
+                    {
+                        colWidth = remainingSpace;
+                    }
+                }
+
+                columnsToRender.Add (new ColumnToRender (colIdx, contentSize.Width, colWidth + 1, maxContentSize, lastColIdx == colIdx));
+
                 contentSize.Width += colWidth;
+
+                if (!isVeryLast)
+                {
+                    // for separator symbols between columns
+                    contentSize.Width += 1;
+                }
             }
 
-            contentSize.Width += (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0)
-                                 + // for right border
-                                 Math.Max (Table.Columns - 1, 0)
-                                 + // for separator symbols between columns
-                                 (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0); // for left border
-
-            if (Style.ExpandLastColumn && Viewport.Width > contentSize.Width)
-            {
-                contentSize.Width = Viewport.Width;
-            }
+            // for left border
+            contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
         }
         else
         {
             contentSize.Width = 0;
         }
 
+        _columnsToRenderCache = columnsToRender.ToArray();
         return contentSize;
     }
 
@@ -1051,7 +972,7 @@ public partial class TableView : View, IDesignable
     }
 
     /// <summary>Describes a desire to render a column at a given horizontal position in the UI</summary>
-    internal class ColumnToRender (int col, int x, int width, bool isVeryLast)
+    internal class ColumnToRender (int col, int x, int width, int maxContentSize, bool isVeryLast)
     {
         /// <summary>The column to render</summary>
         public int Column { get; set; } = col;
@@ -1060,10 +981,15 @@ public partial class TableView : View, IDesignable
         public bool IsVeryLast { get; } = isVeryLast;
 
         /// <summary>
-        ///     The width that the column should occupy as calculated by <see cref="CalculateViewport(Rectangle, int)"/>.  Note
+        ///     The width that the column should occupy as calculated by <see cref="TableView.CalculateContentSize"/>.  Note
         ///     that this includes space for padding i.e. the separator between columns.
         /// </summary>
         public int Width { get; internal set; } = width;
+
+        /// <summary>
+        ///     The maximum size of the content that will be rendered in this column as calculated by <see cref="CalculateMaxCellWidth(int, ColumnStyle)"/>.
+        /// </summary>
+        public int MaxContentSize { get; internal set; } = maxContentSize;
 
         /// <summary>The horizontal position to begin rendering the column at</summary>
         public int X { get; set; } = x;
