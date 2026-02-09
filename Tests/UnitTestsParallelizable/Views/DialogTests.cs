@@ -1176,6 +1176,360 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
     }
 
+    [Theory]
+    [MemberData (nameof (PosData), MemberType = typeof (DialogTests))]
+    public void Dialog_Draws_SubView_With_SubViews_WithDifferentPosTypes (Pos pos, string expected)
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (22, 9);
+
+        using Dialog dialog = new ();
+
+        dialog.Driver = driver;
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.Title = "Dialog";
+        dialog.AddButton (new Button { Text = "Cancel" });
+        dialog.AddButton (new Button { Text = "OK", IsDefault = true });
+
+        var container = new View
+        {
+            X = pos,
+            Id = "container",
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Title = "container",
+            BorderStyle = LineStyle.Single
+        };
+        var view1 = new View { Width = Dim.Auto (), Height = Dim.Auto (), Text = "view1" };
+        var view2 = new View { Y = 1, Width = Dim.Auto (), Height = Dim.Auto (), Text = "view2" };
+        container.Add (view1, view2);
+
+        dialog.Add (container);
+
+        dialog.Layout ();
+        dialog.Draw ();
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    public static TheoryData<Pos, string> PosData () =>
+        new ()
+        {
+            {
+                Pos.Absolute (0), """
+                                  ┌┤Dialog├────────────┐
+                                  │┌┤con├┐             │
+                                  ││view1│             │
+                                  ││view2│             │
+                                  │└─────┘             │
+                                  │                    │
+                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                  │                    │
+                                  └────────────────────┘
+                                  """
+            },
+            {
+                Pos.Absolute (2), """
+                                  ┌┤Dialog├────────────┐
+                                  │  ┌┤con├┐           │
+                                  │  │view1│           │
+                                  │  │view2│           │
+                                  │  └─────┘           │
+                                  │                    │
+                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                  │                    │
+                                  └────────────────────┘
+                                  """
+            },
+            {
+                Pos.Center (), """
+                               ┌┤Dialog├────────────┐
+                               │      ┌┤con├┐       │
+                               │      │view1│       │
+                               │      │view2│       │
+                               │      └─────┘       │
+                               │                    │
+                               │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                               │                    │
+                               └────────────────────┘
+                               """
+            },
+            {
+                Pos.AnchorEnd (), """
+                                  ┌┤Dialog├────────────┐
+                                  │             ┌┤con├┐│
+                                  │             │view1││
+                                  │             │view2││
+                                  │             └─────┘│
+                                  │                    │
+                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                  │                    │
+                                  └────────────────────┘
+                                  """
+            },
+            {
+                Pos.Align (Alignment.Start), """
+                                             ┌┤Dialog├────────────┐
+                                             │┌┤con├┐             │
+                                             ││view1│             │
+                                             ││view2│             │
+                                             │└─────┘             │
+                                             │                    │
+                                             │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                             │                    │
+                                             └────────────────────┘
+                                             """
+            },
+            {
+                Pos.Align (Alignment.Center), """
+                                              ┌┤Dialog├────────────┐
+                                              │      ┌┤con├┐       │
+                                              │      │view1│       │
+                                              │      │view2│       │
+                                              │      └─────┘       │
+                                              │                    │
+                                              │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                              │                    │
+                                              └────────────────────┘
+                                              """
+            },
+            {
+                Pos.Align (Alignment.End), """
+                                           ┌┤Dialog├────────────┐
+                                           │             ┌┤con├┐│
+                                           │             │view1││
+                                           │             │view2││
+                                           │             └─────┘│
+                                           │                    │
+                                           │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                           │                    │
+                                           └────────────────────┘
+                                           """
+            },
+            {
+                Pos.Align (Alignment.Fill), """
+                                            ┌┤Dialog├────────────┐
+                                            │┌┤con├┐             │
+                                            ││view1│             │
+                                            ││view2│             │
+                                            │└─────┘             │
+                                            │                    │
+                                            │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                            │                    │
+                                            └────────────────────┘
+                                            """
+            },
+            {
+                Pos.Percent (50), """
+                                  ┌┤Dialog├────────────┐
+                                  │          ┌┤con├┐   │
+                                  │          │view1│   │
+                                  │          │view2│   │
+                                  │          └─────┘   │
+                                  │                    │
+                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                  │                    │
+                                  └────────────────────┘
+                                  """
+            },
+            {
+                Pos.Func (_ => 3), """
+                                   ┌┤Dialog├────────────┐
+                                   │   ┌┤con├┐          │
+                                   │   │view1│          │
+                                   │   │view2│          │
+                                   │   └─────┘          │
+                                   │                    │
+                                   │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                                   │                    │
+                                   └────────────────────┘
+                                   """
+            }
+        };
+
+    [Theory]
+    [MemberData (nameof (PosViewData), MemberType = typeof (DialogTests))]
+    public void Dialog_Draws_SubView_With_SubViews_WithDifferentPosViewTypes (Func<View, Pos> posFactory, Func<View> viewFactory, string expected)
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (23, 11);
+
+        using Dialog dialog = new ();
+
+        dialog.Driver = driver;
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.Title = "Dialog";
+        dialog.AddButton (new Button { Text = "Cancel" });
+        dialog.AddButton (new Button { Text = "OK", IsDefault = true });
+
+        View view = viewFactory (); // Create fresh instance
+        Pos pos = posFactory (view);
+
+        var container = new View
+        {
+            X = pos,
+            Y = pos,
+            Id = "container",
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Title = "container",
+            BorderStyle = LineStyle.Single
+        };
+        var view1 = new View { Width = Dim.Auto (), Height = Dim.Auto (), Text = "v" };
+        container.Add (view1);
+
+        dialog.Add (container, view);
+
+        dialog.Layout ();
+        dialog.Draw ();
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    public static TheoryData<Func<View, Pos>, Func<View>, string> PosViewData () =>
+        new ()
+        {
+            {
+                Pos.Bottom, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├────────────┐
+                │                    │
+                │                    │
+                │  view              │
+                │   ┌─┐              │
+                │   │v│              │
+                │   └─┘              │
+                │                    │
+                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                │                    │
+                └────────────────────┘
+                """
+            },
+            {
+                Pos.Left, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├────────────┐
+                │                    │
+                │                    │
+                │  view              │
+                │  │v│               │
+                │  └─┘               │
+                │                    │
+                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                │                    │
+                └────────────────────┘
+                """
+            },
+            {
+                Pos.Right, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├────────────┐
+                │                    │
+                │                    │
+                │  view              │
+                │                    │
+                │                    │
+                │                    │
+                │      ┌─┐           │
+                │      │v│           │
+                │      └─┘           │
+                │                    │
+                """
+            },
+            {
+                Pos.Top, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├────────────┐
+                │                    │
+                │                    │
+                │  view              │
+                │  │v│               │
+                │  └─┘               │
+                │                    │
+                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                │                    │
+                └────────────────────┘
+                """
+            },
+            {
+                Pos.X, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├────────────┐
+                │                    │
+                │                    │
+                │  view              │
+                │  │v│               │
+                │  └─┘               │
+                │                    │
+                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                │                    │
+                └────────────────────┘
+                """
+            },
+            {
+                Pos.Y, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├────────────┐
+                │                    │
+                │                    │
+                │  view              │
+                │  │v│               │
+                │  └─┘               │
+                │                    │
+                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
+                │                    │
+                └────────────────────┘
+                """
+            }
+        };
     #endregion Drawing Tests
 
     #region Dialog<TResult> Generic Tests
