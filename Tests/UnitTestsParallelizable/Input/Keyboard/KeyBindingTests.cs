@@ -69,29 +69,29 @@ public class KeyBindingTests
 
     #endregion
 
-    #region IInputBinding Interface Tests
+    #region ICommandBinding Interface Tests
 
-    [Fact]
-    public void Commands_GetSet_Works ()
-    {
-        KeyBinding binding = new ([Command.Activate]);
-        Command [] newCommands = [Command.Accept, Command.HotKey];
+    //[Fact]
+    //public void Commands_GetSet_Works ()
+    //{
+    //    KeyBinding binding = new ([Command.Activate]);
+    //    Command [] newCommands = [Command.Accept, Command.HotKey];
 
-        binding.Commands = newCommands;
+    //    binding.Commands = newCommands;
 
-        Assert.Equal (newCommands, binding.Commands);
-    }
+    //    Assert.Equal (newCommands, binding.Commands);
+    //}
 
-    [Fact]
-    public void Data_GetSet_Works ()
-    {
-        KeyBinding binding = new ([Command.Activate]);
-        object testData = "test data";
+    //[Fact]
+    //public void Data_GetSet_Works ()
+    //{
+    //    KeyBinding binding = new ([Command.Activate]);
+    //    object testData = "test data";
 
-        binding.Data = testData;
+    //    binding.Data = testData;
 
-        Assert.Equal (testData, binding.Data);
-    }
+    //    Assert.Equal (testData, binding.Data);
+    //}
 
     //[Fact]
     //public void Source_GetSet_Works ()
@@ -222,9 +222,9 @@ public class KeyBindingTests
     #region Pattern Matching Tests
 
     [Fact]
-    public void PatternMatching_AsIInputBinding_Works ()
+    public void PatternMatching_AsICommandBinding_Works ()
     {
-        IInputBinding binding = new KeyBinding ([Command.Activate]) { Key = Key.Enter };
+        ICommandBinding binding = new KeyBinding ([Command.Activate]) { Key = Key.Enter };
 
         Assert.True (binding is KeyBinding);
 

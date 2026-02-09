@@ -30,7 +30,7 @@ public class CommandBubblingTests
     /// </summary>
     private class TrackingMenu : Menu
     {
-        public List<(string EventName, View? Source, IInputBinding? Binding)> EventLog { get; } = [];
+        public List<(string EventName, View? Source, ICommandBinding? Binding)> EventLog { get; } = [];
 
         public bool HandleActivating { get; set; }
         public bool HandleAccepting { get; set; }
@@ -69,7 +69,7 @@ public class CommandBubblingTests
     /// </summary>
     private class TrackingMenuBar : MenuBar
     {
-        public List<(string EventName, View? Source, IInputBinding? Binding)> EventLog { get; } = [];
+        public List<(string EventName, View? Source, ICommandBinding? Binding)> EventLog { get; } = [];
 
         public bool HandleActivating { get; set; }
         public bool HandleAccepting { get; set; }
@@ -108,7 +108,7 @@ public class CommandBubblingTests
     /// </summary>
     private class FlagSelectorEventTracker
     {
-        public List<(string EventName, View? Source, IInputBinding? Binding)> EventLog { get; } = [];
+        public List<(string EventName, View? Source, ICommandBinding? Binding)> EventLog { get; } = [];
 
         public void AttachTo (View flagSelector)
         {
@@ -193,7 +193,7 @@ public class CommandBubblingTests
         // FAILS: Command.Activate does NOT bubble - stops at MenuItem
         Assert.NotEmpty (menuBar.EventLog); // <-- This assertion will FAIL
 
-        (string eventName, View? source, IInputBinding? binding) = menuBar.EventLog.First ();
+        (string eventName, View? source, ICommandBinding? binding) = menuBar.EventLog.First ();
         Assert.Equal ("Activating", eventName);
         Assert.Same (checkBox, source); // Source should be the original CheckBox
         Assert.NotNull (binding);
@@ -226,7 +226,7 @@ public class CommandBubblingTests
         // This should PASS because FlagSelector intercepts CheckBox.Activating and forwards it
         Assert.NotEmpty (tracker.EventLog);
 
-        (string eventName, View? source, IInputBinding? _) = tracker.EventLog.First ();
+        (string eventName, View? source, ICommandBinding? _) = tracker.EventLog.First ();
         Assert.Equal ("Activating", eventName);
 
         // Note: Source might be flagSelector (not checkBox) depending on how FlagSelector forwards the event
@@ -279,7 +279,7 @@ public class CommandBubblingTests
         // This MAY fail if event interception in FlagSelector/Shortcut blocks propagation
         Assert.NotEmpty (menuBar.EventLog);
 
-        (string eventName, View? source, IInputBinding? binding) = menuBar.EventLog.First ();
+        (string eventName, View? source, ICommandBinding? binding) = menuBar.EventLog.First ();
         Assert.Equal ("Accepting", eventName);
         Assert.Same (checkBox, source); // Source should be the original CheckBox
         Assert.NotNull (binding);

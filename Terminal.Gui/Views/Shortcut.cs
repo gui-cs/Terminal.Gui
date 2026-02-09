@@ -316,7 +316,7 @@ public class Shortcut : View, IOrientation, IDesignable
             // By setting the Binding source to null, neither IsFromCommandView nor IsBindingFromShortcut will return true,
             // letting the resulting call to this method to fall through; returning false.
             InvokeCommand (args.Context!.Command,
-                           new CommandContext (args.Context!.Command, new WeakReference<View> (CommandView), new InputBinding ([args.Context!.Command], null, null)));
+                           new CommandContext (args.Context!.Command, new WeakReference<View> (CommandView), new CommandBinding ([args.Context!.Command], null, null)));
 
             // When the above InvokeCommand returns, the CommandView should have changed state (e.g., a CheckBox may have toggled its checked state).
             // The call to this OnActivating should signal the event was handled, so the state doesn't change again.
@@ -427,7 +427,7 @@ public class Shortcut : View, IOrientation, IDesignable
             // By setting the Binding source to null, neither IsFromCommandView nor IsBindingFromShortcut will return true,
             // letting the resulting call to this method to fall through; returning false.
             InvokeCommand (args.Context!.Command,
-                           new CommandContext (args.Context!.Command, new WeakReference<View> (this), new InputBinding ([args.Context!.Command], null, null)));
+                           new CommandContext (args.Context!.Command, new WeakReference<View> (this), new CommandBinding ([args.Context!.Command], null, null)));
 
             // Ignore return value and always return true to stop further processing of the command
             InvokeCommand (args.Context!.Command);

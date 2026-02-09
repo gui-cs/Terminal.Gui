@@ -851,7 +851,7 @@ public class ComboBox : View, IDesignable
                 }
                 else if (isMousePositionValid)
                 {
-                    return RaiseAccepting (new CommandContext (Command.Accept, new WeakReference<View> (this), new InputBinding ())) == true;
+                    return RaiseAccepting (new CommandContext (Command.Accept, new WeakReference<View> (this), new CommandBinding ())) == true;
                 }
                 else
                 {

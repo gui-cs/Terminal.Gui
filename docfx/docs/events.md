@@ -346,7 +346,7 @@ public interface ICommandContext
 {
     Command Command { get; set; }      // The command being invoked
     View? Source { get; set; }         // The view that first invoked the command
-    IInputBinding? Binding { get; }    // The binding that triggered the command
+    ICommandBinding? Binding { get; }    // The binding that triggered the command
 }
 ```
 
@@ -371,7 +371,7 @@ public override bool OnAccepting(object? sender, CommandEventArgs e)
             MouseFlags flags = mb.MouseEvent.Flags;
             break;
 
-        case InputBinding ib:
+        case CommandBinding ib:
             // Programmatic invocation
             object? data = ib.Data;
             break;
@@ -393,7 +393,7 @@ Understanding the difference between sources is important during event propagati
 | Property | Description | Changes During Propagation? |
 |----------|-------------|----------------------------|
 | `ICommandContext.Source` | View that first invoked the command | No (constant) |
-| `IInputBinding.Source` | View where binding was defined | No (constant) |
+| `ICommandBinding.Source` | View where binding was defined | No (constant) |
 | `sender` (event parameter) | View currently raising the event | **Yes** |
 
 ```csharp

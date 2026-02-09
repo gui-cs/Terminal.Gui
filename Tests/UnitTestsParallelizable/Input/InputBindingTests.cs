@@ -1,12 +1,12 @@
 namespace InputTests;
 
 /// <summary>
-///     Tests for <see cref="InputBinding"/> record struct.
+///     Tests for <see cref="CommandBinding"/> record struct.
 /// </summary>
 /// <remarks>
 ///     Copilot generated.
 /// </remarks>
-public class InputBindingTests
+public class CommandBindingTests
 {
     #region Constructor Tests
 
@@ -15,7 +15,7 @@ public class InputBindingTests
     {
         Command [] commands = [Command.Activate, Command.Accept];
 
-        InputBinding binding = new (commands);
+        CommandBinding binding = new (commands);
 
         Assert.Equal (commands, binding.Commands);
         Assert.Null (binding.Source);
@@ -28,7 +28,7 @@ public class InputBindingTests
         Command [] commands = [Command.Activate];
         View source = new () { Id = "sourceView" };
 
-        InputBinding binding = new (commands, source);
+        CommandBinding binding = new (commands, source);
 
         Assert.Equal (commands, binding.Commands);
         Assert.Equal (source, binding.Source);
@@ -42,7 +42,7 @@ public class InputBindingTests
         View source = new () { Id = "sourceView" };
         object data = "test data";
 
-        InputBinding binding = new (commands, source, data);
+        CommandBinding binding = new (commands, source, data);
 
         Assert.Equal (commands, binding.Commands);
         Assert.Equal (source, binding.Source);
@@ -53,22 +53,22 @@ public class InputBindingTests
 
     #region Property Tests
 
-    [Fact ]
-    public void Commands_CanBeModified ()
-    {
-        InputBinding binding = new ([Command.Activate]);
+    //[Fact ]
+    //public void Commands_CanBeModified ()
+    //{
+    //    CommandBinding binding = new ([Command.Activate]);
 
-        binding.Commands = [Command.Accept, Command.Cancel];
+    //    binding.Commands = [Command.Accept, Command.Cancel];
 
-        Assert.Equal (2, binding.Commands.Length);
-        Assert.Equal (Command.Accept, binding.Commands [0]);
-        Assert.Equal (Command.Cancel, binding.Commands [1]);
-    }
+    //    Assert.Equal (2, binding.Commands.Length);
+    //    Assert.Equal (Command.Accept, binding.Commands [0]);
+    //    Assert.Equal (Command.Cancel, binding.Commands [1]);
+    //}
 
     //[Fact ]
     //public void Source_CanBeModified ()
     //{
-    //    InputBinding binding = new ([Command.Activate]);
+    //    CommandBinding binding = new ([Command.Activate]);
     //    View source = new () { Id = "newSource" };
 
     //    binding.Source = source;
@@ -76,26 +76,26 @@ public class InputBindingTests
     //    Assert.Equal ("newSource", binding.Source?.Id);
     //}
 
-    [Fact ]
-    public void Data_CanBeModified ()
-    {
-        InputBinding binding = new ([Command.Activate]);
+    //[Fact ]
+    //public void Data_CanBeModified ()
+    //{
+    //    CommandBinding binding = new ([Command.Activate]);
 
-        binding.Data = 42;
+    //    binding.Data = 42;
 
-        Assert.Equal (42, binding.Data);
-    }
+    //    Assert.Equal (42, binding.Data);
+    //}
 
     #endregion
 
-    #region IInputBinding Interface Tests
+    #region ICommandBinding Interface Tests
 
     [Fact ]
-    public void ImplementsIInputBinding ()
+    public void ImplementsICommandBinding ()
     {
-        InputBinding binding = new ([Command.Activate]) { Source = new View { Id = "test" }, Data = "data" };
+        CommandBinding binding = new ([Command.Activate]) { Source = new View { Id = "test" }, Data = "data" };
 
-        IInputBinding iBinding = binding;
+        ICommandBinding iBinding = binding;
 
         Assert.Equal (binding.Commands, iBinding.Commands);
         Assert.Equal (binding.Source, iBinding.Source);
@@ -105,7 +105,7 @@ public class InputBindingTests
     [Fact ]
     public void CanBeUsedPolymorphically ()
     {
-        IInputBinding binding = new InputBinding ([Command.Accept], new View { Id = "polymorphic" });
+        ICommandBinding binding = new CommandBinding ([Command.Accept], new View { Id = "polymorphic" });
 
         Assert.Single (binding.Commands);
         Assert.Equal (Command.Accept, binding.Commands [0]);
@@ -119,37 +119,37 @@ public class InputBindingTests
     [Fact ]
     public void PatternMatching_CanDistinguishFromKeyBinding ()
     {
-        IInputBinding inputBinding = new InputBinding ([Command.Activate]);
-        IInputBinding keyBinding = new KeyBinding ([Command.Activate]) { Key = Key.Enter };
+        ICommandBinding inputBinding = new CommandBinding ([Command.Activate]);
+        ICommandBinding keyBinding = new KeyBinding ([Command.Activate]) { Key = Key.Enter };
 
-        Assert.True (inputBinding is InputBinding);
+        Assert.True (inputBinding is CommandBinding);
         Assert.False (inputBinding is KeyBinding);
         Assert.True (keyBinding is KeyBinding);
-        Assert.False (keyBinding is InputBinding);
+        Assert.False (keyBinding is CommandBinding);
     }
 
     [Fact ]
     public void PatternMatching_CanDistinguishFromMouseBinding ()
     {
-        IInputBinding inputBinding = new InputBinding ([Command.Activate]);
-        IInputBinding mouseBinding = new MouseBinding ([Command.Activate], MouseFlags.LeftButtonClicked);
+        ICommandBinding inputBinding = new CommandBinding ([Command.Activate]);
+        ICommandBinding mouseBinding = new MouseBinding ([Command.Activate], MouseFlags.LeftButtonClicked);
 
-        Assert.True (inputBinding is InputBinding);
+        Assert.True (inputBinding is CommandBinding);
         Assert.False (inputBinding is MouseBinding);
         Assert.True (mouseBinding is MouseBinding);
-        Assert.False (mouseBinding is InputBinding);
+        Assert.False (mouseBinding is CommandBinding);
     }
 
     [Fact ]
     public void PatternMatching_SwitchExpression_Works ()
     {
-        IInputBinding binding = new InputBinding ([Command.Accept], new View { Id = "source" });
+        ICommandBinding binding = new CommandBinding ([Command.Accept], new View { Id = "source" });
 
         string bindingType = binding switch
                              {
                                  KeyBinding => "key",
                                  MouseBinding => "mouse",
-                                 InputBinding => "input",
+                                 CommandBinding => "input",
                                  _ => "unknown"
                              };
 
@@ -164,7 +164,7 @@ public class InputBindingTests
     public void CanBeUsedWithCommandContext ()
     {
         View source = new () { Id = "contextSource" };
-        InputBinding binding = new ([Command.Activate], source, "contextData");
+        CommandBinding binding = new ([Command.Activate], source, "contextData");
 
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (source), Binding = binding };
 
@@ -174,43 +174,43 @@ public class InputBindingTests
         Assert.Equal (source, ctxSource);
         Assert.NotNull (ctx.Binding);
 
-        if (ctx.Binding is InputBinding ib)
+        if (ctx.Binding is CommandBinding ib)
         {
             Assert.Equal ("contextData", ib.Data);
         }
         else
         {
-            Assert.Fail ("Binding should be InputBinding");
+            Assert.Fail ("Binding should be CommandBinding");
         }
     }
 
     [Fact ]
-    public void Binding_Property_ReturnsIInputBinding ()
+    public void Binding_Property_ReturnsICommandBinding ()
     {
-        InputBinding binding = new ([Command.Accept]);
+        CommandBinding binding = new ([Command.Accept]);
 
         CommandContext ctx = new () { Command = Command.Accept, Binding = binding };
 
-        // Binding property (from ICommandContext) returns IInputBinding
+        // Binding property (from ICommandContext) returns ICommandBinding
         Assert.NotNull (ctx.Binding);
-        Assert.IsType<InputBinding> (ctx.Binding);
+        Assert.IsType<CommandBinding> (ctx.Binding);
     }
 
     [Fact ]
     public void PatternMatching_ThroughICommandContext_Works ()
     {
-        InputBinding binding = new ([Command.Accept], new View { Id = "test" });
+        CommandBinding binding = new ([Command.Accept], new View { Id = "test" });
         ICommandContext ctx = new CommandContext { Command = Command.Accept, Binding = binding };
 
         // Can pattern match the binding from the interface
         // Can pattern match the binding from the interface
-        if (ctx.Binding is InputBinding ib)
+        if (ctx.Binding is CommandBinding ib)
         {
             Assert.Equal ("test", ib.Source?.Id);
         }
         else
         {
-            Assert.Fail ("Should be able to pattern match InputBinding from ICommandContext.Binding");
+            Assert.Fail ("Should be able to pattern match CommandBinding from ICommandContext.Binding");
         }
     }
 
@@ -224,8 +224,8 @@ public class InputBindingTests
         Command [] commands = [Command.Activate];
         View source = new () { Id = "source" };
 
-        InputBinding binding1 = new (commands, source, "data");
-        InputBinding binding2 = new (commands, source, "data");
+        CommandBinding binding1 = new (commands, source, "data");
+        CommandBinding binding2 = new (commands, source, "data");
 
         Assert.Equal (binding1, binding2);
     }
@@ -233,8 +233,8 @@ public class InputBindingTests
     [Fact ]
     public void RecordEquality_DifferentCommands_AreNotEqual ()
     {
-        InputBinding binding1 = new ([Command.Activate]);
-        InputBinding binding2 = new ([Command.Accept]);
+        CommandBinding binding1 = new ([Command.Activate]);
+        CommandBinding binding2 = new ([Command.Accept]);
 
         Assert.NotEqual (binding1, binding2);
     }
@@ -242,8 +242,8 @@ public class InputBindingTests
     [Fact ]
     public void RecordEquality_DifferentSources_AreNotEqual ()
     {
-        InputBinding binding1 = new ([Command.Activate], new View { Id = "source1" });
-        InputBinding binding2 = new ([Command.Activate], new View { Id = "source2" });
+        CommandBinding binding1 = new ([Command.Activate], new View { Id = "source1" });
+        CommandBinding binding2 = new ([Command.Activate], new View { Id = "source2" });
 
         Assert.NotEqual (binding1, binding2);
     }

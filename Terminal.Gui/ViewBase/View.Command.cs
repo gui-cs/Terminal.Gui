@@ -25,7 +25,7 @@ public partial class View // Command APIs
     #region Command Management
 
     /// <summary>
-    ///     Function signature commands.
+    ///     Function signature for command invocations.
     /// </summary>
     /// <param name="ctx">Provides context about the circumstances of invoking the command.</param>
     /// <returns>
@@ -51,8 +51,7 @@ public partial class View // Command APIs
     ///         This version of AddCommand is for commands that require <see cref="ICommandContext"/>.
     ///     </para>
     ///     <para>
-    ///         See the Commands Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
+    ///         See the Commands Deep Dive for more information: <see href="../docs/command.md"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
@@ -76,8 +75,7 @@ public partial class View // Command APIs
     ///         <see cref="AddCommand(Command,CommandImplementation)"/>
     ///     </para>
     ///     <para>
-    ///         See the Commands Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
+    ///         See the Commands Deep Dive for more information: <see href="../docs/command.md"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
@@ -104,7 +102,7 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommands (Command [] commands, IInputBinding? binding)
+    public bool? InvokeCommands (Command [] commands, ICommandBinding? binding)
     {
         bool? toReturn = null;
 
@@ -143,7 +141,7 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommand (Command command, IInputBinding? binding)
+    public bool? InvokeCommand (Command command, ICommandBinding? binding)
     {
         if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
         {

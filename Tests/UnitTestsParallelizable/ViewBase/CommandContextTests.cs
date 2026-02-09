@@ -268,7 +268,7 @@ public class CommandContextTests
     #region ICommandContext.Binding Property Tests
 
     [Fact]
-    public void Binding_Property_ReturnsBindingAsIInputBinding ()
+    public void Binding_Property_ReturnsBindingAsICommandBinding ()
     {
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Enter };
 
@@ -317,20 +317,20 @@ public class CommandContextTests
     }
 
     [Fact]
-    public void Binding_Property_WithInputBinding_Works ()
+    public void Binding_Property_WithCommandBinding_Works ()
     {
-        InputBinding inputBinding = new ([Command.Accept], new View { Id = "programmatic" }, "data");
+        CommandBinding inputBinding = new ([Command.Accept], new View { Id = "programmatic" }, "data");
         ICommandContext ctx = new CommandContext { Command = Command.Accept, Binding = inputBinding };
 
         // Pattern match on Binding from the interface
-        if (ctx.Binding is InputBinding ib)
+        if (ctx.Binding is CommandBinding ib)
         {
             Assert.Equal ("programmatic", ib.Source?.Id);
             Assert.Equal ("data", ib.Data);
         }
         else
         {
-            Assert.Fail ("Should be able to pattern match InputBinding from ICommandContext.Binding");
+            Assert.Fail ("Should be able to pattern match CommandBinding from ICommandContext.Binding");
         }
     }
 

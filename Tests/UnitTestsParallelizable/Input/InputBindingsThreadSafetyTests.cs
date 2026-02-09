@@ -1,16 +1,16 @@
 namespace InputTests;
 
 /// <summary>
-///     Tests to verify that InputBindings (KeyBindings and MouseBindings) are thread-safe
+///     Tests to verify that CommandBindings (KeyBindings and MouseBindings) are thread-safe
 ///     for concurrent access scenarios.
 /// </summary>
-public class InputBindingsThreadSafetyTests
+public class CommandBindingsThreadSafetyTests
 {
     [Fact]
     public void Add_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const int NUM_THREADS = 10;
         const int ITEMS_PER_THREAD = 100;
 
@@ -44,7 +44,7 @@ public class InputBindingsThreadSafetyTests
     public void Clear_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const int NUM_THREADS = 10;
 
         // Populate initial data
@@ -76,7 +76,7 @@ public class InputBindingsThreadSafetyTests
     public void GetAllFromCommands_DuringModification_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         var continueRunning = true;
         List<Exception> exceptions = new ();
         const int MAX_ADDITIONS = 200; // Limit total additions to prevent infinite loop
@@ -145,7 +145,7 @@ public class InputBindingsThreadSafetyTests
     public void GetBindings_DuringConcurrentModification_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         var continueRunning = true;
         List<Exception> exceptions = new ();
         const int MAX_MODIFICATIONS = 200; // Limit total modifications
@@ -284,7 +284,7 @@ public class InputBindingsThreadSafetyTests
     public void MixedOperations_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         List<Exception> exceptions = new ();
         const int OPERATIONS_PER_THREAD = 100;
 
@@ -422,7 +422,7 @@ public class InputBindingsThreadSafetyTests
     public void Remove_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const int NUM_ITEMS = 100;
 
         // Populate data
@@ -454,7 +454,7 @@ public class InputBindingsThreadSafetyTests
     public void Replace_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const string OLD_KEY = "old_key";
         const string NEW_KEY = "new_key";
 
@@ -489,7 +489,7 @@ public class InputBindingsThreadSafetyTests
     public void TryGet_ConcurrentAccess_ReturnsConsistentResults ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const string TEST_KEY = "test_key";
 
         bindings.Add (TEST_KEY, Command.Accept);
@@ -504,10 +504,10 @@ public class InputBindingsThreadSafetyTests
     }
 
     /// <summary>
-    ///     Test implementation of InputBindings for testing purposes.
+    ///     Test implementation of CommandBindings for testing purposes.
     /// </summary>
-    private class TestInputBindings ()
-        : InputBindings<string, KeyBinding> ((commands, evt, source) => new KeyBinding { Commands = commands, Key = Key.Empty },
+    private class TestCommandBindings ()
+        : CommandBindingsBase<string, KeyBinding> ((commands, evt, source) => new KeyBinding { Commands = commands, Key = Key.Empty },
                                              StringComparer.OrdinalIgnoreCase)
     {
         public override bool IsValid (string eventArgs) => !string.IsNullOrEmpty (eventArgs);

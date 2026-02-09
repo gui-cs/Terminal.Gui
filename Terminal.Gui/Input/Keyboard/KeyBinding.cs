@@ -10,7 +10,7 @@ namespace Terminal.Gui.Input;
 /// <seealso cref="KeyBindings"/>
 /// <seealso cref="MouseBinding"/>
 /// <seealso cref="CommandContext"/>
-public record struct KeyBinding : IInputBinding
+public record struct KeyBinding : ICommandBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this key binding will invoke.</param>
@@ -47,11 +47,11 @@ public record struct KeyBinding : IInputBinding
         Data = data;
     }
 
-    /// <summary>The commands this key binding will invoke.</summary>
-    public Command [] Commands { get; set; }
+    /// <inheritdoc/>
+    public Command [] Commands { get; init; }
 
     /// <inheritdoc/>
-    public object? Data { get; set; }
+    public object? Data { get; init; }
 
     /// <summary>
     ///     The Key that is bound to the <see cref="Commands"/>.

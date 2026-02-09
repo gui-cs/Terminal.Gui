@@ -240,7 +240,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
             Scrolled?.Invoke (this, new (in distance));
 
             // BUGBUG: the KeyBinding constructor used here sets `target: null`, not `source: null`
-            // BUGBUG: this should not use KeyBinding, but InputBinding
+            // BUGBUG: this should not use KeyBinding, but CommandBinding
             RaiseActivating (new CommandContext (Command.Activate, new WeakReference<View> (this), new KeyBinding ([Command.Activate], null, distance)));
         }
 

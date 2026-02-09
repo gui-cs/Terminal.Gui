@@ -7,7 +7,7 @@ namespace Terminal.Gui.Input;
 /// <seealso cref="MouseBindings"/>
 /// <seealso cref="KeyBinding"/>
 /// <seealso cref="CommandContext"/>
-public record struct MouseBinding : IInputBinding
+public record struct MouseBinding : ICommandBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
@@ -29,19 +29,19 @@ public record struct MouseBinding : IInputBinding
         MouseEvent = args;
     }
 
-    /// <summary>The commands this binding will invoke.</summary>
-    public Command [] Commands { get; set; }
+    /// <inheritdoc/>
+    public Command [] Commands { get; init; }
 
     /// <inheritdoc/>
-    public object? Data { get; set; }
+    public object? Data { get; init; }
+
+    /// <inheritdoc/>
+    public View? Source { get; init; }
 
     /// <summary>
     ///     The mouse event data associated with this binding.
     /// </summary>
     public Mouse? MouseEvent { get; set; }
-
-    /// <inheritdoc/>
-    public View? Source { get; init; }
 
     /// <inheritdoc/>
     public override string ToString () =>

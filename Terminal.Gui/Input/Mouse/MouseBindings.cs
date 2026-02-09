@@ -6,7 +6,7 @@ namespace Terminal.Gui.Input;
 /// </summary>
 /// <seealso cref="View.MouseBindings"/>
 /// <seealso cref="Command"/>
-public class MouseBindings : InputBindings<MouseFlags, MouseBinding>
+public class MouseBindings : CommandBindingsBase<MouseFlags, MouseBinding>
 {
     /// <summary>
     ///     Initializes a new instance.

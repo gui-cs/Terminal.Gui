@@ -6,7 +6,7 @@ namespace Terminal.Gui.Input;
 /// <seealso cref="KeyBindings"/>
 /// <seealso cref="KeyBindings"/>
 /// <seealso cref="Command"/>
-public class KeyBindings : InputBindings<Key, KeyBinding>
+public class KeyBindings : CommandBindingsBase<Key, KeyBinding>
 {
     // BUGBUG: This passes source as the target param of `public KeyBinding (Command [] commands, View? target, object? data = null)`
     /// <summary>Initializes a new instance bound to <paramref name="target"/>.</summary>

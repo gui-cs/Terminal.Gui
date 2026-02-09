@@ -41,29 +41,29 @@ public class MouseBindingTests
 
     #endregion
 
-    #region IInputBinding Interface Tests
+    #region ICommandBinding Interface Tests
 
-    [Fact]
-    public void Commands_GetSet_Works ()
-    {
-        MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
-        Command [] newCommands = [Command.Accept, Command.HotKey];
+    //[Fact]
+    //public void Commands_GetSet_Works ()
+    //{
+    //    MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
+    //    Command [] newCommands = [Command.Accept, Command.HotKey];
 
-        binding.Commands = newCommands;
+    //    binding.Commands = newCommands;
 
-        Assert.Equal (newCommands, binding.Commands);
-    }
+    //    Assert.Equal (newCommands, binding.Commands);
+    //}
 
-    [Fact]
-    public void Data_GetSet_Works ()
-    {
-        MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
-        object testData = "test data";
+    //[Fact]
+    //public void Data_GetSet_Works ()
+    //{
+    //    MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
+    //    object testData = "test data";
 
-        binding.Data = testData;
+    //    binding.Data = testData;
 
-        Assert.Equal (testData, binding.Data);
-    }
+    //    Assert.Equal (testData, binding.Data);
+    //}
 
     //[Fact]
     //public void Source_GetSet_Works ()
@@ -143,9 +143,9 @@ public class MouseBindingTests
     #region Pattern Matching Tests
 
     [Fact]
-    public void PatternMatching_AsIInputBinding_Works ()
+    public void PatternMatching_AsICommandBinding_Works ()
     {
-        IInputBinding binding = new MouseBinding ([Command.Activate], MouseFlags.LeftButtonClicked);
+        ICommandBinding binding = new MouseBinding ([Command.Activate], MouseFlags.LeftButtonClicked);
 
         Assert.True (binding is MouseBinding);
 

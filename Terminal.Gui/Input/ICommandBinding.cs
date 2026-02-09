@@ -1,20 +1,21 @@
 ﻿namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Describes an input binding. Used to bind a set of <see cref="Command"/> objects to a specific input event and
-///     passed as part of command invocations (see <see cref="CommandContext"/>).
+///     Describes command binding. Used to bind a set of <see cref="Command"/> objects to a specific user event and
+///     passed as part of command invocations (see <see cref="CommandContext"/>). Bindings are immutable.
 /// </summary>
-public interface IInputBinding
+/// <seealso cref="CommandContext"/>
+public interface ICommandBinding
 {
     /// <summary>
-    ///     Gets or sets the commands this input binding will invoke.
+    ///     Gets or sets the commands this command binding will invoke.
     /// </summary>
-    Command [] Commands { get; set; }
+    Command [] Commands { get; init; }
 
     /// <summary>
-    ///     Arbitrary context that can be associated with this input binding.
+    ///     Arbitrary context that can be associated with this command binding.
     /// </summary>
-    public object? Data { get; set; }
+    public object? Data { get; init; }
 
     /// <summary>
     ///     Gets or sets the <see cref="View"/> that registered the binding.
