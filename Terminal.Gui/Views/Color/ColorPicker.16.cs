@@ -284,15 +284,24 @@ public class ColorPicker16 : View, IValue<ColorName16>
         //            });
     }
 
-    /// <inheritdoc />
-    protected override bool OnActivating (CommandEventArgs args)
-    {
-        if (base.OnActivating (args))
-        {
-            return true;
-        }
+    ///// <inheritdoc />
+    //protected override bool OnActivating (CommandEventArgs args)
+    //{
+    //    if (base.OnActivating (args))
+    //    {
+    //        return true;
+    //    }
 
-        if (args.Context?.Binding is MouseBinding { MouseEvent.Position: { } pos })
+
+    //    return false;
+    //}
+
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? commandContext)
+    {
+        base.OnActivated (commandContext);
+
+        if (commandContext?.Binding is MouseBinding { MouseEvent.Position: { } pos })
         {
             int col = pos.X / _boxWidth;
             int row = pos.Y / _boxHeight;
@@ -301,12 +310,8 @@ public class ColorPicker16 : View, IValue<ColorName16>
             if (col is >= 0 and < COLS && row is >= 0 and < ROWS)
             {
                 Caret = new Point (col, row);
-
-                return true;
             }
         }
-
-        return false;
     }
 
     /// <summary>Add the KeyBindings.</summary>

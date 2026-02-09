@@ -1,10 +1,12 @@
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Provides a collection of <see cref="MouseFlags"/> bound to <see cref="Command"/>s.
+///     Provides a collection of <see cref="Command"/> objects stored in <see cref="MouseBindings"/>. Carried
+///     as context in command invocations (see <see cref="CommandContext"/>).
 /// </summary>
 /// <seealso cref="MouseBindings"/>
-/// <seealso cref="Command"/>
+/// <seealso cref="KeyBinding"/>
+/// <seealso cref="CommandContext"/>
 public record struct MouseBinding : IInputBinding
 {
     /// <summary>Initializes a new instance.</summary>
@@ -39,7 +41,7 @@ public record struct MouseBinding : IInputBinding
     public Mouse? MouseEvent { get; set; }
 
     /// <inheritdoc/>
-    public View? Source { get; set; }
+    public View? Source { get; init; }
 
     /// <inheritdoc/>
     public override string ToString () =>

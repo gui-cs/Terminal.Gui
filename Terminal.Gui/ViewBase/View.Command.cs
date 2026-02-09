@@ -176,7 +176,8 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Invokes the specified command without context.
+    ///     Invokes the specified command with a default <see cref="CommandContext"/> where <see cref="CommandContext.Source"/>
+    ///     is a weak reference to `this`.
     /// </summary>
     /// <param name="command">The command to invoke.</param>
     /// <returns>
@@ -193,7 +194,14 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = null });
+        return implementation! (new CommandContext
+        {
+            Command = command,
+            Source = new WeakReference<View> (this),
+
+            // By definition, this invocation has no binding
+            Binding = null,
+        });
     }
 
     #endregion Invoke
@@ -524,7 +532,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Called when the View is handling the user pressing the View's <see cref="HotKey"/>s. Calls
-    ///     <see cref="OnHandlingHotKey"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
+    ///     <see cref="OnHandlingHotKey"/> which can be cancelled; if not cancelled raises <see cref="Activating"/>.
     ///     event. The default <see cref="Command.HotKey"/> handler calls this method.
     /// </summary>
     /// <param name="ctx">The context to pass with the command.</param>

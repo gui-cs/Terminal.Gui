@@ -11,6 +11,10 @@ namespace Terminal.Gui.Input;
 ///         but is not associated with a specific key or mouse event.
 ///     </para>
 ///     <para>
+///         <see cref="Source"/> is the View that registered the binding. If <see langword="null"/> the
+///         InputBinding instance was created dynamically (not from a mouse or keyboard binding).
+///     </para>
+///     <para>
 ///         Pattern match on binding types to discriminate between input sources:
 ///         <code>
 ///         if (ctx.Binding is KeyBinding kb) { /* key input */ }
@@ -42,7 +46,7 @@ public record struct InputBinding : IInputBinding
     public object? Data { get; set; }
 
     /// <inheritdoc/>
-    public View? Source { get; set; }
+    public View? Source { get; init; }
 
     /// <inheritdoc />
     public override string ToString ()

@@ -716,13 +716,8 @@ public class ShortcutTests
         Assert.True (shortcutActivatingRaised);
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that when CommandView raises Accepting (e.g., double-click on CheckBox),
-    ///     the Shortcut raises its Activating event.
-    /// </summary>
     [Fact]
-    public void CommandView_Command_Accept_Forwards_To_Activating ()
+    public void CommandView_Command_Accept_Forwards_To_Accepting ()
     {
         // Arrange
         CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
@@ -739,36 +734,26 @@ public class ShortcutTests
         // Act - Invoke Command.Accept directly on CheckBox (simulating double-click)
         checkBox.InvokeCommand (Command.Accept);
 
-        Assert.False (shortcutAcceptingRaised);
-        Assert.True (shortcutActivatingRaised);
+        Assert.True (shortcutAcceptingRaised);
+        Assert.False (shortcutActivatingRaised);
         Assert.False (handlingHotkeyRaised);
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that when Shortcut is activated via direct InvokeCommand (no binding),
-    ///     Activating is raised once but CommandView is NOT forwarded to.
-    ///     Direct InvokeCommand bypasses the forwarding logic in OnActivating.
-    /// </summary>
     [Fact]
     public void Command_Activate_Direct_InvokeCommand_Raises_Activating_Once ()
     {
         // Arrange
-        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+        ShortcutTestView testCommandView = new () { Title = "_Test", CanFocus = false };
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
         var shortcutActivatingCount = 0;
         shortcut.Activating += (_, _) => shortcutActivatingCount++;
 
-        // Act - Invoke Command.Activate on Shortcut directly (no binding)
         shortcut.InvokeCommand (Command.Activate);
 
         // Assert - Shortcut.Activating should be raised exactly once
         Assert.Equal (1, shortcutActivatingCount);
-
-        // CheckBox does NOT change state - direct InvokeCommand doesn't forward to CommandView
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
     // Claude - Opus 4.5
@@ -780,9 +765,9 @@ public class ShortcutTests
     public void CommandView_Command_HotKey_Does_Not_Bubble_To_Shortcut ()
     {
         // Arrange
-        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
+        ShortcutTestView testCommandView = new () { Title = "_Test", CanFocus = false };
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
         var shortcutAcceptingRaised = false;
         shortcut.Accepting += (_, _) => shortcutAcceptingRaised = true;
@@ -792,7 +777,7 @@ public class ShortcutTests
         shortcut.HandlingHotKey += (_, _) => handlingHotkeyRaised = true;
 
         // Act - Invoke Command.HotKey directly on CheckBox
-        checkBox.InvokeCommand (Command.HotKey);
+        testCommandView.InvokeCommand (Command.HotKey);
 
         // HotKey is NOT in CommandsToBubbleUp, so nothing bubbles to Shortcut
         Assert.False (shortcutAcceptingRaised);
@@ -809,21 +794,18 @@ public class ShortcutTests
     public void CommandView_CanFocus_True_Click_Raises_Activating ()
     {
         // Arrange
-        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
+        ShortcutTestView testCommandView = new () { Title = "_Test", CanFocus = false };
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
         var shortcutActivatingRaised = false;
         shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
 
         // Act - Invoke Command.Activate directly on CheckBox (simulating mouse click)
-        checkBox.InvokeCommand (Command.Activate);
+        testCommandView.InvokeCommand (Command.Activate);
 
         // Assert - Shortcut.Activating should have been raised
         Assert.True (shortcutActivatingRaised);
-
-        // And CheckBox should have changed state
-        Assert.Equal (CheckState.Checked, checkBox.Value);
     }
 
     // Claude - Opus 4.5
@@ -852,15 +834,8 @@ public class ShortcutTests
         shortcut.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that when Command.Accept is invoked directly on a Shortcut (without going through
-    ///     a keyboard/mouse binding), OnAccepting calls RaiseActivating, sets Handled=true, and returns true.
-    ///     This prevents the Accepting event from being raised (Accepting is NOT raised because OnAccepting
-    ///     returns true before the event can be invoked).
-    /// </summary>
     [Fact]
-    public void Command_Accept_Raises_Activating_Not_Accepting ()
+    public void Command_Accept_Raises_Accepting ()
     {
         using Shortcut shortcut = new ();
         shortcut.Title = "Test";
@@ -877,10 +852,8 @@ public class ShortcutTests
 
         shortcut.InvokeCommand (Command.Accept);
 
-        // OnAccepting calls RaiseActivating (so Activating fires), then returns true
-        // which prevents the Accepting event from being raised
-        Assert.True (activatingFired);
-        Assert.False (acceptingFired);
+        Assert.False (activatingFired);
+        Assert.True (acceptingFired);
         Assert.False (handlingHotKeyFired);
     }
 
@@ -911,29 +884,6 @@ public class ShortcutTests
         Assert.False (activatingFired);
         Assert.False (acceptingFired);
         Assert.True (handlingHotKeyFired);
-    }
-
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that when Command.Accept is invoked directly on a Shortcut (without going through
-    ///     a keyboard/mouse binding), Action is NOT executed because:
-    ///     1. OnAccepting calls RaiseActivating (not DefaultActivateHandler), so Activated isn't raised
-    ///     2. OnAccepting returns true, preventing Accepted from being raised
-    ///     3. Action is invoked in OnActivated and OnAccepted, but neither is called
-    /// </summary>
-    [Fact]
-    public void Command_Accept_Does_Not_Execute_Action_Without_Binding ()
-    {
-        Shortcut shortcut = new () { Title = "Test" };
-        var actionFired = false;
-        shortcut.Action = () => actionFired = true;
-
-        // Accept invoked directly does NOT execute Action
-        shortcut.InvokeCommand (Command.Accept);
-
-        Assert.False (actionFired);
-
-        shortcut.Dispose ();
     }
 
     // Claude - Opus 4.5

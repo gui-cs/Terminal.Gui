@@ -8,6 +8,7 @@ namespace Terminal.Gui.Input;
 /// <seealso cref="Command"/>
 public class KeyBindings : InputBindings<Key, KeyBinding>
 {
+    // BUGBUG: This passes source as the target param of `public KeyBinding (Command [] commands, View? target, object? data = null)`
     /// <summary>Initializes a new instance bound to <paramref name="target"/>.</summary>
     public KeyBindings (View? target) : base ((commands, key, source) => new KeyBinding (commands, source), new KeyEqualityComparer ()) => Target = target;
 

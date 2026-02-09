@@ -185,7 +185,7 @@ public partial class View // Keyboard APIs
         {
             return true;
         }
-        KeyBinding keyBinding = new ([Command.HotKey], newKey, this, data);
+        KeyBinding keyBinding = new ([Command.HotKey], newKey, source: this, data);
 
         // Add the base and Alt key
         HotKeyBindings.Remove (newKey);
@@ -603,9 +603,7 @@ public partial class View // Keyboard APIs
             binding.Key = key;
         }
 
-        binding.Source = this;
-
-        return InvokeCommands (binding.Commands, binding);
+        return InvokeCommands (binding.Commands, binding with { Source = this });
     }
 
     /// <summary>
@@ -636,9 +634,7 @@ public partial class View // Keyboard APIs
                 binding.Key = hotKey;
             }
 
-            binding.Source = this;
-
-            if (InvokeCommands (binding.Commands, binding) is true)
+            if (InvokeCommands (binding.Commands, binding with {Source = this}) is true)
             {
                 return true;
             }

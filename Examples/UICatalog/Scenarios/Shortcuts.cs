@@ -391,10 +391,12 @@ public class Shortcuts : Scenario
 
         bgColorShortcut.Activating += (s, args) =>
                                       {
+                                          args.Handled = true;
+
                                           // Cycle colors only if activating didn't come from the CommandView
-                                          if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColorShortcut.CommandView)
+                                          if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColor)
                                           {
-                                              args.Handled = true;
+                                              return;
                                           }
                                           else
                                           {

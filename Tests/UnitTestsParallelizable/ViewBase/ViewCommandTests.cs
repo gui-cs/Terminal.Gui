@@ -271,7 +271,7 @@ public class ViewCommandTests
 
     #endregion OnActivating/Activating tests
 
-    #region OnHotKey/HotKey tests
+    #region HotKey tests
 
     [Fact]
     public void HotKey_Command_SetsFocus ()
@@ -284,7 +284,30 @@ public class ViewCommandTests
         Assert.True (view.HasFocus);
     }
 
-    #endregion OnHotKey/HotKey tests
+    [Fact]
+    public void HotKey_Command_Activates ()
+    {
+        var view = new View ();
+
+        view.CanFocus = true;
+        view.InvokeCommand (Command.HotKey);
+
+        int activatingInvoked = 0;
+        view.Activating += ViewOnActivating;
+
+        bool? ret = view.InvokeCommand (Command.Activate);
+        Assert.Equal (1, activatingInvoked);
+
+        return;
+
+        void ViewOnActivating (object? sender, CommandEventArgs e)
+        {
+            activatingInvoked++;
+            e.Handled = true;
+        }
+    }
+
+    #endregion HotKey tests
 
     #region InvokeCommand Tests
 

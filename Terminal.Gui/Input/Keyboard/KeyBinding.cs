@@ -4,11 +4,12 @@
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>.
+///     Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>. Carried
+///     as context in command invocations (see <see cref="CommandContext"/>).
 /// </summary>
 /// <seealso cref="KeyBindings"/>
-/// <seealso cref="KeyBindings"/>
-/// <seealso cref="Command"/>
+/// <seealso cref="MouseBinding"/>
+/// <seealso cref="CommandContext"/>
 public record struct KeyBinding : IInputBinding
 {
     /// <summary>Initializes a new instance.</summary>
@@ -58,8 +59,9 @@ public record struct KeyBinding : IInputBinding
     public Key? Key { get; set; }
 
     /// <inheritdoc/>
-    public View? Source { get; set; }
+    public View? Source { get; init; }
 
+    // TODO: Determine if Target is duplicative of Source
     /// <summary>
     ///     The view the key binding is bound to.
     /// </summary>
@@ -75,9 +77,5 @@ public record struct KeyBinding : IInputBinding
     public View? Target { get; set; }
 
     /// <inheritdoc />
-    public override string ToString ()
-    {
-        return $"[{string.Join (", ", Commands)}], Key={Key}, Source={Source}, Target={Target}, Data={Data}";
-    }
-
+    public override string ToString () => $"[{string.Join (", ", Commands)}], Key={Key}, Source={Source}, Target={Target}, Data={Data}";
 }

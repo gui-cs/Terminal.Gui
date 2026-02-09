@@ -299,25 +299,24 @@ public class Shortcut : View, IOrientation, IDesignable
 
             // Set the context source to the Shortcut (this) so that when we invoke Activate below on the CommandView, and the command bubbles to us again,
             // we can detect that it originated from us and not from the CommandView with IsInvocationFromShortcut below.
-            ICommandContext context = new CommandContext (Command.Activate, new WeakReference<View> (this), args.Context?.Binding);
+            ICommandContext context = new CommandContext (args.Context!.Command, new WeakReference<View> (this), args.Context?.Binding);
 
             // Disable bubbling
             // TODO: Make API for CommandsToBubbleUp richer. Support adding & removing commands
             IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
             CommandsToBubbleUp = [];
 
-            if (CommandView.InvokeCommand (Command.Activate, context) is true)
+            if (CommandView.InvokeCommand (args.Context!.Command, context) is true)
             {
                 // This is not expected;
-                throw new InvalidOperationException ("CommandView.InvokeCommand(Command.Activate) returned true unexpectedly.");
+                throw new InvalidOperationException ("CommandView.InvokeCommand() returned true unexpectedly.");
             }
             CommandsToBubbleUp = tempCommandsToBubbleUp;
 
             // By setting the Binding source to null, neither IsFromCommandView nor IsBindingFromShortcut will return true,
             // letting the resulting call to this method to fall through; returning false.
-            args.Context?.Binding?.Source = null;
-            context = new CommandContext (Command.Activate, null, args.Context?.Binding);
-            InvokeCommand (Command.Activate, context);
+            InvokeCommand (args.Context!.Command,
+                           new CommandContext (args.Context!.Command, new WeakReference<View> (CommandView), new InputBinding ([args.Context!.Command], null, null)));
 
             // When the above InvokeCommand returns, the CommandView should have changed state (e.g., a CheckBox may have toggled its checked state).
             // The call to this OnActivating should signal the event was handled, so the state doesn't change again.
@@ -335,21 +334,16 @@ public class Shortcut : View, IOrientation, IDesignable
             // Disable bubbling
             IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
             CommandsToBubbleUp = [];
-            ICommandContext context = new CommandContext (Command.Activate, null, null);
+            ICommandContext context = new CommandContext (args.Context!.Command, null, null);
 
             // Ignore return value and always return true to stop further processing of the command
-            CommandView.InvokeCommand (Command.Activate, context);
+            CommandView.InvokeCommand (args.Context!.Command, context);
             CommandsToBubbleUp = tempCommandsToBubbleUp;
 
             Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsBindingFromShortcut - Back from CommandView.InvokeCommand");
 
-            // By setting the Binding source to null, neither IsFromCommandView nor IsBindingFromShortcut will return true,
-            // letting the resulting call to this method to fall through; returning false.
-            args.Context?.Binding?.Source = null;
-            context = new CommandContext (Command.Activate, null, args.Context?.Binding);
-
             // Ignore return value and always return true to stop further processing of the command
-            InvokeCommand (Command.Activate, context);
+            InvokeCommand (args.Context!.Command, context);
 
             return true;
         }
@@ -372,35 +366,84 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (!IsBindingFromShortcut (args))
+        if (base.OnAccepting (args))
         {
-            Logging.Debug ($"{this.ToIdentifyingString ()} ({args})) - RaisingActivating");
-            RaiseActivating (args.Context);
+            return true;
+        }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-            // override handled; prevent Accepting from being raised
-            args.Handled = true;
+        if (IsFromCommandView (args.Context))
+        {
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsFromCommandView");
+
+            // The user did something in the CommandView (e.g., clicked on it or pressed its hotkey). We got here because CommandsToBubbleUp
+            // includes Command.Activate, so the event bubbled up to Shortcut.
+            // We're going to cancel the CommandView's Activating and raise our own so that the Shortcut gets focus and can update its state if needed.
+
+            // Set the context source to the Shortcut (this) so that when we invoke Activate below on the CommandView, and the command bubbles to us again,
+            // we can detect that it originated from us and not from the CommandView with IsInvocationFromShortcut below.
+            ICommandContext context = new CommandContext (args.Context!.Command, new WeakReference<View> (this), args.Context?.Binding);
+
+            // Disable bubbling
+            // TODO: Make API for CommandsToBubbleUp richer. Support adding & removing commands
+            IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
+            CommandsToBubbleUp = [];
+
+            if (CommandView.InvokeCommand (args.Context!.Command, context) is true)
+            {
+                // This is not expected;
+                throw new InvalidOperationException ("CommandView.InvokeCommand() returned true unexpectedly.");
+            }
+            CommandsToBubbleUp = tempCommandsToBubbleUp;
+
+            // By setting the Binding source to null, neither IsFromCommandView nor IsBindingFromShortcut will return true,
+            // letting the resulting call to this method to fall through; returning false.
+            InvokeCommand (args.Context!.Command);
+
+            // When the above InvokeCommand returns, the CommandView should have changed state (e.g., a CheckBox may have toggled its checked state).
+            // The call to this OnActivating should signal the event was handled, so the state doesn't change again.
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsFromCommandView - Back from CommandView.InvokeCommand");
 
             return true;
         }
 
-        if (args.Handled)
+        if (IsBindingFromShortcut (args))
         {
+            // The user did something in the Shortcut/KeyView/HelpView.
+            // Need to invoke on the command view so that it can update its state if needed (e.g., toggle a CheckBox).
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsBindingFromShortcut");
+
+            // Disable bubbling
+            IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
+            CommandsToBubbleUp = [];
+            ICommandContext context = new CommandContext (args.Context!.Command, null, null);
+
+            // Ignore return value and always return true to stop further processing of the command
+            CommandView.InvokeCommand (args.Context!.Command, context);
+            CommandsToBubbleUp = tempCommandsToBubbleUp;
+
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - IsBindingFromShortcut - Back from CommandView.InvokeCommand");
+
+            // By setting the Binding source to null, neither IsFromCommandView nor IsBindingFromShortcut will return true,
+            // letting the resulting call to this method to fall through; returning false.
+            InvokeCommand (args.Context!.Command,
+                           new CommandContext (args.Context!.Command, new WeakReference<View> (this), new InputBinding ([args.Context!.Command], null, null)));
+
+            // Ignore return value and always return true to stop further processing of the command
+            InvokeCommand (args.Context!.Command);
+
             return true;
         }
 
-        return base.OnAccepting (args);
+        // If we got here, the Activate came from somewhere else.
+        // We want to allow that, but we don't want to raise Activating again and cause a loop, so we'll just return false and allow it to bubble up.
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - returning false.");
+
+        return false;
     }
 
     /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
-    {
-        if (base.OnHandlingHotKey (args) is true)
-        {
-            return true;
-        }
-
-        return OnActivating (args);
-    }
+    protected override bool OnHandlingHotKey (CommandEventArgs args) => base.OnHandlingHotKey (args) is true || OnActivating (args);
 
     /// <inheritdoc/>
     protected override void OnAccepted (CommandEventArgs args) => Action?.Invoke ();
@@ -572,12 +615,9 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     // Helper to check if command context originated from the CommandView
-    // Both the command source and binding source must be from the CommandView 
+    // Both the command source and binding source must be from the CommandView
     private bool IsFromCommandView (ICommandContext? ctx) =>
-        ctx?.Source?.TryGetTarget (out View? ctxSource) is true
-        && ctxSource == CommandView
-        && ctx?.Binding?.Source is { } bindingSource
-        && bindingSource == CommandView;
+        ctx?.TryGetSource (out View? ctxSource) is true && ctxSource == CommandView && ctx.Binding?.Source == CommandView;
 
     private void SetCommandViewDefaultLayout ()
     {
@@ -824,6 +864,8 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 
             App?.Keyboard.KeyBindings.Remove (Key);
+
+            // Use the form of Add that provides target since this is an app-level hotkey
             App?.Keyboard.KeyBindings.Add (Key, this, Command.HotKey);
         }
         else

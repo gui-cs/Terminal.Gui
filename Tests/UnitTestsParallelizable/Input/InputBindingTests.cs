@@ -65,16 +65,16 @@ public class InputBindingTests
         Assert.Equal (Command.Cancel, binding.Commands [1]);
     }
 
-    [Fact ]
-    public void Source_CanBeModified ()
-    {
-        InputBinding binding = new ([Command.Activate]);
-        View source = new () { Id = "newSource" };
+    //[Fact ]
+    //public void Source_CanBeModified ()
+    //{
+    //    InputBinding binding = new ([Command.Activate]);
+    //    View source = new () { Id = "newSource" };
 
-        binding.Source = source;
+    //    binding.Source = source;
 
-        Assert.Equal ("newSource", binding.Source?.Id);
-    }
+    //    Assert.Equal ("newSource", binding.Source?.Id);
+    //}
 
     [Fact ]
     public void Data_CanBeModified ()

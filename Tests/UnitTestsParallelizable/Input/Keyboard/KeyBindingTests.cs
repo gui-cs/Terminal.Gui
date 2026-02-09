@@ -93,17 +93,17 @@ public class KeyBindingTests
         Assert.Equal (testData, binding.Data);
     }
 
-    [Fact]
-    public void Source_GetSet_Works ()
-    {
-        KeyBinding binding = new ([Command.Activate]);
-        View sourceView = new () { Id = "sourceView" };
+    //[Fact]
+    //public void Source_GetSet_Works ()
+    //{
+    //    KeyBinding binding = new ([Command.Activate]);
+    //    View sourceView = new () { Id = "sourceView" };
 
-        binding.Source = sourceView;
+    //    binding.Source = sourceView;
 
-        Assert.Equal (sourceView, binding.Source);
-        Assert.Equal ("sourceView", binding.Source.Id);
-    }
+    //    Assert.Equal (sourceView, binding.Source);
+    //    Assert.Equal ("sourceView", binding.Source.Id);
+    //}
 
     [Fact]
     public void Source_DefaultsToNull ()

@@ -65,17 +65,17 @@ public class MouseBindingTests
         Assert.Equal (testData, binding.Data);
     }
 
-    [Fact]
-    public void Source_GetSet_Works ()
-    {
-        MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
-        View testView = new () { Id = "testView" };
+    //[Fact]
+    //public void Source_GetSet_Works ()
+    //{
+    //    MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
+    //    View testView = new () { Id = "testView" };
 
-        binding.Source = testView;
+    //    binding.Source = testView;
 
-        Assert.Equal (testView, binding.Source);
-        Assert.Equal ("testView", binding.Source.Id);
-    }
+    //    Assert.Equal (testView, binding.Source);
+    //    Assert.Equal ("testView", binding.Source.Id);
+    //}
 
     [Fact]
     public void Source_DefaultsToNull ()

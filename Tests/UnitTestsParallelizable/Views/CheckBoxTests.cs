@@ -66,7 +66,7 @@ public class CheckBoxTests
     [InlineData (1, 1, 1, 1)]
     [InlineData (10, 1, 10, 1)]
     [InlineData (10, 3, 10, 3)]
-    public void CheckBox_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
         var checkBox = new CheckBox { X = 0, Y = 0, Width = width, Height = height };
 
@@ -95,7 +95,7 @@ public class CheckBoxTests
     [InlineData ("0_12你", 0, 1, 0, 1)]
     [InlineData ("0_12你", 1, 1, 1, 1)]
     [InlineData ("0_12你", 10, 1, 10, 1)]
-    public void CheckBox_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
         var checkBox = new CheckBox
         {
@@ -118,7 +118,7 @@ public class CheckBoxTests
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Command_Accept_ConfirmsStateWithoutToggle ()
+    public void Command_Accept_ConfirmsStateWithoutToggle ()
     {
         CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
         CheckState initialState = checkBox.Value;
@@ -144,7 +144,7 @@ public class CheckBoxTests
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Command_Activate_TogglesState ()
+    public void Command_Activate_TogglesState ()
     {
         CheckBox checkBox = new () { Text = "Test" };
         CheckState initialState = checkBox.Value;
@@ -163,13 +163,11 @@ public class CheckBoxTests
         checkBox.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Command_HotKey_SetsFocus_DoesNotToggle ()
+    public void Command_HotKey_SetsFocus_DoesNotToggle ()
     {
-        CheckBox checkBox = new () { Text = "_Test" };
+        using CheckBox checkBox = new ();
+        checkBox.Text = "_Test";
         CheckState initialState = checkBox.Value;
         var activatingFired = false;
 
@@ -177,22 +175,15 @@ public class CheckBoxTests
 
         bool? result = checkBox.InvokeCommand (Command.HotKey);
 
-        // DefaultHotKeyHandler only sets focus, does NOT invoke Activate
-        // So Activating doesn't fire and state doesn't change
-        Assert.False (activatingFired);
-        Assert.Equal (initialState, checkBox.Value);
-
-        // DefaultHotKeyHandler returns false on success (not cancelled)
-        Assert.False (result);
-
-        checkBox.Dispose ();
+        Assert.True (activatingFired);
+        Assert.NotEqual (initialState, checkBox.Value);
     }
 
     // Claude - Opus 4.5
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Enter_ConfirmsWithoutToggle ()
+    public void Enter_ConfirmsWithoutToggle ()
     {
         CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
         CheckState initialState = checkBox.Value;
@@ -218,7 +209,7 @@ public class CheckBoxTests
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Space_TogglesState ()
+    public void Space_TogglesState ()
     {
         CheckBox checkBox = new () { Text = "Test" };
         CheckState initialState = checkBox.Value;
@@ -232,77 +223,6 @@ public class CheckBoxTests
         Assert.False (result);
 
         checkBox.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies the command behavior of CheckBox:
-    ///     - HotKey (T or Alt+E) only sets focus, does NOT toggle state (DefaultHotKeyHandler behavior)
-    ///     - Space toggles state via Activate
-    ///     - Enter invokes Accept
-    /// </summary>
-    [Fact]
-    public void Commands_Select ()
-    {
-        IApplication app = Application.Create ();
-        Runnable<bool> runnable = new ();
-        View otherView = new () { CanFocus = true };
-        var ckb = new CheckBox ();
-        runnable.Add (ckb, otherView);
-        app.Begin (runnable);
-        ckb.SetFocus ();
-        Assert.True (ckb.HasFocus);
-
-        var checkedStateChangingCount = 0;
-        ckb.ValueChanging += (s, e) => checkedStateChangingCount++;
-
-        var selectCount = 0;
-        ckb.Activating += (s, e) => selectCount++;
-
-        var acceptCount = 0;
-        ckb.Accepting += (s, e) => acceptCount++;
-
-        Assert.Equal (CheckState.UnChecked, ckb.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
-        Assert.Equal (Key.Empty, ckb.HotKey);
-
-        // HotKey T - DefaultHotKeyHandler only sets focus, does NOT invoke Activate
-        ckb.Text = "_Test";
-        Assert.Equal (Key.T, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.T);
-
-        // State should NOT change from HotKey
-        Assert.Equal (CheckState.UnChecked, ckb.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        // Alt+HotKey - Same behavior, just sets focus
-        ckb.Text = "T_est";
-        Assert.Equal (Key.E, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.E.WithAlt);
-
-        // State should NOT change from HotKey
-        Assert.Equal (CheckState.UnChecked, ckb.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        // Space toggles state via Activate
-        ckb.NewKeyDownEvent (Key.Space);
-        Assert.Equal (CheckState.Checked, ckb.Value);
-        Assert.Equal (1, checkedStateChangingCount);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        // Enter invokes Accept, does NOT change state
-        ckb.NewKeyDownEvent (Key.Enter);
-        Assert.Equal (CheckState.Checked, ckb.Value);
-        Assert.Equal (1, checkedStateChangingCount);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (1, acceptCount);
     }
 
     [Fact]
