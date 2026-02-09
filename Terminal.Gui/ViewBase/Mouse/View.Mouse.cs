@@ -42,7 +42,7 @@ public partial class View // Mouse APIs
     internal bool? NewMouseEnterEvent (CancelEventArgs eventArgs)
     {
         // Pre-conditions
-        if (!CanBeVisible (this))
+        if (!CanBeVisible (this) || !Enabled)
         {
             return null;
         }
@@ -77,7 +77,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be visible to receive Enter events (Leave events are always received).
+    ///         A view must be visible and enabled to receive Enter events (Leave events are always received).
     ///     </para>
     ///     <para>
     ///         If the event is cancelled, the mouse event will not be propagated to other views and <see cref="MouseEnter"/>
@@ -104,7 +104,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be visible to receive Enter events (Leave events are always received).
+    ///         A view must be visible and enabled to receive Enter events (Leave events are always received).
     ///     </para>
     ///     <para>
     ///         If the event is cancelled, the mouse event will not be propagated to other views.
