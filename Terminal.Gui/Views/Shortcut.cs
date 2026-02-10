@@ -360,9 +360,16 @@ public class Shortcut : View, IOrientation, IDesignable
         return InvokeCommand (Command.Activate, args.Context) is true;
     }
 
-    private bool DispatchCommandFromSelf (View subViewToDispatch, ICommandContext ctx)
+    /// <summary>
+    ///     Dispatches the command to a specified subview if the command binding source was not `this`.
+    /// </summary>
+    /// <param name="subViewToDispatch"></param>
+    /// <param name="ctx"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public bool DispatchCommandFromSelf (View subViewToDispatch, ICommandContext ctx)
     {
-        if (!IsBindingFromShortcut (ctx))
+        if (!IsBindingFromSelf (ctx))
         {
             return false;
         }
@@ -388,14 +395,17 @@ public class Shortcut : View, IOrientation, IDesignable
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Back from subViewToDispatch.InvokeCommand");
         CommandsToBubbleUp = tempCommandsToBubbleUp;
 
-        // Ignore return value and always return true to stop further processing of the command
-        InvokeCommand (ctx.Command, context);
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Back from InvokeCommand");
-
-        return true;
+        return false;
     }
 
-    private bool DispatchCommandFromSubview (View subView, ICommandContext ctx)
+    /// <summary>
+    ///     Dispatches the command to the specified subview, if the command was not from the subview.
+    /// </summary>
+    /// <param name="subView"></param>
+    /// <param name="ctx"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public bool DispatchCommandFromSubview (View subView, ICommandContext ctx)
     {
         if (!IsFromCommandView (ctx))
         {
@@ -573,7 +583,7 @@ public class Shortcut : View, IOrientation, IDesignable
         ctx.Binding?.Source is { } sourceView && sourceView == HelpView;
 
     // Helper to check if command originated from Shortcut, the HelpView, or the KeyView mouse or keyboard binding
-    private bool IsBindingFromShortcut (ICommandContext ctx)
+    private bool IsBindingFromSelf (ICommandContext ctx)
     {
         if (IsBindingFromKeyView (ctx))
         {

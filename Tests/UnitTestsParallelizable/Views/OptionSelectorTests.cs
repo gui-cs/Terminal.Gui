@@ -493,7 +493,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Down_Vertical_MovesFocusToNextCheckBox ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -513,7 +513,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Down_Vertical_WrapsAroundToFirst ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -554,7 +554,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Up_Vertical_MovesFocusToPreviousCheckBox ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -574,7 +574,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Up_Vertical_WrapsAroundToLast ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -594,7 +594,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Up_Horizontal_ReturnsFalse ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -615,7 +615,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Right_Horizontal_MovesFocusToNextCheckBox ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -635,7 +635,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Right_Horizontal_WrapsAroundToFirst ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -676,7 +676,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Left_Horizontal_MovesFocusToPreviousCheckBox ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -696,7 +696,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Left_Horizontal_WrapsAroundToLast ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Horizontal, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -737,7 +737,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Down_Vertical_WithShowValue_FocusesValueFieldAtEnd ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, Styles = SelectorStyles.ShowValue, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -758,7 +758,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Up_Vertical_WithShowValue_FocusesValueFieldAtStart ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, Styles = SelectorStyles.ShowValue };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, Styles = SelectorStyles.ShowValue, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -779,7 +779,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Up_Vertical_WithShowValue_FromValueField_FocusesLastCheckBox ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, Styles = SelectorStyles.ShowValue };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, Styles = SelectorStyles.ShowValue, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
@@ -797,12 +797,13 @@ public class OptionSelectorTests
         optionSelector.Dispose ();
     }
 
-    // Navigation Does Not Change Value Tests
+    // Navigation Tests
 
-    [Fact]
-    public void Command_Down_DoesNotChangeValue ()
+    [Theory]
+    [CombinatorialData]
+    public void Command_Down_DoesNotChangeValue (TabBehavior tabBehavior)
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = tabBehavior };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.Value = 0;
         optionSelector.SetFocus ();
@@ -814,15 +815,17 @@ public class OptionSelectorTests
         optionSelector.InvokeCommand (Command.Down);
 
         Assert.Equal (0, optionSelector.Value); // Value should remain unchanged
-        Assert.True (checkBoxes [1].HasFocus); // But focus moved
+
+        Assert.True (tabBehavior == TabBehavior.NoStop ? checkBoxes [1].HasFocus : checkBoxes [0].HasFocus);
 
         optionSelector.Dispose ();
     }
 
-    [Fact]
-    public void Command_Up_DoesNotChangeValue ()
+    [Theory]
+    [CombinatorialData]
+    public void Command_Up_DoesNotChangeValue (TabBehavior tabBehavior)
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = tabBehavior };
         optionSelector.Labels = ["Option1", "Option2", "Option3"];
         optionSelector.Value = 2;
         optionSelector.SetFocus ();
@@ -834,7 +837,8 @@ public class OptionSelectorTests
         optionSelector.InvokeCommand (Command.Up);
 
         Assert.Equal (2, optionSelector.Value); // Value should remain unchanged
-        Assert.True (checkBoxes [1].HasFocus); // But focus moved
+
+        Assert.True (tabBehavior == TabBehavior.NoStop ? checkBoxes [1].HasFocus : checkBoxes [2].HasFocus);
 
         optionSelector.Dispose ();
     }

@@ -24,19 +24,13 @@ public sealed class Selectors : Scenario
 
         OptionSelector<Orientation> orientationSelector = new ()
         {
-            Orientation = Orientation.Horizontal,
-            BorderStyle = LineStyle.Dotted,
-            Title = "Selector Or_ientation",
-            Value = Orientation.Vertical
+            Orientation = Orientation.Horizontal, BorderStyle = LineStyle.Dotted, Title = "Selector Or_ientation", Value = Orientation.Vertical
         };
         orientationSelector.ValueChanged += OrientationSelectorOnSelectedItemChanged;
 
         FlagSelector<SelectorStyles> stylesSelector = new ()
         {
-            X = Pos.Right (orientationSelector) + 1,
-            Orientation = Orientation.Horizontal,
-            BorderStyle = LineStyle.Dotted,
-            Title = "Selector St_yles"
+            X = Pos.Right (orientationSelector) + 1, Orientation = Orientation.Horizontal, BorderStyle = LineStyle.Dotted, Title = "Selector St_yles"
         };
         stylesSelector.ValueChanged += StylesSelectorOnValueChanged;
 
@@ -71,7 +65,19 @@ public sealed class Selectors : Scenario
         };
         canFocus.ValueChanged += CanFocusOnValueChanged;
 
-        optionSelectorsFrame = new ()
+        OptionSelector<TabBehavior> tabBehaviorSelector = new ()
+        {
+            X = Pos.Right (canFocus) + 1,
+            Y = Pos.Top (canFocus),
+            Orientation = Orientation.Horizontal,
+            BorderStyle = LineStyle.Dotted,
+            Title = "_Tab Behavior",
+            Value = orientationSelector.TabStop
+        };
+
+        tabBehaviorSelector.ValueChanged += TabBehaviorSelectorOnValueChanged;
+
+        optionSelectorsFrame = new FrameView
         {
             Y = Pos.Bottom (canFocus),
             Width = Dim.Percent (50),
@@ -80,10 +86,7 @@ public sealed class Selectors : Scenario
             TabStop = TabBehavior.TabStop
         };
 
-        Label label = new ()
-        {
-            Title = "Fo_ur Options:"
-        };
+        Label label = new () { Title = "Fo_ur Options:" };
 
         OptionSelector optionSelector = new ()
         {
@@ -98,11 +101,7 @@ public sealed class Selectors : Scenario
         };
         optionSelectorsFrame.Add (label, optionSelector);
 
-        label = new ()
-        {
-            Y = Pos.Bottom (optionSelector),
-            Title = "<VisualRole_>:"
-        };
+        label = new Label { Y = Pos.Bottom (optionSelector), Title = "<VisualRole_>:" };
 
         OptionSelector<VisualRole> optionSelectorT = new ()
         {
@@ -116,7 +115,7 @@ public sealed class Selectors : Scenario
 
         optionSelectorsFrame.Add (label, optionSelectorT);
 
-        flagSelectorsFrame = new ()
+        flagSelectorsFrame = new FrameView
         {
             Y = Pos.Top (optionSelectorsFrame),
             X = Pos.Right (optionSelectorsFrame),
@@ -126,10 +125,7 @@ public sealed class Selectors : Scenario
             TabStop = TabBehavior.TabStop
         };
 
-        label = new ()
-        {
-            Title = "FlagSelector _(uint):"
-        };
+        label = new Label { Title = "FlagSelector _(uint):" };
 
         FlagSelector flagSelector = new ()
         {
@@ -137,30 +133,12 @@ public sealed class Selectors : Scenario
             BorderStyle = LineStyle.Dotted,
             Title = "FlagSe_lector (uint)",
             AssignHotKeys = true,
-            Values =
-            [
-                0b_0001,
-                0b_0010,
-                0b_0100,
-                0b_1000,
-                0b_1111
-            ],
-            Labels =
-            [
-                "0x0001 One",
-                "0x0010 Two",
-                "0x0100 Quattro",
-                "0x1000 8",
-                "0x1111 Fifteen"
-            ]
+            Values = [0b_0001, 0b_0010, 0b_0100, 0b_1000, 0b_1111],
+            Labels = ["0x0001 One", "0x0010 Two", "0x0100 Quattro", "0x1000 8", "0x1111 Fifteen"]
         };
         flagSelectorsFrame.Add (label, flagSelector);
 
-        label = new ()
-        {
-            Y = Pos.Bottom (flagSelector),
-            Title = "_<ViewDiagnosticFlags>:"
-        };
+        label = new Label { Y = Pos.Bottom (flagSelector), Title = "_<ViewDiagnosticFlags>:" };
 
         FlagSelector<ViewDiagnosticFlags> flagSelectorT = new ()
         {
@@ -175,12 +153,33 @@ public sealed class Selectors : Scenario
         flagSelectorsFrame.Add (label, flagSelectorT);
         flagSelectorT.ValueChanged += (_, a) => { View.Diagnostics = (ViewDiagnosticFlags)a.Value!; };
 
-        appWindow.Add (orientationSelector, stylesSelector, horizontalSpace, showBorderAndTitle, canFocus, optionSelectorsFrame, flagSelectorsFrame);
+        appWindow.Add (orientationSelector,
+                       stylesSelector,
+                       horizontalSpace,
+                       showBorderAndTitle,
+                       canFocus,
+                       tabBehaviorSelector,
+                       optionSelectorsFrame,
+                       flagSelectorsFrame);
 
         // Run - Start the application.
         app.Run (appWindow);
 
         return;
+
+        void TabBehaviorSelectorOnValueChanged (object? sender, EventArgs<TabBehavior?> e)
+        {
+            if (sender is not OptionSelector<TabBehavior> s)
+            {
+                return;
+            }
+            List<SelectorBase> selectors = GetAllSelectors ();
+
+            foreach (SelectorBase selector in selectors)
+            {
+                selector.TabBehavior = s.Value!.Value;
+            }
+        }
 
         void OrientationSelectorOnSelectedItemChanged (object? sender, EventArgs<Orientation?> e)
         {
@@ -240,7 +239,7 @@ public sealed class Selectors : Scenario
 
             foreach (SelectorBase selector in selectors)
             {
-                selector.Border!.Thickness = cb.Value == CheckState.Checked ? new (1) : new Thickness (0);
+                selector.Border!.Thickness = cb.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
             }
         }
 

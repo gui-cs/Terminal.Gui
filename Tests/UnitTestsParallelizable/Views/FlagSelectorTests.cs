@@ -86,37 +86,59 @@ public class FlagSelectorTests
     }
 
     [Fact]
-    public void FlagSelector_Command_Activate_ForwardsToFocusedCheckBox ()
+    public void FlagSelector_Command_Activate_Changes_Value_And_Activates ()
     {
         using FlagSelector<SelectorStyles> flagSelector = new ();
 
         CheckBox firstCheckBox = flagSelector.SubViews.OfType<CheckBox> ().ElementAt (0);
+        flagSelector.SetFocus ();
+        Assert.True (flagSelector.HasFocus);
 
         int cbActivatingRaised = 0;
         firstCheckBox.Activating += (_, _) => cbActivatingRaised++;
+
+        int selectorActivatingRaised = 0;
+        flagSelector.Activating += (_, _) => selectorActivatingRaised++;
+
+        int selectorValueChanged = 0;
+        flagSelector.ValueChanged += (_, _) => selectorValueChanged++;
 
         // Activate should forward to the focused CheckBox's Activate
         flagSelector.InvokeCommand (Command.Activate);
 
         Assert.Equal (1, cbActivatingRaised);
+        Assert.Equal (1, selectorActivatingRaised);
+        Assert.Equal (1, selectorValueChanged);
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void FlagSelector_Command_HotKey_ForwardsToFocusedItem ()
+    public void FlagSelector_Command_HotKey_Changes_Value_And_Activates ()
     {
-        FlagSelector<SelectorStyles> flagSelector = new ();
-        flagSelector.BeginInit ();
-        flagSelector.EndInit ();
+        using FlagSelector<SelectorStyles> flagSelector = new ();
 
-        // HotKey forwards to focused item's Activate
-        bool? result = flagSelector.InvokeCommand (Command.HotKey);
+        CheckBox firstCheckBox = flagSelector.SubViews.OfType<CheckBox> ().ElementAt (0);
+        flagSelector.SetFocus ();
+        Assert.True (flagSelector.HasFocus);
 
-        Assert.True (result);
+        int cbActivatingRaised = 0;
+        firstCheckBox.Activating += (_, _) => cbActivatingRaised++;
 
-        flagSelector.Dispose ();
+        int selectorActivatingRaised = 0;
+        flagSelector.Activating += (_, _) => selectorActivatingRaised++;
+
+        int selectorHotKeyRaised = 0;
+        flagSelector.HandlingHotKey += (_, _) => selectorHotKeyRaised++;
+
+        int selectorValueChanged = 0;
+        flagSelector.ValueChanged += (_, _) => selectorValueChanged++;
+
+        // HotKey forwards to focused items Activate
+        flagSelector.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, selectorActivatingRaised);
+        Assert.Equal (1, selectorHotKeyRaised);
+        Assert.Equal (1, selectorValueChanged);
+        Assert.Equal (1, cbActivatingRaised);
     }
 
     // Tests for FlagSelector<TEnum>
@@ -222,7 +244,7 @@ public class FlagSelectorTests
         Assert.False (flagSelector.HasFocus);
         Assert.Null (flagSelector.Value);
 
-        flagSelector.InvokeCommand (Command.HotKey, new KeyBinding ());
+        flagSelector.InvokeCommand (Command.HotKey);
 
         Assert.True (flagSelector.HasFocus);
         Assert.Null (flagSelector.Value);
