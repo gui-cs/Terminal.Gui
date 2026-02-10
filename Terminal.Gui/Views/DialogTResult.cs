@@ -210,6 +210,16 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         return true;
     }
 
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        if (!IsInitialized)
+        {
+            SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
+        }
+        base.OnViewportChanged (e);
+    }
+
     private void UpdateSizes ()
     {
         if (SubViews.Count == 0)
