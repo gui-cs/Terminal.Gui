@@ -1177,7 +1177,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Theory]
-    [MemberData (nameof (PosData), MemberType = typeof (DialogTests))]
+    [MemberData (nameof (PosData))]
     public void Dialog_Draws_SubView_With_SubViews_WithDifferentPosTypes (Pos pos, string expected)
     {
         IDriver driver = CreateTestDriver ();
@@ -1191,8 +1191,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.BorderStyle = LineStyle.Single;
         dialog.ShadowStyle = ShadowStyle.None;
         dialog.Title = "Dialog";
-        dialog.AddButton (new Button { Text = "Cancel" });
-        dialog.AddButton (new Button { Text = "OK", IsDefault = true });
 
         var container = new View
         {
@@ -1220,138 +1218,108 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             {
                 Pos.Absolute (0), """
-                                  ┌┤Dialog├────────────┐
-                                  │┌┤con├┐             │
-                                  ││view1│             │
-                                  ││view2│             │
-                                  │└─────┘             │
-                                  │                    │
-                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                  │                    │
-                                  └────────────────────┘
+                                  ┌┤Dialog├──┐
+                                  │┌┤con├┐   │
+                                  ││view1│   │
+                                  ││view2│   │
+                                  │└─────┘   │
+                                  └──────────┘
                                   """
             },
             {
                 Pos.Absolute (2), """
-                                  ┌┤Dialog├────────────┐
-                                  │  ┌┤con├┐           │
-                                  │  │view1│           │
-                                  │  │view2│           │
-                                  │  └─────┘           │
-                                  │                    │
-                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                  │                    │
-                                  └────────────────────┘
+                                  ┌┤Dialog├──┐
+                                  │  ┌┤con├┐ │
+                                  │  │view1│ │
+                                  │  │view2│ │
+                                  │  └─────┘ │
+                                  └──────────┘
                                   """
             },
             {
                 Pos.Center (), """
-                               ┌┤Dialog├────────────┐
-                               │      ┌┤con├┐       │
-                               │      │view1│       │
-                               │      │view2│       │
-                               │      └─────┘       │
-                               │                    │
-                               │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                               │                    │
-                               └────────────────────┘
+                               ┌┤Dialog├──┐
+                               │ ┌┤con├┐  │
+                               │ │view1│  │
+                               │ │view2│  │
+                               │ └─────┘  │
+                               └──────────┘
                                """
             },
             {
                 Pos.AnchorEnd (), """
-                                  ┌┤Dialog├────────────┐
-                                  │             ┌┤con├┐│
-                                  │             │view1││
-                                  │             │view2││
-                                  │             └─────┘│
-                                  │                    │
-                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                  │                    │
-                                  └────────────────────┘
+                                  ┌┤Dialog├──┐
+                                  │   ┌┤con├┐│
+                                  │   │view1││
+                                  │   │view2││
+                                  │   └─────┘│
+                                  └──────────┘
                                   """
             },
             {
                 Pos.Align (Alignment.Start), """
-                                             ┌┤Dialog├────────────┐
-                                             │┌┤con├┐             │
-                                             ││view1│             │
-                                             ││view2│             │
-                                             │└─────┘             │
-                                             │                    │
-                                             │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                             │                    │
-                                             └────────────────────┘
+                                             ┌┤Dialog├──┐
+                                             │┌┤con├┐   │
+                                             ││view1│   │
+                                             ││view2│   │
+                                             │└─────┘   │
+                                             └──────────┘
                                              """
             },
             {
                 Pos.Align (Alignment.Center), """
-                                              ┌┤Dialog├────────────┐
-                                              │      ┌┤con├┐       │
-                                              │      │view1│       │
-                                              │      │view2│       │
-                                              │      └─────┘       │
-                                              │                    │
-                                              │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                              │                    │
-                                              └────────────────────┘
+                                              ┌┤Dialog├──┐
+                                              │ ┌┤con├┐  │
+                                              │ │view1│  │
+                                              │ │view2│  │
+                                              │ └─────┘  │
+                                              └──────────┘
                                               """
             },
             {
                 Pos.Align (Alignment.End), """
-                                           ┌┤Dialog├────────────┐
-                                           │             ┌┤con├┐│
-                                           │             │view1││
-                                           │             │view2││
-                                           │             └─────┘│
-                                           │                    │
-                                           │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                           │                    │
-                                           └────────────────────┘
+                                           ┌┤Dialog├──┐
+                                           │   ┌┤con├┐│
+                                           │   │view1││
+                                           │   │view2││
+                                           │   └─────┘│
+                                           └──────────┘
                                            """
             },
             {
                 Pos.Align (Alignment.Fill), """
-                                            ┌┤Dialog├────────────┐
-                                            │┌┤con├┐             │
-                                            ││view1│             │
-                                            ││view2│             │
-                                            │└─────┘             │
-                                            │                    │
-                                            │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                            │                    │
-                                            └────────────────────┘
+                                            ┌┤Dialog├──┐
+                                            │┌┤con├┐   │
+                                            ││view1│   │
+                                            ││view2│   │
+                                            │└─────┘   │
+                                            └──────────┘
                                             """
             },
             {
                 Pos.Percent (50), """
-                                  ┌┤Dialog├────────────┐
-                                  │          ┌┤con├┐   │
-                                  │          │view1│   │
-                                  │          │view2│   │
-                                  │          └─────┘   │
-                                  │                    │
-                                  │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                  │                    │
-                                  └────────────────────┘
+                                  ┌┤Dialog├──┐
+                                  │     ┌┤con│
+                                  │     │view│
+                                  │     │view│
+                                  │     └────│
+                                  └──────────┘
                                   """
             },
             {
                 Pos.Func (_ => 3), """
-                                   ┌┤Dialog├────────────┐
-                                   │   ┌┤con├┐          │
-                                   │   │view1│          │
-                                   │   │view2│          │
-                                   │   └─────┘          │
-                                   │                    │
-                                   │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                                   │                    │
-                                   └────────────────────┘
+                                   ┌┤Dialog├──┐
+                                   │   ┌┤con├┐│
+                                   │   │view1││
+                                   │   │view2││
+                                   │   └─────┘│
+                                   └──────────┘
                                    """
             }
         };
 
     [Theory]
-    [MemberData (nameof (PosViewData), MemberType = typeof (DialogTests))]
+    [MemberData (nameof (PosViewData))]
     public void Dialog_Draws_SubView_With_SubViews_WithDifferentPosViewTypes (Func<View, Pos> posFactory, Func<View> viewFactory, string expected)
     {
         IDriver driver = CreateTestDriver ();
@@ -1365,8 +1333,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.BorderStyle = LineStyle.Single;
         dialog.ShadowStyle = ShadowStyle.None;
         dialog.Title = "Dialog";
-        dialog.AddButton (new Button { Text = "Cancel" });
-        dialog.AddButton (new Button { Text = "OK", IsDefault = true });
 
         View view = viewFactory (); // Create fresh instance
         Pos pos = posFactory (view);
@@ -1405,17 +1371,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
                     Text = "view"
                 },
                 """
-                ┌┤Dialog├────────────┐
-                │                    │
-                │                    │
-                │  view              │
-                │   ┌─┐              │
-                │   │v│              │
-                │   └─┘              │
-                │                    │
-                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                │                    │
-                └────────────────────┘
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │   ┌─┐    │
+                │   │v│    │
+                │   └─┘    │
+                └──────────┘
                 """
             },
             {
@@ -1428,16 +1391,13 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
                     Text = "view"
                 },
                 """
-                ┌┤Dialog├────────────┐
-                │                    │
-                │                    │
-                │  view              │
-                │  │v│               │
-                │  └─┘               │
-                │                    │
-                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                │                    │
-                └────────────────────┘
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
                 """
             },
             {
@@ -1450,17 +1410,17 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
                     Text = "view"
                 },
                 """
-                ┌┤Dialog├────────────┐
-                │                    │
-                │                    │
-                │  view              │
-                │                    │
-                │                    │
-                │                    │
-                │      ┌─┐           │
-                │      │v│           │
-                │      └─┘           │
-                │                    │
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │          │
+                │          │
+                │          │
+                │      ┌─┐ │
+                │      │v│ │
+                │      └─┘ │
+                └──────────┘
                 """
             },
             {
@@ -1473,16 +1433,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
                     Text = "view"
                 },
                 """
-                ┌┤Dialog├────────────┐
-                │                    │
-                │                    │
-                │  view              │
-                │  │v│               │
-                │  └─┘               │
-                │                    │
-                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                │                    │
-                └────────────────────┘
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
+                
                 """
             },
             {
@@ -1495,16 +1453,13 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
                     Text = "view"
                 },
                 """
-                ┌┤Dialog├────────────┐
-                │                    │
-                │                    │
-                │  view              │
-                │  │v│               │
-                │  └─┘               │
-                │                    │
-                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                │                    │
-                └────────────────────┘
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
                 """
             },
             {
@@ -1517,19 +1472,17 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
                     Text = "view"
                 },
                 """
-                ┌┤Dialog├────────────┐
-                │                    │
-                │                    │
-                │  view              │
-                │  │v│               │
-                │  └─┘               │
-                │                    │
-                │⟦ Cancel ⟧ ⟦► OK ◄⟧ │
-                │                    │
-                └────────────────────┘
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
                 """
             }
         };
+
     #endregion Drawing Tests
 
     #region Dialog<TResult> Generic Tests
