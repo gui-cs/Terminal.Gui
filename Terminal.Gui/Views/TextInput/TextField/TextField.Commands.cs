@@ -34,27 +34,6 @@ public partial class TextField
         AddCommand (Command.SelectAll, () => SelectAll ());
         AddCommand (Command.DeleteAll, () => DeleteAll ());
         AddCommand (Command.Context, () => ShowContextMenu (true));
-        AddCommand (
-                    Command.HotKey,
-                    ctx =>
-                    {
-                        if (RaiseHandlingHotKey (ctx) is true)
-                        { }
-
-                        // If we have focus, then ignore the hotkey because the user
-                        // means to enter it
-                        if (HasFocus)
-                        {
-                            return false;
-                        }
-
-                        // This is what the default HotKey handler does:
-                        SetFocus ();
-
-                        // Always return true on hotkey, even if SetFocus fails because
-                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
-                        return true;
-                    });
 
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts

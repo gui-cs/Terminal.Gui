@@ -6,13 +6,16 @@ namespace Terminal.Gui.Input;
 /// </summary>
 /// <seealso cref="View.MouseBindings"/>
 /// <seealso cref="Command"/>
-public class MouseBindings : InputBindings<MouseFlags, MouseBinding>
+public class MouseBindings : CommandBindingsBase<MouseFlags, MouseBinding>
 {
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
     public MouseBindings () : base (
-                                    (commands, flags) => new (commands, flags),
+                                    (commands, flags, source) =>
+                                    {
+                                        return new MouseBinding (commands, flags, source);
+                                    },
                                     EqualityComparer<MouseFlags>.Default)
     { }
 

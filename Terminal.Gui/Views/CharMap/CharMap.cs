@@ -248,6 +248,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// <inheritdoc/>
     object? IValue.GetValue () => new Rune (SelectedCodePoint);
 
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     /// <summary>
     ///     Called when the <see cref="CharMap"/> <see cref="Value"/> is changing.
     /// </summary>

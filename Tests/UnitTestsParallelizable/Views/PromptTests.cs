@@ -17,10 +17,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            ResultExtractor = l => l.Text
-        };
+        using Prompt<Label, string> dialog = new (label) { ResultExtractor = l => l.Text };
 
         Assert.Equal (2, dialog.Buttons.Length);
         Assert.Equal (Strings.btnCancel, dialog.Buttons [0].Text);
@@ -33,9 +30,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-        };
+        using Prompt<Label, string> dialog = new (label);
 
         Assert.True (dialog.CanFocus);
         Assert.Equal (Alignment.End, dialog.ButtonAlignment);
@@ -55,9 +50,7 @@ public class PromptTests : TestDriverBase
 
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-        };
+        using Prompt<Label, string> dialog = new (label);
 
         Assert.Same (label, dialog.GetWrappedView ());
     }
@@ -67,10 +60,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test Label" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            ResultExtractor = l => l.Text
-        };
+        using Prompt<Label, string> dialog = new (label) { ResultExtractor = l => l.Text };
 
         // Before EndInit, label is not in SubViews
         Assert.Contains (label, dialog.SubViews);
@@ -88,10 +78,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Hello" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            ResultExtractor = l => l.Text
-        };
+        using Prompt<Label, string> dialog = new (label) { ResultExtractor = l => l.Text };
 
         Assert.NotNull (dialog.ResultExtractor);
     }
@@ -101,10 +88,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Hello" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            ResultExtractor = null
-        };
+        using Prompt<Label, string> dialog = new (label) { ResultExtractor = null };
 
         Assert.Null (dialog.ResultExtractor);
     }
@@ -143,10 +127,7 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using Prompt<TextField, string> dialog = new (textField)
-        {
-            ResultExtractor = tf => tf.Text
-        };
+        using Prompt<TextField, string> dialog = new (textField) { ResultExtractor = tf => tf.Text };
 
         // Verify extractor function works correctly
         string? extracted = dialog.ResultExtractor?.Invoke (textField);
@@ -159,10 +140,7 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using Prompt<TextField, string> dialog = new (textField)
-        {
-            ResultExtractor = tf => tf.Text
-        };
+        using Prompt<TextField, string> dialog = new (textField) { ResultExtractor = tf => tf.Text };
 
         // Initially, result is null
         Assert.Null (dialog.Result);
@@ -178,10 +156,7 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using Prompt<TextField, string> dialog = new (textField)
-        {
-            ResultExtractor = tf => tf.Text
-        };
+        using Prompt<TextField, string> dialog = new (textField) { ResultExtractor = tf => tf.Text };
 
         Assert.Null (dialog.Result);
     }
@@ -191,10 +166,7 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "Test" };
 
-        using Prompt<TextField, string> dialog = new (textField)
-        {
-            ResultExtractor = tf => tf.Text
-        };
+        using Prompt<TextField, string> dialog = new (textField) { ResultExtractor = tf => tf.Text };
 
         dialog.Result = "Hello";
 
@@ -215,11 +187,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Choose an option" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            Title = "Prompt",
-            ResultExtractor = l => l.Text
-        };
+        using Prompt<Label, string> dialog = new (label) { Title = "Prompt", ResultExtractor = l => l.Text };
 
         dialog.BeginInit ();
         dialog.EndInit ();
@@ -234,11 +202,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Hello World" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            Title = "Test",
-            ResultExtractor = l => l.Text
-        };
+        using Prompt<Label, string> dialog = new (label) { Title = "Test", ResultExtractor = l => l.Text };
 
         dialog.BeginInit ();
         dialog.EndInit ();
@@ -262,10 +226,7 @@ public class PromptTests : TestDriverBase
 
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, bool> dialog = new (label)
-        {
-            ResultExtractor = _ => true
-        };
+        using Prompt<Label, bool> dialog = new (label) { ResultExtractor = _ => true };
 
         // Manually set result to simulate acceptance
         dialog.Result = true;
@@ -278,10 +239,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, bool> dialog = new (label)
-        {
-            ResultExtractor = _ => true
-        };
+        using Prompt<Label, bool> dialog = new (label) { ResultExtractor = _ => true };
 
         // Result is null when canceled (default bool is false)
         Assert.False (dialog.Result);
@@ -296,10 +254,7 @@ public class PromptTests : TestDriverBase
     {
         DatePicker datePicker = new () { Value = new DateTime (2024, 6, 15) };
 
-        using Prompt<DatePicker, DateTime> dialog = new (datePicker)
-        {
-            ResultExtractor = dp => dp.Value
-        };
+        using Prompt<DatePicker, DateTime> dialog = new (datePicker) { ResultExtractor = dp => dp.Value };
 
         // Manually invoke the extractor to verify it works
         DateTime? result = dialog.ResultExtractor?.Invoke (datePicker);
@@ -311,20 +266,22 @@ public class PromptTests : TestDriverBase
     [Fact]
     public void Prompt_Works_With_Color_Result ()
     {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
         ColorPicker colorPicker = new () { SelectedColor = Color.Red };
 
-        using Prompt<ColorPicker, Color> dialog = new (colorPicker)
-        {
-            ResultExtractor = cp => cp.SelectedColor
-        };
+        using Prompt<ColorPicker, Color> prompt = new (colorPicker);
+        prompt.ResultExtractor = cp => cp.SelectedColor;
 
-        // Manually invoke the extractor to verify it works
-        Color? result = dialog.ResultExtractor?.Invoke (colorPicker);
+        app.StopAfterFirstIteration = true;
+        app.Iteration += (_, _) => { prompt.InvokeCommand (Command.Accept); };
+
+        Color? result = app.Run (prompt) as Color?;
 
         Assert.NotNull (result);
         Assert.Equal (Color.Red, result.Value);
     }
-
 
     [Fact]
     public void Prompt_Works_With_Color_Text ()
@@ -334,11 +291,11 @@ public class PromptTests : TestDriverBase
 
         ColorPicker colorPicker = new () { SelectedColor = Color.Red };
 
-        using Prompt<ColorPicker, string?> dialog = new (colorPicker);
+        using Prompt<ColorPicker, string?> prompt = new (colorPicker);
 
         app.StopAfterFirstIteration = true;
-        app.Iteration += (_, _) => { dialog.InvokeCommand (Command.Accept); };
-        object? result = app.Run (dialog);
+        app.Iteration += (_, _) => { prompt.InvokeCommand (Command.Accept); };
+        object? result = app.Run (prompt);
 
         Assert.NotNull (result);
         Assert.Equal ("Red", result);
@@ -349,10 +306,7 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "42" };
 
-        using Prompt<TextField, int> dialog = new (textField)
-        {
-            ResultExtractor = tf => int.TryParse (tf.Text, out int result) ? result : 0
-        };
+        using Prompt<TextField, int> dialog = new (textField) { ResultExtractor = tf => int.TryParse (tf.Text, out int result) ? result : 0 };
 
         // Manually invoke the extractor to verify it works
         int? result = dialog.ResultExtractor?.Invoke (textField);
@@ -370,10 +324,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            Title = "Select Item",
-        };
+        using Prompt<Label, string> dialog = new (label) { Title = "Select Item" };
 
         Assert.Equal ("Select Item", dialog.Title);
     }
@@ -383,10 +334,7 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new (label)
-        {
-            Title = "选择日期",
-        };
+        using Prompt<Label, string> dialog = new (label) { Title = "选择日期" };
 
         Assert.Equal ("选择日期", dialog.Title);
     }

@@ -1,4 +1,4 @@
-namespace InputTests;
+namespace ViewBaseTests.Commands;
 
 /// <summary>
 ///     Tests for <see cref="CommandContext"/> record struct.
@@ -10,7 +10,7 @@ public class CommandContextTests
 {
     #region Basic Property Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void CommandContext_WithKeyBinding_SetsProperties ()
     {
         View sourceView = new () { Id = "sourceView" };
@@ -19,6 +19,7 @@ public class CommandContextTests
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (sourceView), Binding = keyBinding };
 
         Assert.Equal (Command.Activate, ctx.Command);
+
         // Phase 2: Temporarily commented - will fix in Phase 4
         // Assert.Equal (sourceView, ctx.Source);
         Assert.NotNull (ctx.Binding);
@@ -33,7 +34,7 @@ public class CommandContextTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void CommandContext_WithMouseBinding_SetsProperties ()
     {
         View sourceView = new () { Id = "sourceView" };
@@ -42,6 +43,7 @@ public class CommandContextTests
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (sourceView), Binding = mouseBinding };
 
         Assert.Equal (Command.Activate, ctx.Command);
+
         // Phase 2: Temporarily commented - will fix in Phase 4
         // Assert.Equal (sourceView, ctx.Source);
         Assert.NotNull (ctx.Binding);
@@ -61,7 +63,7 @@ public class CommandContextTests
 
     #region ICommandContext Interface Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void CommandContext_ImplementsICommandContext ()
     {
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (new View ()) };
@@ -72,7 +74,7 @@ public class CommandContextTests
         Assert.NotNull (iCtx.Source);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void Source_IsMutable_ThroughInterface ()
     {
         View originalSource = new () { Id = "original" };
@@ -91,14 +93,12 @@ public class CommandContextTests
 
     #region Pattern Matching Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void PatternMatching_KeyBinding_Works ()
     {
         ICommandContext ctx = new CommandContext
         {
-            Command = Command.Activate,
-            Source = new WeakReference<View> (new View ()),
-            Binding = new KeyBinding ([Command.Activate]) { Key = Key.Enter }
+            Command = Command.Activate, Source = new WeakReference<View> (new View ()), Binding = new KeyBinding ([Command.Activate]) { Key = Key.Enter }
         };
 
         if (ctx.Binding is KeyBinding { Key: { } key })
@@ -112,7 +112,7 @@ public class CommandContextTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void PatternMatching_MouseBinding_WithMouseEvent_Works ()
     {
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new View { Id = "mouseSource" } };
@@ -132,7 +132,7 @@ public class CommandContextTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void PatternMatching_MouseBinding_NullMouseEvent_DoesNotMatch ()
     {
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked)
@@ -148,14 +148,12 @@ public class CommandContextTests
         Assert.False (matched);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void PatternMatching_DifferentBindingTypes_DoNotMatch ()
     {
         ICommandContext ctx = new CommandContext
         {
-            Command = Command.Activate,
-            Source = new WeakReference<View> (new View ()),
-            Binding = new KeyBinding ([Command.Activate])
+            Command = Command.Activate, Source = new WeakReference<View> (new View ()), Binding = new KeyBinding ([Command.Activate])
         };
 
         // KeyBinding should not match MouseBinding pattern
@@ -168,7 +166,7 @@ public class CommandContextTests
 
     #region Binding Source Property Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void KeyBinding_Source_IsAccessibleThroughContext ()
     {
         View bindingSource = new () { Id = "bindingSource" };
@@ -193,7 +191,7 @@ public class CommandContextTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void MouseBinding_Source_IsAccessibleThroughContext ()
     {
         View bindingSource = new () { Id = "bindingSource" };
@@ -222,7 +220,7 @@ public class CommandContextTests
 
     #region Command Event Args Integration Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void CommandEventArgs_Context_WithKeyBinding_Works ()
     {
         KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter, Source = new View { Id = "keySource" } };
@@ -244,7 +242,7 @@ public class CommandContextTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void CommandEventArgs_Context_WithMouseBinding_Works ()
     {
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new View { Id = "mouseSource" } };
@@ -269,8 +267,8 @@ public class CommandContextTests
 
     #region ICommandContext.Binding Property Tests
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
-    public void Binding_Property_ReturnsBindingAsIInputBinding ()
+    [Fact]
+    public void Binding_Property_ReturnsBindingAsICommandBinding ()
     {
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Enter };
 
@@ -284,7 +282,7 @@ public class CommandContextTests
         Assert.Equal (keyBinding.Commands, iCtx.Binding!.Commands);
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void Binding_Property_AllowsPolymorphicPatternMatching ()
     {
         KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.F5 };
@@ -301,7 +299,7 @@ public class CommandContextTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void Binding_Property_WithMouseBinding_Works ()
     {
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked);
@@ -318,25 +316,25 @@ public class CommandContextTests
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
-    public void Binding_Property_WithInputBinding_Works ()
+    [Fact]
+    public void Binding_Property_WithCommandBinding_Works ()
     {
-        InputBinding inputBinding = new ([Command.Accept], new View { Id = "programmatic" }, "data");
+        CommandBinding inputBinding = new ([Command.Accept], new View { Id = "programmatic" }, "data");
         ICommandContext ctx = new CommandContext { Command = Command.Accept, Binding = inputBinding };
 
         // Pattern match on Binding from the interface
-        if (ctx.Binding is InputBinding ib)
+        if (ctx.Binding is CommandBinding ib)
         {
             Assert.Equal ("programmatic", ib.Source?.Id);
             Assert.Equal ("data", ib.Data);
         }
         else
         {
-            Assert.Fail ("Should be able to pattern match InputBinding from ICommandContext.Binding");
+            Assert.Fail ("Should be able to pattern match CommandBinding from ICommandContext.Binding");
         }
     }
 
-    [Fact (Skip = "Phase 2: Requires WeakReference update - re-enable in Phase 4")]
+    [Fact]
     public void Binding_Property_NullBinding_ReturnsNull ()
     {
         CommandContext ctx = new () { Command = Command.Activate };

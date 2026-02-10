@@ -621,4 +621,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         return true;
     }
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }

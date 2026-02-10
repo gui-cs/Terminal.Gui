@@ -93,38 +93,23 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
+        CommandsToBubbleUp = [Command.Accept];
+
         _buttonContainer = new View
         {
+#if DEBUG
             Id = "Dialog.ButtonContainer",
+#endif
             CanFocus = true,
             X = 0,
             Y = Pos.AnchorEnd (),
             Width = Dim.Fill (),
-            Height = Dim.Auto ()
+            Height = Dim.Auto (),
+            CommandsToBubbleUp = CommandsToBubbleUp
         };
         Padding!.Add (_buttonContainer);
 
         SetStyle ();
-
-        AddCommand (Command.Accept,
-                    ctx =>
-                    {
-                        View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
-
-                        if (isDefaultView == this || isDefaultView is not Button { IsDefault: true })
-                        {
-                            return RaiseAccepting (ctx);
-                        }
-
-                        bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
-
-                        if (handled == true)
-                        {
-                            return true;
-                        }
-
-                        return RaiseAccepting (ctx);
-                    });
     }
 
     private Size _minimumSubViewsSize;
@@ -154,65 +139,80 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         base.OnSubViewLayout (args);
     }
 
-#pragma warning disable TGUI001
     /// <summary>
-    ///     Propagates the buttons in the Padding Accepting events to the Dialog's Accepting event.
+    ///     INTERNAL: When a Dialog Button is pressed, and it's not the DefaultAcceptView,
+    ///     this method raises the <see cref="View.Activating"/> event. This allows the
+    ///     Dialog.OnActivating method to handle stopping the dialog.
     /// </summary>
     private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
     {
-        if (e.Handled || !IsRunning)
+        if (e.Context?.Source?.TryGetTarget (out View? sourceView) is not true)
         {
             return;
         }
 
-        e.Handled = RaiseAccepting (e.Context) is true;
-
-        if (e.Handled)
+        if (sourceView != DefaultAcceptView)
         {
-            return;
+            e.Handled = RaiseActivating (e.Context) is true;
         }
-
-        // Only RequestStop if we are running (modal)
-        if (!IsRunning)
-        {
-            return;
-        }
-
-        e.Handled = true;
-        RequestStop ();
     }
-#pragma warning restore
 
     /// <summary>
-    ///     Overrides the default Accepting behavior to handle Dialog Button presses.
+    ///     Overrides the default Activating behavior to handle non-<see cref="View.DefaultAcceptView"/> Dialog Button presses.
+    ///     The <see cref="View.DefaultAcceptView"/> button press is handled in <see cref="OnAccepting(CommandEventArgs)"/>.
     /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    protected override bool OnAccepting (CommandEventArgs args)
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not Button sourceButton)
+        if (base.OnActivating (args))
+        {
+            return true;
+        }
+
+        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is true)
+        {
+            if (!Buttons.Contains (sourceView as Button))
+            {
+                return true;
+            }
+        }
+
+        if (!IsRunning)
         {
             return false;
         }
-
-        if (!Buttons.Contains (sourceButton))
-        {
-            return false;
-        }
-
-        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == sourceButton)
-        {
-            // Default button pressed
-            return false;
-        }
-
-        // Any other Dialog Button pressed
-        if (IsRunning)
-        {
-            RequestStop ();
-        }
+        RequestStop ();
 
         return true;
+    }
+
+    /// <summary>
+    ///     Overrides the default Accepting behavior to handle Dialog Button presses. If the Button pressed is
+    ///     <see cref="View.DefaultAcceptView"/> then <see cref="View.Accepted"/> will be raised.
+    /// </summary>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        var isDefaultAcceptView = false;
+
+        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is true)
+        {
+            isDefaultAcceptView = sourceView == DefaultAcceptView;
+        }
+
+        if (!IsRunning)
+        {
+            return false;
+        }
+        RequestStop ();
+
+        if (args.Context?.Binding is null)
+        {
+            // Direct invoke of Command.Accept - let Accepted be raised
+            return false;
+        }
+
+        // return false if this was the default accept view so that Accepted will be raised
+        // return true if it was not the default accept view to prevent Accepted from being raised
+        return !isDefaultAcceptView;
     }
 
     private void UpdateSizes ()
@@ -301,6 +301,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             button.Accepting += OnDialogButtonOnAccepting;
         }
 
+        DefaultAcceptView = dialogButton;
         dialogButton.IsDefault = true;
 
         _buttonContainer?.Add (dialogButton);

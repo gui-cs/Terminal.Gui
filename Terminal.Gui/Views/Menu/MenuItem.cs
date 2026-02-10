@@ -97,7 +97,7 @@ public class MenuItem : Shortcut
     /// <inheritdoc/>
     protected override void OnAccepted (CommandEventArgs args)
     {
-        Logging.Debug ($"{Title} ({TargetView?.Title})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({TargetView?.Title})");
         base.OnAccepted (args);
 
         // Translate the incoming command to Command
@@ -108,20 +108,20 @@ public class MenuItem : Shortcut
 
         if (TargetView is { })
         {
-            Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
+            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
            // TargetView.InvokeCommand (Command, args.Context) is true;
         }
         else if (Key.IsValid)
         {
             // Is this an Application-bound command?
-            Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
+            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
             //App?.Keyboard.InvokeCommandsBoundToKey (Key) ?? false;
         }
     }
 
     //internal override bool? DispatchCommand (ICommandContext? commandContext)
     //{
-    //    //Logging.Debug ($"{Title} - {commandContext?.Source} Command: {commandContext?.Command}");
+    //    //Logging.Debug ($"{this.ToIdentifyingString ()} - {commandContext?.Source} Command: {commandContext?.Command}");
     //    bool? ret = null;
 
     //    var quit = false;
@@ -131,7 +131,7 @@ public class MenuItem : Shortcut
     //        if (key == Application.QuitKey && SuperView is { Visible: true })
     //        {
     //            // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-    //            // Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
+    //            // Logging.Debug ($"{this.ToIdentifyingString ()} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
     //            quit = true;
 
     //            //ret = true;
@@ -148,20 +148,20 @@ public class MenuItem : Shortcut
     //    {
     //        if (TargetView is { })
     //        {
-    //            Logging.Debug ($"{Title} - InvokeCommand on TargetView ({TargetView.Title})...");
+    //            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
     //            ret = TargetView.InvokeCommand (Command, commandContext);
     //        }
     //        else if (Key.IsValid)
     //        {
     //            // Is this an Application-bound command?
-    //            Logging.Debug ($"{Title} - Application.InvokeCommandsBoundToKey ({Key})...");
+    //            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
     //            ret = App?.Keyboard.InvokeCommandsBoundToKey (Key);
     //        }
     //    }
 
     //    if (ret is not true)
     //    {
-    //        Logging.Debug ($"{Title} - calling base.DispatchCommand...");
+    //        Logging.Debug ($"{this.ToIdentifyingString ()} - calling base.DispatchCommand...");
     //        // Base will Raise Selected, then Accepting, then invoke the Action, if any
     //        // Note: base.DispatchCommand will call RaiseAccepted via RaiseAccepting when handled
     //        ret = base.DispatchCommand (commandContext);
@@ -173,7 +173,7 @@ public class MenuItem : Shortcut
     ///// <inheritdoc />
     //protected override bool OnAccepting (CommandEventArgs e)
     //{
-    //    // Logging.Debug ($"{Title} - calling base.OnAccepting: {e.Context?.Command}");
+    //    // Logging.Debug ($"{this.ToIdentifyingString ()} - calling base.OnAccepting: {e.Context?.Command}");
     //    bool? ret = base.OnAccepting (e);
 
     //    if (ret is true || e.Cancel)
@@ -215,7 +215,7 @@ public class MenuItem : Shortcut
     {
         // When the mouse enters a menuitem, we set focus to it automatically.
 
-        // Logging.Trace($"OnEnter {Title}");
+        // Logging.Trace($"OnEnter {this.ToIdentifyingString ()}");
         SetFocus ();
 
         return base.OnMouseEnter (eventArgs);

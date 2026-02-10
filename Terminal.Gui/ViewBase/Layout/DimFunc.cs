@@ -23,7 +23,19 @@ public record DimFunc (Func<View?, int> Fn, View? View = null) : Dim
     public View? View { get; } = View;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"DimFunc({Fn (View)})"; }
+    public override string ToString () => $"DimFunc({Fn (View)})";
 
-    internal override int GetAnchor (int size) { return Fn (View); }
+    internal override int GetAnchor (int size) => Fn (View);
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        if (View is { })
+        {
+            yield return View;
+        }
+    }
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => true;
 }

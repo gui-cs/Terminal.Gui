@@ -222,7 +222,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                     return null;
                 }
 
-                handled = binding.Target?.InvokeCommands (binding.Commands, binding);
+                handled = binding.Target?.InvokeCommands (binding.Commands, binding with { Source = binding.Target });
             }
             else
             {

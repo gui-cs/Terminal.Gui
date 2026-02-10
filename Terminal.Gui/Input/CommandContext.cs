@@ -10,11 +10,12 @@
 ///         <code>
 ///         if (ctx.Binding is KeyBinding kb) { /* key input */ }
 ///         else if (ctx.Binding is MouseBinding mb) { /* mouse input */ }
-///         else if (ctx.Binding is InputBinding ib) { /* programmatic */ }
+///         else if (ctx.Binding is CommandBinding ib) { /* programmatic */ }
 ///         </code>
 ///     </para>
 /// </remarks>
-/// <seealso cref="View.InvokeCommand"/>.
+/// <seealso cref="View.InvokeCommand"/>
+/// .
 #pragma warning restore CS1574, CS0419 // XML comment has cref attribute that could not be resolved
 public record struct CommandContext : ICommandContext
 {
@@ -24,19 +25,22 @@ public record struct CommandContext : ICommandContext
     /// <param name="command">The command being invoked.</param>
     /// <param name="source">A weak reference to the view that is the source of the command invocation.</param>
     /// <param name="binding">The binding that triggered the command, if any.</param>
-    public CommandContext (Command command, WeakReference<View>? source, IInputBinding? binding)
+    public CommandContext (Command command, WeakReference<View>? source, ICommandBinding? binding)
     {
         Command = command;
         Binding = binding;
         Source = source;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Command Command { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public WeakReference<View>? Source { get; set; }
 
-    /// <inheritdoc />
-    public IInputBinding? Binding { get; set; }
+    /// <inheritdoc/>
+    public ICommandBinding? Binding { get; set; }
+
+    /// <inheritdoc/>
+    public override string ToString () => $"{Command} (Source={Source.ToIdentifyingString ()}, Binding={Binding})";
 }

@@ -5,12 +5,12 @@ public class ViewCommandTests
     #region OnAccept/Accept tests
 
     [Fact]
-    public void Accept_Command_Raises_NoFocus ()
+    public void Accept_Command_Raised_With_HasFocus_False ()
     {
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        Assert.False (view.InvokeCommand (Command.Accept)); // there's no superview, so it should return true?
+        Assert.False (view.InvokeCommand (Command.Accept));
 
         Assert.Equal (1, view.OnAcceptedCount);
 
@@ -20,26 +20,12 @@ public class ViewCommandTests
     }
 
     [Fact]
-    public void Accept_Command_Handle_OnAccept_NoEvent ()
-    {
-        var view = new ViewEventTester ();
-        Assert.False (view.HasFocus);
-
-        view.HandleOnAccepted = true;
-        Assert.True (view.InvokeCommand (Command.Accept));
-
-        Assert.Equal (1, view.OnAcceptedCount);
-
-        Assert.Equal (0, view.AcceptedCount);
-    }
-
-    [Fact]
-    public void Accept_Handle_Event_OnAccept_Returns_True ()
+    public void Accept_Handle_Event_OnAccepting_Returns_True ()
     {
         var view = new View ();
         var acceptInvoked = false;
 
-        view.Accepting += ViewOnAccept;
+        view.Accepting += ViewOnAccepting;
 
         bool? ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
@@ -47,7 +33,7 @@ public class ViewCommandTests
 
         return;
 
-        void ViewOnAccept (object? sender, CommandEventArgs e)
+        void ViewOnAccepting (object? sender, CommandEventArgs e)
         {
             acceptInvoked = true;
             e.Handled = true;
@@ -55,19 +41,19 @@ public class ViewCommandTests
     }
 
     [Fact]
-    public void Accept_Command_Invokes_Accept_Event ()
+    public void Accept_Command_Invokes_Accepting_Event ()
     {
         var view = new View ();
         var accepted = false;
 
-        view.Accepting += ViewOnAccept;
+        view.Accepting += ViewOnAccepting;
 
         view.InvokeCommand (Command.Accept);
         Assert.True (accepted);
 
         return;
 
-        void ViewOnAccept (object? sender, CommandEventArgs e) => accepted = true;
+        void ViewOnAccepting (object? sender, CommandEventArgs e) => accepted = true;
     }
 
     // Accept on subview should bubble up to parent
@@ -75,6 +61,7 @@ public class ViewCommandTests
     public void Accept_Command_Bubbles_Up_To_SuperView ()
     {
         var view = new ViewEventTester { Id = "view" };
+        view.CommandsToBubbleUp = [Command.Accept];
         var subview = new ViewEventTester { Id = "subview" };
         view.Add (subview);
 
@@ -95,6 +82,7 @@ public class ViewCommandTests
 
         // Add a super view to test deeper hierarchy
         var superView = new ViewEventTester { Id = "superView" };
+        superView.CommandsToBubbleUp = [Command.Accept];
         superView.Add (view);
 
         subview.InvokeCommand (Command.Accept);
@@ -120,50 +108,31 @@ public class ViewCommandTests
     #region Accepted tests
 
     [Fact]
-    public void Accepted_Event_Is_Raised_After_Accepting_When_Handled ()
+    public void Accepted_Raised_When_Accepting_Not_Handled ()
     {
         View view = new ();
-        var acceptingInvoked = false;
         var acceptedInvoked = false;
 
-        view.Accepting += (sender, e) =>
-                          {
-                              acceptingInvoked = true;
-                              e.Handled = true;
-                          };
+        view.Accepting += (sender, e) => { e.Handled = false; };
 
-        view.Accepted += (sender, e) =>
-                         {
-                             acceptedInvoked = true;
-                             Assert.True (acceptingInvoked); // Accepting should be raised first
-                         };
+        view.Accepted += (sender, e) => { acceptedInvoked = true; };
 
-        bool? ret = view.InvokeCommand (Command.Accept);
-        Assert.True (ret);
-        Assert.True (acceptingInvoked);
+        view.InvokeCommand (Command.Accept);
         Assert.True (acceptedInvoked);
     }
 
     [Fact]
-    public void Accepted_Event_Not_Raised_When_Accepting_Not_Handled ()
+    public void Accepted_Not_Raised_When_Accepting_Handled ()
     {
         View view = new ();
-        var acceptingInvoked = false;
         var acceptedInvoked = false;
 
-        view.Accepting += (sender, e) =>
-                          {
-                              acceptingInvoked = true;
-                              e.Handled = false;
-                          };
+        view.Accepting += (sender, e) => { e.Handled = true; };
 
         view.Accepted += (sender, e) => { acceptedInvoked = true; };
 
-        // When not handled, Accept bubbles to SuperView, so returns false (no superview)
-        bool? ret = view.InvokeCommand (Command.Accept);
-        Assert.False (ret);
-        Assert.True (acceptingInvoked);
-        Assert.False (acceptedInvoked); // Should not be invoked when not handled
+        view.InvokeCommand (Command.Accept);
+        Assert.False (acceptedInvoked);
     }
 
     [Fact]
@@ -171,8 +140,6 @@ public class ViewCommandTests
     {
         View view = new ();
         var acceptedInvoked = false;
-
-        view.Accepting += (sender, e) => { e.Handled = true; };
 
         view.Accepted += (sender, e) =>
                          {
@@ -183,27 +150,27 @@ public class ViewCommandTests
                          };
 
         bool? ret = view.InvokeCommand (Command.Accept);
-        Assert.True (ret);
+        Assert.False (ret);
         Assert.True (acceptedInvoked);
     }
 
     [Fact]
-    public void OnAccepted_Called_When_Accepting_Handled ()
+    public void OnAccepted_Called_When_Accepting_Not_Handled ()
     {
         OnAcceptedTestView view = new ();
 
-        view.Accepting += (sender, e) => { e.Handled = true; };
+        view.Accepting += (sender, e) => { e.Handled = false; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (1, view.OnAcceptedCallCount);
     }
 
     [Fact]
-    public void OnAccepted_Not_Called_When_Accepting_Not_Handled ()
+    public void OnAccepted_Not_Called_When_Accepting_Handled ()
     {
         OnAcceptedTestView view = new ();
 
-        view.Accepting += (sender, e) => { e.Handled = false; };
+        view.Accepting += (sender, e) => { e.Handled = true; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (0, view.OnAcceptedCallCount);
@@ -294,17 +261,17 @@ public class ViewCommandTests
     }
 
     [Fact]
-    public void LeftButtonPressed_Invokes_Activate_Command ()
+    public void LeftButtonReleased_Invokes_Activate_Command ()
     {
         var view = new ViewEventTester ();
-        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonPressed, Position = Point.Empty, View = view });
+        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonReleased, Position = Point.Empty, View = view });
 
         Assert.Equal (1, view.OnActivatingCount);
     }
 
     #endregion OnActivating/Activating tests
 
-    #region OnHotKey/HotKey tests
+    #region HotKey tests
 
     [Fact]
     public void HotKey_Command_SetsFocus ()
@@ -317,7 +284,30 @@ public class ViewCommandTests
         Assert.True (view.HasFocus);
     }
 
-    #endregion OnHotKey/HotKey tests
+    [Fact]
+    public void HotKey_Command_Activates ()
+    {
+        var view = new View ();
+
+        view.CanFocus = true;
+        view.InvokeCommand (Command.HotKey);
+
+        int activatingInvoked = 0;
+        view.Activating += ViewOnActivating;
+
+        bool? ret = view.InvokeCommand (Command.Activate);
+        Assert.Equal (1, activatingInvoked);
+
+        return;
+
+        void ViewOnActivating (object? sender, CommandEventArgs e)
+        {
+            activatingInvoked++;
+            e.Handled = true;
+        }
+    }
+
+    #endregion HotKey tests
 
     #region InvokeCommand Tests
 
@@ -363,15 +353,15 @@ public class ViewCommandTests
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void PropagatedCommands_DefaultIsAcceptOnly ()
+    public void CommandsToBubbleUp_DefaultIsEmpty ()
     {
         View view = new ();
-        Assert.Equal ([Command.Accept], view.PropagatedCommands);
+        Assert.Equal ([], view.CommandsToBubbleUp);
     }
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void CommandAccept_PropagatesByDefault ()
+    public void Accept_Command_DoesNotBubbleByDefault ()
     {
         View superView = new ();
         View subView = new ();
@@ -382,12 +372,12 @@ public class ViewCommandTests
 
         subView.InvokeCommand (Command.Accept);
 
-        Assert.True (superViewAcceptingCalled);
+        Assert.False (superViewAcceptingCalled);
     }
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void CommandActivate_DoesNotPropagateByDefault ()
+    public void Activate_Command_DoesNotBubbleByDefault ()
     {
         View superView = new ();
         View subView = new ();
@@ -403,9 +393,9 @@ public class ViewCommandTests
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void PropagatedCommands_CanDisableAllPropagation ()
+    public void CommandsToBubbleUp_CanDisableAllPropagation ()
     {
-        View superView = new () { PropagatedCommands = [] };
+        View superView = new () { CommandsToBubbleUp = [] };
         View subView = new ();
         superView.Add (subView);
 
@@ -419,9 +409,9 @@ public class ViewCommandTests
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void PropagatedCommands_CanBeCustomized ()
+    public void CommandsToBubbleUp_CanBeCustomized ()
     {
-        View superView = new () { PropagatedCommands = [Command.Accept, Command.Activate] };
+        View superView = new () { CommandsToBubbleUp = [Command.Accept, Command.Activate] };
         View subView = new ();
         superView.Add (subView);
 
@@ -435,9 +425,9 @@ public class ViewCommandTests
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void PropagateCommand_StopsWhenHandled ()
+    public void TryBubbleToSuperView_StopsWhenHandled ()
     {
-        View superView = new () { PropagatedCommands = [Command.Accept] };
+        View superView = new () { CommandsToBubbleUp = [Command.Accept] };
         View subView = new ();
         superView.Add (subView);
 
@@ -455,10 +445,10 @@ public class ViewCommandTests
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void PropagateCommand_WorksInDeepHierarchy ()
+    public void TryBubbleToSuperView_WorksInDeepHierarchy ()
     {
-        View grandSuperView = new () { PropagatedCommands = [Command.Accept] };
-        View superView = new () { PropagatedCommands = [Command.Accept] };
+        View grandSuperView = new () { CommandsToBubbleUp = [Command.Accept] };
+        View superView = new () { CommandsToBubbleUp = [Command.Accept] };
         View subView = new ();
 
         grandSuperView.Add (superView);
@@ -475,10 +465,10 @@ public class ViewCommandTests
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void PropagateCommand_StopsAtIntermediateHandler ()
+    public void TryBubbleToSuperView_StopsAtIntermediateHandler ()
     {
-        View grandSuperView = new () { PropagatedCommands = [Command.Accept] };
-        View superView = new () { PropagatedCommands = [Command.Accept] };
+        View grandSuperView = new () { CommandsToBubbleUp = [Command.Accept] };
+        View superView = new () { CommandsToBubbleUp = [Command.Accept] };
         View subView = new ();
 
         grandSuperView.Add (superView);

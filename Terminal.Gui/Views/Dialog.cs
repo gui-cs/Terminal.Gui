@@ -17,12 +17,14 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
 ///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default),
-///         a press of one of the <see cref="Dialog{TResult}.Buttons"/>, or if any subview receives the <see cref="Command.Accept"/>
+///         a press of one of the <see cref="Dialog{TResult}.Buttons"/>, or if any subview receives the
+///         <see cref="Command.Accept"/>
 ///         command
 ///         and does not handle it.
 ///     </para>
 ///     <para>
-///         Buttons are added via <see cref="Dialog{TResult}.AddButton"/> or the <see cref="Dialog{TResult}.Buttons"/> property. The last button added
+///         Buttons are added via <see cref="Dialog{TResult}.AddButton"/> or the <see cref="Dialog{TResult}.Buttons"/>
+///         property. The last button added
 ///         becomes the default (<see cref="Button.IsDefault"/>). Button alignment is controlled by
 ///         <see cref="Dialog{TResult}.ButtonAlignment"/> and <see cref="Dialog{TResult}.ButtonAlignmentModes"/>.
 ///     </para>
@@ -110,13 +112,34 @@ public class Dialog : Dialog<int>
     }
 
     /// <summary>
-    ///     Overrides the default Accepting behavior to handle Dialog Button presses.
+    ///     Overrides the <see cref="Dialog{TResult}"/>  Activating behavior to handle non-Default Dialog Button presses.
+    ///     The <see cref="View.DefaultAcceptView"/> button press is handled in <see cref="OnAccepting(CommandEventArgs)"/>.
+    /// </summary>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        if (!base.OnActivating (args))
+        {
+            return true;
+        }
+
+        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is not true || sourceView is not Button sourceButton)
+        {
+            return false;
+        }
+        Result = Buttons.IndexOf (sourceButton);
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Overrides the <see cref="Dialog{TResult}"/> Accepting behavior to set <see cref="Result"/> to the index of the
+    ///     dialog button pressed.
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not Button sourceButton)
+        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is not true || sourceView is not Button sourceButton)
         {
             return false;
         }
@@ -127,9 +150,8 @@ public class Dialog : Dialog<int>
         }
 
         int buttonIndex = Buttons.IndexOf (sourceButton);
-        Result = buttonIndex != -1 ? buttonIndex : Buttons.IndexOf (Buttons.FirstOrDefault (b => b.IsDefault));
-        args.Handled = true;
-        RequestStop ();
-        return true;
+        Result = buttonIndex;
+
+        return base.OnAccepting (args);
     }
 }

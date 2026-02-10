@@ -30,7 +30,7 @@ public class Menu : Bar
 
         BorderStyle = DefaultBorderStyle;
 
-        PropagatedCommands = [Command.Accept, Command.Activate];
+        CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
@@ -106,23 +106,23 @@ public class Menu : Bar
     {
         //// When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
 
-        //// Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
+        //// Logging.Debug ($"{this.ToIdentifyingString ()} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
 
         //// TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
         //// TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
         //if (SuperView is { })
         //{
-        //    // Logging.Debug ($"{Title} - SuperView is null");
+        //    // Logging.Debug ($"{this.ToIdentifyingString ()} - SuperView is null");
         //    //return false;
         //}
 
-        //// Logging.Debug ($"{Title} - {args.Context}");
+        //// Logging.Debug ($"{this.ToIdentifyingString ()} - {args.Context}");
 
         //if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
         //{
         //    // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
         //    // And causes just the menu to quit.
-        //    // Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
+        //    // Logging.Debug ($"{this.ToIdentifyingString ()} - Returning true - Application.QuitKey/Command = Command.Quit");
         //    return true;
         //}
 
@@ -130,7 +130,7 @@ public class Menu : Bar
         //// Command.Accept to the SuperMenuItem if it exists.
         //if (SuperView is null && SuperMenuItem is { })
         //{
-        //    // Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
+        //    // Logging.Debug ($"{this.ToIdentifyingString ()} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
         //    return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         //}
 
@@ -164,7 +164,7 @@ public class Menu : Bar
 
     internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {
-        // Logging.Debug ($"{Title} ({selected?.Title})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({selected?.Title})");
 
         OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);

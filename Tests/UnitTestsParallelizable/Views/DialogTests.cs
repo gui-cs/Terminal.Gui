@@ -13,42 +13,15 @@ namespace ViewsTests;
 public class DialogTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
-    public void Constructor_Initializes_DefaultValues ()
+    public void Add_SubView_Updates_Dialog ()
     {
         Dialog dialog = new ();
 
-        Assert.NotNull (dialog);
-        Assert.True (dialog.CanFocus);
-        Assert.Equal (Alignment.End, dialog.ButtonAlignment);
-        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, dialog.ButtonAlignmentModes);
-        Assert.Equal (LineStyle.Heavy, dialog.BorderStyle);
-        Assert.Equal (ShadowStyle.Transparent, dialog.ShadowStyle);
-        Assert.Empty (dialog.Buttons);
-        Assert.Null (dialog.Result);
-        Assert.True (dialog.Canceled); // Canceled is true when Result is null
-        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
+        Label label = new () { Text = "Hello World", X = 0, Y = 0 };
 
-        dialog.Dispose ();
-    }
+        dialog.Add (label);
 
-    [Fact]
-    public void Constructor_Sets_Position_Center ()
-    {
-        Dialog dialog = new ();
-
-        Assert.True (dialog.X.Has<PosCenter> (out _));
-        Assert.True (dialog.Y.Has<PosCenter> (out _));
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Constructor_Sets_AutoDimensions ()
-    {
-        Dialog dialog = new ();
-
-        Assert.True (dialog.Width.Has<DimAuto> (out _));
-        Assert.True (dialog.Height.Has<DimAuto> (out _));
+        Assert.Contains (label, dialog.SubViews);
 
         dialog.Dispose ();
     }
@@ -89,18 +62,15 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Buttons_Property_Set_Adds_Buttons ()
+    public void AddButton_Sets_Button_Position ()
     {
         Dialog dialog = new ();
+        Button button = new () { Title = "OK" };
 
-        Button [] buttons = [new () { Title = "Cancel" }, new () { Title = "OK" }];
+        dialog.AddButton (button);
 
-        dialog.Buttons = buttons;
-
-        Assert.Equal (2, dialog.Buttons.Length);
-        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
-        Assert.Equal ("OK", dialog.Buttons [1].Title);
-        Assert.True (dialog.Buttons [1].IsDefault);
+        Assert.True (button.X.Has<PosAlign> (out _));
+        Assert.Equal (1, button.Y);
 
         dialog.Dispose ();
     }
@@ -117,6 +87,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.ButtonAlignment = Alignment.Center;
         Assert.Equal (Alignment.Center, dialog.ButtonAlignment);
+
+        dialog.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (Alignment.Start)]
+    [InlineData (Alignment.Center)]
+    [InlineData (Alignment.End)]
+    [InlineData (Alignment.Fill)]
+    public void ButtonAlignment_Theory (Alignment alignment)
+    {
+        Dialog dialog = new () { ButtonAlignment = alignment };
+
+        Assert.Equal (alignment, dialog.ButtonAlignment);
 
         dialog.Dispose ();
     }
@@ -138,6 +122,23 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Buttons_Property_Set_Adds_Buttons ()
+    {
+        Dialog dialog = new ();
+
+        Button [] buttons = [new () { Title = "Cancel" }, new () { Title = "OK" }];
+
+        dialog.Buttons = buttons;
+
+        Assert.Equal (2, dialog.Buttons.Length);
+        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
+        Assert.Equal ("OK", dialog.Buttons [1].Title);
+        Assert.True (dialog.Buttons [1].IsDefault);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
     public void Canceled_False_When_Result_Null ()
     {
         Dialog dialog = new ();
@@ -149,58 +150,48 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Title_Get_Set ()
+    public void Constructor_Initializes_DefaultValues ()
     {
         Dialog dialog = new ();
 
-        Assert.Equal (string.Empty, dialog.Title);
-
-        dialog.Title = "Test Dialog";
-        Assert.Equal ("Test Dialog", dialog.Title);
-
-        dialog.Title = "你好";
-        Assert.Equal ("你好", dialog.Title);
+        Assert.NotNull (dialog);
+        Assert.True (dialog.CanFocus);
+        Assert.Equal (Alignment.End, dialog.ButtonAlignment);
+        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, dialog.ButtonAlignmentModes);
+        Assert.Equal (LineStyle.Heavy, dialog.BorderStyle);
+        Assert.Equal (ShadowStyle.Transparent, dialog.ShadowStyle);
+        Assert.Empty (dialog.Buttons);
+        Assert.Null (dialog.Result);
+        Assert.True (dialog.Canceled); // Canceled is true when Result is null
+        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
 
         dialog.Dispose ();
     }
 
     [Fact]
-    public void Add_SubView_Updates_Dialog ()
+    public void Constructor_Sets_AutoDimensions ()
     {
         Dialog dialog = new ();
 
-        Label label = new () { Text = "Hello World", X = 0, Y = 0 };
-
-        dialog.Add (label);
-
-        Assert.Contains (label, dialog.SubViews);
+        Assert.True (dialog.Width.Has<DimAuto> (out _));
+        Assert.True (dialog.Height.Has<DimAuto> (out _));
 
         dialog.Dispose ();
     }
 
     [Fact]
-    public void Dialog_With_Title_And_Buttons ()
+    public void Constructor_Sets_Position_Center ()
     {
-        Dialog dialog = new () { Title = "Confirm" };
+        Dialog dialog = new ();
 
-        Button cancelButton = new () { Title = "Cancel" };
-        Button okButton = new () { Title = "OK" };
-
-        dialog.AddButton (cancelButton);
-        dialog.AddButton (okButton);
-
-        Assert.Equal ("Confirm", dialog.Title);
-        Assert.Equal (2, dialog.Buttons.Length);
-        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
-        Assert.Equal ("OK", dialog.Buttons [1].Title);
-        Assert.False (cancelButton.IsDefault);
-        Assert.True (okButton.IsDefault);
+        Assert.True (dialog.X.Has<PosCenter> (out _));
+        Assert.True (dialog.Y.Has<PosCenter> (out _));
 
         dialog.Dispose ();
     }
 
     [Fact]
-    public void Dialog_Arrangement_Default ()
+    public void Arrangement_Default ()
     {
         Dialog dialog = new ();
 
@@ -210,7 +201,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_CanFocus_Default_True ()
+    public void Border_Style_Can_Be_Changed ()
+    {
+        Dialog dialog = new () { BorderStyle = LineStyle.Single };
+
+        Assert.Equal (LineStyle.Single, dialog.BorderStyle);
+
+        dialog.BorderStyle = LineStyle.Double;
+        Assert.Equal (LineStyle.Double, dialog.BorderStyle);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void CanFocus_Default_True ()
     {
         Dialog dialog = new ();
 
@@ -219,8 +223,180 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.Dispose ();
     }
 
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void Dialog_With_Multiple_SubViews ()
+    public void Command_Accept_SetsResultAndStops ()
+    {
+        Dialog dialog = new () { Title = "Test" };
+        Button button = new () { Text = "OK", IsDefault = true };
+        dialog.AddButton (button);
+
+        var acceptingFired = false;
+
+        dialog.Accepting += (_, e) =>
+                            {
+                                acceptingFired = true;
+                                e.Handled = true;
+                            };
+
+        // Accept command on dialog should propagate through default button
+        bool? result = dialog.InvokeCommand (Command.Accept);
+
+        // The accepting event on dialog fires
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        dialog.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void DialogButton_Accept_BubblesUp ()
+    {
+        Dialog dialog = new () { Title = "Test" };
+        Button button = new () { Text = "OK" };
+        dialog.AddButton (button);
+
+        var buttonAcceptingFired = false;
+
+        button.Accepted += (_, e) => { buttonAcceptingFired = true; };
+
+        // Button's Accept should fire
+        bool? handledCommand = button.InvokeCommand (Command.Accept);
+
+        Assert.True (buttonAcceptingFired);
+        Assert.False (handledCommand);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Modal_DialogButton_Accept_BubblesUp ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Dialog dialog = new ();
+        dialog.Title = "Test";
+        Button cancelButton = new () { Text = "Cancel" };
+        dialog.AddButton (cancelButton);
+        Button okButton = new () { Text = "OK" };
+        dialog.AddButton (okButton);
+
+        var dialogAcceptedFired = false;
+
+        dialog.Accepted += (_, e) => { dialogAcceptedFired = true; };
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.True (dialogAcceptedFired);
+        Assert.Equal (1, dialog.Result);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            bool? handledCommand = dialog.Buttons [1].InvokeCommand (Command.Accept);
+            Assert.False (handledCommand); // False means the event was raised, and no one handled it
+
+            // Just in case
+            Assert.True (dialog.StopRequested);
+        }
+    }
+
+    [Fact]
+    public void Modal_DialogButton_Cancel_BubblesUp ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Dialog dialog = new ();
+        dialog.Title = "Test";
+        Button cancelButton = new () { Text = "Cancel" };
+        dialog.AddButton (cancelButton);
+        Button okButton = new () { Text = "OK" };
+        dialog.AddButton (okButton);
+
+        var dialogAcceptedFired = false;
+
+        dialog.Accepted += (_, e) => { dialogAcceptedFired = true; };
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.False (dialogAcceptedFired);
+        Assert.Equal (0, dialog.Result);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            bool? handledCommand = dialog.Buttons [0].InvokeCommand (Command.Accept);
+            Assert.True (handledCommand); // True means Accepting was handled (non default button)
+
+            // Just in case
+            Assert.True (dialog.StopRequested);
+        }
+    }
+
+    [Fact]
+    public void Disposes_Buttons ()
+    {
+        Dialog dialog = new ();
+        Button button1 = new () { Title = "OK" };
+        Button button2 = new () { Title = "Cancel" };
+
+        dialog.AddButton (button1);
+        dialog.AddButton (button2);
+
+        Assert.Equal (2, dialog.Buttons.Length);
+
+        dialog.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+
+        // After disposal, buttons should be disposed through the dialog's disposal chain
+        Assert.True (dialog.WasDisposed);
+        Assert.True (button1.WasDisposed);
+        Assert.True (button2.WasDisposed);
+#endif
+    }
+
+    [Fact]
+    public void ShadowStyle_Can_Be_Changed ()
+    {
+        Dialog dialog = new () { ShadowStyle = ShadowStyle.None };
+
+        Assert.Equal (ShadowStyle.None, dialog.ShadowStyle);
+
+        dialog.ShadowStyle = ShadowStyle.Opaque;
+        Assert.Equal (ShadowStyle.Opaque, dialog.ShadowStyle);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Text_Property ()
+    {
+        Dialog dialog = new () { Text = "This is a message" };
+
+        Assert.Equal ("This is a message", dialog.Text);
+
+        dialog.Text = "Updated message";
+        Assert.Equal ("Updated message", dialog.Text);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void With_Multiple_SubViews ()
     {
         Dialog dialog = new () { Title = "Form" };
 
@@ -248,21 +424,52 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void AddButton_Sets_Button_Position ()
+    public void With_Title_And_Buttons ()
     {
-        Dialog dialog = new ();
-        Button button = new () { Title = "OK" };
+        Dialog dialog = new () { Title = "Confirm" };
 
-        dialog.AddButton (button);
+        Button cancelButton = new () { Title = "Cancel" };
+        Button okButton = new () { Title = "OK" };
 
-        Assert.True (button.X.Has<PosAlign> (out _));
-        Assert.Equal (1, button.Y);
+        dialog.AddButton (cancelButton);
+        dialog.AddButton (okButton);
+
+        Assert.Equal ("Confirm", dialog.Title);
+        Assert.Equal (2, dialog.Buttons.Length);
+        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
+        Assert.Equal ("OK", dialog.Buttons [1].Title);
+        Assert.False (cancelButton.IsDefault);
+        Assert.True (okButton.IsDefault);
 
         dialog.Dispose ();
     }
 
     [Fact]
-    public void Empty_Dialog_Has_No_Buttons ()
+    public void With_Wide_Character_Button_Text ()
+    {
+        Dialog dialog = new ();
+        Button button = new () { Title = "确定" };
+
+        dialog.AddButton (button);
+
+        Assert.Single (dialog.Buttons);
+        Assert.Equal ("确定", dialog.Buttons [0].Title);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void With_Wide_Character_Title ()
+    {
+        Dialog dialog = new () { Title = "你好世界" };
+
+        Assert.Equal ("你好世界", dialog.Title);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Empty_Has_No_Buttons ()
     {
         Dialog dialog = new ();
 
@@ -270,69 +477,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.Null (dialog.Result);
 
         dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_Border_Style_Can_Be_Changed ()
-    {
-        Dialog dialog = new () { BorderStyle = LineStyle.Single };
-
-        Assert.Equal (LineStyle.Single, dialog.BorderStyle);
-
-        dialog.BorderStyle = LineStyle.Double;
-        Assert.Equal (LineStyle.Double, dialog.BorderStyle);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_ShadowStyle_Can_Be_Changed ()
-    {
-        Dialog dialog = new () { ShadowStyle = ShadowStyle.None };
-
-        Assert.Equal (ShadowStyle.None, dialog.ShadowStyle);
-
-        dialog.ShadowStyle = ShadowStyle.Opaque;
-        Assert.Equal (ShadowStyle.Opaque, dialog.ShadowStyle);
-
-        dialog.Dispose ();
-    }
-
-    [Theory]
-    [InlineData (Alignment.Start)]
-    [InlineData (Alignment.Center)]
-    [InlineData (Alignment.End)]
-    [InlineData (Alignment.Fill)]
-    public void ButtonAlignment_Theory (Alignment alignment)
-    {
-        Dialog dialog = new () { ButtonAlignment = alignment };
-
-        Assert.Equal (alignment, dialog.ButtonAlignment);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_Disposes_Buttons ()
-    {
-        Dialog dialog = new ();
-        Button button1 = new () { Title = "OK" };
-        Button button2 = new () { Title = "Cancel" };
-
-        dialog.AddButton (button1);
-        dialog.AddButton (button2);
-
-        Assert.Equal (2, dialog.Buttons.Length);
-
-        dialog.Dispose ();
-
-#if DEBUG_IDISPOSABLE
-
-        // After disposal, buttons should be disposed through the dialog's disposal chain
-        Assert.True (dialog.WasDisposed);
-        Assert.True (button1.WasDisposed);
-        Assert.True (button2.WasDisposed);
-#endif
     }
 
     [Fact]
@@ -357,38 +501,17 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_With_Wide_Character_Title ()
-    {
-        Dialog dialog = new () { Title = "你好世界" };
-
-        Assert.Equal ("你好世界", dialog.Title);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_With_Wide_Character_Button_Text ()
+    public void Title_Get_Set ()
     {
         Dialog dialog = new ();
-        Button button = new () { Title = "确定" };
 
-        dialog.AddButton (button);
+        Assert.Equal (string.Empty, dialog.Title);
 
-        Assert.Single (dialog.Buttons);
-        Assert.Equal ("确定", dialog.Buttons [0].Title);
+        dialog.Title = "Test Dialog";
+        Assert.Equal ("Test Dialog", dialog.Title);
 
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_Text_Property ()
-    {
-        Dialog dialog = new () { Text = "This is a message" };
-
-        Assert.Equal ("This is a message", dialog.Text);
-
-        dialog.Text = "Updated message";
-        Assert.Equal ("Updated message", dialog.Text);
+        dialog.Title = "你好";
+        Assert.Equal ("你好", dialog.Title);
 
         dialog.Dispose ();
     }
@@ -396,7 +519,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     #region Layout Tests
 
     [Fact]
-    public void EnableForDesign_Initializes_Dialog_With_Content ()
+    public void EnableForDesign_Initializes_With_Content ()
     {
         IDriver driver = CreateTestDriver ();
         Dialog dialog = new () { Driver = driver };
@@ -418,7 +541,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Layout_With_EnableForDesign_Default_Container ()
+    public void Layout_With_EnableForDesign_Default_Container ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -448,7 +571,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Layout_With_Small_Container ()
+    public void Layout_With_Small_Container ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (30, 10);
@@ -472,7 +595,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Layout_With_Large_Container ()
+    public void Layout_With_Large_Container ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (200, 100);
@@ -496,7 +619,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Width_Height_DimAuto_Calculates_Based_On_Content ()
+    public void Width_Height_DimAuto_Calculates_Based_On_Content ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -523,7 +646,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Height_Accounts_For_Buttons ()
+    public void Height_Accounts_For_Buttons ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -546,7 +669,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Respects_Explicit_Width_Height ()
+    public void Respects_Explicit_Width_Height ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -566,7 +689,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Padding_Affects_Content_Area ()
+    public void Padding_Affects_Content_Area ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -591,7 +714,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Multiple_Buttons_Layout_Correctly ()
+    public void Multiple_Buttons_Layout_Correctly ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -628,7 +751,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_With_Text_Property_Affects_Height ()
+    public void With_Text_Property_Affects_Height ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -660,7 +783,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     ///     Dialog's size logic should not allow it to be taller or wider than the screen.
     /// </summary>
     [Fact]
-    public void Dialog_Frame_Clamped_To_Container ()
+    public void Frame_Clamped_To_Container ()
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -716,7 +839,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     [InlineData (40, 20)]
     [InlineData (80, 25)]
     [InlineData (100, 50)]
-    public void Dialog_Height_Never_Exceeds_Screen_Height (int screenWidth, int screenHeight)
+    public void Height_Never_Exceeds_Screen_Height (int screenWidth, int screenHeight)
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (screenWidth, screenHeight);
@@ -772,7 +895,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     #region Drawing Tests
 
     [Fact]
-    public void Dialog_Draws_Single_Button ()
+    public void Draws_Single_Button ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (30, 10);
@@ -809,7 +932,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Draws_Two_Buttons ()
+    public void Draws_Two_Buttons ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (40, 10);
@@ -857,7 +980,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Draws_Text_Content ()
+    public void Draws_Text_Content ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (30, 20);
@@ -896,7 +1019,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Draws_Multiline_Text ()
+    public void Draws_Multiline_Text ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (30, 12);
@@ -937,7 +1060,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Draws_Three_Buttons_End_Aligned ()
+    public void Draws_Three_Buttons_End_Aligned ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (50, 10);
@@ -995,7 +1118,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Draws_Buttons_Center_Aligned ()
+    public void Draws_Buttons_Center_Aligned ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (35, 10);
@@ -1043,7 +1166,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Draws_Buttons_Start_Aligned ()
+    public void Draws_Buttons_Start_Aligned ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (35, 10);
@@ -1091,7 +1214,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_Draws_EnableForDesign ()
+    public void Draws_EnableForDesign ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 10);
@@ -1132,14 +1255,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestColorDialog : Dialog<Color>
     {
-        public Color SelectedColor { get; init; } = Color.Blue;
-
         public TestColorDialog ()
         {
             Title = "Select Color";
             AddButton (new Button { Title = "Cancel" });
             AddButton (new Button { Title = "OK" });
         }
+
+        public Color SelectedColor { get; init; } = Color.Blue;
     }
 
     /// <summary>
@@ -1147,14 +1270,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestStringDialog : Dialog<string>
     {
-        public string InputText { get; init; } = "";
-
         public TestStringDialog ()
         {
             Title = "Enter Text";
             AddButton (new Button { Title = "Cancel" });
             AddButton (new Button { Title = "OK" });
         }
+
+        public string InputText { get; init; } = "";
 
         /// <inheritdoc/>
         protected override bool OnAccepting (CommandEventArgs args)
@@ -1172,31 +1295,113 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// <summary>
     ///     Test dialog that returns a <see cref="DateTime"/> result.
     /// </summary>
-    private class TestDateDialog : Dialog<DateTime>
+    private class TestDateDialog : Dialog<DateTime?>
     {
-        private DateTime SelectedDate { get; } = DateTime.Now;
+        private readonly DatePicker _datePicker = new() { Value = new (1966, 9, 10) };
 
         public TestDateDialog ()
         {
             Title = "Select Date";
             AddButton (new Button { Title = "Cancel" });
             AddButton (new Button { Title = "OK" });
+
+            Add ();
         }
 
-        protected override bool OnAccepting (CommandEventArgs args)
-        {
-            if (base.OnAccepting (args))
-            {
-                return true;
-            }
-            Result = SelectedDate;
+        protected override void OnAccepted (CommandEventArgs args) => Result = SelectedDate;
 
-            return false;
+        private DateTime SelectedDate => _datePicker.Value;
+    }
+
+    [Fact]
+    public void Generic_DialogButton_Accept_BubblesUp ()
+    {
+        TestDateDialog dialog = new () { Title = "Test" };
+
+        DateTime selectedDate = new (1966, 9, 10);
+
+        var dialogAcceptedFired = false;
+
+        dialog.Accepted += (_, _) => { dialogAcceptedFired = true; };
+
+        bool? handledCommand = dialog.Buttons [1].InvokeCommand (Command.Accept);
+        Assert.False (handledCommand); // False means the event was raised, and no one handled it
+
+        Assert.True (dialogAcceptedFired);
+
+        Assert.Equal (selectedDate, dialog.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Generic_Modal_DialogButton_Accept_BubblesUp ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using TestDateDialog dialog = new ();
+        dialog.Title = "Test";
+        DateTime selectedDate = new (1966, 9, 10);
+
+        var dialogAcceptedFired = false;
+
+        dialog.Accepted += (_, _) => { dialogAcceptedFired = true; };
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.True (dialogAcceptedFired);
+        Assert.Equal (selectedDate, dialog.Result);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            bool? handledCommand = dialog.Buttons [1].InvokeCommand (Command.Accept);
+            Assert.False (handledCommand); // False means the event was raised, and no one handled it
+
+            // Just in case
+            Assert.True (dialog.StopRequested);
         }
     }
 
     [Fact]
-    public void GenericDialog_Constructor_Initializes_DefaultValues ()
+    public void Generic_Modal_DialogButton_Cancel_BubblesUp ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using TestDateDialog dialog = new ();
+        dialog.Title = "Test";
+        DateTime selectedDate = new (1966, 9, 10);
+
+        var dialogAcceptedFired = false;
+
+        dialog.Accepted += (_, e) => { dialogAcceptedFired = true; };
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.False (dialogAcceptedFired);
+        Assert.Null (dialog.Result);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            bool? handledCommand = dialog.Buttons [0].InvokeCommand (Command.Accept);
+            Assert.True (handledCommand); // True means Accepting was handled (non default button)
+
+            // Just in case
+            Assert.True (dialog.StopRequested);
+        }
+    }
+
+    [Fact]
+    public void GenericConstructor_Initializes_DefaultValues ()
     {
         TestColorDialog dialog = new ();
 
@@ -1210,7 +1415,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Result_Is_Null_Initially ()
+    public void GenericResult_Is_Null_Initially ()
     {
         TestColorDialog colorDialog = new ();
         TestStringDialog stringDialog = new ();
@@ -1227,7 +1432,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Color_Result_Can_Be_Set ()
+    public void GenericColor_Result_Can_Be_Set ()
     {
         TestColorDialog dialog = new ();
 
@@ -1243,7 +1448,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_String_Input_Can_Be_Set ()
+    public void GenericString_Input_Can_Be_Set ()
     {
         TestStringDialog dialog = new () { InputText = "Initial Text" };
 
@@ -1257,7 +1462,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_String_Result_Can_Be_Set ()
+    public void GenericString_Result_Can_Be_Set ()
     {
         TestStringDialog dialog = new ();
 
@@ -1276,7 +1481,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_DateTime_Result_Can_Be_Set ()
+    public void GenericDateTime_Result_Can_Be_Set ()
     {
         TestDateDialog dialog = new ();
         DateTime testDate = new (2024, 6, 15);
@@ -1290,7 +1495,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_OnButtonPressed_Sets_Result_On_OK ()
+    public void GenericOnButtonPressed_Sets_Result_On_OK ()
     {
         TestColorDialog dialog = new () { SelectedColor = Color.Magenta };
 
@@ -1303,7 +1508,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_OnButtonPressed_Leaves_Null_On_Cancel ()
+    public void GenericOnButtonPressed_Leaves_Null_On_Cancel ()
     {
         TestColorDialog dialog = new () { SelectedColor = Color.Cyan };
 
@@ -1314,7 +1519,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_IRunnable_Result_Returns_Object ()
+    public void GenericIRunnable_Result_Returns_Object ()
     {
         TestColorDialog dialog = new ();
 
@@ -1332,7 +1537,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_BaseClass_Result_Casts_Correctly ()
+    public void GenericBaseClass_Result_Casts_Correctly ()
     {
         TestStringDialog dialog = new ();
 
@@ -1348,7 +1553,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Inherits_Dialog_Properties ()
+    public void GenericInherits_Properties ()
     {
         TestColorDialog dialog = new ();
 
@@ -1363,7 +1568,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Buttons_Can_Be_Added ()
+    public void GenericButtons_Can_Be_Added ()
     {
         Dialog<Color> dialog = new ();
 
@@ -1383,7 +1588,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Can_Add_SubViews ()
+    public void GenericCan_Add_SubViews ()
     {
         TestColorDialog dialog = new ();
 
@@ -1396,7 +1601,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Title_Can_Be_Set ()
+    public void GenericTitle_Can_Be_Set ()
     {
         Dialog<string> dialog = new () { Title = "Custom Title" };
 
@@ -1409,7 +1614,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Multiple_Result_Types ()
+    public void GenericMultiple_Result_Types ()
     {
         // Test various result types work correctly
         Dialog<int> intDialog = new ();
@@ -1437,7 +1642,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void NonGenericDialog_Is_DialogOfInt ()
+    public void NonGenericIs_DialogOfInt ()
     {
         Dialog dialog = new ();
         dialog.AddButton (new Button { Title = "Cancel" });
@@ -1454,7 +1659,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void NonGenericDialog_Canceled_Works_As_Expected ()
+    public void NonGenericCanceled_Works_As_Expected ()
     {
         Dialog dialog = new ();
         dialog.AddButton (new Button { Title = "Cancel" });
@@ -1476,7 +1681,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void NonGenericDialog_Result_Throws_With_Invalid_Value ()
+    public void NonGenericResult_Throws_With_Invalid_Value ()
     {
         Dialog dialog = new ();
         dialog.AddButton (new Button { Title = "Cancel" });
@@ -1489,7 +1694,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Layout_Works ()
+    public void GenericLayout_Works ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (80, 25);
@@ -1506,7 +1711,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void GenericDialog_Draws_Correctly ()
+    public void GenericDraws_Correctly ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (30, 10);

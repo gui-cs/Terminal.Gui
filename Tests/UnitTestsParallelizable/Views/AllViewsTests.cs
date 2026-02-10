@@ -130,7 +130,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Command_Select_Raises_Selecting (Type viewType)
+    public void AllViews_Command_Activate_Raises_Activating (Type viewType)
     {
         var view = CreateInstanceIfNotGeneric (viewType);
 
@@ -178,15 +178,11 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         //    designable.EnableForDesign ();
         //}
 
-        var activatingCount = 0;
-        view.Activating += (s, e) => activatingCount++;
-
         var acceptingCount = 0;
         view.Accepting += (s, e) => { acceptingCount++; };
 
         if (view.InvokeCommand (Command.Accept) == true)
         {
-            Assert.Equal (0, activatingCount);
             Assert.Equal (1, acceptingCount);
         }
         view?.Dispose ();

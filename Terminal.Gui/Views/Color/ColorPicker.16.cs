@@ -201,12 +201,19 @@ public class ColorPicker16 : View, IValue<ColorName16>
                 return;
             }
 
+            if (value is < 0 or > (ColorName16)15)
+            {
+                throw new ArgumentOutOfRangeException (nameof (value), @"SelectedColor must be between 0 and 15.");
+            }
+
             _selectColorIndex = (int)value;
             SetNeedsDraw ();
 
             ValueChangedEventArgs<ColorName16> changedArgs = new (oldValue, value);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
         }
     }
 
@@ -215,6 +222,9 @@ public class ColorPicker16 : View, IValue<ColorName16>
 
     /// <inheritdoc/>
     object? IValue.GetValue () => SelectedColor;
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
     ///     Called when the <see cref="ColorPicker16"/> <see cref="Value"/> is changing.
@@ -245,27 +255,63 @@ public class ColorPicker16 : View, IValue<ColorName16>
         AddCommand (Command.Up, ctx => MoveUp (ctx));
         AddCommand (Command.Down, ctx => MoveDown (ctx));
 
-        AddCommand (Command.Activate,
-                    ctx =>
-                    {
-                        if (ctx?.Binding is MouseBinding mouseCommandContext)
-                        {
-                            if (RaiseActivating (ctx) == true)
-                            {
-                                return true;
-                            }
+        //AddCommand (Command.Activate,
+        //            ctx =>
+        //            {
+        //                if (ctx?.Binding is MouseBinding mouseCommandContext)
+        //                {
+        //                    if (RaiseActivating (ctx) is true)
+        //                    {
+        //                        return true;
+        //                    }
 
-                            if (mouseCommandContext.MouseEvent is { })
-                            {
-                                Caret = new Point (mouseCommandContext.MouseEvent.Position!.Value.X / _boxWidth,
-                                                   mouseCommandContext.MouseEvent.Position!.Value.Y / _boxHeight);
-                            }
+        //                    if (mouseCommandContext.MouseEvent?.Position is { } pos)
+        //                    {
+        //                        int col = pos.X / _boxWidth;
+        //                        int row = pos.Y / _boxHeight;
 
-                            return SetFocus ();
-                        }
+        //                        // Only set Caret if within valid color box bounds
+        //                        if (col is >= 0 and < COLS && row is >= 0 and < ROWS)
+        //                        {
+        //                            Caret = new Point (col, row);
+        //                        }
+        //                    }
 
-                        return false;
-                    });
+        //                    return SetFocus ();
+        //                }
+
+        //                return RaiseActivating (ctx) is true;
+        //            });
+    }
+
+    ///// <inheritdoc />
+    //protected override bool OnActivating (CommandEventArgs args)
+    //{
+    //    if (base.OnActivating (args))
+    //    {
+    //        return true;
+    //    }
+
+
+    //    return false;
+    //}
+
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? commandContext)
+    {
+        base.OnActivated (commandContext);
+
+        if (commandContext?.Binding is MouseBinding { MouseEvent.Position: { } pos })
+        {
+            int col = pos.X / _boxWidth;
+            int row = pos.Y / _boxHeight;
+
+            // Only set Caret if within valid color box bounds
+            if (col is >= 0 and < COLS && row is >= 0 and < ROWS)
+            {
+                Caret = new Point (col, row);
+            }
+        }
     }
 
     /// <summary>Add the KeyBindings.</summary>

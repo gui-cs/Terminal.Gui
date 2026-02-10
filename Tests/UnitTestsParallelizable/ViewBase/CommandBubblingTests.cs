@@ -1,4 +1,4 @@
-namespace InputTests;
+namespace ViewBaseTests.Commands;
 
 /// <summary>
 ///     Tests for command propagation through view hierarchies.
@@ -8,8 +8,8 @@ namespace InputTests;
 /// <remarks>
 ///     Claude - Opus 4.5
 ///     IMPORTANT: Most of these tests are expected to FAIL with the current implementation
-///     because Command.Activate does not propagate. They document the DESIRED behavior
-///     that will be enabled by the PropagatedCommands feature.
+///     because Command.Activate does not bubble. They document the DESIRED behavior
+///     that will be enabled by the CommandsToBubbleUp feature.
 ///     Hierarchy under test:
 ///     <code>
 ///     MenuBar (contains MenuBarItems as SubViews)
@@ -21,16 +21,16 @@ namespace InputTests;
 ///                           └─ CheckBox (SubView of FlagSelector)
 ///     </code>
 /// </remarks>
-public class CommandPropagationTests
+public class CommandBubblingTests
 {
-    #region Helper Classes for Tracking Propagation
+    #region Helper Classes for Tracking Bubbling
 
     /// <summary>
     ///     A Menu subclass that tracks Activating/Accepting events for testing.
     /// </summary>
     private class TrackingMenu : Menu
     {
-        public List<(string EventName, View? Source, IInputBinding? Binding)> EventLog { get; } = [];
+        public List<(string EventName, View? Source, ICommandBinding? Binding)> EventLog { get; } = [];
 
         public bool HandleActivating { get; set; }
         public bool HandleAccepting { get; set; }
@@ -69,7 +69,7 @@ public class CommandPropagationTests
     /// </summary>
     private class TrackingMenuBar : MenuBar
     {
-        public List<(string EventName, View? Source, IInputBinding? Binding)> EventLog { get; } = [];
+        public List<(string EventName, View? Source, ICommandBinding? Binding)> EventLog { get; } = [];
 
         public bool HandleActivating { get; set; }
         public bool HandleAccepting { get; set; }
@@ -108,22 +108,23 @@ public class CommandPropagationTests
     /// </summary>
     private class FlagSelectorEventTracker
     {
-        public List<(string EventName, View? Source, IInputBinding? Binding)> EventLog { get; } = [];
+        public List<(string EventName, View? Source, ICommandBinding? Binding)> EventLog { get; } = [];
 
         public void AttachTo (View flagSelector)
         {
             flagSelector.Activating += (_, args) =>
-            {
-                View? sourceView = null;
-                args.Context?.Source?.TryGetTarget (out sourceView);
-                EventLog.Add (("Activating", sourceView, args.Context?.Binding));
-            };
+                                       {
+                                           View? sourceView = null;
+                                           args.Context?.Source?.TryGetTarget (out sourceView);
+                                           EventLog.Add (("Activating", sourceView, args.Context?.Binding));
+                                       };
+
             flagSelector.Accepting += (_, args) =>
-            {
-                View? sourceView = null;
-                args.Context?.Source?.TryGetTarget (out sourceView);
-                EventLog.Add (("Accepting", sourceView, args.Context?.Binding));
-            };
+                                      {
+                                          View? sourceView = null;
+                                          args.Context?.Source?.TryGetTarget (out sourceView);
+                                          EventLog.Add (("Accepting", sourceView, args.Context?.Binding));
+                                      };
         }
     }
 
@@ -138,15 +139,15 @@ public class CommandPropagationTests
 
     #endregion
 
-    #region Test 1: Activate Propagation Through Full Hierarchy
+    #region Test 1: Activate Bubbling Through Full Hierarchy
 
     /// <summary>
-    ///     Tests that Command.Activate propagates from CheckBox through the full hierarchy to MenuBar.
-    ///     EXPECTED TO FAIL: Current implementation does NOT propagate Command.Activate.
-    ///     The activation stops at MenuItem because RaiseActivating() does not call PropagateCommand().
-    ///     This test documents the DESIRED behavior that will be enabled by PropagatedCommands.
+    ///     Tests that Command.Activate bubbles from CheckBox through the full hierarchy to MenuBar.
+    ///     EXPECTED TO FAIL: Current implementation does NOT bubble Command.Activate.
+    ///     The activation stops at MenuItem because RaiseActivating() does not call TryBubbleToSuperView().
+    ///     This test documents the DESIRED behavior that will be enabled by CommandsToBubbleUp.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not propagate - RaiseActivating lacks PropagateCommand call")]
+    [Fact (Skip = "Command.Activate does not bubble - RaiseActivating lacks TryBubbleToSuperView call")]
     public void Activate_Propagates_FromCheckBox_ToMenuBar ()
     {
         // Arrange: Build the complete hierarchy
@@ -189,10 +190,10 @@ public class CommandPropagationTests
         checkBox.InvokeCommand (Command.Activate, ctx);
 
         // Assert: MenuBar should have received the Activating event
-        // FAILS: Command.Activate does NOT propagate - stops at MenuItem
+        // FAILS: Command.Activate does NOT bubble - stops at MenuItem
         Assert.NotEmpty (menuBar.EventLog); // <-- This assertion will FAIL
 
-        (string eventName, View? source, IInputBinding? binding) = menuBar.EventLog.First ();
+        (string eventName, View? source, ICommandBinding? binding) = menuBar.EventLog.First ();
         Assert.Equal ("Activating", eventName);
         Assert.Same (checkBox, source); // Source should be the original CheckBox
         Assert.NotNull (binding);
@@ -200,7 +201,7 @@ public class CommandPropagationTests
     }
 
     /// <summary>
-    ///     Tests that Command.Activate propagates through the FlagSelector to the containing view.
+    ///     Tests that Command.Activate bubbles through the FlagSelector to the containing view.
     ///     This verifies FlagSelector intercepts CheckBox events and forwards them.
     /// </summary>
     [Fact]
@@ -225,7 +226,7 @@ public class CommandPropagationTests
         // This should PASS because FlagSelector intercepts CheckBox.Activating and forwards it
         Assert.NotEmpty (tracker.EventLog);
 
-        (string eventName, View? source, IInputBinding? _) = tracker.EventLog.First ();
+        (string eventName, View? source, ICommandBinding? _) = tracker.EventLog.First ();
         Assert.Equal ("Activating", eventName);
 
         // Note: Source might be flagSelector (not checkBox) depending on how FlagSelector forwards the event
@@ -234,11 +235,11 @@ public class CommandPropagationTests
 
     #endregion
 
-    #region Test 2: Accept Propagation Through Full Hierarchy
+    #region Test 2: Accept Bubbling Through Full Hierarchy
 
     /// <summary>
-    ///     Tests that Command.Accept propagates from CheckBox through the full hierarchy to MenuBar.
-    ///     Command.Accept DOES propagate by default (hard-coded in RaiseAccepting), so this test
+    ///     Tests that Command.Accept bubbles from CheckBox through the full hierarchy to MenuBar.
+    ///     Command.Accept DOES bubble by default (hard-coded in RaiseAccepting), so this test
     ///     might pass, BUT the event interception in FlagSelector and Shortcut may interfere.
     /// </summary>
     [Fact (Skip = "Event interception in FlagSelector/Shortcut blocks Accept propagation through hierarchy")]
@@ -278,7 +279,7 @@ public class CommandPropagationTests
         // This MAY fail if event interception in FlagSelector/Shortcut blocks propagation
         Assert.NotEmpty (menuBar.EventLog);
 
-        (string eventName, View? source, IInputBinding? binding) = menuBar.EventLog.First ();
+        (string eventName, View? source, ICommandBinding? binding) = menuBar.EventLog.First ();
         Assert.Equal ("Accepting", eventName);
         Assert.Same (checkBox, source); // Source should be the original CheckBox
         Assert.NotNull (binding);
@@ -291,11 +292,11 @@ public class CommandPropagationTests
 
     /// <summary>
     ///     Tests that ctx.Source remains the original CheckBox at every level of propagation.
-    ///     EXPECTED TO FAIL: Current implementation doesn't propagate Activate, so we can't
+    ///     EXPECTED TO FAIL: Current implementation doesn't bubble Activate, so we can't
     ///     verify source preservation at higher levels.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not propagate - cannot verify source preservation")]
-    public void Source_RemainsConstant_DuringActivatePropagation ()
+    [Fact (Skip = "Command.Activate does not bubble - cannot verify source preservation")]
+    public void Source_RemainsConstant_DuringActivateBubbling ()
     {
         // Arrange
         FlagSelector<TestFlags> flagSelector = new () { Id = "flagSelector" };
@@ -335,11 +336,11 @@ public class CommandPropagationTests
         // Note: FlagSelector may have changed Source when forwarding - check what we actually got
         // The important thing is that it reached FlagSelector
 
-        // Menu should have received it (FAILS - Activate doesn't propagate)
+        // Menu should have received it (FAILS - Activate doesn't bubble)
         Assert.NotEmpty (menu.EventLog);
         Assert.Same (checkBox, menu.EventLog [0].Source);
 
-        // MenuBar should have received it (FAILS - Activate doesn't propagate)
+        // MenuBar should have received it (FAILS - Activate doesn't bubble)
         Assert.NotEmpty (menuBar.EventLog);
         Assert.Same (checkBox, menuBar.EventLog [0].Source);
     }
@@ -348,8 +349,8 @@ public class CommandPropagationTests
     ///     Tests that ctx.Binding is preserved during propagation.
     ///     EXPECTED TO FAIL for same reason as source preservation test.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not propagate - cannot verify binding preservation")]
-    public void Binding_IsPreserved_DuringActivatePropagation ()
+    [Fact (Skip = "Command.Activate does not bubble - cannot verify binding preservation")]
+    public void Binding_IsPreserved_DuringActivateBubbling ()
     {
         // Arrange
         FlagSelector<TestFlags> flagSelector = new () { Id = "flagSelector" };
@@ -386,7 +387,7 @@ public class CommandPropagationTests
         // FlagSelector (this works)
         Assert.NotEmpty (flagSelectorTracker.EventLog);
 
-        // FAILS: Menu doesn't receive the event because Activate doesn't propagate
+        // FAILS: Menu doesn't receive the event because Activate doesn't bubble
         Assert.NotEmpty (menu.EventLog);
 
         if (menu.EventLog [0].Binding is KeyBinding menuBinding)
@@ -415,15 +416,15 @@ public class CommandPropagationTests
 
     #endregion
 
-    #region Test 4: Handled at Intermediate Level Stops Propagation
+    #region Test 4: Handled at Intermediate Level Stops Bubbling
 
     /// <summary>
     ///     Tests that when Menu handles Activating, MenuBar does NOT receive the event.
     ///     This verifies CWP semantics are respected during propagation.
-    ///     EXPECTED TO FAIL: Current implementation doesn't propagate Activate at all,
+    ///     EXPECTED TO FAIL: Current implementation doesn't bubble Activate at all,
     ///     so we can't test the "handled stops propagation" behavior.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not propagate - cannot test handled-stops-propagation")]
+    [Fact (Skip = "Command.Activate does not bubble - cannot test handled-stops-propagation")]
     public void Activate_HandledAtMenu_DoesNotReachMenuBar ()
     {
         // Arrange
@@ -454,7 +455,7 @@ public class CommandPropagationTests
         checkBox.InvokeCommand (Command.Activate, ctx);
 
         // Assert:
-        // - Menu should have received the event (FAILS - Activate doesn't propagate to Menu)
+        // - Menu should have received the event (FAILS - Activate doesn't bubble to Menu)
         // - MenuBar should NOT have received it (because Menu handled it)
 
         // First, verify Menu received it (this will FAIL with current implementation)
@@ -467,7 +468,7 @@ public class CommandPropagationTests
 
     /// <summary>
     ///     Tests that when Menu handles Accepting, MenuBar does NOT receive the event.
-    ///     Command.Accept already propagates, so this tests the "handled stops propagation" behavior.
+    ///     Command.Accept already bubbles, so this tests the "handled stops propagation" behavior.
     /// </summary>
     [Fact (Skip = "Event interception blocks Accept before reaching Menu - cannot test handled-stops-propagation")]
     public void Accept_HandledAtMenu_DoesNotReachMenuBar ()
@@ -513,12 +514,12 @@ public class CommandPropagationTests
 
     #endregion
 
-    #region Simpler Propagation Tests (Without Full Hierarchy)
+    #region Simpler Bubbling Tests (Without Full Hierarchy)
 
     /// <summary>
     ///     Tests basic propagation: SuperView should receive Activate if it opts in.
     ///     EXPECTED TO FAIL: Current implementation has no opt-in mechanism for Activate propagation.
-    ///     This test documents what PropagatedCommands should enable.
+    ///     This test documents what CommandsToBubbleUp should enable.
     /// </summary>
     [Fact]
     public void Activate_DoesNotPropagate_ByDefault ()
@@ -545,43 +546,9 @@ public class CommandPropagationTests
 
         subView.InvokeCommand (Command.Activate, ctx);
 
-        // Assert: SuperView should NOT receive the event (Activate doesn't propagate by default)
+        // Assert: SuperView should NOT receive the event (Activate doesn't bubble by default)
         // This documents the CURRENT behavior
-        Assert.False (activatingReceived, "Command.Activate should NOT propagate by default (current behavior)");
-    }
-
-    /// <summary>
-    ///     Tests that Accept DOES propagate by default.
-    ///     This is the existing behavior we want to preserve.
-    /// </summary>
-    [Fact]
-    public void Accept_DoesPropagateToSuperView_ByDefault ()
-    {
-        // Arrange: Simple two-level hierarchy
-        View subView = new () { Id = "subView" };
-        View? receivedSource = null;
-        var acceptingReceived = false;
-
-        View superView = new () { Id = "superView" };
-
-        superView.Accepting += (_, args) =>
-                               {
-                                   acceptingReceived = true;
-                                   args.Context?.Source?.TryGetTarget (out receivedSource);
-                               };
-
-        superView.Add (subView);
-        superView.Layout ();
-
-        // Act
-        KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter, Source = subView };
-        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (subView), Binding = keyBinding };
-
-        subView.InvokeCommand (Command.Accept, ctx);
-
-        // Assert: SuperView SHOULD receive the event (Accept propagates by default)
-        Assert.True (acceptingReceived, "Command.Accept should propagate by default");
-        Assert.Same (subView, receivedSource);
+        Assert.False (activatingReceived, "Command.Activate should NOT bubble by default (current behavior)");
     }
 
     #endregion

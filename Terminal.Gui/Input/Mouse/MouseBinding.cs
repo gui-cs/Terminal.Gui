@@ -1,20 +1,23 @@
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Provides a collection of <see cref="MouseFlags"/> bound to <see cref="Command"/>s.
+///     Provides a collection of <see cref="Command"/> objects stored in <see cref="MouseBindings"/>. Carried
+///     as context in command invocations (see <see cref="CommandContext"/>).
 /// </summary>
 /// <seealso cref="MouseBindings"/>
-/// <seealso cref="Command"/>
-public record struct MouseBinding : IInputBinding
+/// <seealso cref="KeyBinding"/>
+/// <seealso cref="CommandContext"/>
+public record struct MouseBinding : ICommandBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
     /// <param name="mouseFlags">The mouse flags that triggered this binding.</param>
-    public MouseBinding (Command [] commands, MouseFlags mouseFlags)
+    /// <param name="source"></param>
+    public MouseBinding (Command [] commands, MouseFlags mouseFlags, View? source = null)
     {
         Commands = commands;
-
         MouseEvent = new Mouse { Timestamp = DateTime.Now, Flags = mouseFlags };
+        Source = source;
     }
 
     /// <summary>Initializes a new instance.</summary>
@@ -26,11 +29,14 @@ public record struct MouseBinding : IInputBinding
         MouseEvent = args;
     }
 
-    /// <summary>The commands this binding will invoke.</summary>
-    public Command [] Commands { get; set; }
+    /// <inheritdoc/>
+    public Command [] Commands { get; init; }
 
     /// <inheritdoc/>
-    public object? Data { get; set; }
+    public object? Data { get; init; }
+
+    /// <inheritdoc/>
+    public View? Source { get; init; }
 
     /// <summary>
     ///     The mouse event data associated with this binding.
@@ -38,5 +44,6 @@ public record struct MouseBinding : IInputBinding
     public Mouse? MouseEvent { get; set; }
 
     /// <inheritdoc/>
-    public View? Source { get; set; }
+    public override string ToString () =>
+        $"[{string.Join (", ", Commands)}] (MouseEvent={MouseEvent}, Source={Source.ToIdentifyingString ()}{(Data is { } ? ", Data=" : "")}";
 }

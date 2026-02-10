@@ -372,15 +372,15 @@ public partial class TextView
         // if the user presses Left (without any control keys) and they are at the start of the text
         if (CurrentColumn == 0 && CurrentRow == 0)
         {
-            if (IsSelecting)
+            if (!IsSelecting)
             {
-                StopSelecting ();
-
-                return true;
+                return false;
             }
+            StopSelecting ();
+
+            return true;
 
             // do not respond (this lets the key press fall through to navigation system - which usually changes focus backward)
-            return false;
         }
 
         ResetAllTrack ();
@@ -434,15 +434,16 @@ public partial class TextView
         if (CurrentColumn == lastCol && CurrentRow == lastRow)
         {
             // Unless they have text selected
-            if (IsSelecting)
+            if (!IsSelecting)
             {
-                // In which case clear
-                StopSelecting ();
-
-                return true;
+                return false;
             }
 
-            return false;
+            // In which case clear
+            StopSelecting ();
+
+            return true;
+
         }
 
         ResetAllTrack ();

@@ -6,6 +6,9 @@ public partial class TextView
     {
         // Things this view knows how to do
 
+        // TextView does nothing on the Accept command (multiline input)
+        //AddCommand (Command.Accept, () => true);
+
         // Note - NewLine is only bound to Enter if Multiline is true
         AddCommand (Command.NewLine, ctx => ProcessEnterKey (ctx));
 
@@ -163,7 +166,7 @@ public partial class TextView
         else
         {
             PositionCursor ();
-            OnUnwrappedCursorPosition ();
+            RaiseUnwrappedCursorPositionChanged ();
         }
         ProcessAutocomplete ();
     }
@@ -232,7 +235,7 @@ public partial class TextView
         {
             ClearRegion ();
 
-            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
         }
 
         UpdateWrapModel ();
@@ -258,13 +261,13 @@ public partial class TextView
         {
             List<Cell> runeList = contents is null ? [] : Cell.ToCellList (contents);
             List<Cell> currentLine = GetCurrentLine ();
-            _historyText.Add ([[.. currentLine]], InsertionPoint);
-            List<List<Cell>> addedLine = [[.. currentLine], runeList];
+            _historyText.Add ([ [.. currentLine]], InsertionPoint);
+            List<List<Cell>> addedLine = [ [.. currentLine], runeList];
             _historyText.Add ([.. addedLine], InsertionPoint, TextEditingLineStatus.Added);
             _model.AddLine (CurrentRow, runeList);
             SetNeedsDraw ();
             CurrentRow++;
-            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             OnContentsChanged ();
         }
@@ -280,7 +283,7 @@ public partial class TextView
 
             if (IsSelecting)
             {
-                _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
+                _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
             }
         }
 
@@ -386,13 +389,13 @@ public partial class TextView
         if (IsSelecting)
         {
             SetWrapModel ();
-            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
+            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
             ClearSelectedRegion ();
 
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
             OnContentsChanged ();
@@ -419,13 +422,13 @@ public partial class TextView
         if (IsSelecting)
         {
             SetWrapModel ();
-            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
+            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
             ClearSelectedRegion ();
 
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
             OnContentsChanged ();
@@ -450,7 +453,7 @@ public partial class TextView
             // Delete backwards
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add ([[.. currentLine]], InsertionPoint);
+            _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
             currentLine.RemoveAt (CurrentColumn - 1);
             SetNeedsDraw ();
@@ -462,7 +465,7 @@ public partial class TextView
 
             CurrentColumn--;
 
-            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             if (CurrentColumn < Viewport.X)
             {
@@ -482,9 +485,9 @@ public partial class TextView
             int prowIdx = CurrentRow - 1;
             List<Cell> prevRow = _model.GetLine (prowIdx);
 
-            _historyText.Add ([[.. prevRow]], InsertionPoint);
+            _historyText.Add ([ [.. prevRow]], InsertionPoint);
 
-            List<List<Cell>> removedLines = [[..prevRow], [..GetCurrentLine ()]];
+            List<List<Cell>> removedLines = [ [.. prevRow], [.. GetCurrentLine ()]];
 
             _historyText.Add (removedLines, new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Removed);
 
@@ -526,9 +529,9 @@ public partial class TextView
         if (CurrentColumn == currentLine.Count)
         {
             // We're at the end of the line; need to merge with the next line
-            _historyText.Add ([[.. currentLine]], InsertionPoint);
+            _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
-            List<List<Cell>> removedLines = [[.. currentLine]];
+            List<List<Cell>> removedLines = [ [.. currentLine]];
             List<Cell> nextLine = _model.GetLine (CurrentRow + 1);
             removedLines.Add ([.. nextLine]);
             _historyText.Add (removedLines, InsertionPoint, TextEditingLineStatus.Removed);
@@ -536,7 +539,7 @@ public partial class TextView
             _model.RemoveLine (CurrentRow + 1);
             SetNeedsDraw ();
 
-            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             if (_wordWrap)
             {
@@ -549,12 +552,12 @@ public partial class TextView
         }
 
         // We're not at the end of the line; delete to end of line
-        _historyText.Add ([[.. currentLine]], InsertionPoint);
+        _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
         currentLine.RemoveAt (CurrentColumn);
         SetNeedsDraw ();
 
-        _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         if (_wordWrap)
         {
@@ -592,13 +595,13 @@ public partial class TextView
             return true;
         }
 
-        _historyText.Add ([[.. currentLine]], InsertionPoint);
+        _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
         if (currentLine.Count == 0)
         {
             if (CurrentRow < _model.Count - 1)
             {
-                List<List<Cell>> removedLines = [[.. currentLine]];
+                List<List<Cell>> removedLines = [ [.. currentLine]];
 
                 _model.RemoveLine (CurrentRow);
                 SetNeedsDraw ();
@@ -648,7 +651,7 @@ public partial class TextView
             SetNeedsDraw ();
         }
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -685,7 +688,7 @@ public partial class TextView
             return true;
         }
 
-        _historyText.Add ([[.. currentLine]], InsertionPoint);
+        _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
         if (currentLine.Count == 0)
         {
@@ -716,7 +719,7 @@ public partial class TextView
                 CurrentRow--;
                 currentLine = _model.GetLine (CurrentRow);
 
-                List<List<Cell>> removedLine = [[..currentLine], []];
+                List<List<Cell>> removedLine = [ [.. currentLine], []];
 
                 _historyText.Add ([.. removedLine], InsertionPoint, TextEditingLineStatus.Removed);
 
@@ -743,7 +746,7 @@ public partial class TextView
             CurrentColumn = 0;
         }
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -766,13 +769,13 @@ public partial class TextView
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
         if (CurrentColumn == 0)
         {
             DeleteTextLeft ();
 
-            _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
 
@@ -826,7 +829,7 @@ public partial class TextView
             CurrentRow = newPos.Value.row;
         }
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -846,13 +849,13 @@ public partial class TextView
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
         if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
             DeleteTextRight ();
 
-            _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
 
@@ -880,7 +883,7 @@ public partial class TextView
             _wrapNeeded = true;
         }
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -949,7 +952,7 @@ public partial class TextView
         SetWrapModel ();
 
         List<Cell> currentLine = GetCurrentLine ();
-        _historyText.Add ([[.. currentLine]], InsertionPoint);
+        _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
         if (IsSelecting)
         {
@@ -959,7 +962,7 @@ public partial class TextView
         int restCount = currentLine.Count - CurrentColumn;
         List<Cell> rest = currentLine.GetRange (CurrentColumn, restCount);
         currentLine.RemoveRange (CurrentColumn, restCount);
-        List<List<Cell>> addedLines = [[.. currentLine]];
+        List<List<Cell>> addedLines = [ [.. currentLine]];
         _model.AddLine (CurrentRow + 1, rest);
         addedLines.Add ([.. _model.GetLine (CurrentRow + 1)]);
         _historyText.Add (addedLines, InsertionPoint, TextEditingLineStatus.Added);
@@ -972,7 +975,7 @@ public partial class TextView
 
         CurrentColumn = 0;
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         if (!_wordWrap && CurrentColumn < Viewport.X)
         {

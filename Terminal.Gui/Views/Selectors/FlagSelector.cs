@@ -32,8 +32,8 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.ValueChanging += OnCheckboxOnValueChanging;
         checkbox.ValueChanged += OnCheckboxOnValueChanged;
-        checkbox.Activating += OnCheckboxOnActivating;
-        checkbox.Accepting += OnCheckboxOnAccepting;
+        //checkbox.Activating += OnCheckboxOnActivating;
+        //checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
@@ -45,6 +45,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
+            // None flag was already checked; prevent changing again
             args.Handled = true;
         }
     }
@@ -77,56 +78,54 @@ public class FlagSelector : SelectorBase, IDesignable
         Value = newValue;
     }
 
-    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
+    //private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
+    //{
+    //    if (sender is not CheckBox checkbox)
+    //    {
+    //        return;
+    //    }
 
-        if (checkbox.CanFocus)
-        {
-            // For Activate, if the view is focusable and SetFocus succeeds, by definition,
-            // the event is handled. So return what SetFocus returns.
-            checkbox.SetFocus ();
-        }
+    //    if (checkbox.CanFocus)
+    //    {
+    //        // For Activate, if the view is focusable and SetFocus succeeds, by definition,
+    //        // the event is handled. So return what SetFocus returns.
+    //        checkbox.SetFocus ();
+    //    }
 
-        // Activating doesn't normally propagate, so we do it here
-        if (InvokeCommand (Command.Activate, args.Context) is true)
-        {
-            // Do not return here; we want to toggle the checkbox state
-            args.Handled = true;
+    //    // Activating doesn't normally propagate, so we do it here
+    //    if (InvokeCommand (Command.Activate, args.Context) is true)
+    //    {
+    //        // Do not return here; we want to toggle the checkbox state
+    //        args.Handled = true;
 
-            //return;
-        }
-    }
+    //        //return;
+    //    }
+    //}
 
-    private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-        Value = (int)checkbox.Data!;
-        args.Handled = false; // Do not set to false; let Accepting propagate
-    }
-
-    private int? _value;
+    //private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
+    //{
+    //    if (sender is not CheckBox checkbox)
+    //    {
+    //        return;
+    //    }
+    //    Value = (int)checkbox.Data!;
+    //    args.Handled = false; // Do not set to false; let Accepting propagate
+    //}
 
     /// <summary>
     ///     Gets or sets the value of the selected flags.
     /// </summary>
     public override int? Value
     {
-        get => _value;
+        get;
         set
         {
-            if (_updatingChecked || _value == value)
+            if (_updatingChecked || field == value)
             {
                 return;
             }
 
-            int? previousValue = _value;
+            int? previousValue = field;
 
             // Raise ValueChanging (cancellable) - use base class implementation
             if (RaiseValueChanging (previousValue, value))
@@ -134,9 +133,9 @@ public class FlagSelector : SelectorBase, IDesignable
                 return;
             }
 
-            _value = value;
+            field = value;
 
-            if (_value is null)
+            if (field is null)
             {
                 UncheckNone ();
                 UncheckAll ();
@@ -146,7 +145,7 @@ public class FlagSelector : SelectorBase, IDesignable
                 UpdateChecked ();
             }
 
-            RaiseValueChanged (previousValue, _value);
+            RaiseValueChanged (previousValue, field);
         }
     }
 

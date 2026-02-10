@@ -2,6 +2,32 @@
 
 > **Guidance for AI agents working with Terminal.Gui.**
 > For humans, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+> See also: [llms.txt](./llms.txt) for machine-readable context.
+
+## Quick Reference: What Are You Doing?
+
+| Your Task | Go Here |
+|-----------|---------|
+| **"Build me an app that..."** | [.claude/tasks/build-app.md](.claude/tasks/build-app.md) |
+| **"Add a feature to Terminal.Gui..."** | Continue below (Contributor Guide) |
+| **"Fix a bug in Terminal.Gui..."** | Continue below (Contributor Guide) |
+
+### App Builder Quick Start
+```bash
+dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new tui-simple -n myapp
+cd myapp
+dotnet run
+```
+
+See [.claude/tasks/build-app.md](.claude/tasks/build-app.md) for complete app development guide.
+See [.claude/cookbook/common-patterns.md](.claude/cookbook/common-patterns.md) for UI recipes.
+
+---
+
+# Contributor Guide
+
+**The rest of this file is for contributors modifying Terminal.Gui itself.**
 
 ## Before Every File Edit
 
@@ -30,6 +56,15 @@ See `.claude/rules/` for detailed guidance:
 See `.claude/tasks/` for task checklists:
 - `scenario-modernization.md` - Upgrading UICatalog scenarios
 - `clean-code-review.md` - Creating clean git commit histories
+- `build-app.md` - Building applications with Terminal.Gui
+
+## Planning Mode
+
+When in planning mode:
+- **Create plan files in `./plans/`** (relative to the repository root)
+- Plan files should be markdown format
+- Include detailed implementation steps, file changes, and verification steps
+- Reference existing code patterns and reuse opportunities
 
 ---
 

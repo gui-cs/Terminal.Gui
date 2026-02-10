@@ -239,13 +239,15 @@ public class ScrollSlider : View, IOrientation, IDesignable
             OnScrolled (distance);
             Scrolled?.Invoke (this, new (in distance));
 
+            // BUGBUG: the KeyBinding constructor used here sets `target: null`, not `source: null`
+            // BUGBUG: this should not use KeyBinding, but CommandBinding
             RaiseActivating (new CommandContext (Command.Activate, new WeakReference<View> (this), new KeyBinding ([Command.Activate], null, distance)));
         }
 
     /// <summary>
     ///     Called when <see cref="Position"/> is changing. Return true to cancel the change.
     /// </summary>
-    protected virtual bool OnPositionChanging (int currentPos, int newPos) { return false; }
+    protected virtual bool OnPositionChanging (int currentPos, int newPos) => false;
 
     /// <summary>
     ///     Raised when the <see cref="Position"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to

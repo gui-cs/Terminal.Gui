@@ -129,6 +129,8 @@ public partial class ListView : View, IDesignable, IValue<int?>
 
             SelectedItem = null;
             _lastSelectedItem = null;
+            OnSourceChanged ();
+            SourceChanged?.Invoke (this, EventArgs.Empty);
             SetNeedsDraw ();
         }
     }
@@ -157,6 +159,16 @@ public partial class ListView : View, IDesignable, IValue<int?>
         SetNeedsDraw ();
         OnCollectionChanged (e);
     }
+
+    /// <summary>
+    ///     Called when the <see cref="Source"/> property is changed. Invokes the <see cref="SourceChanged"/> event.
+    /// </summary>
+    protected virtual void OnSourceChanged () { }
+
+    /// <summary>
+    ///     Event to raise when the <see cref="Source"/> data is changed.
+    /// </summary>
+    public event EventHandler? SourceChanged;
 
     /// <summary>
     ///     Call the event to raises the <see cref="CollectionChanged"/>.
@@ -285,4 +297,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
         Source?.Dispose ();
         base.Dispose (disposing);
     }
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }

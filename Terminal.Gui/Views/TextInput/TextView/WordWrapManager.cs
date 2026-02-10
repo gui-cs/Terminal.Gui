@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -18,38 +17,24 @@ internal class WordWrapManager (TextModel model)
     private List<WrappedLine> _wrappedModelLines = [];
     public TextModel Model { get; private set; } = model;
 
-    public void AddLine (int row, int col)
-    {
-        int modelRow = GetModelLineFromWrappedLines (row);
-        int modelCol = GetModelColFromWrappedLines (row, col);
-        List<Cell> line = GetCurrentLine (modelRow);
-        int restCount = line.Count - modelCol;
-        List<Cell> rest = line.GetRange (modelCol, restCount);
-        line.RemoveRange (modelCol, restCount);
-        Model.AddLine (modelRow + 1, rest);
-        _isWrapModelRefreshing = true;
-        WrapModel (_frameWidth, out _, out _, out _, out _, modelRow + 1);
-        _isWrapModelRefreshing = false;
-    }
-
     public int GetModelColFromWrappedLines (int line, int col)
     {
-        if (_wrappedModelLines?.Count == 0)
+        if (_wrappedModelLines.Count == 0)
         {
             return 0;
         }
 
         int modelLine = GetModelLineFromWrappedLines (line);
-        int firstLine = _wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
+        int firstLine = _wrappedModelLines.IndexOf (r => r._modelLine == modelLine);
         var modelCol = 0;
 
-        for (int i = firstLine; i <= Math.Min (line, _wrappedModelLines!.Count - 1); i++)
+        for (int i = firstLine; i <= Math.Min (line, _wrappedModelLines.Count - 1); i++)
         {
             WrappedLine wLine = _wrappedModelLines [i];
 
             if (i < line)
             {
-                modelCol += wLine.ColWidth;
+                modelCol += wLine._colWidth;
             }
             else
             {
@@ -60,53 +45,8 @@ internal class WordWrapManager (TextModel model)
         return modelCol;
     }
 
-    public int GetModelLineFromWrappedLines (int line)
-    {
-        return _wrappedModelLines.Count > 0
-                   ? _wrappedModelLines [Math.Min (
-                                                   line,
-                                                   _wrappedModelLines.Count - 1
-                                                  )].ModelLine
-                   : 0;
-    }
-
-    public int GetWrappedLineColWidth (int line, int col, WordWrapManager wrapManager)
-    {
-        if (_wrappedModelLines?.Count == 0)
-        {
-            return 0;
-        }
-
-        List<WrappedLine> wModelLines = wrapManager._wrappedModelLines;
-        int modelLine = GetModelLineFromWrappedLines (line);
-        int firstLine = _wrappedModelLines.IndexOf (r => r.ModelLine == modelLine);
-        var modelCol = 0;
-        var colWidthOffset = 0;
-        int i = firstLine;
-
-        while (modelCol < col)
-        {
-            WrappedLine wLine = _wrappedModelLines! [i];
-            WrappedLine wLineToCompare = wModelLines [i];
-
-            if (wLine.ModelLine != modelLine || wLineToCompare.ModelLine != modelLine)
-            {
-                break;
-            }
-
-            modelCol += Math.Max (wLine.ColWidth, wLineToCompare.ColWidth);
-            colWidthOffset += wLine.ColWidth - wLineToCompare.ColWidth;
-
-            if (modelCol > col)
-            {
-                modelCol += col - modelCol;
-            }
-
-            i++;
-        }
-
-        return modelCol - colWidthOffset;
-    }
+    public int GetModelLineFromWrappedLines (int line) =>
+        _wrappedModelLines.Count > 0 ? _wrappedModelLines [Math.Min (line, _wrappedModelLines.Count - 1)]._modelLine : 0;
 
     public bool Insert (int row, int col, Cell cell)
     {
@@ -140,78 +80,9 @@ internal class WordWrapManager (TextModel model)
             line.RemoveAt (modelCol);
         }
 
-        if (line.Count > _frameWidth || (row + 1 < _wrappedModelLines.Count && _wrappedModelLines [row + 1].ModelLine == modelRow))
+        if (line.Count > _frameWidth || (row + 1 < _wrappedModelLines.Count && _wrappedModelLines [row + 1]._modelLine == modelRow))
         {
             return true;
-        }
-
-        return false;
-    }
-
-    public bool RemoveLine (int row, int col, out bool lineRemoved, bool forward = true)
-    {
-        lineRemoved = false;
-        int modelRow = GetModelLineFromWrappedLines (row);
-        List<Cell> line = GetCurrentLine (modelRow);
-        int modelCol = GetModelColFromWrappedLines (row, col);
-
-        if (modelCol == 0 && line.Count == 0)
-        {
-            Model.RemoveLine (modelRow);
-
-            return false;
-        }
-
-        if (modelCol < line.Count)
-        {
-            if (forward)
-            {
-                line.RemoveAt (modelCol);
-
-                return true;
-            }
-
-            if (modelCol - 1 > -1)
-            {
-                line.RemoveAt (modelCol - 1);
-
-                return true;
-            }
-        }
-
-        lineRemoved = true;
-
-        if (forward)
-        {
-            if (modelRow + 1 == Model.Count)
-            {
-                return false;
-            }
-
-            List<Cell> nextLine = Model.GetLine (modelRow + 1);
-            line.AddRange (nextLine);
-            Model.RemoveLine (modelRow + 1);
-
-            if (line.Count > _frameWidth)
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if (modelRow == 0)
-            {
-                return false;
-            }
-
-            List<Cell> prevLine = Model.GetLine (modelRow - 1);
-            prevLine.AddRange (line);
-            Model.RemoveLine (modelRow);
-
-            if (prevLine.Count > _frameWidth)
-            {
-                return true;
-            }
         }
 
         return false;
@@ -247,24 +118,21 @@ internal class WordWrapManager (TextModel model)
         return runesList;
     }
 
-    public void UpdateModel (
-        TextModel model,
-        out int nRow,
-        out int nCol,
-        out int nStartRow,
-        out int nStartCol,
-        int row,
-        int col,
-        int startRow,
-        int startCol,
-        bool preserveTrailingSpaces
-    )
+    public void UpdateModel (TextModel model,
+                             out int nRow,
+                             out int nCol,
+                             out int nStartRow,
+                             out int nStartCol,
+                             int row,
+                             int col,
+                             int startRow,
+                             int startCol,
+                             bool preserveTrailingSpaces)
     {
         _isWrapModelRefreshing = true;
         Model = model;
 
-        WrapModel (
-                   _frameWidth,
+        WrapModel (_frameWidth,
                    out nRow,
                    out nCol,
                    out nStartRow,
@@ -274,24 +142,21 @@ internal class WordWrapManager (TextModel model)
                    startRow,
                    startCol,
                    0,
-                   preserveTrailingSpaces
-                  );
+                   preserveTrailingSpaces);
         _isWrapModelRefreshing = false;
     }
 
-    public TextModel WrapModel (
-        int width,
-        out int nRow,
-        out int nCol,
-        out int nStartRow,
-        out int nStartCol,
-        int row = 0,
-        int col = 0,
-        int startRow = 0,
-        int startCol = 0,
-        int tabWidth = 0,
-        bool preserveTrailingSpaces = true
-    )
+    public TextModel WrapModel (int width,
+                                out int nRow,
+                                out int nCol,
+                                out int nStartRow,
+                                out int nStartCol,
+                                int row = 0,
+                                int col = 0,
+                                int startRow = 0,
+                                int startCol = 0,
+                                int tabWidth = 0,
+                                bool preserveTrailingSpaces = true)
     {
         _frameWidth = width;
 
@@ -299,8 +164,7 @@ internal class WordWrapManager (TextModel model)
         int modelCol = _isWrapModelRefreshing ? col : GetModelColFromWrappedLines (row, col);
         int modelStartRow = _isWrapModelRefreshing ? startRow : GetModelLineFromWrappedLines (startRow);
 
-        int modelStartCol =
-            _isWrapModelRefreshing ? startCol : GetModelColFromWrappedLines (startRow, startCol);
+        int modelStartCol = _isWrapModelRefreshing ? startCol : GetModelColFromWrappedLines (startRow, startCol);
         var wrappedModel = new TextModel ();
         var lines = 0;
         nRow = 0;
@@ -315,16 +179,8 @@ internal class WordWrapManager (TextModel model)
         {
             List<Cell> line = Model.GetLine (i);
 
-            List<List<Cell>> wrappedLines = ToListRune (
-                                                        TextFormatter.Format (
-                                                                              Cell.ToString (line),
-                                                                              width,
-                                                                              Alignment.Start,
-                                                                              true,
-                                                                              preserveTrailingSpaces,
-                                                                              tabWidth
-                                                                             )
-                                                       );
+            List<List<Cell>> wrappedLines =
+                ToListRune (TextFormatter.Format (Cell.ToString (line), width, Alignment.Start, true, preserveTrailingSpaces, tabWidth));
 
             for (var j = 0; j < wrappedLines.Count; j++)
             {
@@ -393,10 +249,7 @@ internal class WordWrapManager (TextModel model)
 
                 wrappedModel.AddLine (lines, wrapLine);
 
-                var wrappedLine = new WrappedLine
-                {
-                    ModelLine = i, Row = lines, RowIndex = j, ColWidth = wrapLine.Count
-                };
+                var wrappedLine = new WrappedLine { _modelLine = i, _row = lines, _rowIndex = j, _colWidth = wrapLine.Count };
                 wModelLines.Add (wrappedLine);
                 lines++;
             }
@@ -407,13 +260,13 @@ internal class WordWrapManager (TextModel model)
         return wrappedModel;
     }
 
-    private List<Cell> GetCurrentLine (int row) { return Model.GetLine (row); }
+    private List<Cell> GetCurrentLine (int row) => Model.GetLine (row);
 
     private class WrappedLine
     {
-        public int ColWidth;
-        public int ModelLine;
-        public int Row;
-        public int RowIndex;
+        public int _colWidth;
+        public int _modelLine;
+        public int _row;
+        public int _rowIndex;
     }
 }

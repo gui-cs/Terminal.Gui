@@ -125,13 +125,13 @@ public class MenuBarItem : MenuItem
 
             void OnPopoverVisibleChanged (object? sender, EventArgs args)
             {
-                // Logging.Debug ($"OnPopoverVisibleChanged - {Title} - Visible = {_popoverMenu?.Visible} ");
+                // Logging.Debug ($"OnPopoverVisibleChanged - {this.ToIdentifyingString ()} - Visible = {_popoverMenu?.Visible} ");
                 PopoverMenuOpen = _popoverMenu?.Visible ?? false;
             }
 
             void OnPopoverMenuOnAccepted (object? sender, CommandEventArgs args)
             {
-                Logging.Debug ($"OnPopoverMenuOnAccepted - {Title} - {args.Context?.Source} - {args.Context?.Command}");
+                Logging.Debug ($"OnPopoverMenuOnAccepted - {this.ToIdentifyingString ()} - {args.Context?.Source} - {args.Context?.Command}");
                 RaiseAccepted (args.Context);
             }
         }

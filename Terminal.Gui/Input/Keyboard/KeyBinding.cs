@@ -4,20 +4,21 @@
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>.
+///     Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>. Carried
+///     as context in command invocations (see <see cref="CommandContext"/>).
 /// </summary>
 /// <seealso cref="KeyBindings"/>
-/// <seealso cref="KeyBindings"/>
-/// <seealso cref="Command"/>
-public record struct KeyBinding : IInputBinding
+/// <seealso cref="MouseBinding"/>
+/// <seealso cref="CommandContext"/>
+public record struct KeyBinding : ICommandBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this key binding will invoke.</param>
-    /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
-    public KeyBinding (Command [] commands, object? context = null)
+    /// <param name="data">Arbitrary context that can be associated with this key binding.</param>
+    public KeyBinding (Command [] commands, object? data = null)
     {
         Commands = commands;
-        Data = context;
+        Data = data;
     }
 
     /// <summary>Initializes a new instance.</summary>
@@ -31,11 +32,26 @@ public record struct KeyBinding : IInputBinding
         Data = data;
     }
 
-    /// <summary>The commands this key binding will invoke.</summary>
-    public Command [] Commands { get; set; }
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="commands">The commands this key binding will invoke.</param>
+    /// <param name="newKey">The key this binding is associated with.</param>
+    /// <param name="source">The view where this key binding was created.</param>
+    /// <param name="data">Arbitrary data that can be associated with this key binding.</param>
+    public KeyBinding (Command [] commands, Key newKey, View? source = null, object? data = null)
+    {
+        Commands = commands;
+        Source = source;
+        Key = newKey;
+        Data = data;
+    }
 
     /// <inheritdoc/>
-    public object? Data { get; set; }
+    public Command [] Commands { get; init; }
+
+    /// <inheritdoc/>
+    public object? Data { get; init; }
 
     /// <summary>
     ///     The Key that is bound to the <see cref="Commands"/>.
@@ -43,8 +59,9 @@ public record struct KeyBinding : IInputBinding
     public Key? Key { get; set; }
 
     /// <inheritdoc/>
-    public View? Source { get; set; }
+    public View? Source { get; init; }
 
+    // TODO: Determine if Target is duplicative of Source
     /// <summary>
     ///     The view the key binding is bound to.
     /// </summary>
@@ -58,4 +75,7 @@ public record struct KeyBinding : IInputBinding
     ///     </para>
     /// </remarks>
     public View? Target { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString () => $"[{string.Join (", ", Commands)}], Key={Key}, Source={Source}, Target={Target}, Data={Data}";
 }

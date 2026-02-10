@@ -62,7 +62,7 @@ public partial class ListView
         // Key.Space is already bound to Command.Activate; this gives us activate then move down
         KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);
 
-        // Use the form of Add that lets us pass context to the handler
+        // Use the form of Add that lets us pass data with the binding
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
 
