@@ -737,7 +737,7 @@ public class OptionSelectorTests
     [Fact]
     public void Command_Down_Vertical_WithShowValue_FocusesValueFieldAtEnd ()
     {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, Styles = SelectorStyles.ShowValue };
+        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop };
         optionSelector.Labels = ["Option1", "Option2"];
         optionSelector.SetFocus ();
         optionSelector.Layout ();
