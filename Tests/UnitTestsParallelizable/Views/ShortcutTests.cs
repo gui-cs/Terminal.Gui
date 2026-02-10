@@ -5,9 +5,15 @@ namespace ViewsTests;
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests
 {
-    // Test view for Shortcut tests
-    private sealed class ShortcutTestView : View, IValue<int?>
+    // CommandView Test view for Shortcut tests
+    private sealed class TestCommandView : View, IValue<int?>
     {
+        public TestCommandView ()
+        {
+            Width = 5;
+            Height = 1;
+        }
+
         public int? Value
         {
             get;
@@ -491,45 +497,55 @@ public class ShortcutTests
         Assert.True (shortcut.CommandView.CanFocus);
     }
 
-    [Theory (Skip = "Broke somehow!")]
-    [InlineData (true, KeyCode.A, 1, 1)]
-    [InlineData (true, KeyCode.C, 1, 1)]
-    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 1)]
-    [InlineData (true, KeyCode.Enter, 1, 1)]
-    [InlineData (true, KeyCode.Space, 1, 1)]
+    [Theory]
+    [InlineData (true, KeyCode.A, 0, 1)]
+    [InlineData (true, KeyCode.C, 0, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 0, 1)]
+    [InlineData (true, KeyCode.Enter, 1, 0)]
+    [InlineData (true, KeyCode.Space, 0, 1)]
     [InlineData (true, KeyCode.F1, 0, 0)]
-    [InlineData (false, KeyCode.A, 1, 1)]
-    [InlineData (false, KeyCode.C, 1, 1)]
-    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1, 1)]
+    [InlineData (false, KeyCode.A, 0, 1)]
+    [InlineData (false, KeyCode.C, 0, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 0, 1)]
     [InlineData (false, KeyCode.Enter, 0, 0)]
     [InlineData (false, KeyCode.Space, 0, 0)]
     [InlineData (false, KeyCode.F1, 0, 0)]
-    public void KeyDown_CheckBox_Raises_Accepted_Selected (bool canFocus, KeyCode key, int expectedAccept, int expectedSelect)
+    public void KeyDown_CheckBox_Raises_Accepted_Activated (bool canFocus, KeyCode key, int expectedAccept, int expectedActivate)
     {
         IApplication app = Application.Create ();
         Runnable<bool> runnable = new ();
         app.Begin (runnable);
 
-        Shortcut shortcut = new () { Key = Key.A, Text = "0", CommandView = new CheckBox { Title = "_C" }, CanFocus = canFocus };
+        Shortcut shortcut = new ()
+        {
+            Key = Key.A,
+            Text = "0",
+            CommandView = new CheckBox { Title = "_C", CanFocus = false },
+            CanFocus = canFocus
+        };
         runnable.Add (shortcut);
 
         Assert.Equal (canFocus, shortcut.HasFocus);
 
-        var accepted = 0;
+        var accepting = 0;
 
         shortcut.Accepting += (_, e) =>
                               {
-                                  accepted++;
+                                  accepting++;
                                   e.Handled = true;
                               };
 
-        var selected = 0;
-        shortcut.Activating += (_, _) => selected++;
+        var activated = 0;
+        shortcut.Activating += (_, e) =>
+                               {
+                                   activated++;
+                                   e.Handled = true;
+                               };
 
         app.Keyboard.RaiseKeyDownEvent (key);
 
-        Assert.Equal (expectedAccept, accepted);
-        Assert.Equal (expectedSelect, selected);
+        Assert.Equal (expectedAccept, accepting);
+        Assert.Equal (expectedActivate, activated);
     }
 
     // Claude - Opus 4.5
@@ -693,27 +709,23 @@ public class ShortcutTests
         Assert.Equal (MouseState.In, shortcut.MouseHighlightStates);
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that when CommandView raises Activating (e.g., from direct click),
-    ///     the Shortcut also raises its Activating event.
-    /// </summary>
     [Fact]
     public void CommandView_Command_Activating_Forwards_To_Activating ()
     {
         // Arrange
-        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+        TestCommandView commandView = new () { Title = "_Test", CanFocus = false };
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = commandView };
+        shortcut.SetFocus ();
 
-        var shortcutActivatingRaised = false;
-        shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
 
         // Act - Invoke Command.Activate directly on CheckBox (simulating direct mouse click)
-        checkBox.InvokeCommand (Command.Activate);
+        commandView.InvokeCommand (Command.Activate);
 
         // Assert - Shortcut.Activating should have been raised
-        Assert.True (shortcutActivatingRaised);
+        Assert.Equal (1, shortcutActivatingRaised);
     }
 
     [Fact]
@@ -743,7 +755,7 @@ public class ShortcutTests
     public void Command_Activate_Direct_InvokeCommand_Raises_Activating_Once ()
     {
         // Arrange
-        ShortcutTestView testCommandView = new () { Title = "_Test", CanFocus = false };
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = false };
 
         Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
@@ -756,7 +768,6 @@ public class ShortcutTests
         Assert.Equal (1, shortcutActivatingCount);
     }
 
-    // Claude - Opus 4.5
     /// <summary>
     ///     Verifies that HotKey invoked on CommandView does NOT bubble to Shortcut.
     ///     HotKey is not in Shortcut's CommandsToBubbleUp list [Activate, Accept].
@@ -765,7 +776,7 @@ public class ShortcutTests
     public void CommandView_Command_HotKey_Does_Not_Bubble_To_Shortcut ()
     {
         // Arrange
-        ShortcutTestView testCommandView = new () { Title = "_Test", CanFocus = false };
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = false };
 
         Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
@@ -785,32 +796,66 @@ public class ShortcutTests
         Assert.False (handlingHotkeyRaised);
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that CommandView with CanFocus=true still allows Shortcut.Activating
-    ///     to be raised when the CommandView is clicked directly.
-    /// </summary>
-    [Fact]
-    public void CommandView_CanFocus_True_Click_Raises_Activating ()
+    [Theory]
+    [CombinatorialData]
+    public void CommandView_Click_Raises_Activating (bool commandViewCanFocus)
     {
         // Arrange
-        ShortcutTestView testCommandView = new () { Title = "_Test", CanFocus = false };
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = commandViewCanFocus };
 
         Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
 
-        var shortcutActivatingRaised = false;
-        shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
 
-        // Act - Invoke Command.Activate directly on CheckBox (simulating mouse click)
-        testCommandView.InvokeCommand (Command.Activate);
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (testCommandView.Frame.Location));
 
         // Assert - Shortcut.Activating should have been raised
-        Assert.True (shortcutActivatingRaised);
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, commandViewActivatingRaised);
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    [Theory]
+    [CombinatorialData]
+    public void CommandView_HotKey_Raises_Activating (bool commandViewCanFocus)
+    {
+        // Arrange
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = commandViewCanFocus };
+
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
+
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
+
+        app.Keyboard.RaiseKeyDownEvent (testCommandView.HotKey);
+
+        // Assert - Shortcut.Activating should have been raised
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (0, commandViewActivatingRaised);
+    }
+
     [Fact]
     public void Command_Activate_Raises_Activating_Only ()
     {
@@ -835,7 +880,7 @@ public class ShortcutTests
     }
 
     [Fact]
-    public void Command_Accept_Raises_Accepting ()
+    public void Command_Accept_Raises_Accepting_Only ()
     {
         using Shortcut shortcut = new ();
         shortcut.Title = "Test";
@@ -857,56 +902,43 @@ public class ShortcutTests
         Assert.False (handlingHotKeyFired);
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that when Command.HotKey is invoked directly on a Shortcut (without going through
-    ///     a keyboard binding), OnHandlingHotKey does NOT call RaiseActivating because IsBindingFromShortcut
-    ///     returns false (no binding was provided). Only HandlingHotKey is raised.
-    /// </summary>
     [Fact]
-    public void Command_HotKey_Raises_HandlingHotKey_Only ()
+    public void Command_Accept_Direct_InvokeCommand_Raises_Accepting_Once ()
     {
-        using Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
-        var activatingFired = false;
+        // Arrange
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = false };
 
-        shortcut.Activating += (_, _) => { activatingFired = true; };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
-        var acceptingFired = false;
-        shortcut.Accepting += (_, _) => { acceptingFired = true; };
+        var shortcutAcceptingCount = 0;
+        shortcut.Accepting += (_, _) => shortcutAcceptingCount++;
 
-        var handlingHotKeyFired = false;
-        shortcut.HandlingHotKey += (_, _) => { handlingHotKeyFired = true; };
+        shortcut.InvokeCommand (Command.Accept);
 
-        shortcut.InvokeCommand (Command.HotKey);
-
-        // OnHandlingHotKey only calls RaiseActivating when IsBindingFromShortcut is true
-        // Since we invoked directly without a binding, Activating is NOT raised
-        Assert.False (activatingFired);
-        Assert.False (acceptingFired);
-        Assert.True (handlingHotKeyFired);
+        Assert.Equal (1, shortcutAcceptingCount);
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that when Command.HotKey is invoked directly on a Shortcut (without going through
-    ///     a keyboard binding), Action is NOT executed because:
-    ///     1. OnHandlingHotKey only calls RaiseActivating when IsBindingFromShortcut is true
-    ///     2. Without a binding, IsBindingFromShortcut returns false, so RaiseActivating isn't called
-    ///     3. Action is invoked in OnActivated, but Activated isn't raised
-    /// </summary>
     [Fact]
-    public void Command_HotKey_Does_Not_Execute_Action_Without_Binding ()
+    public void Command_HotKey_Raises_HandlingHotKey_Then_Activating ()
     {
-        Shortcut shortcut = new () { Title = "_Test" };
-        var actionFired = false;
-        shortcut.Action = () => actionFired = true;
+        using Shortcut shortcut = new ();
+        shortcut.Title = "Test";
+        shortcut.Key = Key.T.WithCtrl;
+        var activatingFired = 0;
 
-        // HotKey invoked directly does NOT execute Action (no binding = no Activating)
+        shortcut.Activating += (_, _) => { activatingFired++; };
+
+        var acceptingFired = 0;
+        shortcut.Accepting += (_, _) => { acceptingFired++; };
+
+        var handlingHotKeyFired = 0;
+        shortcut.HandlingHotKey += (_, _) => { handlingHotKeyFired++; };
+
         shortcut.InvokeCommand (Command.HotKey);
 
-        Assert.False (actionFired);
-
-        shortcut.Dispose ();
+        Assert.Equal (1, handlingHotKeyFired);
+        Assert.Equal (1, activatingFired);
+        Assert.Equal (0, acceptingFired);
     }
 
     // Claude - Haiku 4.5
@@ -919,7 +951,7 @@ public class ShortcutTests
     public void Activating_Context_TryGetSource_Identifies_CommandView_Activation ()
     {
         // Arrange
-        using ShortcutTestView commandView = new ();
+        using TestCommandView commandView = new ();
         commandView.Text = "Command";
         using Shortcut shortcut = new ();
         shortcut.Key = Key.F9;
@@ -966,7 +998,7 @@ public class ShortcutTests
     public void Activating_Can_Handle_Differently_Based_On_CommandView_Source ()
     {
         // Arrange
-        using ShortcutTestView commandView = new ();
+        using TestCommandView commandView = new ();
         commandView.Text = "Command";
         using Shortcut shortcut = new ();
         shortcut.Key = Key.F9;
@@ -1019,7 +1051,6 @@ public class ShortcutTests
     [Fact]
     public void Click_Anywhere_On_Shortcut_Causes_Activation ()
     {
-        // Arrange
         // Arrange
         VirtualTimeProvider time = new ();
         using IApplication app = Application.Create (time);

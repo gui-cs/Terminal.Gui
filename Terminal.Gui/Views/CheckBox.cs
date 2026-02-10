@@ -26,12 +26,11 @@ public class CheckBox : View, IValue<CheckState>
 
         // Activate (Space key and single-click) - Raise Activate event and Advance
         // - DO NOT raise Accept
-        // - DO NOT SetFocus
-        //AddCommand (Command.Activate, ActivateAndAdvance);
+        // - DO SetFocus (if focus is not desired, set CanFocus to false)
 
         // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
-        // The default Accept handler does that.
+
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
 
