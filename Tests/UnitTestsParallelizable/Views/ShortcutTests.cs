@@ -831,7 +831,6 @@ public class ShortcutTests
     public void CommandView_HotKey_Raises_Activating (bool commandViewCanFocus)
     {
         // Arrange
-        // Arrange
         VirtualTimeProvider time = new ();
         using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);

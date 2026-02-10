@@ -480,15 +480,23 @@ public class SelectorBaseTests
     [Fact]
     public void DoubleClickAccepts_True_AcceptOnDoubleClick ()
     {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var selector = new OptionSelector { DoubleClickAccepts = true };
         selector.Labels = ["Option1", "Option2"];
-        selector.Layout ();
+
+        (runnable as View)?.Add (selector);
+        app.Begin (runnable);
 
         var acceptCount = 0;
         selector.Accepting += (_, _) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new Mouse { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (1, acceptCount);
     }
@@ -496,15 +504,23 @@ public class SelectorBaseTests
     [Fact]
     public void DoubleClickAccepts_False_DoesNotAcceptOnDoubleClick ()
     {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var selector = new OptionSelector { DoubleClickAccepts = false };
         selector.Labels = ["Option1", "Option2"];
-        selector.Layout ();
+
+        (runnable as View)?.Add (selector);
+        app.Begin (runnable);
 
         var acceptCount = 0;
         selector.Accepting += (_, _) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new Mouse { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (0, acceptCount);
     }

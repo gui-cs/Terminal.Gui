@@ -31,7 +31,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
 
-        CommandsToBubbleUp = [Command.Accept];
+        CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
         KeyBindings.ReplaceCommands (Key.CursorDown, Command.Down);
         KeyBindings.ReplaceCommands (Key.CursorRight, Command.Right);
