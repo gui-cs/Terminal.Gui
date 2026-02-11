@@ -23,19 +23,19 @@ public class ViewCommandTests
     public void Accept_Handle_Event_OnAccepting_Returns_True ()
     {
         var view = new View ();
-        var acceptInvoked = false;
+        var acceptInvokedCount = 0;
 
         view.Accepting += ViewOnAccepting;
 
         bool? ret = view.InvokeCommand (Command.Accept);
         Assert.True (ret);
-        Assert.True (acceptInvoked);
+        Assert.Equal (1, acceptInvokedCount);
 
         return;
 
         void ViewOnAccepting (object? sender, CommandEventArgs e)
         {
-            acceptInvoked = true;
+            acceptInvokedCount++;
             e.Handled = true;
         }
     }
@@ -44,16 +44,16 @@ public class ViewCommandTests
     public void Accept_Command_Invokes_Accepting_Event ()
     {
         var view = new View ();
-        var accepted = false;
+        var acceptedCount = 0;
 
         view.Accepting += ViewOnAccepting;
 
         view.InvokeCommand (Command.Accept);
-        Assert.True (accepted);
+        Assert.Equal (1, acceptedCount);
 
         return;
 
-        void ViewOnAccepting (object? sender, CommandEventArgs e) => accepted = true;
+        void ViewOnAccepting (object? sender, CommandEventArgs e) => acceptedCount++;
     }
 
     // Accept on subview should bubble up to parent
@@ -111,39 +111,39 @@ public class ViewCommandTests
     public void Accepted_Raised_When_Accepting_Not_Handled ()
     {
         View view = new ();
-        var acceptedInvoked = false;
+        var acceptedInvokedCount = 0;
 
         view.Accepting += (sender, e) => { e.Handled = false; };
 
-        view.Accepted += (sender, e) => { acceptedInvoked = true; };
+        view.Accepted += (sender, e) => { acceptedInvokedCount++; };
 
         view.InvokeCommand (Command.Accept);
-        Assert.True (acceptedInvoked);
+        Assert.Equal (1, acceptedInvokedCount);
     }
 
     [Fact]
     public void Accepted_Not_Raised_When_Accepting_Handled ()
     {
         View view = new ();
-        var acceptedInvoked = false;
+        var acceptedInvokedCount = 0;
 
         view.Accepting += (sender, e) => { e.Handled = true; };
 
-        view.Accepted += (sender, e) => { acceptedInvoked = true; };
+        view.Accepted += (sender, e) => { acceptedInvokedCount++; };
 
         view.InvokeCommand (Command.Accept);
-        Assert.False (acceptedInvoked);
+        Assert.Equal (0, acceptedInvokedCount);
     }
 
     [Fact]
     public void Accepted_Event_Cannot_Be_Cancelled ()
     {
         View view = new ();
-        var acceptedInvoked = false;
+        var acceptedInvokedCount = 0;
 
         view.Accepted += (sender, e) =>
                          {
-                             acceptedInvoked = true;
+                             acceptedInvokedCount++;
 
                              // Accepted event has Handled property but it doesn't affect flow
                              e.Handled = false;
@@ -151,7 +151,7 @@ public class ViewCommandTests
 
         bool? ret = view.InvokeCommand (Command.Accept);
         Assert.False (ret);
-        Assert.True (acceptedInvoked);
+        Assert.Equal (1, acceptedInvokedCount);
     }
 
     [Fact]
@@ -227,19 +227,19 @@ public class ViewCommandTests
     public void Activate_Command_Handle_Event_OnActivating_Returns_True ()
     {
         var view = new View ();
-        var activatingInvoked = false;
+        var activatingInvokedCount = 0;
 
         view.Activating += ViewOnActivating;
 
         bool? ret = view.InvokeCommand (Command.Activate);
         Assert.True (ret);
-        Assert.True (activatingInvoked);
+        Assert.Equal (1, activatingInvokedCount);
 
         return;
 
         void ViewOnActivating (object? sender, CommandEventArgs e)
         {
-            activatingInvoked = true;
+            activatingInvokedCount++;
             e.Handled = true;
         }
     }
@@ -248,23 +248,23 @@ public class ViewCommandTests
     public void Activate_Command_Invokes_Activating_Event ()
     {
         var view = new View ();
-        var activating = false;
+        var activatingCount = 0;
 
         view.Activating += ViewOnActivating;
 
         view.InvokeCommand (Command.Activate);
-        Assert.True (activating);
+        Assert.Equal (1, activatingCount);
 
         return;
 
-        void ViewOnActivating (object? sender, CommandEventArgs e) => activating = true;
+        void ViewOnActivating (object? sender, CommandEventArgs e) => activatingCount++;
     }
 
     [Fact]
     public void LeftButtonReleased_Invokes_Activate_Command ()
     {
         var view = new ViewEventTester ();
-        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonReleased, Position = Point.Empty, View = view });
+        view.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, Position = Point.Empty, View = view });
 
         Assert.Equal (1, view.OnActivatingCount);
     }
@@ -292,7 +292,7 @@ public class ViewCommandTests
         view.CanFocus = true;
         view.InvokeCommand (Command.HotKey);
 
-        int activatingInvoked = 0;
+        var activatingInvoked = 0;
         view.Activating += ViewOnActivating;
 
         bool? ret = view.InvokeCommand (Command.Activate);
@@ -367,12 +367,12 @@ public class ViewCommandTests
         View subView = new ();
         superView.Add (subView);
 
-        var superViewAcceptingCalled = false;
-        superView.Accepting += (_, _) => superViewAcceptingCalled = true;
+        var superViewAcceptingCalledCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCalledCount++;
 
         subView.InvokeCommand (Command.Accept);
 
-        Assert.False (superViewAcceptingCalled);
+        Assert.Equal (0, superViewAcceptingCalledCount);
     }
 
     // Claude - Sonnet 4.5
@@ -383,12 +383,12 @@ public class ViewCommandTests
         View subView = new ();
         superView.Add (subView);
 
-        var superViewActivatingCalled = false;
-        superView.Activating += (_, _) => superViewActivatingCalled = true;
+        var superViewActivatingCalledCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCalledCount++;
 
         subView.InvokeCommand (Command.Activate);
 
-        Assert.False (superViewActivatingCalled);
+        Assert.Equal (0, superViewActivatingCalledCount);
     }
 
     // Claude - Sonnet 4.5
@@ -399,12 +399,12 @@ public class ViewCommandTests
         View subView = new ();
         superView.Add (subView);
 
-        var superViewAcceptingCalled = false;
-        superView.Accepting += (_, _) => superViewAcceptingCalled = true;
+        var superViewAcceptingCalledCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCalledCount++;
 
         subView.InvokeCommand (Command.Accept);
 
-        Assert.False (superViewAcceptingCalled);
+        Assert.Equal (0, superViewAcceptingCalledCount);
     }
 
     // Claude - Sonnet 4.5
@@ -415,12 +415,12 @@ public class ViewCommandTests
         View subView = new ();
         superView.Add (subView);
 
-        var superViewActivatingCalled = false;
-        superView.Activating += (_, _) => superViewActivatingCalled = true;
+        var superViewActivatingCalledCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCalledCount++;
 
         subView.InvokeCommand (Command.Activate);
 
-        Assert.True (superViewActivatingCalled);
+        Assert.Equal (1, superViewActivatingCalledCount);
     }
 
     // Claude - Sonnet 4.5
@@ -431,8 +431,8 @@ public class ViewCommandTests
         View subView = new ();
         superView.Add (subView);
 
-        var superViewAcceptingCalled = false;
-        superView.Accepting += (_, _) => superViewAcceptingCalled = true;
+        var superViewAcceptingCalledCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCalledCount++;
 
         // SubView handles the command
         subView.Accepting += (_, e) => e.Handled = true;
@@ -440,7 +440,7 @@ public class ViewCommandTests
         subView.InvokeCommand (Command.Accept);
 
         // Should NOT propagate because subView handled it
-        Assert.False (superViewAcceptingCalled);
+        Assert.Equal (0, superViewAcceptingCalledCount);
     }
 
     // Claude - Sonnet 4.5
@@ -454,13 +454,13 @@ public class ViewCommandTests
         grandSuperView.Add (superView);
         superView.Add (subView);
 
-        var grandSuperViewAcceptingCalled = false;
-        grandSuperView.Accepting += (_, _) => grandSuperViewAcceptingCalled = true;
+        var grandSuperViewAcceptingCalledCount = 0;
+        grandSuperView.Accepting += (_, _) => grandSuperViewAcceptingCalledCount++;
 
         subView.InvokeCommand (Command.Accept);
 
         // Should propagate all the way up
-        Assert.True (grandSuperViewAcceptingCalled);
+        Assert.Equal (1, grandSuperViewAcceptingCalledCount);
     }
 
     // Claude - Sonnet 4.5
@@ -474,18 +474,424 @@ public class ViewCommandTests
         grandSuperView.Add (superView);
         superView.Add (subView);
 
-        var grandSuperViewAcceptingCalled = false;
-        grandSuperView.Accepting += (_, _) => grandSuperViewAcceptingCalled = true;
+        var grandSuperViewAcceptingCalledCount = 0;
+        grandSuperView.Accepting += (_, _) => grandSuperViewAcceptingCalledCount++;
 
         // SuperView handles it, so shouldn't propagate further
         superView.Accepting += (_, e) => e.Handled = true;
 
         subView.InvokeCommand (Command.Accept);
 
-        Assert.False (grandSuperViewAcceptingCalled);
+        Assert.Equal (0, grandSuperViewAcceptingCalledCount);
     }
 
     #endregion Command Propagation Tests
+
+    #region GetSupportedCommands Tests
+
+    [Fact]
+    public void GetSupportedCommands_Returns_DefaultCommands ()
+    {
+        View view = new ();
+
+        IEnumerable<Command> commands = view.GetSupportedCommands ();
+
+        Assert.Contains (Command.Activate, commands);
+        Assert.Contains (Command.Accept, commands);
+        Assert.Contains (Command.HotKey, commands);
+        Assert.Contains (Command.NotBound, commands);
+    }
+
+    [Fact]
+    public void GetSupportedCommands_DoesNotContain_Unsupported_Commands ()
+    {
+        View view = new ();
+
+        IEnumerable<Command> commands = view.GetSupportedCommands ();
+
+        // Command.New is not bound by default on View
+        Assert.DoesNotContain (Command.New, commands);
+    }
+
+    #endregion
+
+    #region InvokeCommands Tests
+
+    [Fact]
+    public void InvokeCommands_Invokes_Multiple_Commands ()
+    {
+        var view = new ViewEventTester ();
+
+        view.InvokeCommands ([Command.Activate, Command.Accept], null);
+
+        Assert.Equal (1, view.OnActivatingCount);
+        Assert.Equal (1, view.OnAcceptedCount);
+    }
+
+    [Fact]
+    public void InvokeCommands_Returns_True_If_Any_Command_Handled ()
+    {
+        var view = new ViewEventTester ();
+        view.HandleOnActivating = true;
+
+        bool? result = view.InvokeCommands ([Command.Activate, Command.Accept], null);
+
+        Assert.True (result);
+    }
+
+    [Fact]
+    public void InvokeCommands_Returns_False_If_No_Command_Handled ()
+    {
+        var view = new ViewEventTester ();
+
+        bool? result = view.InvokeCommands ([Command.Activate, Command.Accept], null);
+
+        Assert.False (result);
+    }
+
+    [Fact]
+    public void InvokeCommands_EmptyArray_Returns_Null ()
+    {
+        var view = new View ();
+
+        bool? result = view.InvokeCommands ([], null);
+
+        Assert.Null (result);
+    }
+
+    #endregion
+
+    #region InvokeCommand With Binding Tests
+
+    [Fact]
+    public void InvokeCommand_WithKeyBinding_PassesBindingInContext ()
+    {
+        var view = new View ();
+        KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter };
+        ICommandContext? receivedContext = null;
+
+        view.Accepting += (_, e) => receivedContext = e.Context;
+
+        view.InvokeCommand (Command.Accept, keyBinding);
+
+        Assert.NotNull (receivedContext);
+        Assert.Equal (Command.Accept, receivedContext!.Command);
+
+        if (receivedContext.Binding is KeyBinding kb)
+        {
+            Assert.Equal (Key.Enter, kb.Key);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be KeyBinding");
+        }
+    }
+
+    [Fact]
+    public void InvokeCommand_WithMouseBinding_PassesBindingInContext ()
+    {
+        var view = new View ();
+        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
+        ICommandContext? receivedContext = null;
+
+        view.Activating += (_, e) => receivedContext = e.Context;
+
+        view.InvokeCommand (Command.Activate, mouseBinding);
+
+        Assert.NotNull (receivedContext);
+
+        if (receivedContext!.Binding is MouseBinding mb)
+        {
+            Assert.Equal (MouseFlags.LeftButtonClicked, mb.MouseEvent?.Flags);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be MouseBinding");
+        }
+    }
+
+    [Fact]
+    public void InvokeCommand_WithNullBinding_ContextHasNullBinding ()
+    {
+        var view = new View ();
+        ICommandContext? receivedContext = null;
+
+        view.Accepting += (_, e) => receivedContext = e.Context;
+
+        view.InvokeCommand (Command.Accept, (ICommandBinding?)null);
+
+        Assert.NotNull (receivedContext);
+        Assert.Null (receivedContext!.Binding);
+    }
+
+    [Fact]
+    public void InvokeCommand_WithContext_PassesContextToHandler ()
+    {
+        var view = new View ();
+        View sourceView = new () { Id = "source" };
+        KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.F1 };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView), Binding = keyBinding };
+
+        ICommandContext? receivedContext = null;
+        view.Accepting += (_, e) => receivedContext = e.Context;
+
+        view.InvokeCommand (Command.Accept, ctx);
+
+        Assert.NotNull (receivedContext);
+        Assert.Equal (Command.Accept, receivedContext!.Command);
+
+        View? source = null;
+        receivedContext.Source?.TryGetTarget (out source);
+        Assert.Equal ("source", source?.Id);
+    }
+
+    #endregion
+
+    #region Activated Tests
+
+    [Fact]
+    public void Activated_Raised_When_Activating_Not_Handled ()
+    {
+        View view = new ();
+        var activatedInvokedCount = 0;
+
+        view.Activating += (_, e) => { e.Handled = false; };
+        view.Activated += (_, _) => { activatedInvokedCount++; };
+
+        view.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, activatedInvokedCount);
+    }
+
+    [Fact]
+    public void Activated_Not_Raised_When_Activating_Handled ()
+    {
+        View view = new ();
+        var activatedInvokedCount = 0;
+
+        view.Activating += (_, e) => { e.Handled = true; };
+        view.Activated += (_, _) => { activatedInvokedCount++; };
+
+        view.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, activatedInvokedCount);
+    }
+
+    [Fact]
+    public void Activated_Event_Receives_Context ()
+    {
+        View view = new ();
+        ICommandContext? receivedContext = null;
+
+        view.Activated += (_, e) => { receivedContext = e.Value; };
+
+        view.InvokeCommand (Command.Activate);
+
+        Assert.NotNull (receivedContext);
+        Assert.Equal (Command.Activate, receivedContext!.Command);
+    }
+
+    private class OnActivatedTestView : View
+    {
+        public int OnActivatedCallCount { get; private set; }
+
+        protected override void OnActivated (ICommandContext? ctx)
+        {
+            OnActivatedCallCount++;
+            base.OnActivated (ctx);
+        }
+    }
+
+    [Fact]
+    public void OnActivated_Called_When_Activating_Not_Handled ()
+    {
+        OnActivatedTestView view = new ();
+
+        view.Activating += (_, e) => { e.Handled = false; };
+
+        view.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, view.OnActivatedCallCount);
+    }
+
+    [Fact]
+    public void OnActivated_Not_Called_When_Activating_Handled ()
+    {
+        OnActivatedTestView view = new ();
+
+        view.Activating += (_, e) => { e.Handled = true; };
+
+        view.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, view.OnActivatedCallCount);
+    }
+
+    #endregion
+
+    #region HotKeyCommand Tests
+
+    [Fact]
+    public void HotKeyCommand_Raised_When_HandlingHotKey_Not_Handled ()
+    {
+        View view = new ();
+        var hotKeyCommandInvokedCount = 0;
+
+        view.HandlingHotKey += (_, e) => { e.Handled = false; };
+        view.HotKeyCommand += (_, _) => { hotKeyCommandInvokedCount++; };
+
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, hotKeyCommandInvokedCount);
+    }
+
+    [Fact]
+    public void HotKeyCommand_Not_Raised_When_HandlingHotKey_Handled ()
+    {
+        View view = new ();
+        var hotKeyCommandInvokedCount = 0;
+
+        view.HandlingHotKey += (_, e) => { e.Handled = true; };
+        view.HotKeyCommand += (_, _) => { hotKeyCommandInvokedCount++; };
+
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (0, hotKeyCommandInvokedCount);
+    }
+
+    [Fact]
+    public void HotKeyCommand_Event_Receives_Context ()
+    {
+        View view = new ();
+        ICommandContext? receivedContext = null;
+
+        view.HotKeyCommand += (_, e) => { receivedContext = e.Value; };
+
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.NotNull (receivedContext);
+        Assert.Equal (Command.HotKey, receivedContext!.Command);
+    }
+
+    private class OnHotKeyCommandTestView : View
+    {
+        public int OnHotKeyCommandCallCount { get; private set; }
+
+        protected override void OnHotKeyCommand (ICommandContext? ctx)
+        {
+            OnHotKeyCommandCallCount++;
+            base.OnHotKeyCommand (ctx);
+        }
+    }
+
+    [Fact]
+    public void OnHotKeyCommand_Called_When_HandlingHotKey_Not_Handled ()
+    {
+        OnHotKeyCommandTestView view = new ();
+
+        view.HandlingHotKey += (_, e) => { e.Handled = false; };
+
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, view.OnHotKeyCommandCallCount);
+    }
+
+    [Fact]
+    public void OnHotKeyCommand_Not_Called_When_HandlingHotKey_Handled ()
+    {
+        OnHotKeyCommandTestView view = new ();
+
+        view.HandlingHotKey += (_, e) => { e.Handled = true; };
+
+        view.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (0, view.OnHotKeyCommandCallCount);
+    }
+
+    #endregion
+
+    #region DefaultAcceptView Tests
+
+    [Fact]
+    public void DefaultAcceptView_Default_IsNull_WhenNoIsDefaultButton ()
+    {
+        View view = new ();
+
+        Assert.Null (view.DefaultAcceptView);
+    }
+
+    [Fact]
+    public void DefaultAcceptView_CanBeSet ()
+    {
+        View view = new ();
+        View acceptView = new () { Id = "acceptView" };
+
+        view.DefaultAcceptView = acceptView;
+
+        Assert.Equal (acceptView, view.DefaultAcceptView);
+    }
+
+    [Fact]
+    public void DefaultAcceptView_FindsIsDefaultButton ()
+    {
+        View superView = new ();
+        Button defaultButton = new () { IsDefault = true, Id = "defaultButton" };
+        superView.Add (defaultButton);
+
+        Assert.Equal (defaultButton, superView.DefaultAcceptView);
+    }
+
+    [Fact]
+    public void DefaultAcceptView_ExplicitSetting_OverridesIsDefaultButton ()
+    {
+        View superView = new ();
+        Button defaultButton = new () { IsDefault = true, Id = "defaultButton" };
+        View customAcceptView = new () { Id = "customAcceptView" };
+        superView.Add (defaultButton);
+
+        superView.DefaultAcceptView = customAcceptView;
+
+        Assert.Equal (customAcceptView, superView.DefaultAcceptView);
+    }
+
+    [Fact]
+    public void Accept_Bubbles_To_DefaultAcceptView ()
+    {
+        View superView = new ();
+        View subView = new ();
+        Button defaultButton = new () { IsDefault = true, Id = "defaultButton" };
+
+        superView.Add (subView);
+        superView.Add (defaultButton);
+
+        var defaultButtonAcceptingCount = 0;
+        defaultButton.Accepting += (_, _) => defaultButtonAcceptingCount++;
+
+        subView.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, defaultButtonAcceptingCount);
+    }
+
+    [Fact]
+    public void Accept_DoesNotBubble_To_DefaultAcceptView_WhenHandled ()
+    {
+        View superView = new ();
+        View subView = new ();
+        Button defaultButton = new () { IsDefault = true, Id = "defaultButton" };
+
+        superView.Add (subView);
+        superView.Add (defaultButton);
+
+        subView.Accepting += (_, e) => e.Handled = true;
+
+        var defaultButtonAcceptingCount = 0;
+        defaultButton.Accepting += (_, _) => defaultButtonAcceptingCount++;
+
+        subView.InvokeCommand (Command.Accept);
+
+        Assert.Equal (0, defaultButtonAcceptingCount);
+    }
+
+    #endregion
 
     public class ViewEventTester : View
     {

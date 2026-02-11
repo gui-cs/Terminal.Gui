@@ -346,4 +346,165 @@ public class CommandContextTests
     }
 
     #endregion
+
+    #region Constructor Tests
+
+    [Fact]
+    public void CommandContext_ParameterizedConstructor_SetsAllProperties ()
+    {
+        View sourceView = new () { Id = "source" };
+        KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.F1 };
+
+        CommandContext ctx = new (Command.Accept, new WeakReference<View> (sourceView), keyBinding);
+
+        Assert.Equal (Command.Accept, ctx.Command);
+        Assert.NotNull (ctx.Source);
+
+        View? retrievedSource = null;
+        ctx.Source?.TryGetTarget (out retrievedSource);
+        Assert.Equal ("source", retrievedSource?.Id);
+        Assert.NotNull (ctx.Binding);
+
+        if (ctx.Binding is KeyBinding kb)
+        {
+            Assert.Equal (Key.F1, kb.Key);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be KeyBinding");
+        }
+    }
+
+    [Fact]
+    public void CommandContext_ParameterizedConstructor_NullSource_Works ()
+    {
+        CommandBinding binding = new ([Command.Activate], null, "test");
+
+        CommandContext ctx = new (Command.Activate, null, binding);
+
+        Assert.Equal (Command.Activate, ctx.Command);
+        Assert.Null (ctx.Source);
+        Assert.NotNull (ctx.Binding);
+    }
+
+    [Fact]
+    public void CommandContext_ParameterizedConstructor_NullBinding_Works ()
+    {
+        View sourceView = new () { Id = "source" };
+
+        CommandContext ctx = new (Command.Accept, new WeakReference<View> (sourceView), null);
+
+        Assert.Equal (Command.Accept, ctx.Command);
+        Assert.NotNull (ctx.Source);
+        Assert.Null (ctx.Binding);
+    }
+
+    [Fact]
+    public void CommandContext_DefaultConstructor_HasDefaultValues ()
+    {
+        CommandContext ctx = new ();
+
+        Assert.Equal (default (Command), ctx.Command);
+        Assert.Null (ctx.Source);
+        Assert.Null (ctx.Binding);
+    }
+
+    #endregion
+    
+    #region WeakReference Behavior Tests
+
+    [Fact]
+    public void Source_WeakReference_TryGetTarget_ReturnsView ()
+    {
+        View sourceView = new () { Id = "weakRefTest" };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView) };
+
+        View? retrievedView = null;
+        var success = ctx.Source?.TryGetTarget (out retrievedView);
+
+        Assert.True (success);
+        Assert.NotNull (retrievedView);
+        Assert.Equal ("weakRefTest", retrievedView?.Id);
+    }
+
+    [Fact]
+    public void Source_WeakReference_CanBeUpdated ()
+    {
+        View originalView = new () { Id = "original" };
+        View newView = new () { Id = "new" };
+
+        CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (originalView) };
+
+        // Update Source
+        ctx.Source = new WeakReference<View> (newView);
+
+        View? retrievedView = null;
+        ctx.Source?.TryGetTarget (out retrievedView);
+        Assert.Equal ("new", retrievedView?.Id);
+    }
+
+    #endregion
+
+    #region Command Property Mutability Tests
+
+    [Fact]
+    public void Command_Property_CanBeChanged ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept };
+
+        ctx.Command = Command.Activate;
+
+        Assert.Equal (Command.Activate, ctx.Command);
+    }
+
+    [Fact]
+    public void Command_Property_CanBeChangedThroughInterface ()
+    {
+        ICommandContext ctx = new CommandContext { Command = Command.Accept };
+
+        ctx.Command = Command.HotKey;
+
+        Assert.Equal (Command.HotKey, ctx.Command);
+    }
+
+    #endregion
+
+    #region Record Struct Equality Tests
+
+    [Fact]
+    public void CommandContext_ValueEquality_SameValues_AreEqual ()
+    {
+        View sourceView = new () { Id = "source" };
+        WeakReference<View> weakRef = new (sourceView);
+        KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter };
+
+        CommandContext ctx1 = new () { Command = Command.Accept, Source = weakRef, Binding = keyBinding };
+        CommandContext ctx2 = new () { Command = Command.Accept, Source = weakRef, Binding = keyBinding };
+
+        Assert.Equal (ctx1, ctx2);
+    }
+
+    [Fact]
+    public void CommandContext_ValueEquality_DifferentCommand_AreNotEqual ()
+    {
+        CommandContext ctx1 = new () { Command = Command.Accept };
+        CommandContext ctx2 = new () { Command = Command.Activate };
+
+        Assert.NotEqual (ctx1, ctx2);
+    }
+
+    [Fact]
+    public void CommandContext_ValueEquality_DifferentWeakReferences_AreNotEqual ()
+    {
+        View sourceView = new () { Id = "source" };
+
+        // Different WeakReference instances, even to the same view
+        CommandContext ctx1 = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView) };
+        CommandContext ctx2 = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView) };
+
+        // WeakReferences are reference types, so different instances are not equal
+        Assert.NotEqual (ctx1, ctx2);
+    }
+
+    #endregion
 }
