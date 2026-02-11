@@ -297,7 +297,4 @@ public partial class ListView : View, IDesignable, IValue<int?>
         Source?.Dispose ();
         base.Dispose (disposing);
     }
-
-    /// <inheritdoc />
-    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }

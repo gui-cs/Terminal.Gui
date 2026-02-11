@@ -22,29 +22,29 @@ public class KeyBindingsTests
 
         app.Keyboard.RaiseKeyDownEvent (Key.A);
         Assert.False (keyWasHandled);
-        Assert.True (view.ApplicationCommand);
+        Assert.True (view.ApplicationCommandInvoked);
 
         keyWasHandled = false;
         app.Keyboard.RaiseKeyDownEvent (Key.H);
-        Assert.True (view.HotKeyCommand);
+        Assert.True (view.HotKeyCommandInvoked);
         Assert.False (keyWasHandled);
 
         keyWasHandled = false;
         Assert.False (view.HasFocus);
         app.Keyboard.RaiseKeyDownEvent (Key.F);
         Assert.False (keyWasHandled);
-        Assert.False (view.FocusedCommand);
+        Assert.False (view.FocusedCommandInvoked);
 
         keyWasHandled = false;
         view.CanFocus = true;
         view.SetFocus ();
         Assert.True (view.HasFocus);
         app.Keyboard.RaiseKeyDownEvent (Key.F);
-        Assert.True (view.FocusedCommand);
+        Assert.True (view.FocusedCommandInvoked);
         Assert.False (keyWasHandled); // Command was invoked, but wasn't handled
 
-        Assert.True (view.ApplicationCommand);
-        Assert.True (view.HotKeyCommand);
+        Assert.True (view.ApplicationCommandInvoked);
+        Assert.True (view.HotKeyCommandInvoked);
     }
 
     [Fact]
@@ -59,17 +59,17 @@ public class KeyBindingsTests
 
         app.Keyboard.RaiseKeyDownEvent (Key.Z);
         Assert.False (keyWasHandled);
-        Assert.False (view.ApplicationCommand);
-        Assert.False (view.HotKeyCommand);
-        Assert.False (view.FocusedCommand);
+        Assert.False (view.ApplicationCommandInvoked);
+        Assert.False (view.HotKeyCommandInvoked);
+        Assert.False (view.FocusedCommandInvoked);
 
         keyWasHandled = false;
         Assert.False (view.HasFocus);
         app.Keyboard.RaiseKeyDownEvent (Key.F);
         Assert.False (keyWasHandled);
-        Assert.False (view.ApplicationCommand);
-        Assert.False (view.HotKeyCommand);
-        Assert.False (view.FocusedCommand);
+        Assert.False (view.ApplicationCommandInvoked);
+        Assert.False (view.HotKeyCommandInvoked);
+        Assert.False (view.FocusedCommandInvoked);
     }
 
     [Fact]
@@ -86,18 +86,18 @@ public class KeyBindingsTests
 
         keyWasHandled = false;
         app.Keyboard.RaiseKeyDownEvent (Key.H);
-        Assert.True (view.HotKeyCommand);
+        Assert.True (view.HotKeyCommandInvoked);
         Assert.False (keyWasHandled);
 
         view.HotKey = KeyCode.Z;
         keyWasHandled = false;
-        view.HotKeyCommand = false;
+        view.HotKeyCommandInvoked = false;
         app.Keyboard.RaiseKeyDownEvent (Key.H); // old hot key
         Assert.False (keyWasHandled);
-        Assert.False (view.HotKeyCommand);
+        Assert.False (view.HotKeyCommandInvoked);
 
         app.Keyboard.RaiseKeyDownEvent (Key.Z); // new hot key
-        Assert.True (view.HotKeyCommand);
+        Assert.True (view.HotKeyCommandInvoked);
         Assert.False (keyWasHandled);
     }
 
@@ -113,11 +113,11 @@ public class KeyBindingsTests
 
         app.Keyboard.RaiseKeyDownEvent (Key.Z);
         Assert.False (keyWasHandled);
-        Assert.False (view.HotKeyCommand);
+        Assert.False (view.HotKeyCommandInvoked);
 
         keyWasHandled = false;
         app.Keyboard.RaiseKeyDownEvent (Key.F);
-        Assert.False (view.HotKeyCommand);
+        Assert.False (view.HotKeyCommandInvoked);
     }
 
     [Fact]
@@ -134,12 +134,12 @@ public class KeyBindingsTests
 
         app.Keyboard.RaiseKeyDownEvent (Key.Z);
         Assert.False (keyWasHandled);
-        Assert.False (view.HotKeyCommand);
+        Assert.False (view.HotKeyCommandInvoked);
 
         keyWasHandled = false;
         view.Enabled = false;
         app.Keyboard.RaiseKeyDownEvent (Key.F);
-        Assert.False (view.HotKeyCommand);
+        Assert.False (view.HotKeyCommandInvoked);
     }
 
     [Fact]
@@ -189,17 +189,17 @@ public class KeyBindingsTests
         public override void EndInit ()
         {
             base.EndInit ();
-            AddCommand (Command.Save, () => ApplicationCommand = true);
-            AddCommand (Command.HotKey, () => HotKeyCommand = true);
-            AddCommand (Command.Left, () => FocusedCommand = true);
+            AddCommand (Command.Save, () => ApplicationCommandInvoked = true);
+            AddCommand (Command.HotKey, () => HotKeyCommandInvoked = true);
+            AddCommand (Command.Left, () => FocusedCommandInvoked = true);
 
             App!.Keyboard.KeyBindings.AddApp (Key.A, this, Command.Save);
             HotKey = KeyCode.H;
             KeyBindings.Add (Key.F, Command.Left);
         }
 
-        public bool ApplicationCommand { get; set; }
-        public bool FocusedCommand { get; set; }
-        public bool HotKeyCommand { get; set; }
+        public bool ApplicationCommandInvoked { get; set; }
+        public bool FocusedCommandInvoked { get; set; }
+        public bool HotKeyCommandInvoked { get; set; }
     }
 }

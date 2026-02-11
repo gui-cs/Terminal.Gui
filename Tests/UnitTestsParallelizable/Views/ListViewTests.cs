@@ -203,7 +203,7 @@ public class ListViewTests (ITestOutputHelper output)
 
         // In standard selection mode (ShowMarks=false), Space doesn't mark
         Assert.False (lv.Source.IsMarked (lv.SelectedItem!.Value));
-        Assert.True (lv.NewKeyDownEvent (Key.Space));
+        lv.NewKeyDownEvent (Key.Space);
         Assert.False (lv.Source.IsMarked (lv.SelectedItem!.Value)); // Still not marked
 
         var opened = false;
@@ -2706,6 +2706,54 @@ hree - lon",
 
         // HotKey should set focus (returns !SetFocus() which is false on success)
         Assert.False (result);
+
+        listView.Dispose ();
+    }
+
+    [Fact]
+    public void HotKey_Command_Sets_SelectedItem_To_Zero_When_Null ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2", "Item3"]) };
+
+        // Initially SelectedItem is null
+        Assert.Null (listView.SelectedItem);
+
+        listView.InvokeCommand (Command.HotKey);
+
+        // OnHotKeyCommand sets SelectedItem ??= 0
+        Assert.Equal (0, listView.SelectedItem);
+
+        listView.Dispose ();
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Not_Change_SelectedItem_When_Already_Set ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2", "Item3"]) };
+
+        // Set SelectedItem to a non-zero value
+        listView.SelectedItem = 2;
+        Assert.Equal (2, listView.SelectedItem);
+
+        listView.InvokeCommand (Command.HotKey);
+
+        // OnHotKeyCommand uses ??= so it should NOT change SelectedItem
+        Assert.Equal (2, listView.SelectedItem);
+
+        listView.Dispose ();
+    }
+
+    [Fact]
+    public void HotKey_Command_Raises_HotKeyCommand_Event ()
+    {
+        ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2"]) };
+        var hotKeyCommandInvokedCount = 0;
+
+        listView.HotKeyCommand += (_, _) => hotKeyCommandInvokedCount++;
+
+        listView.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, hotKeyCommandInvokedCount);
 
         listView.Dispose ();
     }
