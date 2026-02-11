@@ -634,7 +634,6 @@ public partial class View // Command APIs
     ///     Bubbles a command to the SuperView if the command is in SuperView's <see cref="CommandsToBubbleUp"/> list.
     ///     Handles the special case of invoking <see cref="Command.Accept"/> on a peer IsDefault button.
     /// </summary>
-    /// <param name="command">The command to potentially bubble up.</param>
     /// <param name="ctx">The command context to pass along.</param>
     /// <param name="handled">Whether the command was already handled by this View.</param>
     /// <returns>

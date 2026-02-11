@@ -8,7 +8,7 @@ namespace Terminal.Gui.Input;
 /// <seealso cref="Command"/>
 public class KeyBindings : CommandBindingsBase<Key, KeyBinding>
 {
-    /// <summary>Initializes a new instance bound to <paramref name="target"/>.</summary>
+    /// <summary>Initializes a new instance.</summary>
     public KeyBindings () : base ((commands, key, source) => new KeyBinding (commands, source), new KeyEqualityComparer ()) { }
 
     /// <inheritdoc/>
