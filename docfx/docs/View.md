@@ -128,6 +128,8 @@ See the [Command Deep Dive](command.md).
 - [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Declares commands the View supports
 - [View.InvokeCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Invokes a command
 - [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
+- <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp> - Opt-in list of commands that bubble from SubViews to this View
+- <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> - The SubView that receives `Command.Accept` when no other SubView handles it
 
 ### Input Handling
 
@@ -230,10 +232,12 @@ See the [Navigation Deep Dive](navigation.md).
 Events:
 - `HasFocusChanging` - Before focus changes (cancellable)
 - `HasFocusChanged` - After focus changes
-- `Accepting` - When Command.Accept is invoked (typically Enter key)
+- `Accepting` - When Command.Accept is invoked (typically Enter key) - cancellable
 - `Accepted` - After Command.Accept completes
-- `Activating` - When Command.Activate is invoked (typically Space or mouse click)
+- `Activating` - When Command.Activate is invoked (typically Space or mouse click) - cancellable
 - `Activated` - After Command.Activate completes
+- `HandlingHotKey` - When Command.HotKey is invoked (the view's HotKey was pressed) - cancellable
+- `HotKeyCommand` - After Command.HotKey completes
 
 ### Scrolling
 
@@ -334,7 +338,7 @@ Views use a command pattern for handling input:
 
 ```csharp
 // Add a command the view supports
-view.AddCommand (Command.Accept, () => 
+view.AddCommand (Command.Accept, () =>
 {
     // Handle the Accept command
     return true;
@@ -345,6 +349,9 @@ view.KeyBindings.Add (Key.Enter, Command.Accept);
 
 // Bind a mouse action to the command
 view.MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
+
+// Enable command bubbling from SubViews to this View
+view.CommandsToBubbleUp = [Command.Accept, Command.Activate];
 ```
 
 ### Input
