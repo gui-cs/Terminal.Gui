@@ -46,18 +46,6 @@ public class CheckBox : View, IValue<CheckState>
         AdvanceCheckState ();
     }
 
-    /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
-    {
-        // Invoke Activate on ourselves
-        if (InvokeCommand (Command.Activate, args.Context) is not true)
-        {
-            return base.OnHandlingHotKey (args);
-        }
-
-        return false;
-    }
-
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
     {
         base.Text = e.Value;

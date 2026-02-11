@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Text;
+
 namespace ViewBaseTests.Keyboard;
 
 /// <summary>
@@ -141,44 +143,42 @@ public class KeyBindingsTests
     }
 
     [Fact]
-    public void HotKey_Raises_HotKeyCommand ()
+    public void HotKey_Raises_HandlingHotKey ()
     {
         IApplication? app = Application.Create ();
         app.Begin (new Runnable<bool> ());
-        var hotKeyRaised = false;
-        var acceptRaised = false;
-        var selectRaised = false;
+        var hotKeyRaised = 0;
+        var acceptRaised = 0;
+        var activateRaised = 0;
 
         var view = new View
         {
             CanFocus = true,
-            HotKeySpecifier = new ('_'),
+            HotKeySpecifier = new Rune ('_'),
             Title = "_Test"
         };
         app!.TopRunnableView!.Add (view);
 
-        view.HandlingHotKey += (s, e) => hotKeyRaised = true;
-        view.Accepting += (s, e) => acceptRaised = true;
-        view.Activating += (s, e) => selectRaised = true;
+        view.HandlingHotKey += (s, e) => hotKeyRaised++;
+        view.Accepting += (s, e) => acceptRaised++;
+        view.Activating += (s, e) => activateRaised++;
 
         Assert.Equal (KeyCode.T, view.HotKey);
         app.Keyboard.RaiseKeyDownEvent (Key.T);
-        Assert.True (hotKeyRaised);
-        Assert.False (acceptRaised);
-        Assert.False (selectRaised);
+        Assert.Equal(1, hotKeyRaised);
+        Assert.Equal(0, acceptRaised);
+        Assert.Equal(1, activateRaised);
 
-        hotKeyRaised = false;
         app.Keyboard.RaiseKeyDownEvent (Key.T.WithAlt);
-        Assert.True (hotKeyRaised);
-        Assert.False (acceptRaised);
-        Assert.False (selectRaised);
+        Assert.Equal (2, hotKeyRaised);
+        Assert.Equal (0, acceptRaised);
+        Assert.Equal (2, activateRaised);
 
-        hotKeyRaised = false;
         view.HotKey = KeyCode.E;
         app.Keyboard.RaiseKeyDownEvent(Key.E.WithAlt);
-        Assert.True (hotKeyRaised);
-        Assert.False (acceptRaised);
-        Assert.False (selectRaised);
+        Assert.Equal (3, hotKeyRaised);
+        Assert.Equal (0, acceptRaised);
+        Assert.Equal (3, activateRaised);
     }
 
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
@@ -193,7 +193,7 @@ public class KeyBindingsTests
             AddCommand (Command.HotKey, () => HotKeyCommand = true);
             AddCommand (Command.Left, () => FocusedCommand = true);
 
-            App!.Keyboard.KeyBindings.Add (Key.A, this, Command.Save);
+            App!.Keyboard.KeyBindings.AddApp (Key.A, this, Command.Save);
             HotKey = KeyCode.H;
             KeyBindings.Add (Key.F, Command.Left);
         }

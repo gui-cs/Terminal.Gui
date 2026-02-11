@@ -7,13 +7,13 @@ public partial class View // Keyboard APIs
     /// </summary>
     private void SetupKeyboard ()
     {
-        KeyBindings = new KeyBindings (this);
+        KeyBindings = new KeyBindings ();
         KeyBindings.Add (Key.Space, Command.Activate);
 
         // QUESTION: Should subclasses be required to enable Accept?
         KeyBindings.Add (Key.Enter, Command.Accept);
 
-        HotKeyBindings = new KeyBindings (this);
+        HotKeyBindings = new KeyBindings ();
 
         // Note, setting HotKey will bind HotKey to Command.HotKey
         HotKeySpecifier = (Rune)'_';
@@ -104,15 +104,13 @@ public partial class View // Keyboard APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         By default, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
-    ///         (e.g. <c>Key.D3.WithAlt</c>) This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>
-    ///         .
+    ///         Key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
+    ///         (e.g. <c>Key.D3.WithAlt</c>).
     ///     </para>
     ///     <para>
-    ///         By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings
+    ///         When <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings
     ///         will be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>,
-    ///         key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
-    ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
+    ///         key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added.
     ///     </para>
     /// </remarks>
     /// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
@@ -120,7 +118,7 @@ public partial class View // Keyboard APIs
     /// <param name="data">Arbitrary data that can be associated with this key binding.</param>
     /// <returns><see langword="true"/> if the HotKey bindings were added.</returns>
     /// <exception cref="ArgumentException"></exception>
-    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, object? data = null)
+    public bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, object? data = null)
     {
         if (_hotKey == hotKey)
         {
@@ -185,7 +183,7 @@ public partial class View // Keyboard APIs
         {
             return true;
         }
-        KeyBinding keyBinding = new ([Command.HotKey], newKey, source: this, data);
+        KeyBinding keyBinding = new ([Command.HotKey], newKey, this, null, data);
 
         // Add the base and Alt key
         HotKeyBindings.Remove (newKey);
@@ -634,7 +632,7 @@ public partial class View // Keyboard APIs
                 binding.Key = hotKey;
             }
 
-            if (InvokeCommands (binding.Commands, binding with {Source = this}) is true)
+            if (InvokeCommands (binding.Commands, binding with { Source = this }) is true)
             {
                 return true;
             }

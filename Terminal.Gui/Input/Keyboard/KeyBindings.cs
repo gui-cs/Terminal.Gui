@@ -8,16 +8,16 @@ namespace Terminal.Gui.Input;
 /// <seealso cref="Command"/>
 public class KeyBindings : CommandBindingsBase<Key, KeyBinding>
 {
-    // BUGBUG: This passes source as the target param of `public KeyBinding (Command [] commands, View? target, object? data = null)`
     /// <summary>Initializes a new instance bound to <paramref name="target"/>.</summary>
-    public KeyBindings (View? target) : base ((commands, key, source) => new KeyBinding (commands, source), new KeyEqualityComparer ()) => Target = target;
+    public KeyBindings () : base ((commands, key, source) => new KeyBinding (commands, source), new KeyEqualityComparer ()) { }
 
     /// <inheritdoc/>
     public override bool IsValid (Key eventArgs) => eventArgs.IsValid;
 
     /// <summary>
     ///     <para>
-    ///         Adds a new key combination that will trigger the commands in <paramref name="commands"/> on the View
+    ///         For Application-level HotKey Bindings (<see cref="IKeyboard.KeyBindings"/>); Adds key
+    ///         will trigger the commands in <paramref name="commands"/> on the View
     ///         specified by <paramref name="target"/>.
     ///     </para>
     ///     <para>
@@ -28,26 +28,16 @@ public class KeyBindings : CommandBindingsBase<Key, KeyBinding>
     /// <remarks>
     /// </remarks>
     /// <param name="key">The key to check.</param>
-    /// <param name="target">
-    ///     The View the commands will be invoked on. If <see langword="null"/>, the key will be bound to
-    ///     <see cref="Application"/>.
-    /// </param>
+    /// <param name="target">For Application-level HotKey Bindings; the view the key binding is bound to.</param>
     /// <param name="commands">
     ///     The command to invoked on the <see paramref="target"/> when <paramref name="key"/> is pressed. When
-    ///     multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike will be
+    ///     multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> will be
     ///     consumed if any took effect.
     /// </param>
-    public void Add (Key key, View? target, params Command [] commands)
+    /// <seealso cref="IKeyboard.KeyBindings"/>
+    public void AddApp (Key key, View? target, params Command [] commands)
     {
-        KeyBinding binding = new (commands, target);
+        KeyBinding binding = new (commands, key, source: null, target: target, data: null);
         Add (key, binding);
     }
-
-    /// <summary>
-    ///     The view that the <see cref="KeyBindings"/> are bound to.
-    /// </summary>
-    /// <remarks>
-    ///     If <see langword="null"/> the KeyBindings object is being used for Application.KeyBindings.
-    /// </remarks>
-    public View? Target { get; init; }
 }

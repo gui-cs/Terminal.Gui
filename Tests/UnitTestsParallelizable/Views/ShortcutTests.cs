@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Text;
+using JetBrains.Annotations;
 
 namespace ViewsTests;
 
@@ -276,6 +277,40 @@ public class ShortcutTests
     }
 
     [Fact]
+    public void HotKey_Title_Initializer_SetsCorrectly ()
+    {
+        Shortcut shortcut = new () { Title = "_C" };
+        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.C, shortcut.HotKey);
+    }
+
+    [Fact]
+    public void HotKey_CommandView_Set_Sets_Correctly ()
+    {
+        Shortcut shortcut = new () { Title = "_C" };
+
+        shortcut.CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" };
+        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.D, shortcut.HotKey);
+
+        shortcut = new Shortcut
+        {
+            Title = "_C",
+            CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" }
+        };
+        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.D, shortcut.HotKey);
+
+        shortcut = new Shortcut
+        {
+            CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" },
+            Title = "_C",
+        };
+        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.C, shortcut.HotKey);
+    }
+
+    [Fact]
     public void HelpText_And_Text_Are_The_Same ()
     {
         var shortcut = new Shortcut { Text = "H" };
@@ -498,6 +533,70 @@ public class ShortcutTests
     }
 
     [Theory]
+    [CombinatorialData]
+    public void KeyDown_Key_Raises_HandlingHotKey_And_Accepting (bool canFocus)
+    {
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        Shortcut shortcut = new () { Key = Key.A, Text = "0", Title = "_C", CanFocus = canFocus };
+        runnable.Add (shortcut);
+
+        Assert.Equal (canFocus, shortcut.HasFocus);
+
+        var accepting = 0;
+
+        shortcut.Accepting += (_, e) => { accepting++; };
+
+        var activated = 0;
+
+        shortcut.Activating += (_, e) => { activated++; };
+
+        var handlingHotKey = 0;
+
+        shortcut.HandlingHotKey += (_, e) => { handlingHotKey++; };
+
+        app.Keyboard.RaiseKeyDownEvent (shortcut.Key);
+
+        Assert.Equal (0, accepting);
+        Assert.Equal (1, handlingHotKey);
+        Assert.Equal (1, activated);
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void CheckBox_KeyDown_Key_Raises_HandlingHotKey_And_Accepting (bool canFocus)
+    {
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        Shortcut shortcut = new () { Key = Key.F4, Text = "0", CanFocus = canFocus, CommandView = new CheckBox { Title = "_Test", CanFocus = canFocus } };
+        runnable.Add (shortcut);
+
+        Assert.Equal (canFocus, shortcut.HasFocus);
+
+        var accepting = 0;
+
+        shortcut.Accepting += (_, e) => { accepting++; };
+
+        var activated = 0;
+
+        shortcut.Activating += (_, e) => { activated++; };
+
+        var handlingHotKey = 0;
+
+        shortcut.HandlingHotKey += (_, e) => { handlingHotKey++; };
+
+        app.Keyboard.RaiseKeyDownEvent (shortcut.Key);
+
+        Assert.Equal (0, accepting);
+        Assert.Equal (1, handlingHotKey);
+        Assert.Equal (1, activated);
+    }
+
+    [Theory]
     [InlineData (true, KeyCode.A, 0, 1)]
     [InlineData (true, KeyCode.C, 0, 1)]
     [InlineData (true, KeyCode.C | KeyCode.AltMask, 0, 1)]
@@ -510,19 +609,19 @@ public class ShortcutTests
     [InlineData (false, KeyCode.Enter, 0, 0)]
     [InlineData (false, KeyCode.Space, 0, 0)]
     [InlineData (false, KeyCode.F1, 0, 0)]
-    public void KeyDown_CheckBox_Raises_Accepted_Activated (bool canFocus, KeyCode key, int expectedAccept, int expectedActivate)
+    public void KeyDown_Valid_Keys_Raises_Accepted_Activated_Correctly (bool canFocus, KeyCode key, int expectedAccept, int expectedActivate)
     {
         IApplication app = Application.Create ();
         Runnable<bool> runnable = new ();
         app.Begin (runnable);
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.A,
-            Text = "0",
-            CommandView = new CheckBox { Title = "_C", CanFocus = false },
-            CanFocus = canFocus
-        };
+        Shortcut shortcut = new () { Key = Key.A, Text = "0", Title = "_C", CanFocus = canFocus };
+
+        // The default CommandView does not have a HotKey, so only the Shortcut's Key should trigger activation, not the CommandView's HotKey
+        Assert.Equal (Key.A, shortcut.Key);
+        Assert.Equal (Key.C, shortcut.HotKey);
+        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+
         runnable.Add (shortcut);
 
         Assert.Equal (canFocus, shortcut.HasFocus);
@@ -532,15 +631,27 @@ public class ShortcutTests
         shortcut.Accepting += (_, e) =>
                               {
                                   accepting++;
-                                  e.Handled = true;
+
+                                  //e.Handled = true;
                               };
 
         var activated = 0;
+
         shortcut.Activating += (_, e) =>
                                {
                                    activated++;
-                                   e.Handled = true;
+
+                                   //e.Handled = true;
                                };
+
+        var handlingHotKey = 0;
+
+        shortcut.HandlingHotKey += (_, e) =>
+                                   {
+                                       handlingHotKey++;
+
+                                       //e.Handled = true;
+                                   };
 
         app.Keyboard.RaiseKeyDownEvent (key);
 
@@ -710,45 +821,55 @@ public class ShortcutTests
     }
 
     [Fact]
-    public void CommandView_Command_Activating_Forwards_To_Activating ()
+    public void CommandView_Command_Activate_Bubbles_To_Shortcut ()
     {
         // Arrange
-        TestCommandView commandView = new () { Title = "_Test", CanFocus = false };
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = false };
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = commandView };
-        shortcut.SetFocus ();
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
         var shortcutActivatingRaised = 0;
         shortcut.Activating += (_, _) => shortcutActivatingRaised++;
 
-        // Act - Invoke Command.Activate directly on CheckBox (simulating direct mouse click)
-        commandView.InvokeCommand (Command.Activate);
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
+
+        // Act - Invoke Command.HotKey directly on CheckBox
+        testCommandView.InvokeCommand (Command.Activate);
 
         // Assert - Shortcut.Activating should have been raised
         Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, commandViewActivatingRaised);
     }
 
     [Fact]
     public void CommandView_Command_Accept_Forwards_To_Accepting ()
     {
         // Arrange
-        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = true };
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = false };
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
-        var shortcutAcceptingRaised = false;
-        shortcut.Accepting += (_, _) => shortcutAcceptingRaised = true;
-        var shortcutActivatingRaised = false;
-        shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
-        var handlingHotkeyRaised = false;
-        shortcut.HandlingHotKey += (_, _) => handlingHotkeyRaised = true;
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
 
-        // Act - Invoke Command.Accept directly on CheckBox (simulating double-click)
-        checkBox.InvokeCommand (Command.Accept);
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
 
-        Assert.True (shortcutAcceptingRaised);
-        Assert.False (shortcutActivatingRaised);
-        Assert.False (handlingHotkeyRaised);
+        var shortcutAcceptingRaised = 0;
+        shortcut.Accepting += (_, _) => { shortcutAcceptingRaised++; };
+
+        var commandViewAcceptingRaised = 0;
+        testCommandView.Accepting += (_, _) => { commandViewAcceptingRaised++; };
+
+        // Act - Invoke Command.HotKey directly on CheckBox
+        testCommandView.InvokeCommand (Command.Accept);
+
+        // Assert - Shortcut.Activating should have been raised
+        Assert.Equal (1, shortcutAcceptingRaised);
+        Assert.Equal (1, commandViewAcceptingRaised);
+        Assert.Equal (0, shortcutActivatingRaised);
+        Assert.Equal (0, commandViewActivatingRaised);
     }
 
     [Fact]
@@ -768,37 +889,39 @@ public class ShortcutTests
         Assert.Equal (1, shortcutActivatingCount);
     }
 
-    /// <summary>
-    ///     Verifies that HotKey invoked on CommandView does NOT bubble to Shortcut.
-    ///     HotKey is not in Shortcut's CommandsToBubbleUp list [Activate, Accept].
-    /// </summary>
     [Fact]
-    public void CommandView_Command_HotKey_Does_Not_Bubble_To_Shortcut ()
+    public void CommandView_Command_HotKey_Ignored_Raised_By_Shortcut ()
     {
         // Arrange
         TestCommandView testCommandView = new () { Title = "_Test", CanFocus = false };
 
         Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
 
-        var shortcutAcceptingRaised = false;
-        shortcut.Accepting += (_, _) => shortcutAcceptingRaised = true;
-        var shortcutActivatingRaised = false;
-        shortcut.Activating += (_, _) => shortcutActivatingRaised = true;
-        var handlingHotkeyRaised = false;
-        shortcut.HandlingHotKey += (_, _) => handlingHotkeyRaised = true;
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
 
-        // Act - Invoke Command.HotKey directly on CheckBox
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
+
+        var shortcutHandlingHotKeyFired = 0;
+        shortcut.HandlingHotKey += (_, _) => { shortcutHandlingHotKeyFired++; };
+
+        var commandViewHandlingHotKeyFired = 0;
+        testCommandView.HandlingHotKey += (_, _) => { commandViewHandlingHotKeyFired++; };
+
+        // Act - Invoke Command.HotKey directly on CommandView
         testCommandView.InvokeCommand (Command.HotKey);
 
-        // HotKey is NOT in CommandsToBubbleUp, so nothing bubbles to Shortcut
-        Assert.False (shortcutAcceptingRaised);
-        Assert.False (shortcutActivatingRaised);
-        Assert.False (handlingHotkeyRaised);
+        // Assert - Shortcut.Activating should have been raised
+        Assert.Equal (0, shortcutHandlingHotKeyFired);
+        Assert.Equal (1, commandViewHandlingHotKeyFired);
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, commandViewActivatingRaised);
     }
 
     [Theory]
     [CombinatorialData]
-    public void CommandView_Click_Raises_Activating (bool commandViewCanFocus)
+    public void CommandView_Click_Raises_Activating_On_Both (bool commandViewCanFocus)
     {
         // Arrange
         // Arrange
@@ -828,7 +951,7 @@ public class ShortcutTests
 
     [Theory]
     [CombinatorialData]
-    public void CommandView_HotKey_Raises_Activating (bool commandViewCanFocus)
+    public void CommandView_KeyDown_HotKey_Raises_Activating_On_Both (bool commandViewCanFocus)
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -836,44 +959,66 @@ public class ShortcutTests
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = commandViewCanFocus };
+        CheckBox testCommandView = new () { Title = "_Test", CanFocus = commandViewCanFocus };
+        testCommandView.Value = 0;
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
+        Shortcut shortcut = new () { Key = Key.F4, CommandView = testCommandView };
+        Assert.Equal (Key.F4, shortcut.Key);
+        Assert.Equal (Key.Empty, shortcut.HotKey);
+        Assert.Equal (Key.T, testCommandView.HotKey);
+
         (runnable as View)?.Add (shortcut);
         app.Begin (runnable);
+        Assert.Equal (commandViewCanFocus, testCommandView.HasFocus);
+        Assert.True (shortcut.HasFocus);
 
         var shortcutActivatingRaised = 0;
         shortcut.Activating += (_, _) => shortcutActivatingRaised++;
 
+        var shortcutActivatedRaised = 0;
+        shortcut.Activated += (_, _) => shortcutActivatedRaised++;
+
         var commandViewActivatingRaised = 0;
         testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
 
+        var shortcutHandlingHotKeyFired = 0;
+        shortcut.HandlingHotKey += (_, _) => { shortcutHandlingHotKeyFired++; };
+
+        var commandViewHandlingHotKeyFired = 0;
+        testCommandView.HandlingHotKey += (_, _) => { commandViewHandlingHotKeyFired++; };
+
+        Assert.Equal (CheckState.UnChecked, testCommandView.Value);
         app.Keyboard.RaiseKeyDownEvent (testCommandView.HotKey);
 
         // Assert - Shortcut.Activating should have been raised
         Assert.Equal (1, shortcutActivatingRaised);
-        Assert.Equal (0, commandViewActivatingRaised);
+        Assert.Equal (1, shortcutActivatedRaised);
+        Assert.Equal (0, shortcutHandlingHotKeyFired);
+        Assert.Equal (1, commandViewActivatingRaised);
+        Assert.Equal (1, commandViewHandlingHotKeyFired);
+
+        Assert.Equal (CheckState.Checked, testCommandView.Value);
     }
 
     [Fact]
     public void Command_Activate_Raises_Activating_Only ()
     {
-        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
-        var activatingFired = false;
+        Shortcut shortcut = new ();
+        var activatingFired = 0;
 
-        shortcut.Activating += (_, _) => { activatingFired = true; };
+        shortcut.Activating += (_, _) => activatingFired++;
 
-        var acceptingFired = false;
-        shortcut.Accepting += (_, _) => { acceptingFired = true; };
+        var acceptingFired = 0;
+        shortcut.Accepting += (_, _) => acceptingFired++;
 
-        var handlingHotKeyFired = false;
-        shortcut.HandlingHotKey += (_, _) => { handlingHotKeyFired = true; };
+        var handlingHotKeyFired = 0;
+        shortcut.HandlingHotKey += (_, _) => handlingHotKeyFired++;
 
         shortcut.InvokeCommand (Command.Activate);
 
-        Assert.True (activatingFired);
-        Assert.False (acceptingFired);
-        Assert.False (handlingHotKeyFired);
+        Assert.Equal (1, activatingFired);
+        Assert.Equal (0, acceptingFired);
+        Assert.Equal (0, handlingHotKeyFired);
 
         shortcut.Dispose ();
     }
@@ -921,8 +1066,6 @@ public class ShortcutTests
     public void Command_HotKey_Raises_HandlingHotKey_Then_Activating ()
     {
         using Shortcut shortcut = new ();
-        shortcut.Title = "Test";
-        shortcut.Key = Key.T.WithCtrl;
         var activatingFired = 0;
 
         shortcut.Activating += (_, _) => { activatingFired++; };
