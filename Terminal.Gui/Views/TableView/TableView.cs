@@ -587,6 +587,7 @@ public partial class TableView : View, IDesignable
             return;
         }
 
+        _columnsToRenderCache = null; //this will trigger a recalculation of the size and the columns when needed
         EnsureValidScrollOffsets ();
         EnsureValidSelection ();
         EnsureSelectedCellIsVisible ();
@@ -693,12 +694,17 @@ public partial class TableView : View, IDesignable
     /// <returns></returns>
     private ColumnToRender [] NonHiddenCellInfos ()
     {
-        if (TableIsNullOrInvisible () || _columnsToRenderCache == null || !_columnsToRenderCache.Any ())
+        if (TableIsNullOrInvisible ())
         {
             return Array.Empty<ColumnToRender> ();
         }
 
-        return _columnsToRenderCache;
+        if (_columnsToRenderCache == null)
+        {
+            RefreshContentSize();
+        }
+
+        return _columnsToRenderCache ?? Array.Empty<ColumnToRender> ();
     }
 
     private Size? CalculateContentSize ()
