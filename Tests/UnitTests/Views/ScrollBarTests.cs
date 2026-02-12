@@ -504,6 +504,7 @@ public class ScrollBarTests (ITestOutputHelper output)
 
         var scrollBar = new ScrollBar
         {
+            ShowScroll = true,
             AutoShow = false,
             Orientation = orientation,
         };
