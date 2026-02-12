@@ -146,7 +146,8 @@ public partial class View // Command APIs
         InvokeCommand (command, new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding });
 
     /// <summary>
-    ///     Invokes the specified command given a context. This is the most general form of InvokeCommand and allows the caller to specify arbitrary context.
+    ///     Invokes the specified command given a context. This is the most general form of InvokeCommand and allows the caller
+    ///     to specify arbitrary context.
     /// </summary>
     /// <param name="command">The command to invoke.</param>
     /// <param name="ctx">The context to pass with the command.</param>
@@ -169,7 +170,8 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Invokes the specified command with a default <see cref="CommandContext"/> where <see cref="CommandContext.Source"/>
-    ///     is a weak reference to `this`. The binding in the context will be set to null since this method is for invocations that are
+    ///     is a weak reference to `this`. The binding in the context will be set to null since this method is for invocations
+    ///     that are
     ///     not caused by a binding (e.g. bubbling, default button invocation, etc.).
     /// </summary>
     /// <param name="command">The command to invoke.</param>
@@ -493,7 +495,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the
-    ///     View to change state or preparing it for interaction. 
+    ///     View to change state or preparing it for interaction.
     /// </summary>
     public event EventHandler<EventArgs<ICommandContext?>>? Activated;
 
@@ -565,9 +567,9 @@ public partial class View // Command APIs
     /// <returns><see langword="true"/> to stop processing.</returns>
     protected virtual bool OnHandlingHotKey (CommandEventArgs args) => false;
 
-
     /// <summary>
-    ///     Raises the <see cref="OnHotKeyCommand"/>/<see cref="HotKeyCommand"/> event indicating the View is handling the user pressing the View's <see cref="HotKey"/>.
+    ///     Raises the <see cref="OnHotKeyCommand"/>/<see cref="HotKeyCommand"/> event indicating the View is handling the user
+    ///     pressing the View's <see cref="HotKey"/>.
     ///     The default <see cref="Command.HotKey"/> handler calls this method.
     /// </summary>
     /// <param name="ctx"></param>
@@ -584,13 +586,15 @@ public partial class View // Command APIs
     public event EventHandler<CommandEventArgs>? HandlingHotKey;
 
     /// <summary>
-    ///     Called when the View's <see cref="HotKey"/> is pressed, if the event was not handled by <see cref="OnHandlingHotKey"/> or the <see cref="HandlingHotKey"/> event.
+    ///     Called when the View's <see cref="HotKey"/> is pressed, if the event was not handled by
+    ///     <see cref="OnHandlingHotKey"/> or the <see cref="HandlingHotKey"/> event.
     /// </summary>
     /// <param name="ctx"></param>
     protected virtual void OnHotKeyCommand (ICommandContext? ctx) { }
 
     /// <summary>
-    ///     Event raised when the View's <see cref="HotKey"/> is pressed, if the event was not handled by <see cref="OnHandlingHotKey"/> or the <see cref="HandlingHotKey"/> event.
+    ///     Event raised when the View's <see cref="HotKey"/> is pressed, if the event was not handled by
+    ///     <see cref="OnHandlingHotKey"/> or the <see cref="HandlingHotKey"/> event.
     /// </summary>
     public event EventHandler<EventArgs<ICommandContext?>>? HotKeyCommand;
 
@@ -644,10 +648,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? BubbleDown (View target, ICommandContext? ctx)
     {
-        CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, null)
-        {
-            IsBubblingDown = true
-        };
+        CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, null) { IsBubblingDown = true };
 
         return target.InvokeCommand (downCtx.Command, downCtx);
     }

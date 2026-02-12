@@ -293,19 +293,11 @@ public class ShortcutTests
         Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
         Assert.Equal (Key.D, shortcut.HotKey);
 
-        shortcut = new Shortcut
-        {
-            Title = "_C",
-            CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" }
-        };
+        shortcut = new Shortcut { Title = "_C", CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" } };
         Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
         Assert.Equal (Key.D, shortcut.HotKey);
 
-        shortcut = new Shortcut
-        {
-            CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" },
-            Title = "_C",
-        };
+        shortcut = new Shortcut { CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" }, Title = "_C" };
         Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
         Assert.Equal (Key.C, shortcut.HotKey);
     }
