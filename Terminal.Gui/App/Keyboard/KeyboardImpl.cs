@@ -73,7 +73,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     public IApplication? App { get; set; }
 
     /// <inheritdoc/>
-    public KeyBindings KeyBindings { get; internal set; } = new (null);
+    public KeyBindings KeyBindings { get; internal set; } = new ();
 
     /// <inheritdoc/>
     public Key QuitKey
@@ -304,10 +304,10 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                         while (viewToArrange is { Arrangement: ViewArrangement.Fixed })
                         {
                             viewToArrange = viewToArrange switch
-                            {
-                                Adornment adornmentView => adornmentView.Parent,
-                                _ => viewToArrange.SuperView
-                            };
+                                            {
+                                                Adornment adornmentView => adornmentView.Parent,
+                                                _ => viewToArrange.SuperView
+                                            };
                         }
 
                         if (viewToArrange is { })

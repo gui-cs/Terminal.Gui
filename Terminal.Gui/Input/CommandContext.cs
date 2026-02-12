@@ -42,5 +42,8 @@ public record struct CommandContext : ICommandContext
     public ICommandBinding? Binding { get; set; }
 
     /// <inheritdoc/>
+    public bool IsBubblingDown { get; init; }
+
+    /// <inheritdoc/>
     public override string ToString () => $"{Command} (Source={Source.ToIdentifyingString ()}, Binding={Binding})";
 }

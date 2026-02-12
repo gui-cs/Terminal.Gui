@@ -3,18 +3,25 @@ namespace Terminal.Gui.Views;
 /// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
 public class ColorPicker16 : View, IValue<ColorName16>
 {
-    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
-    public ColorPicker16 () => SetInitialProperties ();
-
     /// <summary>Columns of color boxes</summary>
     private const int COLS = 8;
 
     /// <summary>Rows of color boxes</summary>
     private const int ROWS = 2;
 
+    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
+    public ColorPicker16 ()
+    {
+        CanFocus = true;
+        AddCommands ();
+        AddKeyBindings ();
+
+        Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
+        Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
+        SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
+    }
+
     private int _boxHeight = 2;
-    private int _boxWidth = 4;
-    private int _selectColorIndex = (int)Color.Black;
 
     /// <summary>Height of a color box</summary>
     public int BoxHeight
@@ -33,6 +40,8 @@ public class ColorPicker16 : View, IValue<ColorName16>
         }
     }
 
+    private int _boxWidth = 4;
+
     /// <summary>Width of a color box</summary>
     public int BoxWidth
     {
@@ -49,6 +58,8 @@ public class ColorPicker16 : View, IValue<ColorName16>
             }
         }
     }
+
+    private int _selectColorIndex = (int)Color.Black;
 
     /// <summary>Cursor for the selected color.</summary>
     public Point Caret
@@ -223,7 +234,7 @@ public class ColorPicker16 : View, IValue<ColorName16>
     /// <inheritdoc/>
     object? IValue.GetValue () => SelectedColor;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
@@ -254,49 +265,9 @@ public class ColorPicker16 : View, IValue<ColorName16>
         AddCommand (Command.Right, ctx => MoveRight (ctx));
         AddCommand (Command.Up, ctx => MoveUp (ctx));
         AddCommand (Command.Down, ctx => MoveDown (ctx));
-
-        //AddCommand (Command.Activate,
-        //            ctx =>
-        //            {
-        //                if (ctx?.Binding is MouseBinding mouseCommandContext)
-        //                {
-        //                    if (RaiseActivating (ctx) is true)
-        //                    {
-        //                        return true;
-        //                    }
-
-        //                    if (mouseCommandContext.MouseEvent?.Position is { } pos)
-        //                    {
-        //                        int col = pos.X / _boxWidth;
-        //                        int row = pos.Y / _boxHeight;
-
-        //                        // Only set Caret if within valid color box bounds
-        //                        if (col is >= 0 and < COLS && row is >= 0 and < ROWS)
-        //                        {
-        //                            Caret = new Point (col, row);
-        //                        }
-        //                    }
-
-        //                    return SetFocus ();
-        //                }
-
-        //                return RaiseActivating (ctx) is true;
-        //            });
     }
 
-    ///// <inheritdoc />
-    //protected override bool OnActivating (CommandEventArgs args)
-    //{
-    //    if (base.OnActivating (args))
-    //    {
-    //        return true;
-    //    }
-
-
-    //    return false;
-    //}
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? commandContext)
     {
         base.OnActivated (commandContext);
@@ -375,16 +346,5 @@ public class ColorPicker16 : View, IValue<ColorName16>
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
-    }
-
-    private void SetInitialProperties ()
-    {
-        CanFocus = true;
-        AddCommands ();
-        AddKeyBindings ();
-
-        Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
-        Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-        SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
     }
 }

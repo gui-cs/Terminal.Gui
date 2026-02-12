@@ -18,6 +18,32 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class FlagSelector : SelectorBase, IDesignable
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
+    /// </summary>
+    public FlagSelector () =>
+
+        // Per spec: HotKey restores focus when not focused but does NOT change Active.
+        // When already focused, HotKey is a no-op.
+        // Replace DefaultHotKeyHandler so the HandlingHotKey event fires
+        // but Activate is NOT invoked (no flag toggle).
+        AddCommand (Command.HotKey,
+                    ctx =>
+                    {
+                        if (RaiseHandlingHotKey (ctx) is true)
+                        {
+                            return true;
+                        }
+
+                        if (CanFocus && !HasFocus)
+                        {
+                            SetFocus ();
+                        }
+
+                        // Do NOT invoke Activate - HotKey should not toggle flags.
+                        return true;
+                    });
+
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
@@ -32,8 +58,6 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.ValueChanging += OnCheckboxOnValueChanging;
         checkbox.ValueChanged += OnCheckboxOnValueChanged;
-        //checkbox.Activating += OnCheckboxOnActivating;
-        //checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
@@ -77,40 +101,6 @@ public class FlagSelector : SelectorBase, IDesignable
 
         Value = newValue;
     }
-
-    //private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
-    //{
-    //    if (sender is not CheckBox checkbox)
-    //    {
-    //        return;
-    //    }
-
-    //    if (checkbox.CanFocus)
-    //    {
-    //        // For Activate, if the view is focusable and SetFocus succeeds, by definition,
-    //        // the event is handled. So return what SetFocus returns.
-    //        checkbox.SetFocus ();
-    //    }
-
-    //    // Activating doesn't normally propagate, so we do it here
-    //    if (InvokeCommand (Command.Activate, args.Context) is true)
-    //    {
-    //        // Do not return here; we want to toggle the checkbox state
-    //        args.Handled = true;
-
-    //        //return;
-    //    }
-    //}
-
-    //private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
-    //{
-    //    if (sender is not CheckBox checkbox)
-    //    {
-    //        return;
-    //    }
-    //    Value = (int)checkbox.Data!;
-    //    args.Handled = false; // Do not set to false; let Accepting propagate
-    //}
 
     /// <summary>
     ///     Gets or sets the value of the selected flags.

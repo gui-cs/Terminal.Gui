@@ -23,7 +23,7 @@ public record struct KeyBinding : ICommandBinding
 
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this key binding will invoke.</param>
-    /// <param name="target">The view the key binding is bound to.</param>
+    /// <param name="target">For Application-level HotKey Bindings; the view the key binding is bound to.</param>
     /// <param name="data">Arbitrary data that can be associated with this key binding.</param>
     public KeyBinding (Command [] commands, View? target, object? data = null)
     {
@@ -38,12 +38,15 @@ public record struct KeyBinding : ICommandBinding
     /// <param name="commands">The commands this key binding will invoke.</param>
     /// <param name="newKey">The key this binding is associated with.</param>
     /// <param name="source">The view where this key binding was created.</param>
+    /// <param name="target">For Application-level HotKey Bindings; the view the key binding is bound to.</param>
     /// <param name="data">Arbitrary data that can be associated with this key binding.</param>
-    public KeyBinding (Command [] commands, Key newKey, View? source = null, object? data = null)
+    /// <seealso cref="IKeyboard.KeyBindings"/>
+    public KeyBinding (Command [] commands, Key newKey, View? source = null, View? target = null, object? data = null)
     {
         Commands = commands;
         Source = source;
         Key = newKey;
+        Target = target;
         Data = data;
     }
 

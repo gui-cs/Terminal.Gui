@@ -148,26 +148,21 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return true;
         }
 
-        if (Focused is null || args.Context?.TryGetSource (out View? ctxSource) is not true || ctxSource != this)
+        // Skip BubbleDown when:
+        // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
+        // - No Focused view to dispatch to
+        // - Source is a SubView that already bubbled up (not this selector)
+        if (args.Context?.IsBubblingDown == true
+            || Focused is null
+            || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
         {
             return false;
         }
 
-        // Bubble DOWN to the focused checkbox
-
-        // Disable bubbling
-        IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
-        CommandsToBubbleUp = [];
-        ICommandContext context = new CommandContext (args.Context.Command, null, null);
-
-        if (Focused?.InvokeCommand (args.Context.Command, context) is true)
-        {
-            // This is not expected;
-            throw new InvalidOperationException ("subViewToDispatch.InvokeCommand() returned true unexpectedly.");
-        }
-        CommandsToBubbleUp = tempCommandsToBubbleUp;
-
-        return false;
+        // Bubble DOWN to the focused checkbox.
+        // Return true if BubbleDown handled it, so derived classes (e.g. OptionSelector)
+        // don't also run their own logic (e.g. double-Cycle).
+        return BubbleDown (Focused, args.Context) is true;
     }
 
     /// <inheritdoc/>
@@ -184,17 +179,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
 
         return false;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
-    {
-        if (base.OnHandlingHotKey (args))
-        {
-            return true;
-        }
-
-        return InvokeCommand (Command.Activate, args.Context) is true;
     }
 
     /// <summary>

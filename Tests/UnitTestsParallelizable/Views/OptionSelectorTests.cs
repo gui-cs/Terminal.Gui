@@ -423,9 +423,8 @@ public class OptionSelectorTests
         Assert.True (checkBoxes [1].HasFocus);
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Claude - Opus 4.6
+    // Per OptionSelector spec: Space key cycles to next option
     [Fact]
     public void OptionSelector_Command_Activate_ForwardsToFocusedCheckBox ()
     {
@@ -433,12 +432,14 @@ public class OptionSelectorTests
         optionSelector.Labels = ["Option1", "Option2"];
         optionSelector.BeginInit ();
         optionSelector.EndInit ();
+        optionSelector.SetFocus ();
 
-        // Activate should forward to the focused CheckBox's Activate
-        bool? result = optionSelector.InvokeCommand (Command.Activate);
+        Assert.Equal (0, optionSelector.Value);
 
-        // Command is handled by CheckBox
-        Assert.True (result);
+        // Activate should BubbleDown to the focused CheckBox, triggering Cycle
+        optionSelector.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, optionSelector.Value);
 
         optionSelector.Dispose ();
     }
@@ -467,9 +468,8 @@ public class OptionSelectorTests
         optionSelector.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Claude - Opus 4.6
+    // Per OptionSelector spec: HotKey restores focus and advances Active
     [Fact]
     public void OptionSelector_Command_HotKey_ForwardsToFocusedItem ()
     {
@@ -478,10 +478,13 @@ public class OptionSelectorTests
         optionSelector.BeginInit ();
         optionSelector.EndInit ();
 
-        // HotKey forwards to focused items Activate
-        bool? result = optionSelector.InvokeCommand (Command.HotKey);
+        Assert.Equal (0, optionSelector.Value);
 
-        Assert.True (result);
+        // HotKey should restore focus and advance Active (Cycle)
+        optionSelector.InvokeCommand (Command.HotKey);
+
+        Assert.True (optionSelector.HasFocus);
+        Assert.Equal (1, optionSelector.Value);
 
         optionSelector.Dispose ();
     }

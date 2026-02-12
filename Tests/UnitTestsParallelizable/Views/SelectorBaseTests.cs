@@ -632,7 +632,12 @@ public class SelectorBaseTests
         using IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
         using Runnable runnable = new ();
         var view1 = new View { CanFocus = true };
-        var selector = new OptionSelector { Styles = selectorStyles };
+
+        OptionSelector selector = new ()
+        {
+            Styles = selectorStyles,
+            TabBehavior = TabBehavior.NoStop
+        };
         List<string> options = ["Option1", "Option2", "Option3"];
         selector.Labels = options;
         var view2 = new View { CanFocus = true };

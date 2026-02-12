@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Views;
 
@@ -48,8 +49,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
 
-        AddCommand (Command.Accept, HandleAcceptCommand);
-        AddCommand (Command.Activate, HandleSelectCommand);
         AddCommand (Command.Context, HandleContextCommand);
 
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -187,8 +186,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
     }
 
     private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
-    private int _selectedCodepoint; // Currently selected codepoint
-    private int _startCodepoint; // The codepoint that will be displayed at the top of the Viewport
 
     /// <summary>
     ///     Gets or sets the currently selected codepoint. Causes the Viewport to scroll to make the selected code point
@@ -196,15 +193,15 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// </summary>
     public int SelectedCodePoint
     {
-        get => _selectedCodepoint;
+        get;
         set
         {
-            if (_selectedCodepoint == value)
+            if (field == value)
             {
                 return;
             }
 
-            int oldSelectedCodePoint = _selectedCodepoint;
+            int oldSelectedCodePoint = field;
             int newSelectedCodePoint = Math.Clamp (value, 0, MAX_CODE_POINT);
 
             Rune oldValue = new (oldSelectedCodePoint);
@@ -226,7 +223,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
             Point offsetToNewCursor = GetCursor (newSelectedCodePoint);
 
-            _selectedCodepoint = newSelectedCodePoint;
+            field = newSelectedCodePoint;
 
             // Ensure the new cursor position is visible
             ScrollToMakeCursorVisible (offsetToNewCursor);
@@ -234,9 +231,10 @@ public class CharMap : View, IDesignable, IValue<Rune>
             SetNeedsDraw ();
             UpdateCursor ();
 
-            ValueChangedEventArgs<Rune> changedArgs = new (oldValue, new Rune (_selectedCodepoint));
+            ValueChangedEventArgs<Rune> changedArgs = new (oldValue, new Rune (field));
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, new Rune (field)));
         }
     }
 
@@ -248,7 +246,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// <inheritdoc/>
     object? IValue.GetValue () => new Rune (SelectedCodePoint);
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
@@ -294,10 +292,10 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// </summary>
     public int StartCodePoint
     {
-        get => _startCodepoint;
+        get;
         set
         {
-            _startCodepoint = value;
+            field = value;
             SelectedCodePoint = value;
         }
     }
@@ -394,8 +392,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     #region Details Dialog
 
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     private void ShowDetails ()
     {
         if (App is not { Initialized: true })
@@ -452,7 +448,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
                 name = nameElement.GetString ();
             }
 
-            decResponse = JsonSerializer.Serialize (document.RootElement, new JsonSerializerOptions { WriteIndented = true });
+            decResponse = JsonSerializer.Serialize (document.RootElement, CharMapJsonContext.Default.JsonElement);
         }
         else
         {
@@ -883,10 +879,13 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     #endregion Drawing
 
-    #region Mouse Handling
+    #region Input Handling
 
-    private bool? HandleSelectCommand (ICommandContext? commandContext)
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? commandContext)
     {
+        base.OnActivated (commandContext);
+
         Point position = GetCursor (SelectedCodePoint);
 
         if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
@@ -905,14 +904,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
             }
         }
 
-        if (RaiseActivating (commandContext) is true)
-        {
-            return true;
-        }
-
         if (!TryGetCodePointFromPosition (position, out int cp))
         {
-            return false;
+            return;
         }
 
         if (cp != SelectedCodePoint)
@@ -924,20 +918,14 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
             SelectedCodePoint = cp;
         }
-
-        return true;
     }
 
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    private bool? HandleAcceptCommand (ICommandContext? commandContext)
+    /// <inheritdoc/>
+    protected override void OnAccepted (CommandEventArgs args)
     {
-        if (RaiseAccepting (commandContext) is true)
-        {
-            return true;
-        }
+        base.OnAccepted (args);
 
-        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (args.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             if (!HasFocus && CanFocus)
             {
@@ -946,15 +934,13 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
             if (!TryGetCodePointFromPosition (mouse.Position!.Value, out int cp))
             {
-                return false;
+                return;
             }
 
             SelectedCodePoint = cp;
         }
 
         ShowDetails ();
-
-        return true;
     }
 
     private bool? HandleContextCommand (ICommandContext? commandContext)
@@ -1030,3 +1016,10 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     #endregion Mouse Handling
 }
+
+/// <summary>
+///     Source generation context for AOT-compatible JSON serialization in CharMap.
+/// </summary>
+[JsonSerializable (typeof (JsonElement))]
+[JsonSourceGenerationOptions (WriteIndented = true)]
+internal partial class CharMapJsonContext : JsonSerializerContext;

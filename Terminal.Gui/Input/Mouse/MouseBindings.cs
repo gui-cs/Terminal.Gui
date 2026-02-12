@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.Input;
 
 /// <summary>
@@ -11,14 +10,9 @@ public class MouseBindings : CommandBindingsBase<MouseFlags, MouseBinding>
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
-    public MouseBindings () : base (
-                                    (commands, flags, source) =>
-                                    {
-                                        return new MouseBinding (commands, flags, source);
-                                    },
-                                    EqualityComparer<MouseFlags>.Default)
+    public MouseBindings () : base ((commands, flags, source) => new MouseBinding (commands, flags, source), EqualityComparer<MouseFlags>.Default)
     { }
 
-    /// <inheritdoc />
-    public override bool IsValid (MouseFlags eventArgs) { return eventArgs != MouseFlags.None; }
+    /// <inheritdoc/>
+    public override bool IsValid (MouseFlags eventArgs) => eventArgs != MouseFlags.None;
 }

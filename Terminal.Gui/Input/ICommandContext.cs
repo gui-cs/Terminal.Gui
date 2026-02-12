@@ -7,7 +7,7 @@
 ///     a context object is passed to Command handlers as an <see cref="ICommandContext"/> reference.
 /// </summary>
 /// <seealso cref="View.AddCommand(Command)"/>
-/// <seealso cref="View.InvokeCommand"/>
+/// <seealso cref="View.InvokeCommand(Command)"/>
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 public interface ICommandContext
 {
@@ -41,4 +41,10 @@ public interface ICommandContext
     ///     </para>
     /// </remarks>
     public ICommandBinding? Binding { get; }
+
+    /// <summary>
+    ///     Gets whether this command is being dispatched downward to a SubView. When <see langword="true"/>,
+    ///     <see cref="View.TryBubbleToSuperView"/> will skip bubbling, preventing re-entry.
+    /// </summary>
+    public bool IsBubblingDown { get; }
 }

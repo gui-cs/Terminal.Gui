@@ -190,7 +190,7 @@ public class Menus : Scenario
             // BUGBUG: This is due to TODO's in PopoverMenu where key bindings are not
             // BUGBUG: updated after the MenuBar is created.
             App?.Keyboard.KeyBindings.Remove (Key.F5);
-            App?.Keyboard.KeyBindings.Add (Key.F5, this, Command.Edit);
+            App?.Keyboard.KeyBindings.AddApp (Key.F5, this, Command.Edit);
 
             var menuBar = new MenuBar
             {

@@ -236,13 +236,11 @@ public class ScrollSlider : View, IOrientation, IDesignable
         OnPositionChanged (_position);
         PositionChanged?.Invoke (this, new (in _position));
 
-            OnScrolled (distance);
-            Scrolled?.Invoke (this, new (in distance));
+        OnScrolled (distance);
+        Scrolled?.Invoke (this, new (in distance));
 
-            // BUGBUG: the KeyBinding constructor used here sets `target: null`, not `source: null`
-            // BUGBUG: this should not use KeyBinding, but CommandBinding
-            RaiseActivating (new CommandContext (Command.Activate, new WeakReference<View> (this), new KeyBinding ([Command.Activate], null, distance)));
-        }
+        RaiseActivating (new CommandContext (Command.Activate, new WeakReference<View> (this), new CommandBinding ([Command.Activate], null, distance)));
+    }
 
     /// <summary>
     ///     Called when <see cref="Position"/> is changing. Return true to cancel the change.
