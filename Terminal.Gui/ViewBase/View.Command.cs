@@ -516,7 +516,9 @@ public partial class View // Command APIs
 
         RaiseHotKeyCommand (ctx);
 
-        InvokeCommand (Command.Activate);
+        // Pass the original binding so downstream handlers (e.g. Shortcut.OnActivating)
+        // can distinguish a user-initiated HotKey activation from a programmatic one.
+        InvokeCommand (Command.Activate, ctx?.Binding);
 
         return false;
     }

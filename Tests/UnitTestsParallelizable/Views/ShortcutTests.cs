@@ -1000,6 +1000,46 @@ public class ShortcutTests
         Assert.Equal (CheckState.Checked, testCommandView.Value);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that pressing the Shortcut's Key (not the CommandView's HotKey) correctly
+    ///     bubbles down to the CommandView, toggling a CheckBox. This tests the fix where
+    ///     DefaultHotKeyHandler passes the binding through to InvokeCommand(Command.Activate)
+    ///     so Shortcut.OnActivating can detect a user-initiated action and call BubbleDown.
+    /// </summary>
+    [Theory]
+    [CombinatorialData]
+    public void Shortcut_Key_Activates_CheckBox_CommandView (bool commandViewCanFocus)
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = commandViewCanFocus };
+
+        Shortcut shortcut = new () { Key = Key.F.WithCtrl, CommandView = checkBox };
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
+
+        var checkBoxActivatingRaised = 0;
+        checkBox.Activating += (_, _) => checkBoxActivatingRaised++;
+
+        // Act - Press the Shortcut's Key (Ctrl+F), which triggers Command.HotKey on the Shortcut
+        app.Keyboard.RaiseKeyDownEvent (Key.F.WithCtrl);
+
+        // Assert - CheckBox should have toggled
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, checkBoxActivatingRaised);
+    }
+
     [Fact]
     public void Command_Activate_Raises_Activating_Only ()
     {
