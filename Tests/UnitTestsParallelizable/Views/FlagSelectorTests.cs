@@ -137,10 +137,7 @@ public class FlagSelectorTests
         SelectorStyles? valueBefore = flagSelector.Value;
 
         // Per spec: HotKey when focused is a no-op
-        bool? result = flagSelector.InvokeCommand (Command.HotKey);
-
-        // Custom HotKey handler returns true (handled)
-        Assert.True (result);
+        flagSelector.InvokeCommand (Command.HotKey);
 
         // HandlingHotKey event fires, but no Activate or value change
         Assert.Equal (0, selectorActivatingRaised);

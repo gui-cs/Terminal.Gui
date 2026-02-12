@@ -115,6 +115,9 @@ public class MenuBarItem : MenuItem
             if (_popoverMenu is { })
             {
                 _popoverMenu.App = App;
+#if DEBUG
+                Id = $"{Id}.{_popoverMenu.Id}";
+#endif
 
                 PopoverMenuOpen = _popoverMenu.Visible;
                 _popoverMenu.VisibleChanged += OnPopoverVisibleChanged;
