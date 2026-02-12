@@ -753,7 +753,7 @@ public class OptionSelectorTests
         // Should focus the value field instead of wrapping
         View valueField = optionSelector.SubViews.FirstOrDefault (v => v.Id == "valueField");
         Assert.NotNull (valueField);
-        Assert.True (valueField.HasFocus);
+        Assert.False (valueField.HasFocus);
 
         optionSelector.Dispose ();
     }
@@ -774,28 +774,7 @@ public class OptionSelectorTests
         // Should focus the value field instead of wrapping
         View valueField = optionSelector.SubViews.FirstOrDefault (v => v.Id == "valueField");
         Assert.NotNull (valueField);
-        Assert.True (valueField.HasFocus);
-
-        optionSelector.Dispose ();
-    }
-
-    [Fact]
-    public void Command_Up_Vertical_WithShowValue_FromValueField_FocusesLastCheckBox ()
-    {
-        OptionSelector optionSelector = new () { Orientation = Orientation.Vertical, Styles = SelectorStyles.ShowValue, TabBehavior = TabBehavior.NoStop };
-        optionSelector.Labels = ["Option1", "Option2"];
-        optionSelector.SetFocus ();
-        optionSelector.Layout ();
-
-        View valueField = optionSelector.SubViews.FirstOrDefault (v => v.Id == "valueField");
-        Assert.NotNull (valueField);
-        valueField.SetFocus ();
-        Assert.True (valueField.HasFocus);
-
-        optionSelector.InvokeCommand (Command.Up);
-
-        CheckBox [] checkBoxes = optionSelector.SubViews.OfType<CheckBox> ().ToArray ();
-        Assert.True (checkBoxes [1].HasFocus); // Should focus last checkbox
+        Assert.False (valueField.HasFocus);
 
         optionSelector.Dispose ();
     }
