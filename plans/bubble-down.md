@@ -240,11 +240,7 @@ The existing Shortcut tests in `ShortcutTests.cs` that exercise BubbleDown indir
 tests that verify the Shortcut-specific policy of *when* to call `BubbleDown`. The new
 ViewCommandTests verify the *mechanism* itself.
 
-### 6. Refactor SelectorBase to use BubbleDown (Phase 6)
-
-Once Shortcut is verified working in UICatalog, apply the same pattern to SelectorBase.
-
-### 7. Update Deep Dive Documentation
+### 6. Update Deep Dive Documentation
 
 Update the conceptual documentation to describe `BubbleDown` and `IsBubblingDown`:
 
@@ -261,3 +257,9 @@ Update the conceptual documentation to describe `BubbleDown` and `IsBubblingDown
 **File:** `docfx/docs/shortcut.md` (if exists, or relevant scenario docs)
 - Update Shortcut architecture docs to reflect the simplified dispatch pattern
 - Remove references to `DispatchCommandFromSelf`/`DispatchCommandFromSubview`
+
+### 7. Refactor SelectorBase to use BubbleDown (Phase 7)
+
+Once Shortcut is verified working in UICatalog, apply the same pattern to SelectorBase.
+
+

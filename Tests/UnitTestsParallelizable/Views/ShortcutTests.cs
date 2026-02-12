@@ -448,6 +448,97 @@ public class ShortcutTests
         Assert.True (actionInvoked);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that pressing various keys invokes the <see cref="Shortcut.Action"/> delegate.
+    ///     Action is invoked via <see cref="Shortcut.OnActivated"/> (for Activate) or
+    ///     <see cref="Shortcut.OnAccepted"/> (for Accept).
+    /// </summary>
+    [Theory]
+    [InlineData (true, KeyCode.A, 1)]
+    [InlineData (true, KeyCode.C, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (true, KeyCode.Enter, 1)]
+    [InlineData (true, KeyCode.Space, 1)]
+    [InlineData (true, KeyCode.F1, 0)]
+    [InlineData (false, KeyCode.A, 1)]
+    [InlineData (false, KeyCode.C, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (false, KeyCode.Enter, 0)]
+    [InlineData (false, KeyCode.Space, 0)]
+    [InlineData (false, KeyCode.F1, 0)]
+    public void KeyDown_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
+    {
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        var action = 0;
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.A,
+            Text = "0",
+            Title = "_C",
+            CanFocus = canFocus,
+            Action = () => action++
+        };
+
+        runnable.Add (shortcut);
+
+        Assert.Equal (canFocus, shortcut.HasFocus);
+
+        app.Keyboard.RaiseKeyDownEvent (key);
+
+        Assert.Equal (expectedAction, action);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that pressing various keys invokes the <see cref="Shortcut.Action"/> delegate
+    ///     when <see cref="Shortcut.BindKeyToApplication"/> is <see langword="true"/>.
+    ///     The Shortcut's Key is bound at the application level so it works regardless of focus.
+    /// </summary>
+    [Theory]
+    [InlineData (true, KeyCode.A, 1)]
+    [InlineData (true, KeyCode.C, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (true, KeyCode.Enter, 1)]
+    [InlineData (true, KeyCode.Space, 1)]
+    [InlineData (true, KeyCode.F1, 0)]
+    [InlineData (false, KeyCode.A, 1)]
+    [InlineData (false, KeyCode.C, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1)]
+    [InlineData (false, KeyCode.Enter, 0)]
+    [InlineData (false, KeyCode.Space, 0)]
+    [InlineData (false, KeyCode.F1, 0)]
+    public void KeyDown_App_Scope_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
+    {
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        var action = 0;
+
+        Shortcut shortcut = new ()
+        {
+            App = app,
+            Key = Key.A,
+            Text = "0",
+            Title = "_C",
+            CanFocus = canFocus,
+            BindKeyToApplication = true,
+            Action = () => action++
+        };
+
+        runnable.Add (shortcut);
+        runnable.SetFocus ();
+
+        app.Keyboard.RaiseKeyDownEvent (key);
+
+        Assert.Equal (expectedAction, action);
+    }
+
     [Fact]
     public void SubView_Visibility_Controlled_By_Removal ()
     {
@@ -939,6 +1030,71 @@ public class ShortcutTests
         // Assert - Shortcut.Activating should have been raised
         Assert.Equal (1, shortcutActivatingRaised);
         Assert.Equal (1, commandViewActivatingRaised);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that clicking directly on a Button CommandView routes through Accept (not Activate),
+    ///     because Button maps <see cref="MouseFlags.LeftButtonClicked"/> to <see cref="Command.Accept"/>.
+    ///     The Accept bubbles up to the Shortcut, which also raises its Accepting event.
+    ///     Neither Activating event fires because the click goes through the Accept path.
+    /// </summary>
+    [Theory]
+    [CombinatorialData]
+    public void MouseClick_Button_CommandView_Raises_Accepting_On_Both (bool commandViewCanFocus)
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        Button button = new ()
+        {
+            Title = "C",
+            NoDecorations = true,
+            NoPadding = true,
+            CanFocus = commandViewCanFocus
+        };
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.A,
+            Text = "0",
+            CommandView = button
+        };
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        // Verify the Shortcut and Button have been laid out
+        Assert.True (shortcut.Frame.Width > 0, "Shortcut should have width");
+        Assert.True (button.Frame.Width > 0, "Button should have width");
+
+        var shortcutAcceptingCount = 0;
+        shortcut.Accepting += (_, _) => shortcutAcceptingCount++;
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        var buttonAcceptingCount = 0;
+        button.Accepting += (_, _) => buttonAcceptingCount++;
+
+        var buttonActivatingCount = 0;
+        button.Activating += (_, _) => buttonActivatingCount++;
+
+        // Act - click directly on the Button (CommandView)
+        // Button maps LeftButtonClicked → Command.Accept, so this goes through Accept path
+        Point buttonScreenPos = button.ViewportToScreen (Point.Empty);
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (buttonScreenPos));
+
+        // Assert - Accept fires on Button, then bubbles to Shortcut
+        Assert.Equal (1, buttonAcceptingCount);
+        Assert.Equal (1, shortcutAcceptingCount);
+
+        // Activating does NOT fire because the click was routed to Accept by Button
+        Assert.Equal (0, buttonActivatingCount);
+        Assert.Equal (0, shortcutActivatingCount);
     }
 
     [Theory]
