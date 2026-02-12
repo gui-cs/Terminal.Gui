@@ -153,10 +153,27 @@ protected override bool OnActivating (CommandEventArgs args)
 
 ## Phases
 
-1. Implement `IsBubblingDown` in `ICommandContext` and `CommandContext` and build and run tests to verify no breakage.
-2. Implement `BubbleDown` method in `View` and modify `TryBubbleToSuperView` to check the flag. Build and run tests to verify no breakage.
-3. Refactor `Shortcut` to use `BubbleDown` and remove dispatch methods. Build and run tests to verify no breakage.
+1. [DONE] Implement `IsBubblingDown` in `ICommandContext` and `CommandContext` and build and run tests to verify no breakage.
+2. [DONE] Implement `BubbleDown` method in `View` and modify `TryBubbleToSuperView` to check the flag. Build and run tests to verify no breakage.
+3. [DONE] Refactor `Shortcut` to use `BubbleDown` and remove dispatch methods. Build and run tests to verify no breakage.
 4. Stop here. Do not proceed to refactor `SelectorBase` yet. We want to verify the new pattern in Shortcut first, which has more complex bubbling logic. Once verified, we can apply the same pattern to SelectorBase with confidence.
+
+## Implementation Notes
+
+### Shortcut Simplification Details
+
+The plan's suggested `!IsFromCommandView` check was too broad. The actual condition for bubbling down is:
+- Must have a `Binding` (user interaction, not programmatic `InvokeCommand`)
+- `Binding.Source` must NOT be the `CommandView` (to avoid double-processing when CommandView's event bubbles up)
+
+This condition naturally handles all cases:
+- User clicks Shortcut surface → Binding.Source = Shortcut → bubble down ✓
+- User clicks HelpView/KeyView → Binding.Source = HelpView/KeyView → bubble down ✓
+- CommandView mouse click bubbles up → Binding.Source = CommandView → skip ✓
+- CommandView HotKey triggers Activate → Binding = null → skip ✓
+- Direct `shortcut.InvokeCommand()` → Binding = null → skip ✓
+
+This eliminated the need for `IsFromCommandView`, `IsBindingFromSelf`, `IsBindingFromKeyView`, and `IsBindingFromHelpView` entirely.
 
 ## Files to Modify
 
@@ -175,3 +192,73 @@ protected override bool OnActivating (CommandEventArgs args)
 3. `dotnet test Tests/UnitTests --no-build`
 4. Verify in UICatalog: Shortcut with CheckBox CommandView toggles correctly on click
 5. Verify OptionSelector/FlagSelector respond to clicks and keyboard
+
+## Next Steps
+
+### 5. Add BubbleDown Tests to ViewCommandTests (Phase 5)
+
+The `BubbleDown` method is a View-level API, so it needs View-level tests in
+`Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs`, not just implicit
+coverage through Shortcut tests.
+
+**File:** `Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs`
+
+Add a new `#region BubbleDown Tests` section with the following tests. Each test
+uses plain `View` instances (and a simple `BubbleDownTestView` subclass that
+exposes `BubbleDown` since it is `protected`), avoiding any dependency on
+Shortcut, CheckBox, or other concrete views.
+
+#### Test helper
+
+```csharp
+private class BubbleDownTestView : View
+{
+    public bool? TestBubbleDown (View target, ICommandContext? ctx) => BubbleDown (target, ctx);
+}
+```
+
+#### Tests to add
+
+| Test Name | What it verifies |
+|-----------|-----------------|
+| `BubbleDown_InvokesCommandOnTarget` | Calling `BubbleDown(subView, ctx)` invokes the command on the target and returns the target's result. |
+| `BubbleDown_SetsIsBubblingDown_True` | The `ICommandContext` received by the target's command handler has `IsBubblingDown == true`. |
+| `BubbleDown_ClearsBinding` | The context received by the target has `Binding == null` (no binding carried from the original). |
+| `BubbleDown_PreservesSource` | The context received by the target has the same `Source` as the original context. |
+| `BubbleDown_PreservesCommand` | The context received by the target has the same `Command` as the original context. |
+| `BubbleDown_UsesNotBound_WhenCtxIsNull` | When `ctx` is `null`, `BubbleDown` uses `Command.NotBound`. |
+| `BubbleDown_Target_DoesNotBubbleUp` | When the target is a SubView of a SuperView with `CommandsToBubbleUp` set, the command does NOT bubble to the SuperView because `IsBubblingDown` is true. This is the core invariant. |
+| `BubbleDown_Target_DoesNotBubbleUp_Accept` | Same as above but for `Command.Accept` specifically, verifying that `DefaultAcceptView` is also skipped. |
+| `BubbleDown_Target_DoesNotBubbleUp_DeepHierarchy` | The bubble-down flag prevents bubbling at every level of a 3-level hierarchy. |
+| `TryBubbleToSuperView_SkipsWhenIsBubblingDown` | Directly verifies that `TryBubbleToSuperView` returns `handled` (not `true`) when `IsBubblingDown` is true, even when `CommandsToBubbleUp` contains the command. |
+| `BubbleDown_Then_NormalInvoke_BubblesNormally` | After a `BubbleDown` call completes, a subsequent normal `InvokeCommand` on the same target bubbles normally (no "sticky" state). |
+
+#### Shortcut tests to keep as-is
+
+The existing Shortcut tests in `ShortcutTests.cs` that exercise BubbleDown indirectly
+(e.g., `CheckBox_CanFocus_False_Direct_InvokeCommand_Does_Not_Change_State`,
+`CommandView_Command_Activate_Bubbles_To_Shortcut`, etc.) should remain as integration-level
+tests that verify the Shortcut-specific policy of *when* to call `BubbleDown`. The new
+ViewCommandTests verify the *mechanism* itself.
+
+### 6. Refactor SelectorBase to use BubbleDown (Phase 6)
+
+Once Shortcut is verified working in UICatalog, apply the same pattern to SelectorBase.
+
+### 7. Update Deep Dive Documentation
+
+Update the conceptual documentation to describe `BubbleDown` and `IsBubblingDown`:
+
+**File:** `docfx/docs/command.md`
+- Document `BubbleDown` as the inverse of `TryBubbleToSuperView`
+- Explain `IsBubblingDown` flag and how it prevents re-entry
+- Add flow diagrams showing bubble-up vs bubble-down patterns
+- Document when to use `BubbleDown` (SuperView dispatching to SubView with bubbling suppressed)
+
+**File:** `docfx/docs/View.md`
+- Update the command propagation section to mention `BubbleDown`
+- Add `BubbleDown` to the API reference table alongside `CommandsToBubbleUp` and `TryBubbleToSuperView`
+
+**File:** `docfx/docs/shortcut.md` (if exists, or relevant scenario docs)
+- Update Shortcut architecture docs to reflect the simplified dispatch pattern
+- Remove references to `DispatchCommandFromSelf`/`DispatchCommandFromSubview`

@@ -87,8 +87,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
-        //base.HotKeySpecifier = (Rune)'\xffff';
-
         CommandView = new View
         {
 #if DEBUG
@@ -275,9 +273,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { } binding
-            && binding.Source is { } source
-            && source != CommandView)
+        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
             BubbleDown (CommandView, args.Context);
         }
@@ -306,9 +302,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { } binding
-            && binding.Source is { } source
-            && source != CommandView)
+        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
             BubbleDown (CommandView, args.Context);
         }
@@ -318,19 +312,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     /// <inheritdoc/>
     protected override void OnAccepted (CommandEventArgs args) => Action?.Invoke ();
-
-    /// <inheritdoc/>
-    protected override void OnHotKeyCommand (ICommandContext? ctx)
-    {
-        base.OnHotKeyCommand (ctx);
-
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-
-        //if (ctx?.Binding is KeyBinding binding && binding.Key! == Key)
-        //{
-        //    DispatchCommandFromSelf (CommandView, ctx);
-        //}
-    }
 
     /// <summary>
     ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
@@ -452,8 +433,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
             UpdateKeyBindings (Key.Empty);
             ShowHide ();
-
-            return;
         }
     }
 
