@@ -1308,7 +1308,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             Add ();
         }
 
-        protected override void OnAccepted (CommandEventArgs args) => Result = SelectedDate;
+        protected override void OnAccepted (ICommandContext? ctx) => Result = SelectedDate;
 
         private DateTime SelectedDate => _datePicker.Value;
     }

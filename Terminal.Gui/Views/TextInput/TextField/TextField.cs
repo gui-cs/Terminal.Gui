@@ -53,13 +53,6 @@ public partial class TextField : View, IDesignable, IValue<string>
             Autocomplete.HostControl = this;
             Autocomplete.PopupInsideContainer = false;
         }
-
-        CreateContextMenu ();
-
-        if (ContextMenu?.Key is { })
-        {
-            KeyBindings.Add (ContextMenu.Key, Command.Context);
-        }
     }
 
     /// <summary>Gets or sets whether the text field is read-only.</summary>
@@ -89,6 +82,24 @@ public partial class TextField : View, IDesignable, IValue<string>
         _focusSetByMouse = false;
 
         UpdateCursor ();
+
+        if (newHasFocus)
+        {
+            CreateContextMenu ();
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+            DisposeContextMenu ();
+        }
     }
 
     /// <inheritdoc/>
@@ -116,7 +127,12 @@ public partial class TextField : View, IDesignable, IValue<string>
             new (this, Command.Paste, Strings.ctxPaste),
             new (this, Command.Undo, Strings.ctxUndo),
             new (this, Command.Redo, Strings.ctxRedo)
-        });
+        })
+        {
+#if DEBUG
+            Id = "textFieldContextMenu"
+#endif
+        };
 
         HotKeyBindings.Remove (menu.Key);
         HotKeyBindings.Add (menu.Key, Command.Context);
@@ -131,6 +147,7 @@ public partial class TextField : View, IDesignable, IValue<string>
         if (ContextMenu is { })
         {
             ContextMenu.Visible = false;
+            App?.Popover?.DeRegister (ContextMenu);
             ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
             ContextMenu.Dispose ();
             ContextMenu = null;

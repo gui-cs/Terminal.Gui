@@ -2,8 +2,8 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
-// DoubleClick - Focus, Select, and Accept the item under the mouse.
-// Click - Focus, Select, and do NOT Accept the item under the mouse.
+// DoubleClick - Focus, Activate, and Accept the item under the mouse (CanFocus or not)
+// Click - Focus, Activate, and do NOT Accept the item under the mouse (CanFocus or not).
 // CanFocus - Not Focused:
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Focus item. If item is not active, make Active. Do NOT Accept.
@@ -14,7 +14,7 @@ namespace Terminal.Gui.Views;
 //  Space key - If focused item is Active, move focus to and Activate next. Else, Activate current. Do NOT Accept.
 //  Enter key - Activate and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
-//  Item HotKey - If item is not active, make Active. Do NOT Accept.
+//  Item HotKey - If item is not active, make Active. Do NOT Accept. If item is active, do nothing.
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting a single item from a list of options.
@@ -31,73 +31,33 @@ public class OptionSelector : SelectorBase, IDesignable
         // really wants that.
         base.Value = 0;
 
-    /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? ctx)
     {
-        if (base.OnHandlingHotKey (args))
-        {
-            return true;
-        }
+        base.OnActivated (ctx);
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
-        if (!CanFocus)
-        {
-            if (RaiseActivating (args.Context) is true)
-            {
-                return true;
-            }
-        }
-        else if (!HasFocus && Value is null)
-        {
-            if (RaiseActivating (args.Context) is true)
-            {
-                return true;
-            }
-
-            SetFocus ();
-            Value = Values? [0];
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnActivating (CommandEventArgs args)
-    {
-        if (base.OnActivating (args))
-        {
-            return true;
-        }
-
-        if (!CanFocus || args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
         {
             Cycle ();
 
-            return false;
+            return;
         }
 
-        if (args.Context?.Binding is KeyBinding && (int)checkBox.Data! == Value)
+        if (ctx.Binding is KeyBinding keyBinding && (int)checkBox.Data! == Value && keyBinding.Key is { } && keyBinding.Key == Key.Space)
         {
-            // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
+            // Caused by space. If the checkbox is already checked, we cycle to the next one.
             Cycle ();
         }
         else
         {
             if (Value == (int)checkBox.Data!)
             {
-                return true;
+                return;
             }
 
             Value = (int)checkBox.Data!;
-
-            // if (HasFocus)
-            {
-                UpdateChecked ();
-            }
         }
-
-        return false;
     }
 
     /// <inheritdoc/>
@@ -113,8 +73,9 @@ public class OptionSelector : SelectorBase, IDesignable
         checkbox.RadioStyle = true;
 
         checkbox.Activating += OnCheckboxOnActivating;
-        checkbox.Accepting += OnCheckboxOnAccepting;
+        checkbox.Accepted += CheckboxOnAccepted;
     }
+
 
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
@@ -122,6 +83,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             return;
         }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
 
         // Verify at most one is checked
         Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
@@ -145,26 +107,14 @@ public class OptionSelector : SelectorBase, IDesignable
             }
         }
 
-        if (checkbox.CanFocus)
-        {
-            // For Select, if the view is focusable and SetFocus succeeds, by definition,
-            // the event is handled. So return what SetFocus returns.
-            checkbox.SetFocus ();
-        }
-
-        // Selecting doesn't normally propagate, so we do it here
-        if (InvokeCommand (Command.Activate, args.Context) is true)
-        {
-            // Do not return here; we want to toggle the checkbox state
-            args.Handled = true;
-
-            return;
-        }
+        // Bubble up
+        // TODO: This should not be needed. Figure out why SelectorBase bubble up is not handling this properly.
+        InvokeCommand (Command.Activate, args.Context);
 
         args.Handled = true;
     }
 
-    private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
+    private void CheckboxOnAccepted (object? sender, CommandEventArgs e)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -172,11 +122,12 @@ public class OptionSelector : SelectorBase, IDesignable
         }
 
         Value = (int)checkbox.Data!;
-        args.Handled = false; // Do not set to false; let Accepting propagate
     }
 
     private void Cycle ()
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()}");
+
         int valueIndex = Values.IndexOf (v => v == Value);
 
         Value = valueIndex == Values?.Count - 1 ? Values! [0] : Values! [valueIndex + 1];
@@ -229,12 +180,7 @@ public class OptionSelector : SelectorBase, IDesignable
                 return 0;
             }
 
-            if (HasFocus)
-            {
-                return SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
-            }
-
-            return field;
+            return HasFocus ? SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused) : field;
         }
         set
         {

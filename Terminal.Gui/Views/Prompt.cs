@@ -133,7 +133,7 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
     ///         result.
     ///     </para>
     /// </remarks>
-    protected override void OnAccepted (CommandEventArgs args)
+    protected override void OnAccepted (ICommandContext? ctx)
     {
         //if (base.OnAccepting (args))
         //{

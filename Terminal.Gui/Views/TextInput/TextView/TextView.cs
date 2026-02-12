@@ -113,8 +113,6 @@ public partial class TextView : View, IDesignable
         Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
-        App?.Popover?.Register (ContextMenu);
-        KeyBindings.Add (ContextMenu.Key, Command.Context);
 
         UpdateScrollBars ();
         UpdateContentSize ();
@@ -164,6 +162,20 @@ public partial class TextView : View, IDesignable
         if (newHasFocus)
         {
             PositionCursor ();
+            App?.Popover?.Register (ContextMenu);
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+            App?.Popover?.DeRegister (ContextMenu);
         }
     }
 
@@ -246,7 +258,12 @@ public partial class TextView : View, IDesignable
             new MenuItem (this, Command.Paste, Strings.ctxPaste),
             new MenuItem (this, Command.Undo, Strings.ctxUndo),
             new MenuItem (this, Command.Redo, Strings.ctxRedo)
-        });
+        })
+        {
+#if DEBUG
+            Id = "textViewContextMenu"
+#endif
+        }; ;
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 

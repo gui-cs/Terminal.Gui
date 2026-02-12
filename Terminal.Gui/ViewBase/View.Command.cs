@@ -245,12 +245,13 @@ public partial class View // Command APIs
 
     internal bool? DefaultAcceptHandler (ICommandContext? ctx)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         if (RaiseAccepting (ctx) is true)
         {
             return true;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx?.Source}) - Calling RaiseAccepted");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Calling RaiseAccepted");
         RaiseAccepted (ctx);
 
         return false;
@@ -349,10 +350,8 @@ public partial class View // Command APIs
     /// <seealso cref="RaiseAccepting"/>
     protected void RaiseAccepted (ICommandContext? ctx)
     {
-        CommandEventArgs args = new () { Context = ctx };
-
-        OnAccepted (args);
-        Accepted?.Invoke (this, args);
+        OnAccepted (ctx);
+        Accepted?.Invoke (this, new CommandEventArgs { Context = ctx });
     }
 
     // BUGBUG: Accepted should not use CommandEventArgs since it cannot be cancelled. Use EventArgs<ICommandContext?>?
@@ -367,8 +366,8 @@ public partial class View // Command APIs
     ///         operation.
     ///     </para>
     /// </remarks>
-    /// <param name="args">The event arguments.</param>
-    protected virtual void OnAccepted (CommandEventArgs args) { }
+    /// <param name="ctx"></param>
+    protected virtual void OnAccepted (ICommandContext? ctx) { }
 
     /// <summary>
     ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not
@@ -505,6 +504,8 @@ public partial class View // Command APIs
 
     internal bool? DefaultHotKeyHandler (ICommandContext? ctx)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
         if (RaiseHandlingHotKey (ctx) is true)
         {
             return true;
@@ -648,6 +649,8 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? BubbleDown (View target, ICommandContext? ctx)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
         CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, null) { IsBubblingDown = true };
 
         return target.InvokeCommand (downCtx.Command, downCtx);

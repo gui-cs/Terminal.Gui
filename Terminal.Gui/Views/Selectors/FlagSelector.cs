@@ -1,7 +1,9 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui.Views;
 
-// DoubleClick - Focus, Select (Toggle), and Accept the item under the mouse.
-// Click - Focus, Select (Toggle), and do NOT Accept the item under the mouse.
+// DoubleClick - Focus, Activate, and Accept the item under the mouse (CanFocus or not)
+// Click - Focus, Activate, and do NOT Accept the item under the mouse (CanFocus or not).
 // Not Focused:
 //  HotKey - Restore Focus. Do NOT change Active.
 //  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
@@ -21,29 +23,47 @@ public class FlagSelector : SelectorBase, IDesignable
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
     /// </summary>
-    public FlagSelector () =>
+    public FlagSelector () { }
 
-        // Per spec: HotKey restores focus when not focused but does NOT change Active.
-        // When already focused, HotKey is a no-op.
-        // Replace DefaultHotKeyHandler so the HandlingHotKey event fires
-        // but Activate is NOT invoked (no flag toggle).
-        AddCommand (Command.HotKey,
-                    ctx =>
-                    {
-                        if (RaiseHandlingHotKey (ctx) is true)
-                        {
-                            return true;
-                        }
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
 
-                        if (CanFocus && !HasFocus)
-                        {
-                            SetFocus ();
-                        }
+        return HasFocus;
+    }
 
-                        // Do NOT invoke Activate - HotKey should not toggle flags.
-                        return true;
-                    });
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        if (base.OnActivating (args))
+        {
+            return true;
+        }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
+        return false;
+
+        // Skip BubbleDown when:
+        // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
+        // - No Focused view to dispatch to
+        // - Source is a SubView that already bubbled up (not this selector)
+        if (args.Context?.IsBubblingDown == true
+            || Focused is null
+           // || args.Context?.Binding?.Commands.ContainsAnyExcept (Command.Activate) is true
+            || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
+        {
+            return true;
+        }
+
+        // Bubble DOWN to the focused checkbox.
+        // Return true if BubbleDown handled it, so derived classes (e.g. OptionSelector)
+        // don't also run their own logic (e.g. double-Cycle).
+        return BubbleDown (Focused, args.Context) is true;
+    }
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
@@ -57,7 +77,18 @@ public class FlagSelector : SelectorBase, IDesignable
         checkbox.RadioStyle = false;
 
         checkbox.ValueChanging += OnCheckboxOnValueChanging;
-        checkbox.ValueChanged += OnCheckboxOnValueChanged;
+        checkbox.ValueChanged += CheckboxOnValueChanged;
+        checkbox.Activating += OnCheckboxOnActivating;
+    }
+
+    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
+    {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
+
+        //InvokeCommand (Command.Activate, args.Context);
+
+        //args.Handled = true;
+
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
@@ -66,6 +97,7 @@ public class FlagSelector : SelectorBase, IDesignable
         {
             return;
         }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
 
         if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
@@ -74,33 +106,36 @@ public class FlagSelector : SelectorBase, IDesignable
         }
     }
 
-    private void OnCheckboxOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> args)
+    private void CheckboxOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> args)
     {
-        if (sender is not CheckBox checkbox)
+        if (sender is not CheckBox checkBox)
         {
             return;
         }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
 
         int newValue = Value ?? 0;
 
-        if (checkbox.Value == CheckState.Checked)
+        if (checkBox.Value == CheckState.Checked)
         {
-            if ((int)checkbox.Data! == 0)
+            if ((int)checkBox.Data! == 0)
             {
                 newValue = 0;
             }
             else
             {
-                newValue |= (int)checkbox.Data!;
+                newValue |= (int)checkBox.Data!;
             }
         }
         else
         {
-            newValue &= ~(int)checkbox.Data!;
+            newValue &= ~(int)checkBox.Data!;
         }
 
         Value = newValue;
     }
+
+    private bool _updatingChecked = false;
 
     /// <summary>
     ///     Gets or sets the value of the selected flags.
@@ -141,8 +176,9 @@ public class FlagSelector : SelectorBase, IDesignable
 
     private void UncheckNone ()
     {
-        // Uncheck ONLY the None checkbox (Data == 0)
         _updatingChecked = true;
+
+        // Uncheck ONLY the None checkbox (Data == 0)
 
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! == 0))
         {
@@ -153,8 +189,9 @@ public class FlagSelector : SelectorBase, IDesignable
 
     private void UncheckAll ()
     {
-        // Uncheck all NON-None checkboxes (Data != 0)
         _updatingChecked = true;
+
+        // Uncheck all NON-None checkboxes (Data != 0)
 
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? null!) != 0))
         {
@@ -163,15 +200,9 @@ public class FlagSelector : SelectorBase, IDesignable
         _updatingChecked = false;
     }
 
-    private bool _updatingChecked;
-
     /// <inheritdoc/>
     public override void UpdateChecked ()
     {
-        if (_updatingChecked)
-        {
-            return;
-        }
         _updatingChecked = true;
 
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
@@ -189,6 +220,12 @@ public class FlagSelector : SelectorBase, IDesignable
             }
         }
 
+        if (Styles.HasFlag (SelectorStyles.ShowNoneFlag))
+        {
+            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
+
+            // noneCheckBox?.Value = Value > 0 ? CheckState.Checked : CheckState.UnChecked;
+        }
         _updatingChecked = false;
     }
 

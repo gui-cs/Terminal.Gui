@@ -30,6 +30,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
 
+        CanFocus = true;
+
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
@@ -80,8 +82,6 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             ShadowStyle = ShadowStyle.None
         };
 
-        CanFocus = true;
-
         _down.Accepting += OnDownButtonOnAccept;
         _up.Accepting += OnUpButtonOnAccept;
 
@@ -93,6 +93,11 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                         if (type == typeof (object))
                         {
                             return false;
+                        }
+
+                        if (InvokeCommand (Command.Activate) is true)
+                        {
+                            return true;
                         }
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
@@ -109,6 +114,11 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                         if (type == typeof (object))
                         {
                             return false;
+                        }
+
+                        if (InvokeCommand (Command.Activate) is true)
+                        {
+                            return true;
                         }
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
@@ -139,7 +149,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         }
     }
 
-    private T? _value;
+    private T? _value = default;
 
     /// <summary>
     ///     Gets or sets the value that will be incremented or decremented.
@@ -156,11 +166,6 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         set
         {
             if (EqualityComparer<T?>.Default.Equals (_value, value))
-            {
-                return;
-            }
-
-            if (InvokeCommand (Command.Activate) is true)
             {
                 return;
             }
