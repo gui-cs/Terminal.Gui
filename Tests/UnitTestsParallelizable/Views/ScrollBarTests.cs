@@ -30,6 +30,18 @@ public class ScrollBarTests
     }
 
     [Fact]
+    public void ShowScroll_SetToSameValue_DoesNotChange ()
+    {
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 20, ShowScroll = false };
+        super.Add (scrollBar);
+        Assert.False (scrollBar.ShowScroll);
+        Assert.False (scrollBar.Visible);
+
+        super.Dispose ();
+    }
+
+    [Fact]
     public void ShowScroll_True_And_AutoShow_True_CorrectlyShows_IfScrollableContentSizeIsLessOrEqualThanViewportSize ()
     {
         var super = new Runnable { Id = "super", Width = 1, Height = 20 };
