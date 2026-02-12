@@ -258,7 +258,7 @@ public class Shortcut : View, IOrientation, IDesignable
     // TODO: Enable setting of the margin thickness
     private Thickness GetMarginThickness () => new (1, 0, 1, 0);
 
-    #region Accept/Select/HotKey Command Handling
+    #region Accept/Activate/HotKey Command Handling
 
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
@@ -322,7 +322,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </remarks>
     public Action? Action { get; set; }
 
-    #endregion Accept/Select/HotKey Command Handling
+    #endregion Accept/Activate/HotKey Command Handling
 
     #region IOrientation members
 

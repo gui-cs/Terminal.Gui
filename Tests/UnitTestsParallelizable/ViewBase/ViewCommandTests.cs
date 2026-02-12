@@ -893,6 +893,239 @@ public class ViewCommandTests
 
     #endregion
 
+    #region BubbleDown Tests
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Exposes the protected <see cref="View.BubbleDown"/> method for testing.
+    /// </summary>
+    private class BubbleDownTestView : View
+    {
+        public bool? TestBubbleDown (View target, ICommandContext? ctx) => BubbleDown (target, ctx);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_InvokesCommandOnTarget ()
+    {
+        BubbleDownTestView superView = new ();
+        ViewEventTester target = new ();
+        superView.Add (target);
+
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (superView), null);
+
+        bool? result = superView.TestBubbleDown (target, ctx);
+
+        Assert.Equal (1, target.OnActivatingCount);
+        Assert.False (result);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_SetsIsBubblingDown_True ()
+    {
+        BubbleDownTestView superView = new ();
+        View target = new ();
+        superView.Add (target);
+
+        ICommandContext? receivedCtx = null;
+        target.Activating += (_, e) => receivedCtx = e.Context;
+
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (superView), null);
+        superView.TestBubbleDown (target, ctx);
+
+        Assert.NotNull (receivedCtx);
+        Assert.True (receivedCtx!.IsBubblingDown);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_ClearsBinding ()
+    {
+        BubbleDownTestView superView = new ();
+        View target = new ();
+        superView.Add (target);
+
+        ICommandContext? receivedCtx = null;
+        target.Activating += (_, e) => receivedCtx = e.Context;
+
+        KeyBinding originalBinding = new ([Command.Activate]) { Key = Key.Space };
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (superView), originalBinding);
+        superView.TestBubbleDown (target, ctx);
+
+        Assert.NotNull (receivedCtx);
+        Assert.Null (receivedCtx!.Binding);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_PreservesSource ()
+    {
+        BubbleDownTestView superView = new () { Id = "superView" };
+        View target = new () { Id = "target" };
+        superView.Add (target);
+
+        ICommandContext? receivedCtx = null;
+        target.Activating += (_, e) => receivedCtx = e.Context;
+
+        WeakReference<View> originalSource = new (superView);
+        CommandContext ctx = new (Command.Activate, originalSource, null);
+        superView.TestBubbleDown (target, ctx);
+
+        Assert.NotNull (receivedCtx);
+        View? source = null;
+        Assert.True (receivedCtx!.Source?.TryGetTarget (out source));
+        Assert.Same (superView, source);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_PreservesCommand ()
+    {
+        BubbleDownTestView superView = new ();
+        ViewEventTester target = new ();
+        superView.Add (target);
+
+        CommandContext ctx = new (Command.Accept, new WeakReference<View> (superView), null);
+        superView.TestBubbleDown (target, ctx);
+
+        Assert.Equal (1, target.OnAcceptedCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_UsesNotBound_WhenCtxIsNull ()
+    {
+        BubbleDownTestView superView = new ();
+        ViewEventTester target = new ();
+        superView.Add (target);
+
+        superView.TestBubbleDown (target, null);
+
+        // NotBound command should fire CommandNotBound
+        Assert.Equal (1, target.OnCommandNotBoundCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_Target_DoesNotBubbleUp ()
+    {
+        BubbleDownTestView superView = new () { Id = "superView" };
+        superView.CommandsToBubbleUp = [Command.Activate];
+
+        View target = new () { Id = "target" };
+        superView.Add (target);
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (superView), null);
+        superView.TestBubbleDown (target, ctx);
+
+        // The target's Activate must NOT bubble back up to superView
+        Assert.Equal (0, superViewActivatingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_Target_DoesNotBubbleUp_Accept ()
+    {
+        BubbleDownTestView superView = new () { Id = "superView" };
+        superView.CommandsToBubbleUp = [Command.Accept];
+
+        Button defaultButton = new () { IsDefault = true, Id = "defaultButton" };
+        View target = new () { Id = "target" };
+        superView.Add (target);
+        superView.Add (defaultButton);
+
+        var superViewAcceptingCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCount++;
+
+        var defaultButtonAcceptingCount = 0;
+        defaultButton.Accepting += (_, _) => defaultButtonAcceptingCount++;
+
+        CommandContext ctx = new (Command.Accept, new WeakReference<View> (superView), null);
+        superView.TestBubbleDown (target, ctx);
+
+        // Neither superView Accepting nor DefaultAcceptView should fire
+        Assert.Equal (0, superViewAcceptingCount);
+        Assert.Equal (0, defaultButtonAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_Target_DoesNotBubbleUp_DeepHierarchy ()
+    {
+        BubbleDownTestView root = new () { Id = "root" };
+        root.CommandsToBubbleUp = [Command.Activate];
+
+        View middle = new () { Id = "middle" };
+        middle.CommandsToBubbleUp = [Command.Activate];
+        root.Add (middle);
+
+        View leaf = new () { Id = "leaf" };
+        middle.Add (leaf);
+
+        var rootActivatingCount = 0;
+        root.Activating += (_, _) => rootActivatingCount++;
+
+        var middleActivatingCount = 0;
+        middle.Activating += (_, _) => middleActivatingCount++;
+
+        // BubbleDown from root to leaf — should not bubble to middle or root
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (root), null);
+        root.TestBubbleDown (leaf, ctx);
+
+        Assert.Equal (0, middleActivatingCount);
+        Assert.Equal (0, rootActivatingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TryBubbleToSuperView_SkipsWhenIsBubblingDown ()
+    {
+        View superView = new () { Id = "superView" };
+        superView.CommandsToBubbleUp = [Command.Activate];
+
+        View subView = new () { Id = "subView" };
+        superView.Add (subView);
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Invoke Activate on subView with IsBubblingDown = true
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (subView), null) { IsBubblingDown = true };
+        subView.InvokeCommand (Command.Activate, ctx);
+
+        // SuperView should NOT receive the event
+        Assert.Equal (0, superViewActivatingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void BubbleDown_Then_NormalInvoke_BubblesNormally ()
+    {
+        BubbleDownTestView superView = new () { Id = "superView" };
+        superView.CommandsToBubbleUp = [Command.Activate];
+
+        View target = new () { Id = "target" };
+        superView.Add (target);
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // First: BubbleDown — should NOT bubble
+        CommandContext downCtx = new (Command.Activate, new WeakReference<View> (superView), null);
+        superView.TestBubbleDown (target, downCtx);
+        Assert.Equal (0, superViewActivatingCount);
+
+        // Second: Normal invoke — SHOULD bubble
+        target.InvokeCommand (Command.Activate);
+        Assert.Equal (1, superViewActivatingCount);
+    }
+
+    #endregion
+
     public class ViewEventTester : View
     {
         public ViewEventTester ()

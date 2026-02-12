@@ -195,11 +195,10 @@ This eliminated the need for `IsFromCommandView`, `IsBindingFromSelf`, `IsBindin
 
 ## Next Steps
 
-### 5. Add BubbleDown Tests to ViewCommandTests (Phase 5)
+### 5. [DONE] Add BubbleDown Tests to ViewCommandTests (Phase 5)
 
-The `BubbleDown` method is a View-level API, so it needs View-level tests in
-`Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs`, not just implicit
-coverage through Shortcut tests.
+Added 11 View-level tests for `BubbleDown` in `ViewCommandTests.cs` using a
+`BubbleDownTestView` helper class. All 70 ViewCommandTests pass (59 existing + 11 new).
 
 **File:** `Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs`
 
