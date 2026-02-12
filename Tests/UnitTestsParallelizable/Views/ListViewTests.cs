@@ -1324,6 +1324,7 @@ Item 6",
         app.Init (DriverRegistry.Names.ANSI);
 
         var lv = new ListView { Width = 10, Height = 3 };
+        lv.VerticalScrollBar.ShowScroll = true;
         lv.VerticalScrollBar.AutoShow = true;
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
         var top = new Runnable ();
