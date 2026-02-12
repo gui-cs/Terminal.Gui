@@ -25,6 +25,45 @@ public class FlagSelector : SelectorBase, IDesignable
     /// </summary>
     public FlagSelector () { }
 
+    /// <inheritdoc />
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        return HasFocus;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        if (base.OnActivating (args))
+        {
+            return true;
+        }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+
+        return false;
+
+        // Skip BubbleDown when:
+        // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
+        // - No Focused view to dispatch to
+        // - Source is a SubView that already bubbled up (not this selector)
+        if (args.Context?.IsBubblingDown == true
+            || Focused is null
+           // || args.Context?.Binding?.Commands.ContainsAnyExcept (Command.Activate) is true
+            || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
+        {
+            return true;
+        }
+
+        // Bubble DOWN to the focused checkbox.
+        // Return true if BubbleDown handled it, so derived classes (e.g. OptionSelector)
+        // don't also run their own logic (e.g. double-Cycle).
+        return BubbleDown (Focused, args.Context) is true;
+    }
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
@@ -49,6 +88,7 @@ public class FlagSelector : SelectorBase, IDesignable
         //InvokeCommand (Command.Activate, args.Context);
 
         //args.Handled = true;
+
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
@@ -95,6 +135,8 @@ public class FlagSelector : SelectorBase, IDesignable
         Value = newValue;
     }
 
+    private bool _updatingChecked = false;
+
     /// <summary>
     ///     Gets or sets the value of the selected flags.
     /// </summary>
@@ -103,7 +145,7 @@ public class FlagSelector : SelectorBase, IDesignable
         get;
         set
         {
-            if (field == value)
+            if (_updatingChecked || field == value)
             {
                 return;
             }
@@ -134,27 +176,35 @@ public class FlagSelector : SelectorBase, IDesignable
 
     private void UncheckNone ()
     {
+        _updatingChecked = true;
+
         // Uncheck ONLY the None checkbox (Data == 0)
 
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! == 0))
         {
             cb.Value = CheckState.UnChecked;
         }
+        _updatingChecked = false;
     }
 
     private void UncheckAll ()
     {
+        _updatingChecked = true;
+
         // Uncheck all NON-None checkboxes (Data != 0)
 
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? null!) != 0))
         {
             cb.Value = CheckState.UnChecked;
         }
+        _updatingChecked = false;
     }
 
     /// <inheritdoc/>
     public override void UpdateChecked ()
     {
+        _updatingChecked = true;
+
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             var flag = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
@@ -176,6 +226,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
             // noneCheckBox?.Value = Value > 0 ? CheckState.Checked : CheckState.UnChecked;
         }
+        _updatingChecked = false;
     }
 
     /// <inheritdoc/>

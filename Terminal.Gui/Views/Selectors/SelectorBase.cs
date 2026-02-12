@@ -149,21 +149,23 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
+        return false;
+
         // Skip BubbleDown when:
         // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
         // - No Focused view to dispatch to
         // - Source is a SubView that already bubbled up (not this selector)
-        //if (args.Context?.IsBubblingDown == true
-        //    || Focused is null
-        //    || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
-        //{
-        //    return true;
-        //}
+        if (args.Context?.IsBubblingDown == true
+            || Focused is null
+            || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
+        {
+            return true;
+        }
 
         // Bubble DOWN to the focused checkbox.
         // Return true if BubbleDown handled it, so derived classes (e.g. OptionSelector)
         // don't also run their own logic (e.g. double-Cycle).
-        return false;//BubbleDown (Focused, args.Context) is true;
+        return BubbleDown (Focused, args.Context) is true;
     }
 
     /// <inheritdoc/>
