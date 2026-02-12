@@ -631,6 +631,26 @@ public partial class View // Command APIs
     public IReadOnlyList<Command> CommandsToBubbleUp { get; set; } = [];
 
     /// <summary>
+    ///     Dispatches a command downward to a SubView with bubbling suppressed. Creates a new
+    ///     <see cref="CommandContext"/> with <see cref="ICommandContext.IsBubblingDown"/> set to <see langword="true"/>,
+    ///     which causes <see cref="TryBubbleToSuperView"/> to skip bubbling on the target, preventing re-entry.
+    /// </summary>
+    /// <param name="target">The SubView to dispatch the command to.</param>
+    /// <param name="ctx">The original command context, used to determine the command and source.</param>
+    /// <returns>
+    ///     The result of invoking the command on the target.
+    /// </returns>
+    protected bool? BubbleDown (View target, ICommandContext? ctx)
+    {
+        CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, null)
+        {
+            IsBubblingDown = true
+        };
+
+        return target.InvokeCommand (downCtx.Command, downCtx);
+    }
+
+    /// <summary>
     ///     Bubbles a command to the SuperView if the command is in SuperView's <see cref="CommandsToBubbleUp"/> list.
     ///     Handles the special case of invoking <see cref="Command.Accept"/> on a peer IsDefault button.
     /// </summary>
@@ -645,6 +665,11 @@ public partial class View // Command APIs
         if (handled)
         {
             return true;
+        }
+
+        if (ctx?.IsBubblingDown == true)
+        {
+            return handled;
         }
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");

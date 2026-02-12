@@ -269,30 +269,18 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             return true;
         }
+
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-        if (IsFromCommandView (args.Context!))
+        // Only bubble down to CommandView when the activation came from user interaction
+        // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
+        // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
+        if (args.Context?.Binding is { } binding
+            && binding.Source is { } source
+            && source != CommandView)
         {
-            // If the USER did something to activate the CommandView dispatch it back to the
-            // CommandView and re-invoke on self.
-            if (DispatchCommandFromSubview (CommandView, args.Context!))
-            {
-                return true;
-            }
+            BubbleDown (CommandView, args.Context);
         }
-
-        if (IsBindingFromSelf (args.Context!))
-        {
-            // If the USER did something to activate us or one of our non-CommandView subviews,
-            // dispatch it to the CommandView and re-invoke on self.
-            if (DispatchCommandFromSelf (CommandView, args.Context!))
-            {
-                return true;
-            }
-        }
-
-        // If we got here, the Accept came from another view or was directly invoked.
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - returning false.");
 
         return false;
     }
@@ -312,30 +300,18 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             return true;
         }
+
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-        if (IsFromCommandView (args.Context!))
+        // Only bubble down to CommandView when the activation came from user interaction
+        // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
+        // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
+        if (args.Context?.Binding is { } binding
+            && binding.Source is { } source
+            && source != CommandView)
         {
-            // If the USER did something to activate the CommandView dispatch it back to the
-            // CommandView and re-invoke on self.
-            if (DispatchCommandFromSubview (CommandView, args.Context!))
-            {
-                return true;
-            }
+            BubbleDown (CommandView, args.Context);
         }
-
-        if (IsBindingFromSelf (args.Context!))
-        {
-            // If the USER did something to activate us or one of our non-CommandView subviews,
-            // dispatch it to the CommandView and re-invoke on self.
-            if (DispatchCommandFromSelf (CommandView, args.Context!))
-            {
-                return true;
-            }
-        }
-
-        // If we got here, the Accept came from another view or was directly invoked.
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args}) - returning false.");
 
         return false;
     }
@@ -354,83 +330,6 @@ public class Shortcut : View, IOrientation, IDesignable
         //{
         //    DispatchCommandFromSelf (CommandView, ctx);
         //}
-    }
-
-    /// <summary>
-    ///     Dispatches the command to a specified subview if the command binding source was not `this`.
-    /// </summary>
-    /// <param name="subViewToDispatch"></param>
-    /// <param name="ctx"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    public bool DispatchCommandFromSelf (View subViewToDispatch, ICommandContext ctx)
-    {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-
-        // The user did something in the Shortcut/KeyView/HelpView.
-        // - Disable Bubbling & Invoke on the command view so that it can update its state if needed (e.g., toggle a CheckBox).
-        //   Ignore the return.
-        // - Re-enable Bubbling.
-        // - Invoke command on this, with no Binding.Source set. Ignore the return value.
-        // - Return true to stop processing.
-
-        // Disable bubbling
-        IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
-        CommandsToBubbleUp = [];
-        ICommandContext context = new CommandContext (ctx.Command, null, null);
-
-        if (subViewToDispatch.InvokeCommand (ctx.Command, context) is true)
-        {
-            // This is not expected;
-            throw new InvalidOperationException ("subViewToDispatch.InvokeCommand() returned true unexpectedly.");
-        }
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Back from subViewToDispatch.InvokeCommand");
-        CommandsToBubbleUp = tempCommandsToBubbleUp;
-
-        return false;
-    }
-
-    /// <summary>
-    ///     Dispatches the command to the specified subview, if the command was not from the subview.
-    /// </summary>
-    /// <param name="subView"></param>
-    /// <param name="ctx"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    public bool DispatchCommandFromSubview (View subView, ICommandContext ctx)
-    {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - IsFromCommandView");
-
-        // The user did something in the CommandView (e.g., clicked on it or pressed its hotkey). We got here because CommandsToBubbleUp
-        // includes Command.Activate, so the event bubbled up to Shortcut.
-        // We're going to cancel the CommandView's Activating and raise our own so that the Shortcut gets focus and can update its state if needed.
-
-        // Set the context source to the Shortcut (this) so that when we invoke Activate below on the CommandView, and the command bubbles to us again,
-        // we can detect that it originated from us and not from the CommandView with IsBindingFromSelf before trying to call DispatchCommandFromSelf.
-        ICommandContext context = new CommandContext (ctx.Command, new WeakReference<View> (this), ctx.Binding);
-
-        // Disable bubbling
-        // TODO: Make API for CommandsToBubbleUp richer. Support adding & removing commands
-        IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
-        CommandsToBubbleUp = [];
-
-        if (subView.InvokeCommand (ctx.Command, context) is true)
-        {
-            // This is not expected;
-            throw new InvalidOperationException ("subView.InvokeCommand() returned true unexpectedly.");
-        }
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Back from subView.InvokeCommand");
-        CommandsToBubbleUp = tempCommandsToBubbleUp;
-
-        // By setting the Binding source to subView, neither IsFromCommandView nor IsBindingFromSelf will return true,
-        // letting the event raise fall through.
-        InvokeCommand (ctx.Command, new CommandContext (ctx.Command, new WeakReference<View> (subView), new CommandBinding ([ctx.Command])));
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Back from InvokeCommand");
-
-        // When the above InvokeCommand returns, the CommandView should have changed state (e.g., a CheckBox may have toggled its checked state).
-        // The call to this OnActivating should signal the event was handled, so the state doesn't change again.
-
-        return true;
     }
 
     /// <summary>
@@ -557,38 +456,6 @@ public class Shortcut : View, IOrientation, IDesignable
             return;
         }
     }
-
-    private bool IsBindingFromKeyView (ICommandContext ctx) =>
-
-        // Source == this means the event originated from clicking on Shortcut (not CommandView)
-        ctx.Binding?.Source is { } sourceView && sourceView == KeyView;
-
-    private bool IsBindingFromHelpView (ICommandContext ctx) =>
-
-        // Source == this means the event originated from clicking on Shortcut (not CommandView)
-        ctx.Binding?.Source is { } sourceView && sourceView == HelpView;
-
-    // Helper to check if command originated from Shortcut, the HelpView, or the KeyView mouse or keyboard binding
-    private bool IsBindingFromSelf (ICommandContext ctx)
-    {
-        if (IsBindingFromKeyView (ctx))
-        {
-            return true;
-        }
-
-        if (IsBindingFromHelpView (ctx))
-        {
-            return true;
-        }
-
-        // Source == this means the event originated from clicking on Shortcut (not CommandView)
-        return ctx.Binding?.Source is { } sourceView && sourceView == this;
-    }
-
-    // Helper to check if command context originated from the CommandView
-    // Both the command source and binding source must be from the CommandView
-    private bool IsFromCommandView (ICommandContext? ctx) =>
-        ctx?.TryGetSource (out View? ctxSource) is true && ctxSource == CommandView && ctx.Binding?.Source == CommandView;
 
     private void SetCommandViewDefaultLayout ()
     {

@@ -41,4 +41,10 @@ public interface ICommandContext
     ///     </para>
     /// </remarks>
     public ICommandBinding? Binding { get; }
+
+    /// <summary>
+    ///     Gets whether this command is being dispatched downward to a SubView. When <see langword="true"/>,
+    ///     <see cref="View.TryBubbleToSuperView"/> will skip bubbling, preventing re-entry.
+    /// </summary>
+    public bool IsBubblingDown { get; }
 }
