@@ -921,11 +921,11 @@ public class CharMap : View, IDesignable, IValue<Rune>
     }
 
     /// <inheritdoc/>
-    protected override void OnAccepted (CommandEventArgs args)
+    protected override void OnAccepted (ICommandContext? ctx)
     {
-        base.OnAccepted (args);
+        base.OnAccepted (ctx);
 
-        if (args.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             if (!HasFocus && CanFocus)
             {

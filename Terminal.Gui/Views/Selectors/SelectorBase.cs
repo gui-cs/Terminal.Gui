@@ -147,6 +147,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         {
             return true;
         }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         // Skip BubbleDown when:
         // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
@@ -172,13 +173,16 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         {
             return true;
         }
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-        if (args.Context?.Binding is MouseBinding mouseBinding && mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
-        {
-            return !DoubleClickAccepts;
-        }
-
-        return false;
+        return args.Context?.Binding switch
+               {
+                   { Source: { } source } when source == this => true,
+                   MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+                   KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
+                   null => false,
+                   _ => true
+               };
     }
 
     /// <summary>
@@ -206,6 +210,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             {
                 return;
             }
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({field}->{value})");
 
             field = value;
 
@@ -391,6 +396,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
                 ReadOnly = true,
+                CanFocus = false,
                 TabStop = TabBehavior
             };
 

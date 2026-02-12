@@ -95,15 +95,15 @@ public class MenuItem : Shortcut
     }
 
     /// <inheritdoc/>
-    protected override void OnAccepted (CommandEventArgs args)
+    protected override void OnAccepted (ICommandContext? ctx)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({TargetView?.Title})");
-        base.OnAccepted (args);
+        base.OnAccepted (ctx);
 
         // Translate the incoming command to Command
-        if (Command != Command.NotBound && args.Context is { })
+        if (Command != Command.NotBound && ctx is { })
         {
-            args.Context.Command = Command;
+            ctx.Command = Command;
         }
 
         if (TargetView is { })

@@ -452,9 +452,13 @@ public class MenuBar : Menu, IDesignable
     protected override bool OnAccepting (CommandEventArgs args)
     {
         // TODO: Ensure sourceMenuBar is actually one of our bar items
-        if (Visible && Enabled && args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
+        if (Visible
+            && Enabled
+            && args.Context?.Source?.TryGetTarget (out View? sourceView) == true
+            && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
         {
             Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title})");
+
             if (!CanFocus)
             {
                 Debug.Assert (!Active);
@@ -482,15 +486,17 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnAccepted (CommandEventArgs args)
+    protected override void OnAccepted (ICommandContext? ctx)
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
-        base.OnAccepted (args);
+        base.OnAccepted (ctx);
 
         View? sourceView = null;
-        if (args.Context?.Source?.TryGetTarget (out sourceView) == true && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
+
+        if (ctx?.Source?.TryGetTarget (out sourceView) == true && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
         {
             Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title}) - returning");
+
             return;
         }
 
@@ -677,5 +683,4 @@ public class MenuBar : Menu, IDesignable
             }
         }
     }
-
 }

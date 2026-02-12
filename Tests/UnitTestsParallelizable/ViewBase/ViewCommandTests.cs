@@ -180,10 +180,10 @@ public class ViewCommandTests
     {
         public int OnAcceptedCallCount { get; private set; }
 
-        protected override void OnAccepted (CommandEventArgs args)
+        protected override void OnAccepted (ICommandContext? ctx)
         {
             OnAcceptedCallCount++;
-            base.OnAccepted (args);
+            base.OnAccepted (ctx);
         }
     }
 
