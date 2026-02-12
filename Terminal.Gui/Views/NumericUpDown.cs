@@ -95,6 +95,11 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                             return false;
                         }
 
+                        if (InvokeCommand (Command.Activate) is true)
+                        {
+                            return true;
+                        }
+
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
                             Value = (T)helper!.Add (v, i);
@@ -109,6 +114,11 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                         if (type == typeof (object))
                         {
                             return false;
+                        }
+
+                        if (InvokeCommand (Command.Activate) is true)
+                        {
+                            return true;
                         }
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
@@ -139,7 +149,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         }
     }
 
-    private T? _value;
+    private T? _value = default;
 
     /// <summary>
     ///     Gets or sets the value that will be incremented or decremented.
@@ -156,11 +166,6 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         set
         {
             if (EqualityComparer<T?>.Default.Equals (_value, value))
-            {
-                return;
-            }
-
-            if (InvokeCommand (Command.Activate) is true)
             {
                 return;
             }
