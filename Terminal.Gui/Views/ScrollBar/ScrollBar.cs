@@ -68,6 +68,9 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         CanFocus = false;
 
+        // The scroll bar should not be visible until the ShowScroll is set to true
+        Visible = false;
+
         // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new OrientationHelper (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
@@ -97,6 +100,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
     private void ShowHide ()
     {
+        if (!ShowScroll)
+        {
+            return;
+        }
+
         if (AutoShow)
         {
             Visible = VisibleContentSize < ScrollableContentSize;
@@ -209,7 +217,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
                 if (!AutoShow)
                 {
-                    Visible = true;
+                    Visible = ShowScroll;
                 }
 
                 ShowHide ();
@@ -281,6 +289,38 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
             OnSizeChanged (value);
             ScrollableContentSizeChanged?.Invoke (this, new EventArgs<int> (in value));
+            SetNeedsLayout ();
+        }
+    }
+
+    /// <summary>
+    ///     Determines whether the scroll bar should be shown when is set to <see langword="true"/> or not shown when is set to
+    ///     <see langword="false"/>
+    ///     When is set to <see langword="true"/> and <see cref="AutoShow"/> is true and the dimension of the scroll bar is
+    ///     less than <see cref="ScrollableContentSize"/> the <see cref="View.Visible"/> will be set to true.
+    ///     When is set to <see langword="true"/> and <see cref="AutoShow"/> is true and the dimension of the scroll bar is
+    ///     greater than <see cref="ScrollableContentSize"/> the <see cref="View.Visible"/> will be set to false.
+    ///     When is set to <see langword="true"/> and <see cref="AutoShow"/> is false the <see cref="View.Visible"/> will
+    ///     always be set to true.
+    ///     When is set to <see langword="false"/> the scroll bar will not be shown regardless of the value of
+    ///     <see cref="AutoShow"/> and the dimension of the scroll bar compared to <see cref="ScrollableContentSize"/> and the
+    ///     <see cref="View.Visible"/> will always be set to false.
+    /// </summary>
+    /// <remarks>
+    ///     The default is <see langword="false"/>.
+    /// </remarks>
+    public bool ShowScroll
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+            field = value;
+
+            Visible = value;
             SetNeedsLayout ();
         }
     }

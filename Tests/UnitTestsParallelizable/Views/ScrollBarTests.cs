@@ -12,8 +12,75 @@ public class ScrollBarTests
         Assert.Equal (0, scrollBar.VisibleContentSize);
         Assert.Equal (0, scrollBar.GetSliderPosition ());
         Assert.Equal (0, scrollBar.Value);
+        Assert.False (scrollBar.ShowScroll);
         Assert.False (scrollBar.AutoShow);
     }
+
+    #region ShowScroll
+
+    [Fact]
+    public void ShowScroll_False_Is_Default_CorrectlyDoesNotShows ()
+    {
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 20 };
+        super.Add (scrollBar);
+        Assert.False (scrollBar.ShowScroll);
+        Assert.False (scrollBar.Visible);
+        super.Dispose ();
+    }
+
+    [Fact]
+    public void ShowScroll_True_And_AutoShow_True_CorrectlyShows_IfScrollableContentSizeIsLessOrEqualThanViewportSize ()
+    {
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 20, ShowScroll = true, AutoShow = true };
+        super.Add (scrollBar);
+        super.Layout ();
+
+        Assert.True (scrollBar.ShowScroll);
+        Assert.True (scrollBar.AutoShow);
+        Assert.False (scrollBar.Visible);
+
+        scrollBar.ScrollableContentSize = 19;
+        Assert.False (scrollBar.Visible);
+    }
+
+    [Fact]
+    public void ShowScroll_True_And_AutoShow_True_CorrectlyShows_IfScrollableContentSizeIsGreaterThanViewportSize ()
+    {
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 21, ShowScroll = true, AutoShow = true };
+        super.Add (scrollBar);
+        super.Layout ();
+
+        Assert.True (scrollBar.ShowScroll);
+        Assert.True (scrollBar.AutoShow);
+        Assert.True (scrollBar.Visible);
+
+        scrollBar.ScrollableContentSize = 22;
+        Assert.True (scrollBar.Visible);
+    }
+
+    [Fact]
+    public void ShowScroll_True_And_AutoShow_False_CorrectlyShows_RegardlessScrollableContentSizeAndViewportSize ()
+    {
+        var super = new Runnable { Id = "super", Width = 1, Height = 20 };
+        var scrollBar = new ScrollBar { ScrollableContentSize = 20, ShowScroll = true, AutoShow = false };
+        super.Add (scrollBar);
+        super.Layout ();
+
+        Assert.True (scrollBar.ShowScroll);
+        Assert.False (scrollBar.AutoShow);
+        Assert.True (scrollBar.Visible);
+
+        scrollBar.ScrollableContentSize = 19;
+        Assert.True (scrollBar.Visible);
+
+        scrollBar.ScrollableContentSize = 21;
+        Assert.True (scrollBar.Visible);
+    }
+
+    #endregion AutoShow
 
     #region AutoHide
 
@@ -24,9 +91,11 @@ public class ScrollBarTests
 
         var scrollBar = new ScrollBar ();
         super.Add (scrollBar);
+        Assert.False (scrollBar.ShowScroll);
         Assert.False (scrollBar.AutoShow);
-        Assert.True (scrollBar.Visible);
+        Assert.False (scrollBar.Visible);
 
+        scrollBar.ShowScroll = true;
         scrollBar.AutoShow = true;
         Assert.True (scrollBar.AutoShow);
         Assert.True (scrollBar.Visible);
@@ -50,11 +119,16 @@ public class ScrollBarTests
 
         var scrollBar = new ScrollBar { ScrollableContentSize = 20, AutoShow = false };
         super.Add (scrollBar);
+        Assert.False (scrollBar.ShowScroll);
         Assert.False (scrollBar.AutoShow);
-        Assert.True (scrollBar.Visible);
+        Assert.False (scrollBar.Visible);
 
-        // Should Hide if AutoSize = true, but should not hide if AutoSize = false
+        // Should Hide if AutoSize = true, but should not hide if ShowScroll = true and AutoSize = false
         scrollBar.ScrollableContentSize = 10;
+        Assert.False (scrollBar.Visible);
+
+        // Should Show
+        scrollBar.ShowScroll = true;
         Assert.True (scrollBar.Visible);
 
         super.Dispose ();
@@ -67,9 +141,11 @@ public class ScrollBarTests
 
         var scrollBar = new ScrollBar { ScrollableContentSize = 20 };
         super.Add (scrollBar);
+        Assert.False (scrollBar.ShowScroll);
         Assert.False (scrollBar.AutoShow);
-        Assert.True (scrollBar.Visible);
+        Assert.False (scrollBar.Visible);
 
+        scrollBar.ShowScroll = true;
         scrollBar.AutoShow = true;
 
         super.Layout (new (100, 100));
@@ -103,9 +179,11 @@ public class ScrollBarTests
 
         var scrollBar = new ScrollBar { ScrollableContentSize = 20, VisibleContentSize = 20 };
         super.Add (scrollBar);
+        Assert.False (scrollBar.ShowScroll);
         Assert.False (scrollBar.AutoShow);
-        Assert.True (scrollBar.Visible);
+        Assert.False (scrollBar.Visible);
 
+        scrollBar.ShowScroll = true;
         scrollBar.AutoShow = true;
 
         Assert.Equal (Orientation.Vertical, scrollBar.Orientation);
@@ -184,11 +262,44 @@ public class ScrollBarTests
     #region Position
 
     [Fact]
-    public void Position_Event_Cancels ()
+    public void Position_Event_IsIgnored_IfShowScrollIsFalse ()
     {
         var changingCount = 0;
         var changedCount = 0;
         var scrollBar = new ScrollBar ();
+        scrollBar.ScrollableContentSize = 5;
+        scrollBar.Frame = new Rectangle (0, 0, 1, 4); // Needs to be at least 4 for slider to move
+
+        scrollBar.ValueChanging += (s, e) =>
+                                   {
+                                       if (changingCount == 0)
+                                       {
+                                           e.Handled = true;
+                                       }
+
+                                       changingCount++;
+                                   };
+        scrollBar.ValueChanged += (s, e) => changedCount++;
+
+        Assert.False (scrollBar.ShowScroll);
+
+        scrollBar.Value = 1;
+        Assert.Equal (0, scrollBar.Value);
+        Assert.Equal (0, changingCount);
+        Assert.Equal (0, changedCount);
+
+        scrollBar.Value = 1;
+        Assert.Equal (0, scrollBar.Value);
+        Assert.Equal (0, changingCount);
+        Assert.Equal (0, changedCount);
+    }
+
+    [Fact]
+    public void Position_Event_Cancels ()
+    {
+        var changingCount = 0;
+        var changedCount = 0;
+        var scrollBar = new ScrollBar { ShowScroll = true };
         scrollBar.ScrollableContentSize = 5;
         scrollBar.Frame = new Rectangle (0, 0, 1, 4); // Needs to be at least 4 for slider to move
 
@@ -226,10 +337,24 @@ public class ScrollBarTests
     }
 
     [Fact]
-    public void ScrollableContentSizeChanged_Event ()
+    public void ScrollableContentSizeChanged_Event_IsIgnored_IfShowScrollIsFalse ()
     {
         var count = 0;
         var scrollBar = new ScrollBar ();
+        scrollBar.ScrollableContentSizeChanged += (s, e) => count++;
+
+        Assert.False (scrollBar.ShowScroll);
+
+        scrollBar.ScrollableContentSize = 10;
+        Assert.Equal (10, scrollBar.ScrollableContentSize);
+        Assert.Equal (0, count);
+    }
+
+    [Fact]
+    public void ScrollableContentSizeChanged_Event ()
+    {
+        var count = 0;
+        var scrollBar = new ScrollBar { ShowScroll = true };
         scrollBar.ScrollableContentSizeChanged += (s, e) => count++;
 
         scrollBar.ScrollableContentSize = 10;
