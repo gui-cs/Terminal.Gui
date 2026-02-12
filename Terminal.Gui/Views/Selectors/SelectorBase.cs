@@ -148,24 +148,16 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return true;
         }
 
-        if (Focused is null || args.Context?.TryGetSource (out View? ctxSource) is not true || ctxSource != this)
+        // Only bubble down when there's a Binding (user interaction).
+        // BubbleDown creates a context with Binding=null, which prevents re-entry
+        // when the checkbox's Activating event handler calls InvokeCommand back on the selector.
+        if (Focused is null || args.Context?.Binding is null || args.Context?.TryGetSource (out View? ctxSource) is not true || ctxSource != this)
         {
             return false;
         }
 
         // Bubble DOWN to the focused checkbox
-
-        // Disable bubbling
-        IReadOnlyList<Command> tempCommandsToBubbleUp = CommandsToBubbleUp;
-        CommandsToBubbleUp = [];
-        ICommandContext context = new CommandContext (args.Context.Command, null, null);
-
-        if (Focused?.InvokeCommand (args.Context.Command, context) is true)
-        {
-            // This is not expected;
-            throw new InvalidOperationException ("subViewToDispatch.InvokeCommand() returned true unexpectedly.");
-        }
-        CommandsToBubbleUp = tempCommandsToBubbleUp;
+        BubbleDown (Focused, args.Context);
 
         return false;
     }

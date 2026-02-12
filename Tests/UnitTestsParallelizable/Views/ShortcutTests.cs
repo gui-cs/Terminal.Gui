@@ -1049,20 +1049,9 @@ public class ShortcutTests
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        Button button = new ()
-        {
-            Title = "C",
-            NoDecorations = true,
-            NoPadding = true,
-            CanFocus = commandViewCanFocus
-        };
+        Button button = new () { Title = "C", NoDecorations = true, NoPadding = true, CanFocus = commandViewCanFocus };
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.A,
-            Text = "0",
-            CommandView = button
-        };
+        Shortcut shortcut = new () { Key = Key.A, Text = "0", CommandView = button };
 
         (runnable as View)?.Add (shortcut);
         app.Begin (runnable);

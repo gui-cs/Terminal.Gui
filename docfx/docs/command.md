@@ -243,6 +243,31 @@ flowchart TD
     check_padding --> |no| return_false
 ```
 
+#### `BubbleDown`
+
+`BubbleDown` is the inverse of `TryBubbleToSuperView`. Where bubbling up propagates an unhandled command from a SubView to its SuperView, `BubbleDown` dispatches a command from a SuperView down to a specific SubView with bubbling suppressed.
+
+```csharp
+protected bool? BubbleDown (View target, ICommandContext? ctx)
+```
+
+This method:
+1. Creates a new `CommandContext` with `IsBubblingDown = true` and no binding
+2. Invokes the command on the target
+3. Because `IsBubblingDown` is true, `TryBubbleToSuperView` in the target's Raise method skips bubbling, preventing infinite recursion
+
+`BubbleDown` is used by composite views (like `Shortcut` and `SelectorBase`) that need to forward a command to a SubView without the SubView's command bubbling back up to the SuperView that dispatched it.
+
+```mermaid
+flowchart LR
+    super["SuperView receives command"] --> bubble_down["BubbleDown(subView, ctx)"]
+    bubble_down --> new_ctx["Create CommandContext with IsBubblingDown=true"]
+    new_ctx --> invoke["subView.InvokeCommand(command, ctx)"]
+    invoke --> raise["SubView raises Activating/Accepting"]
+    raise --> try_bubble["TryBubbleToSuperView checks IsBubblingDown"]
+    try_bubble --> skip["IsBubblingDown=true → skip bubbling"]
+```
+
 #### `DefaultAcceptView`
 
 `DefaultAcceptView` is a special property on `View` that identifies the SubView that should receive `Command.Accept` when no other SubView handles it. By default, it returns the first `Button` SubView with `IsDefault = true`, but can be set explicitly.
@@ -411,52 +436,76 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
 
 `Shortcut` is a composite view that contains three SubViews: `CommandView`, `HelpView`, and `KeyView`. It uses `CommandsToBubbleUp = [Command.Activate, Command.Accept]` to receive commands from its SubViews.
 
-### The Dispatch Pattern
+### The BubbleDown Pattern
 
-Because `Shortcut` is a composite view, commands can originate from different SubViews (e.g., clicking on the `CommandView`, clicking on the `KeyView`, or pressing a hotkey on the `Shortcut` itself). The `Shortcut` uses two dispatch methods to coordinate command flow:
+Because `Shortcut` is a composite view, commands can originate from different SubViews (e.g., clicking on the `CommandView`, clicking on the `KeyView`, or pressing a hotkey on the `Shortcut` itself). The `Shortcut` uses `BubbleDown` to coordinate command flow.
 
-#### `DispatchCommandFromSubview`
+When a command arrives at `Shortcut` via `OnActivating` or `OnAccepting`, the Shortcut checks the command's binding source:
 
-When a command originates from the `CommandView` (detected by `IsFromCommandView`), `Shortcut` needs to:
+- **From `CommandView`** (binding source is the `CommandView`): The `CommandView` already processed the command (e.g., a `CheckBox` toggled itself). The Shortcut skips `BubbleDown` to avoid double-processing.
+- **From Shortcut itself, `HelpView`, or `KeyView`** (binding source exists but is not `CommandView`): The Shortcut calls `BubbleDown (CommandView, args.Context)` to forward the command to `CommandView` with bubbling suppressed, allowing `CommandView` to update its state.
+- **No binding** (programmatic `InvokeCommand`): The Shortcut skips `BubbleDown` since there is no user interaction to forward.
 
-1. **Temporarily disable bubbling** (set `CommandsToBubbleUp = []`)
-2. **Re-invoke the command on the CommandView** with `Source` set to `this` (the Shortcut), so the `CommandView` can update its state (e.g., toggle a CheckBox)
-3. **Re-enable bubbling**
-4. **Invoke the command on itself** with a binding source set to the subview, ensuring the event falls through the `OnActivating`/`OnAccepting` without re-dispatching
+```csharp
+protected override bool OnActivating (CommandEventArgs args)
+{
+    if (base.OnActivating (args))
+    {
+        return true;
+    }
 
-This prevents infinite recursion while ensuring both the `CommandView`'s state is updated and the `Shortcut`'s events are raised.
+    // Only bubble down when binding exists and source is not CommandView
+    if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+    {
+        BubbleDown (CommandView, args.Context);
+    }
 
-#### `DispatchCommandFromSelf`
-
-When a command originates from the `Shortcut` itself, `HelpView`, or `KeyView` (detected by `IsBindingFromSelf`), `Shortcut` needs to:
-
-1. **Temporarily disable bubbling**
-2. **Invoke the command on the `CommandView`** with `Source` set to `null`, so the `CommandView` can update its state
-3. **Re-enable bubbling**
-
-This ensures that interactions anywhere on the `Shortcut` (not just the `CommandView`) still cause the `CommandView` to update its state.
+    return false;
+}
+```
 
 #### Flow Diagram
 
 ```mermaid
 flowchart TD
-    input["User action on Shortcut"] --> check_from{"Where did command originate?"}
+    input["User action on Shortcut"] --> check_binding{"Has Binding with Source?"}
 
-    check_from --> |CommandView| from_cv["DispatchCommandFromSubview"]
-    from_cv --> disable1["Disable bubbling"]
-    disable1 --> invoke_cv1["Invoke on CommandView (Source=Shortcut)"]
-    invoke_cv1 --> enable1["Re-enable bubbling"]
-    enable1 --> invoke_self["Invoke on Shortcut (Source=CommandView)"]
-    invoke_self --> raise_events["Shortcut raises Activating/Accepting"]
-    raise_events --> done1["return true (handled)"]
+    check_binding --> |No binding| skip["Skip BubbleDown (programmatic invoke)"]
+    skip --> raise_events1["Shortcut raises Activating/Accepting normally"]
 
-    check_from --> |Shortcut/KeyView/HelpView| from_self["DispatchCommandFromSelf"]
-    from_self --> disable2["Disable bubbling"]
-    disable2 --> invoke_cv2["Invoke on CommandView (Source=null)"]
-    invoke_cv2 --> enable2["Re-enable bubbling"]
-    enable2 --> done2["return false (let Shortcut's handler continue)"]
+    check_binding --> |Yes| check_source{"Binding.Source == CommandView?"}
 
-    check_from --> |Other view| passthrough["Fall through - raise events normally"]
+    check_source --> |Yes - from CommandView| skip2["Skip BubbleDown (CommandView already processed)"]
+    skip2 --> raise_events2["Shortcut raises Activating/Accepting normally"]
+
+    check_source --> |No - from Shortcut/HelpView/KeyView| bubble["BubbleDown(CommandView, ctx)"]
+    bubble --> invoke["CommandView.InvokeCommand with IsBubblingDown=true"]
+    invoke --> cv_update["CommandView updates state (e.g., CheckBox toggles)"]
+    cv_update --> no_rebubble["TryBubbleToSuperView skips (IsBubblingDown=true)"]
+    no_rebubble --> raise_events3["Shortcut raises Activating/Accepting normally"]
+```
+
+### SelectorBase Command Dispatching
+
+`SelectorBase` (used by `OptionSelector` and `FlagSelector`) follows the same `BubbleDown` pattern. When `SelectorBase` receives a `Command.Activate`, it forwards it to the focused `CheckBox` SubView using `BubbleDown`:
+
+```csharp
+protected override bool OnActivating (CommandEventArgs args)
+{
+    if (base.OnActivating (args))
+    {
+        return true;
+    }
+
+    if (Focused is null || args.Context?.TryGetSource (out View? ctxSource) is not true || ctxSource != this)
+    {
+        return false;
+    }
+
+    BubbleDown (Focused, args.Context);
+
+    return false;
+}
 ```
 
 ### Shortcut's `Action` Property
