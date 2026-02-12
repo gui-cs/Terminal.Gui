@@ -390,13 +390,13 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         {
             _valueField = new TextField
             {
+                CanFocus = false,
+
                 Id = "valueField",
                 Text = Value.ToString ()!,
-
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
                 ReadOnly = true,
-                CanFocus = false,
                 TabStop = TabBehavior
             };
 

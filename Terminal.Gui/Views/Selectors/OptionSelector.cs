@@ -73,8 +73,9 @@ public class OptionSelector : SelectorBase, IDesignable
         checkbox.RadioStyle = true;
 
         checkbox.Activating += OnCheckboxOnActivating;
-        checkbox.Accepting += OnCheckboxOnAccepting;
+        checkbox.Accepted += CheckboxOnAccepted;
     }
+
 
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
@@ -113,7 +114,7 @@ public class OptionSelector : SelectorBase, IDesignable
         args.Handled = true;
     }
 
-    private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
+    private void CheckboxOnAccepted (object? sender, CommandEventArgs e)
     {
         if (sender is not CheckBox checkbox)
         {

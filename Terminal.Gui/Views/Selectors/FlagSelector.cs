@@ -1,7 +1,9 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui.Views;
 
-// DoubleClick - Focus, Select (Toggle), and Accept the item under the mouse.
-// Click - Focus, Select (Toggle), and do NOT Accept the item under the mouse.
+// DoubleClick - Focus, Activate, and Accept the item under the mouse (CanFocus or not)
+// Click - Focus, Activate, and do NOT Accept the item under the mouse (CanFocus or not).
 // Not Focused:
 //  HotKey - Restore Focus. Do NOT change Active.
 //  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
@@ -21,28 +23,68 @@ public class FlagSelector : SelectorBase, IDesignable
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
     /// </summary>
-    public FlagSelector () =>
+    public FlagSelector ()
+    {
+        //// Per spec: HotKey restores focus when not focused but does NOT change Active.
+        //// When already focused, HotKey is a no-op.
+        //// Replace DefaultHotKeyHandler so the HandlingHotKey event fires
+        //// but Activate is NOT invoked (no flag toggle).
+        //AddCommand (Command.HotKey,
+        //            ctx =>
+        //            {
+        //                if (RaiseHandlingHotKey (ctx) is true)
+        //                {
+        //                    return true;
+        //                }
 
-        // Per spec: HotKey restores focus when not focused but does NOT change Active.
-        // When already focused, HotKey is a no-op.
-        // Replace DefaultHotKeyHandler so the HandlingHotKey event fires
-        // but Activate is NOT invoked (no flag toggle).
-        AddCommand (Command.HotKey,
-                    ctx =>
-                    {
-                        if (RaiseHandlingHotKey (ctx) is true)
-                        {
-                            return true;
-                        }
+        //                if (CanFocus && !HasFocus)
+        //                {
+        //                    SetFocus ();
+        //                }
 
-                        if (CanFocus && !HasFocus)
-                        {
-                            SetFocus ();
-                        }
+        //                // Do NOT invoke Activate - HotKey should not toggle flags.
+        //                return true;
+        //            });
+    }
 
-                        // Do NOT invoke Activate - HotKey should not toggle flags.
-                        return true;
-                    });
+
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) is not true || sourceView is not CheckBox checkBox)
+        {
+            return;
+        }
+
+        if (ctx.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)
+        {
+
+        }
+
+
+        int newValue = Value ?? 0;
+
+        if (checkBox.Value == CheckState.Checked)
+        {
+            if ((int)checkBox.Data! == 0)
+            {
+                newValue = 0;
+            }
+            else
+            {
+                newValue |= (int)checkBox.Data!;
+            }
+        }
+        else
+        {
+            newValue &= ~(int)checkBox.Data!;
+        }
+
+        Value = newValue;
+    }
 
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
@@ -57,8 +99,23 @@ public class FlagSelector : SelectorBase, IDesignable
         checkbox.RadioStyle = false;
 
         checkbox.ValueChanging += OnCheckboxOnValueChanging;
-        checkbox.ValueChanged += OnCheckboxOnValueChanged;
+        //checkbox.Activating += OnCheckboxOnActivating;
     }
+
+    //private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
+    //{
+    //    if (sender is not CheckBox checkbox)
+    //    {
+    //        return;
+    //    }
+    //    Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
+
+    //    // Bubble up
+    //    // TODO: This should not be needed. Figure out why SelectorBase bubble up is not handling this properly.
+    //    InvokeCommand (Command.Activate, args.Context);
+
+    //    args.Handled = true;
+    //}
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
     {
@@ -72,34 +129,6 @@ public class FlagSelector : SelectorBase, IDesignable
             // None flag was already checked; prevent changing again
             args.Handled = true;
         }
-    }
-
-    private void OnCheckboxOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-
-        int newValue = Value ?? 0;
-
-        if (checkbox.Value == CheckState.Checked)
-        {
-            if ((int)checkbox.Data! == 0)
-            {
-                newValue = 0;
-            }
-            else
-            {
-                newValue |= (int)checkbox.Data!;
-            }
-        }
-        else
-        {
-            newValue &= ~(int)checkbox.Data!;
-        }
-
-        Value = newValue;
     }
 
     /// <summary>

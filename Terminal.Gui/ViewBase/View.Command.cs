@@ -366,8 +366,8 @@ public partial class View // Command APIs
     ///         operation.
     ///     </para>
     /// </remarks>
-    /// <param name="args">The event arguments.</param>
-    protected virtual void OnAccepted (ICommandContext? args) { }
+    /// <param name="ctx"></param>
+    protected virtual void OnAccepted (ICommandContext? ctx) { }
 
     /// <summary>
     ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not

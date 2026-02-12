@@ -311,7 +311,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnAccepted (ICommandContext? args) => Action?.Invoke ();
+    protected override void OnAccepted (ICommandContext? ctx) => Action?.Invoke ();
 
     /// <summary>
     ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the

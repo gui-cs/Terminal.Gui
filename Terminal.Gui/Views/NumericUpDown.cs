@@ -30,6 +30,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
 
+        CanFocus = true;
+
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
@@ -79,8 +81,6 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             CanFocus = false,
             ShadowStyle = ShadowStyle.None
         };
-
-        CanFocus = true;
 
         _down.Accepting += OnDownButtonOnAccept;
         _up.Accepting += OnUpButtonOnAccept;
