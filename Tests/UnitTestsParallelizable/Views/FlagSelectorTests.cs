@@ -111,8 +111,10 @@ public class FlagSelectorTests
         Assert.Equal (1, selectorValueChanged);
     }
 
+    // Claude - Opus 4.6
+    // Per FlagSelector spec: HotKey when focused is a no-op (does NOT change Active)
     [Fact]
-    public void FlagSelector_Command_HotKey_Changes_Value_And_Activates ()
+    public void FlagSelector_Command_HotKey_WhenFocused_IsNoOp ()
     {
         using FlagSelector<SelectorStyles> flagSelector = new ();
 
@@ -132,13 +134,22 @@ public class FlagSelectorTests
         int selectorValueChanged = 0;
         flagSelector.ValueChanged += (_, _) => selectorValueChanged++;
 
-        // HotKey forwards to focused items Activate
-        flagSelector.InvokeCommand (Command.HotKey);
+        SelectorStyles? valueBefore = flagSelector.Value;
 
-        Assert.Equal (1, selectorActivatingRaised);
+        // Per spec: HotKey when focused is a no-op
+        bool? result = flagSelector.InvokeCommand (Command.HotKey);
+
+        // Custom HotKey handler returns true (handled)
+        Assert.True (result);
+
+        // HandlingHotKey event fires, but no Activate or value change
+        Assert.Equal (0, selectorActivatingRaised);
         Assert.Equal (1, selectorHotKeyRaised);
-        Assert.Equal (1, selectorValueChanged);
-        Assert.Equal (1, cbActivatingRaised);
+        Assert.Equal (0, selectorValueChanged);
+        Assert.Equal (0, cbActivatingRaised);
+
+        // Value should not change
+        Assert.Equal (valueBefore, flagSelector.Value);
     }
 
     // Tests for FlagSelector<TEnum>

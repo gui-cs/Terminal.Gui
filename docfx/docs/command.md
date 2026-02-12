@@ -16,28 +16,28 @@ This diagram shows the fundamental command invocation flow within a single view,
 
 ```mermaid
 flowchart TD
-    input["User input (key/mouse)"] --> invoke["View.InvokeCommand(command)"]
-    invoke --> |Command.Activate| act_pre["RaiseActivating: OnActivating + Activating event"]
-    invoke --> |Command.Accept| acc_pre["RaiseAccepting: OnAccepting + Accepting event"]
-    invoke --> |Command.HotKey| hk_pre["RaiseHandlingHotKey: OnHandlingHotKey + HandlingHotKey event"]
+    input[User input - key/mouse] --> invoke[View.InvokeCommand]
+    invoke --> |Command.Activate| act_pre[RaiseActivating]
+    invoke --> |Command.Accept| acc_pre[RaiseAccepting]
+    invoke --> |Command.HotKey| hk_pre[RaiseHandlingHotKey]
 
-    act_pre --> |handled| act_stop["Stop"]
-    act_pre --> |not handled| act_bubble["TryBubbleToSuperView"]
-    act_bubble --> |bubbled & handled| act_stop2["Stop"]
-    act_bubble --> |not bubbled| act_handler["SetFocus + RaiseActivated"]
-    act_handler --> act_done["Complete (returns false)"]
+    act_pre --> |handled| act_stop[Stop]
+    act_pre --> |not handled| act_bubble[TryBubbleToSuperView]
+    act_bubble --> |bubbled and handled| act_stop2[Stop]
+    act_bubble --> |not bubbled| act_handler[SetFocus + RaiseActivated]
+    act_handler --> act_done[Complete - returns false]
 
-    acc_pre --> |handled| acc_stop["Stop"]
-    acc_pre --> |not handled| acc_bubble["TryBubbleToSuperView (DefaultAcceptView + CommandsToBubbleUp)"]
-    acc_bubble --> |bubbled & handled| acc_stop2["Stop"]
-    acc_bubble --> |not bubbled| acc_handler["RaiseAccepted"]
-    acc_handler --> acc_done["Complete (returns false)"]
+    acc_pre --> |handled| acc_stop[Stop]
+    acc_pre --> |not handled| acc_bubble[TryBubbleToSuperView]
+    acc_bubble --> |bubbled and handled| acc_stop2[Stop]
+    acc_bubble --> |not bubbled| acc_handler[RaiseAccepted]
+    acc_handler --> acc_done[Complete - returns false]
 
-    hk_pre --> |handled| hk_stop["Stop"]
-    hk_pre --> |not handled| hk_bubble["TryBubbleToSuperView"]
-    hk_bubble --> |bubbled & handled| hk_stop2["Stop"]
-    hk_bubble --> |not bubbled| hk_handler["SetFocus + RaiseHotKeyCommand + InvokeCommand(Activate)"]
-    hk_handler --> hk_done["Complete (returns false)"]
+    hk_pre --> |handled| hk_stop[Stop]
+    hk_pre --> |not handled| hk_bubble[TryBubbleToSuperView]
+    hk_bubble --> |bubbled and handled| hk_stop2[Stop]
+    hk_bubble --> |not bubbled| hk_handler[SetFocus + RaiseHotKeyCommand + InvokeCommand Activate]
+    hk_handler --> hk_done[Complete - returns false]
 ```
 
 ## Activate/Accept/HotKey System Summary
@@ -67,8 +67,8 @@ The following table documents how `View` and each View subclass binds or handles
 | **TreeView** | `Command.Accept` | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (node selection) | `Command.Accept` |
 | **TextField** | OnKeyDown (inserts space) | `Command.Accept` | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
 | **TextView** | OnKeyDown (inserts space) | OnKeyDown (inserts newline) | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
-| **OptionSelector** | Forwards to SubView | `Command.Accept` | Forwards to SubView HotKey | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **FlagSelector** | Forwards to SubView | `Command.Accept` | Forwards to SubView HotKey | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **OptionSelector** | Forwards to SubView | `Command.Accept` | Restores focus, advances Active | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **FlagSelector** | Forwards to SubView | `Command.Accept` | Restores focus (no-op if focused) | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **Menu** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **MenuBar** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **MenuItem** | Base handler | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
@@ -116,7 +116,7 @@ The table shows how each view handles keyboard and mouse input using one of thes
 
 6. **Shortcut and Button Unified Handling**: Space, Enter, Clicked, and DoubleClicked all map to `Command.HotKey`, providing consistent activation behavior.
 
-7. **Selector Views** (OptionSelector, FlagSelector): These forward Space and HotKey inputs to the focused CheckBox's handlers, enabling keyboard-driven selection changes.
+7. **Selector Views** (OptionSelector, FlagSelector): Space is forwarded to the focused CheckBox via `BubbleDown`. HotKey behavior differs: OptionSelector restores focus and advances the active selection; FlagSelector restores focus (when not focused) but does not change active flags (no-op when focused).
 
 8. **Text Input Views** (TextField, TextView): These override OnKeyDown to handle Space (inserts space character) and OnMouseEvent for cursor positioning, text selection, and drag operations. Enter is bound to `Command.Accept` in TextField (submit), but handled directly in TextView (inserts newline).
 
@@ -225,21 +225,21 @@ All three `Raise` methods (`RaiseAccepting`, `RaiseActivating`, `RaiseHandlingHo
 
 ```mermaid
 flowchart TD
-    start["TryBubbleToSuperView(ctx, handled)"] --> check_handled{handled?}
-    check_handled --> |yes| return_true["return true"]
-    check_handled --> |no| check_accept{Command == Accept?}
-    check_accept --> |yes| check_default{"SuperView has DefaultAcceptView?"}
-    check_default --> |yes| invoke_default["Invoke Accept on DefaultAcceptView"]
-    invoke_default --> default_handled{handled?}
-    default_handled --> |yes| return_true2["return true"]
-    default_handled --> |no| check_bubble{"Command in SuperView.CommandsToBubbleUp?"}
+    start[TryBubbleToSuperView] --> check_handled{handled}
+    check_handled --> |yes| return_true[return true]
+    check_handled --> |no| check_accept{Command is Accept}
+    check_accept --> |yes| check_default{SuperView has DefaultAcceptView}
+    check_default --> |yes| invoke_default[Invoke Accept on DefaultAcceptView]
+    invoke_default --> default_handled{handled}
+    default_handled --> |yes| return_true2[return true]
+    default_handled --> |no| check_bubble{Command in CommandsToBubbleUp}
     check_default --> |no| check_bubble
     check_accept --> |no| check_bubble
-    check_bubble --> |yes| invoke_super["Invoke command on SuperView"]
-    check_bubble --> |no| check_padding{"SuperView is Padding?"}
-    check_padding --> |yes| check_parent{"Command in Padding.Parent.CommandsToBubbleUp?"}
-    check_parent --> |yes| invoke_parent["Invoke command on Padding.Parent"]
-    check_parent --> |no| return_false["return false"]
+    check_bubble --> |yes| invoke_super[Invoke command on SuperView]
+    check_bubble --> |no| check_padding{SuperView is Padding}
+    check_padding --> |yes| check_parent{Command in Parent CommandsToBubbleUp}
+    check_parent --> |yes| invoke_parent[Invoke command on Parent]
+    check_parent --> |no| return_false[return false]
     check_padding --> |no| return_false
 ```
 
@@ -260,12 +260,12 @@ This method:
 
 ```mermaid
 flowchart LR
-    super["SuperView receives command"] --> bubble_down["BubbleDown(subView, ctx)"]
-    bubble_down --> new_ctx["Create CommandContext with IsBubblingDown=true"]
-    new_ctx --> invoke["subView.InvokeCommand(command, ctx)"]
-    invoke --> raise["SubView raises Activating/Accepting"]
-    raise --> try_bubble["TryBubbleToSuperView checks IsBubblingDown"]
-    try_bubble --> skip["IsBubblingDown=true → skip bubbling"]
+    super[SuperView receives command] --> bubble_down[BubbleDown to subView]
+    bubble_down --> new_ctx[Create CommandContext with IsBubblingDown true]
+    new_ctx --> invoke[subView.InvokeCommand]
+    invoke --> raise[SubView raises Activating/Accepting]
+    raise --> try_bubble[TryBubbleToSuperView checks IsBubblingDown]
+    try_bubble --> skip[IsBubblingDown true - skip bubbling]
 ```
 
 #### `DefaultAcceptView`
@@ -468,21 +468,21 @@ protected override bool OnActivating (CommandEventArgs args)
 
 ```mermaid
 flowchart TD
-    input["User action on Shortcut"] --> check_binding{"Has Binding with Source?"}
+    input[User action on Shortcut] --> check_binding{Has Binding with Source}
 
-    check_binding --> |No binding| skip["Skip BubbleDown (programmatic invoke)"]
-    skip --> raise_events1["Shortcut raises Activating/Accepting normally"]
+    check_binding --> |No binding| skip[Skip BubbleDown - programmatic invoke]
+    skip --> raise_events1[Shortcut raises Activating/Accepting normally]
 
-    check_binding --> |Yes| check_source{"Binding.Source == CommandView?"}
+    check_binding --> |Yes| check_source{Binding.Source is CommandView}
 
-    check_source --> |Yes - from CommandView| skip2["Skip BubbleDown (CommandView already processed)"]
-    skip2 --> raise_events2["Shortcut raises Activating/Accepting normally"]
+    check_source --> |Yes - from CommandView| skip2[Skip BubbleDown - CommandView already processed]
+    skip2 --> raise_events2[Shortcut raises Activating/Accepting normally]
 
-    check_source --> |No - from Shortcut/HelpView/KeyView| bubble["BubbleDown(CommandView, ctx)"]
-    bubble --> invoke["CommandView.InvokeCommand with IsBubblingDown=true"]
-    invoke --> cv_update["CommandView updates state (e.g., CheckBox toggles)"]
-    cv_update --> no_rebubble["TryBubbleToSuperView skips (IsBubblingDown=true)"]
-    no_rebubble --> raise_events3["Shortcut raises Activating/Accepting normally"]
+    check_source --> |No - from Shortcut/HelpView/KeyView| bubble[BubbleDown to CommandView]
+    bubble --> invoke[CommandView.InvokeCommand with IsBubblingDown true]
+    invoke --> cv_update[CommandView updates state]
+    cv_update --> no_rebubble[TryBubbleToSuperView skips - IsBubblingDown true]
+    no_rebubble --> raise_events3[Shortcut raises Activating/Accepting normally]
 ```
 
 ### SelectorBase Command Dispatching

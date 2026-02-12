@@ -148,18 +148,21 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return true;
         }
 
-        // Only bubble down when there's a Binding (user interaction).
-        // BubbleDown creates a context with Binding=null, which prevents re-entry
-        // when the checkbox's Activating event handler calls InvokeCommand back on the selector.
-        if (Focused is null || args.Context?.Binding is null || args.Context?.TryGetSource (out View? ctxSource) is not true || ctxSource != this)
+        // Skip BubbleDown when:
+        // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
+        // - No Focused view to dispatch to
+        // - Source is a SubView that already bubbled up (not this selector)
+        if (args.Context?.IsBubblingDown == true
+            || Focused is null
+            || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
         {
             return false;
         }
 
-        // Bubble DOWN to the focused checkbox
-        BubbleDown (Focused, args.Context);
-
-        return false;
+        // Bubble DOWN to the focused checkbox.
+        // Return true if BubbleDown handled it, so derived classes (e.g. OptionSelector)
+        // don't also run their own logic (e.g. double-Cycle).
+        return BubbleDown (Focused, args.Context) is true;
     }
 
     /// <inheritdoc/>
@@ -176,17 +179,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
 
         return false;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
-    {
-        if (base.OnHandlingHotKey (args))
-        {
-            return true;
-        }
-
-        return InvokeCommand (Command.Activate, args.Context) is true;
     }
 
     /// <summary>
