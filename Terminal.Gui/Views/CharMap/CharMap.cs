@@ -94,11 +94,12 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // So, we do it manually on ViewportChanged events.
         ViewportChanged += (_, _) =>
                            {
-                               HorizontalScrollBar.Visible = Viewport.Width < GetContentSize ().Width;
+                               HorizontalScrollBar.ShowScroll = HorizontalScrollBar.Visible = Viewport.Width < GetContentSize ().Width;
                                UpdateCursor ();
                            };
 
         // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
+        VerticalScrollBar.ShowScroll = true;
         VerticalScrollBar.AutoShow = true;
         VerticalScrollBar.Visible = false;
         VerticalScrollBar.X = Pos.AnchorEnd ();

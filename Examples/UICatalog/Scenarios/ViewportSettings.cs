@@ -169,7 +169,7 @@ internal class ViewportSettingsDemoView : FrameView
         SetContentSize (new (60, 40));
         ViewportSettings |= ViewportSettingsFlags.ClearContentOnly;
         ViewportSettings |= ViewportSettingsFlags.ClipContentOnly;
-        VerticalScrollBar.Visible = true;
+        VerticalScrollBar.ShowScroll = true;
 
         // Things this view knows how to do
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));

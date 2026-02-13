@@ -36,7 +36,9 @@ public class EventLog : ListView
 
         Initialized += EventLog_Initialized;
 
+        HorizontalScrollBar.ShowScroll = true;
         HorizontalScrollBar.AutoShow = true;
+        VerticalScrollBar.ShowScroll = true;
         VerticalScrollBar.AutoShow = true;
 
         AddCommand (

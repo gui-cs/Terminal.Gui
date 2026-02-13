@@ -27,8 +27,10 @@ public sealed class ViewportSettingsEditor : EditorBase
             return;
         }
 
-        //ViewToEdit.VerticalScrollBar.AutoShow = true;
-        //ViewToEdit.HorizontalScrollBar.AutoShow = true;
+        ViewToEdit.VerticalScrollBar.ShowScroll = true;
+        ViewToEdit.VerticalScrollBar.AutoShow = true;
+        ViewToEdit.HorizontalScrollBar.ShowScroll = true;
+        ViewToEdit.HorizontalScrollBar.AutoShow = true;
 
         _contentSizeWidth!.Value = ViewToEdit.GetContentSize ().Width;
         _contentSizeHeight!.Value = ViewToEdit.GetContentSize ().Height;
@@ -65,9 +67,9 @@ public sealed class ViewportSettingsEditor : EditorBase
                                          ? CheckState.Checked
                                          : CheckState.UnChecked;
 
-        _cbVerticalScrollBar!.Value = ViewToEdit.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked;
+        _cbVerticalScrollBar!.Value = ViewToEdit.VerticalScrollBar.ShowScroll ? CheckState.Checked : CheckState.UnChecked;
         _cbAutoShowVerticalScrollBar!.Value = ViewToEdit.VerticalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked;
-        _cbHorizontalScrollBar!.Value = ViewToEdit.HorizontalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked;
+        _cbHorizontalScrollBar!.Value = ViewToEdit.HorizontalScrollBar.ShowScroll ? CheckState.Checked : CheckState.UnChecked;
         _cbAutoShowHorizontalScrollBar!.Value = ViewToEdit.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked;
     }
 
@@ -313,7 +315,7 @@ public sealed class ViewportSettingsEditor : EditorBase
         _cbVerticalScrollBar.ValueChanging += VerticalScrollBarToggle;
 
         void VerticalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea) =>
-            ViewToEdit!.VerticalScrollBar.Visible = rea.NewValue == CheckState.Checked;
+            ViewToEdit!.VerticalScrollBar.ShowScroll = rea.NewValue == CheckState.Checked;
 
         _cbAutoShowVerticalScrollBar = new CheckBox
         {
@@ -328,7 +330,7 @@ public sealed class ViewportSettingsEditor : EditorBase
         _cbHorizontalScrollBar.ValueChanging += HorizontalScrollBarToggle;
 
         void HorizontalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea) =>
-            ViewToEdit!.HorizontalScrollBar.Visible = rea.NewValue == CheckState.Checked;
+            ViewToEdit!.HorizontalScrollBar.ShowScroll = rea.NewValue == CheckState.Checked;
 
         _cbAutoShowHorizontalScrollBar = new CheckBox
         {

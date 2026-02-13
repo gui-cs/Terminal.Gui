@@ -11,13 +11,14 @@ public class AllViewsView : View
         BorderStyle = LineStyle.Heavy;
         Arrangement = ViewArrangement.Resizable;
         HorizontalScrollBar.AutoShow = false;
+        VerticalScrollBar.ShowScroll = true;
         VerticalScrollBar.AutoShow = true;
 
         SubViewsLaidOut += (sender, _) =>
                            {
                                if (sender is View sendingView)
                                {
-                                  sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
+                                   sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
                                }
                            };
 

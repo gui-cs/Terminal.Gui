@@ -38,7 +38,9 @@ public class WizardStep : View, IDesignable
     {
         // Help text goes in the right Padding
         // TODO: Enable built-in scrollbars for the help text view once TextView supports
+        //_helpTextView.VerticalScrollBar.ShowScroll = true;
         //_helpTextView.VerticalScrollBar.AutoShow = true;
+        //_helpTextView.HorizontalScrollBar.ShowScroll = true;
         //_helpTextView.HorizontalScrollBar.AutoShow = true;
         _helpTextView.Width = Dim.Func (_ => CalculateHelpPaddingWidth ());
 

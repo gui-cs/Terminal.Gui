@@ -50,7 +50,6 @@ public class HexEditor : Scenario
         _hexView.Arrangement = ViewArrangement.Resizable;
         _hexView.Edited += _hexView_Edited;
         _hexView.PositionChanged += _hexView_PositionChanged;
-        _hexView.VerticalScrollBar.AutoShow = false;
 
         _win.Add (_hexView);
 
@@ -151,7 +150,9 @@ public class HexEditor : Scenario
         };
         _win.Add (_statusBar);
 
+        _hexView.VerticalScrollBar.ShowScroll = true;
         _hexView.VerticalScrollBar.AutoShow = true;
+        _hexView.HorizontalScrollBar.ShowScroll = true;
         _hexView.HorizontalScrollBar.AutoShow = true;
 
         _hexView.Source = LoadFile ();

@@ -25,7 +25,9 @@ public sealed class TextStyles : Scenario
         };
 
         //appWindow.ContentSizeTracksViewport = false;
+        appWindow.VerticalScrollBar.ShowScroll = true;
         appWindow.VerticalScrollBar.AutoShow = true;
+        appWindow.HorizontalScrollBar.ShowScroll = true;
         appWindow.HorizontalScrollBar.AutoShow = true;
 
         appWindow.SubViewsLaidOut += (sender, _) =>
