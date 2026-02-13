@@ -135,10 +135,7 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
     /// </remarks>
     protected override void OnAccepted (ICommandContext? ctx)
     {
-        //if (base.OnAccepting (args))
-        //{
-        //    return true;
-        //}
+        base.OnAccepted (ctx);
 
         if (ResultExtractor is { })
         {

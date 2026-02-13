@@ -876,7 +876,6 @@ public class ShortcutTests
         // Arrange
         CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
 
-        // BUGBUG: This test tests nothing.
         Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);

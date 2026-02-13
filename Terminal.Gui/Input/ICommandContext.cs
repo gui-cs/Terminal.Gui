@@ -44,7 +44,14 @@ public interface ICommandContext
 
     /// <summary>
     ///     Gets whether this command is being dispatched downward to a SubView. When <see langword="true"/>,
-    ///     <see cref="View.TryBubbleToSuperView"/> will skip bubbling, preventing re-entry.
+    ///     <see cref="View.TryBubbleUpToSuperView"/> will skip bubbling, preventing re-entry.
     /// </summary>
     public bool IsBubblingDown { get; }
+
+    /// <summary>
+    ///     Gets whether this command is being dispatched upward to a SuperView. When <see langword="true"/>,
+    ///     <see cref="View.BubbleDown"/> will skip bubbling, preventing re-entry.
+    /// </summary>
+    public bool IsBubblingUp { get; }
+
 }

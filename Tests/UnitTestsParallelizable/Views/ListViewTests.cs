@@ -2701,11 +2701,10 @@ hree - lon",
     public void ListView_Command_HotKey_SetsFocus ()
     {
         ListView listView = new () { Source = new ListWrapper<string> (["Item1", "Item2"]) };
+        Assert.False (listView.HasFocus);
 
-        bool? result = listView.InvokeCommand (Command.HotKey);
-
-        // HotKey should set focus (returns !SetFocus() which is false on success)
-        Assert.False (result);
+        listView.InvokeCommand (Command.HotKey);
+        Assert.True (listView.HasFocus);
 
         listView.Dispose ();
     }

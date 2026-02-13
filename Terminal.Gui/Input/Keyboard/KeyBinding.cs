@@ -80,5 +80,5 @@ public record struct KeyBinding : ICommandBinding
     public View? Target { get; set; }
 
     /// <inheritdoc />
-    public override string ToString () => $"[{string.Join (", ", Commands)}], Key={Key}, Source={Source}, Target={Target}, Data={Data}";
+    public override string ToString () => $"[{string.Join (", ", Commands)}], Key={Key}{(Source is { } ? $", Source={Source.ToIdentifyingString ()}" : "")}{(Target is { } ? $", Source={Target.ToIdentifyingString ()}" : "")}{(Data is { } ? ", Data=" : "")}";
 }

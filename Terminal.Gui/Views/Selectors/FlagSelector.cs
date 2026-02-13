@@ -23,18 +23,20 @@ public class FlagSelector : SelectorBase, IDesignable
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
     /// </summary>
-    public FlagSelector () { }
-
-    /// <inheritdoc />
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    public FlagSelector ()
     {
-        if (base.OnHandlingHotKey (args))
-        {
-            return true;
-        }
+        KeyBindings.Remove (Key.Space);
+        KeyBindings.Remove (Key.Enter);
 
-        return HasFocus;
+        MouseBindings.Clear ();
     }
+
+    /// <summary>
+    ///     Overrides the base method to allow hotkeys to be handled when the selector itself has focus, so that
+    ///     hotkeys can be processed even if no specific item is focused.
+    /// </summary>
+    /// <param name="args">The command event arguments.</param>
+    protected override bool OnHandlingHotKey (CommandEventArgs args) => base.OnHandlingHotKey (args) || HasFocus;
 
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
@@ -45,18 +47,16 @@ public class FlagSelector : SelectorBase, IDesignable
         }
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-        return false;
-
+       // return false;
         // Skip BubbleDown when:
         // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
         // - No Focused view to dispatch to
         // - Source is a SubView that already bubbled up (not this selector)
         if (args.Context?.IsBubblingDown == true
             || Focused is null
-           // || args.Context?.Binding?.Commands.ContainsAnyExcept (Command.Activate) is true
             || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
         {
-            return true;
+            //return true;
         }
 
         // Bubble DOWN to the focused checkbox.
@@ -88,6 +88,10 @@ public class FlagSelector : SelectorBase, IDesignable
         //InvokeCommand (Command.Activate, args.Context);
 
         //args.Handled = true;
+        if (args.Context?.IsBubblingDown is true)
+        {
+            //args.Handled = true;
+        }
 
     }
 

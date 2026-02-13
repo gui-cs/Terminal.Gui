@@ -601,6 +601,8 @@ public partial class View // Keyboard APIs
             binding.Key = key;
         }
 
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({binding})");
+
         return InvokeCommands (binding.Commands, binding with { Source = this });
     }
 

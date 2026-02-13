@@ -45,5 +45,5 @@ public record struct MouseBinding : ICommandBinding
 
     /// <inheritdoc/>
     public override string ToString () =>
-        $"[{string.Join (", ", Commands)}] (MouseEvent={MouseEvent}, Source={Source.ToIdentifyingString ()}{(Data is { } ? ", Data=" : "")}";
+        $"[{string.Join (", ", Commands)}] (MouseEvent={MouseEvent}{(Source is { } ? $", Source={Source.ToIdentifyingString ()}" : "")}{(Data is { } ? ", Data=" : "")}";
 }

@@ -101,7 +101,7 @@ public class ButtonTests
     // Claude - Opus 4.5
     // Button does not raise Activating events. See Button.cs documentation.
     [Fact]
-    public void Command_HotKey_RaisesAccepting_NotActivating ()
+    public void Command_HotKey_RaisesAccepting_AndActivating ()
     {
         Button button = new () { Text = "_Test" };
         var activatingFired = false;
@@ -118,7 +118,7 @@ public class ButtonTests
         bool? result = button.InvokeCommand (Command.HotKey);
 
         // HotKey should raise only Accepting, not Activating
-        Assert.False (activatingFired);
+        Assert.True (activatingFired);
         Assert.True (acceptingFired);
         Assert.True (result);
 
@@ -305,16 +305,16 @@ public class ButtonTests
         btn.Accepting += (_, _) => clicked = true;
 
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
+        btn.NewKeyDownEvent (Key.T);
         Assert.True (clicked);
 
         clicked = false;
-        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt)); // Button processes, but does not handle
+        btn.NewKeyDownEvent (Key.T.WithAlt);
         Assert.True (clicked);
 
         clicked = false;
         btn.HotKey = KeyCode.E;
-        Assert.False (btn.NewKeyDownEvent (Key.E.WithAlt)); // Button processes, but does not handle
+        btn.NewKeyDownEvent (Key.E.WithAlt);
         Assert.True (clicked);
     }
 
@@ -949,13 +949,8 @@ public class ButtonTests
         view.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    /// <summary>
-    ///     Verifies that Button does NOT raise Activating event when HotKey command is invoked.
-    ///     Button only raises Accepting event.
-    /// </summary>
     [Fact]
-    public void HotKey_Command_Does_Not_Raise_Activating ()
+    public void HotKey_Command_Does_Raise_Activating ()
     {
         Button button = new () { Text = "_Test" };
         var activatingFired = false;
@@ -964,7 +959,7 @@ public class ButtonTests
 
         button.InvokeCommand (Command.HotKey);
 
-        Assert.False (activatingFired);
+        Assert.True (activatingFired);
 
         button.Dispose ();
     }

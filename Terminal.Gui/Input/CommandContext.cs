@@ -44,6 +44,9 @@ public record struct CommandContext : ICommandContext
     /// <inheritdoc/>
     public bool IsBubblingDown { get; init; }
 
+    /// <inheritdoc />
+    public bool IsBubblingUp { get; init; }
+
     /// <inheritdoc/>
-    public override string ToString () => $"{Command} (Source={Source.ToIdentifyingString ()}, Binding={Binding})";
+    public override string ToString () => $"{(IsBubblingUp ? Glyphs.UpArrow : IsBubblingDown ? Glyphs.DownArrow : "")}{Command} ({(Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "")}{(Binding is { } ? $", Binding={Binding}" : "")})";
 }

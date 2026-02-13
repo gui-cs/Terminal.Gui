@@ -420,11 +420,11 @@ public class Wizard : Dialog, IDesignable
     {
         if (CurrentStep == GetLastStep ())
         {
-            if (RaiseAccepting (e.Context) is false)
-            {
-                e.Handled = true;
-                RequestStop ();
-            }
+            //if (RaiseAccepting (e.Context) is false)
+            //{
+            //    e.Handled = true;
+            //    RequestStop ();
+            //}
         }
         else
         {

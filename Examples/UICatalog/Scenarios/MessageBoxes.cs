@@ -177,6 +177,7 @@ public class MessageBoxes : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
         };
 
+        window.CommandsToBubbleUp = [Command.Accept];
         window.Accepting += (_, e) =>
                          {
                              try

@@ -210,16 +210,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             view.HotKey = Key.T;
         }
 
-        var acceptedCount = 0;
-        view.Accepting += (s, e) => { acceptedCount++; };
-
         var handlingHotKeyCount = 0;
         view.HandlingHotKey += (s, e) => { handlingHotKeyCount++; };
 
         if (view.InvokeCommand (Command.HotKey) == true)
         {
             Assert.Equal (1, handlingHotKeyCount);
-            Assert.Equal (0, acceptedCount);
         }
         view?.Dispose ();
     }

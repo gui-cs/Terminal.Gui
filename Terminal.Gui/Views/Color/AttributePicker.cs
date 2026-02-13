@@ -78,6 +78,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
         TabStop = TabBehavior.TabStop;
         Height = Dim.Auto ();
         Width = Dim.Fill (0, minimumContentDim: 64);
+        CommandsToBubbleUp = [Command.Accept];
         SetupSubViews ();
     }
 

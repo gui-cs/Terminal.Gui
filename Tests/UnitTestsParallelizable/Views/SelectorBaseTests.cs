@@ -499,6 +499,13 @@ public class SelectorBaseTests
         app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (1, acceptCount);
+        Assert.Equal (0, selector.Value); // Should select the first option on double-click
+
+        checkBox = selector.SubViews.OfType<CheckBox> ().Last ();
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
+
+        Assert.Equal (2, acceptCount);
+        Assert.Equal (1, selector.Value); // Should select the 2nd option on double-click
     }
 
     [Fact]
@@ -523,6 +530,13 @@ public class SelectorBaseTests
         app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selector.Value);
+
+        checkBox = selector.SubViews.OfType<CheckBox> ().Last ();
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
+
+        Assert.Equal (0, acceptCount);
+        Assert.Equal (1, selector.Value); // Should select the second option on double-click
     }
 
     #endregion

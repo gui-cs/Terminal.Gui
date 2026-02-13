@@ -16,7 +16,7 @@ public static class WeakReferenceExtensions
         {
             if (weakRef is null || !weakRef.TryGetTarget (out View? view))
             {
-                return "(null)";
+                return "\0";
             }
 
             return view.ToIdentifyingString ();

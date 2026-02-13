@@ -7,7 +7,7 @@ public partial class TextView
         // Things this view knows how to do
 
         // TextView does nothing on the Accept command (multiline input)
-        //AddCommand (Command.Accept, () => true);
+        //AddCommand (Command.Accept, () => false);
 
         // Note - NewLine is only bound to Enter if Multiline is true
         AddCommand (Command.NewLine, ctx => ProcessEnterKey (ctx));
