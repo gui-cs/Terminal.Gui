@@ -283,17 +283,22 @@ public partial class TableView : View, IDesignable
     /// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
     public int ColumnOffset
     {
-        get => _columnsToRenderCache?.Count(c => c.X + c.Width < Viewport.X) ?? 0;
+        get => _columnsToRenderCache?.Count(c => c.X + c.Width <= Viewport.X) ?? 0;
         set
         {
-            if (value >= 0 && value < (_columnsToRenderCache?.Length ?? 0))
+            if (value < 0)
             {
-                int prev = ColumnOffset;
-                Viewport = Viewport with { X = _columnsToRenderCache [value].X };
-                if (prev != ColumnOffset)
-                {
-                    SetNeedsDraw ();
-                }
+                value = 0;
+            }
+            if (value >= (_columnsToRenderCache?.Length ?? 0))
+            {
+                value = (_columnsToRenderCache?.Length ?? 0) - 1;
+            }
+            int prev = ColumnOffset;
+            Viewport = Viewport with { X = _columnsToRenderCache [value].X };
+            if (prev != ColumnOffset)
+            {
+                SetNeedsDraw ();
             }
         }
     }
@@ -359,6 +364,8 @@ public partial class TableView : View, IDesignable
     }
 
     private ColumnToRender[] _columnsToRenderCache = null;
+
+    private bool inCalculatingContentSize = false;
 
     /// <summary>
     ///     This event is raised when a cell is activated e.g. by double-clicking or pressing
@@ -586,6 +593,8 @@ public partial class TableView : View, IDesignable
     /// <remarks>This always calls <see cref="View.SetNeedsDraw()"/></remarks>
     public void Update ()
     {
+        _columnsToRenderCache = null; //this will trigger a recalculation of the size and the columns when needed
+
         if (!IsInitialized || TableIsNullOrInvisible ())
         {
             SetNeedsDraw ();
@@ -593,7 +602,6 @@ public partial class TableView : View, IDesignable
             return;
         }
 
-        _columnsToRenderCache = null; //this will trigger a recalculation of the size and the columns when needed
         EnsureValidScrollOffsets ();
         EnsureValidSelection ();
         EnsureSelectedCellIsVisible ();
@@ -716,106 +724,116 @@ public partial class TableView : View, IDesignable
     private Size? CalculateContentSize ()
     {
         var contentSize = new Size (0, 0);
-        var headerHeight = GetHeaderHeightIfAny ();
-        var headerHeightVisible = CurrentHeaderHeightVisible ();
-        contentSize.Height += headerHeight + Table?.Rows ?? 0;
+        inCalculatingContentSize = true;
 
-        if (Style.ShowHorizontalBottomline)
+        try
         {
-            contentSize.Height++;
-        }
+            var headerHeight = GetHeaderHeightIfAny ();
+            var headerHeightVisible = CurrentHeaderHeightVisible ();
+            contentSize.Height += headerHeight + Table?.Rows ?? 0;
 
-        // we assume that padding is 0 here
-        var padding = 0;
-        var columnsToRender = new List<ColumnToRender> ();
-
-        if (Table != null)
-        {
-            List<(int colIdx, ColumnStyle colStyle)> nonHiddenColumns = Enumerable.Range (0, Table.Columns)
-                                                                                .Select(c => (colIdx: c, colStyle: Style.GetColumnStyleIfAny (c)))
-                                                                                .Where (e => e.colStyle?.Visible != false)
-                                                                                .ToList();
-
-            int lastColIdx = nonHiddenColumns.Any ()
-                                 ? nonHiddenColumns.Last ().colIdx
-                                 : -1;
-
-            //right border
-            contentSize.Width += (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
-
-            int startRow = 0;
-            int rowsToRender = Table.Rows;
-            if (!UseAllRowsForContentCalculation)
+            if (Style.ShowHorizontalBottomline)
             {
-                startRow = Style.AlwaysShowHeaders
-                    ? Viewport.Y
-                    : Math.Max (Viewport.Y - headerHeight, 0);
-
-                rowsToRender = Math.Min(Viewport.Height - headerHeightVisible, Table.Rows - startRow);
+                contentSize.Height++;
             }
 
-            // Calculate the content size based on the table's data
-            foreach ((int colIdx, ColumnStyle colStyle) in nonHiddenColumns)
+            // we assume that padding is 0 here
+            var padding = 0;
+            var columnsToRender = new List<ColumnToRender> ();
+
+            if (Table != null)
             {
-                int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle, startRow, rowsToRender) + padding;
-                int colWidth = maxContentSize + padding;
+                List<(int colIdx, ColumnStyle colStyle)> nonHiddenColumns = Enumerable.Range (0, Table.Columns)
+                                                                                    .Select (c => (colIdx: c, colStyle: Style.GetColumnStyleIfAny (c)))
+                                                                                    .Where (e => e.colStyle?.Visible != false)
+                                                                                    .ToList ();
 
-                if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
+                int lastColIdx = nonHiddenColumns.Any ()
+                                     ? nonHiddenColumns.Last ().colIdx
+                                     : -1;
+
+                //right border
+                contentSize.Width += (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
+
+                int startRow = 0;
+                int rowsToRender = Table.Rows;
+                if (!UseAllRowsForContentCalculation)
                 {
-                    if (MinCellWidth > MaxCellWidth)
+                    startRow = Style.AlwaysShowHeaders
+                        ? Viewport.Y
+                        : Math.Max (Viewport.Y - headerHeight, 0);
+
+                    rowsToRender = Math.Min (Viewport.Height - headerHeightVisible, Table.Rows - startRow);
+                }
+
+                // Calculate the content size based on the table's data
+                foreach ((int colIdx, ColumnStyle colStyle) in nonHiddenColumns)
+                {
+                    int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle, startRow, rowsToRender) + padding;
+                    int colWidth = maxContentSize + padding;
+
+                    if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
                     {
-                        colWidth = MaxCellWidth + padding;
+                        if (MinCellWidth > MaxCellWidth)
+                        {
+                            colWidth = MaxCellWidth + padding;
+                        }
+                        else
+                        {
+                            colWidth = MinCellWidth + padding;
+                        }
                     }
-                    else
+
+                    // ToDo: MinAcceptableWidth handling?
+                    // if (colStyle is { MinAcceptableWidth: > 0 }
+
+                    bool isVeryLast = colIdx == lastColIdx;
+
+                    if (isVeryLast)
                     {
-                        colWidth = MinCellWidth + padding;
+                        //remaining space for last column
+                        int remainingSpace = Viewport.Width - contentSize.Width - (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
+                        if (Style.ExpandLastColumn && colWidth < remainingSpace)
+                        {
+                            colWidth = remainingSpace;
+                        }
+                    }
+
+                    columnsToRender.Add (new ColumnToRender (colIdx, contentSize.Width, colWidth + 1, maxContentSize, lastColIdx == colIdx));
+
+                    contentSize.Width += colWidth;
+
+                    if (!isVeryLast)
+                    {
+                        // for separator symbols between columns
+                        contentSize.Width += 1;
                     }
                 }
 
-                // ToDo: MinAcceptableWidth handling?
-                // if (colStyle is { MinAcceptableWidth: > 0 }
-
-                bool isVeryLast = colIdx == lastColIdx;
-
-                if (isVeryLast)
-                {
-                    //remaining space for last column
-                    int remainingSpace = Viewport.Width - contentSize.Width - (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
-                    if (Style.ExpandLastColumn && colWidth < remainingSpace)
-                    {
-                        colWidth = remainingSpace;
-                    }
-                }
-
-                columnsToRender.Add (new ColumnToRender (colIdx, contentSize.Width, colWidth + 1, maxContentSize, lastColIdx == colIdx));
-
-                contentSize.Width += colWidth;
-
-                if (!isVeryLast)
-                {
-                    // for separator symbols between columns
-                    contentSize.Width += 1;
-                }
+                // for left border
+                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+            }
+            else
+            {
+                contentSize.Width = 0;
             }
 
-            // for left border
-            contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
-        }
-        else
-        {
-            contentSize.Width = 0;
-        }
+            _columnsToRenderCache = columnsToRender.ToArray ();
 
-        _columnsToRenderCache = columnsToRender.ToArray();
+            //check if it makes sense to scroll to left or up if the scrolled viewport is bigger than needed
+            if (Viewport.X + Viewport.Width > contentSize.Width)
+            {
+                Viewport = Viewport with { X = Math.Max (contentSize.Width - Viewport.Width, 0) };
+            }
+            if (Viewport.Y + Viewport.Height > contentSize.Height)
+            {
+                Viewport = Viewport with { Y = Math.Max (contentSize.Height - Viewport.Height, 0) };
+            }
 
-        //check if it makes sense to scroll to left or up if the scrolled viewport is bigger than needed
-        if (Viewport.X + Viewport.Width > contentSize.Width)
-        {
-            Viewport = Viewport with { X = Math.Max (contentSize.Width - Viewport.Width, 0) };
         }
-        if (Viewport.Y + Viewport.Height > contentSize.Height) 
+        finally
         {
-            Viewport = Viewport with { Y = Math.Max (contentSize.Height - Viewport.Height, 0) };
+            inCalculatingContentSize = false;
         }
 
         return contentSize;

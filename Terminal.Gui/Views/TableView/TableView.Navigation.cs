@@ -51,6 +51,11 @@ public partial class TableView
     protected override void OnViewportChanged (DrawEventArgs e)
     {
         base.OnViewportChanged (e);
+
+        if (inCalculatingContentSize)
+        {
+            return;
+        }
         if (e.OldViewport.Size != e.NewViewport.Size ||
             !UseAllRowsForContentCalculation && e.OldViewport.Y != e.NewViewport.Y)
         {
