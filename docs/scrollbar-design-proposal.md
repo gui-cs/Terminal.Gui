@@ -1,10 +1,5 @@
 # Design Proposal: ViewportSettings-Driven ScrollBar Enablement
 
-**Issue:** [#4714](https://github.com/gui-cs/Terminal.Gui/issues/4714)
-**Supersedes:** PR #4715 (`ShowScroll` property approach)
-
----
-
 ## Problem Statement
 
 The current scrollbar system conflates three distinct concerns into two interacting booleans on `ScrollBar`:
@@ -41,14 +36,12 @@ Two distinct problems:
 
 2. **ScrollBar's own display policy is a boolean that can't represent its actual states.** `AutoShow` is not a toggle between two modes — it's a lossy encoding of three modes (manual, auto, always-visible) into a single bit.
 
-## Design Principles
+## Design Tenets
 
 1. **ViewportSettings is the single source of truth** for whether a View's built-in scrollbars are enabled. Scrollbar enablement *is* a viewport behavior.
 2. **ScrollBar gets a clean visibility policy enum** replacing the confusing `AutoShow` boolean. Every state is reachable, no side effects, no ratchets.
 3. **The View integration layer translates** between ViewportSettings flags and ScrollBar state. No circular dependencies.
 4. **ScrollBar works great standalone.** The new `VisibilityMode` enum is clearer than `AutoShow` for standalone usage too.
-
----
 
 ## Proposed Design
 
@@ -485,27 +478,8 @@ Affected files (~15):
 
 ### TextView: Special Case
 
-`TextView` has its own `ScrollBars` property that manually manages visibility. This can delegate to ViewportSettings internally:
+`TextView` has its own `ScrollBars` property that manually manages visibility. This should be deleted and users of `ScrollBars` should just set `ViewportSetttings`.
 
-```csharp
-public bool ScrollBars
-{
-    get => ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars);
-    set
-    {
-        if (value)
-        {
-            ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
-        }
-        else
-        {
-            ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
-        }
-    }
-}
-```
-
-The existing `UpdateHorizontalScrollBarVisibility()` logic for WordWrap interaction can remain. With the new design, it would set `VisibilityMode = Manual` on the horizontal scrollbar and control `Visible` directly when WordWrap is enabled, while the vertical scrollbar stays in `Auto` mode via the flag.
 
 ### AutoShow — Deprecation Path
 
@@ -516,21 +490,6 @@ The existing `UpdateHorizontalScrollBarVisibility()` logic for WordWrap interact
 | `AutoShow = true` | `VisibilityMode = ScrollBarVisibilityMode.Auto` |
 | `AutoShow = false` (initial) | `VisibilityMode = ScrollBarVisibilityMode.Manual` |
 | `AutoShow = false` (after true) | `VisibilityMode = ScrollBarVisibilityMode.Always` |
-
-Since this is a pre-release v2 alpha, a clean break is preferable to an `[Obsolete]` shim. If backward compatibility is required, `AutoShow` can be retained as:
-
-```csharp
-[Obsolete ("Use VisibilityMode instead.")]
-public bool AutoShow
-{
-    get => VisibilityMode == ScrollBarVisibilityMode.Auto;
-    set => VisibilityMode = value ? ScrollBarVisibilityMode.Auto : ScrollBarVisibilityMode.Always;
-}
-```
-
-Note: this shim maps `AutoShow = false` to `Always` (matching the current side effect) but cannot represent `Manual`. This is acceptable because code using `AutoShow = false` today already gets the `Always` behavior due to the `Visible = true` side effect.
-
----
 
 ## What Changes
 
@@ -553,27 +512,6 @@ Note: this shim maps `AutoShow = false` to `Always` (matching the current side e
 - ViewportSettings constraint enforcement logic
 - All existing `ViewportSettingsFlags` values and semantics
 - `ScrollBar.Visible` — still the actual visibility state
-
----
-
-## Why Not ShowScroll (PR #4715)?
-
-The `ShowScroll` approach:
-1. **Adds a View-level concern (enablement) to ScrollBar**, coupling it to its host
-2. **Creates a 3-boolean interaction matrix** (`ShowScroll x AutoShow x Visible` = 8 states) that is hard to document and test
-3. **Doesn't integrate with ViewportSettings**, where developers already configure viewport behavior
-4. **Keeps the confusing `AutoShow` boolean**, just adding another boolean on top
-5. **Is additive complexity** on ScrollBar rather than leveraging existing architecture
-
-The ViewportSettings + VisibilityMode approach:
-1. **Keeps ScrollBar clean** — it doesn't know or care about "enablement"
-2. **Uses an existing, well-understood mechanism** (flags enum on View) for the View-level concern
-3. **Replaces the confusing boolean** with a self-documenting enum for the ScrollBar-level concern
-4. **Gives independent per-axis control** via standard flag operations
-5. **Fits the mental model**: "this View has scrollbars" is a View property; "how does this scrollbar manage its visibility" is a ScrollBar property
-6. **Reduces total state space**: `(flag on/off) x (Manual/Auto/Always)` = 6 meaningful states vs `ShowScroll x AutoShow x Visible` = 8 states with several invalid/contradictory combinations
-
----
 
 ## Summary
 
