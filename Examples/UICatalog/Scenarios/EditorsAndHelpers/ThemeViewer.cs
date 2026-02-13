@@ -15,7 +15,9 @@ public class ThemeViewer : FrameView
         Width = Dim.Auto ();
         Title = $"{ThemeManager.Theme}";
 
+        VerticalScrollBar.ShowScroll = true;
         VerticalScrollBar.AutoShow = true;
+        HorizontalScrollBar.ShowScroll = true;
         HorizontalScrollBar.AutoShow = true;
 
         SubViewsLaidOut += (sender, _) =>

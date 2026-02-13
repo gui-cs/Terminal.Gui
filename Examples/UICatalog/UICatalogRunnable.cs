@@ -501,6 +501,7 @@ public sealed class UICatalogRunnable : Runnable
         categoryList.ValueChanged += CategoryView_SelectedChanged;
 
         // This enables the scrollbar by causing lazy instantiation to happen
+        categoryList.VerticalScrollBar.ShowScroll = true;
         categoryList.VerticalScrollBar.AutoShow = true;
 
         return categoryList;
@@ -724,7 +725,9 @@ public sealed class UICatalogRunnable : Runnable
             SelectedItem = 0,
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error)
         };
+        eventLog.HorizontalScrollBar.ShowScroll = true;
         eventLog.HorizontalScrollBar.AutoShow = true;
+        eventLog.VerticalScrollBar.ShowScroll = true;
         eventLog.VerticalScrollBar.AutoShow = true;
 
         Button okButton = new () { Text = "OK" };
