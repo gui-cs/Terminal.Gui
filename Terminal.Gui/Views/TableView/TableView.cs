@@ -281,20 +281,19 @@ public partial class TableView : View, IDesignable
     ///     the view.
     /// </summary>
     /// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
-#warning a candidate to remove
     public int ColumnOffset
     {
-        get;
-
-        // try to prevent this being set to an out-of-bounds column
+        get => _columnsToRenderCache?.Count(c => c.X + c.Width < Viewport.X) ?? 0;
         set
         {
-            int prev = field;
-            field = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
-
-            if (prev != field)
+            if (value >= 0 && value < (_columnsToRenderCache?.Length ?? 0))
             {
-                SetNeedsDraw ();
+                int prev = ColumnOffset;
+                Viewport = Viewport with { X = _columnsToRenderCache [value].X };
+                if (prev != ColumnOffset)
+                {
+                    SetNeedsDraw ();
+                }
             }
         }
     }
@@ -311,22 +310,29 @@ public partial class TableView : View, IDesignable
     /// <summary>The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/></summary>
     public string NullSymbol { get; set; } = "-";
 
-#warning a candidate to remove
-    private int _rowOffset;
-
     /// <summary>
     ///     Vertical scroll offset.  The index of the first row in <see cref="Table"/> to display in the first non header
     ///     line of the control when rendering the view.
     /// </summary>
     public int RowOffset
     {
-        get => _rowOffset;
+        get => Style.AlwaysShowHeaders
+                   ? Viewport.Y
+                   : Math.Max(Viewport.Y - GetHeaderHeightIfAny (), 0);
         set
         {
-            int prev = _rowOffset;
-            _rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+            var oldViewportY = Viewport.Y;
 
-            if (_rowOffset != prev)
+            Viewport = Viewport with
+            {
+                Y = value == 0
+                        ? 0
+                        : Style.AlwaysShowHeaders
+                            ? value
+                            : GetHeaderHeightIfAny () + value
+            };
+
+            if (Viewport.Y != oldViewportY)
             {
                 SetNeedsDraw ();
             }
@@ -745,7 +751,7 @@ public partial class TableView : View, IDesignable
                     ? Viewport.Y
                     : Math.Max (Viewport.Y - headerHeight, 0);
 
-                rowsToRender = Math.Min(Viewport.Height - headerHeightVisible, Table.Rows);
+                rowsToRender = Math.Min(Viewport.Height - headerHeightVisible, Table.Rows - startRow);
             }
 
             // Calculate the content size based on the table's data
@@ -801,6 +807,17 @@ public partial class TableView : View, IDesignable
         }
 
         _columnsToRenderCache = columnsToRender.ToArray();
+
+        //check if it makes sense to scroll to left or up if the scrolled viewport is bigger than needed
+        if (Viewport.X + Viewport.Width > contentSize.Width)
+        {
+            Viewport = Viewport with { X = Math.Max (contentSize.Width - Viewport.Width, 0) };
+        }
+        if (Viewport.Y + Viewport.Height > contentSize.Height) 
+        {
+            Viewport = Viewport with { Y = Math.Max (contentSize.Height - Viewport.Height, 0) };
+        }
+
         return contentSize;
     }
 

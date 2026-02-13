@@ -178,12 +178,30 @@ public partial class TableView
 
         if (colEnd is not null && SelectedColumn >= colEnd.Column)
         {
-            Viewport = Viewport with {X = Math.Min (selectedColToRender.X, selectedColToRender.X + selectedColToRender.Width - Viewport.Width)};
+            if (Style.SmoothHorizontalScrolling)
+            {
+                //bring selected col into view
+                Viewport = Viewport with { X = Math.Min (selectedColToRender.X, selectedColToRender.X + selectedColToRender.Width - Viewport.Width) };
+            }
+            else
+            {
+                //bring selected col to start of viewport
+                Viewport = Viewport with { X = selectedColToRender.X };
+            }
         }
 
-        if (colStart is not null && SelectedColumn < colStart.Column)
+        if (colStart is null || SelectedColumn < colStart.Column)
         {
-            Viewport = Viewport with {X = selectedColToRender.X - 1};
+            if (Style.SmoothHorizontalScrolling)
+            {
+                //bring selected col into view
+                Viewport = Viewport with {X = selectedColToRender.X - 1};
+            }
+            else
+            {
+                //bring selected col to end of viewport
+                Viewport = Viewport with { X = selectedColToRender.X - Math.Max(Viewport.Width - selectedColToRender.Width, 0) };
+            }
         }
     }
 
