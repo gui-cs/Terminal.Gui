@@ -147,7 +147,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             return true;
         }
 
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is true && (Buttons.Contains (sourceView as Button) || sourceView == this))
+        if (args.Context?.Binding?.Source is { } sourceView)
         {
             RequestStop ();
 

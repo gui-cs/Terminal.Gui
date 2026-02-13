@@ -856,10 +856,10 @@ public class ViewCommandTests
     public void DefaultAcceptView_Peer_Accept_Bubbles_To_DefaultAcceptView ()
     {
         View superView = new () { CanFocus = true };
-        AcceptTargetTestView subView = new () { IsDefault = false, Id = "subView", CanFocus = true };
+        AcceptTargetTestView nonDefaultAcceptView = new () { IsDefault = false, Id = "nonDefaultAcceptView", CanFocus = true };
         AcceptTargetTestView defaultAcceptView = new () { IsDefault = true, Id = "defaultAcceptView", CanFocus = true };
 
-        superView.Add (subView);
+        superView.Add (nonDefaultAcceptView);
         superView.Add (defaultAcceptView);
         superView.CommandsToBubbleUp = [Command.Accept];
         superView.DefaultAcceptView = defaultAcceptView;
@@ -870,17 +870,57 @@ public class ViewCommandTests
         defaultAcceptView.Accepted += (_, _) => defaultAcceptViewAcceptedCount++;
 
         var subViewAcceptingCount = 0;
+        nonDefaultAcceptView.Accepting += (_, _) => subViewAcceptingCount++;
+
+        var superViewAcceptingCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCount++;
+
+        var superViewAcceptedCount = 0;
+        superView.Accepted += (_, _) => superViewAcceptedCount++;
+
+        nonDefaultAcceptView.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, superViewAcceptingCount);
+        Assert.Equal (1, superViewAcceptedCount);
+        Assert.Equal (1, subViewAcceptingCount);
+        Assert.Equal (1, defaultAcceptViewAcceptingCount);
+        Assert.Equal (1, defaultAcceptViewAcceptedCount);
+    }
+
+    [Fact]
+    public void DefaultAcceptView_Non_IAcceptTarget_Peer_Accept_Bubbles_To_DefaultAcceptView ()
+    {
+        View superView = new () { CanFocus = true };
+        View subView = new () { Id = "subView", CanFocus = true };
+        AcceptTargetTestView defaultAcceptView = new () { IsDefault = true, Id = "defaultAcceptView", CanFocus = true };
+
+        superView.Add (subView);
+        superView.Add (defaultAcceptView);
+        superView.CommandsToBubbleUp = [Command.Accept];
+        superView.DefaultAcceptView = defaultAcceptView;
+
+        var defaultAcceptViewAcceptingCount = 0;
+        defaultAcceptView.Accepting += (_, _) => defaultAcceptViewAcceptingCount++;
+
+        var defaultAcceptViewAcceptedCount = 0;
+        defaultAcceptView.Accepted += (_, _) => defaultAcceptViewAcceptedCount++;
+
+        var subViewAcceptingCount = 0;
         subView.Accepting += (_, _) => subViewAcceptingCount++;
 
         var superViewAcceptingCount = 0;
         superView.Accepting += (_, _) => superViewAcceptingCount++;
 
+        var superViewAcceptedCount = 0;
+        superView.Accepted += (_, _) => superViewAcceptedCount++;
+
         subView.InvokeCommand (Command.Accept);
 
         Assert.Equal (1, superViewAcceptingCount);
+        Assert.Equal (1, superViewAcceptedCount);
         Assert.Equal (1, subViewAcceptingCount);
-        Assert.Equal (0, defaultAcceptViewAcceptingCount);
-        Assert.Equal (0, defaultAcceptViewAcceptedCount);
+        Assert.Equal (1, defaultAcceptViewAcceptingCount);
+        Assert.Equal (1, defaultAcceptViewAcceptedCount);
     }
 
     [Fact]

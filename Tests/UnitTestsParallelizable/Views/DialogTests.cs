@@ -1495,7 +1495,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         }
     }
 
-    [Fact]  
+    [Fact]
     public void Generic_Modal_Dialog_Command_Accept_BubblesUp_TestDateDialog ()
     {
         using IApplication app = Application.Create ();
@@ -1549,6 +1549,65 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             app.Iteration -= AppOnIteration;
 
 
+            Assert.True (dialog.StopRequested);
+        }
+    }
+
+
+    [Fact]
+    public void Generic_Modal_Dialog_DatePicker_Accept_BubblesUp_TestDateDialog ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using TestDateDialog dialog = new ();
+        DatePicker datePicker = dialog.SubViews.OfType<DatePicker> ().FirstOrDefault () ?? throw new InvalidOperationException ("DatePicker not found in dialog.");
+        dialog.Title = "Test";
+        DateTime newDateTime = dialog.SelectedDate.AddYears (1);
+
+        dialog.SelectedDate = newDateTime;
+
+        Button cancelButton = new () { Text = "Cancel" };
+        dialog.AddButton (cancelButton);
+        Button okButton = new () { Text = "OK" };
+        dialog.AddButton (okButton);
+
+        int dialogAcceptedFired = 0;
+
+        dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
+
+        int cancelAcceptingFired = 0;
+        cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
+
+        int cancelAcceptedFired = 0;
+        cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
+
+        int okAcceptingFired = 0;
+        okButton.Accepting += (_, e) => { okAcceptingFired++; };
+
+        int okAcceptedFired = 0;
+        okButton.Accepted += (_, e) => { okAcceptedFired++; };
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.Equal (1, dialogAcceptedFired);
+        Assert.Equal (0, cancelAcceptingFired);
+        Assert.Equal (0, cancelAcceptedFired);
+        Assert.Equal (1, okAcceptingFired);
+        Assert.Equal (1, okAcceptedFired);
+        Assert.Equal (newDateTime, dialog.Result);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            datePicker.InvokeCommand (Command.Accept);
+
+            // Just in case
+            app.Iteration -= AppOnIteration;
+            
             Assert.True (dialog.StopRequested);
         }
     }
