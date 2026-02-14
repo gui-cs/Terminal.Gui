@@ -90,7 +90,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
 
         // We want the horizontal scrollbar to only show when needed.
-        // We can't use ScrollBar.Auto because we are using custom ContentSize
+        // We can't use ScrollBarVisibilityMode.Auto because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
         ViewportChanged += (_, _) =>
                            {
@@ -100,7 +100,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
         // Set up the vertical scrollbar with auto-show behavior.
         ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
-        VerticalScrollBar.Visible = false;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
 
