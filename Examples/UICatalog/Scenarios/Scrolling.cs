@@ -98,23 +98,26 @@ public class Scrolling : Scenario
 
         void WinOnInitialized (object? sender, EventArgs e)
         {
+            _progressTimer = app.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
+
+            return;
+
             bool TimerFn ()
             {
                 progress.Pulse ();
 
                 return _progressTimer is { };
             }
-
-            _progressTimer = app.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
         }
 
         void WinIsRunningChanged (object? sender, EventArgs<bool> args)
         {
-            if (!args.Value && _progressTimer is { })
+            if (args.Value || _progressTimer is null)
             {
-                app.RemoveTimeout (_progressTimer);
-                _progressTimer = null;
+                return;
             }
+            app.RemoveTimeout (_progressTimer);
+            _progressTimer = null;
         }
     }
 }

@@ -102,24 +102,27 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             case ScrollBarVisibilityMode.Auto:
                 // If this scrollbar lives in a View's Padding, respect the View's
                 // ViewportSettings as the authority on whether it should be enabled.
-                if (SuperView is Padding padding && padding.Parent is View ownerView)
+                if (SuperView is Padding { Parent: { } ownerView })
                 {
                     ViewportSettingsFlags requiredFlag = Orientation == Orientation.Vertical
-                        ? ViewportSettingsFlags.HasVerticalScrollBar
-                        : ViewportSettingsFlags.HasHorizontalScrollBar;
+                                                             ? ViewportSettingsFlags.HasVerticalScrollBar
+                                                             : ViewportSettingsFlags.HasHorizontalScrollBar;
 
                     if (!ownerView.ViewportSettings.HasFlag (requiredFlag))
                     {
                         Visible = false;
+
                         break;
                     }
                 }
 
                 Visible = VisibleContentSize < ScrollableContentSize;
+
                 break;
 
             case ScrollBarVisibilityMode.Always:
                 Visible = true;
+
                 break;
 
             case ScrollBarVisibilityMode.Manual:
@@ -212,8 +215,6 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// </remarks>
     public int Increment { get; set; } = 1;
 
-    private ScrollBarVisibilityMode _visibilityMode;
-
     /// <summary>
     ///     Gets or sets how this <see cref="ScrollBar"/> manages its own <see cref="View.Visible"/> state.
     /// </summary>
@@ -231,15 +232,16 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// </remarks>
     public ScrollBarVisibilityMode VisibilityMode
     {
-        get => _visibilityMode;
+        get;
         set
         {
-            if (_visibilityMode != value)
+            if (field == value)
             {
-                _visibilityMode = value;
-                ShowHide ();
-                SetNeedsLayout ();
+                return;
             }
+            field = value;
+            ShowHide ();
+            SetNeedsLayout ();
         }
     }
 
@@ -559,11 +561,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
 #if PROPORTIONAL_SCROLL_JUMP
         // TODO: This logic mostly works to provide a proportional jump. However, the math
-        // TODO: falls apart in edge cases. Most other scroll bars (e.g. Windows) do not do proportional
+        // TODO: falls apart in edge cases. Most scroll bars (e.g. Windows) do not do proportional
         // TODO: Thus, this is disabled; we just jump a page each click.
         // Ratio of the distance to the viewport dimension
         double ratio = (double)Math.Abs (distanceFromCenter) / (VisibleContentSize);
-        // Jump size based on the ratio and the total content size
+        // Jump based on the ratio and the total content size
         int jump = (int)(ratio * (Size - VisibleContentSize));
 #else
         int jump = VisibleContentSize;

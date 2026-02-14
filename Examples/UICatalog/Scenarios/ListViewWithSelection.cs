@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
-using JetBrains.Annotations;
 
 namespace UICatalog.Scenarios;
 
@@ -90,15 +89,12 @@ public class ListViewWithSelection : Scenario
         _eventListView.SchemeName = "Runnable";
         _appWindow.Add (_eventListView);
 
-        _listView?.ValueChanged += (s, a) => LogEvent (s as View, $"ValueChanged: {a.OldValue} -> {a.NewValue}");
-        _listView?.CollectionChanged += (s, a) => LogEvent (s as View, $"CollectionChanged: {a}");
-        _listView?.Accepting += (s, a) => LogEvent (s as View, $"Accept: {a}");
-        _listView?.Activating += (s, a) => LogEvent (s as View, $"Activate: {a}");
+        _listView?.ValueChanged += (_, a) => LogEvent ($"ValueChanged: {a.OldValue} -> {a.NewValue}");
+        _listView?.CollectionChanged += (_, a) => LogEvent ($"CollectionChanged: {a}");
+        _listView?.Accepting += (_, a) => LogEvent ($"Accept: {a}");
+        _listView?.Activating += (_, a) => LogEvent ($"Activate: {a}");
 
-        if (_listView is { })
-        {
-            _listView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
-        }
+        _listView?.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         _listView?.Initialized += (_, _) => _viewportSettingsEditor.ViewToEdit = _listView;
 
@@ -107,13 +103,11 @@ public class ListViewWithSelection : Scenario
 
         return;
 
-        bool? LogEvent (View? _, string message)
+        void LogEvent (string message)
         {
             var msg = $"{message}";
             _eventList.Add (msg);
             _eventListView.MoveDown ();
-
-            return null;
         }
     }
 
@@ -258,11 +252,7 @@ public class ListViewWithSelection : Scenario
 
             used = RenderString (listView, used, width, rowAttribute, $"{Scenarios! [item].GetName ()}: ");
 
-            used = RenderString (listView,
-                                 used,
-                                 width + viewportX,
-                                 rowAttribute with { Style = TextStyle.Italic },
-                                 $"{Scenarios [item].GetDescription ()}");
+            used = RenderString (listView, used, width + viewportX, rowAttribute with { Style = TextStyle.Italic }, $"{Scenarios [item].GetDescription ()}");
 
             while (used < width + viewportX)
             {

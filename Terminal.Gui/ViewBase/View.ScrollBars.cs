@@ -38,7 +38,9 @@ public partial class View
     ///     <para>
     ///         See the Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
-    ///     </para>    /// </remarks>
+    ///     </para>
+    ///     ///
+    /// </remarks>
     public ScrollBar VerticalScrollBar => _verticalScrollBar.Value;
 
     /// <summary>
@@ -184,17 +186,13 @@ public partial class View
             return;
         }
 
-        SyncOneScrollBar (
-            oldFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
-            newFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
-            Orientation.Vertical
-        );
+        SyncOneScrollBar (oldFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
+                          newFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
+                          Orientation.Vertical);
 
-        SyncOneScrollBar (
-            oldFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
-            newFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
-            Orientation.Horizontal
-        );
+        SyncOneScrollBar (oldFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
+                          newFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
+                          Orientation.Horizontal);
     }
 
     private void SyncOneScrollBar (bool hadFlag, bool hasFlag, Orientation orientation)
@@ -210,11 +208,12 @@ public partial class View
             // Disabling: only if the scrollbar was ever created
             Lazy<ScrollBar> lazy = orientation == Orientation.Vertical ? _verticalScrollBar : _horizontalScrollBar;
 
-            if (lazy.IsValueCreated)
+            if (!lazy.IsValueCreated)
             {
-                lazy.Value.VisibilityMode = ScrollBarVisibilityMode.Manual;
-                lazy.Value.Visible = false;
+                return;
             }
+            lazy.Value.VisibilityMode = ScrollBarVisibilityMode.Manual;
+            lazy.Value.Visible = false;
         }
     }
 

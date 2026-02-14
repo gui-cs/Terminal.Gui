@@ -102,7 +102,12 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         void ViewportValueChanging (object? sender, ValueChangingEventArgs<Rectangle?> vea)
         {
-            if (vea.NewValue is null || vea.NewValue.Value.Width < 0 || vea.NewValue.Value.Height < 0 || vea.NewValue.Value.X < 0 || vea.NewValue.Value.Y < 0)
+            if (vea.NewValue is null
+                || vea.NewValue.Value.Width < 0
+                || vea.NewValue.Value.Height < 0
+                || vea.NewValue.Value.X < 0
+                || vea.NewValue.Value.Y < 0
+                || ViewToEdit is Adornment)
             {
                 vea.Handled = true;
 

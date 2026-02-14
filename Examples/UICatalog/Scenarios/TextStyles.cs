@@ -18,11 +18,9 @@ public sealed class TextStyles : Scenario
         app.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ()
-        {
-            Id = "appWindow",
-            Title = GetQuitKeyAndName ()
-        };
+        using Window appWindow = new ();
+        appWindow.Id = "appWindow";
+        appWindow.Title = GetQuitKeyAndName ();
 
         //appWindow.ContentSizeTracksViewport = false;
         appWindow.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
@@ -31,18 +29,15 @@ public sealed class TextStyles : Scenario
                                      {
                                          if (sender is View sendingView)
                                          {
-                                             sendingView.SetContentSize (new Size(sendingView.GetContentSize().Width, sendingView.GetHeightRequiredForSubViews()));
+                                             sendingView.SetContentSize (new Size (sendingView.GetContentSize ().Width,
+                                                                                   sendingView.GetHeightRequiredForSubViews ()));
                                          }
                                      };
 
         appWindow.DrawingContent += OnAppWindowOnDrawingContent;
         appWindow.DrawingSubViews += OnAppWindowOnDrawingSubviews;
 
-        _drawDirectly = new ()
-        {
-            Title = "_Draw styled text directly using DrawingContent vs. Buttons",
-            Value = CheckState.UnChecked
-        };
+        _drawDirectly = new () { Title = "_Draw styled text directly using DrawingContent vs. Buttons", Value = CheckState.UnChecked };
 
         appWindow.Add (_drawDirectly);
         AddButtons (appWindow);
@@ -55,10 +50,7 @@ public sealed class TextStyles : Scenario
     {
         var y = 1;
 
-        TextStyle [] allStyles = Enum.GetValues (typeof (TextStyle))
-                                     .Cast<TextStyle> ()
-                                     .Where (style => style != TextStyle.None)
-                                     .ToArray ();
+        TextStyle [] allStyles = Enum.GetValues (typeof (TextStyle)).Cast<TextStyle> ().Where (style => style != TextStyle.None).ToArray ();
 
         // Add individual flags as labels
         foreach (TextStyle style in allStyles)
@@ -67,20 +59,17 @@ public sealed class TextStyles : Scenario
 
             var button = new Button
             {
-                X = 0,
-                Y = y,
-                Title = $"{Enum.GetName (typeof (TextStyle), style)}",
-                Visible = _drawDirectly!.Value != CheckState.Checked
+                X = 0, Y = y, Title = $"{Enum.GetName (typeof (TextStyle), style)}", Visible = _drawDirectly!.Value != CheckState.Checked
             };
 
             button.GettingAttributeForRole += (sender, args) =>
                                               {
-                                                  if (sender is not Button buttonSender)
+                                                  if (sender is not Button)
                                                   {
                                                       return;
                                                   }
 
-                                                  if (args.Result is not null)
+                                                  if (args.Result is { })
                                                   {
                                                       args.Result = args.Result.Value with { Style = style };
                                                   }
@@ -104,11 +93,12 @@ public sealed class TextStyles : Scenario
 
             for (var bit = 0; bit < allStyles.Length; bit++)
             {
-                if ((i & (1 << bit)) != 0)
+                if ((i & (1 << bit)) == 0)
                 {
-                    combination |= allStyles [bit];
-                    styleNames.Add (Enum.GetName (typeof (TextStyle), allStyles [bit])!);
+                    continue;
                 }
+                combination |= allStyles [bit];
+                styleNames.Add (Enum.GetName (typeof (TextStyle), allStyles [bit])!);
             }
 
             // Skip individual flags
@@ -119,16 +109,11 @@ public sealed class TextStyles : Scenario
 
             y++;
 
-            var button = new Button
-            {
-                X = 0,
-                Y = y,
-                Text = $"[{string.Join (" | ", styleNames)}]",
-                Visible = _drawDirectly!.Value != CheckState.Checked
-            };
+            var button = new Button { X = 0, Y = y, Text = $"[{string.Join (" | ", styleNames)}]", Visible = _drawDirectly!.Value != CheckState.Checked };
+
             button.GettingAttributeForRole += (_, args) =>
                                               {
-                                                  if (args.Result is not null)
+                                                  if (args.Result is { })
                                                   {
                                                       args.Result = args.Result.Value with { Style = combination };
                                                   }
@@ -141,12 +126,12 @@ public sealed class TextStyles : Scenario
 
     private void OnAppWindowOnDrawingSubviews (object? sender, DrawEventArgs e)
     {
-        if (sender is not View sendingVioew)
+        if (sender is not View sendingView)
         {
             return;
         }
 
-        foreach (Button view in sendingVioew.SubViews.OfType<Button> ())
+        foreach (Button view in sendingView.SubViews.OfType<Button> ())
         {
             view.Visible = _drawDirectly!.Value != CheckState.Checked;
         }
@@ -156,73 +141,66 @@ public sealed class TextStyles : Scenario
 
     private void OnAppWindowOnDrawingContent (object? sender, DrawEventArgs args)
     {
-        if (sender is View { } sendingView && _drawDirectly!.Value == CheckState.Checked)
+        if (sender is not View { } sendingView || _drawDirectly!.Value != CheckState.Checked)
         {
-            int y = 2 - args.NewViewport.Y; // Start drawing below the checkbox
+            return;
+        }
+        int y = 2 - args.NewViewport.Y; // Start drawing below the checkbox
 
-            TextStyle [] allStyles = Enum.GetValues (typeof (TextStyle))
-                                         .Cast<TextStyle> ()
-                                         .Where (style => style != TextStyle.None)
-                                         .ToArray ();
+        TextStyle [] allStyles = Enum.GetValues (typeof (TextStyle)).Cast<TextStyle> ().Where (style => style != TextStyle.None).ToArray ();
 
-            // Draw individual flags, one per line
-            foreach (TextStyle style in allStyles)
+        // Draw individual flags, one per line
+        foreach (TextStyle style in allStyles)
+        {
+            string text = Enum.GetName (typeof (TextStyle), style)!;
+
+            sendingView.Move (0, y);
+
+            var attr = new Attribute (sendingView.GetAttributeForRole (VisualRole.Normal)) { Style = style };
+            sendingView.SetAttribute (attr);
+            sendingView.AddStr (text);
+
+            y++; // Move to the next line
+        }
+
+        // Add a blank line
+        y++;
+
+        // Generate all combinations of TextStyle (excluding individual flags)
+        int totalCombinations = 1 << allStyles.Length; // 2^n combinations
+
+        for (var i = 1; i < totalCombinations; i++) // Start from 1 to skip "None"
+        {
+            var combination = (TextStyle)0;
+            List<string> styleNames = [];
+
+            for (var bit = 0; bit < allStyles.Length; bit++)
             {
-                string text = Enum.GetName (typeof (TextStyle), style)!;
-
-                sendingView.Move (0, y);
-
-                var attr = new Attribute (sendingView.GetAttributeForRole (VisualRole.Normal))
-                {
-                    Style = style
-                };
-                sendingView.SetAttribute (attr);
-                sendingView.AddStr (text);
-
-                y++; // Move to the next line
-            }
-
-            // Add a blank line
-            y++;
-
-            // Generate all combinations of TextStyle (excluding individual flags)
-            int totalCombinations = 1 << allStyles.Length; // 2^n combinations
-
-            for (var i = 1; i < totalCombinations; i++) // Start from 1 to skip "None"
-            {
-                var combination = (TextStyle)0;
-                List<string> styleNames = [];
-
-                for (var bit = 0; bit < allStyles.Length; bit++)
-                {
-                    if ((i & (1 << bit)) != 0)
-                    {
-                        combination |= allStyles [bit];
-                        styleNames.Add (Enum.GetName (typeof (TextStyle), allStyles [bit])!);
-                    }
-                }
-
-                // Skip individual flags
-                if (styleNames.Count == 1)
+                if ((i & (1 << bit)) == 0)
                 {
                     continue;
                 }
-
-                var text = $"[{string.Join (" | ", styleNames)}]";
-
-                sendingView.Move (00, y);
-
-                var attr = new Attribute (sendingView.GetAttributeForRole (VisualRole.Normal))
-                {
-                    Style = combination
-                };
-                sendingView.SetAttribute (attr);
-                sendingView.AddStr (text);
-
-                y++; // Move to the next line
+                combination |= allStyles [bit];
+                styleNames.Add (Enum.GetName (typeof (TextStyle), allStyles [bit])!);
             }
 
-            args.Cancel = true;
+            // Skip individual flags
+            if (styleNames.Count == 1)
+            {
+                continue;
+            }
+
+            var text = $"[{string.Join (" | ", styleNames)}]";
+
+            sendingView.Move (00, y);
+
+            var attr = new Attribute (sendingView.GetAttributeForRole (VisualRole.Normal)) { Style = combination };
+            sendingView.SetAttribute (attr);
+            sendingView.AddStr (text);
+
+            y++; // Move to the next line
         }
+
+        args.Cancel = true;
     }
 }
