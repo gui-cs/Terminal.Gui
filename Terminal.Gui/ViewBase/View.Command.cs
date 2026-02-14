@@ -531,7 +531,10 @@ public partial class View // Command APIs
 
         if (RaiseHandlingHotKey (ctx) is true)
         {
-            return true;
+            // The hotkey was cancelled by OnHandlingHotKey or HandlingHotKey event.
+            // Return false so the key is not consumed and can be processed as normal input
+            // (e.g. text input in a TextField whose HotKey matches the character being typed).
+            return false;
         }
 
         if (CanFocus)

@@ -115,10 +115,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            SetText (
-                     _text.GetRange (0, newPos.Value.col)
-                          .Concat (_text.GetRange (_insertionPoint, _text.Count - _insertionPoint))
-                    );
+            SetText (_text.GetRange (0, newPos.Value.col).Concat (_text.GetRange (_insertionPoint, _text.Count - _insertionPoint)));
             _insertionPoint = newPos.Value.col;
         }
 
@@ -140,10 +137,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            SetText (
-                     _text.GetRange (0, _insertionPoint)
-                          .Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col))
-                    );
+            SetText (_text.GetRange (0, _insertionPoint).Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col)));
         }
 
         Adjust ();
@@ -181,12 +175,7 @@ public partial class TextField
 
         Text = StringExtensions.ToString (_text.GetRange (0, selStart))
                + cbTxt
-               + StringExtensions.ToString (
-                                            _text.GetRange (
-                                                            selStart + SelectedLength,
-                                                            _text.Count - (selStart + SelectedLength)
-                                                           )
-                                           );
+               + StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
 
         _insertionPoint = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
         ClearAllSelection ();
@@ -292,10 +281,7 @@ public partial class TextField
             return true;
         }
 
-        _historyText.Add (
-                          [Cell.ToCells (_text)],
-                          new (_insertionPoint, 0)
-                         );
+        _historyText.Add ([Cell.ToCells (_text)], new Point (_insertionPoint, 0));
 
         if (SelectedLength == 0)
         {
@@ -313,15 +299,8 @@ public partial class TextField
 
             if (_preChangeInsertionPoint < _text.Count)
             {
-                SetText (
-                         _text.GetRange (0, _preChangeInsertionPoint - 1)
-                              .Concat (
-                                       _text.GetRange (
-                                                       _preChangeInsertionPoint,
-                                                       _text.Count - _preChangeInsertionPoint
-                                                      )
-                                      )
-                        );
+                SetText (_text.GetRange (0, _preChangeInsertionPoint - 1)
+                              .Concat (_text.GetRange (_preChangeInsertionPoint, _text.Count - _preChangeInsertionPoint)));
             }
             else
             {
@@ -347,10 +326,7 @@ public partial class TextField
             return true;
         }
 
-        _historyText.Add (
-                          [Cell.ToCells (_text)],
-                          new (_insertionPoint, 0)
-                         );
+        _historyText.Add ([Cell.ToCells (_text)], new Point (_insertionPoint, 0));
 
         if (SelectedLength == 0)
         {
@@ -359,10 +335,7 @@ public partial class TextField
                 return true;
             }
 
-            SetText (
-                     _text.GetRange (0, _insertionPoint)
-                          .Concat (_text.GetRange (_insertionPoint + 1, _text.Count - (_insertionPoint + 1)))
-                    );
+            SetText (_text.GetRange (0, _insertionPoint).Concat (_text.GetRange (_insertionPoint + 1, _text.Count - (_insertionPoint + 1))));
         }
         else
         {
@@ -429,7 +402,7 @@ public partial class TextField
         return _insertionPoint != oldCursorPosition || hadSelection;
     }
 
-    private bool MoveLeft () { return Move (-1); }
+    private bool MoveLeft () => Move (-1);
 
     private bool MoveLeftExtend ()
     {
@@ -441,7 +414,7 @@ public partial class TextField
         return true;
     }
 
-    private bool MoveRight () { return Move (1); }
+    private bool MoveRight () => Move (1);
 
     private bool MoveRightExtend ()
     {
@@ -480,10 +453,7 @@ public partial class TextField
             return false;
         }
 
-        int x = Math.Min (
-                          _selectionStart > -1 && _selectionStart > _insertionPoint ? _selectionStart : _insertionPoint,
-                          _text.Count
-                         );
+        int x = Math.Min (_selectionStart > -1 && _selectionStart > _insertionPoint ? _selectionStart : _insertionPoint, _text.Count);
 
         if (x <= 0)
         {
@@ -632,11 +602,9 @@ public partial class TextField
         }
     }
 
-
     /// <summary>
     ///     Gets or sets whether the word forward and word backward navigation should use the same or equivalent rune type.
     ///     Default is <c>false</c> meaning using equivalent rune type.
     /// </summary>
     public bool UseSameRuneTypeForWords { get; set; }
-
 }

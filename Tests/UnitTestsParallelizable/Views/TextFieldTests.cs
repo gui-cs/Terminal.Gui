@@ -106,6 +106,38 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (view.HasFocus);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When a TextField has a HotKey matching a typed character (e.g. 'E' from Title "_Enter Path"),
+    ///     pressing that character while the TextField is focused should insert it as text, not activate the hotkey.
+    /// </summary>
+    [Fact]
+    public void HotKey_WhenFocused_InsertsText_DoesNotActivate ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Title = "_Enter Path", Width = 30 };
+        top.Add (tf);
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        // HotKey should be 'E' from the title
+        Assert.Equal (Key.E, tf.HotKey);
+
+        // Clear any selection from focus
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        // Type "hello" which contains 'e' (the HotKey character)
+        foreach (char c in "hello")
+        {
+            top.NewKeyDownEvent (c);
+        }
+
+        Assert.Equal ("hello", tf.Text);
+
+        top.Dispose ();
+    }
+
     [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {

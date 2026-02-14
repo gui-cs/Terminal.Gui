@@ -124,6 +124,7 @@ public class FileDialogExamples : Scenario
         win.Add (_tbCancelButton);
         var btn = new Button { X = 1, Y = 9, IsDefault = true, Text = "Run Dialog" };
 
+        win.CommandsToBubbleUp = [Command.Accept];
         win.Accepting += (s, e) =>
                          {
                              try

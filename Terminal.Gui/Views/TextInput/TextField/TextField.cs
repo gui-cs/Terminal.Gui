@@ -48,11 +48,12 @@ public partial class TextField : View, IDesignable, IValue<string>
             ScrollOffset = _insertionPoint > Viewport.Width + 1 ? _insertionPoint - Viewport.Width + 1 : 0;
         }
 
-        if (Autocomplete.HostControl is null)
+        if (Autocomplete.HostControl is { })
         {
-            Autocomplete.HostControl = this;
-            Autocomplete.PopupInsideContainer = false;
+            return;
         }
+        Autocomplete.HostControl = this;
+        Autocomplete.PopupInsideContainer = false;
     }
 
     /// <summary>Gets or sets whether the text field is read-only.</summary>
@@ -144,14 +145,15 @@ public partial class TextField : View, IDesignable, IValue<string>
 
     private void DisposeContextMenu ()
     {
-        if (ContextMenu is { })
+        if (ContextMenu is null)
         {
-            ContextMenu.Visible = false;
-            App?.Popover?.DeRegister (ContextMenu);
-            ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
-            ContextMenu.Dispose ();
-            ContextMenu = null;
+            return;
         }
+        ContextMenu.Visible = false;
+        App?.Popover?.DeRegister (ContextMenu);
+        ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
+        ContextMenu.Dispose ();
+        ContextMenu = null;
     }
 
     /// <inheritdoc/>
@@ -180,7 +182,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
