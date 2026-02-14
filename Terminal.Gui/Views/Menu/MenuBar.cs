@@ -449,6 +449,63 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // Mouse click (LeftButtonReleased) on a MenuBarItem triggers Activate.
+        // The source may be a SubView of the MenuBarItem (e.g., CommandView), so walk up the SuperView chain.
+        if (!Visible || !Enabled || args.Context?.Source?.TryGetTarget (out View? sourceView) != true)
+        {
+            return false;
+        }
+
+        MenuBarItem? sourceMenuBarItem = FindMenuBarItemForSource (sourceView);
+
+        if (sourceMenuBarItem is null)
+        {
+            return false;
+        }
+
+        // Toggle the popover: show if closed, hide if open.
+        if (sourceMenuBarItem.PopoverMenuOpen)
+        {
+            HideItem (sourceMenuBarItem);
+        }
+        else
+        {
+            Active = true;
+            ShowItem (sourceMenuBarItem);
+
+            if (!sourceMenuBarItem.HasFocus)
+            {
+                sourceMenuBarItem.SetFocus ();
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Finds the MenuBarItem that is an ancestor (or is itself) the source view, and is a direct SubView of this
+    ///     MenuBar.
+    /// </summary>
+    private MenuBarItem? FindMenuBarItemForSource (View? source)
+    {
+        View? current = source;
+
+        while (current is not null)
+        {
+            if (current is MenuBarItem mbi && mbi.SuperView == this)
+            {
+                return mbi;
+            }
+
+            current = current.SuperView;
+        }
+
+        return null;
+    }
+
+    /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
         // TODO: Ensure sourceMenuBar is actually one of our bar items
