@@ -63,6 +63,8 @@ All in `Tests/UnitTests/Views/MenuBarTests.cs`:
 
 **Pattern:** HotKey-triggered activation and PopoverMenu visibility are broken. The root cause is likely in how MenuBar/MenuBarItem/PopoverMenu coordinate HotKey → Activate → Show/Hide.
 
+**Additional issue:** Clicking on a MenuItem inside an open PopoverMenu does not invoke its action. The Accept command likely does not propagate from the clicked MenuItem back through PopoverMenu → MenuBar → hide popover + invoke action. Same root cause as the mouse click fix (source is CommandView, not MenuItem) may apply here, or Accept propagation through PopoverMenu may be broken.
+
 ### Key Source Files
 
 | File | Lines | Role |
@@ -113,13 +115,18 @@ Test 7 (`Mouse_Click_Activates_And_Opens`) — Mouse click should activate and o
 - Mouse binding on MenuBarItem (LeftButtonReleased → Activate?)
 - Does activation trigger PopoverMenu show?
 
-### 6d: Fix MenuItem Action Invocation
+### 6d: Fix MenuItem Click Action Invocation
+
+**Observed:** Clicking on a MenuItem in an open PopoverMenu does nothing — the action is not invoked and the menu does not close.
 
 Tests 3, 8, 11 — MenuItem actions not firing. Check:
 
 - Does MenuItem.OnAccepted correctly invoke Action?
 - Does the Accept command propagate from PopoverMenu → Menu → MenuItem → Action?
+- Same source-identity issue as mouse click fix? (source is CommandView, not MenuItem — `OnAccepting` may need `FindMenuBarItemForSource`-style fix)
+- Does PopoverMenu hide after a MenuItem action fires?
 - Has the Phase 1 OnAccepted fix changed the invocation order?
+- Write parallelizable test: click on MenuItem in open PopoverMenu → verify action invoked and menu closed
 
 ### 6e: Fix Dynamic MenuItem Updates
 
@@ -204,11 +211,31 @@ All existing MenuBar tests live in `Tests/UnitTests/Views/MenuBarTests.cs` (non-
 
 ---
 
+## Phase 8: Fix Integration Tests
+
+### 8a: MenuBar / PopoverMenu Integration Tests
+
+Integration tests in `Tests/IntegrationTests/` that exercise MenuBar and PopoverMenu are failing. These should be fixed after Phase 6 (since the unit-level fixes will likely resolve most issues).
+
+- Run `dotnet test Tests/IntegrationTests --no-build --filter "FullyQualifiedName~MenuBar|FullyQualifiedName~PopoverMenu"` to identify failures
+- Fix any remaining issues not resolved by Phase 6
+
+### 8b: FileDialog Integration Tests
+
+FileDialog tests are also failing. These may be fixed as a side-effect of Menu fixes (FileDialog uses menus internally) or may be independent issues.
+
+- Run `dotnet test Tests/IntegrationTests --no-build --filter "FullyQualifiedName~FileDialog"` to identify failures
+- Determine if failures are menu-related or independent
+- Fix as needed
+
+---
+
 ## Execution Order
 
 1. ~~Phase 1-5~~ **DONE** — Bar, MenuItem, Menu fixes + Shortcut.Command migration + docs
 2. **Phase 6** (MenuBar/MenuBarItem/PopoverMenu) — Fix the 11 failing tests; this is the core work
 3. **Phase 7** (Scenarios) — Update UICatalog scenarios; verify focus behavior
+4. **Phase 8** (Integration Tests) — Fix MenuBar/PopoverMenu and FileDialog integration test failures (last step)
 
 ## Verification
 
@@ -216,4 +243,5 @@ After each phase:
 1. `dotnet build --no-restore` — Zero new errors
 2. `dotnet test Tests/UnitTestsParallelizable --no-build` — Full parallel suite, no regressions
 3. `dotnet test Tests/UnitTests --no-build --filter "FullyQualifiedName~MenuBar"` — Track/fix MenuBar failures
-4. Manual verification of UICatalog scenarios (Shortcuts, Bars, Menus, ContextMenus)
+4. `dotnet test Tests/IntegrationTests --no-build` — Track integration test failures
+5. Manual verification of UICatalog scenarios (Shortcuts, Bars, Menus, ContextMenus)
