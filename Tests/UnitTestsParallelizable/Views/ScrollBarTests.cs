@@ -22,13 +22,15 @@ public class ScrollBarTests
     {
         Runnable super = new () { Id = "super", Width = 1, Height = 20 };
 
-        ScrollBar scrollBar = new ();
+        ScrollBar scrollBar = new () { VisibleContentSize = 20, ScrollableContentSize = 0 };
         super.Add (scrollBar);
         Assert.Equal (ScrollBarVisibilityMode.Manual, scrollBar.VisibilityMode);
-        Assert.False (scrollBar.Visible);
+        // Views are visible by default
+        Assert.True (scrollBar.Visible);
 
         scrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
         Assert.Equal (ScrollBarVisibilityMode.Auto, scrollBar.VisibilityMode);
+        // When content fits (VisibleContentSize = 20, ScrollableContentSize = 0), hide
         Assert.False (scrollBar.Visible);
 
         // Should Show
@@ -68,7 +70,8 @@ public class ScrollBarTests
         ScrollBar scrollBar = new () { ScrollableContentSize = 20 };
         super.Add (scrollBar);
         Assert.Equal (ScrollBarVisibilityMode.Manual, scrollBar.VisibilityMode);
-        Assert.False (scrollBar.Visible);
+        // Views are visible by default
+        Assert.True (scrollBar.Visible);
 
         scrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
 
@@ -104,7 +107,8 @@ public class ScrollBarTests
         ScrollBar scrollBar = new () { ScrollableContentSize = 20, VisibleContentSize = 20 };
         super.Add (scrollBar);
         Assert.Equal (ScrollBarVisibilityMode.Manual, scrollBar.VisibilityMode);
-        Assert.False (scrollBar.Visible);
+        // Views are visible by default
+        Assert.True (scrollBar.Visible);
 
         scrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
 
