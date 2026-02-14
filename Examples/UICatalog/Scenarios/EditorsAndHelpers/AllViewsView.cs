@@ -13,11 +13,11 @@ public class AllViewsView : View
         HorizontalScrollBar.AutoShow = false;
         VerticalScrollBar.AutoShow = true;
 
-        SubViewsLaidOut += (sender, _) =>
+        ViewportChanged += (sender, _) =>
                            {
                                if (sender is View sendingView)
                                {
-                                  sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
+                                   sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
                                }
                            };
 
