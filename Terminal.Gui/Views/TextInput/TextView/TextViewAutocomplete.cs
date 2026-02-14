@@ -7,14 +7,11 @@ namespace Terminal.Gui.Views;
 public class TextViewAutocomplete : PopupAutocomplete
 {
     /// <inheritdoc/>
-    protected override void DeleteTextBackwards () { ((TextView)HostControl!).DeleteCharLeft (); }
+    protected override void DeleteTextBackwards () => ((TextView)HostControl!).DeleteCharLeft ();
 
     /// <inheritdoc/>
-    protected override void InsertText (string accepted) { ((TextView)HostControl!).InsertText (accepted); }
+    protected override void InsertText (string accepted) => ((TextView)HostControl!).InsertText (accepted);
 
     /// <inheritdoc/>
-    protected override void SetCursorPosition (int column)
-    {
-        ((TextView)HostControl!).InsertionPoint = new (column, ((TextView)HostControl).CurrentRow);
-    }
+    protected override void SetCursorPosition (int column) => ((TextView)HostControl!).InsertionPoint = new Point (column, ((TextView)HostControl).CurrentRow);
 }

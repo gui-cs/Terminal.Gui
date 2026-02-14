@@ -166,10 +166,12 @@ public class InputBindingTests
         View source = new () { Id = "contextSource" };
         InputBinding binding = new ([Command.Activate], source, "contextData");
 
-        CommandContext ctx = new () { Command = Command.Activate, Source = source, Binding = binding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View>(source), Binding = binding };
 
         Assert.Equal (Command.Activate, ctx.Command);
-        Assert.Equal (source, ctx.Source);
+        Assert.NotNull (ctx.Source);
+        Assert.True (ctx.Source.TryGetTarget (out View? view));
+        Assert.Equal (source, view);
         Assert.NotNull (ctx.Binding);
 
         if (ctx.Binding is InputBinding ib)

@@ -21,8 +21,7 @@ public class DimAutoDemo : Scenario
 
         FrameView dimAutoFrameView = CreateDimAutoContentFrameView (app);
 
-
-        appWindow.Add (dimAutoFrameView/*, sliderFrameView dlgButton*/);
+        appWindow.Add (dimAutoFrameView /*, sliderFrameView dlgButton*/);
 
         // Run - Start the application.
         app.Run (appWindow);
@@ -33,10 +32,11 @@ public class DimAutoDemo : Scenario
         FrameView dimAutoFrameView = new ()
         {
             Title = "Type to make View grow",
+
             //X = Pos.Center (),
             //Y = Pos.Center (),
-            Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10),
+            Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (25)),
+            Height = Dim.Auto (DimAutoStyle.Content, 10),
             Arrangement = ViewArrangement.Resizable
         };
         dimAutoFrameView.Margin!.Thickness = new Thickness (1);
@@ -45,7 +45,10 @@ public class DimAutoDemo : Scenario
         TextView textEdit = new ()
         {
             Text = "",
-            X = 0, Y = 0, Width = 20, Height = 4
+            X = 0,
+            Y = 0,
+            Width = 20,
+            Height = 4
         };
         dimAutoFrameView.Add (textEdit);
 
@@ -122,27 +125,17 @@ public class DimAutoDemo : Scenario
                                         bothAuto.Text = textEdit.Text;
                                     };
 
-        Button movingButton = new ()
-        {
-            Text = "_Move",
-            X = Pos.Right (vlabel),
-            Y = Pos.Bottom (vlabel)
-        };
+        Button movingButton = new () { Text = "_Move", X = Pos.Right (vlabel), Y = Pos.Bottom (vlabel) };
         movingButton.Accepting += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
         dimAutoFrameView.Add (movingButton);
 
-        Button resetButton = new ()
-        {
-            Text = "_Reset Button (AnchorEnd)",
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd ()
-        };
+        Button resetButton = new () { Text = "_Reset Button (AnchorEnd)", X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
 
         resetButton.Accepting += (s, e) =>
-        {
-            movingButton.Y = Pos.Bottom (hlabel);
-            movingButton.X = 0;
-        };
+                                 {
+                                     movingButton.Y = Pos.Bottom (hlabel);
+                                     movingButton.X = 0;
+                                 };
         dimAutoFrameView.Add (resetButton);
 
         OptionSelector optionSelector = new ()
@@ -164,17 +157,16 @@ public class DimAutoDemo : Scenario
             Height = Dim.Fill ()
         };
         dimAutoFrameView.Add (fillFrame);
+
         return dimAutoFrameView;
     }
 
     private static FrameView CreateSliderFrameView ()
     {
-        FrameView sliderFrameView = new ()
-        {
-            Title = "LinearRange - Example of a DimAuto View",
-        };
+        FrameView sliderFrameView = new () { Title = "LinearRange - Example of a DimAuto View" };
 
         List<object> options = ["One", "Two", "Three", "Four"];
+
         LinearRange linearRange = new (options)
         {
             X = 0,

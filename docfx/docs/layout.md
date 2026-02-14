@@ -95,6 +95,8 @@ The flags are organized into categories:
 
 Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time @Terminal.Gui.Pos. The size is set via `Width` and `Height`, which are of type @Terminal.Gui.Dim.
 
+The layout system uses virtual properties for categorization without type checking: `ReferencesOtherViews()`, `DependsOnSuperViewContentSize`, `CanContributeToAutoSizing`, `GetMinimumContribution()`, `IsFixed`, and `RequiresTargetLayout`. This enables extensibility.
+
 ```cs
 var label1 = new Label () { X = 1, Y = 2, Width = 3, Height = 4, Title = "Absolute")
 

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Terminal.Gui.Resources;
 
 namespace UICatalog.Scenarios;
 
@@ -225,10 +224,6 @@ public class DrawingArea : View
             }
         }
 
-        // TODO: This is a hack to work around overlapped views not drawing correctly.
-        // without this the toolbox disappears
-        SuperView?.SetNeedsLayout ();
-
         return true;
     }
 
@@ -398,11 +393,11 @@ public class AttributeView : View
     private void ClickedInBackground ()
     {
         Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
-                                                               beginInitHandler: prompt =>
-                                                                                 {
-                                                                                     prompt.Title = "Background Color";
-                                                                                     prompt.GetWrappedView ().SelectedColor = Value.Background;
-                                                                                 });
+                                                                       beginInitHandler: prompt =>
+                                                                                         {
+                                                                                             prompt.Title = "Background Color";
+                                                                                             prompt.GetWrappedView ().SelectedColor = Value.Background;
+                                                                                         });
 
         if (result is { } selectedColor)
         {
@@ -414,11 +409,11 @@ public class AttributeView : View
     private void ClickedInForeground ()
     {
         Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
-                                                                      beginInitHandler: prompt =>
-                                                                                        {
-                                                                                            prompt.Title = "Foreground Color";
-                                                                                            prompt.GetWrappedView ().SelectedColor = Value.Foreground;
-                                                                                        });
+                                                                       beginInitHandler: prompt =>
+                                                                                         {
+                                                                                             prompt.Title = "Foreground Color";
+                                                                                             prompt.GetWrappedView ().SelectedColor = Value.Foreground;
+                                                                                         });
 
         if (result is { } selectedColor)
         {
