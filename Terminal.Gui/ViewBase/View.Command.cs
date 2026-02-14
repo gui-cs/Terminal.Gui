@@ -259,15 +259,25 @@ public partial class View // Command APIs
         ctx?.Source?.TryGetTarget (out source);
         View? defaultAcceptView = DefaultAcceptView;
 
+        bool redirected = false;
+
         if (defaultAcceptView is { } && defaultAcceptView != this && defaultAcceptView != source)
         {
             BubbleDown (defaultAcceptView, ctx);
+            redirected = true;
         }
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Calling RaiseAccepted");
         RaiseAccepted (ctx);
 
-        return true;
+        // Report as handled if:
+        // - Accept was redirected to DefaultAcceptView (BubbleDown performed), or
+        // - Accept bubbled up from a SubView (the full chain processed the command), or
+        // - This view is an IAcceptTarget (e.g. Button) that genuinely handles Accept.
+        // Report as not handled when Accept originated from a local key binding (e.g., Enter key)
+        // on a non-IAcceptTarget view with no redirect - this allows the key to propagate up
+        // the view hierarchy to reach a SuperView that can redirect to DefaultAcceptView.
+        return redirected || ctx?.IsBubblingUp == true || this is IAcceptTarget;
     }
 
     /// <summary>
