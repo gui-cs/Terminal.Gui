@@ -147,7 +147,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             return true;
         }
 
-        if (args.Context?.Binding?.Source is { } sourceView)
+        View? sourceView = null;
+        args.Context?.Source?.TryGetTarget (out sourceView);
+
+        if (sourceView is { })
         {
             RequestStop ();
 

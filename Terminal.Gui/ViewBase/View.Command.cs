@@ -254,21 +254,14 @@ public partial class View // Command APIs
 
         // After this View's Accepting was raised (and not handled/cancelled),
         // forward Accept to the DefaultAcceptView so its Accepting/Accepted events fire too.
-        // Only do this for direct invocations — when Accept bubbles up from a subview,
-        // the subview already had its own Accept lifecycle; don't redirect to DefaultAcceptView.
-        if (ctx?.IsBubblingUp != true)
+        // The defaultAcceptView != source check prevents self-invocation (infinite loops).
+        View? source = null;
+        ctx?.Source?.TryGetTarget (out source);
+        View? defaultAcceptView = DefaultAcceptView;
+
+        if (defaultAcceptView is { } && defaultAcceptView != this && defaultAcceptView != source)
         {
-            View? source = null;
-            ctx?.Source?.TryGetTarget (out source);
-            View? defaultAcceptView = DefaultAcceptView;
-
-            if (defaultAcceptView is { } && defaultAcceptView != this && defaultAcceptView != source)
-            {
-                BubbleDown (defaultAcceptView, ctx);
-
-                // The DefaultAcceptView handled Accept; don't also raise Accepted on this View.
-                //return true;
-            }
+            BubbleDown (defaultAcceptView, ctx);
         }
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Calling RaiseAccepted");

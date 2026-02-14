@@ -358,7 +358,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         app.Run (dialog);
         app.Iteration -= AppOnIteration;
 
-        Assert.Equal (1, dialogAcceptedFired);
+        Assert.Equal (0, dialogAcceptedFired); // 0 because Cancel's OnAccepting handled it; RaiseAccepted is not called
         Assert.Equal (1, cancelAcceptingFired);
         Assert.Equal (0, cancelAcceptedFired);
         Assert.Equal (0, okAcceptingFired);

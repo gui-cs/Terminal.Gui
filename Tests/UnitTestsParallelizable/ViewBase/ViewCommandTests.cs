@@ -924,7 +924,7 @@ public class ViewCommandTests
     }
 
     [Fact]
-    public void DefaultAcceptView_Peer_Accept_DoesNotForward_To_DefaultAcceptView ()
+    public void DefaultAcceptView_Peer_IAcceptTarget_NonDefault_Accept_Bubbles_To_DefaultAcceptView ()
     {
         View superView = new () { CanFocus = true };
         AcceptTargetTestView subView = new () { IsDefault = false, Id = "subView", CanFocus = true };
@@ -950,8 +950,8 @@ public class ViewCommandTests
 
         Assert.Equal (1, superViewAcceptingCount);
         Assert.Equal (1, subViewAcceptingCount);
-        Assert.Equal (0, defaultAcceptViewAcceptingCount);
-        Assert.Equal (0, defaultAcceptViewAcceptedCount);
+        Assert.Equal (1, defaultAcceptViewAcceptingCount);
+        Assert.Equal (1, defaultAcceptViewAcceptedCount);
     }
 
     [Fact]
@@ -991,7 +991,7 @@ public class ViewCommandTests
 
     // CoPilot - ChatGPT o1
     [Fact]
-    public void NonIAcceptTarget_Redirects_To_DefaultAcceptView ()
+    public void NonIAcceptTarget_Without_CommandsToBubbleUp_DoesNotRedirect_To_DefaultAcceptView ()
     {
         View superView = new () { CanFocus = true };
         View nonAcceptTarget = new () { Id = "nonAcceptTarget", CanFocus = true };
@@ -1085,14 +1085,14 @@ public class ViewCommandTests
 
         middleDefaultView.InvokeCommand (Command.Accept);
 
-        Assert.Equal (1, middleAcceptingCount); // 1 because of DefaultAcceptView
-        Assert.Equal (0, middleAcceptedCount); // 0 because middleDefaultView is an IAcceptTarget.IsDefault caused the command to be handled
+        Assert.Equal (1, middleAcceptingCount); // 1 because Accept bubbled up from middleDefaultView
+        Assert.Equal (0, middleAcceptedCount); // 0 because Accept bubbled up to root, so middle's DefaultAcceptHandler returned early
         Assert.Equal (1, rootAcceptingCount); // 1 because of CommandsToBubbleUp
         Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleDefaultView
         Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleDefaultView is an IAcceptTarget and should handle Accepting
-        Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because middleDefaultView is an IAcceptTarget.IsDefault caused the command to be handled
-        Assert.Equal (0, rootIsDefaultViewAcceptingCount); // 0 because root is not an IAcceptTarget
-        Assert.Equal (0, rootIsDefaultViewAcceptedCount); // 0 because middle is not an IAcceptTarget
+        Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because Accept bubbled up, so middleDefaultView's DefaultAcceptHandler returned early
+        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via BubbleDown
+        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after BubbleDown
     }
 
     [Fact]
@@ -1138,14 +1138,14 @@ public class ViewCommandTests
 
         middleView.InvokeCommand (Command.Accept);
 
-        Assert.Equal (1, middleAcceptingCount); // 1 because of DefaultAcceptView
-        Assert.Equal (0, middleAcceptedCount); // 0 because middleDefaultView is an IAcceptTarget.IsDefault caused the command to be handled
+        Assert.Equal (1, middleAcceptingCount); // 1 because Accept bubbled up from middleView
+        Assert.Equal (0, middleAcceptedCount); // 0 because Accept bubbled up to root, so middle's DefaultAcceptHandler returned early
         Assert.Equal (1, rootAcceptingCount); // 1 because of CommandsToBubbleUp
-        Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleDefaultView
-        Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleDefaultView is an IAcceptTarget and should handle Accepting
-        Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because middleDefaultView is an IAcceptTarget.IsDefault caused the command to be handled
-        Assert.Equal (0, rootIsDefaultViewAcceptingCount); // 0 because root is not an IAcceptTarget
-        Assert.Equal (0, rootIsDefaultViewAcceptedCount); // 0 because middle is not an IAcceptTarget
+        Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleView
+        Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleView (non-default IAcceptTarget) fires Accepting
+        Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because Accept bubbled up, so middleView's DefaultAcceptHandler returned early
+        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via BubbleDown
+        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after BubbleDown
     }
 
     [Fact]
@@ -1191,14 +1191,14 @@ public class ViewCommandTests
 
         middleView.InvokeCommand (Command.Accept);
 
-        Assert.Equal (1, middleAcceptingCount); // 1 because of DefaultAcceptView
-        Assert.Equal (0, middleAcceptedCount); // 0 because middleDefaultView is an IAcceptTarget.IsDefault caused the command to be handled
+        Assert.Equal (1, middleAcceptingCount); // 1 because Accept bubbled up from middleView
+        Assert.Equal (0, middleAcceptedCount); // 0 because Accept bubbled up to root, so middle's DefaultAcceptHandler returned early
         Assert.Equal (1, rootAcceptingCount); // 1 because of CommandsToBubbleUp
-        Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleDefaultView
-        Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleDefaultView is an IAcceptTarget and should handle Accepting
-        Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because middleDefaultView is an IAcceptTarget.IsDefault caused the command to be handled
-        Assert.Equal (0, rootIsDefaultViewAcceptingCount); // 0 because root is not an IAcceptTarget
-        Assert.Equal (0, rootIsDefaultViewAcceptedCount); // 0 because middle is not an IAcceptTarget
+        Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleView
+        Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleView (plain View) fires Accepting
+        Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because Accept bubbled up, so middleView's DefaultAcceptHandler returned early
+        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via BubbleDown
+        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after BubbleDown
     }
 
     // CoPilot - ChatGPT o1

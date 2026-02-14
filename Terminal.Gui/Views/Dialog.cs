@@ -132,10 +132,26 @@ public class Dialog : Dialog<int>
     }
 
     /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args) =>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        // For non-default button sources (e.g., Cancel), set Result before base handles it.
+        // Base (Dialog<int>.OnAccepting) will call RequestStop and return true (handled) for
+        // non-default IAcceptTarget sources, preventing DefaultAcceptView from being invoked.
+        View? sourceView = null;
+        args.Context?.Source?.TryGetTarget (out sourceView);
 
-        // Don't call base
-        false;
+        if (sourceView is Button button && Buttons.Contains (button) && button is IAcceptTarget { IsDefault: false })
+        {
+            Result = Buttons.IndexOf (button);
+        }
+        else if (sourceView is { } && DefaultAcceptView is Button defaultButton && Buttons.Contains (defaultButton))
+        {
+            // Non-button source (e.g., CheckBox double-click): set Result to default button's index
+            Result = Buttons.IndexOf (defaultButton);
+        }
+
+        return base.OnAccepting (args);
+    }
 
     /// <summary>
     ///     Overrides the <see cref="Dialog{TResult}"/> Accepting behavior to set <see cref="Result"/> to the index of the
