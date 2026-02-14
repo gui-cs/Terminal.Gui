@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui.Views;
 
 // DoubleClick - Focus, Activate, and Accept the item under the mouse (CanFocus or not)
@@ -32,11 +30,25 @@ public class FlagSelector : SelectorBase, IDesignable
     }
 
     /// <summary>
-    ///     Overrides the base method to allow hotkeys to be handled when the selector itself has focus, so that
-    ///     hotkeys can be processed even if no specific item is focused.
+    ///     Overrides the base method to handle the FlagSelector's HotKey.
+    ///     Per spec: HotKey restores focus but never changes value. When focused, HotKey is a no-op.
     /// </summary>
     /// <param name="args">The command event arguments.</param>
-    protected override bool OnHandlingHotKey (CommandEventArgs args) => base.OnHandlingHotKey (args) || HasFocus;
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        // FlagSelector spec: HotKey restores focus but never activates/changes value
+        if (CanFocus)
+        {
+            SetFocus ();
+        }
+
+        return true;
+    }
 
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
@@ -45,25 +57,44 @@ public class FlagSelector : SelectorBase, IDesignable
         {
             return true;
         }
+
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-       // return false;
         // Skip BubbleDown when:
-        // - IsBubblingDown is true (re-entry from OnCheckboxOnActivating calling back via BubbleDown context)
+        // - IsBubblingDown is true (re-entry prevention)
         // - No Focused view to dispatch to
         // - Source is a SubView that already bubbled up (not this selector)
         if (args.Context?.IsBubblingDown == true
             || Focused is null
             || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
         {
-            //return true;
+            return false;
         }
 
-        // Bubble DOWN to the focused checkbox.
-        // Return true if BubbleDown handled it, so derived classes (e.g. OptionSelector)
-        // don't also run their own logic (e.g. double-Cycle).
-        return BubbleDown (Focused, args.Context) is true;
+        // Programmatic invocation: BubbleDown to the focused checkbox so it activates and toggles.
+        // Return false so FlagSelector.Activating event still fires.
+        BubbleDown (Focused, args.Context);
+
+        return false;
     }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
+        if (ctx?.Source?.TryGetTarget (out View? source) != true || source is not CheckBox checkBox)
+        {
+            // Programmatic: BubbleDown in OnActivating already handled the toggle
+            return;
+        }
+
+        // From checkbox event handler: toggle the checkbox manually
+        // (The checkbox couldn't toggle itself because bubble-up prevented its OnActivated)
+        checkBox.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
+    }
+
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
@@ -83,16 +114,24 @@ public class FlagSelector : SelectorBase, IDesignable
 
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
-
-        //InvokeCommand (Command.Activate, args.Context);
-
-        //args.Handled = true;
-        if (args.Context?.IsBubblingDown is true)
+        if (sender is not CheckBox)
         {
-            //args.Handled = true;
+            return;
         }
 
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
+
+        if (args.Context?.IsBubblingDown is true)
+        {
+            // BubbleDown from OnActivating - let the checkbox handle itself
+            return;
+        }
+
+        // User interaction (Space, Click, HotKey on checkbox):
+        // Invoke Activate on the FlagSelector so events bubble properly,
+        // then handle the toggle in OnActivated.
+        InvokeCommand (Command.Activate, args.Context);
+        args.Handled = true;
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
@@ -139,7 +178,7 @@ public class FlagSelector : SelectorBase, IDesignable
         Value = newValue;
     }
 
-    private bool _updatingChecked = false;
+    private bool _updatingChecked;
 
     /// <summary>
     ///     Gets or sets the value of the selected flags.

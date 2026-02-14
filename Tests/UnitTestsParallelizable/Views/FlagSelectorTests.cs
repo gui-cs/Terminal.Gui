@@ -672,11 +672,12 @@ public class FlagSelectorTests
         app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (1, acceptCount);
-        Assert.Equal (0, valueChangedCount);
 
-        // After double-clicking on an already-checked flag checkbox, it should still be checked (flags don't uncheck on double-click in FlagSelector)
+        // DoubleClick generates Click (Activate/toggle) + DoubleClick (Accept).
+        // The click toggles Data=2 checkbox from UnChecked to Checked, changing Value from 1 to 1|2=3.
+        Assert.Equal (1, valueChangedCount);
         Assert.Equal (CheckState.Checked, checkBox.Value);
-        Assert.Equal (1, selector.Value); // Verify Value is set to first value
+        Assert.Equal (3, selector.Value);
     }
 
     [Fact]
