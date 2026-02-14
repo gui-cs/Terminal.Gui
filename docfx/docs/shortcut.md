@@ -7,14 +7,9 @@
 * [Events](events.md)
 * [Mouse Deep Dive](mouse.md)
 
-## Overview
+## From the User's Perspective
 
-The `Shortcut` class displays a command, help text, and a key binding in a unified control. It is designed for use in `Bar` controls such as menus, toolbars, and status bars. When the key specified by `Key` is pressed, or when the user interacts via mouse or keyboard, the shortcut invokes the appropriate commands.
-
-`Shortcut` is composed of three subviews:
-- **CommandView**: Displays the command text and responds to user interaction (default: a plain `View`, but can be set to `CheckBox`, `Button`, etc.)
-- **HelpView**: Displays help text in the middle
-- **KeyView**: Displays the key binding text on the right
+A `Shortcut` is a single, clickable row in a menu, toolbar, or status bar. It shows three things:
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -23,557 +18,399 @@ The `Shortcut` class displays a command, help text, and a key binding in a unifi
 └─────────────────────────────────────────────────┘
 ```
 
-## Key Concepts
+**What the user expects:**
+
+1. **Clicking anywhere on the Shortcut** activates it: toggles a checkbox, invokes the action, etc.
+2. **Pressing the keyboard shortcut** (shown in KeyView, e.g., Ctrl+O) does the same thing, regardless of focus.
+3. **Pressing the HotKey** (the underlined letter in CommandView, e.g., `O` in `_Open`) does the same thing.
+4. **Pressing Space** while the Shortcut has focus activates it.
+5. **Pressing Enter** while the Shortcut has focus accepts it (confirms/executes).
+6. **Every interaction produces exactly one state change.** Clicking a Shortcut with a CheckBox toggles it once, not twice.
+
+### CommandView Variants
+
+The CommandView can be any View. Common configurations:
+
+| CommandView Type | Activate Behavior | Accept Behavior |
+|-----------------|-------------------|-----------------|
+| **View** (default) | Invokes `Action` | Invokes `Action` |
+| **CheckBox** | Toggles check state, invokes `Action` | Invokes `Action` (no toggle) |
+| **Button** | Invokes `Action` | Invokes Button's Accept |
+| **ColorPicker16** | Opens color dialog or cycles | Invokes `Action` |
+
+### Key Principle: Single Responsibility
+
+From the user's perspective, a Shortcut is **one control**. The fact that it contains three SubViews (CommandView, HelpView, KeyView) is an implementation detail. Whether the user clicks on the command text, the help text, the key text, or the gap between them, the result is the same.
+
+## Design
+
+### Commands and Their Semantics
+
+Shortcut participates in the standard Command system with three commands:
+
+| Command | Trigger | What It Does |
+|---------|---------|-------------|
+| **`Command.Activate`** | Space, click, `Shortcut.Key` press | Changes state (e.g., toggles CheckBox) and invokes `Action` |
+| **`Command.Accept`** | Enter, double-click | Confirms/executes without state change; invokes `Action` |
+| **`Command.HotKey`** | HotKey letter, `Shortcut.Key` | Sets focus, then invokes `Command.Activate` |
 
 ### CommandsToBubbleUp
 
-`Shortcut` sets `CommandsToBubbleUp = [Command.Activate, Command.Accept]` in its constructor. This means when a SubView (like `CommandView`) invokes these commands, they bubble up to the `Shortcut` for handling.
+`Shortcut` sets `CommandsToBubbleUp = [Command.Activate, Command.Accept]` in its constructor. This enables commands from SubViews (like CommandView) to bubble up to the Shortcut for centralized handling.
 
-### Command Forwarding Logic
+### The BubbleDown Pattern
 
-`Shortcut` uses two key helper methods to determine how to handle commands:
+Because Shortcut is a composite view, it must coordinate command flow between itself and its CommandView. The core pattern is:
 
-1. **`IsFromCommandView(ctx)`**: Returns `true` when both the command source AND binding source are the `CommandView`. This indicates the user directly interacted with the CommandView (clicked on it or pressed its hotkey).
+1. **User interacts** with the Shortcut (clicks, presses key, etc.)
+2. The command reaches `Shortcut.OnActivating` or `Shortcut.OnAccepting`
+3. Shortcut **forwards the command down** to CommandView via `BubbleDown`
+4. CommandView processes the command (e.g., CheckBox toggles)
+5. `BubbleDown` suppresses re-bubbling (via `IsBubblingDown = true`), preventing infinite loops
+6. Shortcut raises its own events and invokes `Action`
 
-2. **`IsBindingFromShortcut(args)`**: Returns `true` when the binding source is the Shortcut itself, HelpView, or KeyView. This indicates the user interacted with the Shortcut outside of the CommandView.
+### When to BubbleDown (and When Not To)
 
-### Return Value Semantics
+The critical design decision is **when** Shortcut should forward a command to CommandView. The rule is:
 
-Throughout this document, command handler return values follow these semantics:
-- `true`: Command was handled/cancelled - stop processing
-- `false`: Command executed successfully - continue (allow bubbling)
-- `null`: No handler found
-
-## Command Flow Summary
-
-| Trigger | Source | Flow |
-|---------|--------|------|
-| Click on CommandView | CommandView | `CommandView.Activate` → bubbles to `Shortcut.OnActivating` (IsFromCommandView=true) → forwards back to CommandView → raises Shortcut events |
-| Click on HelpView/KeyView/Shortcut | Shortcut | `Shortcut.Activate` → `OnActivating` (IsBindingFromShortcut=true) → forwards to CommandView → raises events |
-| CommandView HotKey | CommandView | `CommandView.HotKey` → DefaultHotKeyHandler sets focus → if CanFocus, done; else bubbles |
-| Shortcut HotKey | Shortcut | `Shortcut.HotKey` → `OnHandlingHotKey` → `RaiseActivating` → full flow |
-| Space | View | `Command.Activate` → same as click |
-| Enter | View | `Command.Accept` → `OnAccepting` → `RaiseActivating` (if not from Shortcut binding) |
-
-## Detailed Call Flows
-
-### Mouse Interactions
-
-#### Click on CommandView (Default View)
-
-When the user clicks on the CommandView (which is a plain `View` by default):
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant CommandView as CommandView (View)
-    participant Shortcut
-    participant SuperView
-
-    User->>CommandView: LeftButtonReleased
-    Note over CommandView: View's default binding:<br/>LeftButtonReleased → Command.Activate
-    CommandView->>CommandView: InvokeCommand(Activate)
-    CommandView->>CommandView: DefaultActivateHandler
-    CommandView->>CommandView: RaiseActivating()
-    Note over CommandView: Activating event raised on CommandView
-    CommandView->>CommandView: RaiseActivated()
-    Note over CommandView: Activated event raised on CommandView
-    Note over CommandView: Returns false (success)
-
-    Note over CommandView: CommandsToBubbleUp contains Activate<br/>Command bubbles to Shortcut
-    CommandView->>Shortcut: OnActivating(args) [bubbled]
-    Note over Shortcut: IsFromCommandView = true
-
-    Shortcut->>Shortcut: Disable bubbling temporarily
-    Shortcut->>CommandView: InvokeCommand(Activate, context with Shortcut as source)
-    Note over CommandView: CommandView processes again<br/>but now with different source
-    CommandView-->>Shortcut: Returns false
-
-    Shortcut->>Shortcut: Re-enable bubbling
-    Shortcut->>Shortcut: InvokeCommand(Activate) on self
-    Shortcut->>Shortcut: OnActivating (null context)
-    Note over Shortcut: Falls through to return false
-    Shortcut->>Shortcut: RaiseActivated()
-    Note over Shortcut: Shortcut.Activated fires
-    Shortcut->>Shortcut: Action?.Invoke()
-
-    Shortcut->>Shortcut: Returns true (handled)
-
-    Note over SuperView: SuperView sees:<br/>1. Shortcut.Activating<br/>2. Shortcut.Activated<br/>3. Action invoked
+```
+BubbleDown to CommandView ONLY when:
+  - The command has a Binding (i.e., it came from user interaction, not programmatic invoke)
+  - AND the Binding.Source is NOT the CommandView (i.e., it didn't already come from CommandView)
 ```
 
-**Events visible to SuperView:**
-- `Shortcut.Activating` - raised during the forwarding flow
-- `Shortcut.Activated` - raised in `OnActivated`
-- `Action` - invoked in `OnActivated`
+This produces three paths:
 
-**If SuperView subscribes to `CommandView.Activating/Activated`:**
-- `CommandView.Activating` - raised during the initial CommandView processing
-- `CommandView.Activated` - raised during the initial CommandView processing
+| Origin | Has Binding? | Binding.Source | BubbleDown? | Reason |
+|--------|-------------|---------------|-------------|--------|
+| CommandView click/key | Yes | CommandView | **No** | CommandView already processed it; it bubbled up via `CommandsToBubbleUp` |
+| Shortcut/HelpView/KeyView click, or Shortcut.Key press | Yes | Shortcut (or HelpView/KeyView) | **Yes** | CommandView hasn't seen this command yet |
+| Programmatic `InvokeCommand` | No (null) | N/A | **No** | No user interaction to forward |
 
-#### Click on CommandView (CheckBox)
+### Implementation
 
-When the CommandView is a `CheckBox`, the flow shows how Shortcut prevents double-toggling by returning `true` from `OnActivating`:
+```csharp
+protected override bool OnActivating (CommandEventArgs args)
+{
+    if (base.OnActivating (args))
+    {
+        return true;
+    }
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant CheckBox as CommandView (CheckBox)
-    participant Shortcut
+    // Only bubble down when binding exists and source is not CommandView
+    if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+    {
+        return BubbleDown (CommandView, args.Context) is null;
+    }
 
-    User->>CheckBox: LeftButtonReleased
-    Note over CheckBox: View's default binding:<br/>LeftButtonReleased → Command.Activate
-    CheckBox->>CheckBox: InvokeCommand(Activate)
-    CheckBox->>CheckBox: DefaultActivateHandler
-    CheckBox->>CheckBox: RaiseActivating()
-    Note over CheckBox: CheckBox.Activating fires<br/>NO state change yet!
-
-    Note over CheckBox: RaiseActivating tries to bubble<br/>CommandsToBubbleUp contains Activate
-    CheckBox->>Shortcut: OnActivating(args) [via TryBubbleToSuperView]
-    Note over Shortcut: IsFromCommandView = true<br/>(both source AND binding = CommandView)
-
-    Shortcut->>Shortcut: Disable bubbling temporarily
-    Shortcut->>CheckBox: InvokeCommand(Activate, context with Shortcut as source)
-    Note over CheckBox: Second activation with different context
-    CheckBox->>CheckBox: RaiseActivating (source=Shortcut)
-    Note over CheckBox: Activating fires again
-    CheckBox->>CheckBox: TryBubbleToSuperView
-    Note over CheckBox: Bubbles but IsFromCommandView=false now<br/>Falls through
-    CheckBox->>CheckBox: RaiseActivated()
-    Note over CheckBox: CheckBox.Activated fires<br/>AdvanceCheckState() called<br/>STATE CHANGES HERE (once!)
-    CheckBox-->>Shortcut: Returns false
-
-    Shortcut->>Shortcut: Re-enable bubbling
-    Shortcut->>Shortcut: InvokeCommand(Activate) on self
-    Shortcut->>Shortcut: RaiseActivating/RaiseActivated
-    Shortcut->>Shortcut: Action?.Invoke()
-
-    Shortcut-->>CheckBox: Returns true (IMPORTANT!)
-    Note over CheckBox: Original RaiseActivating returns early<br/>Original RaiseActivated NOT called<br/>No second state change!
+    return false;
+}
 ```
 
-**Key Design Point:** By returning `true` from `OnActivating`, Shortcut cancels the original CheckBox's `RaiseActivated` call. The state change only happens in the **forwarded** invocation, preventing double-toggling.
+### OnAccepting Behavior
 
-**Events visible to SuperView:**
-- `Shortcut.Activating` - raised during the flow
-- `Shortcut.Activated` - raised in `OnActivated`
-- `Action` - invoked
+When `Command.Accept` is invoked on a Shortcut:
 
-**If SuperView subscribes to CheckBox directly:**
-- `CheckBox.Activating` - fires TWICE (original + forwarded)
-- `CheckBox.Activated` - fires ONCE (only in forwarded call)
-- `CheckBox.CheckedStateChanging` - fires once (state about to change)
-- `CheckBox.CheckedStateChanged` - fires once (state changed)
+1. `OnAccepting` is called
+2. If the command came from a user binding (not from CommandView), it forwards `Accept` to CommandView via `BubbleDown`
+3. `Action` is invoked via `OnAccepted`
 
-> **Important**: The CheckBox state changes in `OnActivated` via `AdvanceCheckState()`. Shortcut's return of `true` prevents the original activation from reaching `RaiseActivated`, ensuring the state only changes once.
+**Accept does NOT invoke Activate.** These are separate command paths. Accept is for confirmation/execution; Activate is for state change.
 
-#### Click on HelpView or KeyView
+```csharp
+protected override bool OnAccepting (CommandEventArgs args)
+{
+    if (base.OnAccepting (args))
+    {
+        return true;
+    }
 
-Clicking on the HelpView or KeyView triggers `Command.Activate` on that view, which bubbles to `Shortcut`:
+    // Same BubbleDown logic as OnActivating
+    if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+    {
+        return BubbleDown (CommandView, args.Context) is null;
+    }
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant HelpView
-    participant Shortcut
-    participant CommandView
+    return false;
+}
 
-    User->>HelpView: LeftButtonReleased
-    Note over HelpView: View's default binding:<br/>LeftButtonReleased → Command.Activate
-    HelpView->>HelpView: InvokeCommand(Activate)
-    Note over HelpView: Bubbles to Shortcut
-    HelpView->>Shortcut: OnActivating(args)
-    Note over Shortcut: IsFromCommandView = false<br/>IsBindingFromShortcut = true<br/>(binding source is HelpView)
-
-    Shortcut->>Shortcut: Disable bubbling
-    Shortcut->>CommandView: InvokeCommand(Activate, null context)
-    Note over CommandView: CommandView activates<br/>(CheckBox would toggle)
-    CommandView-->>Shortcut: Returns false
-
-    Shortcut->>Shortcut: Re-enable bubbling
-    Shortcut->>Shortcut: InvokeCommand(Activate) on self
-    Shortcut->>Shortcut: RaiseActivated()
-    Shortcut->>Shortcut: Action?.Invoke()
-
-    Shortcut-->>HelpView: Returns true
+protected override void OnAccepted (ICommandContext? ctx) => Action?.Invoke ();
 ```
 
-The same flow applies for KeyView - clicking anywhere on the Shortcut (except CommandView) activates the Shortcut and forwards to CommandView.
+### OnActivated Behavior
 
-#### Click Directly on Shortcut Background
+After activation completes successfully (not cancelled), `OnActivated` invokes `Action`:
 
-If the mouse click is on the Shortcut itself (not on any subview), the binding source will be the Shortcut, triggering the `IsBindingFromShortcut` path.
-
-### Keyboard Interactions
-
-#### CommandView HotKey
-
-When the user presses the CommandView's hotkey (e.g., the underlined character in "_Open"):
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Application
-    participant Shortcut
-    participant CommandView
-
-    User->>Application: Press 'O' (CommandView hotkey)
-    Application->>CommandView: InvokeCommand(Command.HotKey)
-    CommandView->>CommandView: DefaultHotKeyHandler
-    CommandView->>CommandView: RaiseHandlingHotKey()
-    Note over CommandView: HandlingHotKey event fires
-
-    alt CommandView.CanFocus = true
-        CommandView->>CommandView: SetFocus()
-        Note over CommandView: CommandView gets focus<br/>No state change<br/>No Activate
-        CommandView-->>Application: Returns true (handled)
-    else CommandView.CanFocus = false
-        Note over CommandView: Focus cannot be set<br/>Returns from handler
-        Note over CommandView: HotKey command may bubble
-    end
+```csharp
+protected override void OnActivated (ICommandContext? ctx)
+{
+    base.OnActivated (ctx);
+    Action?.Invoke ();
+}
 ```
 
-**Key Point**: The default `HotKey` handler only sets focus via `RaiseHandlingHotKey`. It does NOT invoke `Command.Activate`. This is different from clicking!
+## Detailed Command Flows
 
-**Events visible:**
-- `CommandView.HandlingHotKey` - always fires
-- NO `Activating`/`Activated` events unless the HotKey command bubbles and Shortcut handles it
+### Flow 1: Click on CommandView
 
-#### Shortcut Key (Bound to HotKey)
+When the user clicks on the CommandView area:
 
-When the user presses the Shortcut's `Key` (e.g., Ctrl+O), it's bound to `Command.HotKey`:
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Application
-    participant Shortcut
-    participant CommandView
-
-    User->>Application: Press Shortcut.Key (e.g., Ctrl+O)
-
-    alt BindKeyToApplication = true
-        Application->>Shortcut: InvokeCommand(HotKey) via Application.KeyBindings
-    else BindKeyToApplication = false
-        Application->>Shortcut: InvokeCommand(HotKey) via HotKeyBindings
-    end
-
-    Shortcut->>Shortcut: OnHandlingHotKey(args)
-    Note over Shortcut: base.OnHandlingHotKey returns false
-    Note over Shortcut: IsBindingFromShortcut = true<br/>(binding source is Shortcut)
-
-    Shortcut->>Shortcut: RaiseActivating(ctx)
-    Shortcut->>Shortcut: OnActivating(args)
-    Note over Shortcut: IsFromCommandView = false<br/>IsBindingFromShortcut = true
-
-    Shortcut->>Shortcut: Disable bubbling
-    Shortcut->>CommandView: InvokeCommand(Activate, null context)
-    Note over CommandView: CommandView activates<br/>(CheckBox toggles state)
-    CommandView-->>Shortcut: Returns false
-
-    Shortcut->>Shortcut: Re-enable bubbling
-    Shortcut->>Shortcut: InvokeCommand(Activate) on self
-    Shortcut->>Shortcut: RaiseActivated()
-    Shortcut->>Shortcut: Action?.Invoke()
-
-    Shortcut-->>Application: Returns args.Handled
+```
+User clicks CommandView
+  → CommandView.InvokeCommand(Activate) [from mouse binding]
+  → CommandView.RaiseActivating()
+    → CommandView.Activating event fires
+    → TryBubbleUpToSuperView (Shortcut has Activate in CommandsToBubbleUp)
+      → Shortcut.InvokeCommand(Activate) [with IsBubblingUp=true]
+        → Shortcut.OnActivating(args)
+          → args.Context.Binding.Source == CommandView → skip BubbleDown
+          → return false
+        → Shortcut.Activating event fires
+    → CommandView.RaiseActivated()
+      → CommandView state changes here (e.g., CheckBox toggles)
+  → Shortcut.RaiseActivated()
+    → Action?.Invoke()
 ```
 
-**Events visible to SuperView:**
-- `Shortcut.HandlingHotKey` - fires first
-- `Shortcut.Activating` - fires during `RaiseActivating`
-- `Shortcut.Activated` - fires in `OnActivated`
-- `Action` - invoked
+**Result:** CommandView activates once. Shortcut events fire. Action invoked.
 
-**If SuperView subscribes to CommandView:**
-- `CommandView.Activating` - fires when forwarded
-- `CommandView.Activated` - fires when forwarded
+### Flow 2: Click on HelpView/KeyView/Shortcut Background
 
-#### Space Key
+When the user clicks outside of CommandView but within the Shortcut:
 
-Space is bound to `Command.Activate` by default in `View`:
+Because Shortcut has `MouseHighlightStates = MouseState.In`, it intercepts mouse events for its entire area. The click is attributed to the Shortcut itself.
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Shortcut
-    participant CommandView
-
-    User->>Shortcut: Press Space (Shortcut has focus)
-    Shortcut->>Shortcut: InvokeCommand(Activate)
-    Shortcut->>Shortcut: DefaultActivateHandler
-    Shortcut->>Shortcut: RaiseActivating()
-    Shortcut->>Shortcut: OnActivating(args)
-    Note over Shortcut: Context has no specific source/binding<br/>Falls through to return false
-
-    Shortcut->>Shortcut: RaiseActivated()
-    Shortcut->>Shortcut: Action?.Invoke()
+```
+User clicks on Shortcut (not CommandView)
+  → Shortcut.InvokeCommand(Activate) [from mouse binding, Source=Shortcut]
+  → Shortcut.RaiseActivating()
+    → Shortcut.OnActivating(args)
+      → args.Context.Binding.Source == Shortcut (not CommandView) → BubbleDown!
+      → BubbleDown(CommandView, ctx)
+        → CommandView.InvokeCommand(Activate) [IsBubblingDown=true]
+          → CommandView.RaiseActivating()
+            → TryBubbleUpToSuperView: IsBubblingDown=true → skip
+          → CommandView.RaiseActivated()
+            → State changes here (e.g., CheckBox toggles)
+    → Shortcut.Activating event fires
+  → Shortcut.RaiseActivated()
+    → Action?.Invoke()
 ```
 
-If Space is pressed while CommandView has focus (and CanFocus=true):
+**Result:** CommandView activates once (via BubbleDown). Shortcut events fire. Action invoked.
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant CommandView
-    participant Shortcut
+### Flow 3: Shortcut.Key Press (e.g., Ctrl+O)
 
-    User->>CommandView: Press Space (CommandView has focus)
-    CommandView->>CommandView: InvokeCommand(Activate)
-    CommandView->>CommandView: DefaultActivateHandler
-    CommandView->>CommandView: RaiseActivating()
-    CommandView->>CommandView: RaiseActivated()
-    Note over CommandView: For CheckBox: state changes here
-
-    Note over CommandView: Command bubbles to Shortcut
-    CommandView->>Shortcut: OnActivating (bubbled)
-    Note over Shortcut: IsFromCommandView = true
-    Note over Shortcut: Same flow as click on CommandView
+```
+User presses Shortcut.Key
+  → Shortcut.InvokeCommand(HotKey) [from HotKeyBinding, Binding.Source=Shortcut]
+  → Shortcut.DefaultHotKeyHandler(ctx)
+    → RaiseHandlingHotKey(ctx) → HandlingHotKey event
+    → SetFocus() (if CanFocus)
+    → RaiseHotKeyCommand(ctx) → HotKeyCommand event
+    → InvokeCommand(Activate, ctx.Binding) [passes original binding through]
+      → Shortcut.RaiseActivating()
+        → Shortcut.OnActivating(args)
+          → args.Context.Binding.Source == Shortcut → BubbleDown!
+          → BubbleDown(CommandView, ctx)
+            → CommandView activates (state change)
+        → Shortcut.Activating event fires
+      → Shortcut.RaiseActivated()
+        → Action?.Invoke()
 ```
 
-#### Enter Key
+**Key detail:** `DefaultHotKeyHandler` passes `ctx.Binding` when invoking `Command.Activate`, preserving the binding source so `OnActivating` can detect it was user-initiated and BubbleDown to CommandView.
 
-Enter is bound to `Command.Accept` by default:
+### Flow 4: CommandView HotKey Press (e.g., Alt+O for "_Open")
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Shortcut
-    participant CommandView
-
-    User->>Shortcut: Press Enter
-    Shortcut->>Shortcut: InvokeCommand(Accept)
-    Shortcut->>Shortcut: OnAccepting(args)
-
-    alt IsBindingFromShortcut = false
-        Note over Shortcut: Not from Shortcut's own binding
-        Shortcut->>Shortcut: RaiseActivating(ctx)
-        Note over Shortcut: Triggers the Activate flow
-        Shortcut->>Shortcut: args.Handled = true
-        Shortcut-->>User: Returns true (prevents Accepting)
-    else IsBindingFromShortcut = true
-        Note over Shortcut: From Shortcut's binding
-        Shortcut->>Shortcut: base.OnAccepting(args)
-        Note over Shortcut: Normal Accept flow
-    end
+```
+User presses CommandView's HotKey letter
+  → CommandView.InvokeCommand(HotKey) [from HotKeyBinding]
+  → CommandView.DefaultHotKeyHandler(ctx)
+    → RaiseHandlingHotKey → HandlingHotKey event on CommandView
+    → SetFocus() (if CanFocus)
+    → RaiseHotKeyCommand
+    → InvokeCommand(Activate, ctx.Binding) [Source=CommandView]
+      → CommandView.RaiseActivating()
+        → Bubbles up to Shortcut (Activate in CommandsToBubbleUp)
+          → Shortcut.OnActivating: Binding.Source == CommandView → skip BubbleDown
+      → CommandView.RaiseActivated() → state changes
+  → Shortcut.RaiseActivated() → Action?.Invoke()
 ```
 
-**Key Point**: When Enter is pressed, `OnAccepting` typically redirects to `RaiseActivating` (unless the binding is specifically from the Shortcut), which triggers the same activation flow. This means Enter and Space behave similarly in most cases.
+### Flow 5: Space Key (Shortcut Focused)
 
-### Focus Considerations
+```
+User presses Space (Shortcut has focus)
+  → Shortcut.InvokeCommand(Activate) [from KeyBinding, Source=Shortcut]
+  → Same as Flow 2 (BubbleDown to CommandView)
+```
 
-#### When CommandView.CanFocus = false (Default)
+### Flow 6: Enter Key (Shortcut Focused)
 
-By default, the CommandView is a plain `View` with `CanFocus = false`:
+```
+User presses Enter (Shortcut has focus)
+  → Shortcut.InvokeCommand(Accept) [from KeyBinding, Source=Shortcut]
+  → Shortcut.RaiseAccepting()
+    → Shortcut.OnAccepting(args)
+      → Binding.Source == Shortcut → BubbleDown(CommandView, Accept)
+        → CommandView processes Accept
+    → Shortcut.Accepting event fires
+  → Shortcut.RaiseAccepted()
+    → Action?.Invoke()
+```
 
-- Clicking on CommandView: Shortcut handles the activation
-- CommandView hotkey: May not work as expected (no focus to set)
-- Space/Enter on Shortcut: Shortcut handles activation
+### Flow 7: Programmatic InvokeCommand
 
-#### When CommandView.CanFocus = true (e.g., CheckBox)
+```
+Code calls shortcut.InvokeCommand(Command.Activate)
+  → Shortcut.RaiseActivating()
+    → Shortcut.OnActivating(args)
+      → args.Context.Binding == null → skip BubbleDown
+      → return false
+    → Shortcut.Activating event fires
+  → Shortcut.RaiseActivated()
+    → Action?.Invoke()
+```
 
-When CommandView is a focusable control like CheckBox:
+**Result:** Action invokes, but CommandView does NOT change state. This is by design: programmatic invocations should use `commandView.InvokeCommand(Command.Activate)` directly if they want to change CommandView state.
 
-- Clicking on CommandView: CommandView gets focus, then activates
-- CommandView hotkey: CommandView gets focus (but doesn't activate!)
-- Space on focused CommandView: CommandView activates, then bubbles to Shortcut
-- Tab navigation: Can navigate INTO the CommandView
+## MouseHighlightStates and Event Routing
 
-### Complete Event Reference
+`Shortcut` defaults to `MouseHighlightStates = MouseState.In`, which causes it to highlight on mouse hover and intercept mouse events for its entire area.
 
-#### Events on Shortcut
+### With MouseHighlightStates = MouseState.In (Default)
+
+- Clicks **anywhere** on the Shortcut are attributed to the **Shortcut** itself
+- `Binding.Source` is the Shortcut
+- Path: BubbleDown to CommandView (Flow 2)
+
+### With MouseHighlightStates = MouseState.None
+
+- Clicks on CommandView are attributed to **CommandView**
+- `Binding.Source` is CommandView
+- Path: Bubbles up from CommandView, skip BubbleDown (Flow 1)
+- Clicks on HelpView/KeyView are attributed to those views, which bubble up to Shortcut
+
+**Both paths produce the same result:** CommandView activates once, Shortcut events fire, Action invokes.
+
+## Event Summary
+
+### Events on Shortcut (for SuperView subscribers)
+
+| Event | When Fired | Can Cancel? |
+|-------|-----------|-------------|
+| `HandlingHotKey` | When `Shortcut.Key` is pressed | Yes |
+| `Activating` | During activation flow | Yes |
+| `Activated` | After successful activation; `Action` invoked | No |
+| `Accepting` | When `Command.Accept` invoked | Yes |
+| `Accepted` | After successful accept; `Action` invoked | No |
+
+### Events on CommandView (if subscribed directly)
 
 | Event | When Fired | Notes |
-|-------|------------|-------|
-| `Activating` | During activation flow | Can be cancelled |
-| `Activated` | After successful activation | In `OnActivated` |
-| `Accepting` | When Accept command invoked | Usually redirects to Activating |
-| `Accepted` | In `OnAccepted` | Invokes `Action` |
-| `HandlingHotKey` | When Shortcut.Key pressed | Before activation |
-
-#### Events on CommandView (if subscribed directly)
-
-| Event | When Fired | Notes |
-|-------|------------|-------|
-| `Activating` | When CommandView activates | Before state change |
+|-------|-----------|-------|
+| `Activating` | When CommandView activates | Fires once per interaction |
 | `Activated` | After CommandView activates | State changes here for CheckBox |
-| `HandlingHotKey` | When CommandView hotkey pressed | Only sets focus |
 
-#### CheckBox-Specific Events (when CommandView is CheckBox)
+### CheckBox-Specific Events
 
-| Event | When Fired | Notes |
-|-------|------------|-------|
-| `CheckedStateChanging` | Before state toggle | Can be cancelled |
-| `CheckedStateChanged` | After state toggle | State has changed |
+| Event | When Fired |
+|-------|-----------|
+| `CheckedStateChanging` | Before state toggle (cancellable) |
+| `CheckedStateChanged` | After state toggle |
 
 ## Action Property
 
 The `Action` property is invoked in two places:
 
-1. **`OnActivated`**: Called when `Command.Activate` completes successfully
-2. **`OnAccepted`**: Called when `Command.Accept` completes
+1. **`OnActivated`**: After `Command.Activate` completes successfully
+2. **`OnAccepted`**: After `Command.Accept` completes successfully
 
-This means `Action` may be invoked through either path, providing flexibility in how the Shortcut is triggered.
-
-## Example: SuperView Event Subscription
-
-```csharp
-Shortcut shortcut = new ()
-{
-    Key = Key.F1,
-    Title = "_Help",
-    HelpText = "Show help",
-    Action = () => ShowHelp ()
-};
-
-// Subscribe to Shortcut events
-shortcut.Activating += (sender, args) =>
-{
-    // Called before activation completes
-    // Set args.Cancel = true to prevent
-};
-
-shortcut.Activated += (sender, args) =>
-{
-    // Called after activation - Action already invoked
-};
-
-// For CheckBox CommandView, subscribe to state changes
-CheckBox cb = new () { Text = "_Toggle" };
-shortcut.CommandView = cb;
-
-cb.CheckedStateChanged += (sender, args) =>
-{
-    // Called when checkbox state changes
-    // This fires DURING the Activated phase
-    bool isChecked = args.CurrentValue == CheckState.Checked;
-};
-```
-
-## MouseHighlightStates and Event Routing
-
-The path taken through `OnActivating` depends on the Shortcut's `MouseHighlightStates` setting:
-
-### With `MouseHighlightStates = MouseState.In` (Default)
-
-When the Shortcut highlights on mouse hover (the default), it intercepts mouse events for its entire area:
-
-- Clicks anywhere on the Shortcut (including CommandView area) are attributed to the **Shortcut**
-- `Source` and `Binding.Source` are both the Shortcut
-- **Path taken:** `IsBindingFromShortcut` → forwards to CommandView
-
-### With `MouseHighlightStates = MouseState.None`
-
-When mouse highlighting is disabled, subviews receive mouse events directly:
-
-- Clicks on CommandView are attributed to the **CommandView**
-- `Source` and `Binding.Source` are both the CommandView
-- **Path taken:** `IsFromCommandView` → forwards to CommandView with modified source
-
-### Both Paths Produce the Same Result
-
-Regardless of which path is taken, the result is the same:
-1. CommandView receives `Command.Activate` once
-2. State changes once (e.g., CheckBox toggles)
-3. Shortcut's events fire (`Activating`, `Activated`)
-4. `Action` is invoked
-
-The dual-path design ensures consistent behavior whether the Shortcut or its CommandView receives the initial mouse event.
-
-## Design Rationale
-
-### Why Forward to CommandView?
-
-The forwarding pattern ensures that:
-
-1. **CheckBox state changes**: When clicking anywhere on the Shortcut, the CheckBox toggles
-2. **Consistent behavior**: All interaction paths (click, hotkey, space, enter) produce the same result
-3. **Event bubbling**: SuperViews see consistent events regardless of how the Shortcut was activated
-
-### Why Disable Bubbling During Forward?
-
-When forwarding `Command.Activate` to CommandView, bubbling is temporarily disabled to prevent infinite loops:
-
-```csharp
-CommandsToBubbleUp = [];
-CommandView.InvokeCommand (Command.Activate, context);
-CommandsToBubbleUp = [Command.Activate];
-```
-
-Without this, the command would bubble back to Shortcut, causing infinite recursion.
-
-### HotKey vs. Activate
-
-The distinction is important:
-
-- **HotKey**: Sets focus, doesn't change state
-- **Activate**: Changes state (e.g., toggles CheckBox)
-
-This is why pressing the CommandView's hotkey doesn't toggle a CheckBox, but clicking does.
+This means `Action` fires regardless of whether the Shortcut was activated (Space/click) or accepted (Enter).
 
 ## How To
 
 ### Handle Activation Differently Based on Source
 
-You may want to implement different behavior depending on whether the user activated the `CommandView` directly (e.g., clicked on it) or activated other parts of the `Shortcut` (e.g., pressed the hotkey or clicked elsewhere). Use `args.Context.TryGetSource()` in the `Activating` event handler to determine the activation source.
-
-**Use Case:** A color picker where clicking the picker opens a dialog, but pressing the shortcut key cycles through colors.
+Use `args.Context.TryGetSource()` in the `Activating` event handler to determine whether the user interacted with the CommandView directly or with the Shortcut:
 
 ```csharp
-ColorPicker16 bgColor = new () { Id = "bgColorCP", BoxHeight = 1, BoxWidth = 1 };
-
-Shortcut bgColorShortcut = new ()
+Shortcut shortcut = new ()
 {
-    Id = "bgColor",
     Key = Key.F9,
     HelpText = "Cycles BG Color",
     CommandView = bgColor
 };
 
-bgColorShortcut.Activating += (s, args) =>
+shortcut.Activating += (_, args) =>
 {
-    // Check if activation came from the CommandView itself
-    if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColorShortcut.CommandView)
+    if (args.Context.TryGetSource (out View? source) && source == shortcut.CommandView)
     {
-        // User clicked directly on the ColorPicker16
-        // Mark as handled to allow the ColorPicker16's normal behavior (open dialog)
-        args.Handled = true;
+        // User clicked directly on the CommandView
+        args.Handled = true; // Let CommandView handle it normally
     }
     else
     {
         // User pressed F9 or clicked elsewhere on the Shortcut
-        // Cycle through colors instead
-        if (bgColor.SelectedColor == ColorName16.White)
-        {
-            bgColor.SelectedColor = ColorName16.Black;
-
-            return;
-        }
-
-        bgColor.SelectedColor++;
+        bgColor.SelectedColor++; // Custom logic
     }
-};
-
-// Handle the color change
-bgColor.ValueChanged += (sendingView, args) =>
-{
-    // Update the application's color scheme when color changes
-    _app!.TopRunnableView!.SetScheme (
-        new Scheme (_app.TopRunnableView.GetScheme ())
-        {
-            Normal = new Attribute (
-                _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Foreground,
-                args.NewValue,
-                _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Style
-            )
-        }
-    );
 };
 ```
 
-**Key Points:**
+### Use Shortcut with a CheckBox
 
-- `args.Context.TryGetSource (out View? ctxSource)` retrieves the view that initiated the activation
-- Compare `ctxSource` with `bgColorShortcut.CommandView` to determine if activation came from the CommandView
-- When activation is from the CommandView, set `args.Handled = true` to prevent further processing and allow the CommandView's default behavior
-- When activation is from elsewhere (hotkey, other clicks), implement custom logic (e.g., cycling values)
+```csharp
+Shortcut shortcut = new ()
+{
+    Key = Key.F6,
+    CommandView = new CheckBox { Text = "Force 16 Colors" }
+};
+
+// Subscribe to the CheckBox state changes
+((CheckBox)shortcut.CommandView).CheckedStateChanged += (_, args) =>
+{
+    bool isChecked = args.CurrentValue == CheckState.Checked;
+    // React to state change
+};
+
+// Or subscribe to the Shortcut's Action for simple callbacks
+shortcut.Action = () => DoSomething ();
+```
+
+## Design Rationale
+
+### Why BubbleDown?
+
+Without BubbleDown, clicking on the HelpView or KeyView area would not toggle a CheckBox CommandView. BubbleDown ensures that **all** user interactions with the Shortcut reach the CommandView, maintaining the "single control" illusion.
+
+### Why Check Binding.Source?
+
+The three-way check (has binding? source is CommandView? programmatic?) prevents:
+
+1. **Double-processing**: When CommandView raises Activate and it bubbles up to Shortcut, Shortcut should not BubbleDown back to CommandView (infinite loop / double toggle).
+2. **Unwanted side effects**: Programmatic `InvokeCommand` on the Shortcut should not automatically change CommandView state - the caller should be explicit.
+
+### Why Accept Does Not Invoke Activate?
+
+Accept and Activate are distinct semantic actions:
+
+- **Activate** = "interact with this control" (toggle, select, change state)
+- **Accept** = "confirm/execute" (submit, close menu, run command)
+
+Conflating them causes confusion in composite views like Menu, where Accept on a MenuItem should execute the command and close the menu, but Activate should just highlight/focus the item.
+
+### Comparison with SelectorBase/FlagSelector
+
+`FlagSelector` is another composite view that uses `BubbleDown`, but with intentionally different semantics:
+
+| | Shortcut | FlagSelector |
+|--|---------|-------------|
+| **Check** | `Binding.Source` | `Context.Source` (via `TryGetSource`) |
+| **Programmatic invoke** | Skip BubbleDown | BubbleDown to focused checkbox |
+| **From SubView** | Skip (already processed) | Skip (already processed) |
+| **From self** | BubbleDown to CommandView | BubbleDown to focused checkbox |
+
+**Why the difference?** FlagSelector is a container for N equivalent checkboxes; programmatic `InvokeCommand(Activate)` naturally means "toggle the focused item." Shortcut is a composite with one CommandView; programmatic invoke should raise Shortcut's own events/Action without implicitly changing CommandView state. Callers who want to change CommandView state should call `commandView.InvokeCommand(Activate)` directly.
+
+`OptionSelector` takes a different approach entirely: it subscribes to checkbox `Activating` events and manually calls `InvokeCommand(Command.Activate, args.Context)` on itself, bypassing the BubbleDown pattern. This works but has a TODO noting it shouldn't be needed.
