@@ -27,35 +27,44 @@ public class FlagSelector : SelectorBase, IDesignable
         KeyBindings.Remove (Key.Enter);
 
         MouseBindings.Clear ();
-
-        // Replace DefaultHotKeyHandler: FlagSelector spec says HotKey restores focus but never
-        // activates/changes value. We skip the InvokeCommand(Activate) that DefaultHotKeyHandler does.
-        AddCommand (Command.HotKey, ctx =>
-        {
-            if (RaiseHandlingHotKey (ctx) is true)
-            {
-                return true;
-            }
-
-            if (CanFocus)
-            {
-                SetFocus ();
-            }
-
-            RaiseHotKeyCommand (ctx);
-
-            // Do NOT invoke Activate - FlagSelector HotKey should never toggle a flag
-            return true;
-        });
     }
+
+    // Set by OnHandlingHotKey to suppress the Activate that DefaultHotKeyHandler
+    // fires after RaiseHandlingHotKey. Checked and cleared in OnActivating.
+    private bool _suppressHotKeyActivate;
 
     /// <summary>
     ///     Overrides the base method to handle the FlagSelector's HotKey.
     ///     Per spec: When focused, HotKey is a complete no-op (returns <see langword="true"/> to stop processing).
-    ///     When not focused, returns <see langword="false"/> to let <see cref="View.HandlingHotKey"/> fire.
+    ///     When not focused, restores focus and sets a flag to suppress the Activate that
+    ///     <see cref="View.DefaultHotKeyHandler"/> would otherwise invoke. Returns <see langword="false"/>
+    ///     so the <see cref="View.HandlingHotKey"/> event still fires.
     /// </summary>
     /// <param name="args">The command event arguments.</param>
-    protected override bool OnHandlingHotKey (CommandEventArgs args) => base.OnHandlingHotKey (args) || HasFocus;
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        // When focused, HotKey is a no-op
+        if (HasFocus)
+        {
+            return true;
+        }
+
+        // Not focused: restore focus, suppress the Activate that DefaultHotKeyHandler will invoke
+        _suppressHotKeyActivate = true;
+
+        if (CanFocus)
+        {
+            SetFocus ();
+        }
+
+        // Return false so HandlingHotKey event fires (required by AllViews contract)
+        return false;
+    }
 
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
@@ -67,13 +76,19 @@ public class FlagSelector : SelectorBase, IDesignable
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
+        // HotKey-triggered Activate: OnHandlingHotKey set the flag to suppress toggling
+        if (_suppressHotKeyActivate)
+        {
+            _suppressHotKeyActivate = false;
+
+            return false;
+        }
+
         // Skip BubbleDown when:
         // - IsBubblingDown is true (re-entry prevention)
         // - No Focused view to dispatch to
         // - Source is a SubView that already bubbled up (not this selector)
-        if (args.Context?.IsBubblingDown == true
-            || Focused is null
-            || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
+        if (args.Context?.IsBubblingDown == true || Focused is null || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
         {
             return false;
         }
@@ -270,12 +285,6 @@ public class FlagSelector : SelectorBase, IDesignable
             }
         }
 
-        if (Styles.HasFlag (SelectorStyles.ShowNoneFlag))
-        {
-            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
-
-            // noneCheckBox?.Value = Value > 0 ? CheckState.Checked : CheckState.UnChecked;
-        }
         _updatingChecked = false;
     }
 
@@ -293,16 +302,18 @@ public class FlagSelector : SelectorBase, IDesignable
     protected override void OnCreatedSubViews ()
     {
         // If the values include 0, and ShowNoneFlag is not specified, remove the "None" check box
-        if (!Styles.HasFlag (SelectorStyles.ShowNoneFlag))
+        if (Styles.HasFlag (SelectorStyles.ShowNoneFlag))
         {
-            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
-
-            if (noneCheckBox is { })
-            {
-                Remove (noneCheckBox);
-                noneCheckBox.Dispose ();
-            }
+            return;
         }
+        CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
+
+        if (noneCheckBox is null)
+        {
+            return;
+        }
+        Remove (noneCheckBox);
+        noneCheckBox.Dispose ();
     }
 
     /// <inheritdoc/>
