@@ -94,8 +94,11 @@ public class ListViewWithSelection : Scenario
         _listView?.CollectionChanged += (s, a) => LogEvent (s as View, $"CollectionChanged: {a}");
         _listView?.Accepting += (s, a) => LogEvent (s as View, $"Accept: {a}");
         _listView?.Activating += (s, a) => LogEvent (s as View, $"Activate: {a}");
-        _listView?.VerticalScrollBar.AutoShow = true;
-        _listView?.HorizontalScrollBar.AutoShow = true;
+
+        if (_listView is { })
+        {
+            _listView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+        }
 
         _listView?.Initialized += (_, _) => _viewportSettingsEditor.ViewToEdit = _listView;
 

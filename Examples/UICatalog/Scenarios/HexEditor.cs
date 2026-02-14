@@ -50,7 +50,7 @@ public class HexEditor : Scenario
         _hexView.Arrangement = ViewArrangement.Resizable;
         _hexView.Edited += _hexView_Edited;
         _hexView.PositionChanged += _hexView_PositionChanged;
-        _hexView.VerticalScrollBar.AutoShow = false;
+        // Scrollbars are disabled by default (VisibilityMode.Manual)
 
         _win.Add (_hexView);
 
@@ -151,8 +151,7 @@ public class HexEditor : Scenario
         };
         _win.Add (_statusBar);
 
-        _hexView.VerticalScrollBar.AutoShow = true;
-        _hexView.HorizontalScrollBar.AutoShow = true;
+        _hexView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         _hexView.Source = LoadFile ();
 

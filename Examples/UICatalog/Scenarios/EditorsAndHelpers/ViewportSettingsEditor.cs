@@ -65,10 +65,10 @@ public sealed class ViewportSettingsEditor : EditorBase
                                          ? CheckState.Checked
                                          : CheckState.UnChecked;
 
-        _cbVerticalScrollBar!.Value = ViewToEdit.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked;
-        _cbAutoShowVerticalScrollBar!.Value = ViewToEdit.VerticalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked;
-        _cbHorizontalScrollBar!.Value = ViewToEdit.HorizontalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked;
-        _cbAutoShowHorizontalScrollBar!.Value = ViewToEdit.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked;
+        _cbVerticalScrollBar!.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar) ? CheckState.Checked : CheckState.UnChecked;
+        _cbAutoShowVerticalScrollBar!.Value = ViewToEdit.VerticalScrollBar.VisibilityMode == ScrollBarVisibilityMode.Auto ? CheckState.Checked : CheckState.UnChecked;
+        _cbHorizontalScrollBar!.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar) ? CheckState.Checked : CheckState.UnChecked;
+        _cbAutoShowHorizontalScrollBar!.Value = ViewToEdit.HorizontalScrollBar.VisibilityMode == ScrollBarVisibilityMode.Auto ? CheckState.Checked : CheckState.UnChecked;
     }
 
     private CheckBox? _cbAllowNegativeX;
@@ -312,32 +312,50 @@ public sealed class ViewportSettingsEditor : EditorBase
         _cbVerticalScrollBar = new CheckBox { Title = "VerticalScrollBar", X = 0, Y = Pos.Bottom (_cbClearContentOnly), CanFocus = false };
         _cbVerticalScrollBar.ValueChanging += VerticalScrollBarToggle;
 
-        void VerticalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea) =>
-            ViewToEdit!.VerticalScrollBar.Visible = rea.NewValue == CheckState.Checked;
+        void VerticalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
+        {
+            if (rea.NewValue == CheckState.Checked)
+            {
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+            }
+            else
+            {
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
+            }
+        }
 
         _cbAutoShowVerticalScrollBar = new CheckBox
         {
-            Title = "AutoShow", X = Pos.Right (_cbVerticalScrollBar) + 1, Y = Pos.Top (_cbVerticalScrollBar), CanFocus = false
+            Title = "Auto Mode", X = Pos.Right (_cbVerticalScrollBar) + 1, Y = Pos.Top (_cbVerticalScrollBar), CanFocus = false
         };
         _cbAutoShowVerticalScrollBar.ValueChanging += AutoShowVerticalScrollBarToggle;
 
         void AutoShowVerticalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea) =>
-            ViewToEdit!.VerticalScrollBar.AutoShow = rea.NewValue == CheckState.Checked;
+            ViewToEdit!.VerticalScrollBar.VisibilityMode = rea.NewValue == CheckState.Checked ? ScrollBarVisibilityMode.Auto : ScrollBarVisibilityMode.Manual;
 
         _cbHorizontalScrollBar = new CheckBox { Title = "HorizontalScrollBar", X = 0, Y = Pos.Bottom (_cbVerticalScrollBar), CanFocus = false };
         _cbHorizontalScrollBar.ValueChanging += HorizontalScrollBarToggle;
 
-        void HorizontalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea) =>
-            ViewToEdit!.HorizontalScrollBar.Visible = rea.NewValue == CheckState.Checked;
+        void HorizontalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
+        {
+            if (rea.NewValue == CheckState.Checked)
+            {
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
+            }
+            else
+            {
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.HasHorizontalScrollBar;
+            }
+        }
 
         _cbAutoShowHorizontalScrollBar = new CheckBox
         {
-            Title = "AutoShow ", X = Pos.Right (_cbHorizontalScrollBar) + 1, Y = Pos.Top (_cbHorizontalScrollBar), CanFocus = false
+            Title = "Auto Mode ", X = Pos.Right (_cbHorizontalScrollBar) + 1, Y = Pos.Top (_cbHorizontalScrollBar), CanFocus = false
         };
         _cbAutoShowHorizontalScrollBar.ValueChanging += AutoShowHorizontalScrollBarToggle;
 
         void AutoShowHorizontalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea) =>
-            ViewToEdit!.HorizontalScrollBar.AutoShow = rea.NewValue == CheckState.Checked;
+            ViewToEdit!.HorizontalScrollBar.VisibilityMode = rea.NewValue == CheckState.Checked ? ScrollBarVisibilityMode.Auto : ScrollBarVisibilityMode.Manual;
 
         Add (labelContentSize,
              _contentSizeWidth,

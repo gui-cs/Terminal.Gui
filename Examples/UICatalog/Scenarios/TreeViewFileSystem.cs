@@ -52,7 +52,7 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = Pos.Bottom (menu), Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
-        _treeViewFiles.VerticalScrollBar.AutoShow = false;
+        // Scrollbars are disabled by default (VisibilityMode.Manual)
 
         _detailsFrame = new DetailsFrame (_iconProvider)
         {

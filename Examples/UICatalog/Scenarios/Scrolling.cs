@@ -69,14 +69,20 @@ public class Scrolling : Scenario
         {
             X = Pos.Left (demoView),
             Y = Pos.Bottom (hCheckBox),
-            Text = "_AutoShow (both)",
-            Value = demoView.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
+            Text = "_HasScrollBars",
+            Value = demoView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars) ? CheckState.Checked : CheckState.UnChecked
         };
 
         ahCheckBox.ValueChanging += (_, e) =>
                                            {
-                                               demoView.HorizontalScrollBar.AutoShow = e.NewValue == CheckState.Checked;
-                                               demoView.VerticalScrollBar.AutoShow = e.NewValue == CheckState.Checked;
+                                               if (e.NewValue == CheckState.Checked)
+                                               {
+                                                   demoView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+                                               }
+                                               else
+                                               {
+                                                   demoView.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
+                                               }
                                            };
         win.Add (ahCheckBox);
 

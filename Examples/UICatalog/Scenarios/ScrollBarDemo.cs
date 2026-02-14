@@ -33,7 +33,8 @@ public class ScrollBarDemo : Scenario
         ScrollBar scrollBar = new ()
         {
             X = Pos.AnchorEnd () - 5,
-            AutoShow = false,
+            VisibilityMode = ScrollBarVisibilityMode.Manual,
+            Visible = true,
             ScrollableContentSize = 100,
             Height = Dim.Fill ()
         };
@@ -265,10 +266,10 @@ public class ScrollBarDemo : Scenario
         {
             Y = Pos.Top (lblOptions),
             X = Pos.Right (lblOptions) + 1,
-            Text = "_AutoShow",
-            Value = scrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
+            Text = "_VisibilityMode = Auto",
+            Value = scrollBar.VisibilityMode == ScrollBarVisibilityMode.Auto ? CheckState.Checked : CheckState.UnChecked
         };
-        autoShow.ValueChanging += (_, e) => scrollBar.AutoShow = e.NewValue == CheckState.Checked;
+        autoShow.ValueChanging += (_, e) => scrollBar.VisibilityMode = e.NewValue == CheckState.Checked ? ScrollBarVisibilityMode.Auto : ScrollBarVisibilityMode.Manual;
         demoFrame.Add (autoShow);
 
         Label lblSliderPosition = new ()

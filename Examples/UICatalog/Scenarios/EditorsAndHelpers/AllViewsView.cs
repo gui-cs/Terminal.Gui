@@ -10,8 +10,7 @@ public class AllViewsView : View
         CanFocus = true;
         BorderStyle = LineStyle.Heavy;
         Arrangement = ViewArrangement.Resizable;
-        HorizontalScrollBar.AutoShow = false;
-        VerticalScrollBar.AutoShow = true;
+        ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
         SubViewsLaidOut += (sender, _) =>
                            {

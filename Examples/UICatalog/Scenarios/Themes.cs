@@ -81,7 +81,7 @@ public sealed class Themes : Scenario
         viewListView.Border!.Thickness = new (0, 1, 0, 0);
         viewListView.Margin!.Thickness = new (0, 0, 1, 0);
 
-        viewListView.VerticalScrollBar.AutoShow = true;
+        viewListView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
 
         ViewPropertiesEditor viewPropertiesEditor = new ()
