@@ -74,8 +74,8 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // Initial content size; height will be corrected by RebuildVisibleRows()
         SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, HEADER_HEIGHT + _rowHeight));
 
-        // Set up the horizontal scrollbar. Turn off AutoShow since we do it manually.
-        HorizontalScrollBar.AutoShow = false;
+        // Set up the horizontal scrollbar with manual visibility control.
+        HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
         HorizontalScrollBar.Increment = COLUMN_WIDTH;
 
         // This prevents scrolling past the last column
@@ -90,7 +90,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
 
         // We want the horizontal scrollbar to only show when needed.
-        // We can't use ScrollBar.AutoShow because we are using custom ContentSize
+        // We can't use ScrollBar.Auto because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
         ViewportChanged += (_, _) =>
                            {
@@ -98,8 +98,8 @@ public class CharMap : View, IDesignable, IValue<Rune>
                                UpdateCursor ();
                            };
 
-        // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
-        VerticalScrollBar.AutoShow = true;
+        // Set up the vertical scrollbar with auto-show behavior.
+        ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
         VerticalScrollBar.Visible = false;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header

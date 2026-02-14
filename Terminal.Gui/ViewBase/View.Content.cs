@@ -278,7 +278,10 @@ public partial class View
                 return;
             }
 
+            ViewportSettingsFlags oldFlags = _viewportSettings;
             _viewportSettings = value;
+
+            SyncScrollBarsToSettings (oldFlags, value);
 
             if (IsInitialized)
             {

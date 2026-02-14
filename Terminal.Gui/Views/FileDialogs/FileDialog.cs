@@ -57,10 +57,8 @@ public class FileDialog : Dialog, IDesignable
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem? fileSystem)
     {
-        HorizontalScrollBar.AutoShow = false;
-        HorizontalScrollBar.Visible = false;
-        VerticalScrollBar.AutoShow = false;
-        VerticalScrollBar.Visible = false;
+        // Scrollbars are disabled by default (VisibilityMode.Manual and Visible = false)
+        // No need to explicitly set them
 
         _fileSystem = fileSystem;
         Style = new FileDialogStyle (fileSystem);

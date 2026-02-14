@@ -174,6 +174,51 @@ public partial class View
     }
 
     /// <summary>
+    ///     Synchronizes the ScrollBar states with the ViewportSettings flags.
+    ///     Called when ViewportSettings changes to enable/disable built-in scrollbars.
+    /// </summary>
+    private void SyncScrollBarsToSettings (ViewportSettingsFlags oldFlags, ViewportSettingsFlags newFlags)
+    {
+        if (this is Adornment)
+        {
+            return;
+        }
+
+        SyncOneScrollBar (
+            oldFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
+            newFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
+            Orientation.Vertical
+        );
+
+        SyncOneScrollBar (
+            oldFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
+            newFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
+            Orientation.Horizontal
+        );
+    }
+
+    private void SyncOneScrollBar (bool hadFlag, bool hasFlag, Orientation orientation)
+    {
+        if (!hadFlag && hasFlag)
+        {
+            // Enabling: access triggers lazy creation, then set Auto mode
+            ScrollBar scrollBar = orientation == Orientation.Vertical ? VerticalScrollBar : HorizontalScrollBar;
+            scrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
+        }
+        else if (hadFlag && !hasFlag)
+        {
+            // Disabling: only if the scrollbar was ever created
+            Lazy<ScrollBar> lazy = orientation == Orientation.Vertical ? _verticalScrollBar : _horizontalScrollBar;
+
+            if (lazy.IsValueCreated)
+            {
+                lazy.Value.VisibilityMode = ScrollBarVisibilityMode.Manual;
+                lazy.Value.Visible = false;
+            }
+        }
+    }
+
+    /// <summary>
     ///     Clean up the ScrollBars of the View. Called by View.Dispose.
     /// </summary>
     private void DisposeScrollBars ()
