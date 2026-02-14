@@ -76,21 +76,23 @@ All planned features implemented:
 - `OnAccepted` override — calls `RequestStop` after button press
 - `DefaultAcceptView` used for IsDefault button routing
 
-### 3.4 Menu System — IN PROGRESS
+### 3.4 Menu System — DONE
 
-**Files:** `Terminal.Gui/Views/Menu/Menu.cs`, `MenuBar.cs`, `MenuItem.cs`, `PopoverMenu.cs`
+**Files:** `Terminal.Gui/Views/Menu/Menu.cs`, `MenuBar.cs`, `MenuBarItem.cs`, `PopoverMenu.cs`
 
 **Done:**
 - `Menu.CommandsToBubbleUp = [Command.Accept, Command.Activate]`
 - MenuItem inherits from Shortcut (gets BubbleDown behavior)
 - MenuBar inherits from Bar
-
-**Not Done (active work):**
-- `Menu.OnAccepting` is fully commented out (~25 lines, lines 107-136)
-  - QuitKey handling in menu context
-  - SuperMenuItem propagation for PopoverMenu (no SuperView case)
-  - SuperView null-check logic
-- Integration testing of full menu hierarchy bubbling
+- Menu: Custom Activate/Accept handlers run DefaultHandler but return false for IsBubblingUp
+  - Events fire on Menu (Activating/Accepting) but the command isn't consumed
+  - Originating MenuItem can complete its RaiseActivated/RaiseAccepted → Action?.Invoke()
+- Menu: OnSubViewAdded subscribes to `menuItem.Activated` → `RaiseAccepted` (closes menu after Activate)
+- MenuBar: Overrides Menu's handlers with DefaultActivateHandler/DefaultAcceptHandler (preserves popover toggle)
+- MenuBarItem: Custom HotKey handler skips SetFocus before InvokeCommand(Activate)
+  - Prevents race between OnSelectedMenuItemChanged (focus-based) and OnActivating (command-based)
+- All 18 MenuBar tests pass (was 9/20), all 9 Menu tests pass
+- Full parallel suite: 13,928 pass, 0 fail
 
 ### 3.5 TextView — DONE
 

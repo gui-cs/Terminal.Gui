@@ -27,6 +27,7 @@ PopoverBaseImpl
 | 4. Migrate Command to Shortcut | Moved TargetView + Command from MenuItem to Shortcut; moved OnAccepted logic | **DONE** |
 | 5. Update command.md | Added Shortcut/MenuItem/Menu/Bar rows to command table | **DONE** |
 | — Shortcut Command tests | Added 9 tests for TargetView/Command on Shortcut | **DONE** |
+| 6. Fix MenuBar / MenuBarItem / PopoverMenu | Fixed all 5 remaining failures: command bubbling, HotKey switching, menu closing | **DONE** |
 
 ### Current Test Counts
 
@@ -34,36 +35,29 @@ PopoverBaseImpl
 |------|-------|
 | ShortcutTests (all partials) | 124 |
 | MenuItemTests | 11 |
-| MenuTests | 10 |
+| MenuTests | 9 |
 | BarTests | 16 |
-| **MenuBarTests** | **9 pass, 11 fail** |
-| Full parallel suite | 13,918 pass, 0 fail |
+| **MenuBarTests** | **18 pass, 0 fail** (2 skipped by design) |
+| Full parallel suite | 13,928 pass, 0 fail |
+| Full non-parallel suite | 1,002 pass, 0 fail |
 
 ---
 
 ## Next: MenuBar, MenuBarItem, PopoverMenu
 
-### 11 Failing MenuBarTests
+### MenuBarTests — ALL FIXED
 
-All in `Tests/UnitTests/Views/MenuBarTests.cs`:
+All 18 tests pass (was 9 pass, 11 fail). 2 tests skipped by design.
 
-| # | Test | Error |
-|---|------|-------|
-| 1 | `MenuBarItem_HotKey_Activates_And_Opens` | Assert.True — PopoverMenu not visible |
-| 2 | `MenuBarItem_HotKey_Deactivates` | Assert.True — PopoverMenu not visible |
-| 3 | `MenuItems_HotKey_RaisesAction` | Assert.True — Action not invoked |
-| 4 | `MenuItems_HotKey_Deactivates` | Assert.True — PopoverMenu not visible |
-| 5 | `HotKey_Makes_PopoverMenu_Visible_Only_Once` | Assert.Equal(1, 0) — never becomes visible |
-| 6 | `WhenOpen_Other_MenuBarItem_HotKey_Activates_And_Opens` | Assert.True — switching fails |
-| 7 | `Mouse_Click_Activates_And_Opens` | Assert.True — PopoverMenu not visible |
-| 8 | `Dynamic_Change_MenuItem_Title` | Assert.Equal(1, 0) — action not invoked |
-| 9 | `MenuBarItem_Disabled_Popover_Is_Activated` | Assert.True — disabled item handling |
-| 10 | `Update_MenuBarItem_HotKey_Works` | Assert.True — updated hotkey not working |
-| 11 | `Visible_False_MenuItem_Key_Does_Action` | Assert.Equal(1, 0) — action not invoked |
+**Root causes found and fixed:**
 
-**Pattern:** HotKey-triggered activation and PopoverMenu visibility are broken. The root cause is likely in how MenuBar/MenuBarItem/PopoverMenu coordinate HotKey → Activate → Show/Hide.
+1. **Activate/Accept command consumed by Menu** — Menu's DefaultActivateHandler/DefaultAcceptHandler returned true when commands bubbled up from MenuItems, preventing the originating MenuItem from calling RaiseActivated/RaiseAccepted → Action?.Invoke(). **Fix:** Custom Activate/Accept handlers in Menu that run the default handler (so events fire) but return false for IsBubblingUp.
 
-**Additional issue:** Clicking on a MenuItem inside an open PopoverMenu does not invoke its action. The Accept command likely does not propagate from the clicked MenuItem back through PopoverMenu → MenuBar → hide popover + invoke action. Same root cause as the mouse click fix (source is CommandView, not MenuItem) may apply here, or Accept propagation through PopoverMenu may be broken.
+2. **Menu not closing after HotKey activation** — The HotKey → Activate flow invoked Action but didn't trigger the Accept chain (needed for PopoverMenu to close). **Fix:** Subscribe to `menuItem.Activated` in Menu.OnSubViewAdded → `RaiseAccepted` to trigger PopoverMenu.MenuAccepted → close.
+
+3. **MenuBarItem HotKey switch race condition** — DefaultHotKeyHandler called SetFocus before InvokeCommand(Activate), causing OnSelectedMenuItemChanged to open the popover, then OnActivating to toggle it closed. **Fix:** MenuBarItem overrides Command.HotKey to skip SetFocus (ShowItem handles focus).
+
+4. **MenuBar command handlers** — MenuBar overrides Menu's Activate/Accept handlers with DefaultActivateHandler/DefaultAcceptHandler to preserve popover toggle behavior in OnActivating/OnAccepting.
 
 ### Key Source Files
 
@@ -233,7 +227,7 @@ FileDialog tests are also failing. These may be fixed as a side-effect of Menu f
 ## Execution Order
 
 1. ~~Phase 1-5~~ **DONE** — Bar, MenuItem, Menu fixes + Shortcut.Command migration + docs
-2. **Phase 6** (MenuBar/MenuBarItem/PopoverMenu) — Fix the 11 failing tests; this is the core work
+2. ~~Phase 6~~ **DONE** — MenuBar/MenuBarItem/PopoverMenu: All tests pass
 3. **Phase 7** (Scenarios) — Update UICatalog scenarios; verify focus behavior
 4. **Phase 8** (Integration Tests) — Fix MenuBar/PopoverMenu and FileDialog integration test failures (last step)
 

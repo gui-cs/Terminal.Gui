@@ -29,6 +29,35 @@ public class Menu : Bar
 
         CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
+        // When a MenuItem's Activate bubbles up to this Menu, run the full handler
+        // (so Activating/Activated events fire on Menu) but return false so the originating
+        // MenuItem can complete its own activation (RaiseActivated → Action?.Invoke()).
+        AddCommand (Command.Activate, ctx =>
+                                      {
+                                          if (ctx?.IsBubblingUp == true)
+                                          {
+                                              DefaultActivateHandler (ctx);
+
+                                              return false;
+                                          }
+
+                                          return DefaultActivateHandler (ctx);
+                                      });
+
+        // Same for Accept: run the handler (fires Accepting/Accepted events) but return false
+        // so the originating MenuItem completes its own Accept processing.
+        AddCommand (Command.Accept, ctx =>
+                                    {
+                                        if (ctx?.IsBubblingUp == true)
+                                        {
+                                            DefaultAcceptHandler (ctx);
+
+                                            return false;
+                                        }
+
+                                        return DefaultAcceptHandler (ctx);
+                                    });
+
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 
@@ -63,6 +92,10 @@ public class Menu : Bar
                 menuItem.CanFocus = true;
 
                 menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
+
+                // When a MenuItem is activated (e.g., via HotKey → Activate flow),
+                // raise Accepted on this Menu so PopoverMenu can close.
+                menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
 
                 break;
             }
