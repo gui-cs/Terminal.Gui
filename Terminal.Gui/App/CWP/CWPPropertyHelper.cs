@@ -110,8 +110,7 @@ public static class CWPPropertyHelper
         ValueChangedEventArgs<T> changedArgs = new (currentValue, finalValue);
         currentValue = finalValue;
         onChanged?.Invoke (changedArgs);
-        // BUGBUG: This should pass this not null; need to test
-        changedEvent?.Invoke (null, changedArgs);
+        changedEvent?.Invoke (sender, changedArgs);
 
         return true;
     }
