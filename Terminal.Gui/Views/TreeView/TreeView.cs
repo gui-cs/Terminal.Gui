@@ -464,10 +464,13 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <returns><see langword="true"/> if <see cref="ObjectActivated"/> was fired.</returns>
     public bool? ActivateSelectedObjectIfAny (ICommandContext commandContext)
     {
-        // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
-        if (RaiseAccepting (commandContext) == true)
+        // Only raise Accepting when the command is Accept, not when Activate is invoked (e.g. via HotKey).
+        if (commandContext?.Command == Command.Accept)
         {
-            return true;
+            if (RaiseAccepting (commandContext) == true)
+            {
+                return true;
+            }
         }
 
         T o = SelectedObject;

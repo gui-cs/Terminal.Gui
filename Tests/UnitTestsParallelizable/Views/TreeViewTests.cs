@@ -38,12 +38,11 @@ public class TreeViewTests
         Assert.Equal ("candle", tree.SelectedObject.Text);
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    // NOTE: TreeView is a special case - both Activate and Accept invoke the same handler
+    // Claude - Opus 4.6
+    // Activate should NOT raise Accepting (it only activates the object).
+    // Accept SHOULD raise Accepting. HotKey invokes Activate, so it must not trigger Accept.
     [Fact]
-    public void Command_Activate_SameAsAccept ()
+    public void Command_Activate_Does_Not_Accept ()
     {
         TreeView treeView = new ();
         TreeNode root = new () { Text = "Root" };
@@ -64,9 +63,9 @@ public class TreeViewTests
         treeView.InvokeCommand (Command.Accept);
         int afterAccept = acceptingCount;
 
-        // Both commands should trigger the same handler
-        Assert.Equal (1, afterActivate);
-        Assert.Equal (2, afterAccept);
+        // Activate should not trigger Accepting; Accept should
+        Assert.Equal (0, afterActivate);
+        Assert.Equal (1, afterAccept);
 
         treeView.Dispose ();
     }
