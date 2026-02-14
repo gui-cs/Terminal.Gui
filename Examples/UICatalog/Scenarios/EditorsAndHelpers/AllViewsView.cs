@@ -3,7 +3,7 @@ namespace UICatalog.Scenarios;
 
 public class AllViewsView : View
 {
-    private const int MAX_VIEW_FRAME_HEIGHT = 25;
+    private const int MAX_VIEW_FRAME_HEIGHT = 30;
 
     public AllViewsView ()
     {
@@ -196,12 +196,12 @@ public class AllViewsView : View
 
         if (!view.Width.Has<DimAuto> (out _))
         {
-            view.Width = Dim.Fill ();
+            view.Width = Dim.Fill (0, minimumContentDim: 100);
         }
 
         if (!view.Height.Has<DimAuto> (out _))
         {
-            view.Height = Dim.Auto (minimumContentDim: MAX_VIEW_FRAME_HEIGHT - 2, maximumContentDim: MAX_VIEW_FRAME_HEIGHT - 2);
+            view.Height = Dim.Auto (minimumContentDim: MAX_VIEW_FRAME_HEIGHT - 2, maximumContentDim: MAX_VIEW_FRAME_HEIGHT - view.GetAdornmentsThickness().Vertical);
         }
     }
 }
