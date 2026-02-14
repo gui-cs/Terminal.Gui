@@ -27,28 +27,35 @@ public class FlagSelector : SelectorBase, IDesignable
         KeyBindings.Remove (Key.Enter);
 
         MouseBindings.Clear ();
+
+        // Replace DefaultHotKeyHandler: FlagSelector spec says HotKey restores focus but never
+        // activates/changes value. We skip the InvokeCommand(Activate) that DefaultHotKeyHandler does.
+        AddCommand (Command.HotKey, ctx =>
+        {
+            if (RaiseHandlingHotKey (ctx) is true)
+            {
+                return true;
+            }
+
+            if (CanFocus)
+            {
+                SetFocus ();
+            }
+
+            RaiseHotKeyCommand (ctx);
+
+            // Do NOT invoke Activate - FlagSelector HotKey should never toggle a flag
+            return true;
+        });
     }
 
     /// <summary>
     ///     Overrides the base method to handle the FlagSelector's HotKey.
-    ///     Per spec: HotKey restores focus but never changes value. When focused, HotKey is a no-op.
+    ///     Per spec: When focused, HotKey is a complete no-op (returns <see langword="true"/> to stop processing).
+    ///     When not focused, returns <see langword="false"/> to let <see cref="View.HandlingHotKey"/> fire.
     /// </summary>
     /// <param name="args">The command event arguments.</param>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
-    {
-        if (base.OnHandlingHotKey (args))
-        {
-            return true;
-        }
-
-        // FlagSelector spec: HotKey restores focus but never activates/changes value
-        if (CanFocus)
-        {
-            SetFocus ();
-        }
-
-        return true;
-    }
+    protected override bool OnHandlingHotKey (CommandEventArgs args) => base.OnHandlingHotKey (args) || HasFocus;
 
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
