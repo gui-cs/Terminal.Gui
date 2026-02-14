@@ -234,6 +234,55 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Null (exception);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that common printable characters including space, letters, digits,
+    ///     and punctuation are correctly inserted as text input.
+    /// </summary>
+    [Fact]
+    public void CommonInput_AllPrintableCharacters_InsertedAsText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 40 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        // Type a string with letters, digits, space, and punctuation
+        foreach (char c in "Hello World 123!@#")
+        {
+            top.NewKeyDownEvent (c);
+        }
+
+        Assert.Equal ("Hello World 123!@#", tf.Text);
+
+        top.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that the space key is not consumed by the default View Command.Activate binding.
+    ///     TextField removes the Key.Space binding so space can be typed as text.
+    /// </summary>
+    [Fact]
+    public void Space_IsInsertedAsText_NotConsumedByActivate ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 20 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+
+        top.NewKeyDownEvent ((Key)'a');
+        top.NewKeyDownEvent (Key.Space);
+        top.NewKeyDownEvent ((Key)'b');
+
+        Assert.Equal ("a b", tf.Text);
+
+        top.Dispose ();
+    }
+
     [Fact]
     public void Backspace_From_End ()
     {
