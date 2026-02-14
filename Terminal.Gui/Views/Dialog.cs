@@ -122,36 +122,55 @@ public class Dialog : Dialog<int>
             return true;
         }
 
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is not true || sourceView is not Button sourceButton)
+        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is not true || !Buttons.Contains (sourceView as Button))
         {
             return false;
         }
-        Result = Buttons.IndexOf (sourceButton);
+        Result = Buttons.IndexOf (sourceView as Button);
 
         return true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        // For non-default button sources (e.g., Cancel), set Result before base handles it.
+        // Base (Dialog<int>.OnAccepting) will call RequestStop and return true (handled) for
+        // non-default IAcceptTarget sources, preventing DefaultAcceptView from being invoked.
+        View? sourceView = null;
+        args.Context?.Source?.TryGetTarget (out sourceView);
+
+        if (sourceView is Button button && Buttons.Contains (button) && button is IAcceptTarget { IsDefault: false })
+        {
+            Result = Buttons.IndexOf (button);
+        }
+        else if (sourceView is { } && DefaultAcceptView is Button defaultButton && Buttons.Contains (defaultButton))
+        {
+            // Non-button source (e.g., CheckBox double-click): set Result to default button's index
+            Result = Buttons.IndexOf (defaultButton);
+        }
+
+        return base.OnAccepting (args);
     }
 
     /// <summary>
     ///     Overrides the <see cref="Dialog{TResult}"/> Accepting behavior to set <see cref="Result"/> to the index of the
     ///     dialog button pressed.
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="ctx"></param>
     /// <returns></returns>
-    protected override bool OnAccepting (CommandEventArgs args)
+    protected override void OnAccepted (ICommandContext? ctx)
     {
-        if (args.Context?.Source?.TryGetTarget (out View? sourceView) is not true || sourceView is not Button sourceButton)
+        base.OnAccepted (ctx);
+
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) is not true || !Buttons.Contains (sourceView as Button))
         {
-            return false;
+            return;
         }
 
-        if (!Buttons.Contains (sourceButton))
-        {
-            return false;
-        }
+        RequestStop ();
 
-        int buttonIndex = Buttons.IndexOf (sourceButton);
+        int buttonIndex = Buttons.IndexOf (sourceView as Button);
         Result = buttonIndex;
-
-        return base.OnAccepting (args);
     }
 }

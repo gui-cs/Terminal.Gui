@@ -95,10 +95,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                             return false;
                         }
 
-                        if (InvokeCommand (Command.Activate) is true)
-                        {
-                            return true;
-                        }
+                        InvokeCommand (Command.Activate);
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
@@ -116,10 +113,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                             return false;
                         }
 
-                        if (InvokeCommand (Command.Activate) is true)
-                        {
-                            return true;
-                        }
+                        InvokeCommand (Command.Activate);
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {

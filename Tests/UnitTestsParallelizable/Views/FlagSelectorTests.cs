@@ -641,14 +641,25 @@ public class FlagSelectorTests
 
     [Fact]
     public void Mouse_DoubleClick_TogglesAndAccepts ()
-    {
+    {      
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var selector = new FlagSelector { DoubleClickAccepts = true };
         selector.Values = [1, 2];
         selector.Labels = ["Flag1", "Flag2"];
-        selector.Layout ();
+
+        (runnable as View)?.Add (selector);
+        app.Begin (runnable);
 
         var acceptCount = 0;
         selector.Accepting += (s, e) => acceptCount++;
+
+        var valueChangedCount = 0;
+        selector.ValueChanged += (s, e) => valueChangedCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
 
@@ -657,13 +668,15 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, checkBox.Value); // FIXED: Was UnChecked
         Assert.Equal (1, selector.Value); // Verify Value is set to first value
 
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonClicked });
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        checkBox = selector.SubViews.OfType<CheckBox> ().Last ();
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (1, acceptCount);
+        Assert.Equal (0, valueChangedCount);
 
         // After double-clicking on an already-checked flag checkbox, it should still be checked (flags don't uncheck on double-click in FlagSelector)
         Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (1, selector.Value); // Verify Value is set to first value
     }
 
     [Fact]

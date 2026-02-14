@@ -453,7 +453,11 @@ public class Dialogs : Scenario
         }
 
         /// <inheritdoc/>
-        protected override void OnAccepted (ICommandContext? ctx) => Result = _colorPicker.Value!.Value;
+        protected override void OnAccepted (ICommandContext? ctx)
+        {
+            base.OnAccepted (ctx);
+            Result = _colorPicker.Value!.Value;
+        }
     }
 
     public override List<Key> GetDemoKeyStrokes (IApplication? app)

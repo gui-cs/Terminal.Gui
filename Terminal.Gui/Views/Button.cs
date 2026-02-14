@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace Terminal.Gui.Views;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses <see cref="View.HotKey"/>,
@@ -19,13 +18,12 @@ namespace Terminal.Gui.Views;
 ///         Button does not raise <see cref="View.Activating"/> events.
 ///     </para>
 /// </remarks>
-public class Button : View, IDesignable
+public class Button : View, IDesignable, IAcceptTarget
 {
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
     private readonly Rune _rightDefault;
-    private bool _isDefault;
 
     /// <summary>
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
@@ -54,15 +52,6 @@ public class Button : View, IDesignable
         Width = Dim.Auto (DimAutoStyle.Text);
 
         CanFocus = true;
-
-        AddCommand (Command.HotKey,
-                    ctx =>
-                    {
-                        // BUGBUG: Once we fix RaiseAccepting to setfocus by default we can remove this.
-                        SetFocus ();
-
-                        return RaiseAccepting (ctx);
-                    });
 
         KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
         KeyBindings.ReplaceCommands (Key.Enter, Command.Accept);
@@ -107,34 +96,10 @@ public class Button : View, IDesignable
         }
     }
 
-    private bool? HandleHotKeyCommand (ICommandContext commandContext)
+    /// <inheritdoc />
+    protected override void OnHotKeyCommand (ICommandContext? commandContext)
     {
-        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
-
-        bool? handled = RaiseActivating (commandContext);
-
-        if (handled == true)
-        {
-            return true;
-        }
-        SetFocus ();
-
-        handled = RaiseAccepting (commandContext);
-
-        if (handled == true)
-        {
-            return true;
-        }
-
-        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
-        // TODO: no use-case has been identified for any View other than Button to act like this.
-        // If Accept was not handled...
-        if (cachedIsDefault && SuperView is { })
-        {
-            return SuperView.InvokeCommand (Command.Accept);
-        }
-
-        return false;
+        InvokeCommand (Command.Accept);
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
@@ -149,39 +114,18 @@ public class Button : View, IDesignable
     /// <inheritdoc/>
     public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
-    /// <summary>
-    ///     Gets or sets whether the <see cref="Button"/> will act as the default handler for <see cref="Command.Accept"/>
-    ///     commands on the <see cref="View.SuperView"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If <see langword="true"/>:
-    ///     </para>
-    ///     <para>
-    ///         - The Button will display an indicator that it is the default Button.
-    ///     </para>
-    ///     <para>
-    ///         - When clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
-    ///         invoked on the SuperView.
-    ///     </para>
-    ///     <para>
-    ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
-    ///         the
-    ///         first Button in the SuperView that has <see cref="IsDefault"/> set to <see langword="true"/>. See
-    ///         <see cref="View.RaiseAccepting"/> for more information.
-    ///     </para>
-    /// </remarks>
+    /// <inheritdoc />
     public bool IsDefault
     {
-        get => _isDefault;
+        get;
         set
         {
-            if (_isDefault == value)
+            if (field == value)
             {
                 return;
             }
 
-            _isDefault = value;
+            field = value;
 
             UpdateTextFormatterText ();
             SetNeedsLayout ();

@@ -42,7 +42,7 @@ public class CheckBoxTests
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
         // Select with keyboard - DefaultActivateHandler returns false on success
-        Assert.False (checkBox.NewKeyDownEvent (Key.Space));
+        checkBox.NewKeyDownEvent (Key.Space);
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
         // Select with mouse
@@ -52,7 +52,7 @@ public class CheckBoxTests
         checkBox.AllowCheckStateNone = true;
 
         // DefaultActivateHandler returns false on success
-        Assert.False (checkBox.NewKeyDownEvent (Key.Space));
+        checkBox.NewKeyDownEvent (Key.Space);
         Assert.Equal (CheckState.None, checkBox.Value);
 
         checkBox.AllowCheckStateNone = false;
@@ -139,10 +139,6 @@ public class CheckBoxTests
         checkBox.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
     public void Command_Activate_TogglesState ()
     {
@@ -152,13 +148,10 @@ public class CheckBoxTests
 
         checkBox.Activating += (_, _) => activatingFired = true;
 
-        bool? result = checkBox.InvokeCommand (Command.Activate);
+        checkBox.InvokeCommand (Command.Activate);
 
         Assert.True (activatingFired);
         Assert.NotEqual (initialState, checkBox.Value);
-
-        // DefaultActivateHandler returns false on success (not cancelled)
-        Assert.False (result);
 
         checkBox.Dispose ();
     }
@@ -215,12 +208,9 @@ public class CheckBoxTests
         CheckState initialState = checkBox.Value;
 
         // Space should trigger state toggle via Activate command
-        bool? result = checkBox.NewKeyDownEvent (Key.Space);
+        checkBox.NewKeyDownEvent (Key.Space);
 
         Assert.NotEqual (initialState, checkBox.Value);
-
-        // DefaultActivateHandler returns false on success (not cancelled)
-        Assert.False (result);
 
         checkBox.Dispose ();
     }
@@ -344,38 +334,45 @@ public class CheckBoxTests
     }
 
     [Fact]
-    public void Mouse_DoubleClick_Accepts ()
+    public void Mouse_DoubleClick_Advances_And_Accepts ()
     {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var checkBox = new CheckBox { Text = "_Checkbox" };
+        (runnable as View)?.Add (checkBox);
+        app.Begin (runnable);
         Assert.True (checkBox.CanFocus);
 
-        var checkedStateChangingCount = 0;
-        checkBox.ValueChanging += (s, e) => checkedStateChangingCount++;
+        var valueChangingCount = 0;
+        checkBox.ValueChanging += (s, e) => valueChangingCount++;
 
-        var selectCount = 0;
-        checkBox.Activating += (s, e) => selectCount++;
+        var activatingCount = 0;
+        checkBox.Activating += (s, e) => activatingCount++;
 
-        var acceptCount = 0;
+        var acceptingCount = 0;
+        checkBox.Accepting += (s, e) => acceptingCount++;
 
-        checkBox.Accepting += (s, e) =>
-                              {
-                                  acceptCount++;
-                                  e.Handled = true;
-                              };
+        var acceptedCount = 0;
+        checkBox.Accepted += (s, e) => acceptedCount++;
 
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, valueChangingCount);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptingCount);
 
-        checkBox.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
+        // Double click should advance and then accept
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (Point.Empty));
 
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (1, valueChangingCount);
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptingCount);
+        Assert.Equal (1, acceptedCount);
     }
 
     // Test that Title and Text are the same

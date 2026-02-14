@@ -31,8 +31,11 @@ public class CheckBox : View, IValue<CheckState>
         // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
 
+        // Use LeftButtonClicked instead of LeftButtonReleased to prevent double activation on double-click.
+        // LeftButtonClicked fires once per click; LeftButtonReleased fires on each release (twice for double-click).
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
-        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
 
         TitleChanged += Checkbox_TitleChanged;
 

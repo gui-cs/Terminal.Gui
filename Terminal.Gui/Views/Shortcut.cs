@@ -273,9 +273,9 @@ public class Shortcut : View, IOrientation, IDesignable
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+       // if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
-            BubbleDown (CommandView, args.Context);
+            return BubbleDown (CommandView, args.Context) is null;
         }
 
         return false;
@@ -299,12 +299,14 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
+        InvokeCommand (Command.Activate);
+
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+       // if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
-            BubbleDown (CommandView, args.Context);
+           return BubbleDown (CommandView, args.Context) is null;
         }
 
         return false;

@@ -383,7 +383,7 @@ public class Shortcuts : Scenario
                                           args.Handled = true;
 
                                           // Cycle colors only if activating didn't come from the CommandView
-                                          if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColor)
+                                          if (args.Context?.Binding is null || args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColor)
                                           { }
                                           else
                                           {

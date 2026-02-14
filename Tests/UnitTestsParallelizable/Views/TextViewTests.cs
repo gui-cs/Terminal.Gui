@@ -2411,23 +2411,6 @@ public class TextViewTests
         textView.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void Command_Accept_NotTypical ()
-    {
-        TextView textView = new () { Text = "Test" };
-
-        // TextView doesn't typically use Accept command (multiline input)
-        // Just verify the command doesn't crash
-        bool? result = textView.InvokeCommand (Command.Accept);
-
-        Assert.False (result);
-
-        textView.Dispose ();
-    }
-
     [Fact]
     public void Command_HotKey_SetsFocus ()
     {

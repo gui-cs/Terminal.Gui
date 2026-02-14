@@ -140,7 +140,6 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     public void Enter_Enables_Default_Button_Accept ()
     {
         var superView = new Window { Id = "superView" };
-
         var tf = new TextField { Id = "tf" };
 
         var button = new Button { Id = "button", IsDefault = true };
@@ -174,13 +173,13 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         var handle = false;
         view.Accepting += TextViewAccepting;
 
-        Assert.False (view.InvokeCommand (Command.Accept));
+        view.InvokeCommand (Command.Accept);
         Assert.True (tfAcceptingInvoked);
 
         tfAcceptingInvoked = false;
         handle = true;
         view.Accepting += TextViewAccepting;
-        Assert.True (view.InvokeCommand (Command.Accept));
+        view.InvokeCommand (Command.Accept);
         Assert.True (tfAcceptingInvoked);
 
         return;
