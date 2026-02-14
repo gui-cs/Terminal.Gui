@@ -347,14 +347,14 @@ shortcut.Activating += (_, args) =>
 {
     if (args.Context.TryGetSource (out View? source) && source == shortcut.CommandView)
     {
-        // User clicked directly on the CommandView
-        args.Handled = true; // Let CommandView handle it normally
+        // User clicked directly on the CommandView — don't set Handled so
+        // the CommandView's OnActivated runs (e.g., picks color from mouse position).
+        return;
     }
-    else
-    {
-        // User pressed F9 or clicked elsewhere on the Shortcut
-        bgColor.SelectedColor++; // Custom logic
-    }
+
+    // User pressed F9 or clicked elsewhere on the Shortcut — cycle the color.
+    args.Handled = true;
+    bgColor.SelectedColor++;
 };
 ```
 
