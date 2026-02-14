@@ -87,6 +87,7 @@ public class DatePicker : View, IValue<DateTime>
             ValueChangedEventArgs<DateTime> changedArgs = new (oldValue, _date);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _date));
         }
     }
 

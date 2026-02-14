@@ -180,6 +180,9 @@ public partial class TextField : View, IDesignable, IValue<string>
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
 
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     /// <summary>
     ///     Raises the <see cref="ValueChanging"/> event.
     /// </summary>
@@ -198,6 +201,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     {
         ValueChangedEventArgs<string?> args = new (oldValue, newValue);
         ValueChanged?.Invoke (this, args);
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, newValue));
     }
 
     #endregion
@@ -212,7 +216,4 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         base.Dispose (disposing);
     }
-
-    /// <inheritdoc />
-    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }
