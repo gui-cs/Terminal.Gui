@@ -289,6 +289,41 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Accept/Activate/HotKey Command Handling
 
+    /// <summary>
+    ///     Gets or sets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on
+    ///     when the Shortcut is accepted.
+    /// </summary>
+    public View? TargetView { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the Shortcut
+    ///     is accepted. If no <see cref="TargetView"/> is set, the <see cref="Key"/> will be used to invoke commands
+    ///     bound at the application level.
+    /// </summary>
+    public Command Command
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+
+            if (string.IsNullOrEmpty (Title))
+            {
+                Title = GlobalResources.GetString ($"cmd.{field}") ?? string.Empty;
+            }
+
+            if (string.IsNullOrEmpty (HelpText))
+            {
+                HelpText = GlobalResources.GetString ($"cmd.{field}.Help") ?? string.Empty;
+            }
+        }
+    }
+
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
@@ -340,7 +375,29 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnAccepted (ICommandContext? ctx) => Action?.Invoke ();
+    protected override void OnAccepted (ICommandContext? ctx)
+    {
+        base.OnAccepted (ctx);
+        Action?.Invoke ();
+
+        // Translate the incoming command to Command
+        if (Command != Command.NotBound && ctx is { })
+        {
+            ctx.Command = Command;
+        }
+
+        if (TargetView is { })
+        {
+            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
+            TargetView.InvokeCommand (Command, ctx);
+        }
+        else if (Key.IsValid && Command != Command.NotBound)
+        {
+            // Is this an Application-bound command?
+            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+            App?.Keyboard.InvokeCommandsBoundToKey (Key);
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the

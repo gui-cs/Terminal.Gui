@@ -75,6 +75,10 @@ The following table documents how `View` and each View subclass binds or handles
 | **FileDialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **DatePicker** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | OnMouseEvent (toggle) | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Shortcut** | `Command.Activate` (BubbleDown to CommandView) | `Command.Accept` (BubbleDown to CommandView) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **MenuItem** | `Command.Activate` (inherited from Shortcut) | `Command.Accept` (invokes TargetView.Command) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **Menu** | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems |
+| **Bar** | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts |
 | **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent | OnMouseEvent | OnMouseEvent | Not bound |
 | **ProgressBar** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
 | **SpinnerView** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
@@ -117,7 +121,7 @@ The table shows how each view handles keyboard and mouse input using one of thes
    - **DoubleClicked**: `MouseFlags.LeftButtonDoubleClicked` - synthesized from timing of two clicks
    - For detailed information about the mouse event pipeline and how events are synthesized, see the [Mouse Deep Dive](mouse.md).
 
-9. **Shortcut, Bar, MenuItem, MenuBar**: These views are currently being redesigned and are not included in this table. See the source code for current behavior.
+9. **Shortcut**: Uses `CommandsToBubbleUp = [Command.Activate, Command.Accept]` and `BubbleDown` to coordinate commands between its SubViews (CommandView, HelpView, KeyView). See the [Shortcut Deep Dive](shortcut.md) for details. **MenuItem** extends Shortcut with `TargetView` and `Command` properties for invoking commands on target views. **Menu** is a vertical `Bar` container for MenuItems. **MenuBar** is being redesigned; see source code for current behavior.
 
 10. **Implementation Patterns**: To understand how bindings work, see:
     - `Terminal.Gui/ViewBase/Mouse/View.Mouse.cs` - Base mouse handling and MouseBindings
