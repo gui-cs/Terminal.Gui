@@ -85,6 +85,35 @@ public class Shortcut : View, IOrientation, IDesignable
 
         CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
+        // Override the default Activate handler. When a SubView's Activate bubbles up to this
+        // Shortcut (IsBubblingUp=true), we return false so the originating SubView's
+        // DefaultActivateHandler continues to call RaiseActivated (e.g., CheckBox needs this to
+        // toggle its state). Without this, the SuperView consuming the command would prevent
+        // the SubView from completing its own activation.
+        AddCommand (Command.Activate, ctx =>
+                                      {
+                                          if (RaiseActivating (ctx) is true)
+                                          {
+                                              return true;
+                                          }
+
+                                          if (CanFocus)
+                                          {
+                                              SetFocus ();
+                                          }
+
+                                          RaiseActivated (ctx);
+
+                                          // When the command bubbled up from a SubView, return false so the
+                                          // SubView continues its own processing (e.g., CheckBox.OnActivated toggles state).
+                                          if (ctx?.IsBubblingUp == true)
+                                          {
+                                              return false;
+                                          }
+
+                                          return true;
+                                      });
+
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
         CommandView = new View
@@ -273,7 +302,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-       // if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -299,14 +328,12 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-        InvokeCommand (Command.Activate);
-
-        // Only bubble down to CommandView when the activation came from user interaction
+        // Only bubble down to CommandView when accept came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-       // if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
-           return BubbleDown (CommandView, args.Context) is null;
+            return BubbleDown (CommandView, args.Context) is null;
         }
 
         return false;

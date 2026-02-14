@@ -1,0 +1,412 @@
+using JetBrains.Annotations;
+
+namespace ViewsTests;
+
+[TestSubject (typeof (Shortcut))]
+public partial class ShortcutTests
+{
+    [Theory]
+    [CombinatorialData]
+    public void CommandView_Click_Raises_Activating_On_Both (bool commandViewCanFocus)
+    {
+        // Arrange
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = commandViewCanFocus };
+
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
+
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (testCommandView.Frame.Location));
+
+        // Assert - Shortcut.Activating should have been raised
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, commandViewActivatingRaised);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that clicking directly on a Button CommandView routes through Accept (not Activate),
+    ///     because Button maps <see cref="MouseFlags.LeftButtonClicked"/> to <see cref="Command.Accept"/>.
+    ///     The Accept bubbles up to the Shortcut, which also raises its Accepting event.
+    ///     Neither Activating event fires because the click goes through the Accept path.
+    /// </summary>
+    [Theory]
+    [CombinatorialData]
+    public void MouseClick_Button_CommandView_Raises_Accepting_On_Both (bool commandViewCanFocus)
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        Button button = new () { Title = "C", NoDecorations = true, NoPadding = true, CanFocus = commandViewCanFocus };
+
+        Shortcut shortcut = new () { Key = Key.A, Text = "0", CommandView = button };
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        // Verify the Shortcut and Button have been laid out
+        Assert.True (shortcut.Frame.Width > 0, "Shortcut should have width");
+        Assert.True (button.Frame.Width > 0, "Button should have width");
+
+        var shortcutAcceptingCount = 0;
+        shortcut.Accepting += (_, _) => shortcutAcceptingCount++;
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        var buttonAcceptingCount = 0;
+        button.Accepting += (_, _) => buttonAcceptingCount++;
+
+        var buttonActivatingCount = 0;
+        button.Activating += (_, _) => buttonActivatingCount++;
+
+        // Act - click directly on the Button (CommandView)
+        // Button maps LeftButtonClicked → Command.Accept, so this goes through Accept path
+        Point buttonScreenPos = button.ViewportToScreen (Point.Empty);
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (buttonScreenPos));
+
+        // Assert - Accept fires on Button, then bubbles to Shortcut
+        Assert.Equal (1, buttonAcceptingCount);
+        Assert.Equal (1, shortcutAcceptingCount);
+
+        // Activating does NOT fire because the click was routed to Accept by Button
+        Assert.Equal (0, buttonActivatingCount);
+        Assert.Equal (0, shortcutActivatingCount);
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void CommandView_KeyDown_HotKey_Raises_Activating_On_Both (bool commandViewCanFocus)
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        CheckBox testCommandView = new () { Title = "_Test", CanFocus = commandViewCanFocus };
+        testCommandView.Value = 0;
+
+        Shortcut shortcut = new () { Key = Key.F4, CommandView = testCommandView };
+        Assert.Equal (Key.F4, shortcut.Key);
+        Assert.Equal (Key.Empty, shortcut.HotKey);
+        Assert.Equal (Key.T, testCommandView.HotKey);
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+        Assert.Equal (commandViewCanFocus, testCommandView.HasFocus);
+        Assert.True (shortcut.HasFocus);
+
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
+
+        var shortcutActivatedRaised = 0;
+        shortcut.Activated += (_, _) => shortcutActivatedRaised++;
+
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
+
+        var shortcutHandlingHotKeyFired = 0;
+        shortcut.HandlingHotKey += (_, _) => { shortcutHandlingHotKeyFired++; };
+
+        var commandViewHandlingHotKeyFired = 0;
+        testCommandView.HandlingHotKey += (_, _) => { commandViewHandlingHotKeyFired++; };
+
+        Assert.Equal (CheckState.UnChecked, testCommandView.Value);
+        app.Keyboard.RaiseKeyDownEvent (testCommandView.HotKey);
+
+        // Assert - Shortcut.Activating should have been raised
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, shortcutActivatedRaised);
+        Assert.Equal (0, shortcutHandlingHotKeyFired);
+        Assert.Equal (1, commandViewActivatingRaised);
+        Assert.Equal (1, commandViewHandlingHotKeyFired);
+
+        Assert.Equal (CheckState.Checked, testCommandView.Value);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that pressing the Shortcut's Key (not the CommandView's HotKey) correctly
+    ///     bubbles down to the CommandView, toggling a CheckBox. This tests the fix where
+    ///     DefaultHotKeyHandler passes the binding through to InvokeCommand(Command.Activate)
+    ///     so Shortcut.OnActivating can detect a user-initiated action and call BubbleDown.
+    /// </summary>
+    [Theory]
+    [CombinatorialData]
+    public void Shortcut_Key_Activates_CheckBox_CommandView (bool commandViewCanFocus)
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = commandViewCanFocus };
+
+        Shortcut shortcut = new () { Key = Key.F.WithCtrl, CommandView = checkBox };
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
+
+        var checkBoxActivatingRaised = 0;
+        checkBox.Activating += (_, _) => checkBoxActivatingRaised++;
+
+        // Act - Press the Shortcut's Key (Ctrl+F), which triggers Command.HotKey on the Shortcut
+        app.Keyboard.RaiseKeyDownEvent (Key.F.WithCtrl);
+
+        // Assert - CheckBox should have toggled
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, checkBoxActivatingRaised);
+    }
+
+    // Claude - Haiku 4.5
+    /// <summary>
+    ///     Verifies that Context.TryGetSource() can be used in Activating event handlers to determine
+    ///     if the activation came from the CommandView itself.
+    ///     This pattern (shown in Shortcuts.cs:374) allows different handling based on the activation source.
+    /// </summary>
+    [Fact]
+    public void Activating_Context_TryGetSource_Identifies_CommandView_Activation ()
+    {
+        // Arrange
+        using TestCommandView commandView = new ();
+        commandView.Text = "Command";
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F9;
+        shortcut.HelpText = "Test";
+        shortcut.CommandView = commandView;
+
+        View? capturedSource = null;
+        var activatingFired = 0;
+
+        shortcut.Activating += (_, args) =>
+                               {
+                                   // ReSharper disable once AccessToModifiedClosure
+                                   activatingFired++;
+                                   args.Context.TryGetSource (out capturedSource);
+                               };
+
+        // Act 1 - Activate the CommandView directly (simulates clicking on the CommandView)
+        commandView.InvokeCommand (Command.Activate);
+
+        // Assert - The source should be the CommandView
+        Assert.Equal (1, activatingFired);
+        Assert.NotNull (capturedSource);
+        Assert.Same (commandView, capturedSource);
+
+        // Reset
+        capturedSource = null;
+        activatingFired = 0;
+
+        // Act 2 - Activate the Shortcut directly (not through CommandView)
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Assert - The source should be the Shortcut when activating it directly
+        Assert.Equal (1, activatingFired);
+        Assert.NotNull (capturedSource);
+        Assert.Same (shortcut, capturedSource);
+    }
+
+    // Claude - Haiku 4.5
+    /// <summary>
+    ///     Demonstrates the pattern from Shortcuts.cs:374 where Activating event is marked as Handled
+    ///     when activation comes from the CommandView, but custom logic runs otherwise.
+    /// </summary>
+    [Fact]
+    public void Activating_Can_Handle_Differently_Based_On_CommandView_Source ()
+    {
+        // Arrange
+        using TestCommandView commandView = new ();
+        commandView.Text = "Command";
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F9;
+        shortcut.HelpText = "Cycles value";
+        shortcut.CommandView = commandView;
+
+        var customLogicExecuted = false;
+        var handledWhenFromCommandView = false;
+
+        shortcut.Activating += (_, args) =>
+                               {
+                                   // Pattern from Shortcuts.cs:374 - check if activation came from CommandView
+                                   if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == shortcut.CommandView)
+                                   {
+                                       // Mark as handled when coming from CommandView
+                                       args.Handled = true;
+                                       handledWhenFromCommandView = true;
+                                   }
+                                   else
+                                   {
+                                       // Execute custom logic when NOT from CommandView
+                                       customLogicExecuted = true;
+                                   }
+                               };
+
+        // Act 1 - Activate the CommandView directly
+        commandView.InvokeCommand (Command.Activate);
+
+        // Assert - Should be marked as handled, custom logic should NOT run
+        Assert.True (handledWhenFromCommandView);
+        Assert.False (customLogicExecuted);
+
+        // Reset
+        handledWhenFromCommandView = false;
+        customLogicExecuted = false;
+
+        // Act 2 - Activate the Shortcut directly (not through CommandView)
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Assert - Should NOT be marked as handled, custom logic SHOULD run
+        Assert.False (handledWhenFromCommandView);
+        Assert.True (customLogicExecuted);
+    }
+
+    // Claude - Haiku 4.5
+    /// <summary>
+    ///     Verifies that clicking anywhere across the entire width of a Shortcut causes activation,
+    ///     including clicks in gaps between CommandView, HelpView, and KeyView.
+    /// </summary>
+    [Fact]
+    public void Click_Anywhere_On_Shortcut_Causes_Activation ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F1;
+        shortcut.HelpText = "Help text";
+        shortcut.Title = "Command";
+        shortcut.Width = 40; // Wide enough to create gaps between subviews
+        shortcut.Height = 1;
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var activatingCount = 0;
+
+        shortcut.Activating += (_, _) => { activatingCount++; };
+
+        // Verify layout created gaps
+        Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
+        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
+        Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
+
+        // Act & Assert - Click at various X positions across the entire width
+        for (var x = 0; x < shortcut.Frame.Width; x++)
+        {
+            int expectedCount = activatingCount + 1;
+
+            // Simulate mouse click at position x
+            app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (x, 0)));
+
+            Assert.True (activatingCount == expectedCount,
+                         $"Click at X={x} should activate the Shortcut. Expected: {expectedCount}, Actual: {activatingCount}");
+        }
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that pressing Space when the Shortcut has focus correctly BubbleDowns
+    ///     to the CommandView. Space triggers Activate on the Shortcut, which should forward
+    ///     to CommandView because Binding.Source is the Shortcut (not CommandView).
+    /// </summary>
+    [Fact]
+    public void Space_Key_BubblesDown_To_CheckBox_CommandView ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+
+        Shortcut shortcut = new () { Key = Key.F5, CommandView = checkBox, CanFocus = true };
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        Assert.True (shortcut.HasFocus);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        var checkBoxActivatingCount = 0;
+        checkBox.Activating += (_, _) => checkBoxActivatingCount++;
+
+        // Act - Press Space while Shortcut has focus
+        app.Keyboard.RaiseKeyDownEvent (Key.Space);
+
+        // Assert - CheckBox should toggle (BubbleDown from Shortcut to CommandView)
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (1, shortcutActivatingCount);
+        Assert.Equal (1, checkBoxActivatingCount);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that Enter key invokes Accept (not Activate) on the Shortcut.
+    ///     Accept should NOT change CheckBox state - it's for confirmation, not state change.
+    /// </summary>
+    [Fact]
+    public void Enter_Key_Invokes_Accept_Not_Activate ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+
+        Shortcut shortcut = new () { Key = Key.F5, CommandView = checkBox, CanFocus = true };
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        Assert.True (shortcut.HasFocus);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        var shortcutAcceptingCount = 0;
+        shortcut.Accepting += (_, _) => shortcutAcceptingCount++;
+
+        var actionInvoked = 0;
+        shortcut.Action = () => actionInvoked++;
+
+        // Act - Press Enter while Shortcut has focus
+        app.Keyboard.RaiseKeyDownEvent (Key.Enter);
+
+        // Assert - Accept fires, Activate does NOT fire, CheckBox state unchanged
+        Assert.Equal (1, shortcutAcceptingCount);
+        Assert.Equal (0, shortcutActivatingCount);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        Assert.Equal (1, actionInvoked);
+    }
+}
