@@ -117,7 +117,8 @@ public enum ViewportSettingsFlags
     AllowYPlusHeightGreaterThanContentHeight = 0b_0000_1000_0000,
 
     /// <summary>
-    ///     Combines <see cref="AllowXPlusWidthGreaterThanContentWidth"/> and <see cref="AllowYPlusHeightGreaterThanContentHeight"/>.
+    ///     Combines <see cref="AllowXPlusWidthGreaterThanContentWidth"/> and
+    ///     <see cref="AllowYPlusHeightGreaterThanContentHeight"/>.
     ///     Allows blank space to appear when scrolling in either direction.
     /// </summary>
     AllowLocationPlusSizeGreaterThanContentSize = AllowXPlusWidthGreaterThanContentWidth | AllowYPlusHeightGreaterThanContentHeight,
