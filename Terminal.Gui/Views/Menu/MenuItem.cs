@@ -36,7 +36,7 @@ public class MenuItem : Shortcut
         base (targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
               string.IsNullOrEmpty (commandText) ? GlobalResources.GetString ($"cmd{command}") : commandText,
               null,
-              string.IsNullOrEmpty (helpText) ? GlobalResources.GetString ($"cmd{command}Help") : helpText)
+              string.IsNullOrEmpty (helpText) ? GlobalResources.GetString ($"cmd{command}_Help") : helpText)
     {
         TargetView = targetView;
         Command = command;

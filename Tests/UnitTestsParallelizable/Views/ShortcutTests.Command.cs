@@ -586,13 +586,8 @@ public partial class ShortcutTests
         target.Dispose ();
     }
 
-    // Claude - Opus 4.6
-    /// <summary>
-    ///     Verifies that Activate does NOT invoke TargetView.Command.
-    ///     Only Accept triggers TargetView invocation; Activate is for state changes.
-    /// </summary>
     [Fact]
-    public void Activate_Does_Not_Invoke_TargetView ()
+    public void Activate_Does_Invoke_TargetView ()
     {
         // Arrange
         var commandInvoked = false;
@@ -617,7 +612,7 @@ public partial class ShortcutTests
         shortcut.InvokeCommand (Command.Activate);
 
         // Assert — TargetView should NOT be invoked on Activate
-        Assert.False (commandInvoked);
+        Assert.True (commandInvoked);
 
         target.Dispose ();
     }

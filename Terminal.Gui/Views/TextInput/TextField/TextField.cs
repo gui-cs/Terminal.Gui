@@ -121,13 +121,13 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         PopoverMenu menu = new (new List<MenuItem>
         {
-            new (this, Command.SelectAll, Strings.ctxSelectAll),
-            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new (this, Command.Copy, Strings.ctxCopy),
-            new (this, Command.Cut, Strings.ctxCut),
-            new (this, Command.Paste, Strings.ctxPaste),
-            new (this, Command.Undo, Strings.ctxUndo),
-            new (this, Command.Redo, Strings.ctxRedo)
+            new (this, Command.SelectAll),
+            new (this, Command.DeleteAll),
+            new (this, Command.Copy),
+            new (this, Command.Cut),
+            new (this, Command.Paste),
+            new (this, Command.Undo),
+            new (this, Command.Redo)
         })
         {
 #if DEBUG

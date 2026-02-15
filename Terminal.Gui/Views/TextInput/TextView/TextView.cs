@@ -251,13 +251,13 @@ public partial class TextView : View, IDesignable
     {
         PopoverMenu menu = new (new List<View>
         {
-            new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
-            new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new MenuItem (this, Command.Copy, Strings.ctxCopy),
-            new MenuItem (this, Command.Cut, Strings.ctxCut),
-            new MenuItem (this, Command.Paste, Strings.ctxPaste),
-            new MenuItem (this, Command.Undo, Strings.ctxUndo),
-            new MenuItem (this, Command.Redo, Strings.ctxRedo)
+            new MenuItem (this, Command.SelectAll),
+            new MenuItem (this, Command.DeleteAll),
+            new MenuItem (this, Command.Copy),
+            new MenuItem (this, Command.Cut),
+            new MenuItem (this, Command.Paste),
+            new MenuItem (this, Command.Undo),
+            new MenuItem (this, Command.Redo)
         })
         {
 #if DEBUG
