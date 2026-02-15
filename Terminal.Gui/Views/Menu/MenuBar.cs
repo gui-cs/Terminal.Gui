@@ -124,13 +124,13 @@ public class MenuBar : Menu, IDesignable
 
             field = value;
 
-            Logging.Debug ($"Active set to {field} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+            // Logging.Debug ($"Active set to {field} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
             // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
             // it won't be to the MenuBar
             CanFocus = value;
 
-            Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
             if (!field)
             {
@@ -348,7 +348,7 @@ public class MenuBar : Menu, IDesignable
             && args.Context?.Source?.TryGetTarget (out View? sourceView) == true
             && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
         {
-            Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title})");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title})");
 
             if (!CanFocus)
             {
@@ -386,12 +386,12 @@ public class MenuBar : Menu, IDesignable
 
         if (ctx?.Source?.TryGetTarget (out sourceView) == true && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
         {
-            Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title}) - returning");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView.Title}) - returning");
 
             return;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView?.Title})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({sourceView?.Title})");
 
         Active = false;
     }
@@ -599,15 +599,15 @@ public class MenuBar : Menu, IDesignable
         var menuBgColorCp = new ColorPicker { Width = 30 };
 
         menuBgColorCp.ValueChanged += (_, args) =>
-        {
-            // BUGBUG: This is weird.
-            SetScheme (GetScheme () with
-            {
-                Normal = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground,
-                                        args.NewValue ?? Color.Black,
-                                        GetAttributeForRole (VisualRole.Normal).Style)
-            });
-        };
+                                      {
+                                          // BUGBUG: This is weird.
+                                          SetScheme (GetScheme () with
+                                          {
+                                              Normal = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                      args.NewValue ?? Color.Black,
+                                                                      GetAttributeForRole (VisualRole.Normal).Style)
+                                          });
+                                      };
 
         Add (new MenuBarItem (Strings.menuFile,
                               [
@@ -738,5 +738,4 @@ public class MenuBar : Menu, IDesignable
             }
         }
     }
-
 }

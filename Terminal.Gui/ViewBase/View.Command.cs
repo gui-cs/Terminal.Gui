@@ -245,7 +245,7 @@ public partial class View // Command APIs
 
     internal bool? DefaultAcceptHandler (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         if (RaiseAccepting (ctx) is true)
         {
@@ -259,7 +259,7 @@ public partial class View // Command APIs
         ctx?.Source?.TryGetTarget (out source);
         View? defaultAcceptView = DefaultAcceptView;
 
-        bool redirected = false;
+        var redirected = false;
 
         if (defaultAcceptView is { } && defaultAcceptView != this && defaultAcceptView != source)
         {
@@ -267,7 +267,7 @@ public partial class View // Command APIs
             redirected = true;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Calling RaiseAccepted");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Calling RaiseAccepted");
         RaiseAccepted (ctx);
 
         // Report as handled if:
@@ -326,7 +326,7 @@ public partial class View // Command APIs
         if (!args.Handled)
         {
             // Use TryBubbleToSuperView helper to handle Activate bubbling (opt-in via CommandsToBubbleUp)
-            args.Handled = TryBubbleUpToSuperView (ctx, args.Handled) is true;
+            args.Handled = TryBubbleUp (ctx, args.Handled) is true;
         }
 
         // Do not return null as the event was raised.
@@ -377,8 +377,6 @@ public partial class View // Command APIs
         Accepted?.Invoke (this, new CommandEventArgs { Context = ctx });
     }
 
-    // BUGBUG: Accepted should not use CommandEventArgs since it cannot be cancelled. Use EventArgs<ICommandContext?>?
-
     /// <summary>
     ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not
     ///     cancelled.
@@ -412,7 +410,7 @@ public partial class View // Command APIs
 
     internal bool? DefaultActivateHandler (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         if (RaiseActivating (ctx) is true)
         {
@@ -448,7 +446,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseActivating (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
@@ -459,13 +457,13 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoking Activating event");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoking Activating event");
         Activating?.Invoke (this, args);
 
         if (!args.Handled)
         {
             // Use TryBubbleToSuperView helper to handle Activate bubbling (opt-in via CommandsToBubbleUp)
-            args.Handled = TryBubbleUpToSuperView (ctx, args.Handled) is true;
+            args.Handled = TryBubbleUp (ctx, args.Handled) is true;
         }
 
         return args.Handled;
@@ -503,7 +501,7 @@ public partial class View // Command APIs
     /// <seealso cref="RaiseActivating"/>
     protected void RaiseActivated (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         OnActivated (ctx);
         Activated?.Invoke (this, new EventArgs<ICommandContext?> (ctx));
     }
@@ -527,7 +525,7 @@ public partial class View // Command APIs
 
     internal bool? DefaultHotKeyHandler (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         if (RaiseHandlingHotKey (ctx) is true)
         {
@@ -574,13 +572,13 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoking HandlingHotKey event");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoking HandlingHotKey event");
         HandlingHotKey?.Invoke (this, args);
 
         if (!args.Handled)
         {
             // Use TryBubbleToSuperView helper to handle bubbling (opt-in via CommandsToBubbleUp)
-            args.Handled = TryBubbleUpToSuperView (ctx, args.Handled) is true;
+            args.Handled = TryBubbleUp (ctx, args.Handled) is true;
         }
 
         return args.Handled;
@@ -630,7 +628,7 @@ public partial class View // Command APIs
 
     #endregion Default Event Handlers
 
-    #region Command Propagation
+    #region Command Bubbling
 
     /// <summary>
     ///     Gets or sets the default accept view for this View. The default accept view will have <see cref="Command.Accept"/>
@@ -645,15 +643,7 @@ public partial class View // Command APIs
     /// </remarks>
     public View? DefaultAcceptView
     {
-        get
-        {
-            if (field is null)
-            {
-                return GetSubViews (includePadding: true).FirstOrDefault (v => v is IAcceptTarget { IsDefault: true });
-            }
-
-            return field;
-        }
+        get => field ?? GetSubViews (includePadding: true).FirstOrDefault (v => v is IAcceptTarget { IsDefault: true });
         set;
     }
 
@@ -673,7 +663,7 @@ public partial class View // Command APIs
     /// <summary>
     ///     Dispatches a command downward to a SubView with bubbling suppressed. Creates a new
     ///     <see cref="CommandContext"/> with <see cref="ICommandContext.IsBubblingDown"/> set to <see langword="true"/>,
-    ///     which causes <see cref="TryBubbleUpToSuperView"/> to skip bubbling on the target, preventing re-entry.
+    ///     which causes <see cref="TryBubbleUp"/> to skip bubbling on the target, preventing re-entry.
     /// </summary>
     /// <param name="target">The SubView to dispatch the command to.</param>
     /// <param name="ctx">The original command context, used to determine the command and source.</param>
@@ -682,12 +672,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? BubbleDown (View target, ICommandContext? ctx)
     {
-        //if (ctx?.IsBubblingUp == true)
-        //{
-        //    return false;
-        //}
-
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingDown = true };
 
@@ -704,7 +689,7 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was handled (either locally or by bubbling).
     ///     <see langword="false"/> if the command was not handled.
     /// </returns>
-    protected bool? TryBubbleUpToSuperView (ICommandContext? ctx, bool handled)
+    protected bool? TryBubbleUp (ICommandContext? ctx, bool handled)
     {
         if (handled)
         {
@@ -724,7 +709,7 @@ public partial class View // Command APIs
 
             // Get the source view to determine how to handle the redirect
             View? source = null;
-            ctx?.Source?.TryGetTarget (out source);
+            ctx.Source?.TryGetTarget (out source);
 
             if (isDefaultView is { } && isDefaultView != this && isDefaultView != source)
             {
@@ -732,29 +717,23 @@ public partial class View // Command APIs
                 {
                     // Non-default IAcceptTarget sources bubble up to SuperView
                     // so it can determine which accept target was activated
-                    if (!acceptTarget.IsDefault)
+                    if (acceptTarget.IsDefault)
                     {
-                        CommandContext upCtx = new (Command.Accept, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
-
-                        return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
+                        return false;
                     }
+                    CommandContext upCtx = new (Command.Accept, ctx.Source, ctx.Binding) { IsBubblingUp = true };
+
+                    return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
 
                     // Default IAcceptTarget source - let it flow normally without redirect
-                    return false;
                 }
-                //else
-                //{
-                //    CommandContext upCtx = new (Command.Accept, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
-
-                //    return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
-                //}
             }
         }
 
         // Check if SuperView wants this command bubbled up to it
         if (SuperView?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
         {
-            Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
             CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
 
             return SuperView.InvokeCommand (upCtx.Command, upCtx);
@@ -765,7 +744,7 @@ public partial class View // Command APIs
             // Check if Padding's Parent wants this command bubbled up to it
             if (padding.Parent?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
             {
-                Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+                // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
                 CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
 
                 return padding.Parent.InvokeCommand (upCtx.Command, upCtx);
@@ -773,19 +752,16 @@ public partial class View // Command APIs
         }
 
         // Handle when THIS view is a Padding
-        if (this is Padding selfPadding)
+        if (this is Padding selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
         {
-            if (selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
-            {
-                Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-                CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
+            // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+            CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
 
-                return selfPadding.Parent.InvokeCommand (upCtx.Command, upCtx);
-            }
+            return selfPadding.Parent.InvokeCommand (upCtx.Command, upCtx);
         }
 
         return handled;
     }
 
-    #endregion Command Propagation
+    #endregion Command Bubbling
 }

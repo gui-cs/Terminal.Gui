@@ -59,7 +59,7 @@ public class Menus : Scenario
                                                 return;
                                             }
 
-                                            Logging.Debug ($"{sender.Id} CommandNotBound: {args.Context?.Command}");
+                                            // Logging.Debug ($"{sender.Id} CommandNotBound: {args.Context?.Command}");
                                             eventSource.Add ($"{sender.Id} CommandNotBound: {args.Context?.Command}");
                                             eventLog.MoveDown ();
                                         };
@@ -72,7 +72,8 @@ public class Menus : Scenario
                                       }
 
                                       string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-                                      Logging.Debug ($"{sender.Id} Accepting: {sourceTitle}");
+
+                                      // Logging.Debug ($"{sender.Id} Accepting: {sourceTitle}");
                                       eventSource.Add ($"{sender.Id} Accepting: {sourceTitle}: ");
                                       eventLog.MoveDown ();
                                   };
@@ -87,7 +88,8 @@ public class Menus : Scenario
                                                   string sourceText = args.Context?.Source?.TryGetTarget (out View? sourceView) == true
                                                                           ? sourceView.Text
                                                                           : "null";
-                                                  Logging.Debug ($"{sender.Id} Accepted: {sourceText}");
+
+                                                  // Logging.Debug ($"{sender.Id} Accepted: {sourceText}");
                                                   eventSource.Add ($"{sender.Id} Accepted: {sourceText}: ");
                                                   eventLog.MoveDown ();
                                               };
@@ -155,7 +157,7 @@ public class Menus : Scenario
             AddCommand (Command.Quit,
                         _ =>
                         {
-                            Logging.Debug ("MenuHost Command.Quit - RequestStop");
+                            // Logging.Debug ("MenuHost Command.Quit - RequestStop");
                             App?.RequestStop ();
 
                             return true;
@@ -243,7 +245,7 @@ public class Menus : Scenario
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {sourceView.Title}");
+                                    // Logging.Debug ($"menuBar.Accepted: {sourceView.Title}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;
@@ -296,7 +298,7 @@ public class Menus : Scenario
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {sourceView.Title}");
+                                    // Logging.Debug ($"menuBar.Accepted: {sourceView.Title}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;
@@ -331,7 +333,8 @@ public class Menus : Scenario
             ContextMenu!.Accepted += (_, args) =>
                                      {
                                          string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-                                         Logging.Debug ($"ContextMenu.Accepted: {sourceTitle}");
+
+                                         // Logging.Debug ($"ContextMenu.Accepted: {sourceTitle}");
 
                                          // Forward the event to the MenuHost
                                          if (args.Context is { })
@@ -370,7 +373,7 @@ public class Menus : Scenario
             {
                 lastCommandText.Text = ctx?.Command!.ToString ()!;
 
-                Logging.Debug ($"lastCommand: {lastCommandText.Text}");
+                // Logging.Debug ($"lastCommand: {lastCommandText.Text}");
 
                 return true;
             }

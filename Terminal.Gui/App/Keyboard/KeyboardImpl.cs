@@ -156,7 +156,6 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         //        }
         //#endif
 
-        Logging.Debug($"{key}");
         // TODO: This should match standard event patterns
         KeyDown?.Invoke (this, key);
 
