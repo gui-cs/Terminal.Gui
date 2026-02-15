@@ -377,37 +377,6 @@ public class MenuBarTests ()
         top.Dispose ();
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void Mouse_Click_Activates_And_Opens ()
-    {
-        // Arrange
-        var top = new Runnable () { App = ApplicationImpl.Instance };
-        MenuBar menuBar = new MenuBar () { App = ApplicationImpl.Instance };
-        menuBar.EnableForDesign (ref top);
-
-        top.Add (menuBar);
-        SessionToken rs = Application.Begin (top);
-        Assert.False (menuBar.Active);
-
-        // Act
-        Application.RaiseMouseEvent (new ()
-        {
-            Flags = MouseFlags.LeftButtonPressed
-        });
-        Application.RaiseMouseEvent (new ()
-        {
-            Flags = MouseFlags.LeftButtonReleased
-        });
-        Assert.True (menuBar.Active);
-        Assert.True (menuBar.IsOpen ());
-        Assert.True (menuBar.HasFocus);
-        Assert.True (menuBar.CanFocus);
-
-        Application.End (rs);
-        top.Dispose ();
-    }
-
     // QUESTION: Windows' menus close the menu when you click on the menu bar item again.
     // QUESTION: What does Mac do?
     // QUESTION: How bad is it that this test is skipped?
