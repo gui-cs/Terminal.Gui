@@ -85,6 +85,35 @@ public class Shortcut : View, IOrientation, IDesignable
 
         CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
+        // Override the default Activate handler. When a SubView's Activate bubbles up to this
+        // Shortcut (IsBubblingUp=true), we return false so the originating SubView's
+        // DefaultActivateHandler continues to call RaiseActivated (e.g., CheckBox needs this to
+        // toggle its state). Without this, the SuperView consuming the command would prevent
+        // the SubView from completing its own activation.
+        AddCommand (Command.Activate, ctx =>
+                                      {
+                                          if (RaiseActivating (ctx) is true)
+                                          {
+                                              return true;
+                                          }
+
+                                          if (CanFocus)
+                                          {
+                                              SetFocus ();
+                                          }
+
+                                          RaiseActivated (ctx);
+
+                                          // When the command bubbled up from a SubView, return false so the
+                                          // SubView continues its own processing (e.g., CheckBox.OnActivated toggles state).
+                                          if (ctx?.IsBubblingUp == true)
+                                          {
+                                              return false;
+                                          }
+
+                                          return true;
+                                      });
+
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
         CommandView = new View
@@ -260,6 +289,41 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Accept/Activate/HotKey Command Handling
 
+    /// <summary>
+    ///     Gets or sets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on
+    ///     when the Shortcut is accepted.
+    /// </summary>
+    public View? TargetView { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the Shortcut
+    ///     is accepted. If no <see cref="TargetView"/> is set, the <see cref="Key"/> will be used to invoke commands
+    ///     bound at the application level.
+    /// </summary>
+    public Command Command
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+
+            if (string.IsNullOrEmpty (Title))
+            {
+                Title = GlobalResources.GetString ($"cmd.{field}") ?? string.Empty;
+            }
+
+            if (string.IsNullOrEmpty (HelpText))
+            {
+                HelpText = GlobalResources.GetString ($"cmd.{field}.Help") ?? string.Empty;
+            }
+        }
+    }
+
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
@@ -273,7 +337,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-       // if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -299,21 +363,41 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
-        InvokeCommand (Command.Activate);
-
-        // Only bubble down to CommandView when the activation came from user interaction
+        // Only bubble down to CommandView when accept came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-       // if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
-           return BubbleDown (CommandView, args.Context) is null;
+            return BubbleDown (CommandView, args.Context) is null;
         }
 
         return false;
     }
 
     /// <inheritdoc/>
-    protected override void OnAccepted (ICommandContext? ctx) => Action?.Invoke ();
+    protected override void OnAccepted (ICommandContext? ctx)
+    {
+        base.OnAccepted (ctx);
+        Action?.Invoke ();
+
+        // Translate the incoming command to Command
+        if (Command != Command.NotBound && ctx is { })
+        {
+            ctx.Command = Command;
+        }
+
+        if (TargetView is { })
+        {
+            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
+            TargetView.InvokeCommand (Command, ctx);
+        }
+        else if (Key.IsValid && Command != Command.NotBound)
+        {
+            // Is this an Application-bound command?
+            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+            App?.Keyboard.InvokeCommandsBoundToKey (Key);
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the

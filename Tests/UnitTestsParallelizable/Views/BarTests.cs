@@ -76,7 +76,7 @@ public class BarTests
     [Fact]
     public void Constructor_InitializesWithShortcuts_WhenProvided ()
     {
-        List<Shortcut> shortcuts = new() { new Shortcut (Key.Empty, "Command1", null), new Shortcut (Key.Empty, "Command2", null) };
+        List<Shortcut> shortcuts = new () { new Shortcut (Key.Empty, "Command1", null), new Shortcut (Key.Empty, "Command2", null) };
 
         var bar = new Bar (shortcuts);
 
@@ -102,13 +102,14 @@ public class BarTests
         // Parent customizes attribute resolution
         var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
 
-        parentView.GettingAttributeForRole += (sender, args) =>
+        parentView.GettingAttributeForRole += (_, args) =>
                                               {
-                                                  if (args.Role == VisualRole.Normal)
+                                                  if (args.Role != VisualRole.Normal)
                                                   {
-                                                      args.Result = customAttribute;
-                                                      args.Handled = true;
+                                                      return;
                                                   }
+                                                  args.Result = customAttribute;
+                                                  args.Handled = true;
                                               };
 
         // StatusBar sets SchemeName = "Menu" in its constructor
@@ -162,5 +163,128 @@ public class BarTests
         Assert.Same (shortcut1, removedShortcut);
         Assert.DoesNotContain (shortcut1, bar.SubViews);
         Assert.Contains (shortcut2, bar.SubViews);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Bar_MouseWheel_Navigates_Focus ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        Shortcut sc1 = new () { Title = "First", Key = Key.F1 };
+        Shortcut sc2 = new () { Title = "Second", Key = Key.F2 };
+        Shortcut sc3 = new () { Title = "Third", Key = Key.F3 };
+
+        Bar bar = new ([sc1, sc2, sc3]);
+        (runnable as View)?.Add (bar);
+        app.Begin (runnable);
+
+        // First shortcut should have focus initially
+        Assert.True (sc1.HasFocus);
+
+        // Use NewMouseEvent directly on the bar to simulate wheel events
+        // WheeledUp moves Forward (toward next subview in order)
+        bar.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledUp, Position = Point.Empty });
+
+        Assert.True (sc2.HasFocus);
+
+        // Wheel up again to move to third
+        bar.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledUp, Position = Point.Empty });
+
+        Assert.True (sc3.HasFocus);
+
+        // WheeledDown moves Backward (toward previous subview)
+        bar.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledDown, Position = Point.Empty });
+
+        Assert.True (sc2.HasFocus);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Bar_Vertical_Layout_Aligns_KeyViews ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        // Keys with different text lengths: "F1" (2 chars) vs "Ctrl+Shift+F12" (longer)
+        Shortcut sc1 = new () { Title = "Short", Key = Key.F1 };
+        Shortcut sc2 = new () { Title = "Medium", Key = Key.F12.WithCtrl.WithShift };
+        Shortcut sc3 = new () { Title = "Long", Key = Key.F5 };
+
+        Bar bar = new ([sc1, sc2, sc3]);
+        bar.Orientation = Orientation.Vertical;
+
+        (runnable as View)?.Add (bar);
+        app.Begin (runnable);
+
+        // After layout, all shortcuts should have the same MinimumKeyTextSize
+        // which equals the max key text width among them
+        int expected = sc1.MinimumKeyTextSize;
+        Assert.True (expected > 0);
+        Assert.Equal (expected, sc2.MinimumKeyTextSize);
+        Assert.Equal (expected, sc3.MinimumKeyTextSize);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Bar_No_CommandsToBubbleUp ()
+    {
+        Bar bar = new ();
+
+        // Bar is a transparent container and should not bubble up commands
+        Assert.Empty (bar.CommandsToBubbleUp);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Bar_AddShortcutAt_Rebuilds_SubViews_Order ()
+    {
+        Shortcut sc1 = new () { Title = "First", Key = Key.F1 };
+        Shortcut sc2 = new () { Title = "Second", Key = Key.F2 };
+        Bar bar = new ([sc1, sc2]);
+
+        // Insert a new shortcut at index 1 (between sc1 and sc2)
+        Shortcut scInserted = new () { Title = "Inserted", Key = Key.F3 };
+        bar.AddShortcutAt (1, scInserted);
+
+        Assert.Equal (3, bar.SubViews.Count);
+        Assert.Same (sc1, bar.SubViews.ElementAt (0));
+        Assert.Same (scInserted, bar.SubViews.ElementAt (1));
+        Assert.Same (sc2, bar.SubViews.ElementAt (2));
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Bar_RemoveShortcut_Returns_Removed_Item ()
+    {
+        Shortcut sc1 = new () { Title = "First", Key = Key.F1 };
+        Shortcut sc2 = new () { Title = "Second", Key = Key.F2 };
+        Shortcut sc3 = new () { Title = "Third", Key = Key.F3 };
+        Bar bar = new ([sc1, sc2, sc3]);
+
+        Assert.Equal (3, bar.SubViews.Count);
+
+        // Remove the middle shortcut (index 1)
+        Shortcut? removed = bar.RemoveShortcut (1);
+
+        Assert.Same (sc2, removed);
+        Assert.Equal (2, bar.SubViews.Count);
+        Assert.Same (sc1, bar.SubViews.ElementAt (0));
+        Assert.Same (sc3, bar.SubViews.ElementAt (1));
+
+        bar.Dispose ();
     }
 }

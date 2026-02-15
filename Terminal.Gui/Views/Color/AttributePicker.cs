@@ -35,6 +35,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
                                               out _);
     }
 
+
     /// <summary>
     ///     Raised when <see cref="Value"/> is about to change.
     ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
@@ -45,6 +46,9 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
     ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<Attribute?>>? ValueChanged;
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     private ColorPicker? _foregroundPicker;
     private ColorPicker? _backgroundPicker;
@@ -169,7 +173,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
     /// <summary>
     ///     Called after <see cref="Value"/> has changed.
     /// </summary>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<Attribute?> args) { }
+    protected virtual void OnValueChanged (ValueChangedEventArgs<Attribute?> args) => ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue));
 
     private void OnForegroundColorChanged (object? sender, ValueChangedEventArgs<Color?> e) => UpdateValueFromSubViews ();
 
@@ -266,7 +270,4 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
 
         base.Dispose (disposing);
     }
-
-    /// <inheritdoc />
-    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 }

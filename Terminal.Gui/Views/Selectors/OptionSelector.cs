@@ -31,7 +31,7 @@ public class OptionSelector : SelectorBase, IDesignable
         // really wants that.
         base.Value = 0;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
         base.OnActivated (ctx);
@@ -75,7 +75,6 @@ public class OptionSelector : SelectorBase, IDesignable
         checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepted += CheckboxOnAccepted;
     }
-
 
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {

@@ -81,6 +81,14 @@ public class MenuBar : Menu, IDesignable
                         return false; // RaiseAccepted (ctx);
                     });
 
+        // Override Menu's Activate handler: MenuBar needs the full DefaultActivateHandler
+        // so that OnActivating fires when a MenuBarItem's Activate bubbles up (to toggle the popover).
+        AddCommand (Command.Activate, DefaultActivateHandler);
+
+        // Override Menu's Accept handler: MenuBar needs the full DefaultAcceptHandler
+        // so that OnAccepting fires when a MenuBarItem's Accept bubbles up (to open the popover).
+        AddCommand (Command.Accept, DefaultAcceptHandler);
+
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
 
@@ -446,6 +454,63 @@ public class MenuBar : Menu, IDesignable
         {
             ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // Mouse click (LeftButtonReleased) on a MenuBarItem triggers Activate.
+        // The source may be a SubView of the MenuBarItem (e.g., CommandView), so walk up the SuperView chain.
+        if (!Visible || !Enabled || args.Context?.Source?.TryGetTarget (out View? sourceView) != true)
+        {
+            return false;
+        }
+
+        MenuBarItem? sourceMenuBarItem = FindMenuBarItemForSource (sourceView);
+
+        if (sourceMenuBarItem is null)
+        {
+            return false;
+        }
+
+        // Toggle the popover: show if closed, hide if open.
+        if (sourceMenuBarItem.PopoverMenuOpen)
+        {
+            HideItem (sourceMenuBarItem);
+        }
+        else
+        {
+            Active = true;
+            ShowItem (sourceMenuBarItem);
+
+            if (!sourceMenuBarItem.HasFocus)
+            {
+                sourceMenuBarItem.SetFocus ();
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Finds the MenuBarItem that is an ancestor (or is itself) the source view, and is a direct SubView of this
+    ///     MenuBar.
+    /// </summary>
+    private MenuBarItem? FindMenuBarItemForSource (View? source)
+    {
+        View? current = source;
+
+        while (current is { })
+        {
+            if (current is MenuBarItem mbi && mbi.SuperView == this)
+            {
+                return mbi;
+            }
+
+            current = current.SuperView;
+        }
+
+        return null;
     }
 
     /// <inheritdoc/>

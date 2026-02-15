@@ -1668,6 +1668,98 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         }
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void Generic_Modal_Dialog_EnterKey_Accepts_Dialog ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using TestDateDialog dialog = new ();
+        dialog.Title = "Test";
+        DateTime newDateTime = dialog.SelectedDate.AddYears (1);
+
+        dialog.SelectedDate = newDateTime;
+
+        int dialogAcceptedFired = 0;
+
+        dialog.Accepted += (_, _) => { dialogAcceptedFired++; };
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.Equal (1, dialogAcceptedFired);
+        Assert.Equal (newDateTime, dialog.Result);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            app.Iteration -= AppOnIteration;
+
+            // Simulate pressing Enter key via Application key processing
+            app.Keyboard.RaiseKeyDownEvent (Key.Enter);
+
+            if (!dialog.StopRequested)
+            {
+                // Enter didn't work - get debug info and force stop
+                View? focused = dialog.Focused;
+                View? deepFocused = dialog.MostFocused;
+
+                dialog.RequestStop ();
+
+                Assert.Fail ($"Enter key did not accept dialog. Focused={focused?.GetType ().Name ?? "null"} ({focused?.Id}), MostFocused={deepFocused?.GetType ().Name ?? "null"} ({deepFocused?.Id})");
+            }
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void NonGeneric_Modal_Dialog_EnterKey_Accepts_Dialog ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Dialog dialog = new ();
+        dialog.Title = "Test";
+
+        Button cancelButton = new () { Text = "Cancel" };
+        dialog.AddButton (cancelButton);
+        Button okButton = new () { Text = "OK" };
+        dialog.AddButton (okButton);
+
+        Label label = new () { Text = "Press Enter" };
+        dialog.Add (label);
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        // Enter on the focused button (Cancel, the first button) should stop the dialog
+        Assert.True (dialog.StopRequested);
+
+        // Cancel button (index 0) is focused by default, so pressing Enter accepts with Result=0
+        Assert.Equal (0, dialog.Result);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            app.Iteration -= AppOnIteration;
+
+            // Simulate pressing Enter key via Application key processing
+            app.Keyboard.RaiseKeyDownEvent (Key.Enter);
+
+            if (!dialog.StopRequested)
+            {
+                dialog.RequestStop ();
+
+                Assert.Fail ("Enter key did not accept dialog.");
+            }
+        }
+    }
+
     [Fact]
     public void GenericConstructor_Initializes_DefaultValues ()
     {

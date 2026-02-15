@@ -13,7 +13,7 @@ public class MenuBarItem : MenuItem
     /// <summary>
     ///     Creates a new instance of <see cref="MenuBarItem"/>.
     /// </summary>
-    public MenuBarItem () : base (null, Command.NotBound) { }
+    public MenuBarItem () : base (null, Command.NotBound) { SetupCommands (); }
 
     /// <summary>
     ///     Creates a new instance of <see cref="MenuBarItem"/>. Each MenuBarItem typically has a <see cref="PopoverMenu"/>
@@ -41,6 +41,7 @@ public class MenuBarItem : MenuItem
         TargetView = targetView;
         Command = command;
         PopoverMenu = popoverMenu;
+        SetupCommands ();
     }
 
     /// <summary>
@@ -78,6 +79,31 @@ public class MenuBarItem : MenuItem
                 commandText,
                 new (menuItems) { Title = $"PopoverMenu for {commandText}" })
     { }
+
+    /// <summary>
+    ///     Initializes <see cref="MenuBarItem"/>-specific command handlers.
+    /// </summary>
+    private void SetupCommands ()
+    {
+        // Override the default HotKey handler to skip SetFocus before InvokeCommand(Activate).
+        // DefaultHotKeyHandler calls SetFocus() which triggers OnSelectedMenuItemChanged on MenuBar,
+        // opening the popover BEFORE Activate can toggle it — causing it to open then immediately close
+        // when switching between MenuBarItems via HotKey.
+        AddCommand (Command.HotKey, ctx =>
+                                    {
+                                        if (RaiseHandlingHotKey (ctx) is true)
+                                        {
+                                            return false;
+                                        }
+
+                                        RaiseHotKeyCommand (ctx);
+
+                                        // ShowItem/HideItem in MenuBar.OnActivating handles focus.
+                                        InvokeCommand (Command.Activate, ctx?.Binding);
+
+                                        return true;
+                                    });
+    }
 
     /// <summary>
     ///     Do not use this property. MenuBarItem does not support SubMenu. Use <see cref="PopoverMenu"/> instead.

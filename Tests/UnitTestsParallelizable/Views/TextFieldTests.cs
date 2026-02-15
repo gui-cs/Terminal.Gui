@@ -106,6 +106,38 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (view.HasFocus);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When a TextField has a HotKey matching a typed character (e.g. 'E' from Title "_Enter Path"),
+    ///     pressing that character while the TextField is focused should insert it as text, not activate the hotkey.
+    /// </summary>
+    [Fact]
+    public void HotKey_WhenFocused_InsertsText_DoesNotActivate ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Title = "_Enter Path", Width = 30 };
+        top.Add (tf);
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        // HotKey should be 'E' from the title
+        Assert.Equal (Key.E, tf.HotKey);
+
+        // Clear any selection from focus
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        // Type "hello" which contains 'e' (the HotKey character)
+        foreach (char c in "hello")
+        {
+            top.NewKeyDownEvent (c);
+        }
+
+        Assert.Equal ("hello", tf.Text);
+
+        top.Dispose ();
+    }
+
     [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
@@ -200,6 +232,55 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 
         Exception exception = Record.Exception (() => tf.SetFocus ());
         Assert.Null (exception);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that common printable characters including space, letters, digits,
+    ///     and punctuation are correctly inserted as text input.
+    /// </summary>
+    [Fact]
+    public void CommonInput_AllPrintableCharacters_InsertedAsText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 40 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        // Type a string with letters, digits, space, and punctuation
+        foreach (char c in "Hello World 123!@#")
+        {
+            top.NewKeyDownEvent (c);
+        }
+
+        Assert.Equal ("Hello World 123!@#", tf.Text);
+
+        top.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that the space key is not consumed by the default View Command.Activate binding.
+    ///     TextField removes the Key.Space binding so space can be typed as text.
+    /// </summary>
+    [Fact]
+    public void Space_IsInsertedAsText_NotConsumedByActivate ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 20 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+
+        top.NewKeyDownEvent ((Key)'a');
+        top.NewKeyDownEvent (Key.Space);
+        top.NewKeyDownEvent ((Key)'b');
+
+        Assert.Equal ("a b", tf.Text);
+
+        top.Dispose ();
     }
 
     [Fact]

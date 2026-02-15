@@ -364,8 +364,9 @@ public class Shortcuts : Scenario
 
         // Set the CommandView to a ColorPicker16. This demonstrates how to support handling direct value changes
         // when the user activates the CommandView and cycling the value if the user activates any other part
-        // of the Shortcut. The trick is to mark the Activating event as handled if the source of the command
-        // was the CommandView.
+        // of the Shortcut. When the activation comes from the CommandView (e.g., a mouse click on a color),
+        // let it continue so ColorPicker16.OnActivated runs and picks the color from the mouse position.
+        // When the activation comes from elsewhere (e.g., HotKey), cycle the color.
         ColorPicker16 bgColor = new () { Id = "bgColorCP", BoxHeight = 1, BoxWidth = 1 };
 
         Shortcut bgColorShortcut = new ()
@@ -380,22 +381,24 @@ public class Shortcuts : Scenario
 
         bgColorShortcut.Activating += (_, args) =>
                                       {
+                                          // If activation came from the CommandView (e.g., mouse click on a color),
+                                          // don't mark as Handled so ColorPicker16.OnActivated runs and picks the color.
+                                          if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColor)
+                                          {
+                                              return;
+                                          }
+
+                                          // For all other sources (HotKey, programmatic), cycle the color.
                                           args.Handled = true;
 
-                                          // Cycle colors only if activating didn't come from the CommandView
-                                          if (args.Context?.Binding is null || args.Context.TryGetSource (out View? ctxSource) && ctxSource == bgColor)
-                                          { }
-                                          else
+                                          if (bgColor.SelectedColor == ColorName16.White)
                                           {
-                                              if (bgColor.SelectedColor == ColorName16.White)
-                                              {
-                                                  bgColor.SelectedColor = ColorName16.Black;
+                                              bgColor.SelectedColor = ColorName16.Black;
 
-                                                  return;
-                                              }
-
-                                              bgColor.SelectedColor++;
+                                              return;
                                           }
+
+                                          bgColor.SelectedColor++;
                                       };
 
         bgColor.ValueChanged += (sendingView, args) =>

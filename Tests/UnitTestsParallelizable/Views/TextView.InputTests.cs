@@ -427,4 +427,54 @@ public class TextViewInputTests
         Assert.False (tv.IsSelecting);
         Assert.True (tv.EnterKeyAddsLine);
     }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that common printable characters including space, letters, digits,
+    ///     and punctuation are correctly inserted as text input.
+    /// </summary>
+    [Fact]
+    public void CommonInput_AllPrintableCharacters_InsertedAsText ()
+    {
+        Runnable top = new ();
+        TextView tv = new () { Width = 40, Height = 2 };
+        top.Add (tv);
+        tv.SetFocus ();
+
+        // Type a string with letters, digits, space, and punctuation
+        foreach (char c in "Hello World 123!@#")
+        {
+            top.NewKeyDownEvent (c);
+        }
+
+        Assert.Equal ("Hello World 123!@#", tv.Text);
+
+        top.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that the space key is not consumed by the default View Command.Activate binding.
+    ///     TextView removes the Key.Space binding so space can be typed as text.
+    /// </summary>
+    [Fact]
+    public void Space_IsInsertedAsText_NotConsumedByActivate ()
+    {
+        Runnable top = new ();
+        TextView tv = new () { Width = 20, Height = 2 };
+        top.Add (tv);
+        tv.SetFocus ();
+
+        top.NewKeyDownEvent ((Key)'a');
+        top.NewKeyDownEvent (Key.Space);
+        top.NewKeyDownEvent ((Key)'b');
+
+        Assert.Equal ("a b", tv.Text);
+
+        top.Dispose ();
+    }
+
+    // Note: TextView disables HotKeySpecifier (sets it to '\xffff') in its constructor,
+    // so unlike TextField, it does not need a HotKey_WhenFocused_InsertsText test.
+    // The HotKey-eating-characters scenario only applies to TextField (e.g. FileDialog "_Enter Path").
 }

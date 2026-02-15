@@ -23,14 +23,40 @@ public class Menu : Bar
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
-        if (Border is { })
-        {
-            Border.Settings &= ~BorderSettings.Title;
-        }
+        Border?.Settings &= ~BorderSettings.Title;
 
         BorderStyle = DefaultBorderStyle;
 
         CommandsToBubbleUp = [Command.Accept, Command.Activate];
+
+        // When a MenuItem's Activate bubbles up to this Menu, run the full handler
+        // (so Activating/Activated events fire on Menu) but return false so the originating
+        // MenuItem can complete its own activation (RaiseActivated → Action?.Invoke()).
+        AddCommand (Command.Activate,
+                    ctx =>
+                    {
+                        if (ctx?.IsBubblingUp != true)
+                        {
+                            return DefaultActivateHandler (ctx);
+                        }
+                        DefaultActivateHandler (ctx);
+
+                        return false;
+                    });
+
+        // Same for Accept: run the handler (fires Accepting/Accepted events) but return false
+        // so the originating MenuItem completes its own Accept processing.
+        AddCommand (Command.Accept,
+                    ctx =>
+                    {
+                        if (ctx?.IsBubblingUp != true)
+                        {
+                            return DefaultAcceptHandler (ctx);
+                        }
+                        DefaultAcceptHandler (ctx);
+
+                        return false;
+                    });
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
@@ -55,15 +81,6 @@ public class Menu : Bar
     public MenuItem? SuperMenuItem { get; set; }
 
     /// <inheritdoc/>
-    protected override void OnVisibleChanged ()
-    {
-        if (Visible)
-        {
-            SelectedMenuItem = SubViews.Where (mi => mi is MenuItem).ElementAtOrDefault (0) as MenuItem;
-        }
-    }
-
-    /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
@@ -74,67 +91,22 @@ public class Menu : Bar
             {
                 menuItem.CanFocus = true;
 
-                AddCommand (menuItem.Command,
-                            ctx =>
-                            {
-                                RaiseAccepted (ctx);
+                menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
 
-                                return true;
-                            });
-
-                //menuItem.Accepting += MenuItemOnAccepted;
+                // When a MenuItem is activated (e.g., via HotKey → Activate flow),
+                // raise Accepted on this Menu so PopoverMenu can close.
+                menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
 
                 break;
-
-                //void MenuItemOnAccepted (object? sender, CommandEventArgs e) =>
-
-                //        // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
-                //        RaiseAccepted (e.Context);
-                }
+            }
 
             case Line line:
                 // Grow line so we get auto-join line
                 line.X = Pos.Func (_ => -Border!.Thickness.Left);
-                line.Width = Dim.Fill ()! + Dim.Func (_ => Border!.Thickness.Right);
+                line.Width = Dim.Fill () + Dim.Func (_ => Border!.Thickness.Right);
 
                 break;
         }
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args)
-    {
-        //// When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
-
-        //// Logging.Debug ($"{this.ToIdentifyingString ()} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
-
-        //// TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
-        //// TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
-        //if (SuperView is { })
-        //{
-        //    // Logging.Debug ($"{this.ToIdentifyingString ()} - SuperView is null");
-        //    //return false;
-        //}
-
-        //// Logging.Debug ($"{this.ToIdentifyingString ()} - {args.Context}");
-
-        //if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
-        //{
-        //    // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-        //    // And causes just the menu to quit.
-        //    // Logging.Debug ($"{this.ToIdentifyingString ()} - Returning true - Application.QuitKey/Command = Command.Quit");
-        //    return true;
-        //}
-
-        //// Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
-        //// Command.Accept to the SuperMenuItem if it exists.
-        //if (SuperView is null && SuperMenuItem is { })
-        //{
-        //    // Logging.Debug ($"{this.ToIdentifyingString ()} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
-        //    return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
-        //}
-
-        return false;
     }
 
     /// <inheritdoc/>
@@ -142,25 +114,14 @@ public class Menu : Bar
     {
         base.OnFocusedChanged (previousFocused, focused);
 
-        SelectedMenuItem = focused as MenuItem;
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }
 
     /// <summary>
-    ///     Gets or set the currently selected menu item. This is a helper that
+    ///     Gets the currently selected menu item. This is a helper that
     ///     tracks <see cref="View.Focused"/>.
     /// </summary>
-    public MenuItem? SelectedMenuItem
-    {
-        get => Focused as MenuItem;
-        set
-        {
-            if (value == Focused)
-            { }
-
-            // Note we DO NOT set focus here; This property tracks Focused
-        }
-    }
+    public MenuItem? SelectedMenuItem => Focused as MenuItem;
 
     internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {

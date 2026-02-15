@@ -21,23 +21,20 @@ flowchart TD
     invoke --> |Command.Accept| acc_pre[RaiseAccepting]
     invoke --> |Command.HotKey| hk_pre[RaiseHandlingHotKey]
 
-    act_pre --> |handled| act_stop[Stop]
-    act_pre --> |not handled| act_bubble[TryBubbleToSuperView]
-    act_bubble --> |bubbled and handled| act_stop2[Stop]
-    act_bubble --> |not bubbled| act_handler[SetFocus + RaiseActivated]
-    act_handler --> act_done[Complete - returns false]
+    act_pre --> |handled| act_stop[Stop - returns true]
+    act_pre --> |not handled| act_handler[SetFocus + RaiseActivated]
+    act_handler --> act_done[Complete - returns true]
 
-    acc_pre --> |handled| acc_stop[Stop]
-    acc_pre --> |not handled| acc_bubble[TryBubbleToSuperView]
-    acc_bubble --> |bubbled and handled| acc_stop2[Stop]
-    acc_bubble --> |not bubbled| acc_handler[RaiseAccepted]
-    acc_handler --> acc_done[Complete - returns false]
+    acc_pre --> |handled| acc_stop[Stop - returns true]
+    acc_pre --> |not handled| acc_default{DefaultAcceptView exists?}
+    acc_default --> |yes| acc_bubble_down[BubbleDown to DefaultAcceptView]
+    acc_bubble_down --> acc_accepted[RaiseAccepted]
+    acc_default --> |no| acc_accepted
+    acc_accepted --> acc_done[Returns true if redirected or IsBubblingUp or IAcceptTarget]
 
-    hk_pre --> |handled| hk_stop[Stop]
-    hk_pre --> |not handled| hk_bubble[TryBubbleToSuperView]
-    hk_bubble --> |bubbled and handled| hk_stop2[Stop]
-    hk_bubble --> |not bubbled| hk_handler[SetFocus + RaiseHotKeyCommand + InvokeCommand Activate]
-    hk_handler --> hk_done[Complete - returns false]
+    hk_pre --> |handled| hk_cancel[Returns false - key not consumed]
+    hk_pre --> |not handled| hk_handler[SetFocus + RaiseHotKeyCommand + InvokeCommand Activate]
+    hk_handler --> hk_done[Complete - returns true]
 ```
 
 ## Activate/Accept/HotKey System Summary
@@ -58,34 +55,33 @@ The following table documents how `View` and each View subclass binds or handles
 
 | View | Space | Enter | HotKey | Pressed | Released | Clicked | DoubleClicked |
 |------|-------|-------|--------|---------|----------|---------|---------------|
-| **View** (base) | `Command.Activate` (default) | `Command.Accept` (default) | `Command.HotKey` (default) | Base OnMouseEvent (updates MouseState) | `Command.Activate` (default) | Not bound by default | Not bound by default |
-| **Button** | `Command.Accept` | `Command.Accept` | `Command.HotKey` (calls RaiseAccepting) | OnMouseEvent (updates MouseState) | `Command.Activate` (inherited) | Not bound (overridden) | Not bound (overridden) |
-| **CheckBox** | `Command.Activate` | `Command.Accept` | `Command.HotKey` | `Command.Activate` | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
-| **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **ListView** | Custom handler (selection) | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (selects item) | `Command.Accept` |
-| **TableView** | Custom handler (toggle selection) | `Command.Accept` | `Command.HotKey` | OnMouseEvent (cell selection) | OnMouseEvent (end drag) | OnMouseEvent (cell selection) | `Command.Accept` |
-| **TreeView** | `Command.Accept` | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (node selection) | `Command.Accept` |
-| **TextField** | OnKeyDown (inserts space) | `Command.Accept` | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
-| **TextView** | OnKeyDown (inserts space) | OnKeyDown (inserts newline) | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
-| **OptionSelector** | Forwards to SubView | `Command.Accept` | Restores focus, advances Active | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **FlagSelector** | Forwards to SubView | `Command.Accept` | Restores focus (no-op if focused) | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **Menu** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **MenuBar** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **MenuItem** | Base handler | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
-| **Shortcut** | `Command.HotKey` | `Command.HotKey` | `Command.HotKey` | OnMouseEvent (updates MouseState) | OnMouseEvent (updates MouseState) | `Command.HotKey` | `Command.HotKey` |
+| **View** (base) | `Command.Activate` | `Command.Accept` | `Command.HotKey` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **Button** | `Command.Accept` | `Command.Accept` | `Command.HotKey` → `Command.Accept` | Configurable via `MouseHoldRepeat` | Configurable via `MouseHoldRepeat` | `Command.Accept` | `Command.Accept` |
+| **CheckBox** | `Command.Activate` (advances state) | `Command.Accept` | `Command.HotKey` | Not bound | Not bound (removed) | `Command.Activate` | `Command.Accept` |
+| **ListView** | `Command.Activate` (marks item) | `Command.Accept` | `Command.HotKey` | Not bound | Not bound | `Command.Activate` | `Command.Accept` |
+| **TableView** | Not bound | `Command.Accept` (CellActivationKey) | `Command.HotKey` | Not bound | Not bound | `Command.Activate` | Not bound |
+| **TreeView** | Not bound | `Command.Activate` (ObjectActivationKey) | `Command.HotKey` | Not bound | Not bound | OnMouseEvent (node selection) | OnMouseEvent (ObjectActivationButton) |
+| **TextField** | Removed (text input) | `Command.Accept` | `Command.HotKey` (cancels if focused) | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | Not bound | OnMouseEvent (select word) |
+| **TextView** | Removed (text input) | `Command.NewLine` or `Command.Accept` | `Command.HotKey` | Not bound | Not bound | Not bound | Not bound |
+| **OptionSelector** | Forwards to CheckBox SubView | `Command.Accept` | Restores focus, advances Active | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **FlagSelector** | Removed (forwards to SubView) | Removed (forwards to SubView) | Restores focus (no-op if focused) | Not bound (cleared) | Not bound (cleared) | Not bound (cleared) | Not bound (cleared) |
+| **HexView** | Removed | Removed | Not bound | Not bound | Not bound | `Command.Activate` | `Command.Activate` |
+| **ColorPicker** | Not bound | Not bound | Not bound | Not bound | Not bound | Not bound (removed) | `Command.Accept` |
+| **Label** | Not bound | Not bound | Forwards to next focusable peer | Not bound | Not bound | Not bound | Not bound |
+| **TabView** | Not bound | Not bound | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
+| **NumericUpDown** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **Dialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **Wizard** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **FileDialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **TabView** | Not bound | Not bound | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
-| **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent (auto-repeat/jump) | OnMouseEvent (auto-repeat) | OnMouseEvent (jump position) | Not bound |
-| **HexView** | OnKeyDown (custom) | Not bound | Not bound | OnMouseEvent (position cursor) | Base OnMouseEvent | OnMouseEvent (position cursor) | OnMouseEvent (toggle side) |
-| **NumericUpDown** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **DatePicker** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **ColorPicker** | OnKeyDown (custom) | Not bound | Handled by SubViews | OnMouseEvent (adjust value) | Base OnMouseEvent | OnMouseEvent (adjust value) | `Command.Accept` |
+| **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | OnMouseEvent (toggle) | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Shortcut** | `Command.Activate` (BubbleDown to CommandView) | `Command.Accept` (BubbleDown to CommandView) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **MenuItem** | `Command.Activate` (inherited from Shortcut) | `Command.Accept` (invokes TargetView.Command) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **Menu** | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems |
+| **Bar** | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts |
+| **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent | OnMouseEvent | OnMouseEvent | Not bound |
 | **ProgressBar** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
 | **SpinnerView** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
-| **Bar** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **Label** | Not bound | Not bound | Forwards to next focusable | Not bound | Not bound | Not bound | Not bound |
 
 ### Notes on Command Behaviors
 
@@ -104,28 +100,28 @@ The table shows how each view handles keyboard and mouse input using one of thes
 
 #### Key Points
 
-1. **View Base Class**: The first row shows the default behavior provided by the base `View` class. Space and Enter are bound to `Command.Activate` and `Command.Accept` respectively in `SetupCommands()`. Mouse events use the base `OnMouseEvent` implementation which updates `MouseState`. Subclasses typically override these bindings or add MouseBindings for Clicked/DoubleClicked events.
+1. **View Base Class**: The first row shows the default behavior provided by the base `View` class. Space and Enter are bound to `Command.Activate` and `Command.Accept` respectively in `SetupCommands ()`. `MouseFlags.LeftButtonReleased` is bound to `Command.Activate` by default. Subclasses typically override these bindings or add MouseBindings for Clicked/DoubleClicked events.
 
-2. **Composite Views** (Dialog, Wizard, FileDialog, DatePicker, NumericUpDown, Bar): These views delegate input handling to their SubViews. The SuperView may intercept commands to coordinate actions (e.g., Dialog intercepting `Accept` to set `Result`).
+2. **Composite Views** (Dialog, Wizard, FileDialog, DatePicker, NumericUpDown, ComboBox): These views delegate input handling to their SubViews. The SuperView may intercept commands to coordinate actions (e.g., Dialog intercepting `Accept` to set `Result`).
 
-3. **Display-Only Views** (ProgressBar, SpinnerView, Label): These views typically have `CanFocus = false` and do not handle keyboard or mouse input directly.
+3. **Display-Only Views** (ProgressBar, SpinnerView, Label): These views typically have `CanFocus = false` and do not handle keyboard or mouse input directly. `Label` forwards its HotKey to the next focusable peer view.
 
 4. **Command Bindings vs. Event Handlers**: Views with simple, standardized behaviors use **command bindings** (KeyBinding/MouseBinding -> Command). Views requiring custom logic (e.g., text editing, cursor positioning, drag selection) override **OnKeyDown** or **OnMouseEvent** directly.
 
-5. **TreeView Special Case**: Both Space and Enter are bound to `Command.Accept`, which invokes the same handler (`ActivateSelectedObjectIfAny`).
+5. **Button**: Implements `IAcceptTarget`. Space, Enter, Clicked, and DoubleClicked all map to `Command.Accept`. Mouse bindings are managed dynamically by the `MouseHoldRepeat` property.
 
-6. **Shortcut and Button Unified Handling**: Space, Enter, Clicked, and DoubleClicked all map to `Command.HotKey`, providing consistent activation behavior.
+6. **Selector Views** (OptionSelector, FlagSelector): These inherit from `SelectorBase` which sets `CommandsToBubbleUp = [Command.Activate, Command.Accept]`. Space/Enter are forwarded to the focused CheckBox via `BubbleDown`. HotKey behavior differs: OptionSelector restores focus and advances the active selection; FlagSelector restores focus (when not focused) but does not change active flags (no-op when focused).
 
-7. **Selector Views** (OptionSelector, FlagSelector): Space is forwarded to the focused CheckBox via `BubbleDown`. HotKey behavior differs: OptionSelector restores focus and advances the active selection; FlagSelector restores focus (when not focused) but does not change active flags (no-op when focused).
+7. **Text Input Views** (TextField, TextView): These remove the `Key.Space` binding so space characters can be typed as text. TextField cancels HotKey processing when already focused (via `OnHandlingHotKey`) so the HotKey character can be typed as text. Enter maps to `Command.Accept` in TextField (submit), and to `Command.NewLine` in multi-line TextView (or `Command.Accept` in single-line mode).
 
-8. **Text Input Views** (TextField, TextView): These override OnKeyDown to handle Space (inserts space character) and OnMouseEvent for cursor positioning, text selection, and drag operations. Enter is bound to `Command.Accept` in TextField (submit), but handled directly in TextView (inserts newline).
-
-9. **Mouse Event Columns**:
+8. **Mouse Event Columns**:
    - **Pressed**: `MouseFlags.LeftButtonPressed` - button initially pressed down
    - **Released**: `MouseFlags.LeftButtonReleased` - button released after press
    - **Clicked**: `MouseFlags.LeftButtonClicked` - synthesized from press+release in same location
    - **DoubleClicked**: `MouseFlags.LeftButtonDoubleClicked` - synthesized from timing of two clicks
    - For detailed information about the mouse event pipeline and how events are synthesized, see the [Mouse Deep Dive](mouse.md).
+
+9. **Shortcut**: Uses `CommandsToBubbleUp = [Command.Activate, Command.Accept]` and `BubbleDown` to coordinate commands between its SubViews (CommandView, HelpView, KeyView). See the [Shortcut Deep Dive](shortcut.md) for details. **MenuItem** extends Shortcut with `TargetView` and `Command` properties for invoking commands on target views. **Menu** is a vertical `Bar` container for MenuItems. **MenuBar** is being redesigned; see source code for current behavior.
 
 10. **Implementation Patterns**: To understand how bindings work, see:
     - `Terminal.Gui/ViewBase/Mouse/View.Mouse.cs` - Base mouse handling and MouseBindings
@@ -170,9 +166,9 @@ The `Command` system bridges user input and view behavior, enabling:
 
 The `View.Command` APIs in the `View` class provide infrastructure for registering, invoking, and routing commands, adhering to the *Cancellable Work Pattern*. `View` provides default implementations of four commands:
 
-* `Command.Activate` - Bound to `Key.Space` and `MouseFlags.LeftButtonReleased`. The default handler (`DefaultActivateHandler`) calls `RaiseActivating`; if not handled, sets focus and calls `RaiseActivated`.
-* `Command.Accept` - Bound to `Key.Enter`. The default handler (`DefaultAcceptHandler`) calls `RaiseAccepting`; if not handled, calls `RaiseAccepted`.
-* `Command.HotKey` - Bound to `View.HotKey`. The default handler (`DefaultHotKeyHandler`) calls `RaiseHandlingHotKey`; if not handled, sets focus, calls `RaiseHotKeyCommand`, then invokes `Command.Activate`.
+* `Command.Activate` - Bound to `Key.Space` and `MouseFlags.LeftButtonReleased`. The default handler (`DefaultActivateHandler`) calls `RaiseActivating`; if not handled, sets focus, calls `RaiseActivated`, and returns `true`.
+* `Command.Accept` - Bound to `Key.Enter`. The default handler (`DefaultAcceptHandler`) calls `RaiseAccepting`; if not handled, redirects to `DefaultAcceptView` via `BubbleDown` (if available), calls `RaiseAccepted`, and returns `true` if redirected, bubbling up, or the view is an `IAcceptTarget`.
+* `Command.HotKey` - Bound to `View.HotKey`. The default handler (`DefaultHotKeyHandler`) calls `RaiseHandlingHotKey`; if handled, returns `false` (allowing the key through as text input); if not handled, sets focus, calls `RaiseHotKeyCommand`, invokes `Command.Activate`, and returns `true`.
 * `Command.NotBound` - Invoked when an unregistered command is triggered. Raises the `CommandNotBound` event.
 
 ### Command Registration
@@ -215,37 +211,44 @@ By default, `CommandsToBubbleUp` is empty (no bubbling). Views that need hierarc
 | **Menu** | `[Command.Accept, Command.Activate]` |
 | **SelectorBase** (OptionSelector, FlagSelector) | `[Command.Activate, Command.Accept]` |
 
-#### `TryBubbleToSuperView`
+#### `TryBubbleUpToSuperView`
 
-All three `Raise` methods (`RaiseAccepting`, `RaiseActivating`, `RaiseHandlingHotKey`) call the unified `TryBubbleToSuperView` helper when the command is not handled. This method:
+All three `Raise` methods (`RaiseAccepting`, `RaiseActivating`, `RaiseHandlingHotKey`) call the unified `TryBubbleUpToSuperView` helper when the command is not handled. This method:
 
-1. **Checks for `DefaultAcceptView`** (only for `Command.Accept`): If the SuperView has a `DefaultAcceptView` (e.g., a `Button` with `IsDefault = true`), the command is first invoked on that view.
-2. **Checks `SuperView.CommandsToBubbleUp`**: If the current command is in the SuperView's `CommandsToBubbleUp` list, the command is invoked on the SuperView.
-3. **Handles the Padding edge case**: If the SuperView is a `Padding` adornment, checks the Padding's parent View's `CommandsToBubbleUp` instead.
+1. **Checks `IsBubblingDown`**: If the context has `IsBubblingDown = true` (set by `BubbleDown`), returns `false` immediately to prevent infinite recursion.
+2. **Handles `Command.Accept` with `IAcceptTarget`** (only for `Command.Accept`): If a `DefaultAcceptView` exists and the source is a non-default `IAcceptTarget`, bubbles up to the SuperView with `IsBubblingUp = true`. If the source is the default `IAcceptTarget`, flows normally without redirect.
+3. **Checks `SuperView.CommandsToBubbleUp`**: If the current command is in the SuperView's `CommandsToBubbleUp` list, the command is invoked on the SuperView with `IsBubblingUp = true`.
+4. **Handles the Padding edge cases**: If the SuperView is a `Padding` adornment, checks the Padding's parent View's `CommandsToBubbleUp` instead. Also handles the case where `this` is a `Padding`.
 
 ```mermaid
 flowchart TD
-    start[TryBubbleToSuperView] --> check_handled{handled}
+    start[TryBubbleUpToSuperView] --> check_handled{Already handled?}
     check_handled --> |yes| return_true[return true]
-    check_handled --> |no| check_accept{Command is Accept}
-    check_accept --> |yes| check_default{SuperView has DefaultAcceptView}
-    check_default --> |yes| invoke_default[Invoke Accept on DefaultAcceptView]
-    invoke_default --> default_handled{handled}
-    default_handled --> |yes| return_true2[return true]
-    default_handled --> |no| check_bubble{Command in CommandsToBubbleUp}
+    check_handled --> |no| check_down{IsBubblingDown?}
+    check_down --> |yes| return_false_down[return false - skip bubbling]
+    check_down --> |no| check_accept{Command is Accept?}
+    check_accept --> |yes| check_default{DefaultAcceptView exists?}
+    check_default --> |yes| check_source{Source is IAcceptTarget?}
+    check_source --> |yes, non-default| bubble_up_accept[Bubble up to SuperView with IsBubblingUp]
+    check_source --> |yes, IsDefault| return_false_default[return false - flow normally]
+    check_source --> |no| check_bubble
     check_default --> |no| check_bubble
-    check_accept --> |no| check_bubble
-    check_bubble --> |yes| invoke_super[Invoke command on SuperView]
-    check_bubble --> |no| check_padding{SuperView is Padding}
-    check_padding --> |yes| check_parent{Command in Parent CommandsToBubbleUp}
-    check_parent --> |yes| invoke_parent[Invoke command on Parent]
-    check_parent --> |no| return_false[return false]
-    check_padding --> |no| return_false
+    check_accept --> |no| check_bubble{Command in SuperView.CommandsToBubbleUp?}
+    check_bubble --> |yes| invoke_super[Invoke command on SuperView with IsBubblingUp]
+    check_bubble --> |no| check_padding{SuperView is Padding?}
+    check_padding --> |yes| check_parent{Command in Padding.Parent.CommandsToBubbleUp?}
+    check_parent --> |yes| invoke_parent[Invoke command on Padding.Parent]
+    check_parent --> |no| check_self_padding{this is Padding?}
+    check_padding --> |no| check_self_padding
+    check_self_padding --> |yes| check_self_parent{Command in self.Parent.CommandsToBubbleUp?}
+    check_self_parent --> |yes| invoke_self_parent[Invoke command on self.Parent]
+    check_self_parent --> |no| return_false[return false]
+    check_self_padding --> |no| return_false
 ```
 
 #### `BubbleDown`
 
-`BubbleDown` is the inverse of `TryBubbleToSuperView`. Where bubbling up propagates an unhandled command from a SubView to its SuperView, `BubbleDown` dispatches a command from a SuperView down to a specific SubView with bubbling suppressed.
+`BubbleDown` is the inverse of `TryBubbleUpToSuperView`. Where bubbling up propagates an unhandled command from a SubView to its SuperView, `BubbleDown` dispatches a command from a SuperView down to a specific SubView with bubbling suppressed.
 
 ```csharp
 protected bool? BubbleDown (View target, ICommandContext? ctx)
@@ -254,7 +257,7 @@ protected bool? BubbleDown (View target, ICommandContext? ctx)
 This method:
 1. Creates a new `CommandContext` with `IsBubblingDown = true` and no binding
 2. Invokes the command on the target
-3. Because `IsBubblingDown` is true, `TryBubbleToSuperView` in the target's Raise method skips bubbling, preventing infinite recursion
+3. Because `IsBubblingDown` is true, `TryBubbleUpToSuperView` in the target's Raise method skips bubbling, preventing infinite recursion
 
 `BubbleDown` is used by composite views (like `Shortcut` and `SelectorBase`) that need to forward a command to a SubView without the SubView's command bubbling back up to the SuperView that dispatched it.
 
@@ -264,13 +267,13 @@ flowchart LR
     bubble_down --> new_ctx[Create CommandContext with IsBubblingDown true]
     new_ctx --> invoke[subView.InvokeCommand]
     invoke --> raise[SubView raises Activating/Accepting]
-    raise --> try_bubble[TryBubbleToSuperView checks IsBubblingDown]
+    raise --> try_bubble[TryBubbleUpToSuperView checks IsBubblingDown]
     try_bubble --> skip[IsBubblingDown true - skip bubbling]
 ```
 
 #### `DefaultAcceptView`
 
-`DefaultAcceptView` is a special property on `View` that identifies the SubView that should receive `Command.Accept` when no other SubView handles it. By default, it returns the first `Button` SubView with `IsDefault = true`, but can be set explicitly.
+`DefaultAcceptView` is a special property on `View` that identifies the SubView that should receive `Command.Accept` when no other SubView handles it. By default, it returns the first SubView implementing `IAcceptTarget` with `IsDefault = true` (e.g., a `Button`), but can be set explicitly.
 
 ```csharp
 public View? DefaultAcceptView
@@ -279,16 +282,34 @@ public View? DefaultAcceptView
     {
         if (field is null)
         {
-            return GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+            return GetSubViews (includePadding: true)
+                .FirstOrDefault (v => v is IAcceptTarget { IsDefault: true });
         }
 
         return field;
     }
-    set => field = value;
+    set;
 }
 ```
 
 This enables the common pattern where pressing Enter in a `TextField` within a `Dialog` activates the default "OK" button.
+
+#### `IAcceptTarget`
+
+`IAcceptTarget` is an interface implemented by views that serve as terminal destinations for `Command.Accept` (e.g., `Button`). It has a single property:
+
+```csharp
+public interface IAcceptTarget
+{
+    bool IsDefault { get; set; }
+}
+```
+
+The `IAcceptTarget` interface affects command flow in three ways:
+
+1. **`DefaultAcceptView` resolution**: When a view looks for a default accept target, it searches for SubViews implementing `IAcceptTarget { IsDefault: true }`.
+2. **`DefaultAcceptHandler` return value**: The handler returns `true` (indicating the command was handled) when the view implements `IAcceptTarget`, signaling that Accept has reached its terminal destination.
+3. **`TryBubbleUpToSuperView` behavior**: When a non-default `IAcceptTarget` source raises Accept and a `DefaultAcceptView` exists, the command bubbles up to the SuperView with `IsBubblingUp = true` so the SuperView can determine which accept target was activated. A default `IAcceptTarget` source flows normally without redirect.
 
 ## The Activating and Accepting Concepts
 
@@ -303,53 +324,17 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
 - **Definition**: `Activating` represents a user action that changes a view's state or prepares it for further interaction, such as selecting an item in a `ListView`, toggling a `CheckBox`, or focusing a `MenuItem`. It is associated with `Command.Activate`, typically triggered by a spacebar press, single mouse click, navigation keys (e.g., arrow keys), or mouse enter (e.g., in menus).
 - **Event**: The `Activating` event is raised by `RaiseActivating`, allowing external code to modify or cancel the state change.
 - **Virtual Method**: `OnActivating` enables subclasses to preprocess or cancel the action.
-- **Implementation**:
-  ```csharp
-  protected bool? RaiseActivating (ICommandContext? ctx)
-  {
-      CommandEventArgs args = new () { Context = ctx };
-
-      if (OnActivating (args) || args.Handled)
-      {
-          return true;
-      }
-
-      Activating?.Invoke (this, args);
-
-      if (!args.Handled)
-      {
-          args.Handled = TryBubbleToSuperView (ctx, args.Handled) is true;
-      }
-
-      return args.Handled;
-  }
-  ```
-  - **Default Behavior**: If not handled, the default handler sets focus (if `CanFocus` is true) and raises `Activated`.
+- **Flow**: `RaiseActivating` follows the Cancellable Work Pattern:
+  1. Calls `OnActivating (args)` - subclasses can handle/cancel
+  2. Raises `Activating` event - subscribers can handle/cancel
+  3. If not handled, calls `TryBubbleUpToSuperView` - bubbles if SuperView's `CommandsToBubbleUp` includes `Command.Activate`
+  - **Default Behavior**: If not handled, the default handler (`DefaultActivateHandler`) sets focus (if `CanFocus` is true), raises `Activated`, and returns `true`.
   - **Cancellation**: `args.Handled` or `OnActivating` returning `true` halts the command.
-  - **Bubbling**: If not handled by the view or its event subscribers, `TryBubbleToSuperView` checks if the SuperView's `CommandsToBubbleUp` includes `Command.Activate`.
   - **Context**: `ICommandContext` provides invocation details (source view, binding).
 
 - **Use Cases**:
   - **ListView**: Activating an item (e.g., via arrow keys or mouse click) raises `Activating` to update the highlighted item.
-  - **CheckBox**: Toggling the checked state (e.g., via spacebar) raises `Activating` to change the state, as seen in the `AdvanceAndSelect` method:
-    ```csharp
-    private bool? AdvanceAndSelect (ICommandContext? commandContext)
-    {
-        bool? cancelled = AdvanceCheckState ();
-
-        if (cancelled is true)
-        {
-            return true;
-        }
-
-        if (RaiseActivating (commandContext) is true)
-        {
-            return true;
-        }
-
-        return commandContext?.Command == Command.HotKey ? cancelled : cancelled is false;
-    }
-    ```
+  - **CheckBox**: Toggling the checked state (e.g., via spacebar) triggers `Command.Activate`, which raises `Activating`/`Activated`. The `OnActivated` override calls `AdvanceCheckState ()` to cycle the checkbox value.
   - **OptionSelector**: Activating an OptionSelector option raises `Activating` to update the selected option.
   - **Menu** and **MenuBar**: Activating a `MenuItem` (e.g., via mouse enter or arrow keys) sets focus, tracked by `SelectedMenuItem` and raising `SelectedMenuItemChanged`.
   - **Views without State**: For views like `Button`, `Activating` typically sets focus but does not change state, making it less relevant.
@@ -361,30 +346,15 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
 - **Definition**: `Accepting` represents a user action that confirms or finalizes a view's state or triggers an action, such as submitting a dialog, activating a button, or confirming a selection in a list. It is associated with `Command.Accept`, typically triggered by the Enter key or double-click.
 - **Event**: The `Accepting` event is raised by `RaiseAccepting`, allowing external code to modify or cancel the action.
 - **Virtual Method**: `OnAccepting` enables subclasses to preprocess or cancel the action.
-- **Implementation**:
-  ```csharp
-  protected bool? RaiseAccepting (ICommandContext? ctx)
-  {
-      CommandEventArgs args = new () { Context = ctx };
-
-      args.Handled = OnAccepting (args) || args.Handled;
-
-      if (!args.Handled && Accepting is { })
-      {
-          Accepting?.Invoke (this, args);
-      }
-
-      if (!args.Handled)
-      {
-          args.Handled = TryBubbleToSuperView (ctx, args.Handled) is true;
-      }
-
-      return args.Handled;
-  }
-  ```
-  - **Default Behavior**: If not handled, the default handler calls `RaiseAccepted`.
+- **Flow**: `RaiseAccepting` follows the Cancellable Work Pattern:
+  1. Calls `OnAccepting (args)` - subclasses can handle/cancel
+  2. Raises `Accepting` event - subscribers can handle/cancel
+  3. If not handled, calls `TryBubbleUpToSuperView` - handles `DefaultAcceptView` redirection and `CommandsToBubbleUp` bubbling
+  - **Default Behavior**: If `RaiseAccepting` is not handled, `DefaultAcceptHandler` performs additional steps:
+    1. Checks for `DefaultAcceptView` and calls `BubbleDown` to it (if it exists and is not the source)
+    2. Calls `RaiseAccepted`
+    3. Returns `true` if: Accept was redirected to `DefaultAcceptView`, the command is bubbling up (`IsBubblingUp`), or the view implements `IAcceptTarget`
   - **Cancellation**: `args.Handled` or `OnAccepting` returning `true` halts the command.
-  - **Bubbling**: If not handled, `TryBubbleToSuperView` first checks for a `DefaultAcceptView` (e.g., an `IsDefault` button), then checks `SuperView.CommandsToBubbleUp`.
   - **Context**: `ICommandContext` provides invocation details.
 
 - **Use Cases**:
@@ -414,7 +384,10 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
   {
       if (RaiseHandlingHotKey (ctx) is true)
       {
-          return true;
+          // Return false so the key is not consumed and can be processed
+          // as normal input (e.g. text input in a TextField whose HotKey
+          // matches the character being typed).
+          return false;
       }
 
       if (CanFocus)
@@ -424,13 +397,17 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
 
       RaiseHotKeyCommand (ctx);
 
-      InvokeCommand (Command.Activate);
+      // Pass the original binding so downstream handlers can distinguish
+      // a user-initiated HotKey activation from a programmatic one.
+      InvokeCommand (Command.Activate, ctx?.Binding);
 
-      return false;
+      return true;
   }
   ```
 
-- **Propagation**: Like `Activate` and `Accept`, `HotKey` bubbling is opt-in via `CommandsToBubbleUp`. `RaiseHandlingHotKey` calls `TryBubbleToSuperView` when unhandled.
+  > **Important**: When `RaiseHandlingHotKey` returns `true` (indicating the hotkey was handled/cancelled), `DefaultHotKeyHandler` returns `false`. This is intentional: it allows the key character to pass through to text input processing. For example, a `TextField` with HotKey `_E` that already has focus will cancel the hotkey in `OnHandlingHotKey` so the 'E' character can be typed as text input.
+
+- **Propagation**: Like `Activate` and `Accept`, `HotKey` bubbling is opt-in via `CommandsToBubbleUp`. `RaiseHandlingHotKey` calls `TryBubbleUpToSuperView` when unhandled.
 
 ## Shortcut Command Dispatching
 
@@ -481,15 +458,16 @@ flowchart TD
     check_source --> |No - from Shortcut/HelpView/KeyView| bubble[BubbleDown to CommandView]
     bubble --> invoke[CommandView.InvokeCommand with IsBubblingDown true]
     invoke --> cv_update[CommandView updates state]
-    cv_update --> no_rebubble[TryBubbleToSuperView skips - IsBubblingDown true]
+    cv_update --> no_rebubble[TryBubbleUpToSuperView skips - IsBubblingDown true]
     no_rebubble --> raise_events3[Shortcut raises Activating/Accepting normally]
 ```
 
 ### SelectorBase Command Dispatching
 
-`SelectorBase` (used by `OptionSelector` and `FlagSelector`) follows the same `BubbleDown` pattern. When `SelectorBase` receives a `Command.Activate`, it forwards it to the focused `CheckBox` SubView using `BubbleDown`:
+`SelectorBase` (used by `OptionSelector` and `FlagSelector`) follows a similar `BubbleDown` pattern. `SelectorBase` sets `CommandsToBubbleUp = [Command.Activate, Command.Accept]` so that commands from CheckBox SubViews bubble up to the selector. In their `OnActivating` overrides, `FlagSelector` and `OptionSelector` use `BubbleDown` to forward programmatic activations to the focused `CheckBox` SubView:
 
 ```csharp
+// Simplified from FlagSelector.OnActivating
 protected override bool OnActivating (CommandEventArgs args)
 {
     if (base.OnActivating (args))
@@ -497,7 +475,10 @@ protected override bool OnActivating (CommandEventArgs args)
         return true;
     }
 
-    if (Focused is null || args.Context?.TryGetSource (out View? ctxSource) is not true || ctxSource != this)
+    // Skip BubbleDown when re-entering, no focused view, or source is a SubView
+    if (args.Context?.IsBubblingDown == true
+        || Focused is null
+        || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
     {
         return false;
     }

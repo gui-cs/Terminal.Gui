@@ -117,7 +117,7 @@ public class Dialog : Dialog<int>
     /// </summary>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        if (!base.OnActivating (args))
+        if (base.OnActivating (args))
         {
             return true;
         }
@@ -128,7 +128,7 @@ public class Dialog : Dialog<int>
         }
         Result = Buttons.IndexOf (sourceView as Button);
 
-        return true;
+        return false;
     }
 
     /// <inheritdoc/>
