@@ -570,13 +570,10 @@ public sealed class UICatalogRunnable : Runnable
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
-        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false };
-
-        statusBarShortcut.Accepting += (_, args) =>
-                                       {
-                                           ShowStatusBar = !ShowStatusBar;
-                                           args.Handled = true;
-                                       };
+        Shortcut statusBarShortcut = new ()
+        {
+            Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar
+        };
 
         _force16ColorsShortcutCb = new CheckBox
         {
@@ -592,12 +589,11 @@ public sealed class UICatalogRunnable : Runnable
             Key = Key.F7
         };
 
-        force16ColorsShortcut.Accepting += (_, args) =>
+        force16ColorsShortcut.Activated += (_, args) =>
                                            {
                                                Driver.Force16Colors = !Driver.Force16Colors;
                                                _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                                SetNeedsDraw ();
-                                               args.Handled = true;
                                            };
         statusBar.Add (_shQuit, statusBarShortcut, force16ColorsShortcut, _shVersion);
 
