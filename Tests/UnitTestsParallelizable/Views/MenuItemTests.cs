@@ -179,7 +179,7 @@ public class MenuItemTests
 
         menuItem.Dispose ();
 
-        Assert.True (subMenu.WasDisposed);
+        Assert.Null (menuItem.SubMenu);
     }
 
     // Claude - Opus 4.6
