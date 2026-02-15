@@ -187,7 +187,7 @@ public class ScrollBarTests
     public void VisibilityMode_None_Overrides_ViewportSettingsFlags ()
     {
         Runnable super = new () { Id = "super", Width = 1, Height = 20 };
-
+        super.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
         ScrollBar scrollBar = new () { ScrollableContentSize = 100, VisibleContentSize = 10 };
         super.Add (scrollBar);
 
