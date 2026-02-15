@@ -19,6 +19,17 @@ public sealed class Selectors : Scenario
         appWindow.Title = GetQuitKeyAndName ();
         appWindow.BorderStyle = LineStyle.None;
 
+        EventLog eventLog = new ()
+        {
+            Id = "eventLog",
+            X = Pos.AnchorEnd (),
+            Height = Dim.Fill (),
+            SchemeName = "Runnable",
+            BorderStyle = LineStyle.Double,
+            Title = "E_vents",
+            Arrangement = ViewArrangement.LeftResizable
+        };
+
         FrameView? optionSelectorsFrame = null;
         FrameView? flagSelectorsFrame = null;
 
@@ -80,7 +91,6 @@ public sealed class Selectors : Scenario
         optionSelectorsFrame = new FrameView
         {
             Y = Pos.Bottom (canFocus),
-            Width = Dim.Percent (50),
             Height = Dim.Fill (),
             Title = "O_ptionSelectors",
             TabStop = TabBehavior.TabStop
@@ -119,7 +129,7 @@ public sealed class Selectors : Scenario
         {
             Y = Pos.Top (optionSelectorsFrame),
             X = Pos.Right (optionSelectorsFrame),
-            Width = Dim.Fill (),
+            Width = Dim.Fill (to: eventLog),
             Height = Dim.Fill (),
             Title = "_FlagSelectors",
             TabStop = TabBehavior.TabStop
@@ -153,6 +163,8 @@ public sealed class Selectors : Scenario
         flagSelectorsFrame.Add (label, flagSelectorT);
         flagSelectorT.ValueChanged += (_, a) => { View.Diagnostics = (ViewDiagnosticFlags)a.Value!; };
 
+        optionSelectorsFrame.Width = Dim.Func (view => (appWindow.Viewport.Width - eventLog.Frame.Width) / 2);
+
         appWindow.Add (orientationSelector,
                        stylesSelector,
                        horizontalSpace,
@@ -160,7 +172,17 @@ public sealed class Selectors : Scenario
                        canFocus,
                        tabBehaviorSelector,
                        optionSelectorsFrame,
-                       flagSelectorsFrame);
+                       flagSelectorsFrame,
+                       eventLog);
+
+        eventLog.SetViewToLog (orientationSelector);
+        eventLog.SetViewToLog (stylesSelector);
+        eventLog.SetViewToLog (tabBehaviorSelector);
+
+        foreach (SelectorBase selector in GetAllSelectors ())
+        {
+            eventLog.SetViewToLog (selector);
+        }
 
         // Run - Start the application.
         app.Run (appWindow);

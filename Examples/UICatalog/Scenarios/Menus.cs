@@ -1,6 +1,5 @@
 #nullable enable
 
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -27,18 +26,16 @@ public class Menus : Scenario
         using Runnable runnable = new ();
         runnable.Title = GetQuitKeyAndName ();
 
-        ObservableCollection<string> eventSource = [];
-
-        ListView eventLog = new ()
+        EventLog eventLog = new ()
         {
-            Title = "Event Log",
+            Id = "eventLog",
             X = Pos.AnchorEnd (),
-            Width = Dim.Auto (),
-            Height = Dim.Fill (), // Make room for some wide things
+            Height = Dim.Fill (),
             SchemeName = "Runnable",
-            Source = new ListWrapper<string> (eventSource)
+            BorderStyle = LineStyle.Double,
+            Title = "E_vents",
+            Arrangement = ViewArrangement.LeftResizable
         };
-        eventLog.Border!.Thickness = new Thickness (0, 1, 0, 0);
 
         MenuHost menuHostView = new ()
         {
@@ -52,47 +49,12 @@ public class Menus : Scenario
         };
         runnable.Add (menuHostView);
 
-        menuHostView.CommandNotBound += (o, args) =>
-                                        {
-                                            if (o is not View sender || args.Handled)
-                                            {
-                                                return;
-                                            }
+        eventLog.SetViewToLog (menuHostView);
 
-                                            // Logging.Debug ($"{sender.Id} CommandNotBound: {args.Context?.Command}");
-                                            eventSource.Add ($"{sender.Id} CommandNotBound: {args.Context?.Command}");
-                                            eventLog.MoveDown ();
-                                        };
-
-        menuHostView.Accepting += (o, args) =>
-                                  {
-                                      if (o is not View sender || args.Handled)
-                                      {
-                                          return;
-                                      }
-
-                                      string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-
-                                      // Logging.Debug ($"{sender.Id} Accepting: {sourceTitle}");
-                                      eventSource.Add ($"{sender.Id} Accepting: {sourceTitle}: ");
-                                      eventLog.MoveDown ();
-                                  };
-
-        menuHostView.ContextMenu!.Accepted += (o, args) =>
-                                              {
-                                                  if (o is not View sender || args.Handled)
-                                                  {
-                                                      return;
-                                                  }
-
-                                                  string sourceText = args.Context?.Source?.TryGetTarget (out View? sourceView) == true
-                                                                          ? sourceView.Text
-                                                                          : "null";
-
-                                                  // Logging.Debug ($"{sender.Id} Accepted: {sourceText}");
-                                                  eventSource.Add ($"{sender.Id} Accepted: {sourceText}: ");
-                                                  eventLog.MoveDown ();
-                                              };
+        if (menuHostView.ContextMenu is { })
+        {
+            eventLog.SetViewToLog (menuHostView.ContextMenu);
+        }
 
         runnable.Add (eventLog);
 
