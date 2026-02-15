@@ -212,8 +212,7 @@ public partial class View
             {
                 return;
             }
-            lazy.Value.VisibilityMode = ScrollBarVisibilityMode.Manual;
-            lazy.Value.Visible = false;
+            lazy.Value.VisibilityMode = ScrollBarVisibilityMode.None;
         }
     }
 

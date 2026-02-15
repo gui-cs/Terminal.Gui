@@ -41,47 +41,61 @@ public class Scrolling : Scenario
 
         win.Add (demoView);
 
-        var hCheckBox = new CheckBox
+        Label lblHScrollBar = new () { X = Pos.X (demoView), Y = Pos.Bottom (demoView), Text = "_Horizontal ScrollBar:" };
+        win.Add (lblHScrollBar);
+
+        OptionSelector<ScrollBarVisibilityMode> osHScrollBar = new ()
         {
-            X = Pos.X (demoView),
-            Y = Pos.Bottom (demoView),
-            Text = "ViewportSettings.Has_HorizontalScrollBar",
-            Value = demoView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar) ? CheckState.Checked : CheckState.UnChecked
+            X = Pos.Right (lblHScrollBar) + 1,
+            Y = Pos.Top (lblHScrollBar),
+            Value = demoView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar)
+                        ? ScrollBarVisibilityMode.Auto
+                        : ScrollBarVisibilityMode.None,
+            Orientation = Orientation.Horizontal,
+            AssignHotKeys = true
         };
-        win.Add (hCheckBox);
+        win.Add (osHScrollBar);
 
-        hCheckBox.ValueChanging += (_, e) =>
-                                   {
-                                       if (e.NewValue == CheckState.Checked)
-                                       {
-                                           demoView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
-                                       }
-                                       else
-                                       {
-                                           demoView.ViewportSettings &= ~ViewportSettingsFlags.HasHorizontalScrollBar;
-                                       }
-                                   };
+        osHScrollBar.ValueChanged += (_, e) =>
+                                     {
+                                         if (e.Value == ScrollBarVisibilityMode.Auto)
+                                         {
+                                             demoView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
+                                         }
+                                         else
+                                         {
+                                             demoView.ViewportSettings &= ~ViewportSettingsFlags.HasHorizontalScrollBar;
+                                             demoView.HorizontalScrollBar.VisibilityMode = e.Value!.Value;
+                                         }
+                                     };
 
-        var vCheckBox = new CheckBox
+        Label lblVScrollBar = new () { X = Pos.Right (osHScrollBar) + 3, Y = Pos.Bottom (demoView), Text = "_Vertical ScrollBar:" };
+        win.Add (lblVScrollBar);
+
+        OptionSelector<ScrollBarVisibilityMode> osVScrollBar = new ()
         {
-            X = Pos.Right (hCheckBox) + 3,
-            Y = Pos.Bottom (demoView),
-            Text = "ViewportSettings.Has_VerticalScrollBar",
-            Value = demoView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar) ? CheckState.Checked : CheckState.UnChecked
+            X = Pos.Right (lblVScrollBar) + 1,
+            Y = Pos.Top (lblVScrollBar),
+            Value = demoView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar)
+                        ? ScrollBarVisibilityMode.Auto
+                        : ScrollBarVisibilityMode.None,
+            Orientation = Orientation.Horizontal,
+            AssignHotKeys = true
         };
-        win.Add (vCheckBox);
+        win.Add (osVScrollBar);
 
-        vCheckBox.ValueChanging += (_, e) =>
-                                   {
-                                       if (e.NewValue == CheckState.Checked)
-                                       {
-                                           demoView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
-                                       }
-                                       else
-                                       {
-                                           demoView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
-                                       }
-                                   };
+        osVScrollBar.ValueChanged += (_, e) =>
+                                     {
+                                         if (e.Value == ScrollBarVisibilityMode.Auto)
+                                         {
+                                             demoView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+                                         }
+                                         else
+                                         {
+                                             demoView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
+                                             demoView.VerticalScrollBar.VisibilityMode = e.Value!.Value;
+                                         }
+                                     };
 
         // Add a progress bar to cause constant redraws
         var progress = new ProgressBar { X = Pos.Center (), Y = Pos.AnchorEnd (), Width = Dim.Fill () };

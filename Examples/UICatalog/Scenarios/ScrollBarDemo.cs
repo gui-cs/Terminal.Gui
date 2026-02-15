@@ -26,7 +26,7 @@ public class ScrollBarDemo : Scenario
             SchemeName = "Base",
             Arrangement = ViewArrangement.Resizable
         };
-        demoFrame.Padding!.Thickness = new (1);
+        demoFrame.Padding!.Thickness = new Thickness (1);
         demoFrame.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
         window.Add (demoFrame);
 
@@ -143,9 +143,8 @@ public class ScrollBarDemo : Scenario
                                                }
                                                scrollBar.ScrollableContentSize = e.NewValue;
 
-                                               controlledList.SetSource (new ObservableCollection<string> (Enumerable
-                                                                                      .Range (0, scrollBar.ScrollableContentSize)
-                                                                                      .Select (n => $"{n:00000}")));
+                                               controlledList.SetSource (new ObservableCollection<string> (Enumerable.Range (0, scrollBar.ScrollableContentSize)
+                                                                             .Select (n => $"{n:00000}")));
                                            };
 
         Label lblVisibleContentSize = new ()
@@ -213,17 +212,17 @@ public class ScrollBarDemo : Scenario
         };
         demoFrame.Add (lblOptions);
 
-        CheckBox autoShow = new ()
+        OptionSelector<ScrollBarVisibilityMode> osVisibilityMode = new ()
         {
             Y = Pos.Top (lblOptions),
             X = Pos.Right (lblOptions) + 1,
-            Text = "_VisibilityMode = Auto",
-            Value = scrollBar.VisibilityMode == ScrollBarVisibilityMode.Auto ? CheckState.Checked : CheckState.UnChecked
+            Value = scrollBar.VisibilityMode,
+            Orientation = Orientation.Horizontal,
+            AssignHotKeys = true
         };
 
-        autoShow.ValueChanging +=
-            (_, e) => scrollBar.VisibilityMode = e.NewValue == CheckState.Checked ? ScrollBarVisibilityMode.Auto : ScrollBarVisibilityMode.Manual;
-        demoFrame.Add (autoShow);
+        osVisibilityMode.ValueChanged += (_, e) => scrollBar.VisibilityMode = e.Value!.Value;
+        demoFrame.Add (osVisibilityMode);
 
         Label lblSliderPosition = new ()
         {

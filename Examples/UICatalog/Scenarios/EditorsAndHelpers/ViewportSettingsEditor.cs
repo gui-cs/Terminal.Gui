@@ -55,11 +55,13 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         _cbTransparentMouse?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse) ? CheckState.Checked : CheckState.UnChecked;
 
-        _cbVerticalScrollBar?.Value =
-            ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar) ? CheckState.Checked : CheckState.UnChecked;
+        _osVerticalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar)
+                                          ? ScrollBarVisibilityMode.Auto
+                                          : ScrollBarVisibilityMode.None;
 
-        _cbHorizontalScrollBar?.Value =
-            ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar) ? CheckState.Checked : CheckState.UnChecked;
+        _osHorizontalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar)
+                                            ? ScrollBarVisibilityMode.Auto
+                                            : ScrollBarVisibilityMode.None;
     }
 
     /// <inheritdoc/>
@@ -90,8 +92,8 @@ public sealed class ViewportSettingsEditor : EditorBase
     private CheckBox? _cbClipContentOnly;
     private CheckBox? _cbTransparent;
     private CheckBox? _cbTransparentMouse;
-    private CheckBox? _cbVerticalScrollBar;
-    private CheckBox? _cbHorizontalScrollBar;
+    private OptionSelector<ScrollBarVisibilityMode>? _osVerticalScrollBar;
+    private OptionSelector<ScrollBarVisibilityMode>? _osHorizontalScrollBar;
 
     private void ViewportSettingsEditor_Initialized (object? s, EventArgs e)
     {
@@ -319,36 +321,53 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbVerticalScrollBar = new CheckBox { Title = "VerticalScrollBar", Y = Pos.Bottom (_cbClearContentOnly), CanFocus = false };
-        _cbVerticalScrollBar.ValueChanging += VerticalScrollBarToggle;
+        Label lblVerticalScrollBar = new () { Title = "V ScrollBar:", Y = Pos.Bottom (_cbClearContentOnly) };
 
-        void VerticalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
+        _osVerticalScrollBar = new OptionSelector<ScrollBarVisibilityMode>
         {
-            if (rea.NewValue == CheckState.Checked)
+            X = Pos.Right (lblVerticalScrollBar) + 1,
+            Y = Pos.Top (lblVerticalScrollBar),
+            Value = ScrollBarVisibilityMode.None,
+            Orientation = Orientation.Horizontal,
+            AssignHotKeys = true
+        };
+        _osVerticalScrollBar.ValueChanged += VerticalScrollBarChanged;
+
+        void VerticalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
+        {
+            if (rea.Value == ScrollBarVisibilityMode.Auto)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
             }
             else
             {
                 ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
+                ViewToEdit!.VerticalScrollBar.VisibilityMode = rea.Value!.Value;
             }
         }
 
-        _cbHorizontalScrollBar = new CheckBox
-        {
-            Title = "HorizontalScrollBar", X = Pos.Right (_cbVerticalScrollBar) + 1, Y = Pos.Top (_cbVerticalScrollBar), CanFocus = false
-        };
-        _cbHorizontalScrollBar.ValueChanging += HorizontalScrollBarToggle;
+        Label lblHorizontalScrollBar = new () { Title = "H ScrollBar:", Y = Pos.Bottom (lblVerticalScrollBar) };
 
-        void HorizontalScrollBarToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
+        _osHorizontalScrollBar = new OptionSelector<ScrollBarVisibilityMode>
         {
-            if (rea.NewValue == CheckState.Checked)
+            X = Pos.Right (lblHorizontalScrollBar) + 1,
+            Y = Pos.Top (lblHorizontalScrollBar),
+            Value = ScrollBarVisibilityMode.None,
+            Orientation = Orientation.Horizontal,
+            AssignHotKeys = true
+        };
+        _osHorizontalScrollBar.ValueChanged += HorizontalScrollBarChanged;
+
+        void HorizontalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
+        {
+            if (rea.Value == ScrollBarVisibilityMode.Auto)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
             }
             else
             {
                 ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.HasHorizontalScrollBar;
+                ViewToEdit!.HorizontalScrollBar.VisibilityMode = rea.Value!.Value;
             }
         }
 
@@ -360,7 +379,9 @@ public sealed class ViewportSettingsEditor : EditorBase
              _cbClipContentOnly,
              _cbTransparent,
              _cbTransparentMouse,
-             _cbVerticalScrollBar,
-             _cbHorizontalScrollBar);
+             lblVerticalScrollBar,
+             _osVerticalScrollBar,
+             lblHorizontalScrollBar,
+             _osHorizontalScrollBar);
     }
 }

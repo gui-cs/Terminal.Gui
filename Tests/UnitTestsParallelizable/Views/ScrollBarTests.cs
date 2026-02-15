@@ -41,7 +41,7 @@ public class ScrollBarTests
 
         // Should Hide
         scrollBar.ScrollableContentSize = 10;
-        super.Layout (new (100, 100));
+        super.Layout (new Size (100, 100));
         Assert.False (scrollBar.Visible);
 
         super.Dispose ();
@@ -78,25 +78,25 @@ public class ScrollBarTests
 
         scrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
 
-        super.Layout (new (100, 100));
+        super.Layout (new Size (100, 100));
         Assert.False (scrollBar.Visible);
         Assert.Equal (1, scrollBar.Frame.Width);
         Assert.Equal (20, scrollBar.Frame.Height);
 
         scrollBar.ScrollableContentSize = 10;
-        super.Layout (new (100, 100));
+        super.Layout (new Size (100, 100));
         Assert.False (scrollBar.Visible);
 
         scrollBar.ScrollableContentSize = 30;
-        super.Layout (new (100, 100));
+        super.Layout (new Size (100, 100));
         Assert.True (scrollBar.Visible);
 
         scrollBar.VisibilityMode = ScrollBarVisibilityMode.Always;
-        super.Layout (new (100, 100));
+        super.Layout (new Size (100, 100));
         Assert.True (scrollBar.Visible);
 
         scrollBar.ScrollableContentSize = 10;
-        super.Layout (new (100, 100));
+        super.Layout (new Size (100, 100));
         Assert.True (scrollBar.Visible);
 
         super.Dispose ();
@@ -149,6 +149,94 @@ public class ScrollBarTests
         scrollBar.VisibleContentSize = 10;
 
         //Application.RunIteration (ref rs);
+        Assert.True (scrollBar.Visible);
+
+        super.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void VisibilityMode_None_AlwaysHides ()
+    {
+        Runnable super = new () { Id = "super", Width = 1, Height = 20 };
+
+        ScrollBar scrollBar = new () { ScrollableContentSize = 100, VisibleContentSize = 10 };
+        super.Add (scrollBar);
+
+        // Start with Manual — visible by default
+        Assert.True (scrollBar.Visible);
+
+        // Set to None — should hide
+        scrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
+        Assert.False (scrollBar.Visible);
+
+        // Even if content overflows, None keeps it hidden
+        scrollBar.ScrollableContentSize = 200;
+        super.Layout (new Size (100, 100));
+        Assert.False (scrollBar.Visible);
+
+        // Changing VisibleContentSize also doesn't make it appear
+        scrollBar.VisibleContentSize = 5;
+        Assert.False (scrollBar.Visible);
+
+        super.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void VisibilityMode_None_Overrides_ViewportSettingsFlags ()
+    {
+        Runnable super = new () { Id = "super", Width = 1, Height = 20 };
+
+        ScrollBar scrollBar = new () { ScrollableContentSize = 100, VisibleContentSize = 10 };
+        super.Add (scrollBar);
+
+        scrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
+        Assert.False (scrollBar.Visible);
+
+        // Manually setting Visible = true should be overridden on next ShowHide
+        scrollBar.Visible = true;
+        scrollBar.ScrollableContentSize = 200; // triggers ShowHide
+        Assert.False (scrollBar.Visible);
+
+        super.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void VisibilityMode_Transitions_Between_All_Modes ()
+    {
+        Runnable super = new () { Id = "super", Width = 1, Height = 20 };
+
+        ScrollBar scrollBar = new () { ScrollableContentSize = 100, VisibleContentSize = 10 };
+        super.Add (scrollBar);
+
+        // Manual (default) — visible by default
+        Assert.Equal (ScrollBarVisibilityMode.Manual, scrollBar.VisibilityMode);
+        Assert.True (scrollBar.Visible);
+
+        // Manual → Auto (content overflows, so should show)
+        scrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
+        Assert.True (scrollBar.Visible);
+
+        // Auto → None (should hide)
+        scrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
+        Assert.False (scrollBar.Visible);
+
+        // None → Always (should show)
+        scrollBar.VisibilityMode = ScrollBarVisibilityMode.Always;
+        Assert.True (scrollBar.Visible);
+
+        // Always → None (should hide)
+        scrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
+        Assert.False (scrollBar.Visible);
+
+        // None → Manual (stays hidden until explicitly changed)
+        scrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
+        Assert.False (scrollBar.Visible);
+
+        // Manual — developer can set Visible = true
+        scrollBar.Visible = true;
         Assert.True (scrollBar.Visible);
 
         super.Dispose ();

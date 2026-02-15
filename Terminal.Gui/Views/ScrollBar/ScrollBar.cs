@@ -128,6 +128,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             case ScrollBarVisibilityMode.Manual:
                 // Hands off — the developer controls Visible directly
                 break;
+
+            case ScrollBarVisibilityMode.None:
+                Visible = false;
+
+                break;
         }
 
         _slider.VisibleContentSize = VisibleContentSize;
