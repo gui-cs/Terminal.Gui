@@ -92,6 +92,8 @@ public class Shortcut : View, IOrientation, IDesignable
         // the SubView from completing its own activation.
         AddCommand (Command.Activate, ctx =>
                                       {
+                                          _activationBubbledUp = false;
+
                                           if (RaiseActivating (ctx) is true)
                                           {
                                               return true;
@@ -102,14 +104,25 @@ public class Shortcut : View, IOrientation, IDesignable
                                               SetFocus ();
                                           }
 
-                                          RaiseActivated (ctx);
-
-                                          // When the command bubbled up from a SubView, return false so the
-                                          // SubView continues its own processing (e.g., CheckBox.OnActivated toggles state).
                                           if (ctx?.IsBubblingUp == true)
                                           {
+                                              // Defer RaiseActivated until CommandView.Activated fires.
+                                              _activationBubbledUp = true;
+                                              _deferredActivationContext = ctx;
+
+                                              // If activation bubbled up from a non-CommandView SubView (e.g., HelpView/KeyView),
+                                              // BubbleDown to CommandView now. This happens AFTER the Activating event handler had
+                                              // a chance to cancel (RaiseActivating above). CommandView.Activated will trigger
+                                              // the deferred RaiseActivated via CommandView_Activated.
+                                              if (ctx?.Binding is { Source: { } source } && source != CommandView)
+                                              {
+                                                  BubbleDown (CommandView, ctx);
+                                              }
+
                                               return false;
                                           }
+
+                                          RaiseActivated (ctx);
 
                                           return true;
                                       });
@@ -289,6 +302,9 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Accept/Activate/HotKey Command Handling
 
+    private bool _activationBubbledUp;
+    private ICommandContext? _deferredActivationContext;
+
     /// <summary>
     ///     Gets or sets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on
     ///     when the Shortcut is accepted.
@@ -337,7 +353,11 @@ public class Shortcut : View, IOrientation, IDesignable
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+        // When IsBubblingUp, skip BubbleDown here so the Activating event handler gets a chance
+        // to handle/cancel first. The Activate command handler will BubbleDown after if needed.
+        if (args.Context?.IsBubblingUp != true
+            && args.Context?.Binding is { Source: { } source }
+            && source != CommandView)
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -491,6 +511,7 @@ public class Shortcut : View, IOrientation, IDesignable
             ArgumentNullException.ThrowIfNull (value);
 
             // Clean up old
+            _commandView.Activated -= CommandView_Activated;
             _commandView.GettingAttributeForRole -= SubViewOnGettingAttributeForRole;
             Remove (_commandView);
             _commandView.Dispose ();
@@ -505,6 +526,7 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 #endif
             _commandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+            _commandView.Activated += CommandView_Activated;
 
             // If the CommandView has a hotkey, we use that. Otherwise, we use '_' to indicate the hotkey is in the Title.
             if (_commandView.HotKey != Key.Empty)
@@ -571,6 +593,18 @@ public class Shortcut : View, IOrientation, IDesignable
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
+    }
+
+    private void CommandView_Activated (object? sender, EventArgs<ICommandContext?> e)
+    {
+        if (_activationBubbledUp)
+        {
+            _activationBubbledUp = false;
+            ICommandContext? ctx = _deferredActivationContext;
+            _deferredActivationContext = null;
+
+            RaiseActivated (ctx);
+        }
     }
 
     #endregion Command
@@ -822,6 +856,7 @@ public class Shortcut : View, IOrientation, IDesignable
         if (disposing)
         {
             TitleChanged -= Shortcut_TitleChanged;
+            CommandView.Activated -= CommandView_Activated;
 
             if (CommandView.SuperView is null)
             {

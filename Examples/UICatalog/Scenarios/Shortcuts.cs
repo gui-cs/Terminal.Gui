@@ -433,6 +433,7 @@ public class Shortcuts : Scenario
         {
             eventLog.SetViewToLog (shortcut);
             eventLog.SetViewToLog (shortcut.CommandView);
+            shortcut.Action += () => eventLog.Log ($"{shortcut.ToIdentifyingString ()} Action!");
         }
 
         AlignKeys (true);
