@@ -10,7 +10,7 @@ public class IValueTests
     /// <summary>
     ///     Test view implementing IValue&lt;int?&gt; using CWPPropertyHelper.
     /// </summary>
-    private class TestIntValueView : View, IValue<int?>
+    private sealed class TestIntValueView : View, IValue<int?>
     {
         private int? _value;
 
@@ -31,12 +31,10 @@ public class IValueTests
 
         public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
         public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
-
-        protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
-        protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
-
-        /// <inheritdoc/>
         public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+        private bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
+        private void OnValueChanged (ValueChangedEventArgs<int?> args) => ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue));
     }
 
     /// <summary>
