@@ -136,19 +136,19 @@ public class TreeViewTests
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) => accepted = true;
+        void OnAccept (object? sender, CommandEventArgs e) => accepted = true;
     }
 
     [Fact]
     public void Accept_Command_Accepts_and_ActivatesObject ()
     {
-        TreeView<object> treeView = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> treeView = CreateTree (out Factory f, out Car car1, out _);
         Assert.NotNull (car1);
         treeView.SelectedObject = car1;
 
         var accepted = false;
         var activated = false;
-        object selectedObject = null;
+        object? selectedObject = null;
 
         treeView.Accepting += Accept;
         treeView.ObjectActivated += ObjectActivated;
@@ -161,23 +161,23 @@ public class TreeViewTests
 
         return;
 
-        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        void ObjectActivated (object? sender, ObjectActivatedEventArgs<object?> e)
         {
             activated = true;
             selectedObject = e.ActivatedObject;
         }
 
-        void Accept (object sender, CommandEventArgs e) => accepted = true;
+        void Accept (object? sender, CommandEventArgs e) => accepted = true;
     }
 
     [Fact]
     public void Accept_Cancel_Event_Prevents_ObjectActivated ()
     {
-        TreeView<object> treeView = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> treeView = CreateTree (out Factory f, out Car car1, out _);
         treeView.SelectedObject = car1;
         var accepted = false;
         var activated = false;
-        object selectedObject = null;
+        object? selectedObject = null;
 
         treeView.Accepting += Accept;
         treeView.ObjectActivated += ObjectActivated;
@@ -190,13 +190,13 @@ public class TreeViewTests
 
         return;
 
-        void ObjectActivated (object sender, ObjectActivatedEventArgs<object> e)
+        void ObjectActivated (object? sender, ObjectActivatedEventArgs<object?> e)
         {
             activated = true;
             selectedObject = e.ActivatedObject;
         }
 
-        void Accept (object sender, CommandEventArgs e)
+        void Accept (object? sender, CommandEventArgs e)
         {
             accepted = true;
             e.Handled = true;
@@ -207,7 +207,7 @@ public class TreeViewTests
     [Fact]
     public void ContentHeight_BiggerAfterExpand ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
         Assert.Equal (1, tree.ContentHeight);
 
         tree.Expand (f);
@@ -220,7 +220,7 @@ public class TreeViewTests
     [Fact]
     public void ContentWidth_BiggerAfterExpand ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
         tree.BeginInit ();
         tree.EndInit ();
 
@@ -245,7 +245,7 @@ public class TreeViewTests
     [Fact]
     public void ContentWidth_VisibleVsAll ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out Car car2);
         tree.BeginInit ();
         tree.EndInit ();
 
@@ -307,7 +307,7 @@ public class TreeViewTests
     [Fact]
     public void GetChildren_ReturnsChildrenOnlyWhenExpanded ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         Assert.Empty (tree.GetChildren (f));
         Assert.Empty (tree.GetChildren (c1));
@@ -335,7 +335,7 @@ public class TreeViewTests
     [Fact]
     public void GetParent_ReturnsParentOnlyWhenExpanded ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         Assert.Null (tree.GetParent (f));
         Assert.Null (tree.GetParent (c1));
@@ -359,7 +359,7 @@ public class TreeViewTests
     [Fact]
     public void GetScrollOffsetOf_MinusOneForUnRevealed ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         // to start with the tree is collapsed and only knows about the root object
         Assert.Equal (0, tree.GetScrollOffsetOf (f));
@@ -386,7 +386,7 @@ public class TreeViewTests
     [Fact]
     public void GoTo_OnlyAppliesToExposedObjects ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
         tree.BeginInit ();
         tree.EndInit ();
 
@@ -428,7 +428,7 @@ public class TreeViewTests
     [Fact]
     public void IsExpanded_FalseIfCannotExpand ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car c, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car c, out _);
 
         // expose the car by expanding the factory
         tree.Expand (f);
@@ -451,7 +451,7 @@ public class TreeViewTests
     [Fact]
     public void IsExpanded_TrueAfterExpand ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
         Assert.False (tree.IsExpanded (f));
 
         tree.Expand (f);
@@ -510,9 +510,9 @@ public class TreeViewTests
     [Fact]
     public void ObjectActivated_Called ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        object activated = null;
+        object? activated = null;
         var called = false;
 
         // register for the event
@@ -542,10 +542,10 @@ public class TreeViewTests
     [Fact]
     public void ObjectActivated_CustomKey ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
 
         tree.ObjectActivationKey = KeyCode.Delete;
-        object activated = null;
+        object? activated = null;
         var called = false;
 
         // register for the event
@@ -582,9 +582,9 @@ public class TreeViewTests
     [Fact]
     public void ObjectActivationButton_DoubleClick ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        object activated = null;
+        object? activated = null;
         var called = false;
 
         // register for the event
@@ -607,12 +607,12 @@ public class TreeViewTests
     [Fact]
     public void ObjectActivationButton_RightClick ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
 
         tree.ObjectActivationButton = MouseFlags.MiddleButtonClicked;
         tree.ExpandAll ();
 
-        object activated = null;
+        object? activated = null;
         var called = false;
 
         // register for the event
@@ -640,7 +640,7 @@ public class TreeViewTests
     [Fact]
     public void ObjectActivationButton_SetToNull ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
         Assert.Null (tree.SelectedObject);
 
         Assert.True (tree.SetFocus ());
@@ -650,7 +650,7 @@ public class TreeViewTests
         // disable activation
         tree.ObjectActivationButton = null;
 
-        object activated = null;
+        object? activated = null;
         var called = false;
 
         // register for the event
@@ -677,7 +677,7 @@ public class TreeViewTests
     [Fact]
     public void RebuildTree_AfterChangingChildrenGetterDuringRuntime ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         var wheel = "Shiny Wheel";
 
@@ -692,7 +692,7 @@ public class TreeViewTests
         Assert.False (tree.IsExpanded (c1));
 
         // change the children getter so that now cars can have wheels
-        tree.TreeBuilder = new DelegateTreeBuilder<object> (o =>
+        tree.TreeBuilder = new DelegateTreeBuilder<object?> (o =>
 
                                                                 // factories have cars
                                                                 o is Factory
@@ -723,7 +723,7 @@ public class TreeViewTests
     [Fact]
     public void RefreshObject_AfterChangingChildrenGetterDuringRuntime ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         var wheel = "Shiny Wheel";
 
@@ -738,7 +738,7 @@ public class TreeViewTests
         Assert.False (tree.IsExpanded (c1));
 
         // change the children getter so that now cars can have wheels
-        tree.TreeBuilder = new DelegateTreeBuilder<object> (o =>
+        tree.TreeBuilder = new DelegateTreeBuilder<object?> (o =>
 
                                                                 // factories have cars
                                                                 o is Factory
@@ -764,7 +764,7 @@ public class TreeViewTests
     [Fact]
     public void RefreshObject_ChildRemoved ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         //reveal it by expanding the root object
         tree.Expand (f);
@@ -833,11 +833,10 @@ public class TreeViewTests
         Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj2, child)));
     }
 
-    /// <summary>Tests illegal ranges for <see cref="TreeView.ScrollOffset"/></summary>
     [Fact]
     public void ScrollOffset_CannotBeNegative ()
     {
-        TreeView<object> tree = CreateTree ();
+        TreeView<object?> tree = CreateTree ();
 
         Assert.Equal (0, tree.ScrollOffsetVertical);
 
@@ -867,8 +866,8 @@ public class TreeViewTests
     private class EqualityTestObject
     {
         public int Age { get; set; }
-        public string Name { get; set; }
-        public override bool Equals (object obj) => obj is EqualityTestObject eto && Equals (Name, eto.Name);
+        public required string Name { get; init; }
+        public override bool Equals (object? obj) => obj is EqualityTestObject eto && Equals (Name, eto.Name);
         public override int GetHashCode () => Name?.GetHashCode () ?? base.GetHashCode ();
     }
 
@@ -876,29 +875,29 @@ public class TreeViewTests
 
     private class Factory
     {
-        public Car [] Cars { get; set; }
+        public required Car [] Cars { get; set; }
         public override string ToString () => "Factory";
     }
 
     private class Car
     {
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public override string ToString () => Name;
     }
 
-    private TreeView<object> CreateTree () => CreateTree (out _, out _, out _);
+    private TreeView<object?> CreateTree () => CreateTree (out _, out _, out _);
 
-    private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2)
+    private TreeView<object?> CreateTree (out Factory factory1, out Car car1, out Car car2)
     {
-        car1 = new Car ();
-        car2 = new Car ();
+        car1 = new Car { Name = string.Empty };
+        car2 = new Car { Name = string.Empty };
 
-        factory1 = new Factory { Cars = new [] { car1, car2 } };
+        factory1 = new Factory { Cars = [car1, car2] };
 
         TreeView<object> tree = new (new DelegateTreeBuilder<object> (s => s is Factory f ? f.Cars : null));
         tree.AddObject (factory1);
 
-        return tree;
+        return tree!;
     }
 
     #endregion

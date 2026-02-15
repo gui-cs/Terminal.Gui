@@ -500,7 +500,7 @@ public class MenuBar : Menu, IDesignable
     {
         View? current = source;
 
-        while (current is not null)
+        while (current is { })
         {
             if (current is MenuBarItem mbi && mbi.SuperView == this)
             {
