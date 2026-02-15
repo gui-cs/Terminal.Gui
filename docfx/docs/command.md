@@ -75,8 +75,8 @@ The following table documents how `View` and each View subclass binds or handles
 | **FileDialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **DatePicker** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | OnMouseEvent (toggle) | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **Shortcut** | `Command.Activate` (BubbleDown to CommandView) | `Command.Accept` (BubbleDown to CommandView) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
-| **MenuItem** | `Command.Activate` (inherited from Shortcut) | `Command.Accept` (invokes TargetView.Command) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **Shortcut** | `Command.Activate` (BubbleDown to CommandView, invokes TargetView if set) | `Command.Accept` (BubbleDown to CommandView, invokes TargetView if set) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **MenuItem** | `Command.Activate` (inherited from Shortcut, invokes TargetView.Command) | `Command.Accept` (inherited from Shortcut, invokes TargetView.Command) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
 | **Menu** | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems |
 | **Bar** | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts |
 | **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent | OnMouseEvent | OnMouseEvent | Not bound |
@@ -121,7 +121,7 @@ The table shows how each view handles keyboard and mouse input using one of thes
    - **DoubleClicked**: `MouseFlags.LeftButtonDoubleClicked` - synthesized from timing of two clicks
    - For detailed information about the mouse event pipeline and how events are synthesized, see the [Mouse Deep Dive](mouse.md).
 
-9. **Shortcut**: Uses `CommandsToBubbleUp = [Command.Activate, Command.Accept]` and `BubbleDown` to coordinate commands between its SubViews (CommandView, HelpView, KeyView). See the [Shortcut Deep Dive](shortcut.md) for details. **MenuItem** extends Shortcut with `TargetView` and `Command` properties for invoking commands on target views. **Menu** is a vertical `Bar` container for MenuItems. **MenuBar** is being redesigned; see source code for current behavior.
+9. **Shortcut**: Uses `CommandsToBubbleUp = [Command.Activate, Command.Accept]` and `BubbleDown` to coordinate commands between its SubViews (CommandView, HelpView, KeyView). See the [Shortcut Deep Dive](shortcut.md) for details. `Shortcut` has `TargetView` and `Command` properties; both `OnActivated` and `OnAccepted` invoke the command on the `TargetView` if set. **MenuItem** extends Shortcut, inheriting this TargetView dispatching behavior. **Menu** is a vertical `Bar` container for MenuItems. **MenuBar** is being redesigned; see source code for current behavior.
 
 10. **Implementation Patterns**: To understand how bindings work, see:
     - `Terminal.Gui/ViewBase/Mouse/View.Mouse.cs` - Base mouse handling and MouseBindings
@@ -431,10 +431,14 @@ protected override bool OnActivating (CommandEventArgs args)
         return true;
     }
 
-    // Only bubble down when binding exists and source is not CommandView
-    if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+    // Only bubble down to CommandView when the activation came from user interaction
+    // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
+    // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
+    // When IsBubblingUp, skip BubbleDown here so the Activating event handler gets a chance
+    // to handle/cancel first. The Activate command handler will BubbleDown after if needed.
+    if (args.Context?.IsBubblingUp != true && args.Context?.Binding is { Source: { } source } && source != CommandView)
     {
-        BubbleDown (CommandView, args.Context);
+        return BubbleDown (CommandView, args.Context) is null;
     }
 
     return false;
@@ -489,16 +493,31 @@ protected override bool OnActivating (CommandEventArgs args)
 }
 ```
 
-### Shortcut's `Action` Property
+### Shortcut's `Action` and `TargetView` Properties
 
-`Shortcut` has an `Action` property that is invoked in `OnActivated` and `OnAccepted`. This provides a simple callback mechanism for handling shortcut activation:
+`Shortcut` has an `Action` property that is invoked in `OnActivated` and `OnAccepted`. Additionally, if `TargetView` is set (and `Command` is not `NotBound`), `Shortcut` invokes the command on the target view. If no `TargetView` is set but `Key` is valid, it falls back to invoking application-bound key commands. This enables both simple callback and target-view-based command dispatching:
 
 ```csharp
 protected override void OnActivated (ICommandContext? ctx)
 {
     base.OnActivated (ctx);
     Action?.Invoke ();
-}
 
-protected override void OnAccepted (CommandEventArgs args) => Action?.Invoke ();
+    // Translate the incoming command to Command
+    if (Command != Command.NotBound && ctx is { })
+    {
+        ctx.Command = Command;
+    }
+
+    if (TargetView is { })
+    {
+        TargetView.InvokeCommand (Command, ctx);
+    }
+    else if (Key.IsValid && Command != Command.NotBound)
+    {
+        App?.Keyboard.InvokeCommandsBoundToKey (Key);
+    }
+}
 ```
+
+`OnAccepted` follows the same pattern: it invokes `Action`, then dispatches to `TargetView` or application-bound keys.
