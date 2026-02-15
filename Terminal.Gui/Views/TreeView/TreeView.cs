@@ -317,7 +317,7 @@ public class TreeView<T> : View, ITreeView where T : class
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
 
         KeyBindings.Remove (ObjectActivationKey);
-        KeyBindings.Add (ObjectActivationKey, Command.Activate);
+        KeyBindings.Add (ObjectActivationKey, Command.Accept);
     }
 
     /// <summary>
