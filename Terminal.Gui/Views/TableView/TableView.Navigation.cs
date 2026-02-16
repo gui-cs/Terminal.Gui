@@ -41,7 +41,8 @@ public partial class TableView
     /// Recalculates and updates the content size based on the current state.
     /// </summary>
     /// <remarks>Call this method after making changes that affect the content's dimensions to ensure the
-    /// layout remains accurate.</remarks>
+    /// layout remains accurate.
+    /// Also call this if data in Table has changed.</remarks>
     public void RefreshContentSize ()
     {
         SetContentSize (CalculateContentSize ());

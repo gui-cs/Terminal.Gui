@@ -73,6 +73,20 @@ public class TableViewTest : Scenario
         setRowOffsetButton.Padding.Thickness = new Thickness (1, 0, 1, 0);
         setRowOffsetButton.Accepting += (sender, args) => tableView.RowOffset = rowOffsetUpDown.Value;
 
+        var selectedRowUpDown = new NumericUpDown<int> ()
+        {
+            X = Pos.Right (setRowOffsetButton), Y = Pos.Bottom (optionsView),
+        };
+        selectedRowUpDown.Padding.Thickness = new Thickness (1, 0, 1, 0);
+
+        var setSelectedRowButton = new Button ()
+        {
+            X = Pos.Right (selectedRowUpDown), Y = Pos.Bottom (optionsView),
+            Text = "Set",
+        };
+        setSelectedRowButton.Padding.Thickness = new Thickness (1, 0, 1, 0);
+        setSelectedRowButton.Accepting += (sender, args) => tableView.SelectedRow = selectedRowUpDown.Value;
+
         tableView = new TableView
         {
             X = 0, Y = Pos.Bottom(offsetLabel),
@@ -131,7 +145,7 @@ public class TableViewTest : Scenario
 
 
 
-        win.Add (optionsView, offsetLabel, colOffsetUpDown, setColOffsetButton, rowOffsetUpDown, setRowOffsetButton, tableView);
+        win.Add (optionsView, offsetLabel, colOffsetUpDown, setColOffsetButton, rowOffsetUpDown, setRowOffsetButton, selectedRowUpDown, setSelectedRowButton, tableView);
 
         app.Run (win);
     }
