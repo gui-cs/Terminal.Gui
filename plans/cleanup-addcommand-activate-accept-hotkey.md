@@ -6,7 +6,7 @@
 
 ## Scope
 
-Refactor 6 Views. **Excluded**: Menu/MenuBar/MenuBarItem (complex bubbling — separate effort), Shortcut (legitimately needs custom flow), SelectorBase (already correct).
+Refactor 6 Views. **Excluded**: Menu/MenuBar/MenuBarItem/TableView (complex bubbling — separate effort), Shortcut (legitimately needs custom flow), SelectorBase (already correct).
 
 ## Default Handler Flows (Reference)
 
@@ -55,14 +55,6 @@ Remove `AddCommand(Command.Activate, ...)` and `AddCommand(Command.Accept, ...)`
 - [ ] Check external callers of `ActivateSelectedObjectIfAny`
 - [ ] Tests pass: `Tests/UnitTests/Views/TreeViewTests.cs`, `Tests/UnitTestsParallelizable/Views/TreeViewTests.cs`
 
-### 5. TableView — `OnAccepted`+`OnActivating` overrides replace both `AddCommand` calls
-
-**File:** `Terminal.Gui/Views/TableView/TableView.cs`
-
-Remove `AddCommand(Command.Accept, ...)` and `AddCommand(Command.Activate, ...)`. Override `OnAccepted` to call `OnCellActivated`. Override `OnActivating` to handle `ToggleCurrentCellSelection` — if toggle succeeds, set `args.Handled = true` and return true.
-
-- [ ] Implement
-- [ ] Tests pass: `Tests/UnitTests/Views/TableViewTests.cs`, `Tests/UnitTestsParallelizable/Views/TableViewTests.cs`
 
 ### 6. LinearRange — `OnActivated`+`OnAccepting` overrides replace both `AddCommand` calls
 

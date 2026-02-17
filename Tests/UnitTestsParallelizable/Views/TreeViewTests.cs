@@ -70,6 +70,26 @@ public class TreeViewTests
         treeView.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void Command_Activate_Fires_ObjectActivated ()
+    {
+        TreeView treeView = new ();
+        TreeNode root = new () { Text = "Root" };
+        treeView.AddObject (root);
+        treeView.SelectedObject = root;
+
+        var activatedFired = false;
+
+        treeView.ObjectActivated += (_, _) => activatedFired = true;
+
+        treeView.InvokeCommand (Command.Activate);
+
+        Assert.True (activatedFired);
+
+        treeView.Dispose ();
+    }
+
     // Claude - Opus 4.5
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
