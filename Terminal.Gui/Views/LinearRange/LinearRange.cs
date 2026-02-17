@@ -52,14 +52,14 @@ public class LinearRange<T> : View, IOrientation
         // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new OrientationHelper (this); // Do not use object initializer!
         _orientationHelper.Orientation = _config._linearRangeOrientation = orientation;
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
+        _orientationHelper.OrientationChanging += (_, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (_, e) => OrientationChanged?.Invoke (this, e);
 
         SetDefaultStyle ();
         SetCommands ();
         SetContentSize ();
 
-        SubViewLayout += (s, e) => { SetContentSize (); };
+        SubViewLayout += (_, _) => { SetContentSize (); };
     }
 
     // TODO: Make configurable via ConfigurationManager
@@ -487,11 +487,12 @@ public class LinearRange<T> : View, IOrientation
 
         OptionFocused?.Invoke (this, args);
 
-        if (!args.Cancel)
+        if (args.Cancel)
         {
-            _lastFocusedOption = FocusedOption;
-            FocusedOption = newFocusedOption;
+            return args.Cancel;
         }
+        _lastFocusedOption = FocusedOption;
+        FocusedOption = newFocusedOption;
 
         return args.Cancel;
     }
@@ -500,19 +501,18 @@ public class LinearRange<T> : View, IOrientation
 
     #region Public Methods
 
-    private int _focusedOption;
-
     /// <summary>The focused option (has the cursor).</summary>
     public int FocusedOption
     {
-        get => _focusedOption;
+        get;
         set
         {
-            if (_focusedOption != value)
+            if (field == value)
             {
-                _focusedOption = value;
-                UpdateCursor ();
+                return;
             }
+            field = value;
+            UpdateCursor ();
         }
     }
 
@@ -522,36 +522,33 @@ public class LinearRange<T> : View, IOrientation
         // TODO: Handle range type.
         // Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
 
-        if (!_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options!.Count)
+        if (_setOptions.Contains (optionIndex) || optionIndex < 0 || optionIndex >= _options!.Count)
         {
-            FocusedOption = optionIndex;
-            SetFocusedOption ();
-
-            return true;
+            return false;
         }
+        FocusedOption = optionIndex;
+        SetFocusedOption ();
 
-        return false;
+        return true;
+
     }
 
     /// <summary>Causes the specified option to be un-set and be focused.</summary>
     public bool UnSetOption (int optionIndex)
     {
-        if (!AllowEmpty && _setOptions.Count > 2 && _setOptions.Contains (optionIndex))
+        if (AllowEmpty || _setOptions.Count <= 2 || !_setOptions.Contains (optionIndex))
         {
-            FocusedOption = optionIndex;
-            SetFocusedOption ();
-
-            return true;
+            return false;
         }
+        FocusedOption = optionIndex;
+        SetFocusedOption ();
 
-        return false;
+        return true;
+
     }
 
     /// <summary>Get the indexes of the set options.</summary>
-    public List<int> GetSetOptions () =>
-
-        // Copy
-        _setOptions.OrderBy (e => e).ToList ();
+    public List<int> GetSetOptions () => _setOptions.OrderBy (e => e).ToList ();
 
     #endregion Public Methods
 
@@ -786,7 +783,7 @@ public class LinearRange<T> : View, IOrientation
     {
         position = (-1, -1);
 
-        if (option < 0 || option >= _options!.Count ())
+        if (option < 0 || option >= _options!.Count)
         {
             return false;
         }
@@ -795,14 +792,7 @@ public class LinearRange<T> : View, IOrientation
         offset += _config._startSpacing;
         offset += option * (_config._cachedInnerSpacing + 1);
 
-        if (_config._linearRangeOrientation == Orientation.Vertical)
-        {
-            position = (0, offset);
-        }
-        else
-        {
-            position = (offset, 0);
-        }
+        position = _config._linearRangeOrientation == Orientation.Vertical ? (0, offset) : (offset, 0);
 
         return true;
     }
@@ -1646,7 +1636,7 @@ public class LinearRange<T> : View, IOrientation
             case LinearRangeType.Multiple:
                 if (_setOptions.Contains (FocusedOption))
                 {
-                    if (!_config._allowEmpty && _setOptions.Count () == 1)
+                    if (!_config._allowEmpty && _setOptions.Count == 1)
                     {
                         break;
                     }
