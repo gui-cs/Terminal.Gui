@@ -75,8 +75,8 @@ The following table documents how `View` and each View subclass binds or handles
 | **FileDialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **DatePicker** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | OnMouseEvent (toggle) | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **Shortcut** | `Command.Activate` (BubbleDown to CommandView) | `Command.Accept` (BubbleDown to CommandView) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
-| **MenuItem** | `Command.Activate` (inherited from Shortcut) | `Command.Accept` (invokes TargetView.Command) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **Shortcut** | `Command.Activate` (BubbleDown to CommandView, invokes TargetView if set) | `Command.Accept` (BubbleDown to CommandView, invokes TargetView if set) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
+| **MenuItem** | `Command.Activate` (inherited from Shortcut, invokes TargetView.Command) | `Command.Accept` (inherited from Shortcut, invokes TargetView.Command) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
 | **Menu** | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems | Handled by MenuItems |
 | **Bar** | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts | Handled by Shortcuts |
 | **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent | OnMouseEvent | OnMouseEvent | Not bound |
@@ -121,7 +121,7 @@ The table shows how each view handles keyboard and mouse input using one of thes
    - **DoubleClicked**: `MouseFlags.LeftButtonDoubleClicked` - synthesized from timing of two clicks
    - For detailed information about the mouse event pipeline and how events are synthesized, see the [Mouse Deep Dive](mouse.md).
 
-9. **Shortcut**: Uses `CommandsToBubbleUp = [Command.Activate, Command.Accept]` and `BubbleDown` to coordinate commands between its SubViews (CommandView, HelpView, KeyView). See the [Shortcut Deep Dive](shortcut.md) for details. **MenuItem** extends Shortcut with `TargetView` and `Command` properties for invoking commands on target views. **Menu** is a vertical `Bar` container for MenuItems. **MenuBar** is being redesigned; see source code for current behavior.
+9. **Shortcut**: Uses `CommandsToBubbleUp = [Command.Activate, Command.Accept]` and `BubbleDown` to coordinate commands between its SubViews (CommandView, HelpView, KeyView). See the [Shortcut Deep Dive](shortcut.md) for details. `Shortcut` has `TargetView` and `Command` properties; both `OnActivated` and `OnAccepted` invoke the command on the `TargetView` if set. **MenuItem** extends Shortcut, inheriting this TargetView dispatching behavior. **Menu** is a vertical `Bar` container for MenuItems. **MenuBar** is being redesigned; see source code for current behavior.
 
 10. **Implementation Patterns**: To understand how bindings work, see:
     - `Terminal.Gui/ViewBase/Mouse/View.Mouse.cs` - Base mouse handling and MouseBindings
@@ -211,9 +211,9 @@ By default, `CommandsToBubbleUp` is empty (no bubbling). Views that need hierarc
 | **Menu** | `[Command.Accept, Command.Activate]` |
 | **SelectorBase** (OptionSelector, FlagSelector) | `[Command.Activate, Command.Accept]` |
 
-#### `TryBubbleUpToSuperView`
+#### `TryBubbleUp`
 
-All three `Raise` methods (`RaiseAccepting`, `RaiseActivating`, `RaiseHandlingHotKey`) call the unified `TryBubbleUpToSuperView` helper when the command is not handled. This method:
+All three `Raise` methods (`RaiseAccepting`, `RaiseActivating`, `RaiseHandlingHotKey`) call the unified `TryBubbleUp` helper when the command is not handled. This method:
 
 1. **Checks `IsBubblingDown`**: If the context has `IsBubblingDown = true` (set by `BubbleDown`), returns `false` immediately to prevent infinite recursion.
 2. **Handles `Command.Accept` with `IAcceptTarget`** (only for `Command.Accept`): If a `DefaultAcceptView` exists and the source is a non-default `IAcceptTarget`, bubbles up to the SuperView with `IsBubblingUp = true`. If the source is the default `IAcceptTarget`, flows normally without redirect.
@@ -222,7 +222,7 @@ All three `Raise` methods (`RaiseAccepting`, `RaiseActivating`, `RaiseHandlingHo
 
 ```mermaid
 flowchart TD
-    start[TryBubbleUpToSuperView] --> check_handled{Already handled?}
+    start[TryBubbleUp] --> check_handled{Already handled?}
     check_handled --> |yes| return_true[return true]
     check_handled --> |no| check_down{IsBubblingDown?}
     check_down --> |yes| return_false_down[return false - skip bubbling]
@@ -248,7 +248,7 @@ flowchart TD
 
 #### `BubbleDown`
 
-`BubbleDown` is the inverse of `TryBubbleUpToSuperView`. Where bubbling up propagates an unhandled command from a SubView to its SuperView, `BubbleDown` dispatches a command from a SuperView down to a specific SubView with bubbling suppressed.
+`BubbleDown` is the inverse of `TryBubbleUp`. Where bubbling up propagates an unhandled command from a SubView to its SuperView, `BubbleDown` dispatches a command from a SuperView down to a specific SubView with bubbling suppressed.
 
 ```csharp
 protected bool? BubbleDown (View target, ICommandContext? ctx)
@@ -257,7 +257,7 @@ protected bool? BubbleDown (View target, ICommandContext? ctx)
 This method:
 1. Creates a new `CommandContext` with `IsBubblingDown = true` and no binding
 2. Invokes the command on the target
-3. Because `IsBubblingDown` is true, `TryBubbleUpToSuperView` in the target's Raise method skips bubbling, preventing infinite recursion
+3. Because `IsBubblingDown` is true, `TryBubbleUp` in the target's Raise method skips bubbling, preventing infinite recursion
 
 `BubbleDown` is used by composite views (like `Shortcut` and `SelectorBase`) that need to forward a command to a SubView without the SubView's command bubbling back up to the SuperView that dispatched it.
 
@@ -267,7 +267,7 @@ flowchart LR
     bubble_down --> new_ctx[Create CommandContext with IsBubblingDown true]
     new_ctx --> invoke[subView.InvokeCommand]
     invoke --> raise[SubView raises Activating/Accepting]
-    raise --> try_bubble[TryBubbleUpToSuperView checks IsBubblingDown]
+    raise --> try_bubble[TryBubbleUp checks IsBubblingDown]
     try_bubble --> skip[IsBubblingDown true - skip bubbling]
 ```
 
@@ -309,7 +309,7 @@ The `IAcceptTarget` interface affects command flow in three ways:
 
 1. **`DefaultAcceptView` resolution**: When a view looks for a default accept target, it searches for SubViews implementing `IAcceptTarget { IsDefault: true }`.
 2. **`DefaultAcceptHandler` return value**: The handler returns `true` (indicating the command was handled) when the view implements `IAcceptTarget`, signaling that Accept has reached its terminal destination.
-3. **`TryBubbleUpToSuperView` behavior**: When a non-default `IAcceptTarget` source raises Accept and a `DefaultAcceptView` exists, the command bubbles up to the SuperView with `IsBubblingUp = true` so the SuperView can determine which accept target was activated. A default `IAcceptTarget` source flows normally without redirect.
+3. **`TryBubbleUp` behavior**: When a non-default `IAcceptTarget` source raises Accept and a `DefaultAcceptView` exists, the command bubbles up to the SuperView with `IsBubblingUp = true` so the SuperView can determine which accept target was activated. A default `IAcceptTarget` source flows normally without redirect.
 
 ## The Activating and Accepting Concepts
 
@@ -327,7 +327,7 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
 - **Flow**: `RaiseActivating` follows the Cancellable Work Pattern:
   1. Calls `OnActivating (args)` - subclasses can handle/cancel
   2. Raises `Activating` event - subscribers can handle/cancel
-  3. If not handled, calls `TryBubbleUpToSuperView` - bubbles if SuperView's `CommandsToBubbleUp` includes `Command.Activate`
+  3. If not handled, calls `TryBubbleUp` - bubbles if SuperView's `CommandsToBubbleUp` includes `Command.Activate`
   - **Default Behavior**: If not handled, the default handler (`DefaultActivateHandler`) sets focus (if `CanFocus` is true), raises `Activated`, and returns `true`.
   - **Cancellation**: `args.Handled` or `OnActivating` returning `true` halts the command.
   - **Context**: `ICommandContext` provides invocation details (source view, binding).
@@ -349,7 +349,7 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
 - **Flow**: `RaiseAccepting` follows the Cancellable Work Pattern:
   1. Calls `OnAccepting (args)` - subclasses can handle/cancel
   2. Raises `Accepting` event - subscribers can handle/cancel
-  3. If not handled, calls `TryBubbleUpToSuperView` - handles `DefaultAcceptView` redirection and `CommandsToBubbleUp` bubbling
+  3. If not handled, calls `TryBubbleUp` - handles `DefaultAcceptView` redirection and `CommandsToBubbleUp` bubbling
   - **Default Behavior**: If `RaiseAccepting` is not handled, `DefaultAcceptHandler` performs additional steps:
     1. Checks for `DefaultAcceptView` and calls `BubbleDown` to it (if it exists and is not the source)
     2. Calls `RaiseAccepted`
@@ -407,7 +407,7 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
 
   > **Important**: When `RaiseHandlingHotKey` returns `true` (indicating the hotkey was handled/cancelled), `DefaultHotKeyHandler` returns `false`. This is intentional: it allows the key character to pass through to text input processing. For example, a `TextField` with HotKey `_E` that already has focus will cancel the hotkey in `OnHandlingHotKey` so the 'E' character can be typed as text input.
 
-- **Propagation**: Like `Activate` and `Accept`, `HotKey` bubbling is opt-in via `CommandsToBubbleUp`. `RaiseHandlingHotKey` calls `TryBubbleUpToSuperView` when unhandled.
+- **Propagation**: Like `Activate` and `Accept`, `HotKey` bubbling is opt-in via `CommandsToBubbleUp`. `RaiseHandlingHotKey` calls `TryBubbleUp` when unhandled.
 
 ## Shortcut Command Dispatching
 
@@ -431,10 +431,14 @@ protected override bool OnActivating (CommandEventArgs args)
         return true;
     }
 
-    // Only bubble down when binding exists and source is not CommandView
-    if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+    // Only bubble down to CommandView when the activation came from user interaction
+    // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
+    // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
+    // When IsBubblingUp, skip BubbleDown here so the Activating event handler gets a chance
+    // to handle/cancel first. The Activate command handler will BubbleDown after if needed.
+    if (args.Context?.IsBubblingUp != true && args.Context?.Binding is { Source: { } source } && source != CommandView)
     {
-        BubbleDown (CommandView, args.Context);
+        return BubbleDown (CommandView, args.Context) is null;
     }
 
     return false;
@@ -458,7 +462,7 @@ flowchart TD
     check_source --> |No - from Shortcut/HelpView/KeyView| bubble[BubbleDown to CommandView]
     bubble --> invoke[CommandView.InvokeCommand with IsBubblingDown true]
     invoke --> cv_update[CommandView updates state]
-    cv_update --> no_rebubble[TryBubbleUpToSuperView skips - IsBubblingDown true]
+    cv_update --> no_rebubble[TryBubbleUp skips - IsBubblingDown true]
     no_rebubble --> raise_events3[Shortcut raises Activating/Accepting normally]
 ```
 
@@ -489,16 +493,31 @@ protected override bool OnActivating (CommandEventArgs args)
 }
 ```
 
-### Shortcut's `Action` Property
+### Shortcut's `Action` and `TargetView` Properties
 
-`Shortcut` has an `Action` property that is invoked in `OnActivated` and `OnAccepted`. This provides a simple callback mechanism for handling shortcut activation:
+`Shortcut` has an `Action` property that is invoked in `OnActivated` and `OnAccepted`. Additionally, if `TargetView` is set (and `Command` is not `NotBound`), `Shortcut` invokes the command on the target view. If no `TargetView` is set but `Key` is valid, it falls back to invoking application-bound key commands. This enables both simple callback and target-view-based command dispatching:
 
 ```csharp
 protected override void OnActivated (ICommandContext? ctx)
 {
     base.OnActivated (ctx);
     Action?.Invoke ();
-}
 
-protected override void OnAccepted (CommandEventArgs args) => Action?.Invoke ();
+    // Translate the incoming command to Command
+    if (Command != Command.NotBound && ctx is { })
+    {
+        ctx.Command = Command;
+    }
+
+    if (TargetView is { })
+    {
+        TargetView.InvokeCommand (Command, ctx);
+    }
+    else if (Key.IsValid && Command != Command.NotBound)
+    {
+        App?.Keyboard.InvokeCommandsBoundToKey (Key);
+    }
+}
 ```
+
+`OnAccepted` follows the same pattern: it invokes `Action`, then dispatches to `TargetView` or application-bound keys.

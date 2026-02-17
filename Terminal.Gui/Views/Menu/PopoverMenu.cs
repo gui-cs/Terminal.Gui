@@ -525,7 +525,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Calculate the initial position to the right of the menu item
         GetLocationEnsuringFullVisibility (menu, idealLocation.X, idealLocation.Y, out int nx, out int ny);
 
-        return new (nx, ny);
+        return new Point (nx, ny);
     }
 
     private void AddAndShowSubMenu (Menu? menu)
@@ -609,23 +609,24 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Visible = false;
         }
 
-        if (e.Context?.Binding is KeyBinding { Key: { } key })
+        if (e.Context?.Binding is not KeyBinding { Key: { } key })
         {
-            if (key == Application.QuitKey && SuperView is { Visible: true })
-            {
-                // Logging.Debug ($"{this.ToIdentifyingString ()} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
-                e.Handled = true;
-            }
+            return;
+        }
+
+        if (key == Application.QuitKey && SuperView is { Visible: true })
+        {
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
+            e.Handled = true;
         }
     }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({e.Context}) Command: {e.Context?.Command}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({e.Context}) Command: {e.Context?.Command}");
 
         if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true)
         {
-
             if (sourceView is MenuItem { SubMenu: null })
             {
                 HideAndRemoveSubMenu (_root);

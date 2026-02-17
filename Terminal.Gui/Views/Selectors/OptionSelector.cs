@@ -35,7 +35,8 @@ public class OptionSelector : SelectorBase, IDesignable
     protected override void OnActivated (ICommandContext? ctx)
     {
         base.OnActivated (ctx);
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
         {
@@ -82,7 +83,8 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             return;
         }
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
+
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
 
         // Verify at most one is checked
         Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
@@ -125,7 +127,7 @@ public class OptionSelector : SelectorBase, IDesignable
 
     private void Cycle ()
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()}");
 
         int valueIndex = Values.IndexOf (v => v == Value);
 

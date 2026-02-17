@@ -154,7 +154,6 @@ public class CheckBox : View, IValue<CheckState>
         }
 
         CheckState oldValue = _value;
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({oldValue}->{newValue})");
 
         ValueChangingEventArgs<CheckState> changingArgs = new (oldValue, newValue);
 

@@ -56,15 +56,12 @@ public class Shortcuts : Scenario
             X = Pos.Left (eventLog),
             Y = 0,
             Id = "canFocusCB",
-            Text = $"*._CommandView.CanFocus",
-            CanFocus = false,
+            Text = "*._CommandView.CanFocus",
+            CanFocus = false
         };
         _window.Add (canFocusCb);
 
-        canFocusCb.ValueChanged += (_, args) =>
-                                {
-                                    SetCommandViewsCanFocus (args.NewValue == CheckState.Checked);
-                                };
+        canFocusCb.ValueChanged += (_, args) => { SetCommandViewsCanFocus (args.NewValue == CheckState.Checked); };
 
         Shortcut alignKeysShortcut = new ()
         {
@@ -162,9 +159,9 @@ public class Shortcuts : Scenario
             Key = Key.F2,
             Width = Dim.Fill (eventLog),
             CommandView = new OptionSelector<Orientation>
-            {
-                Id = "optionSelectorOS", Orientation = Orientation.Vertical, MouseHighlightStates = MouseState.None
-            }
+                {
+                    Id = "optionSelectorOS", Orientation = Orientation.Vertical, MouseHighlightStates = MouseState.None
+                }
         };
 
         _window.Add (optionSelectorShortcut);
@@ -190,7 +187,11 @@ public class Shortcuts : Scenario
                                                                             {
                                                                                 if (send is LinearRange<string> lr)
                                                                                 {
-                                                                                    eventLog.Log ($"OptionsChanged: {lr.GetType ().Name} - {string.Join (",", lr.GetSetOptions ())}");
+                                                                                    eventLog.Log ($"OptionsChanged: {
+                                                                                        lr.GetType ().Name
+                                                                                    } - {
+                                                                                        string.Join (",", lr.GetSetOptions ())
+                                                                                    }");
                                                                                 }
                                                                             };
 
@@ -225,12 +226,35 @@ public class Shortcuts : Scenario
 
         _window.Add (listViewShortcut);
 
+        Shortcut commandNewShortcut = new ()
+        {
+            Id = "commandNew",
+            X = 0,
+            Y = Pos.Bottom (listViewShortcut),
+            Width = Dim.Width (listViewShortcut),
+            Key = Key.N.WithCtrl,
+            TargetView = _window,
+            Command = Command.New
+        };
+
+        _window.CommandNotBound += (o, args) =>
+                                   {
+                                       if (args.Context?.Command != Command.New)
+                                       {
+                                           return;
+                                       }
+                                       MessageBox.Query (_app!, "Create something new!", "Command.New was invoked from the commandNewShortcut.", "Thanks!");
+                                       args.Handled = true;
+                                   };
+
+        _window.Add (commandNewShortcut);
+
         Shortcut noCommandShortcut = new ()
         {
             Id = "noCommand",
             X = 0,
-            Y = Pos.Bottom (listViewShortcut),
-            Width = Dim.Width (listViewShortcut),
+            Y = Pos.Bottom (commandNewShortcut),
+            Width = Dim.Width (commandNewShortcut),
             HelpText = "No Command",
             Key = Key.D0
         };
@@ -433,6 +457,7 @@ public class Shortcuts : Scenario
         {
             eventLog.SetViewToLog (shortcut);
             eventLog.SetViewToLog (shortcut.CommandView);
+            shortcut.Action += () => eventLog.Log ($"{shortcut.ToIdentifyingString ()} Action!");
         }
 
         AlignKeys (true);

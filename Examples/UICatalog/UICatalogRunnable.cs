@@ -174,29 +174,19 @@ public sealed class UICatalogRunnable : Runnable
             {
                 Title = "Force _16 Colors",
                 Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-
-                // Best practice for CheckBoxes in menus is to disable focus and highlight states
-                CanFocus = false,
-                MouseHighlightStates = MouseState.None
             };
 
-            _force16ColorsMenuItemCb.ValueChanging += (_, args) =>
-                                                      {
-                                                          if (Driver.Force16Colors && args.NewValue == CheckState.UnChecked && !App!.Driver!.SupportsTrueColor)
-                                                          {
-                                                              args.Handled = true;
-                                                          }
-                                                      };
+            menuItems.Add (new MenuItem
+            {
+                CommandView = _force16ColorsMenuItemCb,
+                Action = () =>
+                         {
+                             Driver.Force16Colors = !Driver.Force16Colors;
+                             _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                             SetNeedsDraw ();
 
-            _force16ColorsMenuItemCb.ValueChanged += (_, args) =>
-                                                     {
-                                                         Driver.Force16Colors = args.NewValue == CheckState.Checked;
-
-                                                         _force16ColorsShortcutCb!.Value = args.NewValue;
-                                                         SetNeedsDraw ();
-                                                     };
-
-            menuItems.Add (new MenuItem { CommandView = _force16ColorsMenuItemCb });
+                         }
+            });
 
             menuItems.Add (new Line ());
 
@@ -204,22 +194,37 @@ public sealed class UICatalogRunnable : Runnable
             {
                 _themesSelector = new OptionSelector
                 {
-                    // MouseHighlightStates = MouseState.In,
-                    CanFocus = true
-
-                    // InvertFocusAttribute = true
+                    CanFocus = false
                 };
 
-                _themesSelector.ValueChanged += (_, args) =>
-                                                {
-                                                    if (args.NewValue is null)
-                                                    {
-                                                        return;
-                                                    }
-                                                    ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.NewValue];
-                                                };
+                MenuItem menuItem = new ()
+                {
+                    CommandView = _themesSelector,
+                    HelpText = "Cycle Through Themes",
+                    Key = Key.T.WithCtrl
+                };
 
-                var menuItem = new MenuItem { CommandView = _themesSelector, HelpText = "Cycle Through Themes", Key = Key.T.WithCtrl };
+                menuItem.Activating += (_, args) =>
+                                      {
+                                          // If activation came from the CommandView (e.g., mouse click on an option),
+                                          // don't mark as Handled so OptionSelector.OnActivated runs and picks the option.
+                                          if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == _themesSelector)
+                                          {
+                                              return;
+                                          }
+
+                                          // For all other sources (HotKey, programmatic), cycle the color.
+                                          args.Handled = true;
+
+                                          if (_themesSelector.Value == ThemeManager.GetThemeNames ().Count - 1)
+                                          {
+                                              _themesSelector.Value = 0;
+
+                                              return;
+                                          }
+
+                                          _themesSelector.Value++;
+                                      };
                 menuItems.Add (menuItem);
 
                 menuItems.Add (new Line ());
@@ -318,9 +323,34 @@ public sealed class UICatalogRunnable : Runnable
                 AssignHotKeys = true,
                 Labels = Enum.GetNames<LogLevel> (),
                 Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel))
-
-                // MouseHighlightStates = MouseState.In,
             };
+
+            MenuItem logMenu = new MenuItem
+            {
+                CommandView = _logLevelSelector, HelpText = "Cycle Through Log Levels", Key = Key.L.WithCtrl
+            };
+
+            logMenu.Activating += (_, args) =>
+                          {
+                              // If activation came from the CommandView (e.g., mouse click on a color),
+                              // don't mark as Handled so ColorPicker16.OnActivated runs and picks the color.
+                              if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == _logLevelSelector)
+                              {
+                                  return;
+                              }
+
+                              // For all other sources (HotKey, programmatic), cycle the color.
+                              args.Handled = true;
+
+                              if (_logLevelSelector.Value == Enum.GetNames<LogLevel> ().Length - 1)
+                              {
+                                  _logLevelSelector.Value = 0;
+
+                                  return;
+                              }
+
+                              _logLevelSelector.Value++;
+                          };
 
             _logLevelSelector.ValueChanged += (_, args) =>
                                               {
@@ -333,7 +363,7 @@ public sealed class UICatalogRunnable : Runnable
                                                       UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
                                               };
 
-            menuItems.Add (new MenuItem { CommandView = _logLevelSelector, HelpText = "Cycle Through Log Levels", Key = Key.L.WithCtrl });
+            menuItems.Add (logMenu);
 
             // add a separator
             menuItems.Add (new Line ());
@@ -344,6 +374,15 @@ public sealed class UICatalogRunnable : Runnable
         }
     }
 
+    private void OnThemesSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
+    {
+        if (args.NewValue is null)
+        {
+            return;
+        }
+        ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.NewValue];
+    }
+
     private void UpdateThemesMenu ()
     {
         if (_themesSelector is null)
@@ -351,11 +390,15 @@ public sealed class UICatalogRunnable : Runnable
             return;
         }
 
+        _themesSelector.ValueChanged -= OnThemesSelectorOnValueChanged;
+
         _themesSelector.Value = null;
         _themesSelector.AssignHotKeys = true;
         _themesSelector.UsedHotKeys.Clear ();
         _themesSelector.Labels = ThemeManager.GetThemeNames ().ToArray ();
         _themesSelector.Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
+
+        _themesSelector.ValueChanged += OnThemesSelectorOnValueChanged;
 
         if (_topSchemesSelector is null)
         {
@@ -570,13 +613,10 @@ public sealed class UICatalogRunnable : Runnable
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
-        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false };
-
-        statusBarShortcut.Accepting += (_, args) =>
-                                       {
-                                           ShowStatusBar = !ShowStatusBar;
-                                           args.Handled = true;
-                                       };
+        Shortcut statusBarShortcut = new ()
+        {
+            Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar
+        };
 
         _force16ColorsShortcutCb = new CheckBox
         {
@@ -592,12 +632,11 @@ public sealed class UICatalogRunnable : Runnable
             Key = Key.F7
         };
 
-        force16ColorsShortcut.Accepting += (_, args) =>
+        force16ColorsShortcut.Activated += (_, args) =>
                                            {
                                                Driver.Force16Colors = !Driver.Force16Colors;
                                                _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                                SetNeedsDraw ();
-                                               args.Handled = true;
                                            };
         statusBar.Add (_shQuit, statusBarShortcut, force16ColorsShortcut, _shVersion);
 

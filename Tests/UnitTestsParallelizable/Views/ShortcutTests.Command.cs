@@ -586,13 +586,8 @@ public partial class ShortcutTests
         target.Dispose ();
     }
 
-    // Claude - Opus 4.6
-    /// <summary>
-    ///     Verifies that Activate does NOT invoke TargetView.Command.
-    ///     Only Accept triggers TargetView invocation; Activate is for state changes.
-    /// </summary>
     [Fact]
-    public void Activate_Does_Not_Invoke_TargetView ()
+    public void Activate_Does_Invoke_TargetView ()
     {
         // Arrange
         var commandInvoked = false;
@@ -617,7 +612,7 @@ public partial class ShortcutTests
         shortcut.InvokeCommand (Command.Activate);
 
         // Assert — TargetView should NOT be invoked on Activate
-        Assert.False (commandInvoked);
+        Assert.True (commandInvoked);
 
         target.Dispose ();
     }
@@ -678,6 +673,137 @@ public partial class ShortcutTests
 
         // Assert — only Action fires, no TargetView or app-level invocation
         Assert.True (actionFired);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that when a CheckBox CommandView's Activate bubbles up to Shortcut,
+    ///     the Shortcut's Action sees the UPDATED CheckBox value (after toggle), not the stale value.
+    ///     This is the regression test for the deferred RaiseActivated fix.
+    /// </summary>
+    [Fact]
+    public void Action_Sees_Updated_CheckBox_Value_On_BubbleUp_Activate ()
+    {
+        // Arrange
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+
+        CheckState? capturedValue = null;
+
+        Shortcut shortcut = new ()
+        {
+            Key = Key.T,
+            CommandView = checkBox,
+            Action = () => capturedValue = checkBox.Value
+        };
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        // Act - Invoke Activate directly on the CheckBox (simulates bubble-up from click)
+        checkBox.InvokeCommand (Command.Activate);
+
+        // Assert - Action should see the NEW value (Checked), not the old value (UnChecked)
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (CheckState.Checked, capturedValue);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies correct event ordering for compound views in Shortcut when activation
+    ///     bubbles up from the CommandView (e.g., CheckBox click).
+    ///     Expected order:
+    ///     1. CheckBox.Activating
+    ///     2. Shortcut.Activating (from bubble-up)
+    ///     3. Shortcut.Activated (deferred, fires during CheckBox.Activated invocation)
+    ///     4. CheckBox.Activated (test handler fires after Shortcut's subscription)
+    ///     Key: CheckBox.OnActivated (state change) runs before both Activated events.
+    /// </summary>
+    [Fact]
+    public void BubbleUp_Activate_Event_Ordering_CommandView_Completes_Before_Shortcut_Activated ()
+    {
+        // Arrange
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+
+        List<string> eventLog = [];
+        CheckState? valueAtShortcutActivated = null;
+
+        checkBox.Activating += (_, _) => eventLog.Add ("CheckBox.Activating");
+        checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
+
+        shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
+        shortcut.Activated += (_, _) =>
+                              {
+                                  valueAtShortcutActivated = checkBox.Value;
+                                  eventLog.Add ("Shortcut.Activated");
+                              };
+
+        // Act - Invoke Activate directly on the CheckBox (simulates bubble-up from click)
+        checkBox.InvokeCommand (Command.Activate);
+
+        // Assert - Verify ordering:
+        // Shortcut.Activated fires during CheckBox.Activated event (Shortcut subscribed first),
+        // but CheckBox.OnActivated (state change) already ran before Activated events.
+        Assert.Equal (4, eventLog.Count);
+        Assert.Equal ("CheckBox.Activating", eventLog [0]);
+        Assert.Equal ("Shortcut.Activating", eventLog [1]);
+        Assert.Equal ("Shortcut.Activated", eventLog [2]);
+        Assert.Equal ("CheckBox.Activated", eventLog [3]);
+
+        // CheckBox.OnActivated toggled state BEFORE Activated events fired
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (CheckState.Checked, valueAtShortcutActivated);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies correct event ordering for compound views in Shortcut when activation
+    ///     is triggered via BubbleDown (e.g., clicking on Shortcut's HelpView area).
+    ///     OnActivating calls BubbleDown when the activation source is not the CommandView.
+    ///     Expected order:
+    ///     1. Shortcut.Activating (fires in RaiseActivating, after OnActivating/BubbleDown)
+    ///     2. Shortcut.Activated (direct path, not deferred since IsBubblingUp is false)
+    ///     BubbleDown also triggers CommandView events, but inside OnActivating (before Shortcut.Activating).
+    /// </summary>
+    [Fact]
+    public void BubbleDown_Activate_Event_Ordering_With_Binding_Source ()
+    {
+        // Arrange
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+
+        List<string> eventLog = [];
+        CheckState? valueAtShortcutActivated = null;
+
+        checkBox.Activating += (_, _) => eventLog.Add ("CheckBox.Activating");
+        checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
+
+        shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
+        shortcut.Activated += (_, _) =>
+                              {
+                                  valueAtShortcutActivated = checkBox.Value;
+                                  eventLog.Add ("Shortcut.Activated");
+                              };
+
+        // Act - Invoke Activate with a binding source (the Shortcut), which triggers BubbleDown
+        // to the CommandView. This simulates what happens on HotKey press or mouse click on
+        // the Shortcut's non-CommandView area (e.g., HelpView or KeyView).
+        KeyBinding binding = new ([Command.Activate], Key.T, shortcut);
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (shortcut), binding);
+        shortcut.InvokeCommand (Command.Activate, ctx);
+
+        // Assert - BubbleDown fires CommandView events during OnActivating (before Shortcut.Activating),
+        // then Shortcut.Activating fires, then Shortcut.Activated (direct path).
+        Assert.Equal (4, eventLog.Count);
+        Assert.Equal ("CheckBox.Activating", eventLog [0]);
+        Assert.Equal ("CheckBox.Activated", eventLog [1]);
+        Assert.Equal ("Shortcut.Activating", eventLog [2]);
+        Assert.Equal ("Shortcut.Activated", eventLog [3]);
+
+        // CheckBox should have toggled
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (CheckState.Checked, valueAtShortcutActivated);
     }
 
     // Claude - Opus 4.6

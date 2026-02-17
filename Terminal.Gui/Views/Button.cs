@@ -102,7 +102,7 @@ public class Button : View, IDesignable, IAcceptTarget
         InvokeCommand (Command.Accept);
     }
 
-    private void Button_TitleChanged (object sender, EventArgs<string> e)
+    private void Button_TitleChanged (object? sender, EventArgs<string> e)
     {
         base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;

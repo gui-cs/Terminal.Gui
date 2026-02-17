@@ -85,34 +85,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
-        // Override the default Activate handler. When a SubView's Activate bubbles up to this
-        // Shortcut (IsBubblingUp=true), we return false so the originating SubView's
-        // DefaultActivateHandler continues to call RaiseActivated (e.g., CheckBox needs this to
-        // toggle its state). Without this, the SuperView consuming the command would prevent
-        // the SubView from completing its own activation.
-        AddCommand (Command.Activate, ctx =>
-                                      {
-                                          if (RaiseActivating (ctx) is true)
-                                          {
-                                              return true;
-                                          }
-
-                                          if (CanFocus)
-                                          {
-                                              SetFocus ();
-                                          }
-
-                                          RaiseActivated (ctx);
-
-                                          // When the command bubbled up from a SubView, return false so the
-                                          // SubView continues its own processing (e.g., CheckBox.OnActivated toggles state).
-                                          if (ctx?.IsBubblingUp == true)
-                                          {
-                                              return false;
-                                          }
-
-                                          return true;
-                                      });
+        AddCommand (Command.Activate, HandleActivate);
 
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
@@ -155,6 +128,52 @@ public class Shortcut : View, IOrientation, IDesignable
         Key = key;
         Action = action;
         ShowHide ();
+    }
+
+    /// <summary>
+    ///     Override the default Activate handler. When a SubView's Activate bubbles up to this
+    ///     Shortcut (IsBubblingUp=true), we return false so the originating SubView's
+    ///     DefaultActivateHandler continues to call RaiseActivated (e.g., CheckBox needs this to
+    ///     toggle its state). Without this, the SuperView consuming the command would prevent
+    ///     the SubView from completing its own activation.
+    /// </summary>
+    /// <param name="ctx"></param>
+    /// <returns></returns>
+    private bool? HandleActivate (ICommandContext? ctx)
+    {
+        _activationBubbledUp = false;
+
+        if (RaiseActivating (ctx) is true)
+        {
+            return true;
+        }
+
+        if (CanFocus)
+        {
+            SetFocus ();
+        }
+
+        if (ctx?.IsBubblingUp == true)
+        {
+            // Defer RaiseActivated until CommandView.Activated fires.
+            _activationBubbledUp = true;
+            _deferredActivationContext = ctx;
+
+            // If activation bubbled up from a non-CommandView SubView (e.g., HelpView/KeyView),
+            // BubbleDown to CommandView now. This happens AFTER the Activating event handler had
+            // a chance to cancel (RaiseActivating above). CommandView.Activated will trigger
+            // the deferred RaiseActivated via CommandView_Activated.
+            if (ctx.Binding is { Source: { } source } && source != CommandView)
+            {
+                BubbleDown (CommandView, ctx);
+            }
+
+            return false;
+        }
+
+        RaiseActivated (ctx);
+
+        return true;
     }
 
     // This is used to calculate the minimum width of the Shortcut when Width is NOT Dim.Auto
@@ -289,6 +308,9 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Accept/Activate/HotKey Command Handling
 
+    private bool _activationBubbledUp;
+    private ICommandContext? _deferredActivationContext;
+
     /// <summary>
     ///     Gets or sets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on
     ///     when the Shortcut is accepted.
@@ -314,12 +336,12 @@ public class Shortcut : View, IOrientation, IDesignable
 
             if (string.IsNullOrEmpty (Title))
             {
-                Title = GlobalResources.GetString ($"cmd.{field}") ?? string.Empty;
+                Title = GlobalResources.GetString ($"cmd{field}") ?? string.Empty;
             }
 
             if (string.IsNullOrEmpty (HelpText))
             {
-                HelpText = GlobalResources.GetString ($"cmd.{field}.Help") ?? string.Empty;
+                HelpText = GlobalResources.GetString ($"cmd{field}_Help") ?? string.Empty;
             }
         }
     }
@@ -332,12 +354,14 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+        // When IsBubblingUp, skip BubbleDown here so the Activating event handler gets a chance
+        // to handle/cancel first. The Activate command handler will BubbleDown after if needed.
+        if (args.Context?.IsBubblingUp != true && args.Context?.Binding is { Source: { } source } && source != CommandView)
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -349,8 +373,27 @@ public class Shortcut : View, IOrientation, IDesignable
     protected override void OnActivated (ICommandContext? ctx)
     {
         base.OnActivated (ctx);
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
+
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
+
+        // Translate the incoming command to Command
+        if (Command != Command.NotBound && ctx is { })
+        {
+            ctx.Command = Command;
+        }
+
+        if (TargetView is { })
+        {
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
+            TargetView.InvokeCommand (Command, ctx);
+        }
+        else if (Key.IsValid && Command != Command.NotBound)
+        {
+            // Is this an Application-bound command?
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+            App?.Keyboard.InvokeCommandsBoundToKey (Key);
+        }
     }
 
     /// <inheritdoc/>
@@ -361,7 +404,7 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         // Only bubble down to CommandView when accept came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
@@ -388,13 +431,13 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (TargetView is { })
         {
-            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
             TargetView.InvokeCommand (Command, ctx);
         }
         else if (Key.IsValid && Command != Command.NotBound)
         {
             // Is this an Application-bound command?
-            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
             App?.Keyboard.InvokeCommandsBoundToKey (Key);
         }
     }
@@ -491,6 +534,7 @@ public class Shortcut : View, IOrientation, IDesignable
             ArgumentNullException.ThrowIfNull (value);
 
             // Clean up old
+            _commandView.Activated -= CommandView_Activated;
             _commandView.GettingAttributeForRole -= SubViewOnGettingAttributeForRole;
             Remove (_commandView);
             _commandView.Dispose ();
@@ -505,6 +549,7 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 #endif
             _commandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+            _commandView.Activated += CommandView_Activated;
 
             // If the CommandView has a hotkey, we use that. Otherwise, we use '_' to indicate the hotkey is in the Title.
             if (_commandView.HotKey != Key.Empty)
@@ -565,12 +610,24 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
-    {
+    private void Shortcut_TitleChanged (object? sender, EventArgs<string> e) =>
+
         // If the Title changes, update the CommandView Text.
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
+
+    private void CommandView_Activated (object? sender, EventArgs<ICommandContext?> e)
+    {
+        if (!_activationBubbledUp)
+        {
+            return;
+        }
+        _activationBubbledUp = false;
+        ICommandContext? ctx = _deferredActivationContext;
+        _deferredActivationContext = null;
+
+        RaiseActivated (ctx);
     }
 
     #endregion Command
@@ -822,6 +879,7 @@ public class Shortcut : View, IOrientation, IDesignable
         if (disposing)
         {
             TitleChanged -= Shortcut_TitleChanged;
+            CommandView.Activated -= CommandView_Activated;
 
             if (CommandView.SuperView is null)
             {
