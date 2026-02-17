@@ -182,14 +182,15 @@ public class ScrollBarTests
         super.Dispose ();
     }
 
-    // Claude - Opus 4.6
+    // Claude - Opus 4.5
     [Fact]
     public void VisibilityMode_None_Overrides_ViewportSettingsFlags ()
     {
         Runnable super = new () { Id = "super", Width = 1, Height = 20 };
         super.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
-        ScrollBar scrollBar = new () { ScrollableContentSize = 100, VisibleContentSize = 10 };
-        super.Add (scrollBar);
+        ScrollBar scrollBar = super.HorizontalScrollBar;
+        scrollBar.ScrollableContentSize = 100;
+        scrollBar.VisibleContentSize = 10;
 
         scrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
         Assert.False (scrollBar.Visible);
@@ -289,7 +290,7 @@ public class ScrollBarTests
         scrollBar.ScrollableContentSize = 5;
         scrollBar.Frame = new Rectangle (0, 0, 1, 4); // Needs to be at least 4 for slider to move
 
-        scrollBar.ValueChanging += (s, e) =>
+        scrollBar.ValueChanging += (_, e) =>
                                    {
                                        if (changingCount == 0)
                                        {
@@ -298,7 +299,7 @@ public class ScrollBarTests
 
                                        changingCount++;
                                    };
-        scrollBar.ValueChanged += (s, e) => changedCount++;
+        scrollBar.ValueChanged += (_, _) => changedCount++;
 
         scrollBar.Value = 1;
         Assert.Equal (0, scrollBar.Value);
@@ -327,7 +328,7 @@ public class ScrollBarTests
     {
         var count = 0;
         var scrollBar = new ScrollBar ();
-        scrollBar.ScrollableContentSizeChanged += (s, e) => count++;
+        scrollBar.ScrollableContentSizeChanged += (_, _) => count++;
 
         scrollBar.ScrollableContentSize = 10;
         Assert.Equal (10, scrollBar.ScrollableContentSize);
