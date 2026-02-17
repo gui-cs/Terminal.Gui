@@ -110,7 +110,8 @@ public class EventLog : ListView
 
     private void OnViewOnAccepted (object? s, CommandEventArgs args) => Log ($"{(s as View).ToIdentifyingString ()} Accepted: {FormatContext (args.Context)}");
 
-    private void OnViewOnAccepting (object? s, CommandEventArgs args) => Log ($"{(s as View).ToIdentifyingString ()} Accepting: {FormatContext (args.Context)}");
+    private void OnViewOnAccepting (object? s, CommandEventArgs args) =>
+        Log ($"{(s as View).ToIdentifyingString ()} Accepting: {FormatContext (args.Context)}");
 
     private void OnViewOnActivating (object? s, CommandEventArgs args) =>
         Log ($"{(s as View).ToIdentifyingString ()} Activating: {FormatContext (args.Context)}");
@@ -160,5 +161,4 @@ public class EventLog : ListView
         Border?.Add (ExpandButton!);
         Source = new ListWrapper<string> (_eventSource);
     }
-
-    }
+}

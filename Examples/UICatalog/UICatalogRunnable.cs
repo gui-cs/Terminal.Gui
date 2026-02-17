@@ -538,15 +538,14 @@ public sealed class UICatalogRunnable : Runnable
             CommandView = _force16ColorsShortcutCb,
             HelpText = "",
             BindKeyToApplication = true,
-            Key = Key.F7
+            Key = Key.F7,
+            Action = () =>
+                     {
+                         Driver.Force16Colors = !Driver.Force16Colors;
+                         _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                         SetNeedsDraw ();
+                     }
         };
-
-        force16ColorsShortcut.Activated += (_, args) =>
-                                           {
-                                               Driver.Force16Colors = !Driver.Force16Colors;
-                                               _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
-                                               SetNeedsDraw ();
-                                           };
         statusBar.Add (_shQuit, statusBarShortcut, force16ColorsShortcut, _shVersion);
 
         if (UICatalog.Options.DontEnableConfigurationManagement)

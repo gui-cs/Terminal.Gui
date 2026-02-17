@@ -641,11 +641,7 @@ public partial class View // Command APIs
     ///     having an "OK" button that accepts the dialog when the user presses Enter or clicks the button, without having to
     ///     set up explicit bindings for each control in the dialog that should trigger the "OK" button's Accept behavior.
     /// </remarks>
-    public View? DefaultAcceptView
-    {
-        get => field ?? GetSubViews (includePadding: true).FirstOrDefault (v => v is IAcceptTarget { IsDefault: true });
-        set;
-    }
+    public View? DefaultAcceptView { get => field ?? GetSubViews (includePadding: true).FirstOrDefault (v => v is IAcceptTarget { IsDefault: true }); set; }
 
     /// <summary>
     ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews.
