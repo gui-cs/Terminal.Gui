@@ -150,27 +150,45 @@ public class Shortcuts : Scenario
 
         _window.Add (buttonShortcut);
 
+        OptionSelector optionSelector = new () { Id = "optionSelector", Orientation = Orientation.Vertical, MouseHighlightStates = MouseState.None };
+        optionSelector.EnableForDesign ();
+
         Shortcut optionSelectorShortcut = new ()
         {
             Id = "optionSelector",
-            HelpText = "Linear Range Orientation",
+            HelpText = "Enable for Design OS",
             X = 0,
             Y = Pos.Bottom (buttonShortcut),
             Key = Key.F2,
             Width = Dim.Fill (eventLog),
-            CommandView = new OptionSelector<Orientation>
-                {
-                    Id = "optionSelectorOS", Orientation = Orientation.Vertical, MouseHighlightStates = MouseState.None
-                }
+            CommandView = optionSelector
         };
 
         _window.Add (optionSelectorShortcut);
+
+        FlagSelector<ViewDiagnosticFlags> flagSelector = new () { Styles = SelectorStyles.ShowNoneFlag };
+        flagSelector.AssignHotKeys = true;
+        flagSelector.Value = View.Diagnostics;
+
+        flagSelector.ValueChanged += (_, args) => { View.Diagnostics = args.Value ?? ViewDiagnosticFlags.Off; };
+
+        Shortcut diagnosticShortcut = new ()
+        {
+            Id = "diagnosticShortcut",
+            Y = Pos.Bottom (optionSelectorShortcut),
+            Key = Key.F3,
+            Width = Dim.Fill (eventLog),
+            CommandView = flagSelector,
+            HelpText = "View Diagnostics"
+        };
+
+        _window.Add (diagnosticShortcut);
 
         Shortcut sliderShortcut = new ()
         {
             Id = "sliderShortcut",
             X = 0,
-            Y = Pos.Bottom (optionSelectorShortcut),
+            Y = Pos.Bottom (diagnosticShortcut),
             Width = Dim.Fill (eventLog),
             HelpText = "LinearRanges work!",
             CommandView = new LinearRange<string> { Id = "sliderLR", Orientation = Orientation.Horizontal, AllowEmpty = true },
@@ -194,12 +212,6 @@ public class Shortcuts : Scenario
                                                                                     }");
                                                                                 }
                                                                             };
-
-        optionSelectorShortcut.Action += () =>
-                                         {
-                                             ((LinearRange<string>)sliderShortcut.CommandView).Orientation =
-                                                 ((OptionSelector<Orientation>)optionSelectorShortcut.CommandView).Value!.Value;
-                                         };
 
         _window.Add (sliderShortcut);
 

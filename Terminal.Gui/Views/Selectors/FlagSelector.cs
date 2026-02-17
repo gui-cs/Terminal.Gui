@@ -74,7 +74,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return true;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         // HotKey-triggered Activate: OnHandlingHotKey set the flag to suppress toggling
         if (_suppressHotKeyActivate)
@@ -105,7 +105,7 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         base.OnActivated (ctx);
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         if (ctx?.Source?.TryGetTarget (out View? source) != true || source is not CheckBox checkBox)
         {
@@ -142,7 +142,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
 
         if (args.Context?.IsBubblingDown is true)
         {
@@ -164,7 +164,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
 
         if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
@@ -180,7 +180,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
 
         int newValue = Value ?? 0;
 

@@ -143,6 +143,8 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         _activationBubbledUp = false;
 
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
         if (RaiseActivating (ctx) is true)
         {
             return true;
@@ -163,7 +165,7 @@ public class Shortcut : View, IOrientation, IDesignable
             // BubbleDown to CommandView now. This happens AFTER the Activating event handler had
             // a chance to cancel (RaiseActivating above). CommandView.Activated will trigger
             // the deferred RaiseActivated via CommandView_Activated.
-            if (ctx.Binding is { Source: { } source } && source != CommandView)
+            if (ctx.Binding is { Source: { } source } && !IsWithinCommandView (source))
             {
                 BubbleDown (CommandView, ctx);
             }
@@ -308,6 +310,28 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Accept/Activate/HotKey Command Handling
 
+    /// <summary>
+    ///     Checks whether the specified view is the <see cref="CommandView"/> or a descendant of it.
+    ///     Used to determine if a command originated from within the CommandView hierarchy,
+    ///     in which case BubbleDown should be skipped (the activation already came from CommandView).
+    /// </summary>
+    private bool IsWithinCommandView (View source)
+    {
+        View? v = source;
+
+        while (v is { })
+        {
+            if (v == CommandView)
+            {
+                return true;
+            }
+
+            v = v.SuperView;
+        }
+
+        return false;
+    }
+
     private bool _activationBubbledUp;
     private ICommandContext? _deferredActivationContext;
 
@@ -354,14 +378,14 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         // Only bubble down to CommandView when the activation came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
         // When IsBubblingUp, skip BubbleDown here so the Activating event handler gets a chance
         // to handle/cancel first. The Activate command handler will BubbleDown after if needed.
-        if (args.Context?.IsBubblingUp != true && args.Context?.Binding is { Source: { } source } && source != CommandView)
+        if (args.Context?.IsBubblingUp != true && args.Context?.Binding is { Source: { } source } && !IsWithinCommandView (source))
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -374,7 +398,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         base.OnActivated (ctx);
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
 
         // Translate the incoming command to Command
@@ -385,13 +409,13 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (TargetView is { })
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
+            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
             TargetView.InvokeCommand (Command, ctx);
         }
         else if (Key.IsValid && Command != Command.NotBound)
         {
             // Is this an Application-bound command?
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
             App?.Keyboard.InvokeCommandsBoundToKey (Key);
         }
     }
@@ -404,12 +428,12 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         // Only bubble down to CommandView when accept came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { Source: { } source } && source != CommandView)
+        if (args.Context?.Binding is { Source: { } source } && !IsWithinCommandView (source))
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -431,13 +455,13 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (TargetView is { })
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
+            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
             TargetView.InvokeCommand (Command, ctx);
         }
         else if (Key.IsValid && Command != Command.NotBound)
         {
             // Is this an Application-bound command?
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
             App?.Keyboard.InvokeCommandsBoundToKey (Key);
         }
     }

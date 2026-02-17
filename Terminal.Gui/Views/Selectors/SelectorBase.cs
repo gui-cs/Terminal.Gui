@@ -148,7 +148,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return true;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         return args.Context?.Binding switch
                {
@@ -186,7 +186,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 return;
             }
 
-            // Logging.Debug ($"{this.ToIdentifyingString ()} ({field}->{value})");
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({field}->{value})");
 
             field = value;
 

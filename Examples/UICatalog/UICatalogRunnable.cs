@@ -161,8 +161,7 @@ public sealed class UICatalogRunnable : Runnable
                                                                                               buttons: Strings.btnOk),
                                                                       Key.A.WithCtrl)
                                                     ])
-                               ])
-        { Title = "menuBar", Id = "menuBar" };
+                               ]) { Title = "menuBar", Id = "menuBar" };
 
         return menuBar;
 
@@ -170,11 +169,7 @@ public sealed class UICatalogRunnable : Runnable
         {
             List<View> menuItems = [];
 
-            _force16ColorsMenuItemCb = new CheckBox
-            {
-                Title = "Force _16 Colors",
-                Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-            };
+            _force16ColorsMenuItemCb = new CheckBox { Title = "Force _16 Colors", Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked };
 
             menuItems.Add (new MenuItem
             {
@@ -184,7 +179,6 @@ public sealed class UICatalogRunnable : Runnable
                              Driver.Force16Colors = !Driver.Force16Colors;
                              _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                              SetNeedsDraw ();
-
                          }
             });
 
@@ -192,55 +186,18 @@ public sealed class UICatalogRunnable : Runnable
 
             if (ConfigurationManager.IsEnabled)
             {
-                _themesSelector = new OptionSelector
-                {
-                    CanFocus = false
-                };
+                _themesSelector = new OptionSelector ();
+                _themesSelector.ValueChanged += OnThemesSelectorOnValueChanged;
 
-                MenuItem menuItem = new ()
-                {
-                    CommandView = _themesSelector,
-                    HelpText = "Cycle Through Themes",
-                    Key = Key.T.WithCtrl
-                };
+                MenuItem menuItem = new () { CommandView = _themesSelector, HelpText = "Cycle Through Themes", Key = Key.T.WithCtrl };
 
-                menuItem.Activating += (_, args) =>
-                                      {
-                                          // If activation came from the CommandView (e.g., mouse click on an option),
-                                          // don't mark as Handled so OptionSelector.OnActivated runs and picks the option.
-                                          if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == _themesSelector)
-                                          {
-                                              return;
-                                          }
-
-                                          // For all other sources (HotKey, programmatic), cycle the color.
-                                          args.Handled = true;
-
-                                          if (_themesSelector.Value == ThemeManager.GetThemeNames ().Count - 1)
-                                          {
-                                              _themesSelector.Value = 0;
-
-                                              return;
-                                          }
-
-                                          _themesSelector.Value++;
-                                      };
                 menuItems.Add (menuItem);
 
                 menuItems.Add (new Line ());
 
                 _topSchemesSelector = new OptionSelector ();
 
-                _topSchemesSelector.ValueChanged += (_, args) =>
-                                                    {
-                                                        if (args.NewValue is null)
-                                                        {
-                                                            return;
-                                                        }
-                                                        CachedRunnableScheme = SchemeManager.GetSchemesForCurrentTheme ().Keys.ToArray () [(int)args.NewValue];
-                                                        SchemeName = CachedRunnableScheme;
-                                                        SetNeedsDraw ();
-                                                    };
+                _topSchemesSelector.ValueChanged += OnTopSchemesSelectorOnValueChanged;
 
                 menuItem = new MenuItem
                 {
@@ -257,35 +214,40 @@ public sealed class UICatalogRunnable : Runnable
             }
 
             return menuItems.ToArray ();
+
+            void OnTopSchemesSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
+            {
+                if (args.NewValue is null)
+                {
+                    return;
+                }
+                CachedRunnableScheme = SchemeManager.GetSchemesForCurrentTheme ().Keys.ToArray () [(int)args.NewValue];
+                SchemeName = CachedRunnableScheme;
+                SetNeedsDraw ();
+            }
+
+            void OnThemesSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
+            {
+                if (args.NewValue is null)
+                {
+                    return;
+                }
+                ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.NewValue];
+            }
         }
 
         View [] CreateDiagnosticMenuItems ()
         {
             List<View> menuItems = [];
 
-            _diagnosticFlagsSelector = new FlagSelector<ViewDiagnosticFlags> { Styles = SelectorStyles.ShowNoneFlag, CanFocus = true };
+            _diagnosticFlagsSelector = new FlagSelector<ViewDiagnosticFlags> { Styles = SelectorStyles.ShowNoneFlag };
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
             _diagnosticFlagsSelector.AssignHotKeys = true;
             _diagnosticFlagsSelector.Value = Diagnostics;
 
-            _diagnosticFlagsSelector.Activating += (_, args) =>
-                                                   {
-                                                       if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true)
-                                                       {
-                                                           _diagnosticFlags =
-                                                               (ViewDiagnosticFlags)(int)sourceView.Data!; // (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                                                           Diagnostics = _diagnosticFlags;
-                                                       }
-                                                   };
+            _diagnosticFlagsSelector.ValueChanged += OnDiagnosticFlagsSelectorOnValueChanged;
 
-            var diagFlagMenuItem = new MenuItem { CommandView = _diagnosticFlagsSelector, HelpText = "View Diagnostics" };
-
-            diagFlagMenuItem.Accepting += (_, _) =>
-                                          {
-                                              //_diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                                              //Diagnostics = _diagnosticFlags;
-                                              //args.Handled = true;
-                                          };
+            MenuItem diagFlagMenuItem = new () { CommandView = _diagnosticFlagsSelector, HelpText = "View Diagnostics" };
 
             menuItems.Add (diagFlagMenuItem);
 
@@ -293,75 +255,32 @@ public sealed class UICatalogRunnable : Runnable
 
             _disableMouseCb = new CheckBox
             {
-                Title = "_Disable MouseEventArgs",
-                Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
-
-                // Best practice for CheckBoxes in menus is to disable focus and highlight states
-                CanFocus = false,
-                MouseHighlightStates = MouseState.None
+                Title = "_Disable MouseEventArgs", Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked
             };
 
-            //_disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
-            _disableMouseCb.Activating += (_, _) =>
-                                          {
-                                              App!.Mouse.IsMouseDisabled = !App!.Mouse.IsMouseDisabled;
-                                              _disableMouseCb.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.None;
-                                          };
+            _disableMouseCb.ValueChanged += (_, args) => { App!.Mouse.IsMouseDisabled = args.NewValue == CheckState.Checked; };
             menuItems.Add (new MenuItem { CommandView = _disableMouseCb, HelpText = "Disable MouseEventArgs" });
 
             return menuItems.ToArray ();
+
+            void OnDiagnosticFlagsSelectorOnValueChanged (object? _, EventArgs<ViewDiagnosticFlags?> args) =>
+                Diagnostics = args.Value ?? ViewDiagnosticFlags.Off;
         }
 
         View [] CreateLoggingMenuItems ()
         {
             List<View?> menuItems = [];
 
-            LogLevel [] logLevels = Enum.GetValues<LogLevel> ();
-
             _logLevelSelector = new OptionSelector
             {
                 AssignHotKeys = true,
                 Labels = Enum.GetNames<LogLevel> (),
-                Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel))
+                Value = Enum.GetValues<LogLevel> ().ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel))
             };
 
-            MenuItem logMenu = new MenuItem
-            {
-                CommandView = _logLevelSelector, HelpText = "Cycle Through Log Levels", Key = Key.L.WithCtrl
-            };
+            MenuItem logMenu = new () { CommandView = _logLevelSelector, HelpText = "Cycle Through Log Levels", Key = Key.L.WithCtrl };
 
-            logMenu.Activating += (_, args) =>
-                          {
-                              // If activation came from the CommandView (e.g., mouse click on a color),
-                              // don't mark as Handled so ColorPicker16.OnActivated runs and picks the color.
-                              if (args.Context.TryGetSource (out View? ctxSource) && ctxSource == _logLevelSelector)
-                              {
-                                  return;
-                              }
-
-                              // For all other sources (HotKey, programmatic), cycle the color.
-                              args.Handled = true;
-
-                              if (_logLevelSelector.Value == Enum.GetNames<LogLevel> ().Length - 1)
-                              {
-                                  _logLevelSelector.Value = 0;
-
-                                  return;
-                              }
-
-                              _logLevelSelector.Value++;
-                          };
-
-            _logLevelSelector.ValueChanged += (_, args) =>
-                                              {
-                                                  UICatalog.Options = UICatalog.Options with
-                                                  {
-                                                      DebugLogLevel = Enum.GetName (logLevels [args.NewValue!.Value])!
-                                                  };
-
-                                                  UICatalog.LogLevelSwitch.MinimumLevel =
-                                                      UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
-                                              };
+            _logLevelSelector.ValueChanged += OnLogLevelSelectorOnValueChanged;
 
             menuItems.Add (logMenu);
 
@@ -371,16 +290,14 @@ public sealed class UICatalogRunnable : Runnable
             menuItems.Add (new MenuItem ("_Open Log Folder", string.Empty, () => OpenUrl (UICatalog.LOGFILE_LOCATION)));
 
             return menuItems.ToArray ()!;
-        }
-    }
 
-    private void OnThemesSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
-    {
-        if (args.NewValue is null)
-        {
-            return;
+            void OnLogLevelSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
+            {
+                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (Enum.GetValues<LogLevel> () [args.NewValue!.Value])! };
+
+                UICatalog.LogLevelSwitch.MinimumLevel = UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
+            }
         }
-        ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.NewValue];
     }
 
     private void UpdateThemesMenu ()
@@ -390,15 +307,11 @@ public sealed class UICatalogRunnable : Runnable
             return;
         }
 
-        _themesSelector.ValueChanged -= OnThemesSelectorOnValueChanged;
-
         _themesSelector.Value = null;
         _themesSelector.AssignHotKeys = true;
         _themesSelector.UsedHotKeys.Clear ();
         _themesSelector.Labels = ThemeManager.GetThemeNames ().ToArray ();
         _themesSelector.Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
-
-        _themesSelector.ValueChanged += OnThemesSelectorOnValueChanged;
 
         if (_topSchemesSelector is null)
         {
@@ -526,8 +439,7 @@ public sealed class UICatalogRunnable : Runnable
             X = 0,
             Y = Pos.Bottom (_menuBar!),
             Width = Dim.Auto (),
-            Height = Dim.Fill (to: _statusBar!),
-
+            Height = Dim.Fill (_statusBar!),
             ShowMarks = false,
             CanFocus = true,
             Title = "_Categories",
@@ -613,10 +525,7 @@ public sealed class UICatalogRunnable : Runnable
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
-        Shortcut statusBarShortcut = new ()
-        {
-            Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar
-        };
+        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar };
 
         _force16ColorsShortcutCb = new CheckBox
         {

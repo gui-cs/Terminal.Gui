@@ -808,6 +808,65 @@ public partial class ShortcutTests
 
     // Claude - Opus 4.6
     /// <summary>
+    ///     Verifies that when a FlagSelector is used as a Shortcut's CommandView, activating an
+    ///     individual checkbox inside the FlagSelector (with a binding whose Source is the inner
+    ///     checkbox) causes exactly one ValueChanged and one Shortcut.Activating. Before the
+    ///     IsWithinCommandView fix, the Shortcut would BubbleDown back to the FlagSelector
+    ///     (because Source was the inner checkbox, not the FlagSelector itself), causing duplicate
+    ///     activations and multiple ValueChanged events.
+    /// </summary>
+    [Fact]
+    public void FlagSelector_CommandView_SubView_Activate_Does_Not_Duplicate ()
+    {
+        // Arrange
+        FlagSelector flagSelector = new ()
+        {
+            Values = [1, 2, 4],
+            Labels = ["Flag1", "Flag2", "Flag3"]
+        };
+
+        Shortcut shortcut = new () { Key = Key.F5, CommandView = flagSelector };
+
+        // FlagSelector defaults Value to the first item (1) when Values is set.
+        // Clear it so we can detect a single toggle.
+        flagSelector.Value = null;
+
+        var valueChangedCount = 0;
+        flagSelector.ValueChanged += (_, _) => valueChangedCount++;
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        var shortcutActivatedCount = 0;
+        shortcut.Activated += (_, _) => shortcutActivatedCount++;
+
+        var flagSelectorActivatingCount = 0;
+        flagSelector.Activating += (_, _) => flagSelectorActivatingCount++;
+
+        // Get the first checkbox inside the FlagSelector
+        CheckBox firstCheckBox = flagSelector.SubViews.OfType<CheckBox> ().First ();
+
+        // Act - Invoke Activate on the inner checkbox with a binding that has Source = the
+        // checkbox. This simulates a mouse click, which creates a MouseBinding with Source
+        // pointing to the clicked view. The binding is key: without it, HandleActivate's
+        // `ctx.Binding is { Source: { } source }` check fails and BubbleDown is never called.
+        KeyBinding binding = new ([Command.Activate], Key.Space, firstCheckBox);
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (firstCheckBox), binding);
+        firstCheckBox.InvokeCommand (Command.Activate, ctx);
+
+        // Assert - Each event should fire exactly once
+        Assert.Equal (1, valueChangedCount);
+        Assert.Equal (1, shortcutActivatingCount);
+        Assert.Equal (1, shortcutActivatedCount);
+        Assert.Equal (1, flagSelectorActivatingCount);
+
+        // The checkbox should be checked (toggled once, not toggled twice back to unchecked)
+        Assert.Equal (CheckState.Checked, firstCheckBox.Value);
+        Assert.Equal (1, flagSelector.Value);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
     ///     Verifies that the Command property setter is idempotent — setting the same value
     ///     twice does not re-trigger Title/HelpText logic.
     /// </summary>
