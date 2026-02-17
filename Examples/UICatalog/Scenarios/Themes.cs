@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Collections.ObjectModel;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Themes", "Shows off Themes, Schemes, and VisualRoles.")]
@@ -36,8 +38,8 @@ public sealed class Themes : Scenario
             Labels = options,
             Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.Theme)
         };
-        themeOptionSelector.Border!.Thickness = new (0, 1, 0, 0);
-        themeOptionSelector.Margin!.Thickness = new (0, 0, 1, 0);
+        themeOptionSelector.Border!.Thickness = new Thickness (0, 1, 0, 0);
+        themeOptionSelector.Margin!.Thickness = new Thickness (0, 0, 1, 0);
 
         themeOptionSelector.ValueChanged += (sender, args) =>
                                             {
@@ -45,7 +47,7 @@ public sealed class Themes : Scenario
                                                 {
                                                     return;
                                                 }
-                                                var newTheme = optionSelector.Labels! [(int)args.NewValue!];
+                                                string newTheme = optionSelector.Labels! [(int)args.NewValue!];
 
                                                 // strip off the leading underscore
                                                 ThemeManager.Theme = newTheme [1..];
@@ -69,10 +71,10 @@ public sealed class Themes : Scenario
             BorderStyle = LineStyle.Rounded,
             Width = Dim.Auto (),
             Height = Dim.Fill (),
-            Source = new ListWrapper<string> (new (viewClasses.Keys))
+            Source = new ListWrapper<string> (new ObservableCollection<string> (viewClasses.Keys))
         };
-        viewListView.Border!.Thickness = new (0, 1, 0, 0);
-        viewListView.Margin!.Thickness = new (0, 0, 1, 0);
+        viewListView.Border!.Thickness = new Thickness (0, 1, 0, 0);
+        viewListView.Margin!.Thickness = new Thickness (0, 0, 1, 0);
 
         viewListView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
@@ -88,7 +90,7 @@ public sealed class Themes : Scenario
             Height = Dim.Fill (),
             TabStop = TabBehavior.TabStop
         };
-        viewFrame.Border!.Thickness = new (0, 1, 0, 0);
+        viewFrame.Border!.Thickness = new Thickness (0, 1, 0, 0);
 
         viewListView.ValueChanged += (_, args) =>
                                      {
@@ -108,11 +110,12 @@ public sealed class Themes : Scenario
                                          var viewName = (string)viewListView.Source!.ToList () [args.NewValue.Value]!;
                                          _view = CreateView (viewClasses [viewName]);
 
-                                         if (_view is { })
+                                         if (_view is null)
                                          {
-                                             viewFrame.Add (_view);
-                                             viewPropertiesEditor.ViewToEdit = _view;
+                                             return;
                                          }
+                                         viewFrame.Add (_view);
+                                         viewPropertiesEditor.ViewToEdit = _view;
                                      };
 
         appWindow.Add (themeOptionSelector, themeViewer, allViewsCheckBox, viewListView, viewPropertiesEditor, viewFrame);

@@ -165,7 +165,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
                 break;
             }
 
-            if (!anyValid || (!ShowUnicodeCategory.HasValue ? !anyValid : !anyVisible))
+            if (!anyValid || (ShowUnicodeCategory.HasValue && !anyVisible))
             {
                 continue;
             }
