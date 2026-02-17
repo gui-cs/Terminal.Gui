@@ -132,29 +132,6 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.ValueChanging += OnCheckboxOnValueChanging;
         checkbox.ValueChanged += CheckboxOnValueChanged;
-        checkbox.Activating += OnCheckboxOnActivating;
-    }
-
-    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox)
-        {
-            return;
-        }
-
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
-
-        if (args.Context?.IsBubblingDown is true)
-        {
-            // BubbleDown from OnActivating - let the checkbox handle itself
-            return;
-        }
-
-        // User interaction (Space, Click, HotKey on checkbox):
-        // Invoke Activate on the FlagSelector so events bubble properly,
-        // then handle the toggle in OnActivated.
-        InvokeCommand (Command.Activate, args.Context);
-        args.Handled = true;
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)

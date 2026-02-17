@@ -72,57 +72,6 @@ public class OptionSelector : SelectorBase, IDesignable
         }
 
         checkbox.RadioStyle = true;
-
-        checkbox.Activating += OnCheckboxOnActivating;
-        checkbox.Accepted += CheckboxOnAccepted;
-    }
-
-    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
-
-        // Verify at most one is checked
-        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
-
-        if (args.Context?.Binding is MouseBinding && checkbox.Value == CheckState.Checked)
-        {
-            // If user clicks with mouse and item is already checked, do nothing
-            args.Handled = true;
-
-            return;
-        }
-
-        if (args.Context is { Binding: KeyBinding, Command: Command.HotKey })
-        {
-            if (checkbox.Value == CheckState.Checked)
-            {
-                // If user uses an item hotkey and the item is already checked, do nothing
-                args.Handled = true;
-
-                return;
-            }
-        }
-
-        // Bubble up
-        // TODO: This should not be needed. Figure out why SelectorBase bubble up is not handling this properly.
-        InvokeCommand (Command.Activate, args.Context);
-
-        args.Handled = true;
-    }
-
-    private void CheckboxOnAccepted (object? sender, CommandEventArgs e)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-
-        Value = (int)checkbox.Data!;
     }
 
     private void Cycle ()
