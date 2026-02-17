@@ -269,31 +269,36 @@ public class FlagSelector : SelectorBase, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnCreatingSubViews ()
+    public override void CreateSubViews ()
     {
+        base.CreateSubViews ();
+
+        var changed = false;
+
         // FlagSelector supports a "None" check box; add it
         if (Styles.HasFlag (SelectorStyles.ShowNoneFlag) && Values is { } && !Values.Contains (0))
         {
             Add (CreateCheckBox ("None", 0));
+            changed = true;
         }
-    }
 
-    /// <inheritdoc/>
-    protected override void OnCreatedSubViews ()
-    {
-        // If the values include 0, and ShowNoneFlag is not specified, remove the "None" check box
-        if (Styles.HasFlag (SelectorStyles.ShowNoneFlag))
+        // If the values include 0 and ShowNoneFlag is not specified, remove the zero-value check box
+        if (!Styles.HasFlag (SelectorStyles.ShowNoneFlag))
         {
-            return;
-        }
-        CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
+            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
 
-        if (noneCheckBox is null)
-        {
-            return;
+            if (noneCheckBox is { })
+            {
+                Remove (noneCheckBox);
+                noneCheckBox.Dispose ();
+                changed = true;
+            }
         }
-        Remove (noneCheckBox);
-        noneCheckBox.Dispose ();
+
+        if (changed)
+        {
+            SetLayout ();
+        }
     }
 
     /// <inheritdoc/>

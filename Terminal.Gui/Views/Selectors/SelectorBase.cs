@@ -103,17 +103,17 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 break;
 
             default:
+            {
+                if (Styles.HasFlag (SelectorStyles.ShowValue))
                 {
-                    if (Styles.HasFlag (SelectorStyles.ShowValue))
-                    {
-                        _valueField?.SetFocus ();
+                    _valueField?.SetFocus ();
 
-                        return true;
-                    }
-                    active = SubViews.OfType<CheckBox> ().Count () - 1;
-
-                    break;
+                    return true;
                 }
+                active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                break;
+            }
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
 
@@ -168,9 +168,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             // which would cause TryBubbleUp to bubble the wrong command to SuperView.
             // For direct invocations, use the focused CheckBox as the source so OnActivated
             // identifies which item to activate.
-            WeakReference<View> source = enterFromCheckBox
-                                             ? args.Context!.Source!
-                                             : new WeakReference<View> (Focused!);
+            WeakReference<View> source = enterFromCheckBox ? args.Context!.Source! : new WeakReference<View> (Focused!);
 
             CommandContext activateCtx = new (Command.Activate, source, args.Context?.Binding);
             InvokeCommand (Command.Activate, activateCtx);
@@ -363,7 +361,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     /// <summary>
     ///     Creates the subviews for this selector.
     /// </summary>
-    public void CreateSubViews ()
+    public virtual void CreateSubViews ()
     {
         // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
@@ -381,8 +379,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return;
         }
 
-        OnCreatingSubViews ();
-
         for (var index = 0; index < Labels?.Count; index++)
         {
             Add (CreateCheckBox (Labels.ElementAt (index), Values!.ElementAt (index)));
@@ -393,9 +389,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             _valueField = new TextField
             {
                 CanFocus = false,
-
                 Id = "valueField",
                 Text = Value.ToString ()!,
+
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
                 ReadOnly = true,
@@ -405,22 +401,10 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             Add (_valueField);
         }
 
-        OnCreatedSubViews ();
-
         // Note: Hotkey assignment is now handled automatically by the base class
         // when SubViews are added via Add(). No need to call AssignUniqueHotKeys() here.
         SetLayout ();
     }
-
-    /// <summary>
-    ///     Called before <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
-    /// </summary>
-    protected virtual void OnCreatingSubViews () { }
-
-    /// <summary>
-    ///     Called after <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
-    /// </summary>
-    protected virtual void OnCreatedSubViews () { }
 
     /// <summary>
     ///     INTERNAL: Creates a checkbox subview
@@ -460,7 +444,10 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
     }
 
-    private void SetLayout ()
+    /// <summary>
+    ///     Updates the layout of the subviews based on <see cref="Orientation"/>.
+    /// </summary>
+    protected void SetLayout ()
     {
         var maxNaturalCheckBoxWidth = 0;
 
