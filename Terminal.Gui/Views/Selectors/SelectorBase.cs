@@ -150,6 +150,32 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
+        // Per spec: Enter key should Activate AND Accept for both OptionSelector and FlagSelector.
+        // Enter only triggers Command.Accept (View's default key binding), so invoke Activate here
+        // before continuing with Accept processing. Also handle direct programmatic Accept invocations
+        // (Binding is null) by activating the currently focused checkbox.
+        bool enterFromCheckBox = args.Context?.Binding is KeyBinding { Key: { } key }
+                                 && key == Key.Enter
+                                 && args.Context?.Source?.TryGetTarget (out View? enterSource) == true
+                                 && enterSource is CheckBox;
+
+        bool directAccept = args.Context?.Binding is null && Focused is CheckBox;
+
+        if (enterFromCheckBox || directAccept)
+        {
+            // Create a fresh context with Command.Activate (not Accept) and IsBubblingUp=false.
+            // The original args.Context may have Command=Accept and IsBubblingUp=true from a bubble,
+            // which would cause TryBubbleUp to bubble the wrong command to SuperView.
+            // For direct invocations, use the focused CheckBox as the source so OnActivated
+            // identifies which item to activate.
+            WeakReference<View> source = enterFromCheckBox
+                                             ? args.Context!.Source!
+                                             : new WeakReference<View> (Focused!);
+
+            CommandContext activateCtx = new (Command.Activate, source, args.Context?.Binding);
+            InvokeCommand (Command.Activate, activateCtx);
+        }
+
         return args.Context?.Binding switch
                {
                    { Source: { } source } when source == this => true,

@@ -464,7 +464,9 @@ public partial class ShortcutTests
     public void Command_Property_Does_Not_Overwrite_Existing_Title ()
     {
         // Arrange
-        using Shortcut shortcut = new () { Title = "My Title", HelpText = "My Help" };
+        using Shortcut shortcut = new ();
+        shortcut.Title = "My Title";
+        shortcut.HelpText = "My Help";
 
         // Act — setting Command should NOT overwrite existing Title/HelpText
         shortcut.Command = Command.Save;
@@ -486,22 +488,22 @@ public partial class ShortcutTests
         // Arrange
         var commandInvoked = false;
         TestTargetView target = new () { Title = "Target" };
-        target.RegisterCommand (Command.Save, () =>
-                                              {
-                                                  commandInvoked = true;
 
-                                                  return true;
-                                              });
+        target.RegisterCommand (Command.Save,
+                                () =>
+                                {
+                                    commandInvoked = true;
+
+                                    return true;
+                                });
 
         target.HotKeyBindings.Add (Key.S.WithCtrl, Command.Save);
 
-        using Shortcut shortcut = new ()
-        {
-            Key = Key.S.WithCtrl,
-            Title = "Save",
-            TargetView = target,
-            Command = Command.Save
-        };
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.S.WithCtrl;
+        shortcut.Title = "Save";
+        shortcut.TargetView = target;
+        shortcut.Command = Command.Save;
 
         // Act
         shortcut.InvokeCommand (Command.Accept);
@@ -522,20 +524,19 @@ public partial class ShortcutTests
         // Arrange
         var commandInvoked = false;
         TestTargetView target = new () { Title = "Target" };
-        target.RegisterCommand (Command.Save, () =>
-                                              {
-                                                  commandInvoked = true;
 
-                                                  return true;
-                                              });
+        target.RegisterCommand (Command.Save,
+                                () =>
+                                {
+                                    commandInvoked = true;
 
-        using Shortcut shortcut = new ()
-        {
-            Key = Key.F5,
-            Title = "Test",
-            TargetView = target
-            // Command is default (NotBound)
-        };
+                                    return true;
+                                });
+
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F5;
+        shortcut.Title = "Test";
+        shortcut.TargetView = target; // Command is default (NotBound)
 
         // Act
         shortcut.InvokeCommand (Command.Accept);
@@ -559,22 +560,22 @@ public partial class ShortcutTests
         var commandInvoked = false;
 
         TestTargetView target = new () { Title = "Target" };
-        target.RegisterCommand (Command.Save, () =>
-                                              {
-                                                  commandInvoked = true;
 
-                                                  return true;
-                                              });
+        target.RegisterCommand (Command.Save,
+                                () =>
+                                {
+                                    commandInvoked = true;
+
+                                    return true;
+                                });
         target.HotKeyBindings.Add (Key.S.WithCtrl, Command.Save);
 
-        using Shortcut shortcut = new ()
-        {
-            Key = Key.S.WithCtrl,
-            Title = "Save",
-            TargetView = target,
-            Command = Command.Save,
-            Action = () => actionFired = true
-        };
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.S.WithCtrl;
+        shortcut.Title = "Save";
+        shortcut.TargetView = target;
+        shortcut.Command = Command.Save;
+        shortcut.Action = () => actionFired = true;
 
         // Act
         shortcut.InvokeCommand (Command.Accept);
@@ -592,21 +593,21 @@ public partial class ShortcutTests
         // Arrange
         var commandInvoked = false;
         TestTargetView target = new () { Title = "Target" };
-        target.RegisterCommand (Command.Save, () =>
-                                              {
-                                                  commandInvoked = true;
 
-                                                  return true;
-                                              });
+        target.RegisterCommand (Command.Save,
+                                () =>
+                                {
+                                    commandInvoked = true;
+
+                                    return true;
+                                });
         target.HotKeyBindings.Add (Key.S.WithCtrl, Command.Save);
 
-        using Shortcut shortcut = new ()
-        {
-            Key = Key.S.WithCtrl,
-            Title = "Save",
-            TargetView = target,
-            Command = Command.Save
-        };
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.S.WithCtrl;
+        shortcut.Title = "Save";
+        shortcut.TargetView = target;
+        shortcut.Command = Command.Save;
 
         // Act — Activate, not Accept
         shortcut.InvokeCommand (Command.Activate);
@@ -634,9 +635,8 @@ public partial class ShortcutTests
 
         Shortcut shortcut = new ()
         {
-            Key = Key.S.WithCtrl,
-            Title = "Save",
-            Command = Command.Save
+            Key = Key.S.WithCtrl, Title = "Save", Command = Command.Save
+
             // No TargetView — will attempt app-level key binding invocation
         };
 
@@ -661,12 +661,10 @@ public partial class ShortcutTests
         // Arrange
         var actionFired = false;
 
-        using Shortcut shortcut = new ()
-        {
-            Key = Key.F5,
-            Title = "Test",
-            Action = () => actionFired = true
-        };
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F5;
+        shortcut.Title = "Test";
+        shortcut.Action = () => actionFired = true;
 
         // Act
         shortcut.InvokeCommand (Command.Accept);
@@ -689,12 +687,7 @@ public partial class ShortcutTests
 
         CheckState? capturedValue = null;
 
-        Shortcut shortcut = new ()
-        {
-            Key = Key.T,
-            CommandView = checkBox,
-            Action = () => capturedValue = checkBox.Value
-        };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox, Action = () => capturedValue = checkBox.Value };
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
@@ -732,6 +725,7 @@ public partial class ShortcutTests
         checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
 
         shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
+
         shortcut.Activated += (_, _) =>
                               {
                                   valueAtShortcutActivated = checkBox.Value;
@@ -780,6 +774,7 @@ public partial class ShortcutTests
         checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
 
         shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
+
         shortcut.Activated += (_, _) =>
                               {
                                   valueAtShortcutActivated = checkBox.Value;
@@ -819,11 +814,7 @@ public partial class ShortcutTests
     public void FlagSelector_CommandView_SubView_Activate_Does_Not_Duplicate ()
     {
         // Arrange
-        FlagSelector flagSelector = new ()
-        {
-            Values = [1, 2, 4],
-            Labels = ["Flag1", "Flag2", "Flag3"]
-        };
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["Flag1", "Flag2", "Flag3"] };
 
         Shortcut shortcut = new () { Key = Key.F5, CommandView = flagSelector };
 
@@ -863,6 +854,96 @@ public partial class ShortcutTests
         // The checkbox should be checked (toggled once, not toggled twice back to unchecked)
         Assert.Equal (CheckState.Checked, firstCheckBox.Value);
         Assert.Equal (1, flagSelector.Value);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that pressing Enter on a focused OptionSelector item inside a Shortcut
+    ///     activates (changes Value) and accepts. The OptionSelector has CanFocus=true so
+    ///     individual checkboxes can receive focus. The second option is focused and Enter
+    ///     is pressed — Value should change from 0 to 1 and Activating should fire.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_CommandView_Enter_Activates_And_Accepts ()
+    {
+        // Arrange
+        OptionSelector optionSelector = new () { CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };
+
+        Shortcut shortcut = new () { Key = Key.F6, CommandView = optionSelector };
+
+        Assert.Equal (0, optionSelector.Value); // First option is active by default
+
+        var valueChangedCount = 0;
+        optionSelector.ValueChanged += (_, _) => valueChangedCount++;
+
+        var selectorActivatingCount = 0;
+        optionSelector.Activating += (_, _) => selectorActivatingCount++;
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        var shortcutAcceptingCount = 0;
+        shortcut.Accepting += (_, _) => shortcutAcceptingCount++;
+
+        // Give the shortcut focus so the OptionSelector and its first checkbox get focus
+        shortcut.SetFocus ();
+        shortcut.Layout ();
+
+        // Focus the second checkbox (Option2)
+        CheckBox [] checkBoxes = optionSelector.SubViews.OfType<CheckBox> ().ToArray ();
+        checkBoxes [1].SetFocus ();
+        Assert.True (checkBoxes [1].HasFocus);
+
+        // Act - Press Enter on the focused (but not selected) checkbox
+        checkBoxes [1].NewKeyDownEvent (Key.Enter);
+
+        // Assert - Per spec: Enter should Activate AND Accept
+        Assert.Equal (1, valueChangedCount);
+        Assert.Equal (1, selectorActivatingCount);
+        Assert.Equal (1, optionSelector.Value); // Should now be Option2
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that invoking Command.Accept directly on an OptionSelector (CommandView of a
+    ///     Shortcut) activates the focused item and changes Value. This is the programmatic
+    ///     equivalent of pressing Enter — Accept should also Activate the focused item.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_CommandView_Direct_Accept_Activates_Focused_Item ()
+    {
+        // Arrange
+        OptionSelector optionSelector = new () { CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };
+
+        Shortcut shortcut = new () { Key = Key.F6, CommandView = optionSelector };
+
+        Assert.Equal (0, optionSelector.Value); // First option is active by default
+
+        var valueChangedCount = 0;
+        optionSelector.ValueChanged += (_, _) => valueChangedCount++;
+
+        var selectorActivatingCount = 0;
+        optionSelector.Activating += (_, _) => selectorActivatingCount++;
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        // Give the shortcut focus so the OptionSelector and its first checkbox get focus
+        shortcut.SetFocus ();
+        shortcut.Layout ();
+
+        // Focus the second checkbox (Option2)
+        CheckBox [] checkBoxes = optionSelector.SubViews.OfType<CheckBox> ().ToArray ();
+        checkBoxes [1].SetFocus ();
+        Assert.True (checkBoxes [1].HasFocus);
+
+        // Act - Invoke Accept directly on the OptionSelector
+        optionSelector.InvokeCommand (Command.Accept);
+
+        // Assert - Accept should also Activate the focused item
+        Assert.Equal (1, valueChangedCount);
+        Assert.Equal (1, selectorActivatingCount);
+        Assert.Equal (1, optionSelector.Value); // Should now be Option2
     }
 
     // Claude - Opus 4.6
