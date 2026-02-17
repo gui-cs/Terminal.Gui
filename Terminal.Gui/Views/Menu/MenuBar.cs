@@ -588,13 +588,46 @@ public class MenuBar : Menu, IDesignable
 
         Id = "DemoBar";
 
-        var bordersCb = new CheckBox { Title = "_Borders", Value = DefaultBorderStyle == LineStyle.None ? CheckState.UnChecked : CheckState.Checked };
+        var bordersCb = new CheckBox
+        {
+            Title = "_Borders",
 
-        var autoSaveCb = new CheckBox { Title = "_Auto Save" };
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false,
+            Value = DefaultBorderStyle == LineStyle.None ? CheckState.UnChecked : CheckState.Checked
+        };
 
-        var enableOverwriteCb = new CheckBox { Title = "Enable _Overwrite" };
+        var autoSaveCb = new CheckBox
+        {
+            Title = "_Auto Save",
 
-        var mutuallyExclusiveOptionsSelector = new OptionSelector { Labels = ["G_ood", "_Bad", "U_gly"], Value = 0 };
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false
+        };
+
+        var enableOverwriteCb = new CheckBox
+        {
+            Title = "Enable _Overwrite",
+
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false
+        };
+
+        var mutuallyExclusiveOptionsSelector = new OptionSelector
+        {
+            Labels = ["G_ood", "_Bad", "U_gly"],
+            Value = 0,
+
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector).
+            // For an OptionSelector, we want the selected item to be highlighted distinctly, so ensure CanFocus is true.
+            CanFocus = true
+        };
 
         var menuBgColorCp = new ColorPicker { Width = 30 };
 

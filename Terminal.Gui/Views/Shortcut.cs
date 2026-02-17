@@ -608,14 +608,22 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextFormatter.WordWrap = false;
 
         CommandView.MouseHighlightStates = MouseState.None;
+        CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     private void SubViewOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
     {
+        var subView = sender as View;
+
+        if (subView is null)
+        {
+            return;
+        }
+
         switch (e.Role)
         {
             case VisualRole.Normal:
-                if (HasFocus)
+                if (subView.HasFocus)
                 {
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.Focus);
@@ -624,10 +632,28 @@ public class Shortcut : View, IOrientation, IDesignable
                 break;
 
             case VisualRole.HotNormal:
-                if (HasFocus)
+                if (subView.HasFocus)
                 {
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.HotFocus);
+                }
+
+                break;
+
+            case VisualRole.Focus:
+                if (subView.HasFocus)
+                {
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.Active);
+                }
+
+                break;
+
+            case VisualRole.HotFocus:
+                if (subView.HasFocus)
+                {
+                    e.Handled = true;
+                    e.Result = GetAttributeForRole (VisualRole.HotActive);
                 }
 
                 break;
@@ -684,7 +710,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.Visible = true;
         HelpView.VerticalTextAlignment = Alignment.Center;
         HelpView.TextAlignment = Alignment.Start;
-        HelpView.TextFormatter.WordWrap = false;
+        HelpView.TextFormatter.WordWrap = true;
         HelpView.MouseHighlightStates = MouseState.None;
     }
 
