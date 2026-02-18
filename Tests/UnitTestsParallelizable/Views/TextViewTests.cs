@@ -2449,5 +2449,63 @@ public class TextViewTests
         textView.Dispose ();
     }
 
+    [Fact]
+    public void Tab_And_Shift_Tab_With_TabKeyAddsTab_True_AddsRemovesTabCharacter ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable runnable = new ();
+        View view1 = new () { CanFocus = true };
+        TextView textView = new () { Text = "Test" };
+        View view2 = new () { CanFocus = true };
+        runnable.Add (view1, textView, view2);
+
+        app.Begin (runnable);
+
+        // Move focus to textView
+        textView.SetFocus ();
+        Assert.True (textView.TabKeyAddsTab);
+
+        // Press Tab - should add tab character
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
+        Assert.Equal ("\tTest", textView.Text);
+        Assert.True (textView.HasFocus);
+
+        // Press Shift+Tab - should remove tab character
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.Equal ("Test", textView.Text);
+        Assert.True (textView.HasFocus);
+    }
+
+    [Fact]
+    public void Tab_And_Shift_Tab_With_TabKeyAddsTab_False_DoesNotAddTabCharacter_AndMovesFocusToNextPreviousView ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable runnable = new ();
+        View view1 = new () { CanFocus = true };
+        TextView textView = new () { Text = "Test", TabKeyAddsTab = false };
+        View view2 = new () { CanFocus = true };
+        runnable.Add (view1, textView, view2);
+
+        app.Begin (runnable);
+
+        // Move focus to textView
+        textView.SetFocus ();
+
+        // Press Tab - should move focus to next view
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
+        Assert.Equal ("Test", textView.Text);
+        Assert.False (textView.HasFocus);
+        Assert.True (view2.HasFocus);
+
+        // Move focus back to textView
+        textView.SetFocus ();
+
+        // Press Shift+Tab - should move focus to previous view
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.Equal ("Test", textView.Text);
+        Assert.False (textView.HasFocus);
+        Assert.True (view1.HasFocus);
+    }
+
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 }

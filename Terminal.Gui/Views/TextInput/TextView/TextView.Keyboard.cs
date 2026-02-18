@@ -47,16 +47,13 @@ public partial class TextView
 
     /// <summary>
     ///     Gets or sets whether the <see cref="TextView"/> inserts a tab character (<c>\t</c>) into the text or ignores tab
-    ///     input. If
-    ///     set to <see langword="false"/> and the user presses the <see cref="Key.Tab"/> the focus will move to the next
+    ///     input.
+    ///     If set to <see langword="false"/> and the user presses the <see cref="Key.Tab"/> the focus will move to the next
     ///     view.
     ///     The default is <see langword="true"/> ; if the user presses <see cref="Key.Tab"/>, a tab character will be inserted
-    ///     into the
-    ///     text.
+    ///     into the text; if the user presses shift-<see cref="Key.Tab"/>, the tab character will be removed from the text at
+    ///     the current location.
     /// </summary>
-    /// <remarks>
-    ///     This setting has no effect on shift-<see cref="Key.Tab"/> which always moves the focus to the previous view.
-    /// </remarks>
     public bool TabKeyAddsTab
     {
         get => _tabKeyAddsTab;

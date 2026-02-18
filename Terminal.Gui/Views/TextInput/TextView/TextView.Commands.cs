@@ -51,7 +51,8 @@ public partial class TextView
         AddCommand (Command.Undo, () => Undo ());
         AddCommand (Command.Redo, () => Redo ());
 
-        AddCommand (Command.NextTabStop, () => ProcessTab ());
+        AddCommand (Command.NextTabStop, () => ProcessTab (true));
+        AddCommand (Command.PreviousTabStop, () => ProcessTab (false));
         AddCommand (Command.ToggleOverwrite, () => ProcessSetOverwrite ());
         AddCommand (Command.EnableOverwrite, () => SetOverwrite (true));
         AddCommand (Command.DisableOverwrite, () => SetOverwrite (false));
@@ -1011,7 +1012,7 @@ public partial class TextView
         return SetOverwrite (!Used);
     }
 
-    private bool ProcessTab ()
+    private bool ProcessTab (bool addTab)
     {
         ResetColumnTrack ();
 
@@ -1020,7 +1021,23 @@ public partial class TextView
             return false;
         }
 
-        InsertText (new Key ((KeyCode)'\t'));
+        if (addTab)
+        {
+            InsertText (new Key ((KeyCode)'\t'));
+        }
+        else
+        {
+            List<Cell> line = GetCurrentLine ();
+
+            if (CurrentColumn - 1 > -1 && CurrentColumn < line.Count && line [CurrentColumn - 1].Grapheme == "\t")
+            {
+                DeleteTextLeft ();
+            }
+            else
+            {
+                return true;
+            }
+        }
         DoNeededAction ();
 
         return true;
