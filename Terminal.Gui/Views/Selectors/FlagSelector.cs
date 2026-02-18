@@ -69,7 +69,7 @@ public class FlagSelector : SelectorBase, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        if (base.OnActivating (args))
+        if (base.OnActivating (args) || args.Handled)
         {
             return true;
         }
@@ -82,6 +82,20 @@ public class FlagSelector : SelectorBase, IDesignable
             _suppressHotKeyActivate = false;
 
             return false;
+        }
+
+        // When a CheckBox SubView's activation bubbles up, toggle it and raise Activated
+        // (so Shortcut's deferred activation path completes via CommandView_Activated).
+        // Return true to consume — prevents the originator CheckBox from double-toggling
+        // via AdvanceCheckState.
+        if (args.Context?.IsBubblingUp == true
+            && args.Context.Source?.TryGetTarget (out View? source) == true
+            && source is CheckBox checkBox)
+        {
+            checkBox.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
+            RaiseActivated (args.Context);
+
+            return true;
         }
 
         // Skip BubbleDown when:
@@ -105,17 +119,9 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         base.OnActivated (ctx);
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-
-        if (ctx?.Source?.TryGetTarget (out View? source) != true || source is not CheckBox checkBox)
-        {
-            // Programmatic: BubbleDown in OnActivating already handled the toggle
-            return;
-        }
-
-        // From checkbox event handler: toggle the checkbox manually
-        // (The checkbox couldn't toggle itself because bubble-up prevented its OnActivated)
-        checkBox.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
+        // No additional toggle here — OnActivating handles the bubble case
+        // and calls RaiseActivated directly. For direct invocations, the
+        // BubbleDown in OnActivating triggers the CheckBox toggle via AdvanceCheckState.
     }
 
     /// <inheritdoc/>

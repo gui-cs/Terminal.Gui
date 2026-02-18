@@ -32,11 +32,52 @@ public class OptionSelector : SelectorBase, IDesignable
         base.Value = 0;
 
     /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args}");
+        if (base.OnActivating (args) || args.Handled)
+        {
+            return true;
+        }
+
+        // When a CheckBox SubView's activation bubbles up, apply the value change here
+        // and consume the command so the originating CheckBox does not independently toggle
+        // via AdvanceCheckState. DefaultActivateHandler returns false for IsBubblingUp
+        // by default (notification), but OptionSelector returns true (consumption) because
+        // it owns the selection state, not the individual CheckBoxes.
+        if (args.Context?.IsBubblingUp == true)
+        {
+            ApplyActivation (args.Context);
+            RaiseActivated (args.Context);
+
+            return true;
+        }
+
+
+        return false;
+    }
+
+    /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         base.OnActivated (ctx);
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // For direct invocations (not bubbling), apply the value change in the completion phase.
+        // Skip when IsBubblingUp — OnActivating already applied the change and called RaiseActivated.
+        if (ctx?.IsBubblingUp != true)
+        {
+            ApplyActivation (ctx);
+        }
+    }
+
+    /// <summary>
+    ///     Applies the value change based on the activation source. Shared by both
+    ///     <see cref="OnActivating"/> (for bubble consumption) and <see cref="OnActivated"/> (for direct invocation).
+    /// </summary>
+    private void ApplyActivation (ICommandContext? ctx)
+    {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
         {
@@ -76,7 +117,7 @@ public class OptionSelector : SelectorBase, IDesignable
 
     private void Cycle ()
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()}");
+        Logging.Debug ($"{this.ToIdentifyingString ()}");
 
         int valueIndex = Values.IndexOf (v => v == Value);
 
@@ -103,6 +144,7 @@ public class OptionSelector : SelectorBase, IDesignable
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             var value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            Logging.Debug ($"{this.ToIdentifyingString ()} {cb.ToIdentifyingString ()}.Value = {value}");
 
             cb.Value = value == Value ? CheckState.Checked : CheckState.UnChecked;
         }

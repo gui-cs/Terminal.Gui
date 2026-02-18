@@ -81,14 +81,6 @@ public class MenuBar : Menu, IDesignable
                         return false; // RaiseAccepted (ctx);
                     });
 
-        // Override Menu's Activate handler: MenuBar needs the full DefaultActivateHandler
-        // so that OnActivating fires when a MenuBarItem's Activate bubbles up (to toggle the popover).
-        AddCommand (Command.Activate, DefaultActivateHandler);
-
-        // Override Menu's Accept handler: MenuBar needs the full DefaultAcceptHandler
-        // so that OnAccepting fires when a MenuBarItem's Accept bubbles up (to open the popover).
-        AddCommand (Command.Accept, DefaultAcceptHandler);
-
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
 

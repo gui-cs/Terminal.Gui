@@ -5,14 +5,14 @@ namespace ViewsTests;
 [TestSubject (typeof (Bar))]
 public class BarTests
 {
-    // BUGBUG: This test is not correct. Bar should bubble up Accept and Activate commands (and maybe HotKey), but currently it doesn't bubble up any commands. This test verifies the current behavior which may change per issue #4473
+    // Claude - Opus 4.6
     [Fact]
-    public void No_CommandsToBubbleUp ()
+    public void Has_CommandsToBubbleUp ()
     {
         Bar bar = new ();
 
-        // Bar is a transparent container and should not bubble up commands
-        Assert.Empty (bar.CommandsToBubbleUp);
+        Assert.Contains (Command.Accept, bar.CommandsToBubbleUp);
+        Assert.Contains (Command.Activate, bar.CommandsToBubbleUp);
 
         bar.Dispose ();
     }
@@ -44,7 +44,8 @@ public class BarTests
         // Invoke on Bar
         bar.InvokeCommand (Command.Activate);
 
-        Assert.Equal (0, shortcut1ActivatingFired); // BUGBUG: This should be 1 because Bar should bubble down Activate command to its shortcuts, but currently it doesn't bubble down any commands. This verifies the current behavior which may change per issue #4473
+        // Bar does not BubbleDown to shortcuts; it fires its own events
+        Assert.Equal (0, shortcut1ActivatingFired);
         Assert.Equal (0, shortcut2ActivatingFired);
         Assert.Equal (1, barActivatingFired);
 
@@ -80,7 +81,7 @@ public class BarTests
 
         Assert.Equal (1, shortcut1ActivatingFired);
         Assert.Equal (0, shortcut2ActivatingFired);
-        Assert.Equal (0, barActivatingFired); // BUGBUG: This should be 1 because Bar should bubble up Activate command from its shortcuts, but currently it doesn't bubble up any commands. This verifies the current behavior which may change per issue #4473
+        Assert.Equal (1, barActivatingFired); // Activate bubbles up from Shortcut to Bar
 
         bar.Dispose ();
     }
@@ -324,6 +325,203 @@ public class BarTests
         Assert.Equal (2, bar.SubViews.Count);
         Assert.Same (sc1, bar.SubViews.ElementAt (0));
         Assert.Same (sc3, bar.SubViews.ElementAt (1));
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Activate_Bubbles_To_Bar ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        var barActivatingFired = 0;
+
+        bar.Activating += (_, _) => { barActivatingFired++; };
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, barActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Accept_Bubbles_To_Bar ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        var barAcceptingFired = 0;
+
+        bar.Accepting += (_, _) => { barAcceptingFired++; };
+
+        shortcut.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, barAcceptingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Activate_Handled_Does_Not_Bubble_To_Bar ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        var barActivatingFired = 0;
+
+        shortcut.Activating += (_, e) => { e.Handled = true; };
+        bar.Activating += (_, _) => { barActivatingFired++; };
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, barActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Accept_Handled_Does_Not_Bubble_To_Bar ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        var barAcceptingFired = 0;
+
+        shortcut.Accepting += (_, e) => { e.Handled = true; };
+        bar.Accepting += (_, _) => { barAcceptingFired++; };
+
+        shortcut.InvokeCommand (Command.Accept);
+
+        Assert.Equal (0, barAcceptingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Bar_Activate_Does_Not_BubbleDown_To_Shortcuts ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        var shortcutActivatingFired = 0;
+
+        shortcut.Activating += (_, _) => { shortcutActivatingFired++; };
+
+        // Invoke Activate directly on Bar
+        bar.InvokeCommand (Command.Activate);
+
+        // Bar fires its own events, does NOT BubbleDown to shortcuts
+        Assert.Equal (0, shortcutActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Activate_Bubbles_Through_Nested_Bars ()
+    {
+        // Use Bar as the outer container since it already has CommandsToBubbleUp + custom handlers
+        Bar outerBar = new () { Id = "outerBar" };
+        Bar innerBar = new () { Id = "innerBar" };
+        outerBar.Add (innerBar);
+
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        innerBar.Add (shortcut);
+
+        var innerBarActivatingFired = 0;
+        var outerBarActivatingFired = 0;
+
+        innerBar.Activating += (_, _) => { innerBarActivatingFired++; };
+        outerBar.Activating += (_, _) => { outerBarActivatingFired++; };
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, innerBarActivatingFired);
+        Assert.Equal (1, outerBarActivatingFired);
+
+        outerBar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Activate_Event_Order ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        List<string> eventOrder = [];
+
+        shortcut.Activating += (_, _) => { eventOrder.Add ("Shortcut.Activating"); };
+        bar.Activating += (_, _) => { eventOrder.Add ("Bar.Activating"); };
+        shortcut.Activated += (_, _) => { eventOrder.Add ("Shortcut.Activated"); };
+        bar.Activated += (_, _) => { eventOrder.Add ("Bar.Activated"); };
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Shortcut.Activating fires first, then bubbles to Bar.Activating,
+        // then Shortcut.Activated, then Bar.Activated
+        Assert.Contains ("Shortcut.Activating", eventOrder);
+        Assert.Contains ("Bar.Activating", eventOrder);
+
+        int shortcutActivatingIdx = eventOrder.IndexOf ("Shortcut.Activating");
+        int barActivatingIdx = eventOrder.IndexOf ("Bar.Activating");
+        Assert.True (shortcutActivatingIdx < barActivatingIdx);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void CheckBox_CommandView_Activate_Bubbles_To_Bar ()
+    {
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+        Shortcut shortcut = new () { Title = "Test", CommandView = checkBox };
+
+        Bar bar = new ();
+        bar.Add (shortcut);
+
+        var barActivatingFired = 0;
+
+        bar.Activating += (_, _) => { barActivatingFired++; };
+
+        // Simulate activating the Shortcut (which BubblesDown to CommandView)
+        shortcut.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, barActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void CheckBox_CommandView_Toggles_Exactly_Once ()
+    {
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+        Shortcut shortcut = new () { Title = "Test", CommandView = checkBox };
+
+        Bar bar = new ();
+        bar.Add (shortcut);
+
+        CheckState initialState = checkBox.Value;
+
+        // Activate the CheckBox directly — this bubbles up through Shortcut → Bar
+        checkBox.InvokeCommand (Command.Activate);
+
+        // CheckBox should have toggled exactly once (not double-toggled by the bubble)
+        Assert.NotEqual (initialState, checkBox.Value);
 
         bar.Dispose ();
     }

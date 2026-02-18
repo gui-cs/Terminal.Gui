@@ -230,6 +230,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     /// <returns><see langword="true"/> if the change was cancelled.</returns>
     protected bool RaiseValueChanging (int? currentValue, int? newValue)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({currentValue}->{newValue})");
+
         ValueChangingEventArgs<int?> args = new (currentValue, newValue);
         ValueChanging?.Invoke (this, args);
 

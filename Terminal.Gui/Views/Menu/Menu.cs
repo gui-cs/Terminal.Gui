@@ -35,35 +35,6 @@ public class Menu : Bar
 
         CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
-        // When a MenuItem's Activate bubbles up to this Menu, run the full handler
-        // (so Activating/Activated events fire on Menu) but return false so the originating
-        // MenuItem can complete its own activation (RaiseActivated → Action?.Invoke()).
-        AddCommand (Command.Activate,
-                    ctx =>
-                    {
-                        if (ctx?.IsBubblingUp != true)
-                        {
-                            return DefaultActivateHandler (ctx);
-                        }
-                        DefaultActivateHandler (ctx);
-
-                        return false;
-                    });
-
-        // Same for Accept: run the handler (fires Accepting/Accepted events) but return false
-        // so the originating MenuItem completes its own Accept processing.
-        AddCommand (Command.Accept,
-                    ctx =>
-                    {
-                        if (ctx?.IsBubblingUp != true)
-                        {
-                            return DefaultAcceptHandler (ctx);
-                        }
-                        DefaultAcceptHandler (ctx);
-
-                        return false;
-                    });
-
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 

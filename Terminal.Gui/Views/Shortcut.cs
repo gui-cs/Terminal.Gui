@@ -671,15 +671,22 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void CommandView_Activated (object? sender, EventArgs<ICommandContext?> e)
     {
-        if (!_activationBubbledUp)
+        if (_activationBubbledUp)
         {
-            return;
-        }
-        _activationBubbledUp = false;
-        ICommandContext? ctx = _deferredActivationContext;
-        _deferredActivationContext = null;
+            // Deferred path: HandleActivate ran and deferred RaiseActivated.
+            _activationBubbledUp = false;
+            ICommandContext? ctx = _deferredActivationContext;
+            _deferredActivationContext = null;
 
-        RaiseActivated (ctx);
+            RaiseActivated (ctx);
+        }
+        else if (e.Value?.IsBubblingUp == true)
+        {
+            // CommandView consumed the bubble in OnActivating (e.g., FlagSelector/OptionSelector)
+            // before it reached HandleActivate. The CommandView called RaiseActivated directly,
+            // so complete the Shortcut's activation now.
+            RaiseActivated (e.Value);
+        }
     }
 
     #endregion Command

@@ -255,13 +255,18 @@ public partial class View // Command APIs
         // After this View's Accepting was raised (and not handled/cancelled),
         // forward Accept to the DefaultAcceptView so its Accepting/Accepted events fire too.
         // The defaultAcceptView != source check prevents self-invocation (infinite loops).
+        //
+        // Skip the DefaultAcceptView redirect if Accept will also bubble to an ancestor
+        // via CommandsToBubbleUp. Both paths (bubble + redirect) would reach the same ancestor,
+        // causing double Accepted events. The bubble path handles it.
         View? source = null;
         ctx?.Source?.TryGetTarget (out source);
         View? defaultAcceptView = DefaultAcceptView;
 
         var redirected = false;
+        bool acceptWillBubble = CommandWillBubbleToAncestor (Command.Accept);
 
-        if (defaultAcceptView is { } && defaultAcceptView != this && defaultAcceptView != source)
+        if (!acceptWillBubble && defaultAcceptView is { } && defaultAcceptView != this && defaultAcceptView != source)
         {
             BubbleDown (defaultAcceptView, ctx);
             redirected = true;
@@ -272,13 +277,15 @@ public partial class View // Command APIs
 
         // Report as handled if:
         // - Accept was redirected to DefaultAcceptView (BubbleDown performed), or
+        // - Accept will bubble to ancestor (so DefaultAcceptView redirect was skipped), or
         // - Accept bubbled up from a SubView (the full chain processed the command), or
         // - This view is an IAcceptTarget (e.g. Button) that genuinely handles Accept.
         // Report as not handled when Accept originated from a local key binding (e.g., Enter key)
         // on a non-IAcceptTarget view with no redirect - this allows the key to propagate up
         // the view hierarchy to reach a SuperView that can redirect to DefaultAcceptView.
-        return redirected || ctx?.IsBubblingUp == true || this is IAcceptTarget;
+        return redirected || acceptWillBubble || ctx?.IsBubblingUp == true || this is IAcceptTarget;
     }
+
 
     /// <summary>
     ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked.
@@ -417,15 +424,50 @@ public partial class View // Command APIs
             return true;
         }
 
+        // When a SubView's activation bubbles up, the default behavior is notification:
+        // Activating fires (above), but Activated and side effects (SetFocus) are skipped.
+        // The originating view completes its own activation. Returning false tells TryBubbleUp
+        // "not consumed" so the originator continues.
+        //
+        // Views that need to CONSUME the activation (e.g., SelectorBase) override OnActivating
+        // to apply state changes and return true, which stops processing before reaching here.
+        if (ctx?.IsBubblingUp == true)
+        {
+            return false;
+        }
+
         if (CanFocus)
         {
-            // Set focus if not handled yet. Setting focus does NOT mean the event is handled, so we return.
             SetFocus ();
         }
 
         RaiseActivated (ctx);
 
         return true;
+    }
+
+    /// <summary>
+    ///     Checks whether the given <paramref name="command"/> will bubble to an ancestor via
+    ///     <see cref="CommandsToBubbleUp"/>. This mirrors the checks in <see cref="TryBubbleUp"/>.
+    /// </summary>
+    private bool CommandWillBubbleToAncestor (Command command)
+    {
+        if (SuperView?.CommandsToBubbleUp.Contains (command) == true)
+        {
+            return true;
+        }
+
+        if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        {
+            return true;
+        }
+
+        if (this is Padding selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -679,11 +721,23 @@ public partial class View // Command APIs
     ///     Bubbles a command to the SuperView if the command is in SuperView's <see cref="CommandsToBubbleUp"/> list.
     ///     Handles the special case of invoking <see cref="Command.Accept"/> on a peer IsDefault button.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Bubbling is a <b>notification</b>, not a consumption. The SuperView's handler is invoked, but its
+    ///         return value is ignored — this method always returns <see langword="false"/> after a successful bubble.
+    ///         This ensures the originating view can complete its own processing (e.g., a CheckBox can toggle,
+    ///         a Shortcut can raise Activated) without being blocked by the SuperView returning <see langword="true"/>.
+    ///     </para>
+    ///     <para>
+    ///         To cancel a SubView's command, subscribe to the SubView's <c>Activating</c>/<c>Accepting</c> event
+    ///         and set <c>Handled = true</c> — that guard runs <b>before</b> <see cref="TryBubbleUp"/> is called.
+    ///     </para>
+    /// </remarks>
     /// <param name="ctx">The command context to pass along.</param>
     /// <param name="handled">Whether the command was already handled by this View.</param>
     /// <returns>
-    ///     <see langword="true"/> if the command was handled (either locally or by bubbling).
-    ///     <see langword="false"/> if the command was not handled.
+    ///     <see langword="true"/> if the command was already handled locally.
+    ///     <see langword="false"/> if the command was not handled (including after a successful bubble).
     /// </returns>
     protected bool? TryBubbleUp (ICommandContext? ctx, bool handled)
     {
@@ -717,8 +771,10 @@ public partial class View // Command APIs
                     {
                         return false;
                     }
+
                     CommandContext upCtx = new (Command.Accept, ctx.Source, ctx.Binding) { IsBubblingUp = true };
 
+                    // DefaultAcceptView redirect is a special case — it IS a consumption (not just a notification)
                     return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
 
                     // Default IAcceptTarget source - let it flow normally without redirect

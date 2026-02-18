@@ -35,8 +35,7 @@ public class Bar : View, IOrientation, IDesignable
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
-        // BUGBUG: This should be enabled
-        //CommandsToBubbleUp = [Command.Accept, Command.Activate];
+        CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
         if (shortcuts is null)
         {
