@@ -116,6 +116,11 @@ public partial class TextView
     {
         List<Cell> currentLine = GetCurrentLine ();
         CurrentColumn = currentLine.Count;
+
+        if (CurrentColumn >= Viewport.X + Viewport.Width)
+        {
+            SetNeedsDraw ();
+        }
         DoNeededAction ();
 
         return true;

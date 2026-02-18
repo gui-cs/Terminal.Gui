@@ -1,9 +1,11 @@
 ﻿#nullable disable
 using System.Text;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace ViewsTests.TextViewTests;
 
-public class TextViewTests
+public class TextViewTests (ITestOutputHelper output)
 {
     [Fact]
     public void CloseFile_Throws_If_FilePath_Is_Null ()
@@ -2581,6 +2583,38 @@ public class TextViewTests
 
         Assert.True (textView.NewKeyDownEvent (Key.InsertChar));
         Assert.True (textView.Used);
+    }
+
+    [Fact]
+    public void Command_RightEnd_Draws_Cursor_At_End_Of_Line ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "Testing End Key",
+            Width = 10,
+            Height = 5,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 3), textView.Viewport);
+
+        Assert.True (textView.NewKeyDownEvent (Key.End));
+        textView.Draw ();
+
+        var expected = """
+                       ┌────────┐
+                       │End Key │
+                       │        │
+                       │        │
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
     }
 
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
