@@ -407,17 +407,29 @@ public class Shortcut : View, IOrientation, IDesignable
             ctx.Command = Command;
         }
 
-        if (TargetView is { })
+        InvokeOnTargetOrApp (ctx);
+    }
+
+    private void InvokeOnTargetOrApp (ICommandContext? ctx)
+    {
+        View? target = TargetView ?? GetTopSuperView ();
+
+        if (target is { })
         {
-            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
-            TargetView.InvokeCommand (Command, ctx);
+            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({target.Title})...");
+            target.InvokeCommand (Command, ctx);
+
+            return;
         }
-        else if (Key.IsValid && Command != Command.NotBound)
+
+        if (!Key.IsValid || Command == Command.NotBound)
         {
-            // Is this an Application-bound command?
-            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
-            App?.Keyboard.InvokeCommandsBoundToKey (Key);
+            return;
         }
+
+        // Is this an Application-bound command?
+        Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+        App?.Keyboard.InvokeCommandsBoundToKey (Key);
     }
 
     /// <inheritdoc/>
@@ -453,17 +465,7 @@ public class Shortcut : View, IOrientation, IDesignable
             ctx.Command = Command;
         }
 
-        if (TargetView is { })
-        {
-            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({TargetView.Title})...");
-            TargetView.InvokeCommand (Command, ctx);
-        }
-        else if (Key.IsValid && Command != Command.NotBound)
-        {
-            // Is this an Application-bound command?
-            Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
-            App?.Keyboard.InvokeCommandsBoundToKey (Key);
-        }
+        InvokeOnTargetOrApp (ctx);
     }
 
     /// <summary>

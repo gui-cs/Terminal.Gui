@@ -169,28 +169,23 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Gets all menu items with the specified Title, anywhere in the menu hierarchy.
+    ///     Gets all <see cref="MenuItem"/>s in the menu hierarchy that match <paramref name="predicate"/>.
     /// </summary>
-    /// <param name="title"></param>
-    /// <returns></returns>
-    public IEnumerable<MenuItem> GetMenuItemsWithTitle (string title)
+    /// <param name="predicate">A function to test each <see cref="MenuItem"/>.</param>
+    /// <returns>All matching <see cref="MenuItem"/>s across all <see cref="PopoverMenu"/>s.</returns>
+    public IEnumerable<MenuItem> GetMenuItemsWith (Func<MenuItem, bool> predicate)
     {
         List<MenuItem> menuItems = [];
-
-        if (string.IsNullOrEmpty (title))
-        {
-            return menuItems;
-        }
 
         foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
         {
             if (mbi.PopoverMenu is { })
             {
-                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus ());
+                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus (predicate));
             }
         }
 
-        return menuItems.Where (mi => mi.Title == title);
+        return menuItems;
     }
 
     /// <summary>
@@ -619,15 +614,7 @@ public class MenuBar : Menu, IDesignable
             CanFocus = false
         };
 
-        var mutuallyExclusiveOptionsSelector = new OptionSelector
-        {
-            Labels = ["G_ood", "_Bad", "U_gly"],
-            Value = 0,
-
-            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector).
-            // For an OptionSelector, we want the selected item to be highlighted distinctly, so ensure CanFocus is true.
-            CanFocus = true
-        };
+        OptionSelector<Schemes> mutuallyExclusiveOptionsSelector = new () { Title = "Scheme", CanFocus = true };
 
         var menuBgColorCp = new ColorPicker { Width = 30 };
 
@@ -688,7 +675,8 @@ public class MenuBar : Menu, IDesignable
                                                               },
                                                               new MenuItem
                                                               {
-                                                                  HelpText = "3 Mutually Exclusive Options",
+                                                                  Id = "mutuallyExclusiveOptions",
+                                                                  HelpText = "Mutually Exclusive Options",
                                                                   CommandView = mutuallyExclusiveOptionsSelector,
                                                                   Key = Key.F7
                                                               },
@@ -746,9 +734,16 @@ public class MenuBar : Menu, IDesignable
 
             var nestedSubMenu = new MenuItem { Title = "_Moar Details", SubMenu = new Menu (ConfigureMoreDetailsSubMenu ()) };
 
-            var editMode = new MenuItem
+            // This menu item is used to test Application Key binding. See the Menus Scenario.
+            // F5 will toggle the Edit Mode checkbox, and the menu item text will update to show the Command it's bound to.
+            MenuItem editMode = new ()
             {
-                Text = "App Binding to Command.Edit", Id = "EditMode", Command = Command.Edit, CommandView = new CheckBox { Title = "E_dit Mode" }
+                Text = "App Binding to Command.Edit",
+                Id = "EditMode",
+                Command = Command.Edit,
+                CommandView = new CheckBox { Title = "E_dit Mode" },
+                Key = Key.F5,
+                BindKeyToApplication = true
             };
 
             return [detail, nestedSubMenu, null!, editMode];

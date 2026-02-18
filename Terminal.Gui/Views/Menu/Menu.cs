@@ -6,6 +6,12 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class Menu : Bar
 {
+    /// <summary>
+    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+
     /// <inheritdoc/>
     public Menu () : this ([]) { }
 
@@ -69,11 +75,17 @@ public class Menu : Bar
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+
+
+        //if (ctx.IsBubblingUp)
+        //{
+        //    SuperMenuItem?.InvokeCommand (ctx.Command);
+        //}
+    }
 
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
@@ -88,17 +100,17 @@ public class Menu : Bar
         switch (view)
         {
             case MenuItem menuItem:
-            {
-                menuItem.CanFocus = true;
+                {
+                    menuItem.CanFocus = true;
 
-                menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
+                    menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
 
-                // When a MenuItem is activated (e.g., via HotKey → Activate flow),
-                // raise Accepted on this Menu so PopoverMenu can close.
-                menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
+                    // When a MenuItem is activated (e.g., via HotKey → Activate flow),
+                    // raise Accepted on this Menu so PopoverMenu can close.
+                    menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
 
-                break;
-            }
+                    break;
+                }
 
             case Line line:
                 // Grow line so we get auto-join line

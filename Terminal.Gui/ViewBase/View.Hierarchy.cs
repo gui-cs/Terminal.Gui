@@ -109,8 +109,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return true;
         }
 
-        return CWPPropertyHelper.ChangeProperty (
-                                                 this,
+        return CWPPropertyHelper.ChangeProperty (this,
                                                  ref _superView,
                                                  value,
                                                  OnSuperViewChanging,
@@ -290,7 +289,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         OnSubViewAdded (view);
-        SubViewAdded?.Invoke (this, new (this, view));
+        SubViewAdded?.Invoke (this, new SuperViewChangedEventArgs (this, view));
     }
 
     /// <summary>
@@ -432,7 +431,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         OnSubViewRemoved (view);
-        SubViewRemoved?.Invoke (this, new (this, view));
+        SubViewRemoved?.Invoke (this, new SuperViewChangedEventArgs (this, view));
     }
 
     /// <summary>
@@ -515,22 +514,35 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 #pragma warning disable CS0067 // The event is never used
     /// <summary>Raised when a SubView has been removed from this View.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? Removed;
-#pragma warning restore CS0067 // The event is never used   
+#pragma warning restore CS0067 // The event is never used
 
     #endregion AddRemove
 
-    // TODO: This drives a weird coupling of Application.TopRunnable and View. It's not clear why this is needed.
-    /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
-    /// <returns>The superview view.</returns>
-    internal View? GetTopSuperView (View? view = null, View? superview = null)
+    /// <summary>
+    ///     Walks up the <see cref="SuperView"/> chain and returns the topmost ancestor of
+    ///     <paramref name="from"/> (or of this View if <paramref name="from"/> is <see langword="null"/>).
+    /// </summary>
+    /// <param name="from">
+    ///     The View whose ancestor chain to walk. If <see langword="null"/>, starts from this View's <see cref="SuperView"/>.
+    /// </param>
+    /// <param name="to">
+    ///     If specified, traversal stops when this View is reached. Defaults to <see cref="IApplication.TopRunnableView"/>.
+    /// </param>
+    /// <returns>
+    ///     The topmost ancestor found, <paramref name="to"/> if encountered, or <see langword="null"/> if no
+    ///     ancestors exist.
+    /// </returns>
+    /// <seealso cref="SuperView"/>
+    /// <seealso cref="IsInHierarchy"/>
+    public View? GetTopSuperView (View? from = null, View? to = null)
     {
-        View? top = superview ?? App?.TopRunnableView;
+        View? top = to; // ?? App?.TopRunnableView;
 
-        for (View? v = view?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
+        for (View? v = from?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
         {
             top = v;
 
-            if (top == superview)
+            if (top == to)
             {
                 break;
             }
@@ -606,22 +618,19 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     Moves <paramref name="subview"/> one position towards the end of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
-    public void MoveSubViewTowardsEnd (View subview)
-    {
-        PerformActionForSubView (
-                                 subview,
+    public void MoveSubViewTowardsEnd (View subview) =>
+        PerformActionForSubView (subview,
                                  x =>
                                  {
-                                     int idx = InternalSubViews!.IndexOf (x);
+                                     int idx = InternalSubViews.IndexOf (x);
 
-                                     if (idx + 1 < InternalSubViews.Count)
+                                     if (idx + 1 >= InternalSubViews.Count)
                                      {
-                                         InternalSubViews.Remove (x);
-                                         InternalSubViews.Insert (idx + 1, x);
+                                         return;
                                      }
-                                 }
-                                );
-    }
+                                     InternalSubViews.Remove (x);
+                                     InternalSubViews.Insert (idx + 1, x);
+                                 });
 
     /// <summary>
     ///     Moves <paramref name="subview"/> to the end of the <see cref="SubViews"/> list.
@@ -632,68 +641,57 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     {
         if (Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
-            PerformActionForSubView (
-                                     subview,
+            PerformActionForSubView (subview,
                                      x =>
                                      {
-                                         while (InternalSubViews!.IndexOf (x) != InternalSubViews.Count - 1)
+                                         while (InternalSubViews.IndexOf (x) != InternalSubViews.Count - 1)
                                          {
                                              View v = InternalSubViews [0];
-                                             InternalSubViews!.Remove (v);
+                                             InternalSubViews.Remove (v);
                                              InternalSubViews.Add (v);
                                          }
-                                     }
-                                    );
+                                     });
 
             return;
         }
 
-        PerformActionForSubView (
-                                 subview,
+        PerformActionForSubView (subview,
                                  x =>
                                  {
-                                     InternalSubViews!.Remove (x);
+                                     InternalSubViews.Remove (x);
                                      InternalSubViews.Add (x);
-                                 }
-                                );
+                                 });
     }
 
     /// <summary>
     ///     Moves <paramref name="subview"/> one position towards the start of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
-    public void MoveSubViewTowardsStart (View subview)
-    {
-        PerformActionForSubView (
-                                 subview,
+    public void MoveSubViewTowardsStart (View subview) =>
+        PerformActionForSubView (subview,
                                  x =>
                                  {
-                                     int idx = InternalSubViews!.IndexOf (x);
+                                     int idx = InternalSubViews.IndexOf (x);
 
-                                     if (idx > 0)
+                                     if (idx <= 0)
                                      {
-                                         InternalSubViews.Remove (x);
-                                         InternalSubViews.Insert (idx - 1, x);
+                                         return;
                                      }
-                                 }
-                                );
-    }
+                                     InternalSubViews.Remove (x);
+                                     InternalSubViews.Insert (idx - 1, x);
+                                 });
 
     /// <summary>
     ///     Moves <paramref name="subview"/> to the start of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
-    public void MoveSubViewToStart (View subview)
-    {
-        PerformActionForSubView (
-                                 subview,
+    public void MoveSubViewToStart (View subview) =>
+        PerformActionForSubView (subview,
                                  x =>
                                  {
-                                     InternalSubViews!.Remove (x);
+                                     InternalSubViews.Remove (x);
                                      InternalSubViews.Insert (0, subview);
-                                 }
-                                );
-    }
+                                 });
 
     /// <summary>
     ///     Internal API that runs <paramref name="action"/> on a subview if it is part of the <see cref="SubViews"/> list.

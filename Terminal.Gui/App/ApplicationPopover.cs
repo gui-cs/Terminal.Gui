@@ -122,9 +122,10 @@ public sealed class ApplicationPopover : IDisposable
         }
         popover.Current ??= App?.TopRunnableView as IRunnable;
 
-        if (popover is View popoverView)
+        if (popover is View { IsInitialized: false } popoverView)
         {
-            popoverView.App = App;
+            popoverView.BeginInit ();
+            popoverView.EndInit ();
         }
 
         _popovers.Add (popover);

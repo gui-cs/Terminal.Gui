@@ -349,33 +349,47 @@ public class Bars : Scenario
 
     private void ConfigMenuBar (Bar bar)
     {
-        Shortcut fileMenuBarItem = new () { Title = Strings.menuFile, HelpText = "File Menu", Key = Key.D0.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut fileMenuBarItem = new () { Title = Strings.menuFile, HelpText = "File Menu", Key = Key.D0.WithAlt };
 
-        Shortcut editMenuBarItem = new () { Title = "_Edit", HelpText = "Edit Menu", Key = Key.D1.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut editMenuBarItem = new () { Title = "_Edit", HelpText = "Edit Menu", Key = Key.D1.WithAlt };
 
-        Shortcut helpMenuBarItem = new () { Title = Strings.menuHelp, HelpText = "Halp Menu", Key = Key.D2.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut helpMenuBarItem = new () { Title = Strings.menuHelp, HelpText = "Halp Menu", Key = Key.D2.WithAlt };
 
         bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
     }
 
     private void ConfigureMenu (Bar bar)
     {
-        Shortcut shortcut1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag", MouseHighlightStates = MouseState.In };
+        Shortcut shortcut1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
 
-        Shortcut shortcut2 = new () { Title = "Za_G", Text = "Gonna zag", Key = Key.G.WithAlt, MouseHighlightStates = MouseState.In };
+        Line line = new ();
 
-        Shortcut shortcut3 = new () { Title = "_Three", Text = "The 3rd item", Key = Key.D3.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut shortcut4 = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+        shortcut4.CommandView = new CheckBox { Title = shortcut4.Title, CanFocus = false };
 
-        Line line = new () { X = -1, Width = Dim.Fill ()! + 1 };
-
-        Shortcut shortcut4 = new () { Title = "_Four", Text = "Below the line", Key = Key.D3.WithAlt, MouseHighlightStates = MouseState.In };
-
-        shortcut4.CommandView = new CheckBox { Title = shortcut4.Title, MouseHighlightStates = MouseState.None, CanFocus = false };
+        shortcut4.Action += () =>
+                            {
+                                if (shortcut4.CommandView is CheckBox cb)
+                                {
+                                    bar.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                }
+                            };
 
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
         shortcut4.Accepting += (_, args) => args.Handled = true;
 
-        bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
+        OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+        Shortcut schemeShortcut = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+
+        schemeOptionSelector!.ValueChanged += (_, args) =>
+                                              {
+                                                  if (args.Value is { } scheme)
+                                                  {
+                                                      bar.SchemeName = scheme.ToString ();
+                                                  }
+                                              };
+
+        bar.Add (shortcut1, line, shortcut4, schemeShortcut);
     }
 
     public void ConfigStatusBar (Bar bar)
