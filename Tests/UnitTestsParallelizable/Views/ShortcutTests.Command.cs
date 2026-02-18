@@ -556,15 +556,15 @@ public partial class ShortcutTests
     public void Accept_Invokes_Both_Action_And_TargetView ()
     {
         // Arrange
-        var actionFired = false;
-        var commandInvoked = false;
+        var actionFired = 0;
+        var commandInvoked = 0;
 
         TestTargetView target = new () { Title = "Target" };
 
         target.RegisterCommand (Command.Save,
                                 () =>
                                 {
-                                    commandInvoked = true;
+                                    commandInvoked++;
 
                                     return true;
                                 });
@@ -575,14 +575,14 @@ public partial class ShortcutTests
         shortcut.Title = "Save";
         shortcut.TargetView = target;
         shortcut.Command = Command.Save;
-        shortcut.Action = () => actionFired = true;
+        shortcut.Action = () => actionFired ++;
 
         // Act
         shortcut.InvokeCommand (Command.Accept);
 
         // Assert — both fire
-        Assert.True (actionFired);
-        Assert.True (commandInvoked);
+        Assert.Equal (1, actionFired);
+        Assert.Equal (1, commandInvoked);
 
         target.Dispose ();
     }

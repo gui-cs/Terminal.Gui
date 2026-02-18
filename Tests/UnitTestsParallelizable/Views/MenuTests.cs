@@ -221,4 +221,185 @@ public class MenuTests
 
         menu.Dispose ();
     }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Has_CommandsToBubbleUp ()
+    {
+        Menu menu = new ();
+
+        Assert.Contains (Command.Accept, menu.CommandsToBubbleUp);
+        Assert.Contains (Command.Activate, menu.CommandsToBubbleUp);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_Accept_Handled_Does_Not_Bubble_Further ()
+    {
+        // Menu inside a Bar — handled Accept on Menu should not reach Bar
+        Bar bar = new ();
+        Menu menu = new ();
+        bar.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var barAcceptingFired = 0;
+
+        menu.Accepting += (_, e) => { e.Handled = true; };
+        bar.Accepting += (_, _) => { barAcceptingFired++; };
+
+        menuItem.InvokeCommand (Command.Accept);
+
+        Assert.Equal (0, barAcceptingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_Activate_Handled_Does_Not_Bubble_Further ()
+    {
+        Bar bar = new ();
+        Menu menu = new ();
+        bar.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var barActivatingFired = 0;
+
+        menu.Activating += (_, e) => { e.Handled = true; };
+        bar.Activating += (_, _) => { barActivatingFired++; };
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, barActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Activate_Does_Not_Double_Fire_On_Menu ()
+    {
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+
+        menu.Activating += (_, _) => { menuActivatingCount++; };
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        // Menu.Activating should fire exactly once
+        Assert.Equal (1, menuActivatingCount);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Accept_Does_Not_Double_Fire_On_Menu ()
+    {
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuAcceptingCount = 0;
+
+        menu.Accepting += (_, _) => { menuAcceptingCount++; };
+
+        menuItem.InvokeCommand (Command.Accept);
+
+        // Menu.Accepting should fire exactly once
+        Assert.Equal (1, menuAcceptingCount);
+
+        menu.Dispose ();
+    }
+
+    [Fact (Skip = "Fix in #4620 - genericized deferred raising")]
+    public void MenuItem_Action_Fires_On_Accept ()
+    {
+        Menu menu = new ();
+
+        int actionFired = 0;
+        MenuItem menuItem = new () { Title = "Test", Action = () => actionFired++ };
+        menu.Add (menuItem);
+
+        menuItem.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, actionFired);
+
+        menu.Dispose ();
+    }
+
+    [Fact]
+    public void MenuItem_Action_Fires_On_Activate ()
+    {
+        Menu menu = new ();
+
+        int actionFired = 0;
+        MenuItem menuItem = new () { Title = "Test", Action = () => actionFired++ };
+        menu.Add (menuItem);
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, actionFired);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Activate_Bubbles_Through_Menu_To_Bar ()
+    {
+        Bar bar = new ();
+        Menu menu = new ();
+        bar.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var barActivatingFired = 0;
+        var menuActivatingFired = 0;
+
+        menu.Activating += (_, _) => { menuActivatingFired++; };
+        bar.Activating += (_, _) => { barActivatingFired++; };
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, menuActivatingFired);
+        Assert.Equal (1, barActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Accept_Bubbles_Through_Menu_To_Bar ()
+    {
+        Bar bar = new ();
+        Menu menu = new ();
+        bar.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var barAcceptingFired = 0;
+        var menuAcceptingFired = 0;
+
+        menu.Accepting += (_, _) => { menuAcceptingFired++; };
+        bar.Accepting += (_, _) => { barAcceptingFired++; };
+
+        menuItem.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, menuAcceptingFired);
+        Assert.Equal (1, barAcceptingFired);
+
+        bar.Dispose ();
+    }
 }

@@ -128,7 +128,7 @@ public class PopoverMenuTests
     ///     This is the direct programmatic invocation path.
     /// </summary>
     // Claude - Opus 4.6
-    [Fact (Skip = "Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
+    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
     public void Activate_FromOptionSelectorCheckBox_ReachesMenuBar_Direct ()
     {
         (TrackingMenuBar menuBar, _, _, TrackingMenu menu, _, _, CheckBox secondCheckBox)
@@ -151,7 +151,7 @@ public class PopoverMenuTests
     ///     propagates through PopoverMenu to MenuBar.
     /// </summary>
     // Claude - Opus 4.6
-    [Fact (Skip = "Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
+    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
     public void Activate_FromOptionSelectorCheckBox_ReachesMenuBar_Keyboard ()
     {
         (TrackingMenuBar menuBar, _, _, TrackingMenu menu, _, _, CheckBox secondCheckBox)
@@ -183,7 +183,7 @@ public class PopoverMenuTests
     ///     propagates through PopoverMenu to MenuBar.
     /// </summary>
     // Claude - Opus 4.6
-    [Fact (Skip = "Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
+    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
     public void Activate_FromOptionSelectorCheckBox_ReachesMenuBar_Mouse ()
     {
         (TrackingMenuBar menuBar, _, _, TrackingMenu menu, _, _, CheckBox secondCheckBox)

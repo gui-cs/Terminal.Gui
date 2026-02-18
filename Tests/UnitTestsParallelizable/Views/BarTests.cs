@@ -407,6 +407,41 @@ public class BarTests
         bar.Dispose ();
     }
 
+
+    // Claude - Opus 4.6
+    [Fact (Skip = "Fix in #4620 - genericized deferred raising")]
+    public void Shortcut_Action_Fires_On_Accept ()
+    {
+        Bar bar = new ();
+
+        int actionFired = 0;
+        Shortcut shortcut = new () { Title = "Test", Action = () => actionFired++ };
+        bar.Add (shortcut);
+
+        shortcut.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, actionFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Action_Fires_On_Activate ()
+    {
+        Bar bar = new ();
+
+        int actionFired = 0;
+        Shortcut shortcut = new () { Title = "Test", Action = () => actionFired++ };
+        bar.Add (shortcut);
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, actionFired);
+
+        bar.Dispose ();
+    }
+
     // Claude - Opus 4.6
     [Fact]
     public void Bar_Activate_Does_Not_BubbleDown_To_Shortcuts ()
@@ -522,6 +557,142 @@ public class BarTests
 
         // CheckBox should have toggled exactly once (not double-toggled by the bubble)
         Assert.NotEqual (initialState, checkBox.Value);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Bar_Accept_Does_Not_BubbleDown_To_Shortcuts ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        var shortcutAcceptingFired = 0;
+
+        shortcut.Accepting += (_, _) => { shortcutAcceptingFired++; };
+
+        bar.InvokeCommand (Command.Accept);
+
+        // Bar fires its own events, does NOT BubbleDown to shortcuts
+        Assert.Equal (0, shortcutAcceptingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Shortcut_Not_In_Bar_Does_Not_Bubble ()
+    {
+        // A plain View does NOT have CommandsToBubbleUp, so Shortcut shouldn't bubble
+        View superView = new () { Id = "plainView" };
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        superView.Add (shortcut);
+
+        var superViewActivatingFired = 0;
+
+        superView.Activating += (_, _) => { superViewActivatingFired++; };
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, superViewActivatingFired);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Multiple_Shortcuts_Only_Invoked_One_Bubbles ()
+    {
+        Bar bar = new ();
+        Shortcut sc1 = new () { Title = "First", Key = Key.F1 };
+        Shortcut sc2 = new () { Title = "Second", Key = Key.F2 };
+        bar.Add (sc1);
+        bar.Add (sc2);
+
+        var sc1ActivatingFired = 0;
+        var sc2ActivatingFired = 0;
+        var barActivatingFired = 0;
+
+        sc1.Activating += (_, _) => { sc1ActivatingFired++; };
+        sc2.Activating += (_, _) => { sc2ActivatingFired++; };
+        bar.Activating += (_, _) => { barActivatingFired++; };
+
+        // Activate only sc2
+        sc2.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, sc1ActivatingFired);
+        Assert.Equal (1, sc2ActivatingFired);
+        Assert.Equal (1, barActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Nested_Bar_Handled_Does_Not_Bubble_To_Outer ()
+    {
+        Bar outerBar = new () { Id = "outerBar" };
+        Bar innerBar = new () { Id = "innerBar" };
+        outerBar.Add (innerBar);
+
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        innerBar.Add (shortcut);
+
+        var outerBarActivatingFired = 0;
+
+        // Inner bar handler cancels the bubble
+        innerBar.Activating += (_, e) => { e.Handled = true; };
+        outerBar.Activating += (_, _) => { outerBarActivatingFired++; };
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        // Outer bar should NOT receive the event because inner bar handled it
+        Assert.Equal (0, outerBarActivatingFired);
+
+        outerBar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void CommandView_Accept_Bubbles_To_Bar ()
+    {
+        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+        Shortcut shortcut = new () { Title = "Test", CommandView = checkBox };
+
+        Bar bar = new ();
+        bar.Add (shortcut);
+
+        var barAcceptingFired = 0;
+
+        bar.Accepting += (_, _) => { barAcceptingFired++; };
+
+        shortcut.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, barAcceptingFired);
+
+        bar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Clearing_CommandsToBubbleUp_Prevents_Bubbling ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut = new () { Title = "Test", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut);
+
+        // Clear CommandsToBubbleUp
+        bar.CommandsToBubbleUp = [];
+
+        var barActivatingFired = 0;
+
+        bar.Activating += (_, _) => { barActivatingFired++; };
+
+        shortcut.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, barActivatingFired);
 
         bar.Dispose ();
     }

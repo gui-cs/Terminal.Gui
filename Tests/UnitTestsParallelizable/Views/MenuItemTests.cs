@@ -203,4 +203,83 @@ public class MenuItemTests
         menuItem.Dispose ();
         targetView.Dispose ();
     }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Activate_Bubbles_To_Menu ()
+    {
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "Test Item" };
+        menu.Add (menuItem);
+
+        var menuActivatingFired = 0;
+
+        menu.Activating += (_, _) => { menuActivatingFired++; };
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, menuActivatingFired);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_With_CommandView_Activate_Bubbles_To_Menu ()
+    {
+        CheckBox checkBox = new () { Title = "_Check", CanFocus = false };
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        var menuActivatingFired = 0;
+
+        menu.Activating += (_, _) => { menuActivatingFired++; };
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, menuActivatingFired);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Accept_Handled_Does_Not_Bubble_To_Menu ()
+    {
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuAcceptingFired = 0;
+
+        menuItem.Accepting += (_, e) => { e.Handled = true; };
+        menu.Accepting += (_, _) => { menuAcceptingFired++; };
+
+        menuItem.InvokeCommand (Command.Accept);
+
+        Assert.Equal (0, menuAcceptingFired);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Activate_Handled_Does_Not_Bubble_To_Menu ()
+    {
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuActivatingFired = 0;
+
+        menuItem.Activating += (_, e) => { e.Handled = true; };
+        menu.Activating += (_, _) => { menuActivatingFired++; };
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, menuActivatingFired);
+
+        menu.Dispose ();
+    }
 }
