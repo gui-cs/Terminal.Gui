@@ -5,50 +5,82 @@ namespace ViewsTests;
 [TestSubject (typeof (Bar))]
 public class BarTests
 {
+    // BUGBUG: This test is not correct. Bar should bubble up Accept and Activate commands (and maybe HotKey), but currently it doesn't bubble up any commands. This test verifies the current behavior which may change per issue #4473
     [Fact]
-    public void AddShortcutAt_InsertsShortcutCorrectly ()
-    {
-        var bar = new Bar ();
-        var shortcut = new Shortcut (Key.Empty, "Command", null);
-        bar.AddShortcutAt (0, shortcut);
-
-        Assert.Contains (shortcut, bar.SubViews);
-    }
-
-    [Fact]
-    public void AlignmentModesProperty_SetsCorrectly ()
-    {
-        var bar = new Bar ();
-        Assert.Equal (AlignmentModes.StartToEnd, bar.AlignmentModes); // Default value
-
-        bar.AlignmentModes = AlignmentModes.EndToStart;
-        Assert.Equal (AlignmentModes.EndToStart, bar.AlignmentModes);
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void Bar_Commands_DelegatedToShortcuts ()
+    public void No_CommandsToBubbleUp ()
     {
         Bar bar = new ();
-        Shortcut shortcut = new () { Title = "Test", Key = Key.T.WithCtrl };
-        bar.Add (shortcut);
 
-        var acceptingFired = false;
+        // Bar is a transparent container and should not bubble up commands
+        Assert.Empty (bar.CommandsToBubbleUp);
 
-        shortcut.Accepting += (_, e) =>
-                              {
-                                  acceptingFired = true;
-                                  e.Handled = true;
-                              };
+        bar.Dispose ();
+    }
 
-        // Bar delegates commands to contained Shortcuts
-        // Shortcut doesn't require Init when just testing commands
-        bool? result = shortcut.InvokeCommand (Command.Accept);
+    [Fact]
+    public void Command_Activate_BubblesDownToShortcuts ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut1 = new () { Title = "Test1", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut1);
 
-        Assert.True (acceptingFired);
-        Assert.True (result);
+        var shortcut1ActivatingFired = 0;
+
+        shortcut1.Activating += (_, e) => { shortcut1ActivatingFired++; };
+
+        Shortcut shortcut2 = new () { Title = "Test2", Key = Key.D1.WithCtrl };
+        bar.Add (shortcut2);
+
+        var shortcut2ActivatingFired = 0;
+
+        shortcut2.Activating += (_, e) => { shortcut2ActivatingFired++; };
+
+        var barActivatingFired = 0;
+
+        bar.Activating += (_, e) => { barActivatingFired++; };
+
+        shortcut1.SetFocus ();
+
+        // Invoke on Bar
+        bar.InvokeCommand (Command.Activate);
+
+        Assert.Equal (0, shortcut1ActivatingFired); // BUGBUG: This should be 1 because Bar should bubble down Activate command to its shortcuts, but currently it doesn't bubble down any commands. This verifies the current behavior which may change per issue #4473
+        Assert.Equal (0, shortcut2ActivatingFired);
+        Assert.Equal (1, barActivatingFired);
+
+        bar.Dispose ();
+    }
+
+    [Fact]
+    public void Command_Activate_On_Shortcut_BubblesDownToShortcuts ()
+    {
+        Bar bar = new ();
+        Shortcut shortcut1 = new () { Title = "Test1", Key = Key.D0.WithCtrl };
+        bar.Add (shortcut1);
+
+        var shortcut1ActivatingFired = 0;
+
+        shortcut1.Activating += (_, e) => { shortcut1ActivatingFired++; };
+
+        Shortcut shortcut2 = new () { Title = "Test2", Key = Key.D1.WithCtrl };
+        bar.Add (shortcut2);
+
+        var shortcut2ActivatingFired = 0;
+
+        shortcut2.Activating += (_, e) => { shortcut2ActivatingFired++; };
+
+        var barActivatingFired = 0;
+
+        bar.Activating += (_, e) => { barActivatingFired++; };
+
+        shortcut1.SetFocus ();
+
+        // Invoke on Shortcut
+        shortcut1.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, shortcut1ActivatingFired);
+        Assert.Equal (0, shortcut2ActivatingFired);
+        Assert.Equal (0, barActivatingFired); // BUGBUG: This should be 1 because Bar should bubble up Activate command from its shortcuts, but currently it doesn't bubble up any commands. This verifies the current behavior which may change per issue #4473
 
         bar.Dispose ();
     }
@@ -86,6 +118,26 @@ public class BarTests
         {
             Assert.Same (shortcuts [i], bar.SubViews.ElementAt (i));
         }
+    }
+
+    [Fact]
+    public void AddShortcutAt_InsertsShortcutCorrectly ()
+    {
+        var bar = new Bar ();
+        var shortcut = new Shortcut (Key.Empty, "Command", null);
+        bar.AddShortcutAt (0, shortcut);
+
+        Assert.Contains (shortcut, bar.SubViews);
+    }
+
+    [Fact]
+    public void AlignmentModesProperty_SetsCorrectly ()
+    {
+        var bar = new Bar ();
+        Assert.Equal (AlignmentModes.StartToEnd, bar.AlignmentModes); // Default value
+
+        bar.AlignmentModes = AlignmentModes.EndToStart;
+        Assert.Equal (AlignmentModes.EndToStart, bar.AlignmentModes);
     }
 
     [Fact]
@@ -167,7 +219,7 @@ public class BarTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void Bar_MouseWheel_Navigates_Focus ()
+    public void MouseWheel_Navigates_Focus ()
     {
         VirtualTimeProvider time = new ();
         using IApplication app = Application.Create (time);
@@ -206,7 +258,7 @@ public class BarTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void Bar_Vertical_Layout_Aligns_KeyViews ()
+    public void Vertical_Layout_Aligns_KeyViews ()
     {
         VirtualTimeProvider time = new ();
         using IApplication app = Application.Create (time);
@@ -236,19 +288,7 @@ public class BarTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void Bar_No_CommandsToBubbleUp ()
-    {
-        Bar bar = new ();
-
-        // Bar is a transparent container and should not bubble up commands
-        Assert.Empty (bar.CommandsToBubbleUp);
-
-        bar.Dispose ();
-    }
-
-    // Claude - Opus 4.6
-    [Fact]
-    public void Bar_AddShortcutAt_Rebuilds_SubViews_Order ()
+    public void AddShortcutAt_Rebuilds_SubViews_Order ()
     {
         Shortcut sc1 = new () { Title = "First", Key = Key.F1 };
         Shortcut sc2 = new () { Title = "Second", Key = Key.F2 };
@@ -268,7 +308,7 @@ public class BarTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void Bar_RemoveShortcut_Returns_Removed_Item ()
+    public void RemoveShortcut_Returns_Removed_Item ()
     {
         Shortcut sc1 = new () { Title = "First", Key = Key.F1 };
         Shortcut sc2 = new () { Title = "Second", Key = Key.F2 };

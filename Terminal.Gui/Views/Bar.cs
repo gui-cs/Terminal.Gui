@@ -35,6 +35,9 @@ public class Bar : View, IOrientation, IDesignable
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
+        // BUGBUG: This should be enabled
+        // CommandsToBubbleUp = [Command.Accept, Command.Activate];
+
         if (shortcuts is null)
         {
             return;
@@ -275,7 +278,7 @@ public class Bar : View, IOrientation, IDesignable
                         else
                         {
                             subView.Width = Dim.Auto (DimAutoStyle.Auto, maxBarItemWidth, maxBarItemWidth);
-                        } 
+                        }
                     }
                 }
                 else

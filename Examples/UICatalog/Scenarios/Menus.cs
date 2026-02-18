@@ -65,11 +65,21 @@ public class Menus : Scenario
                                         menuItem.Action += () => _eventLog.Log ($"{menuItem.ToIdentifyingString ()} Action!");
                                     }
 
-                                    if (menuHostView.ContextMenu is { })
+                                    foreach (Menu menu in menuHostView?.SubViews.OfType<Menu> ().Where(m => m.Id == "TestMenu")!)
+                                    {
+                                        _eventLog.SetViewToLog (menu);
+
+                                        foreach (MenuItem mi in menu.SubViews.OfType<MenuItem> ())
+                                        {
+                                            _eventLog.SetViewToLog (mi);
+                                            _eventLog.SetViewToLog (mi.CommandView);
+                                        }
+                                    }
+
+                                    if (menuHostView?.ContextMenu is { })
                                     {
                                         _eventLog.SetViewToLog (menuHostView.ContextMenu);
                                     }
-
                                 };
 
         runnable.Add (_eventLog);
@@ -237,7 +247,7 @@ public class Menus : Scenario
                             // The command was invoked. Toggle the status Cb.
                             editModeStatusCb.AdvanceCheckState ();
 
-                            return true;    
+                            return true;
                         });
 
             Add (editModeStatusCb);
@@ -297,6 +307,44 @@ public class Menus : Scenario
 
             autoSaveStatusCb.SetFocus ();
             App?.Popover?.Register (ContextMenu);
+
+            Menu testMenu = new () { Y = Pos.Bottom (editModeStatusCb) + 1, Id = "TestMenu" };
+            ConfigureTestMenu (testMenu);
+            Add (testMenu);
+        }
+
+        private void ConfigureTestMenu (Menu menu)
+        {
+            MenuItem menuItem1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
+
+            Line line = new ();
+
+            MenuItem menuItemBorders = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+            menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
+
+            menuItemBorders.Action += () =>
+                                {
+                                    if (menuItemBorders.CommandView is CheckBox cb)
+                                    {
+                                        menu.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                    }
+                                };
+
+            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+            menuItemBorders.Accepting += (_, args) => args.Handled = true;
+
+            OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+            MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+
+            schemeOptionSelector!.ValueChanged += (_, args) =>
+                                                  {
+                                                      if (args.Value is { } scheme)
+                                                      {
+                                                          menu.SchemeName = scheme.ToString ();
+                                                      }
+                                                  };
+
+            menu.Add (menuItem1, line, menuItemBorders, menuItemScheme);
         }
 
         /// <inheritdoc/>
