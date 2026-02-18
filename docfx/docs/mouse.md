@@ -279,22 +279,64 @@ view.MouseStateChanged += (sender, e) =>
 
 ### Mouse Grab
 
-Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled **automatically grab the mouse** when a button is pressed:
+Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled **automatically grab the mouse** when a button is pressed. For manual grab control, use the `IMouseGrabHandler` interface via `App.Mouse`.
 
 **Grab Lifecycle:**
-1. **Press inside** ? Auto-grab, set focus (if `CanFocus`), `MouseState |= Pressed`
-2. **Move outside** ? `MouseState |= PressedOutside` (unless `MouseHoldRepeat`)
-3. **Release** ? Ungrab, clear pressed state, invoke commands if inside
+1. **Press inside** ? Call `GrabMouse(view)` (auto or manual), fires `GrabbingMouse` (cancellable) then `GrabbedMouse`
+2. **During grab** ? ALL mouse events routed exclusively to grabbed view with viewport-relative coordinates
+3. **Move outside** ? `MouseState |= PressedOutside` (unless `MouseHoldRepeat`)
+4. **Release/Click** ? Call `UngrabMouse()`, fires `UnGrabbingMouse` (cancellable) then `UnGrabbedMouse`
 
 **Grabbed View Receives:**
 - ALL mouse events (even outside viewport)
-- Coordinates converted to viewport-relative
+- Coordinates converted to viewport-relative (`mouse.Position`)
 - `mouse.View` set to grabbed view
 
 **Auto-ungrab occurs when:**
 - Button released (via clicked event)
-- View removed from hierarchy
+- View disposed (uses `WeakReference<View>` internally)
 - Application ends
+
+**Manual Grab Example (for custom drag operations):**
+```csharp
+protected override bool OnMouseEvent(Mouse mouse)
+{
+    if (mouse.Flags.HasFlag(MouseFlags.Button1Pressed))
+    {
+        App?.Mouse.GrabMouse(this);
+        _isDragging = true;
+        return true;
+    }
+
+    if (_isDragging && mouse.Flags.HasFlag(MouseFlags.Button1Released))
+    {
+        App?.Mouse.UngrabMouse();
+        _isDragging = false;
+        return true;
+    }
+
+    if (_isDragging)
+    {
+        // mouse.Position is viewport-relative during grab
+        UpdateDragPosition(mouse.Position);
+        return true;
+    }
+
+    return false;
+}
+```
+
+**Preventing Grab Theft (for complex drag operations):**
+```csharp
+// Subscribe to prevent other views from stealing the grab during drag
+App.Mouse.GrabbingMouse += (sender, e) =>
+{
+    if (_isDragging && !ReferenceEquals(e.View, this))
+    {
+        e.Cancel = true; // Prevent other views from grabbing
+    }
+};
+```
 
 ### Continuous Button Press
 
@@ -402,6 +444,7 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, 'm'=release)
 - Press and Release events pass through immediately
 - Click events synthesized immediately after release
 - Multi-click detection tracks timing/position/button
+- Modifier keys (Shift, Ctrl, Alt) are preserved in synthetic click events
 
 **Output:** Stream of `Mouse` events including synthesized clicks
 
@@ -435,16 +478,11 @@ if (mouse.IsPressed &&
 
 #### 4.3: Mouse Grab Handling
 ```csharp
-if (MouseGrabView is {})
-{
-    // Convert to grab view coordinates and send
-    Point viewportLoc = MouseGrabView.ScreenToViewport(mouse.ScreenPosition);
-    MouseGrabView.NewMouseEvent(new Mouse { 
-        Position = viewportLoc, 
-        ScreenPosition = mouse.ScreenPosition,
-        View = MouseGrabView 
-    });
-}
+// If a view has grabbed the mouse, route events exclusively to that view
+// HandleMouseGrab converts coordinates to the grabbed view's viewport
+// and delivers the event directly, returning true to stop further processing
+if (HandleMouseGrab(deepestViewUnderMouse, mouse))
+    return; // Grabbed view received the event
 ```
 
 #### 4.4: Convert to View Coordinates
@@ -495,8 +533,12 @@ if (RaiseMouseEvent(mouse) || mouse.Handled)
 
 **On Pressed:**
 ```csharp
-if (App.Mouse.MouseGrabView != this)
+if (!App.Mouse.IsGrabbed(this))
+{
+    // GrabbingMouse event fires first (can be cancelled)
+    // If not cancelled, GrabbedMouse event fires
     App.Mouse.GrabMouse(this);
+}
 if (!HasFocus && CanFocus) SetFocus();
 
 if (mouse.Position in Viewport)
@@ -513,8 +555,13 @@ MouseState &= ~MouseState.PressedOutside;
 
 **On Clicked:**
 ```csharp
-if (App.Mouse.MouseGrabView == this)
+if (App.Mouse.IsGrabbed(this))
+{
+    // UnGrabbingMouse event fires first (can be cancelled)
+    // If not cancelled, UnGrabbedMouse event fires
+    // MouseEnter/Leave events update for views under current mouse position
     App.Mouse.UngrabMouse();
+}
 ```
 
 #### 5.4: Invoke Commands via MouseBindings
@@ -580,14 +627,32 @@ This ensures consistent mouse behavior across platforms while maintaining platfo
 
 Terminal.Gui provides sophisticated input injection for testing without hardware:
 
-### Quick Test Example
+### Quick Test Example (Using Helper Methods)
+
+**Recommended approach** - Use helper methods for cleaner test code:
+
+```csharp
+using IApplication app = Application.Create();
+app.Init(DriverRegistry.Names.ANSI);
+
+// Inject a left click - simple and clear
+app.InjectSequence(InputInjectionExtensions.LeftButtonClick(new Point(10, 5)));
+
+// Inject a right click
+app.InjectSequence(InputInjectionExtensions.RightButtonClick(new Point(10, 5)));
+
+// Inject a double-click
+app.InjectSequence(InputInjectionExtensions.LeftButtonDoubleClick(new Point(10, 5)));
+```
+
+**Alternative approach** - Manual event creation for advanced scenarios:
 
 ```csharp
 VirtualTimeProvider time = new();
 using IApplication app = Application.Create(time);
 app.Init(DriverRegistry.Names.ANSI);
 
-// Inject click
+// Inject click manually
 app.InjectMouse(new() { 
     ScreenPosition = new(10, 5), 
     Flags = MouseFlags.LeftButtonPressed 
@@ -599,6 +664,18 @@ app.InjectMouse(new() {
 ```
 
 ### Testing Double-Click with Virtual Time
+
+**Using helper method** (recommended):
+
+```csharp
+using IApplication app = Application.Create();
+app.Init(DriverRegistry.Names.ANSI);
+
+// One line for a complete double-click
+app.InjectSequence(InputInjectionExtensions.LeftButtonDoubleClick(new Point(10, 5)));
+```
+
+**Manual approach** (for custom timing control):
 
 ```csharp
 VirtualTimeProvider time = new();
@@ -635,9 +712,24 @@ app.InjectMouse(new() {
 // Double-click detected!
 ```
 
+### Mouse Click Helper Methods
+
+Terminal.Gui provides three helper methods in `InputInjectionExtensions` to simplify common mouse click patterns:
+
+- **`LeftButtonClick(Point p)`** - Single left click (Press + Release)
+- **`RightButtonClick(Point p)`** - Single right click (Press + Release)
+- **`LeftButtonDoubleClick(Point p)`** - Double left click (two complete click sequences)
+
+**Benefits:**
+- Reduces boilerplate from 2-4 lines to 1 line
+- Built-in appropriate delays for reliable click detection
+- Clearer test intent
+- Fewer errors from mismatched Press/Release pairs
+
 ### Key Testing Features
 
 - **Virtual Time Control** - Deterministic multi-click timing
+- **Helper Methods** - `InputInjectionExtensions.LeftButtonClick()`, etc. for simplified injection
 - **Single-Call Injection** - `app.InjectMouse(mouse)` handles everything
 - **No Real Delays** - Tests run instantly with virtual time
 - **Two Modes** - Direct (fast) and Pipeline (full ANSI encoding)
@@ -693,3 +785,5 @@ These events work with `MouseState` to enable hover effects and visual feedback.
 - [Input Injection](input-injection.md) - Complete testing documentation
 - [View Layout](layout.md) - Understanding coordinate systems and layout
 - [Cancellable Work Pattern](cancellable-work-pattern.md) - Event processing pattern
+- @Terminal.Gui.IMouseGrabHandler - API reference for mouse grab handling
+- @Terminal.Gui.IMouse - API reference for the mouse interface

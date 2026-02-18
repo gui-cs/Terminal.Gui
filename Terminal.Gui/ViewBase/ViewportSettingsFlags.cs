@@ -13,7 +13,7 @@ public enum ViewportSettingsFlags
     /// <summary>
     ///     No settings.
     /// </summary>
-    None = 0b_0000,
+    None = 0b_0000_0000_0000,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set to negative values enabling scrolling beyond the left of
@@ -23,7 +23,7 @@ public enum ViewportSettingsFlags
     ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to positive values.
     ///     </para>
     /// </summary>
-    AllowNegativeX = 0b_0001,
+    AllowNegativeX = 0b_0000_0000_0001,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set to negative values enabling scrolling beyond the top of the
@@ -32,60 +32,33 @@ public enum ViewportSettingsFlags
     ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to positive values.
     ///     </para>
     /// </summary>
-    AllowNegativeY = 0b_0010,
+    AllowNegativeY = 0b_0000_0000_0010,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set to negative coordinates enabling scrolling beyond the
-    ///     top-left of the
-    ///     content area.
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.Size</c> is constrained to positive coordinates.
-    ///     </para>
+    ///     Combines <see cref="AllowNegativeX"/> and <see cref="AllowNegativeY"/>.
     /// </summary>
     AllowNegativeLocation = AllowNegativeX | AllowNegativeY,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set values greater than <see cref="View.GetContentSize ()"/>
-    ///     <c>.Width</c> enabling scrolling beyond the right
-    ///     of the content area.
+    ///     If set, <see cref="View.Viewport"/><c>.X</c> can exceed <c>ContentSize.Width - 1</c>,
+    ///     enabling scrolling beyond the right of the content.
     ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to <see cref="View.GetContentSize ()"/>
-    ///         <c>.Width - 1</c>.
-    ///         This means the last column of the content will remain visible even if there is an attempt to scroll the
-    ///         Viewport past the last column.
-    ///     </para>
-    ///     <para>
-    ///         The practical effect of this is that the last column of the content will always be visible.
+    ///         When not set, <c>Viewport.X</c> is clamped to keep at least the last column visible.
     ///     </para>
     /// </summary>
-    AllowXGreaterThanContentWidth = 0b_0100,
+    AllowXGreaterThanContentWidth = 0b_0000_0000_0100,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.GetContentSize ()"/>
-    ///     <c>.Height</c> enabling scrolling beyond the right
-    ///     of the content area.
+    ///     If set, <see cref="View.Viewport"/><c>.Y</c> can exceed <c>ContentSize.Height - 1</c>,
+    ///     enabling scrolling beyond the bottom of the content.
     ///     <para>
-    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to <see cref="View.GetContentSize ()"/>
-    ///         <c>.Height - 1</c>.
-    ///         This means the last row of the content will remain visible even if there is an attempt to scroll the Viewport
-    ///         past the last row.
-    ///     </para>
-    ///     <para>
-    ///         The practical effect of this is that the last row of the content will always be visible.
+    ///         When not set, <c>Viewport.Y</c> is clamped to keep at least the last row visible.
     ///     </para>
     /// </summary>
-    AllowYGreaterThanContentHeight = 0b_1000,
+    AllowYGreaterThanContentHeight = 0b_0000_0000_1000,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Location</c> can be set values greater than
-    ///     <see cref="View.GetContentSize ()"/>
-    ///     enabling scrolling beyond the bottom-right
-    ///     of the content area.
-    ///     <para>
-    ///         When not set, <see cref="View.Viewport"/> is constrained to <see cref="View.GetContentSize ()"/><c> -1</c>.
-    ///         This means the last column and row of the content will remain visible even if there is an attempt to
-    ///         scroll the Viewport past the last column or row.
-    ///     </para>
+    ///     Combines <see cref="AllowXGreaterThanContentWidth"/> and <see cref="AllowYGreaterThanContentHeight"/>.
     /// </summary>
     AllowLocationGreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
 
@@ -102,7 +75,7 @@ public enum ViewportSettingsFlags
     ///         This can be useful in infinite scrolling scenarios.
     ///     </para>
     /// </summary>
-    AllowNegativeXWhenWidthGreaterThanContentWidth = 0b_0001_0000,
+    AllowNegativeXWhenWidthGreaterThanContentWidth = 0b_0000_0001_0000,
 
     /// <summary>
     ///     If set and <see cref="View.Viewport"/><c>.Height</c> is greater than <see cref="View.GetContentSize ()"/>
@@ -117,7 +90,7 @@ public enum ViewportSettingsFlags
     ///         This can be useful in infinite scrolling scenarios.
     ///     </para>
     /// </summary>
-    AllowNegativeYWhenHeightGreaterThanContentHeight = 0b_0010_0000,
+    AllowNegativeYWhenHeightGreaterThanContentHeight = 0b_0000_0010_0000,
 
     /// <summary>
     ///     The combination of <see cref="AllowNegativeXWhenWidthGreaterThanContentWidth"/> and
@@ -126,10 +99,34 @@ public enum ViewportSettingsFlags
     AllowNegativeLocationWhenSizeGreaterThanContentSize = AllowNegativeXWhenWidthGreaterThanContentWidth | AllowNegativeYWhenHeightGreaterThanContentHeight,
 
     /// <summary>
+    ///     If set, <c>Viewport.X + Viewport.Width</c> can exceed <c>ContentSize.Width</c>,
+    ///     allowing blank space on the right when scrolling.
+    ///     <para>
+    ///         When not set (default), <c>Viewport.X</c> is clamped so the content always fills the viewport horizontally.
+    ///     </para>
+    /// </summary>
+    AllowXPlusWidthGreaterThanContentWidth = 0b_0000_0100_0000,
+
+    /// <summary>
+    ///     If set, <c>Viewport.Y + Viewport.Height</c> can exceed <c>ContentSize.Height</c>,
+    ///     allowing blank space at the bottom when scrolling.
+    ///     <para>
+    ///         When not set (default), <c>Viewport.Y</c> is clamped so the content always fills the viewport vertically.
+    ///     </para>
+    /// </summary>
+    AllowYPlusHeightGreaterThanContentHeight = 0b_0000_1000_0000,
+
+    /// <summary>
+    ///     Combines <see cref="AllowXPlusWidthGreaterThanContentWidth"/> and <see cref="AllowYPlusHeightGreaterThanContentHeight"/>.
+    ///     Allows blank space to appear when scrolling in either direction.
+    /// </summary>
+    AllowLocationPlusSizeGreaterThanContentSize = AllowXPlusWidthGreaterThanContentWidth | AllowYPlusHeightGreaterThanContentHeight,
+
+    /// <summary>
     ///     By default, clipping is applied to the <see cref="View.Viewport"/>. Setting this flag will cause clipping to be
     ///     applied to the visible content area.
     /// </summary>
-    ClipContentOnly = 0b_0100_0000,
+    ClipContentOnly = 0b_0001_0000_0000,
 
     /// <summary>
     ///     If set <see cref="View.ClearViewport"/> will clear only the portion of the content
@@ -138,27 +135,31 @@ public enum ViewportSettingsFlags
     ///     <see cref="ClipContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be
     ///     disabled).
     /// </summary>
-    ClearContentOnly = 0b_1000_0000,
+    ClearContentOnly = 0b_0010_0000_0000,
 
     /// <summary>
-    ///     If set the View will be transparent: The <see cref="View.Viewport"/> will not be cleared when the View is drawn and the clip region
+    ///     If set the View will be transparent: The <see cref="View.Viewport"/> will not be cleared when the View is drawn and
+    ///     the clip region
     ///     will be set to clip the View's <see cref="View.Text"/> and <see cref="View.SubViews"/>.
     ///     <para>
     ///         Only the topmost View in a SubView Hierarchy can be transparent. Any subviews of the topmost transparent view
     ///         will have indeterminate draw behavior.
     ///     </para>
     ///     <para>
-    ///         Combine this with <see cref="TransparentMouse"/> to get a view that is both visually transparent and transparent to the mouse.
+    ///         Combine this with <see cref="TransparentMouse"/> to get a view that is both visually transparent and
+    ///         transparent to the mouse.
     ///     </para>
     /// </summary>
-    Transparent = 0b_0001_0000_0000,
+    Transparent = 0b_0100_0000_0000,
 
     /// <summary>
-    ///     If set the View will be transparent to mouse events: Specifically, any mouse event that occurs over the View that is NOT occupied by a SubView
+    ///     If set the View will be transparent to mouse events: Specifically, any mouse event that occurs over the View that
+    ///     is NOT occupied by a SubView
     ///     will not be captured by the View.
     ///     <para>
-    ///         Combine this with <see cref="Transparent"/> to get a view that is both visually transparent and transparent to the mouse.
+    ///         Combine this with <see cref="Transparent"/> to get a view that is both visually transparent and transparent to
+    ///         the mouse.
     ///     </para>
     /// </summary>
-    TransparentMouse = 0b_0010_0000_0000,
+    TransparentMouse = 0b_1000_0000_0000
 }

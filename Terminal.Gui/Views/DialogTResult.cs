@@ -81,10 +81,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         // Set automatic width and height, with minimums based on content size. Also, subtract
         // Padding thickness in case the scrollbar is visible
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth () - (VerticalScrollBar.Visible ? 1 : 0)),
-                          maximumContentDim: Dim.Percent (100) - 4);
+                          maximumContentDim: Dim.Percent (100) - Dim.Func (_ => GetAdornmentsThickness ().Horizontal));
 
         Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight () - _minimumButtonsSize.Height - (HorizontalScrollBar.Visible ? 1 : 0)),
-                           maximumContentDim: Dim.Percent (100) - 4);
+                           maximumContentDim: Dim.Percent (100) - Dim.Func (_ => GetAdornmentsThickness ().Vertical));
         ButtonAlignment = Dialog.DefaultButtonAlignment;
         ButtonAlignmentModes = Dialog.DefaultButtonAlignmentModes;
 
@@ -190,12 +190,12 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (!Buttons.Contains (args.Context?.Source))
+        if (!args.Context.TryGetSource (out View? sourceView) || !Buttons.Contains (sourceView))
         {
             return false;
         }
 
-        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == args.Context?.Source)
+        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == sourceView)
         {
             // Default button pressed
             return false;

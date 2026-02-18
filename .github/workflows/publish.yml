@@ -66,4 +66,27 @@ jobs:
     #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
         
     - name: Publish Terminal.Gui.${{ steps.gitversion.outputs.SemVer }} to NuGet.org
-      run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} 
+      run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}
+    
+    # - name: Delist old NuGet packages
+    #   if: github.ref == 'refs/heads/v2_release'
+    #   shell: pwsh
+    #   run: |
+    #     $version = "${{ steps.gitversion.outputs.SemVer }}"
+    #     Write-Host "Running delist script for just-published version: $version"
+    #     ./Scripts/delist-nuget.ps1 -ApiKey "${{ secrets.NUGET_API_KEY }}" -JustPublishedVersion "$version"
+    
+    - name: Prepare payload for template dispatch
+      if: github.ref == 'refs/heads/v2_release'
+      id: payload
+      run: |
+        echo "json={\"version\":\"${{ steps.gitversion.outputs.SemVer }}\"}" >> $GITHUB_OUTPUT
+    
+    - name: Trigger Terminal.Gui.templates update
+      if: github.ref == 'refs/heads/v2_release'
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.TEMPLATE_REPO_TOKEN }}
+        repository: gui-cs/Terminal.Gui.templates
+        event-type: terminal-gui-v2-released
+        client-payload: ${{ steps.payload.outputs.json }} 

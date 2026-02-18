@@ -77,6 +77,11 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 - **Triggers**: push to `v2_release`, `v2_develop`, and tags `v*`(ignores `**.md`)
 - Uses GitVersion to compute SemVer, builds Release, packs with symbols, and pushes to NuGet.org using `NUGET_API_KEY`
 - **Automatically triggered** by the Create Release workflow when a new tag is pushed
+- **Additional actions on v2_release branch**:
+  - Delists old NuGet packages to keep package list clean:
+    - Keeps only the most recent `2.0.0-develop.*` package
+    - Keeps only the just-published `2.0.0-alpha.*` or `2.0.0-beta.*` package
+  - Triggers Terminal.Gui.templates repository update via repository_dispatch (requires `PAT_FOR_TEMPLATES` secret)
 
 ### 6) Build and publish API docs (`.github/workflows/api-docs.yml`)
 

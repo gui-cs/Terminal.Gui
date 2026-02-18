@@ -28,11 +28,11 @@
 ///     superView.Add (field);
 ///     
 ///     // This button WILL force the SuperView to be wide enough to accommodate it at the right edge
-///     Button button = new () 
-///     { 
+///     Button button = new ()
+///     {
 ///         Text = "OK",
 ///         X = Pos.AnchorEnd (),  // ← SuperView width must accommodate this position!
-///         Y = 2 
+///         Y = 2
 ///     };
 ///     superView.Add (button);
 ///     
@@ -78,7 +78,7 @@ public record PosAnchorEnd : Pos
     ///     This is equivalent to using <c>Pos.AnchorEnd (0)</c>, but uses the view's calculated dimension
     ///     as the offset, ensuring the view fits exactly at the end.
     /// </remarks>
-    public PosAnchorEnd () { UseDimForOffset = true; }
+    public PosAnchorEnd () => UseDimForOffset = true;
 
     /// <summary>
     ///     Constructs a new position anchored to the end (right side or bottom) of the SuperView's content area,
@@ -95,7 +95,7 @@ public record PosAnchorEnd : Pos
     ///     // If SuperView width is 80, button will be at X = 80 - 2 = 78
     ///     </code>
     /// </example>
-    public PosAnchorEnd (int offset) { Offset = offset; }
+    public PosAnchorEnd (int offset) => Offset = offset;
 
     /// <summary>
     ///     If <see langword="true"/>, the offset is the width/height of the view.
@@ -131,4 +131,7 @@ public record PosAnchorEnd : Pos
 
         return newLocation;
     }
+
+    /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => true;
 }
