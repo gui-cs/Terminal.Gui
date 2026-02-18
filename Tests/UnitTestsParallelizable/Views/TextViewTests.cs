@@ -2449,8 +2449,10 @@ public class TextViewTests
         textView.Dispose ();
     }
 
-    [Fact]
-    public void Tab_And_Shift_Tab_With_TabKeyAddsTab_True_AddsRemovesTabCharacter ()
+    [Theory]
+    [InlineData (0, "\tTest")]
+    [InlineData (4, "Test\t")]
+    public void Tab_And_Shift_Tab_With_TabKeyAddsTab_True_AddsRemovesTabCharacter (int col, string expected)
     {
         using IApplication app = Application.Create ().Init ();
         Runnable runnable = new ();
@@ -2465,9 +2467,12 @@ public class TextViewTests
         textView.SetFocus ();
         Assert.True (textView.TabKeyAddsTab);
 
+        // Move insertion point to specified column
+        textView.InsertionPoint = new Point (col, 0);
+
         // Press Tab - should add tab character
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
-        Assert.Equal ("\tTest", textView.Text);
+        Assert.Equal (expected, textView.Text);
         Assert.True (textView.HasFocus);
 
         // Press Shift+Tab - should remove tab character

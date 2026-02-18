@@ -1029,7 +1029,7 @@ public partial class TextView
         {
             List<Cell> line = GetCurrentLine ();
 
-            if (CurrentColumn - 1 > -1 && CurrentColumn < line.Count && line [CurrentColumn - 1].Grapheme == "\t")
+            if (CurrentColumn - 1 > -1 && CurrentColumn - 1 < line.Count && line [CurrentColumn - 1].Grapheme == "\t")
             {
                 DeleteTextLeft ();
             }
