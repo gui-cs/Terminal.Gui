@@ -2512,5 +2512,76 @@ public class TextViewTests
         Assert.True (view1.HasFocus);
     }
 
+    [Fact]
+    public void Shift_Tab_With_TabKeyAddsTab_True_DoesNotRemoveTabCharacter_IfTabCharacterNotPresent ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable runnable = new ();
+        View view1 = new () { CanFocus = true };
+        TextView textView = new () { Text = "Test", TabKeyAddsTab = true };
+        View view2 = new () { CanFocus = true };
+        runnable.Add (view1, textView, view2);
+        app.Begin (runnable);
+
+        // Move focus to textView
+        textView.SetFocus ();
+
+        // Press Shift+Tab - should not remove tab character since it's not present
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.Equal ("Test", textView.Text);
+        Assert.True (textView.HasFocus);
+    }
+
+    [Theory]
+    [InlineData (0, "aTest")]
+    [InlineData (2, "Teast")]
+    public void Used_True_DoesNotOverwrite_ExistentText_AndAddTypedKey (int col, string expected)
+    {
+        TextView textView = CreateTextView ();
+        textView.Text = "Test";
+        textView.InsertionPoint = new Point (col, 0);
+
+        Assert.True (textView.Used); // default is true
+
+        // Simulate a key event with Used = true
+        Assert.True (textView.NewKeyDownEvent (Key.A));
+
+        // Text should not be overwritten, but the typed key should be added at the insertion point
+        Assert.Equal (expected, textView.Text);
+        Assert.Equal (new Point (col + 1, 0), textView.InsertionPoint);
+    }
+
+    [Theory]
+    [InlineData (0, "aest")]
+    [InlineData (2, "Teat")]
+    public void Used_False_DoesOverwrite_ExistentText_AndReplaceWithTypedKey (int col, string expected)
+    {
+        TextView textView = CreateTextView ();
+        textView.Text = "Test";
+        textView.InsertionPoint = new Point (col, 0);
+        textView.Used = false;
+
+        // Simulate a key event with Used = false
+        Assert.True (textView.NewKeyDownEvent (Key.A));
+
+        // Text should be overwritten at the insertion point with the typed key
+        Assert.Equal (expected, textView.Text);
+        Assert.Equal (new Point (col + 1, 0), textView.InsertionPoint);
+    }
+
+    [Fact]
+    public void Key_Insert_InvokeCommand_ToggleOverwrite_And_Toggles_Used_Property ()
+    {
+        TextView textView = new ();
+
+        Assert.True (textView.Used);
+
+        Assert.True (textView.NewKeyDownEvent (Key.InsertChar));
+        Assert.False (textView.Used);
+
+        Assert.True (textView.NewKeyDownEvent (Key.InsertChar));
+        Assert.True (textView.Used);
+    }
+
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 }
