@@ -812,9 +812,8 @@ public partial class View // Command APIs
         if (!IsSourceWithinView (target, ctx))
         {
             BubbleDown (target, ctx);
+            _lastDispatchOccurred = true;
         }
-
-        _lastDispatchOccurred = true;
 
         return false;
     }
