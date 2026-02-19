@@ -297,7 +297,7 @@ public class Shortcut : View, IOrientation, IDesignable
             // BubbleDown to CommandView now. This happens AFTER the Activating event handler had
             // a chance to cancel (RaiseActivating above). CommandView.Activated will trigger
             // the deferred RaiseActivated via CommandView_Activated.
-            if (ctx.Binding is { Source: { } source } && !IsWithinCommandView (source))
+            if (ctx.Binding is { Source: { } weakSource } && weakSource.TryGetTarget (out View? source) && !IsWithinCommandView (source))
             {
                 BubbleDown (CommandView, ctx);
             }
@@ -350,7 +350,10 @@ public class Shortcut : View, IOrientation, IDesignable
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
         // When IsBubblingUp, skip BubbleDown here so the Activating event handler gets a chance
         // to handle/cancel first. The Activate command handler will BubbleDown after if needed.
-        if (args.Context?.IsBubblingUp != true && args.Context?.Binding is { Source: { } source } && !IsWithinCommandView (source))
+        if (args.Context?.IsBubblingUp != true
+            && args.Context?.Binding is { Source: { } weakSource }
+            && weakSource.TryGetTarget (out View? source)
+            && !IsWithinCommandView (source))
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -366,13 +369,15 @@ public class Shortcut : View, IOrientation, IDesignable
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
 
-        // Translate the incoming command to Command
-        if (Command != Command.NotBound && ctx is { })
+        // Translate the incoming command to Command via immutable context
+        ICommandContext? targetCtx = ctx;
+
+        if (Command != Command.NotBound && ctx is CommandContext cc)
         {
-            ctx.Command = Command;
+            targetCtx = cc.WithCommand (Command);
         }
 
-        InvokeOnTargetOrApp (ctx);
+        InvokeOnTargetOrApp (targetCtx);
     }
 
     private void InvokeOnTargetOrApp (ICommandContext? ctx)
@@ -410,7 +415,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // Only bubble down to CommandView when accept came from user interaction
         // with this Shortcut or its non-CommandView SubViews (HelpView/KeyView).
         // Skip when the command bubbled up from CommandView or was directly invoked (no binding).
-        if (args.Context?.Binding is { Source: { } source } && !IsWithinCommandView (source))
+        if (args.Context?.Binding is { Source: { } weakSource } && weakSource.TryGetTarget (out View? source) && !IsWithinCommandView (source))
         {
             return BubbleDown (CommandView, args.Context) is null;
         }
@@ -425,13 +430,15 @@ public class Shortcut : View, IOrientation, IDesignable
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
 
-        // Translate the incoming command to Command
-        if (Command != Command.NotBound && ctx is { })
+        // Translate the incoming command to Command via immutable context
+        ICommandContext? targetCtx = ctx;
+
+        if (Command != Command.NotBound && ctx is CommandContext cc)
         {
-            ctx.Command = Command;
+            targetCtx = cc.WithCommand (Command);
         }
 
-        InvokeOnTargetOrApp (ctx);
+        InvokeOnTargetOrApp (targetCtx);
     }
 
     /// <summary>

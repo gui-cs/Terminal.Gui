@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Input;
+namespace Terminal.Gui.Input;
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
 /// <summary>
@@ -14,7 +14,7 @@ public interface ICommandContext
     /// <summary>
     ///     The <see cref="Command"/> that is being invoked.
     /// </summary>
-    public Command Command { get; set; }
+    public Command Command { get; }
 
     /// <summary>
     ///     A weak reference to the View that was the source of the command invocation, if any.
@@ -25,7 +25,7 @@ public interface ICommandContext
     ///     Uses WeakReference to prevent memory leaks and access to disposed views when views are disposed during command
     ///     propagation.
     /// </remarks>
-    public WeakReference<View>? Source { get; set; }
+    public WeakReference<View>? Source { get; }
 
     /// <summary>
     ///     The binding that triggered the command.
@@ -43,15 +43,25 @@ public interface ICommandContext
     public ICommandBinding? Binding { get; }
 
     /// <summary>
+    ///     Gets the routing mode for this command invocation.
+    /// </summary>
+    public CommandRouting Routing { get; }
+
+    /// <summary>
     ///     Gets whether this command is being dispatched downward to a SubView. When <see langword="true"/>,
     ///     <see cref="View.TryBubbleUp"/> will skip bubbling, preventing re-entry.
     /// </summary>
+    /// <remarks>
+    ///     Backward-compatible property. Equivalent to <c>Routing == CommandRouting.DispatchingDown</c>.
+    /// </remarks>
     public bool IsBubblingDown { get; }
 
     /// <summary>
     ///     Gets whether this command is being dispatched upward to a SuperView. When <see langword="true"/>,
     ///     <see cref="View.BubbleDown"/> will skip bubbling, preventing re-entry.
     /// </summary>
+    /// <remarks>
+    ///     Backward-compatible property. Equivalent to <c>Routing == CommandRouting.BubblingUp</c>.
+    /// </remarks>
     public bool IsBubblingUp { get; }
-
 }

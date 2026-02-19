@@ -815,7 +815,7 @@ public partial class View // Mouse APIs
             return null;
         }
 
-        return InvokeCommands (binding.Commands, binding with { MouseEvent = mouseEventArgs, Source = this });
+        return InvokeCommands (binding.Commands, binding with { MouseEvent = mouseEventArgs, Source = new WeakReference<View> (this) });
     }
 
     #endregion Command Invocation

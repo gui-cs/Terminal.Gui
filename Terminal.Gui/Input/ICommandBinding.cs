@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Input;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Describes command binding. Used to bind a set of <see cref="Command"/> objects to a specific user event and
@@ -18,9 +18,13 @@ public interface ICommandBinding
     public object? Data { get; init; }
 
     /// <summary>
-    ///     Gets or sets the <see cref="View"/> that registered the binding.
+    ///     Gets the <see cref="View"/> that registered the binding as a weak reference.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///         Uses <see cref="WeakReference{T}"/> to prevent memory leaks when views are disposed
+    ///         while bindings still reference them.
+    ///     </para>
     ///     <para>
     ///         For key bindings, this is the view that registered the binding.
     ///     </para>
@@ -31,5 +35,5 @@ public interface ICommandBinding
     ///         For programmatic invocations, this is the view that called <see cref="View.InvokeCommand(Command)"/>.
     ///     </para>
     /// </remarks>
-    public View? Source { get; init; }
+    public WeakReference<View>? Source { get; init; }
 }

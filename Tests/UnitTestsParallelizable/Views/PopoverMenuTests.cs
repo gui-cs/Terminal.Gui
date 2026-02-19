@@ -158,7 +158,7 @@ public class PopoverMenuTests
             = BuildOptionSelectorInMenuBarHierarchy ();
 
         // Act: Simulate keyboard activation via Space key binding
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = secondCheckBox };
+        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (secondCheckBox) };
 
         CommandContext ctx = new ()
         {
@@ -190,7 +190,7 @@ public class PopoverMenuTests
             = BuildOptionSelectorInMenuBarHierarchy ();
 
         // Act: Simulate mouse activation via LeftButtonReleased binding
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonReleased) { Source = secondCheckBox };
+        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonReleased) { Source = new WeakReference<View> (secondCheckBox) };
 
         CommandContext ctx = new ()
         {
@@ -252,7 +252,7 @@ public class PopoverMenuTests
             = BuildOptionSelectorInMenuBarHierarchy ();
 
         // Act
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = secondCheckBox };
+        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (secondCheckBox) };
 
         CommandContext ctx = new ()
         {

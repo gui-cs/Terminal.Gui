@@ -159,13 +159,14 @@ public class MouseBindingTests
     [Fact]
     public void PatternMatching_MouseEvent_Works ()
     {
-        MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new View { Id = "sourceView" } };
+        MouseBinding binding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new WeakReference<View> (new View { Id = "sourceView" }) };
 
         // Pattern matching on MouseEvent property
         if (binding is { MouseEvent: { } mouseEvent, Source: { } source })
         {
             Assert.Equal (MouseFlags.LeftButtonClicked, mouseEvent.Flags);
-            Assert.Equal ("sourceView", source.Id);
+            Assert.True (source.TryGetTarget (out View? sv));
+            Assert.Equal ("sourceView", sv?.Id);
         }
         else
         {

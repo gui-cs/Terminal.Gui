@@ -184,7 +184,7 @@ public class CommandBubblingTests
         menuBar.Layout ();
 
         // Act: Invoke Command.Activate on the CheckBox (simulating user pressing Space)
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
+        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (checkBox) };
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
 
         checkBox.InvokeCommand (Command.Activate, ctx);
@@ -237,7 +237,7 @@ public class CommandBubblingTests
         menuBar.Layout ();
 
         // Act: Invoke Command.Accept on the CheckBox (simulating double-click)
-        MouseBinding mouseBinding = new ([Command.Accept], MouseFlags.LeftButtonDoubleClicked) { Source = checkBox };
+        MouseBinding mouseBinding = new ([Command.Accept], MouseFlags.LeftButtonDoubleClicked) { Source = new WeakReference<View> (checkBox) };
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (checkBox), Binding = mouseBinding };
 
         checkBox.InvokeCommand (Command.Accept, ctx);
@@ -290,7 +290,7 @@ public class CommandBubblingTests
         menuBar.Layout ();
 
         // Act
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
+        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (checkBox) };
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
 
         checkBox.InvokeCommand (Command.Activate, ctx);
@@ -343,7 +343,7 @@ public class CommandBubblingTests
         menuBar.Layout ();
 
         // Create a distinctive binding we can verify
-        KeyBinding originalBinding = new ([Command.Activate]) { Key = Key.F5, Source = checkBox, Data = "test-data-marker" };
+        KeyBinding originalBinding = new ([Command.Activate]) { Key = Key.F5, Source = new WeakReference<View> (checkBox), Data = "test-data-marker" };
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = originalBinding };
 
         // Act
@@ -416,7 +416,7 @@ public class CommandBubblingTests
         menuBar.Layout ();
 
         // Act
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
+        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (checkBox) };
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
 
         checkBox.InvokeCommand (Command.Activate, ctx);
@@ -462,7 +462,7 @@ public class CommandBubblingTests
         menuBar.Layout ();
 
         // Act
-        MouseBinding mouseBinding = new ([Command.Accept], MouseFlags.LeftButtonDoubleClicked) { Source = checkBox };
+        MouseBinding mouseBinding = new ([Command.Accept], MouseFlags.LeftButtonDoubleClicked) { Source = new WeakReference<View> (checkBox) };
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (checkBox), Binding = mouseBinding };
 
         checkBox.InvokeCommand (Command.Accept, ctx);
@@ -508,7 +508,7 @@ public class CommandBubblingTests
         superView.Layout ();
 
         // Act
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Enter, Source = subView };
+        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Enter, Source = new WeakReference<View> (subView) };
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (subView), Binding = keyBinding };
 
         subView.InvokeCommand (Command.Activate, ctx);
