@@ -35,6 +35,7 @@ public class OptionSelector : SelectorBase, IDesignable
     protected override bool OnActivating (CommandEventArgs args)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({args}");
+
         if (base.OnActivating (args) || args.Handled)
         {
             return true;
@@ -52,7 +53,6 @@ public class OptionSelector : SelectorBase, IDesignable
 
             return true;
         }
-
 
         return false;
     }

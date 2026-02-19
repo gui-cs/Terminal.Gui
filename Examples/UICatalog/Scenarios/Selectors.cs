@@ -88,13 +88,7 @@ public sealed class Selectors : Scenario
 
         tabBehaviorSelector.ValueChanged += TabBehaviorSelectorOnValueChanged;
 
-        optionSelectorsFrame = new FrameView
-        {
-            Y = Pos.Bottom (canFocus),
-            Height = Dim.Fill (),
-            Title = "O_ptionSelectors",
-            TabStop = TabBehavior.TabStop
-        };
+        optionSelectorsFrame = new FrameView { Y = Pos.Bottom (canFocus), Height = Dim.Fill (), Title = "O_ptionSelectors", TabStop = TabBehavior.TabStop };
 
         Label label = new () { Title = "Fo_ur Options:" };
 
@@ -129,7 +123,7 @@ public sealed class Selectors : Scenario
         {
             Y = Pos.Top (optionSelectorsFrame),
             X = Pos.Right (optionSelectorsFrame),
-            Width = Dim.Fill (to: eventLog),
+            Width = Dim.Fill (eventLog),
             Height = Dim.Fill (),
             Title = "_FlagSelectors",
             TabStop = TabBehavior.TabStop

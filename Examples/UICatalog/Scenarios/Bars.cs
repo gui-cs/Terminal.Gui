@@ -74,7 +74,7 @@ public class Bars : Scenario
         Label barLabel = new () { Title = "Bar:", X = 0, Y = 0 };
         menuLikeExamples.Add (barLabel);
 
-        Bar menuLikeBar = new Bar
+        var menuLikeBar = new Bar
         {
             Id = "menu-like",
             X = 0,
@@ -166,8 +166,6 @@ public class Bars : Scenario
         }
 
         mainWindow.Add (eventLog);
-
-        return;
 
         //void MenuLikeExamplesMouseEvent (object _, Mouse mouse)
         //{

@@ -164,6 +164,7 @@ public sealed class UICatalogRunnable : Runnable
                                ]) { Title = "menuBar", Id = "menuBar" };
 
         menuBar.CommandsToBubbleUp = [Command.Accept, Command.Activate, Command.HotKey];
+
         return menuBar;
 
         View [] CreateThemeMenuItems ()
@@ -187,10 +188,7 @@ public sealed class UICatalogRunnable : Runnable
 
             if (ConfigurationManager.IsEnabled)
             {
-                _themesSelector = new OptionSelector ()
-                {
-                    CanFocus = true
-                };
+                _themesSelector = new OptionSelector { CanFocus = true };
                 _themesSelector.ValueChanged += OnThemesSelectorOnValueChanged;
 
                 MenuItem menuItem = new () { CommandView = _themesSelector, HelpText = "Cycle Through Themes", Key = Key.T.WithCtrl };

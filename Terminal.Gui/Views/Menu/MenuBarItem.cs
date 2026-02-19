@@ -154,7 +154,6 @@ public class MenuBarItem : MenuItem
     {
         // Logging.Debug ($"OnPopoverMenuOnActivated - {this.ToIdentifyingString ()} - {e.Value?.Source} - {e.Value?.Command}");
 //        RaiseActivated (e.Value);
-
     }
 
     private bool _popoverMenuOpen;

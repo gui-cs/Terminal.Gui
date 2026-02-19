@@ -46,18 +46,13 @@ public class Menu : Bar
         }
     }
 
-    /// <inheritdoc />
-    protected override void OnActivated (ICommandContext? ctx)
-    {
-        base.OnActivated (ctx);
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
 
-
-        //if (ctx.IsBubblingUp)
-        //{
-        //    SuperMenuItem?.InvokeCommand (ctx.Command);
-        //}
-    }
-
+    //if (ctx.IsBubblingUp)
+    //{
+    //    SuperMenuItem?.InvokeCommand (ctx.Command);
+    //}
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
     /// </summary>
@@ -71,17 +66,17 @@ public class Menu : Bar
         switch (view)
         {
             case MenuItem menuItem:
-                {
-                    menuItem.CanFocus = true;
+            {
+                menuItem.CanFocus = true;
 
-                    menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
+                menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
 
-                    // When a MenuItem is activated (e.g., via HotKey → Activate flow),
-                    // raise Accepted on this Menu so PopoverMenu can close.
-                    menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
+                // When a MenuItem is activated (e.g., via HotKey → Activate flow),
+                // raise Accepted on this Menu so PopoverMenu can close.
+                menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
 
-                    break;
-                }
+                break;
+            }
 
             case Line line:
                 // Grow line so we get auto-join line

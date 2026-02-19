@@ -310,7 +310,6 @@ public class Shortcut : View, IOrientation, IDesignable
         return true;
     }
 
-
     /// <summary>
     ///     Checks whether the specified view is the <see cref="CommandView"/> or a descendant of it.
     ///     Used to determine if a command originated from within the CommandView hierarchy,
@@ -335,7 +334,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private bool _activationBubbledUp;
     private ICommandContext? _deferredActivationContext;
-    
+
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {

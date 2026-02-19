@@ -58,14 +58,14 @@ public class Menus : Scenario
                                 {
                                     _eventLog.SetViewToLog (menuHostView.MenuBar);
 
-                                    foreach (MenuItem menuItem in menuHostView?.MenuBar?.GetMenuItemsWith ((v) => true) ?? [])
+                                    foreach (MenuItem menuItem in menuHostView?.MenuBar?.GetMenuItemsWith (v => true) ?? [])
                                     {
                                         _eventLog.SetViewToLog (menuItem);
                                         _eventLog.SetViewToLog (menuItem.CommandView);
                                         menuItem.Action += () => _eventLog.Log ($"{menuItem.ToIdentifyingString ()} Action!");
                                     }
 
-                                    foreach (Menu menu in menuHostView?.SubViews.OfType<Menu> ().Where(m => m.Id == "TestMenu")!)
+                                    foreach (Menu menu in menuHostView?.SubViews.OfType<Menu> ().Where (m => m.Id == "TestMenu")!)
                                     {
                                         _eventLog.SetViewToLog (menu);
 
@@ -147,6 +147,7 @@ public class Menus : Scenario
 
             MenuHost host = this;
             MenuBar?.EnableForDesign (ref host);
+
             // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
             foreach (MenuBarItem? mbi in MenuBar?.SubViews.Select (s => s as MenuBarItem)!)
             {
@@ -252,15 +253,16 @@ public class Menus : Scenario
 
             Add (editModeStatusCb);
 
-            OptionSelector<Schemes>? schemeOptionSelector = MenuBar.GetMenuItemsWith (mi => mi.Id == "mutuallyExclusiveOptions").FirstOrDefault ()?.CommandView as OptionSelector<Schemes>;
-            schemeOptionSelector!.ValueChanged += (_, args) =>
-                                              {
-                                                  if (args.Value is { } scheme)
-                                                  {
-                                                      MenuBar.SchemeName = scheme.ToString ();
-                                                  }
-                                              };
+            OptionSelector<Schemes>? schemeOptionSelector =
+                MenuBar.GetMenuItemsWith (mi => mi.Id == "mutuallyExclusiveOptions").FirstOrDefault ()?.CommandView as OptionSelector<Schemes>;
 
+            schemeOptionSelector!.ValueChanged += (_, args) =>
+                                                  {
+                                                      if (args.Value is { } scheme)
+                                                      {
+                                                          MenuBar.SchemeName = scheme.ToString ();
+                                                      }
+                                                  };
 
             // Set up the Context Menu
             ContextMenu = new PopoverMenu { Title = "ContextMenu", Id = "ContextMenu" };
@@ -323,12 +325,12 @@ public class Menus : Scenario
             menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
 
             menuItemBorders.Action += () =>
-                                {
-                                    if (menuItemBorders.CommandView is CheckBox cb)
-                                    {
-                                        menu.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
-                                    }
-                                };
+                                      {
+                                          if (menuItemBorders.CommandView is CheckBox cb)
+                                          {
+                                              menu.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                          }
+                                      };
 
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             menuItemBorders.Accepting += (_, args) => args.Handled = true;

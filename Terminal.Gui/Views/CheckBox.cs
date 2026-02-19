@@ -42,7 +42,7 @@ public class CheckBox : View, IValue<CheckState>
         MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? commandContext)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({commandContext})");
@@ -136,7 +136,7 @@ public class CheckBox : View, IValue<CheckState>
     /// <param name="args">The event arguments containing old and new values.</param>
     protected virtual void OnValueChanged (ValueChangedEventArgs<CheckState> args) { }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
