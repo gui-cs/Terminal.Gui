@@ -101,6 +101,7 @@ public class MenuBarItem : MenuItem
     public new Menu? SubMenu { get => null; set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead."); }
 
     private PopoverMenu? _popoverMenu;
+    private CommandBridge? _popoverBridge;
 
     /// <summary>
     ///     The Popover Menu that will be displayed when this item is selected.
@@ -118,7 +119,8 @@ public class MenuBarItem : MenuItem
             if (_popoverMenu is { })
             {
                 _popoverMenu.VisibleChanged -= OnPopoverVisibleChanged;
-                _popoverMenu.Accepted -= OnPopoverMenuOnAccepted;
+                _popoverBridge?.Dispose ();
+                _popoverBridge = null;
             }
 
             _popoverMenu = value;
@@ -132,8 +134,9 @@ public class MenuBarItem : MenuItem
 
                 PopoverMenuOpen = _popoverMenu.Visible;
                 _popoverMenu.VisibleChanged += OnPopoverVisibleChanged;
-                _popoverMenu.Accepted += OnPopoverMenuOnAccepted;
-                _popoverMenu.Activated += OnPopoverMenuOnActivated;
+
+                // Bridge Accept from PopoverMenu → MenuBarItem across the non-containment boundary.
+                _popoverBridge = CommandBridge.Connect (this, _popoverMenu, Command.Accept);
             }
 
             return;
@@ -142,18 +145,7 @@ public class MenuBarItem : MenuItem
 
                 // Logging.Debug ($"OnPopoverVisibleChanged - {this.ToIdentifyingString ()} - Visible = {_popoverMenu?.Visible} ");
                 PopoverMenuOpen = _popoverMenu?.Visible ?? false;
-
-            void OnPopoverMenuOnAccepted (object? sender, CommandEventArgs args) =>
-
-                // Logging.Debug ($"OnPopoverMenuOnAccepted - {this.ToIdentifyingString ()} - {args.Context?.Source} - {args.Context?.Command}");
-                RaiseAccepted (args.Context);
         }
-    }
-
-    private void OnPopoverMenuOnActivated (object? sender, EventArgs<ICommandContext?> e)
-    {
-        // Logging.Debug ($"OnPopoverMenuOnActivated - {this.ToIdentifyingString ()} - {e.Value?.Source} - {e.Value?.Command}");
-//        RaiseActivated (e.Value);
     }
 
     private bool _popoverMenuOpen;

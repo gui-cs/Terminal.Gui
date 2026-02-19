@@ -398,7 +398,7 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="ctx">The command context.</param>
     /// <seealso cref="RaiseAccepting"/>
-    protected void RaiseAccepted (ICommandContext? ctx)
+    internal protected void RaiseAccepted (ICommandContext? ctx)
     {
         OnAccepted (ctx);
         Accepted?.Invoke (this, new CommandEventArgs { Context = ctx });
@@ -580,7 +580,7 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="ctx">The command context.</param>
     /// <seealso cref="RaiseActivating"/>
-    protected void RaiseActivated (ICommandContext? ctx)
+    internal protected void RaiseActivated (ICommandContext? ctx)
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         OnActivated (ctx);
