@@ -77,6 +77,13 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
+        // TODO: When OptionSelector is a CommandView inside a MenuItem/Shortcut and activation
+        // arrives via DispatchingDown from the Shortcut, ctx.Source is the OptionSelector itself
+        // (not the clicked CheckBox). This causes the fallback to Cycle() instead of selecting
+        // the correct item. The root cause is that LeftButtonReleased is not bound on CheckBox
+        // (it uses LeftButtonClicked), so the event propagates to the parent Shortcut which
+        // dispatches down with Source=CommandView. Need to identify the correct CheckBox from
+        // the Focused state or mouse position when Source is not a CheckBox.
         if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
         {
             Cycle ();
