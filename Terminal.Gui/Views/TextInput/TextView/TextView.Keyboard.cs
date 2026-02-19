@@ -46,14 +46,23 @@ public partial class TextView
     private bool _tabKeyAddsTab = true;
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="TextView"/> inserts a tab character (<c>\t</c>) into the text or ignores tab
-    ///     input.
-    ///     If set to <see langword="false"/> and the user presses the <see cref="Key.Tab"/> the focus will move to the next
-    ///     view.
-    ///     The default is <see langword="true"/> ; if the user presses <see cref="Key.Tab"/>, a tab character will be inserted
-    ///     into the text; if the user presses shift-<see cref="Key.Tab"/>, the tab character will be removed from the text at
-    ///     the current location.
+    ///     Gets or sets whether <see cref="Key.Tab"/> inserts a tab character (<c>\t</c>) into the <see cref="TextView"/>.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Default: <see langword="true"/>
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="TabKeyAddsTab"/> is set to <see langword="true"/>, and the user presses <see cref="Key.Tab"/>,
+    ///         a tab character is inserted at the current cursor position; if Shift+<see cref="Key.Tab"/> is pressed,
+    ///         a tab character is removed from the current cursor position if one exists.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="TabKeyAddsTab"/> is set to <see langword="false"/>, the <see cref="Key.Tab"/> event and the
+    ///         Shift+<see cref="Key.Tab"/> is bubbled recursively to the up hierarchy. If left unhandled, the app will move
+    ///         focus to the next or previous view.
+    ///     </para>
+    /// </remarks>
     public bool TabKeyAddsTab
     {
         get => _tabKeyAddsTab;
