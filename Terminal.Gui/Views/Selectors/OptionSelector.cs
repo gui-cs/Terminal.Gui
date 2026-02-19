@@ -65,8 +65,7 @@ public class OptionSelector : SelectorBase, IDesignable
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         base.OnActivated (ctx);
 
-        // Apply the value change. Runs for ALL activation paths uniformly.
-        // No routing-direction check needed — the framework handled dispatch/consumption.
+        // Apply value change for all activation paths.
         ApplyActivation (ctx);
     }
 
@@ -77,7 +76,22 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
-        if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
+        // Determine the target CheckBox based on routing:
+        // - BubblingUp: use ctx.Source (the CheckBox that bubbled)
+        // - DispatchingDown (from Shortcut): use Focused (the CheckBox that has focus)
+        // - Direct/programmatic: Cycle() (advance to next option)
+        CheckBox? checkBox = null;
+
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is CheckBox cb)
+        {
+            checkBox = cb;
+        }
+        else if (ctx?.Routing == CommandRouting.DispatchingDown && Focused is CheckBox focusedCb)
+        {
+            checkBox = focusedCb;
+        }
+
+        if (checkBox is null)
         {
             Cycle ();
 
