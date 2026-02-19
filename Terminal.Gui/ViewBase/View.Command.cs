@@ -249,6 +249,12 @@ public partial class View // Command APIs
 
         if (RaiseAccepting (ctx) is true)
         {
+            // If dispatch consumed the command, the composite view needs completion.
+            if (_lastDispatchOccurred)
+            {
+                RaiseAccepted (ctx);
+            }
+
             return true;
         }
 
@@ -270,6 +276,14 @@ public partial class View // Command APIs
         {
             BubbleDown (defaultAcceptView, ctx);
             redirected = true;
+        }
+
+        // Composite views with dispatch targets always get completion on bubble.
+        if (ctx?.IsBubblingUp == true && GetDispatchTarget (ctx) is { })
+        {
+            RaiseAccepted (ctx);
+
+            return false;
         }
 
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Calling RaiseAccepted");
@@ -328,6 +342,12 @@ public partial class View // Command APIs
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
             //Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx?.Source?.Title}) - Raising Accepting...");
             Accepting?.Invoke (this, args);
+        }
+
+        // Framework dispatch: composite views delegate commands to a target SubView.
+        if (!args.Handled)
+        {
+            args.Handled = TryDispatchToTarget (ctx);
         }
 
         if (!args.Handled)
@@ -421,6 +441,12 @@ public partial class View // Command APIs
 
         if (RaiseActivating (ctx) is true)
         {
+            // If dispatch consumed the command, the composite view needs completion.
+            if (_lastDispatchOccurred)
+            {
+                RaiseActivated (ctx);
+            }
+
             return true;
         }
 
@@ -429,8 +455,9 @@ public partial class View // Command APIs
         // The originating view completes its own activation. Returning false tells TryBubbleUp
         // "not consumed" so the originator continues.
         //
-        // Views that need to CONSUME the activation (e.g., SelectorBase) override OnActivating
-        // to apply state changes and return true, which stops processing before reaching here.
+        // Composite views with ConsumeDispatch=true already completed above (RaiseActivating returned true).
+        // Composite views with ConsumeDispatch=false (relay) defer completion — they use the
+        // dispatch target's Activated event to fire their own RaiseActivated after the originator completes.
         if (ctx?.IsBubblingUp == true)
         {
             return false;
@@ -441,7 +468,13 @@ public partial class View // Command APIs
             SetFocus ();
         }
 
-        RaiseActivated (ctx);
+        // For relay dispatch (ConsumeDispatch=false), the dispatch target's Activated event
+        // already fired RaiseActivated via the deferred completion callback (e.g., CommandView_Activated
+        // in Shortcut). Skip duplicate RaiseActivated.
+        if (!_lastDispatchOccurred)
+        {
+            RaiseActivated (ctx);
+        }
 
         return true;
     }
@@ -501,6 +534,12 @@ public partial class View // Command APIs
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoking Activating event");
         Activating?.Invoke (this, args);
+
+        // Framework dispatch: composite views delegate commands to a target SubView.
+        if (!args.Handled)
+        {
+            args.Handled = TryDispatchToTarget (ctx);
+        }
 
         if (!args.Handled)
         {
@@ -669,6 +708,133 @@ public partial class View // Command APIs
     #endregion HotKey
 
     #endregion Default Event Handlers
+
+    #region Dispatch (Composite Pattern)
+
+    /// <summary>
+    ///     Gets the SubView to dispatch commands to. Return <see langword="null"/> to skip dispatch.
+    ///     The framework calls this during <see cref="RaiseActivating"/>/<see cref="RaiseAccepting"/>
+    ///     after the <c>OnXxxing</c> virtual and <c>Xxxing</c> event have had a chance to cancel.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Override this in composite views that delegate commands to a primary SubView.
+    ///         For example, <c>Shortcut</c> returns <c>CommandView</c> and selectors return <c>Focused</c>.
+    ///     </para>
+    ///     <para>
+    ///         The framework guards against dispatch when:
+    ///         <list type="bullet">
+    ///             <item>Routing is <see cref="CommandRouting.DispatchingDown"/> (prevents re-entry)</item>
+    ///             <item>No binding exists on the context (programmatic invocation — skip dispatch)</item>
+    ///             <item>The binding source is within the target (prevents loops)</item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
+    /// <param name="ctx">The command context.</param>
+    /// <returns>The SubView to dispatch to, or <see langword="null"/> to skip dispatch.</returns>
+    protected virtual View? GetDispatchTarget (ICommandContext? ctx) => null;
+
+    /// <summary>
+    ///     If <see langword="true"/>, dispatching to the target consumes the command, preventing the
+    ///     original SubView from completing its own activation/acceptance. If <see langword="false"/>
+    ///     (default), the dispatch is a relay and the original SubView completes normally.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When <see langword="true"/>, the composite view owns the state mutation. The framework
+    ///         marks the command as handled after dispatch, stopping the originator. The composite's
+    ///         <c>OnActivated</c>/<c>OnAccepted</c> fires to perform the mutation.
+    ///     </para>
+    ///     <para>
+    ///         When <see langword="false"/> (relay), the command is dispatched to the target but not
+    ///         consumed. The originator continues its own activation/acceptance.
+    ///     </para>
+    /// </remarks>
+    protected virtual bool ConsumeDispatch => false;
+
+    /// <summary>
+    ///     Tracks whether a dispatch occurred during the last <see cref="RaiseActivating"/> or
+    ///     <see cref="RaiseAccepting"/> call. Used by <see cref="DefaultActivateHandler"/> and
+    ///     <see cref="DefaultAcceptHandler"/> to determine whether to call <c>RaiseActivated</c>/<c>RaiseAccepted</c>.
+    /// </summary>
+    private bool _lastDispatchOccurred;
+
+    /// <summary>
+    ///     Attempts to dispatch the command to the <see cref="GetDispatchTarget"/> view.
+    ///     For <see cref="ConsumeDispatch"/>=false (relay), performs a <see cref="BubbleDown"/>.
+    ///     For <see cref="ConsumeDispatch"/>=true (consume), marks the command as handled without dispatching.
+    /// </summary>
+    /// <returns><see langword="true"/> if the command was consumed (ConsumeDispatch=true and dispatch conditions met).</returns>
+    private bool TryDispatchToTarget (ICommandContext? ctx)
+    {
+        _lastDispatchOccurred = false;
+
+        View? target = GetDispatchTarget (ctx);
+
+        if (target is null)
+        {
+            return false;
+        }
+
+        // Guard: don't dispatch if already dispatching down (prevents re-entry)
+        if (ctx?.Routing == CommandRouting.DispatchingDown)
+        {
+            return false;
+        }
+
+        // Guard: don't dispatch for programmatic invocations (no binding)
+        if (ctx?.Binding is null)
+        {
+            return false;
+        }
+
+        if (ConsumeDispatch)
+        {
+            // Consume pattern (OptionSelector, FlagSelector): mark as handled without dispatching.
+            // The composite handles state mutation in OnActivated/OnAccepted.
+            _lastDispatchOccurred = true;
+
+            return true;
+        }
+
+        // Relay pattern (Shortcut): dispatch to target if source is not within target.
+        if (!IsSourceWithinView (target, ctx))
+        {
+            BubbleDown (target, ctx);
+        }
+
+        _lastDispatchOccurred = true;
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Checks whether the binding source of the given context is within the specified view
+    ///     (i.e., is the view itself or a descendant).
+    /// </summary>
+    private static bool IsSourceWithinView (View target, ICommandContext? ctx)
+    {
+        if (ctx?.Binding?.Source is not { } weakSource || !weakSource.TryGetTarget (out View? source))
+        {
+            return false;
+        }
+
+        View? current = source;
+
+        while (current is { })
+        {
+            if (current == target)
+            {
+                return true;
+            }
+
+            current = current.SuperView;
+        }
+
+        return false;
+    }
+
+    #endregion Dispatch (Composite Pattern)
 
     #region Command Bubbling
 
