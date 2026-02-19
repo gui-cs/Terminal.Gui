@@ -52,6 +52,7 @@ public partial class TestContext : IDisposable
     // ===== Logging =====
     private readonly object _logsLock = new ();
     private readonly TextWriter? _logWriter;
+    private ILogger? _testLogger;
     private IDisposable? _loggerScope;
     private StringBuilder? _logsSb;
 
@@ -69,6 +70,7 @@ public partial class TestContext : IDisposable
 
         // Don't force a size - let the driver determine it
         CommonInit (0, 0, timeout);
+        _loggerScope = Logging.PushLogger (_testLogger!);
 
         try
         {
@@ -120,6 +122,8 @@ public partial class TestContext : IDisposable
         // Start the application in a background thread
         _runTask = Task.Run (() =>
                              {
+                                 _loggerScope = Logging.PushLogger (_testLogger!);
+
                                  try
                                  {
                                      try
@@ -202,11 +206,10 @@ public partial class TestContext : IDisposable
         _timeout = timeout ?? TimeSpan.FromSeconds (30);
         _logsSb = new StringBuilder ();
 
-        ILogger logger = LoggerFactory
-                         .Create (builder => builder.SetMinimumLevel (LogLevel.Trace)
-                                                    .AddProvider (new TextWriterLoggerProvider (new ThreadSafeStringWriter (_logsSb, _logsLock))))
-                         .CreateLogger ("Test Logging");
-        _loggerScope = Logging.PushLogger (logger);
+        _testLogger = LoggerFactory
+                      .Create (builder => builder.SetMinimumLevel (LogLevel.Trace)
+                                                 .AddProvider (new TextWriterLoggerProvider (new ThreadSafeStringWriter (_logsSb, _logsLock))))
+                      .CreateLogger ("Test Logging");
 
         // ✅ Link _runCancellationTokenSource with a timeout
         // This creates a token that responds to EITHER the run cancellation OR timeout
