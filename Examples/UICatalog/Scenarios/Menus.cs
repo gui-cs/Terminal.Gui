@@ -266,9 +266,7 @@ public class Menus : Scenario
 
             // Set up the Context Menu
             ContextMenu = new PopoverMenu { Title = "ContextMenu", Id = "ContextMenu" };
-            Menu testContextMenu = new () { Y = Pos.Bottom (editModeStatusCb) + 1, Id = "TestMenu" };
-            ConfigureTestMenu (testContextMenu);
-            ContextMenu?.Root = testContextMenu;
+            ContextMenu?.EnableForDesign (ref host);
 
             ContextMenu?.Visible = false;
 
