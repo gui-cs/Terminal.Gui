@@ -790,12 +790,17 @@ public partial class ShortcutTests
         shortcut.InvokeCommand (Command.Activate, ctx);
 
         // Assert - Shortcut.Activating fires first (notification before dispatch),
-        // then BubbleDown fires CommandView events, then Shortcut.Activated via deferred callback.
+        // then BubbleDown fires CommandView events. Shortcut.Activated fires from
+        // CommandView_Activated (subscribed before test handler), so it interleaves
+        // with CheckBox.Activated.
         Assert.Equal (4, eventLog.Count);
         Assert.Equal ("Shortcut.Activating", eventLog [0]);
         Assert.Equal ("CheckBox.Activating", eventLog [1]);
-        Assert.Equal ("CheckBox.Activated", eventLog [2]);
-        Assert.Equal ("Shortcut.Activated", eventLog [3]);
+
+        // Shortcut.Activated fires during CheckBox.Activated event dispatch
+        // (CommandView_Activated subscribed before test handler)
+        Assert.Equal ("Shortcut.Activated", eventLog [2]);
+        Assert.Equal ("CheckBox.Activated", eventLog [3]);
 
         // CheckBox should have toggled
         Assert.Equal (CheckState.Checked, checkBox.Value);

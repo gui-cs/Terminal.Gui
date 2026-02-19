@@ -35,13 +35,18 @@ public class OptionSelector : SelectorBase, IDesignable
 
     /// <summary>
     ///     Returns the dispatch target for composite command handling.
-    ///     For IsBubblingUp, returns the source CheckBox from the context.
-    ///     For direct invocation, returns the focused CheckBox.
+    ///     Only dispatches for Activate commands — Accept should bubble normally.
     /// </summary>
     protected override View? GetDispatchTarget (ICommandContext? ctx)
     {
+        // Only dispatch Activate, not Accept. Accept should bubble to Menu/MenuBar normally.
+        if (ctx?.Command != Command.Activate)
+        {
+            return null;
+        }
+
         // When a CheckBox's activation bubbles up, the source IS the CheckBox.
-        if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
+        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
         {
             return source;
         }

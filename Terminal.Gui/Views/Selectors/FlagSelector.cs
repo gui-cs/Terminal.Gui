@@ -33,15 +33,28 @@ public class FlagSelector : SelectorBase, IDesignable
 
     /// <summary>
     ///     Returns the dispatch target for composite command handling.
-    ///     For IsBubblingUp, returns the source CheckBox from the context.
-    ///     For direct invocation, returns the focused CheckBox.
+    ///     Only dispatches for Activate commands — Accept should bubble normally.
     /// </summary>
     protected override View? GetDispatchTarget (ICommandContext? ctx)
     {
+        // Only dispatch Activate, not Accept. Accept should bubble to Menu/MenuBar normally.
+        if (ctx?.Command != Command.Activate)
+        {
+            return null;
+        }
+
         // When a CheckBox's activation bubbles up, the source IS the CheckBox.
-        if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
+        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
         {
             return source;
+        }
+
+        // Suppress dispatch when the HotKey flag is set (HotKey → SetFocus only, no toggle).
+        if (_suppressHotKeyActivate)
+        {
+            _suppressHotKeyActivate = false;
+
+            return null;
         }
 
         return Focused;
@@ -51,6 +64,10 @@ public class FlagSelector : SelectorBase, IDesignable
     ///     Consumes: FlagSelector owns toggle semantics.
     /// </summary>
     protected override bool ConsumeDispatch => true;
+
+    // Set by OnHandlingHotKey to suppress the Activate that DefaultHotKeyHandler
+    // fires after RaiseHandlingHotKey. Checked and cleared in GetDispatchTarget.
+    private bool _suppressHotKeyActivate;
 
     /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
@@ -66,25 +83,28 @@ public class FlagSelector : SelectorBase, IDesignable
             return true;
         }
 
-        // Not focused: restore focus only. No _suppressHotKeyActivate flag needed —
-        // DefaultHotKeyHandler calls InvokeCommand(Activate) without a binding,
-        // so GetDispatchTarget dispatch is skipped by the framework's
-        // programmatic-invoke guard (binding is null → no dispatch).
+        // Not focused: restore focus, suppress the Activate dispatch that DefaultHotKeyHandler will invoke.
+        _suppressHotKeyActivate = true;
+
         if (CanFocus)
         {
             SetFocus ();
         }
 
+        // Return false so HandlingHotKey event fires (required by AllViews contract)
         return false;
     }
+
+    // _suppressHotKeyActivate is checked and cleared in GetDispatchTarget
 
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
         base.OnActivated (ctx);
 
-        // Toggle the source CheckBox's value directly.
-        // ConsumeDispatch=true means CheckBox.OnActivated/AdvanceCheckState was suppressed.
+        // Toggle only when the source is a CheckBox (IsBubblingUp path where consume prevented
+        // CheckBox.AdvanceCheckState). For programmatic invocations, BubbleDown already activated
+        // the focused CheckBox and AdvanceCheckState ran, so no additional toggle is needed.
         if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox checkBox)
         {
             checkBox.Value = checkBox.Value == CheckState.Checked

@@ -782,16 +782,27 @@ public partial class View // Command APIs
             return false;
         }
 
-        // Guard: don't dispatch for programmatic invocations (no binding)
-        if (ctx?.Binding is null)
+        // Guard: for relay dispatch (ConsumeDispatch=false), don't dispatch for programmatic
+        // invocations (no binding). This prevents accidental loops in composite views like Shortcut.
+        // For consume dispatch (ConsumeDispatch=true), programmatic invocations DO dispatch because
+        // the composite view forwards commands to the focused SubView.
+        if (!ConsumeDispatch && ctx?.Binding is null)
         {
             return false;
         }
 
         if (ConsumeDispatch)
         {
-            // Consume pattern (OptionSelector, FlagSelector): mark as handled without dispatching.
+            // Consume pattern (OptionSelector, FlagSelector).
+            // When a SubView's command bubbles up (IsBubblingUp), consume without dispatching.
             // The composite handles state mutation in OnActivated/OnAccepted.
+            // For programmatic/direct invocations, forward to the target via BubbleDown
+            // so the target gets activated (matching the old BubbleDown-in-OnActivating behavior).
+            if (ctx?.IsBubblingUp != true)
+            {
+                BubbleDown (target, ctx);
+            }
+
             _lastDispatchOccurred = true;
 
             return true;
