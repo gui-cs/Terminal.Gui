@@ -193,6 +193,7 @@ public partial class View // Mouse APIs
     ///         Valid values are:
     ///         <list type="bullet">
     ///             <item><see langword="null"/> - Disabled (default)</item>
+    ///             <item><see cref="MouseFlags.LeftButtonPressed"/> - Commands invoked on Press during hold</item>
     ///             <item><see cref="MouseFlags.LeftButtonReleased"/> - Commands invoked on Press during hold</item>
     ///             <item><see cref="MouseFlags.LeftButtonClicked"/> - Commands invoked on Click after hold</item>
     ///             <item>Other xxxReleased or xxxClicked flags for other mouse buttons</item>
