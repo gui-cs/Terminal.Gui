@@ -2617,5 +2617,67 @@ public class TextViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
     }
 
+    [Fact]
+    public void Command_Right_Draws_Cursor_At_Start_Of_NextLine ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1 Testing Line 1\n2 Testing Line 2",
+            Width = 10,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
+
+        textView.InsertionPoint = new Point (16, 0); // End of first line
+        Assert.True (textView.NewKeyDownEvent (Key.CursorRight));
+        textView.Draw ();
+
+        var expected = """
+                       ┌────────┐
+                       │2 Testin│
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+    }
+
+    [Fact]
+    public void Command_Left_Draws_Cursor_At_End_Of_PreviousLine ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1 Testing Line 1\n2 Testing Line 1",
+            Width = 10,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
+
+        textView.InsertionPoint = new Point (0, 1); // Start of second line
+        Assert.True (textView.NewKeyDownEvent (Key.CursorLeft));
+        textView.Draw ();
+
+        var expected = """
+                       ┌────────┐
+                       │ Line 1 │
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+    }
+
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 }

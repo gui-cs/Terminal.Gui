@@ -141,8 +141,8 @@ public partial class TextView
                 if (CurrentRow < Viewport.Y)
                 {
                     Viewport = Viewport with { Y = Viewport.Y - 1 };
-                    SetNeedsDraw ();
                 }
+                SetNeedsDraw ();
 
                 List<Cell> currentLine = GetCurrentLine ();
                 CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
@@ -246,8 +246,8 @@ public partial class TextView
                 if (CurrentRow >= Viewport.Y + Viewport.Height)
                 {
                     Viewport = Viewport with { Y = Viewport.Y + 1 };
-                    SetNeedsDraw ();
                 }
+                SetNeedsDraw ();
             }
             else
             {
