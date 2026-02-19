@@ -374,6 +374,175 @@ public class MenuBarTests : TestsAllDrivers
                                   .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that clicking the "Error" checkbox in the OptionSelector&lt;Schemes&gt;
+    ///     inside File → Preferences SubMenu changes Value from Base (0) to Error (4).
+    ///     Exercises the full Shortcut → OptionSelector dispatch path inside a PopoverMenu SubMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_SubMenu_Click_Sets_Correct_Value ()
+    {
+        string d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Set up MenuBar with EnableForDesign
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+                                       menuBar = new MenuBar ();
+                                       View top = app.TopRunnableView!;
+                                       top.Add (new View { CanFocus = true, Id = "focusableView" });
+                                       menuBar.EnableForDesign (ref top);
+                                       app.TopRunnableView!.Add (menuBar);
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the File menu via F9 then verify it's open
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "File menu should be open after F9");
+
+        // Step 3: Navigate down to "Preferences" (it's after several items + a Line)
+        // File menu items: New, Open, Save, SaveAs, Line, FileOptions, Line, Preferences, Line, Quit
+        c = c.KeyDown (Key.CursorDown); // New → Open
+        c = c.KeyDown (Key.CursorDown); // Open → Save
+        c = c.KeyDown (Key.CursorDown); // Save → SaveAs
+        c = c.KeyDown (Key.CursorDown); // SaveAs → (skips Line) → File Options
+        c = c.KeyDown (Key.CursorDown); // File Options → (skips Line) → Preferences
+
+        // Step 4: Open the Preferences SubMenu by pressing Right or Enter
+        c = c.KeyDown (Key.CursorRight);
+
+        // Step 5: Find the OptionSelector and subscribe to ValueChanged
+        c = c.Then (_ =>
+                    {
+                        // Find the mutuallyExclusiveOptions MenuItem
+                        IEnumerable<MenuItem> allMenuItems = menuBar!.GetMenuItemsWith (mi => mi.Id == "mutuallyExclusiveOptions");
+                        MenuItem? optionMenuItem = allMenuItems.FirstOrDefault ();
+                        Assert.NotNull (optionMenuItem);
+
+                        optionSelector = optionMenuItem!.CommandView as OptionSelector<Schemes>;
+                        Assert.NotNull (optionSelector);
+                        Assert.Equal (Schemes.Base, optionSelector!.Value);
+
+                        optionSelector.ValueChanged += (_, args) =>
+                                                       {
+                                                           capturedNewValue = args.Value;
+                                                           valueChangedCount++;
+                                                       };
+                    });
+
+        // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        // This simulates the real user scenario where the user opens the menu and clicks
+        // directly on a checkbox without using arrow keys.
+        CheckBox? errorCheckBox = null;
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ()
+                                                       .FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        Assert.NotNull (errorCheckBox);
+                        System.Drawing.Point pos = errorCheckBox!.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c = c.ScreenShot ("After clicking Error (full driver sequence)", _out);
+
+        // Assert — Value should change from Base (0) to Error (4), not to Menu (1)
+        Assert.Equal (Schemes.Error, optionSelector!.Value);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Simpler variant: OptionSelector directly in the root Menu (no SubMenu nesting).
+    ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_RootMenu_Space_Sets_Correct_Value ()
+    {
+        string d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus =
+                                           [
+                                               new MenuBarItem ("_Test",
+                                                                [
+                                                                    new MenuItem
+                                                                    {
+                                                                        Id = "selectorItem",
+                                                                        HelpText = "Pick a scheme",
+                                                                        CommandView = optionSelector
+                                                                    }
+                                                                ])
+                                           ]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+
+                                       optionSelector.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          capturedNewValue = args.Value;
+                                                                          valueChangedCount++;
+                                                                      };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the Test menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        c = c.ScreenShot ("After F9 - menu open", _out);
+
+        // Step 3: Navigate within the OptionSelector to Error
+        // Items: Base(0), Menu(1), Dialog(2), Runnable(3), Error(4)
+        c = c.KeyDown (Key.CursorDown); // Base → Menu
+        c = c.KeyDown (Key.CursorDown); // Menu → Dialog
+        c = c.KeyDown (Key.CursorDown); // Dialog → Runnable
+        c = c.KeyDown (Key.CursorDown); // Runnable → Error
+
+        c = c.ScreenShot ("After navigating to Error", _out);
+
+        // Step 4: Press Space to activate
+        c = c.KeyDown (Key.Space);
+
+        c = c.ScreenShot ("After Space on Error", _out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (Schemes.Error, capturedNewValue);
+        Assert.Equal (Schemes.Error, optionSelector!.Value);
+
+        c.Dispose ();
+    }
+
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void MenuBar_Not_Active_DoesNotEat_Space (string d)
