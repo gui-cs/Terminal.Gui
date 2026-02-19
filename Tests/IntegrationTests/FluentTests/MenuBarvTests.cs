@@ -467,6 +467,91 @@ public class MenuBarTests : TestsAllDrivers
 
     // Claude - Opus 4.6
     /// <summary>
+    ///     Tests a Bar with Shortcuts as the CommandView of a MenuItem in a PopoverMenu.
+    ///     Clicks on the second Shortcut's text area to verify the correct Shortcut activates
+    ///     (not Cycle or wrong dispatch). This tests whether the dispatch issue is general
+    ///     to compound CommandViews, not specific to OptionSelector.
+    /// </summary>
+    [Fact]
+    public void Bar_CommandView_In_Menu_Click_Activates_Correct_Shortcut ()
+    {
+        string d = "ansi";
+        IApplication? app = null;
+        MenuBar? menuBar = null;
+        var shortcut1ActivatedCount = 0;
+        var shortcut2ActivatedCount = 0;
+        var shortcut3ActivatedCount = 0;
+        Shortcut? shortcut2 = null;
+
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       Shortcut s1 = new () { Title = "First", Key = Key.F1, Id = "s1" };
+                                       s1.Activated += (_, _) => shortcut1ActivatedCount++;
+
+                                       shortcut2 = new Shortcut { Title = "Second", Key = Key.F2, Id = "s2" };
+                                       shortcut2.Activated += (_, _) => shortcut2ActivatedCount++;
+
+                                       Shortcut s3 = new () { Title = "Third", Key = Key.F3, Id = "s3" };
+                                       s3.Activated += (_, _) => shortcut3ActivatedCount++;
+
+                                       Bar bar = new () { Orientation = Orientation.Vertical };
+                                       bar.Add (s1, shortcut2, s3);
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus =
+                                           [
+                                               new MenuBarItem ("_Test",
+                                                                [
+                                                                    new MenuItem
+                                                                    {
+                                                                        Id = "barItem",
+                                                                        HelpText = "Bar with shortcuts",
+                                                                        CommandView = bar
+                                                                    }
+                                                                ])
+                                           ]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Open the menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        c = c.ScreenShot ("Menu open with Bar CommandView", _out);
+
+        // Click on the second shortcut ("Second")
+        var screenX = 0;
+        var screenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        System.Drawing.Point pos = shortcut2!.FrameToScreen ().Location;
+                        screenX = pos.X + 1; // offset into the text area
+                        screenY = pos.Y;
+                    });
+
+        c = c.LeftClick (screenX, screenY);
+
+        c = c.ScreenShot ("After clicking Second shortcut", _out);
+
+        // Assert — only the second shortcut should activate
+        Assert.Equal (0, shortcut1ActivatedCount);
+        Assert.True (shortcut2ActivatedCount >= 1, $"shortcut2 Activated should fire (fired {shortcut2ActivatedCount} times)");
+        Assert.Equal (0, shortcut3ActivatedCount);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
     ///     Simpler variant: OptionSelector directly in the root Menu (no SubMenu nesting).
     ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
     /// </summary>
