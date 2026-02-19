@@ -143,22 +143,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 return;
             }
 
-            // Try to disable Ctrl+C handling to allow raw input
-            try
-            {
-                // BUGBUG: This is not needed on Windows as we turn off ENABLE_PROCESSED_INPUT in _windowsVTInput.TryEnable () above
-                // BUGBUG: This does nothing if we're running Unix, because we are using raw mode
-
-                // All TreatConsoleCAsInput does is un-set ENABLE_PROCESSED_INPUT on the input handle
-                Console.TreatControlCAsInput = true;
-            }
-            catch (Exception ex)
-            {
-                Logging.Warning ($"Failed to set TreatControlCAsInput: {ex.Message}");
-
-                // Not supported in all environments - continue anyway
-            }
-
             // NOTE: Output operations (alternate buffer, cursor visibility, mouse events)
             // NOTE: are handled by ANSIOutput, not here. ANSIInput only handles input.
 
@@ -217,11 +201,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     yield break;
                 }
 
-                // Convert UTF-8 bytes to characters
-                uint cp = WindowsVTInputHelper.GetConsoleCP ();
-                var enc = Encoding.GetEncoding ((int)cp);
-
-                string text = enc.GetString (buffer, 0, bytesRead);
+                string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
 
                 //Logging.Trace ($"AnsiInput.Read: read {bytesRead} text: {text}");
 

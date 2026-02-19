@@ -41,6 +41,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
+    [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool ReadConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint hConsoleInput, out uint lpcNumberOfEvents);
 
@@ -150,31 +153,76 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         bytesRead = 0;
 
-        if (!IsEnabled || InputHandle == nint.Zero || !Console.KeyAvailable)
+        if (!IsEnabled || InputHandle == nint.Zero)
         {
             return false;
         }
 
         try
         {
-            //Logging.Trace ("ReadFile...");
-            bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
-#pragma warning disable IL3050
-
-            //Logging.Trace ($"...{JsonSerializer.Serialize (Encoding.UTF8.GetString (buffer, 0, (int)numBytesRead))}");
-#pragma warning restore IL3050
-
-            if (!success)
+            // Use native API to check for available console input events instead of
+            // relying on Console.KeyAvailable. The latter can miss some control
+            // characters (e.g. Ctrl+Z) when console modes are changed for VT input.
+            if (!GetNumberOfConsoleInputEvents (InputHandle, out uint numberOfEvents) || numberOfEvents == 0)
             {
-                int error = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"ReadFile failed with error code: {error}");
+                return false;
+            }
+
+            // Prefer reading INPUT_RECORDs directly. This reliably exposes all
+            // key events (including control characters like Ctrl+Z) regardless
+            // of whether the console converts them into the character stream.
+            var toRead = (int)Math.Min (numberOfEvents, 64);
+            InputRecord [] records = new InputRecord [toRead];
+
+            if (!ReadConsoleInput (InputHandle, records, (uint)toRead, out uint eventsRead))
+            {
+                int err = Marshal.GetLastWin32Error ();
+                Logging.Warning ($"ReadConsoleInput failed: {err}");
 
                 return false;
             }
 
-            bytesRead = (int)numBytesRead;
+            var pos = 0;
 
-            return true;
+            for (var r = 0; r < eventsRead && pos < buffer.Length; r++)
+            {
+                if (records [r].EventType != EventType.Key)
+                {
+                    continue;
+                }
+
+                KeyEventRecord ke = records [r].KeyEvent;
+
+                // Only process key-down events
+                if (!ke.bKeyDown)
+                {
+                    continue;
+                }
+
+                // If the event provides a Unicode character (including control
+                // characters like U+001A), encode it to UTF-8 and append to the buffer.
+                if (ke.UnicodeChar != '\0')
+                {
+                    try
+                    {
+                        int written = Encoding.UTF8.GetBytes ([ke.UnicodeChar], 0, 1, buffer, pos);
+                        pos += written;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.Warning ($"Encoding key char failed: {ex.Message}");
+                    }
+                }
+            }
+
+            if (pos > 0)
+            {
+                bytesRead = pos;
+
+                return true;
+            }
+
+            return false;
         }
         catch (Exception ex)
         {
