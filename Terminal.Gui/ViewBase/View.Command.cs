@@ -279,7 +279,7 @@ public partial class View // Command APIs
         }
 
         // Composite views with dispatch targets always get completion on bubble.
-        if (ctx?.IsBubblingUp == true && GetDispatchTarget (ctx) is { })
+        if (ctx?.Routing == CommandRouting.BubblingUp && GetDispatchTarget (ctx) is { })
         {
             RaiseAccepted (ctx);
 
@@ -297,7 +297,7 @@ public partial class View // Command APIs
         // Report as not handled when Accept originated from a local key binding (e.g., Enter key)
         // on a non-IAcceptTarget view with no redirect - this allows the key to propagate up
         // the view hierarchy to reach a SuperView that can redirect to DefaultAcceptView.
-        return redirected || acceptWillBubble || ctx?.IsBubblingUp == true || this is IAcceptTarget;
+        return redirected || acceptWillBubble || ctx?.Routing == CommandRouting.BubblingUp || this is IAcceptTarget;
     }
 
 
@@ -458,7 +458,7 @@ public partial class View // Command APIs
         // Composite views with ConsumeDispatch=true already completed above (RaiseActivating returned true).
         // Composite views with ConsumeDispatch=false (relay) defer completion — they use the
         // dispatch target's Activated event to fire their own RaiseActivated after the originator completes.
-        if (ctx?.IsBubblingUp == true)
+        if (ctx?.Routing == CommandRouting.BubblingUp)
         {
             return false;
         }
@@ -794,11 +794,11 @@ public partial class View // Command APIs
         if (ConsumeDispatch)
         {
             // Consume pattern (OptionSelector, FlagSelector).
-            // When a SubView's command bubbles up (IsBubblingUp), consume without dispatching.
+            // When a SubView's command bubbles up (BubblingUp), consume without dispatching.
             // The composite handles state mutation in OnActivated/OnAccepted.
             // For programmatic/direct invocations, forward to the target via BubbleDown
             // so the target gets activated (matching the old BubbleDown-in-OnActivating behavior).
-            if (ctx?.IsBubblingUp != true)
+            if (ctx?.Routing != CommandRouting.BubblingUp)
             {
                 BubbleDown (target, ctx);
             }
@@ -877,7 +877,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Dispatches a command downward to a SubView with bubbling suppressed. Creates a new
-    ///     <see cref="CommandContext"/> with <see cref="ICommandContext.IsBubblingDown"/> set to <see langword="true"/>,
+    ///     <see cref="CommandContext"/> with <see cref="ICommandContext.Routing"/> set to <see cref="CommandRouting.DispatchingDown"/>,
     ///     which causes <see cref="TryBubbleUp"/> to skip bubbling on the target, preventing re-entry.
     /// </summary>
     /// <param name="target">The SubView to dispatch the command to.</param>
@@ -889,7 +889,7 @@ public partial class View // Command APIs
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
-        CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingDown = true };
+        CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.DispatchingDown };
 
         return target.InvokeCommand (downCtx.Command, downCtx);
     }
@@ -923,7 +923,7 @@ public partial class View // Command APIs
             return true;
         }
 
-        if (ctx?.IsBubblingDown == true)
+        if (ctx?.Routing == CommandRouting.DispatchingDown)
         {
             return false;
         }
@@ -949,7 +949,7 @@ public partial class View // Command APIs
                         return false;
                     }
 
-                    CommandContext upCtx = new (Command.Accept, ctx.Source, ctx.Binding) { IsBubblingUp = true };
+                    CommandContext upCtx = new (Command.Accept, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
                     // DefaultAcceptView redirect is a special case — it IS a consumption (not just a notification)
                     return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
@@ -963,7 +963,7 @@ public partial class View // Command APIs
         if (SuperView?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
         {
             // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-            CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
+            CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.BubblingUp };
 
             return SuperView.InvokeCommand (upCtx.Command, upCtx);
         }
@@ -974,7 +974,7 @@ public partial class View // Command APIs
             if (padding.Parent?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
             {
                 // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-                CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
+                CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.BubblingUp };
 
                 return padding.Parent.InvokeCommand (upCtx.Command, upCtx);
             }
@@ -984,7 +984,7 @@ public partial class View // Command APIs
         if (this is Padding selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
         {
             // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-            CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { IsBubblingUp = true };
+            CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.BubblingUp };
 
             return selfPadding.Parent.InvokeCommand (upCtx.Command, upCtx);
         }

@@ -1289,7 +1289,7 @@ public class ViewCommandTests
         superView.TestBubbleDown (target, ctx);
 
         Assert.NotNull (receivedCtx);
-        Assert.True (receivedCtx!.IsBubblingDown);
+        Assert.Equal (CommandRouting.DispatchingDown, receivedCtx!.Routing);
     }
 
     // Claude - Opus 4.6
@@ -1447,8 +1447,8 @@ public class ViewCommandTests
         var superViewActivatingCount = 0;
         superView.Activating += (_, _) => superViewActivatingCount++;
 
-        // Invoke Activate on subView with IsBubblingDown = true
-        CommandContext ctx = new (Command.Activate, new WeakReference<View> (subView), null) { IsBubblingDown = true };
+        // Invoke Activate on subView with Routing = DispatchingDown
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (subView), null) { Routing = CommandRouting.DispatchingDown };
         subView.InvokeCommand (Command.Activate, ctx);
 
         // SuperView should NOT receive the event

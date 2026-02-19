@@ -48,38 +48,6 @@ public readonly record struct CommandContext : ICommandContext
     /// <inheritdoc/>
     public CommandRouting Routing { get; init; }
 
-    /// <inheritdoc/>
-    /// <remarks>
-    ///     Backward-compatible property. Equivalent to <c>Routing == CommandRouting.DispatchingDown</c>.
-    /// </remarks>
-    public bool IsBubblingDown
-    {
-        get => Routing == CommandRouting.DispatchingDown;
-        init
-        {
-            if (value)
-            {
-                Routing = CommandRouting.DispatchingDown;
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    /// <remarks>
-    ///     Backward-compatible property. Equivalent to <c>Routing == CommandRouting.BubblingUp</c>.
-    /// </remarks>
-    public bool IsBubblingUp
-    {
-        get => Routing == CommandRouting.BubblingUp;
-        init
-        {
-            if (value)
-            {
-                Routing = CommandRouting.BubblingUp;
-            }
-        }
-    }
-
     /// <summary>
     ///     Creates a new context with a different command, preserving all other fields.
     /// </summary>
@@ -95,5 +63,5 @@ public readonly record struct CommandContext : ICommandContext
     public CommandContext WithRouting (CommandRouting routing) => this with { Routing = routing };
 
     /// <inheritdoc/>
-    public override string ToString () => $"{(IsBubblingUp ? Glyphs.UpArrow : IsBubblingDown ? Glyphs.DownArrow : "")}{Command} ({(Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "")}{(Binding is { } ? $", Binding={Binding}" : "")})";
+    public override string ToString () => $"{(Routing == CommandRouting.BubblingUp ? Glyphs.UpArrow : Routing == CommandRouting.DispatchingDown ? Glyphs.DownArrow : "")}{Command} ({(Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "")}{(Binding is { } ? $", Binding={Binding}" : "")})";
 }

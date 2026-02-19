@@ -46,22 +46,4 @@ public interface ICommandContext
     ///     Gets the routing mode for this command invocation.
     /// </summary>
     public CommandRouting Routing { get; }
-
-    /// <summary>
-    ///     Gets whether this command is being dispatched downward to a SubView. When <see langword="true"/>,
-    ///     <see cref="View.TryBubbleUp"/> will skip bubbling, preventing re-entry.
-    /// </summary>
-    /// <remarks>
-    ///     Backward-compatible property. Equivalent to <c>Routing == CommandRouting.DispatchingDown</c>.
-    /// </remarks>
-    public bool IsBubblingDown { get; }
-
-    /// <summary>
-    ///     Gets whether this command is being dispatched upward to a SuperView. When <see langword="true"/>,
-    ///     <see cref="View.BubbleDown"/> will skip bubbling, preventing re-entry.
-    /// </summary>
-    /// <remarks>
-    ///     Backward-compatible property. Equivalent to <c>Routing == CommandRouting.BubblingUp</c>.
-    /// </remarks>
-    public bool IsBubblingUp { get; }
 }
