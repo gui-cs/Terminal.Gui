@@ -104,7 +104,8 @@ public partial class TextView
         }
         else
         {
-            return true;
+            // Let bubbled to the up hierarchy
+            return false;
         }
 
         DoNeededAction ();
@@ -302,7 +303,8 @@ public partial class TextView
         }
         else
         {
-            return true;
+            // Let bubbled to the up hierarchy
+            return false;
         }
 
         DoNeededAction ();

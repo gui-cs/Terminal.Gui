@@ -2679,5 +2679,50 @@ public class TextViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
     }
 
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Command_Down_MovesFocusToNextView_WhenCursorIsAtLastLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable runnable = new ();
+        TextView textView = new () { Text = "Test", TabKeyAddsTab = tabKeyAddsTab };
+        View nextView = new () { CanFocus = true };
+        runnable.Add (textView, nextView);
+        app.Begin (runnable);
+
+        // Assert it's the last line
+        Assert.Equal (textView.CurrentRow, textView.Lines - 1);
+
+        // Press Down - should move focus to next view since we're at end of line
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.False (textView.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Command_Up_MovesFocusToPreviousView_WhenCursorIsAtFirstLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable runnable = new ();
+        View previousView = new () { CanFocus = true };
+        TextView textView = new () { Text = "Test", TabKeyAddsTab = tabKeyAddsTab };
+        runnable.Add (previousView, textView);
+        app.Begin (runnable);
+
+        // Set focus to textView
+        textView.SetFocus ();
+
+        // Assert it's the first line
+        Assert.Equal (0, textView.CurrentRow);
+
+        // Press Up - should move focus to previous view since we're at start of line
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.False (textView.HasFocus);
+        Assert.True (previousView.HasFocus);
+    }
+
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 }
