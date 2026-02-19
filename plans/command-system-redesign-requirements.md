@@ -907,3 +907,278 @@ public class Shortcut : View, IOrientation, IDesignable
 
 Net: ~120 lines of the most complex, bug-prone code in the class replaced by a
 single virtual method override.
+
+---
+
+### C. OptionSelector.cs (Redesigned)
+
+OptionSelector currently has an `OnActivating` override with two branches
+(IsBubblingUp consumption vs. fallthrough) and an `OnActivated` that must
+check IsBubblingUp to avoid double-applying. With the new design, the
+framework's dispatch machinery handles the bubble consumption via
+`ConsumeDispatch = true`, and `ApplyActivation` moves entirely to `OnActivated`.
+
+```csharp
+public class OptionSelector : SelectorBase, IDesignable
+{
+    public OptionSelector () => base.Value = 0;
+
+    // ──── Command Coordination ────
+
+    /// <summary>
+    ///     Dispatch to whichever CheckBox has focus. The framework will:
+    ///     - Skip dispatch if the command already came from a CheckBox (source guard)
+    ///     - Skip dispatch if no binding (programmatic invoke)
+    ///     - Consume the command (ConsumeDispatch = true) so the originating
+    ///       CheckBox does NOT call AdvanceCheckState independently
+    /// </summary>
+    protected override View? GetDispatchTarget (ICommandContext? ctx) => Focused;
+
+    /// <summary>
+    ///     Consume: OptionSelector owns the selection state, not the individual
+    ///     CheckBoxes. When a CheckBox activation dispatches here, the framework
+    ///     returns true (handled) so CheckBox.OnActivated/AdvanceCheckState is
+    ///     suppressed.
+    /// </summary>
+    protected override bool ConsumeDispatch => true;
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+
+        // Apply the value change in the completion phase. This runs for ALL
+        // activation paths: direct invocation, dispatch from framework, or
+        // programmatic. No need to check routing direction — the framework
+        // already handled dispatch/consumption.
+        ApplyActivation (ctx);
+    }
+
+    // ──── DELETED (now handled by framework) ────
+    //
+    // - protected override bool OnActivating (CommandEventArgs args)  — ~23 lines
+    //   The IsBubblingUp check, ApplyActivation call, RaiseActivated call,
+    //   and return true (consumption) are all replaced by:
+    //     GetDispatchTarget => Focused
+    //     ConsumeDispatch => true
+    //
+    // The two-branch structure (IsBubblingUp vs. direct) collapses because
+    // the framework dispatches uniformly and OnActivated always applies.
+
+    /// <summary>
+    ///     Applies the value change based on the activation source.
+    /// </summary>
+    private void ApplyActivation (ICommandContext? ctx)
+    {
+        // Unchanged from current implementation
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
+        {
+            Cycle ();
+
+            return;
+        }
+
+        if (ctx.Binding is KeyBinding keyBinding
+            && (int)checkBox.Data! == Value
+            && keyBinding.Key is { }
+            && keyBinding.Key == Key.Space)
+        {
+            Cycle ();
+        }
+        else
+        {
+            if (Value == (int)checkBox.Data!)
+            {
+                return;
+            }
+
+            Value = (int)checkBox.Data!;
+        }
+    }
+
+    // ──── Everything below is unchanged ────
+
+    protected override void OnSubViewAdded (View view)
+    {
+        base.OnSubViewAdded (view);
+
+        if (view is not CheckBox checkbox)
+        {
+            return;
+        }
+
+        checkbox.RadioStyle = true;
+    }
+
+    private void Cycle () { /* unchanged */ }
+    public override void UpdateChecked () { /* unchanged */ }
+    public int FocusedItem { get; set; }  // unchanged
+    public bool EnableForDesign () { /* unchanged */ }
+}
+```
+
+**What changed**:
+- `OnActivating` override (23 lines) → **deleted**. Replaced by `GetDispatchTarget`
+  + `ConsumeDispatch`.
+- `OnActivated` override → **simplified**. No longer needs `IsBubblingUp` check.
+  Always calls `ApplyActivation`.
+- `ApplyActivation` → **unchanged**. Same logic, just called from one place now.
+- **Added**: 2 one-line overrides (`GetDispatchTarget`, `ConsumeDispatch`)
+
+Net: ~20 lines of routing logic replaced by 2 declarative overrides. The
+remaining business logic (`ApplyActivation`, `Cycle`, `UpdateChecked`) is
+identical.
+
+---
+
+### D. FlagSelector.cs (Redesigned)
+
+FlagSelector is the most complex selector. Currently it has:
+- `_suppressHotKeyActivate` flag + `OnHandlingHotKey` override to prevent toggle on focus
+- `OnActivating` with 4 code paths (base handled, suppress, bubble consumption, BubbleDown)
+- Direct CheckBox.Value manipulation in the bubble path
+
+With the new design, `GetDispatchTarget` + `ConsumeDispatch` replace the bubble
+consumption and BubbleDown paths. The HotKey suppress flag is eliminated because
+the framework's dispatch guard (no dispatch for programmatic/no-binding invocations)
+naturally handles it — `DefaultHotKeyHandler` calls `InvokeCommand(Activate)` without
+a binding after `SetFocus`, so `GetDispatchTarget` dispatch is skipped.
+
+```csharp
+public class FlagSelector : SelectorBase, IDesignable
+{
+    public FlagSelector ()
+    {
+        KeyBindings.Remove (Key.Space);
+        KeyBindings.Remove (Key.Enter);
+        MouseBindings.Clear ();
+    }
+
+    // ──── Command Coordination ────
+
+    /// <summary>
+    ///     Dispatch to whichever CheckBox has focus.
+    /// </summary>
+    protected override View? GetDispatchTarget (ICommandContext? ctx) => Focused;
+
+    /// <summary>
+    ///     Consume: FlagSelector owns the toggle semantics. When a CheckBox
+    ///     activation dispatches here, the framework returns true (handled)
+    ///     so CheckBox.OnActivated/AdvanceCheckState is suppressed.
+    ///     FlagSelector toggles the checkbox value directly in OnActivated.
+    /// </summary>
+    protected override bool ConsumeDispatch => true;
+
+    /// <inheritdoc/>
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        // When focused, HotKey is a no-op
+        if (HasFocus)
+        {
+            return true;
+        }
+
+        // Not focused: restore focus. No need for _suppressHotKeyActivate flag —
+        // DefaultHotKeyHandler calls InvokeCommand(Activate) without a binding,
+        // so GetDispatchTarget dispatch is skipped by the framework's
+        // programmatic-invoke guard.
+        if (CanFocus)
+        {
+            SetFocus ();
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+
+        // Toggle the source CheckBox's value directly.
+        // This runs for all activation paths. For dispatch from framework
+        // (user clicked a CheckBox, dispatched here via GetDispatchTarget),
+        // the CheckBox's own AdvanceCheckState was suppressed by ConsumeDispatch.
+        // For programmatic invocations (no dispatch), this handles it too.
+        if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox checkBox)
+        {
+            checkBox.Value = checkBox.Value == CheckState.Checked
+                                 ? CheckState.UnChecked
+                                 : CheckState.Checked;
+        }
+
+        // CheckboxOnValueChanged handler updates FlagSelector.Value bitmask
+    }
+
+    // ──── DELETED (now handled by framework) ────
+    //
+    // - private bool _suppressHotKeyActivate                          — flag
+    // - protected override bool OnActivating (CommandEventArgs args)  — ~45 lines
+    //   The 4 code paths (base, suppress, IsBubblingUp consumption,
+    //   BubbleDown to focused) are all replaced by:
+    //     GetDispatchTarget => Focused
+    //     ConsumeDispatch => true
+    //   The programmatic BubbleDown path (source == this, dispatch to Focused)
+    //   is now handled by framework dispatch when binding is present.
+    //   The _suppressHotKeyActivate is eliminated because DefaultHotKeyHandler's
+    //   InvokeCommand(Activate) has no binding → framework skips dispatch.
+
+    // ──── Everything below is unchanged ────
+
+    protected override void OnSubViewAdded (View view)
+    {
+        base.OnSubViewAdded (view);
+
+        if (view is not CheckBox checkbox)
+        {
+            return;
+        }
+
+        checkbox.RadioStyle = false;
+        checkbox.ValueChanging += OnCheckboxOnValueChanging;
+        checkbox.ValueChanged += CheckboxOnValueChanged;
+    }
+
+    private void OnCheckboxOnValueChanging (...) { /* unchanged */ }
+    private void CheckboxOnValueChanged (...) { /* unchanged */ }
+
+    private bool _updatingChecked;
+    public override int? Value { get; set; }  // unchanged (with RaiseValueChanging etc.)
+    public override void UpdateChecked () { /* unchanged */ }
+    public override void CreateSubViews () { /* unchanged */ }
+    public bool EnableForDesign () { /* unchanged */ }
+}
+```
+
+**What changed**:
+- `_suppressHotKeyActivate` flag → **deleted**. Framework's programmatic-invoke guard
+  handles it.
+- `OnActivating` override (45 lines, 4 code paths) → **deleted**. Replaced by
+  `GetDispatchTarget` + `ConsumeDispatch`.
+- `OnHandlingHotKey` → **simplified**. No flag to set; just SetFocus and return.
+- `OnActivated` → **simplified**. Always toggles the source CheckBox directly.
+  No routing-direction checks needed.
+- **Added**: 2 one-line overrides (`GetDispatchTarget`, `ConsumeDispatch`)
+
+Net: ~50 lines of the most complex routing logic (4 code paths with
+IsBubblingUp/IsBubblingDown/suppress checks) replaced by 2 declarative
+overrides. The toggle logic and value management are identical.
+
+---
+
+### Key Observation Across All Four Samples
+
+| View | `GetDispatchTarget` | `ConsumeDispatch` | Lines Deleted | Lines Added |
+|------|--------------------|--------------------|---------------|-------------|
+| CheckBox | (not overridden) | (not overridden) | 0 | 0 |
+| Shortcut | `=> CommandView` | `false` (default) | ~120 | 1 |
+| OptionSelector | `=> Focused` | `true` | ~23 | 2 |
+| FlagSelector | `=> Focused` | `true` | ~50 | 2 |
+
+The pattern: **leaf views don't change. Composite views replace N lines of
+hand-written routing with 1-2 declarative overrides.**
