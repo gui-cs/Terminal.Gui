@@ -354,7 +354,7 @@ public class MenuBarTests : TestsAllDrivers
 
                                              top.Add (new View { CanFocus = true, Id = "focusableView" });
                                              menuBar.EnableForDesign (ref top);
-                                             IEnumerable<MenuItem> items = menuBar.GetMenuItemsWithTitle (Strings.cmdQuit);
+                                             IEnumerable<MenuItem> items = menuBar.GetMenuItemsWith (mi => mi.Title == Strings.cmdQuit);
 
                                              foreach (MenuItem item in items)
                                              {

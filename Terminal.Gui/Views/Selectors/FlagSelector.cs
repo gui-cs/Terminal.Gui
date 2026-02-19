@@ -69,12 +69,12 @@ public class FlagSelector : SelectorBase, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        if (base.OnActivating (args))
+        if (base.OnActivating (args) || args.Handled)
         {
             return true;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
 
         // HotKey-triggered Activate: OnHandlingHotKey set the flag to suppress toggling
         if (_suppressHotKeyActivate)
@@ -82,6 +82,20 @@ public class FlagSelector : SelectorBase, IDesignable
             _suppressHotKeyActivate = false;
 
             return false;
+        }
+
+        // When a CheckBox SubView's activation bubbles up, toggle it and raise Activated
+        // (so Shortcut's deferred activation path completes via CommandView_Activated).
+        // Return true to consume — prevents the originator CheckBox from double-toggling
+        // via AdvanceCheckState.
+        if (args.Context?.IsBubblingUp == true
+            && args.Context.Source?.TryGetTarget (out View? source) == true
+            && source is CheckBox checkBox)
+        {
+            checkBox.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
+            RaiseActivated (args.Context);
+
+            return true;
         }
 
         // Skip BubbleDown when:
@@ -105,17 +119,9 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         base.OnActivated (ctx);
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-
-        if (ctx?.Source?.TryGetTarget (out View? source) != true || source is not CheckBox checkBox)
-        {
-            // Programmatic: BubbleDown in OnActivating already handled the toggle
-            return;
-        }
-
-        // From checkbox event handler: toggle the checkbox manually
-        // (The checkbox couldn't toggle itself because bubble-up prevented its OnActivated)
-        checkBox.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
+        // No additional toggle here — OnActivating handles the bubble case
+        // and calls RaiseActivated directly. For direct invocations, the
+        // BubbleDown in OnActivating triggers the CheckBox toggle via AdvanceCheckState.
     }
 
     /// <inheritdoc/>
@@ -132,29 +138,6 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.ValueChanging += OnCheckboxOnValueChanging;
         checkbox.ValueChanged += CheckboxOnValueChanged;
-        checkbox.Activating += OnCheckboxOnActivating;
-    }
-
-    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox)
-        {
-            return;
-        }
-
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context})");
-
-        if (args.Context?.IsBubblingDown is true)
-        {
-            // BubbleDown from OnActivating - let the checkbox handle itself
-            return;
-        }
-
-        // User interaction (Space, Click, HotKey on checkbox):
-        // Invoke Activate on the FlagSelector so events bubble properly,
-        // then handle the toggle in OnActivated.
-        InvokeCommand (Command.Activate, args.Context);
-        args.Handled = true;
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
@@ -164,7 +147,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
 
         if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
@@ -180,7 +163,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
 
         int newValue = Value ?? 0;
 
@@ -292,31 +275,36 @@ public class FlagSelector : SelectorBase, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnCreatingSubViews ()
+    public override void CreateSubViews ()
     {
+        base.CreateSubViews ();
+
+        var changed = false;
+
         // FlagSelector supports a "None" check box; add it
         if (Styles.HasFlag (SelectorStyles.ShowNoneFlag) && Values is { } && !Values.Contains (0))
         {
             Add (CreateCheckBox ("None", 0));
+            changed = true;
         }
-    }
 
-    /// <inheritdoc/>
-    protected override void OnCreatedSubViews ()
-    {
-        // If the values include 0, and ShowNoneFlag is not specified, remove the "None" check box
-        if (Styles.HasFlag (SelectorStyles.ShowNoneFlag))
+        // If the values include 0 and ShowNoneFlag is not specified, remove the zero-value check box
+        if (!Styles.HasFlag (SelectorStyles.ShowNoneFlag))
         {
-            return;
-        }
-        CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
+            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
 
-        if (noneCheckBox is null)
-        {
-            return;
+            if (noneCheckBox is { })
+            {
+                Remove (noneCheckBox);
+                noneCheckBox.Dispose ();
+                changed = true;
+            }
         }
-        Remove (noneCheckBox);
-        noneCheckBox.Dispose ();
+
+        if (changed)
+        {
+            SetLayout ();
+        }
     }
 
     /// <inheritdoc/>

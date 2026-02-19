@@ -42,7 +42,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <remarks>
     ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
     /// </remarks>
-    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menu (menuItems?.Select (item => item ?? new Line ())) { Title = "Popover Root" }) { }
+    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menu (menuItems?.Select (item => item ?? new Line ()))) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified menu items.
@@ -51,7 +51,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <remarks>
     ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
     /// </remarks>
-    public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems) { Title = "Popover Root" }) { }
+    public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menu"/>.
@@ -309,6 +309,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 return;
             }
 
+#if DEBUG
+            Id = $"{Root?.Id}.PopoverMenu";
+#endif
+
             // Unsubscribe from old hierarchy before replacing
             if (_root is { })
             {
@@ -326,10 +330,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             _root = value;
 
-            if (_root is { })
-            {
-                _root.App = App;
-            }
+            _root?.App = App;
 
             // TODO: This needs to be done whenever any MenuItem in the menu tree changes to support dynamic menus
             // TODO: And it needs to clear the old bindings first
@@ -351,9 +352,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void UpdateKeyBindings ()
     {
-        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus ();
+        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus (mi => mi.Command != Command.NotBound);
 
-        foreach (MenuItem menuItem in all.Where (mi => mi.Command != Command.NotBound))
+        foreach (MenuItem menuItem in all)
         {
             Key? key;
 
@@ -392,16 +393,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     protected override bool OnKeyDownNotHandled (Key key)
     {
         // See if any of our MenuItems have this key as Key
-        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus ();
+        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus (mi => key != Application.QuitKey && mi.Key == key);
 
         foreach (MenuItem menuItem in all)
         {
-            if (key != Application.QuitKey && menuItem.Key == key)
-            {
-                // Logging.Debug ($"{this.ToIdentifyingString ()} - key: {key}");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - key: {key}");
 
-                return menuItem.NewKeyDownEvent (key);
-            }
+            return menuItem.NewKeyDownEvent (key);
         }
 
         return base.OnKeyDownNotHandled (key);
@@ -444,13 +442,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <summary>
-    ///     Gets all the menu items in the popover menu hierarchy.
+    ///     Gets menu items in the popover menu hierarchy, optionally filtered by <paramref name="predicate"/>.
     /// </summary>
-    /// <returns>An enumerable collection of all <see cref="MenuItem"/> instances across all menus in the hierarchy.</returns>
+    /// <param name="predicate">
+    ///     If provided, only <see cref="MenuItem"/>s matching the predicate are returned.
+    ///     If <see langword="null"/>, all menu items are returned.
+    /// </param>
+    /// <returns>An enumerable of matching <see cref="MenuItem"/> instances across all menus in the hierarchy.</returns>
     /// <remarks>
     ///     This method traverses all menus returned by <see cref="GetAllSubMenus"/> and collects their menu items.
     /// </remarks>
-    internal IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus ()
+    internal IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus (Func<MenuItem, bool>? predicate = null)
     {
         List<MenuItem> result = [];
 
@@ -458,7 +460,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             foreach (View subView in menu.SubViews)
             {
-                if (subView is MenuItem menuItem)
+                if (subView is MenuItem menuItem && (predicate is null || predicate (menuItem)))
                 {
                     result.Add (menuItem);
                 }
@@ -656,7 +658,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (!Visible && args.Context?.Binding is KeyBinding { Key: { } key } keyBinding)
         {
-            if (GetMenuItemsOfAllSubMenus ().All (i => i.Key != key))
+            if (!GetMenuItemsOfAllSubMenus (i => i.Key == key).Any ())
             {
                 // Logging.Debug ($"{this.ToIdentifyingString ()} ({args.Context?.Source?.Title}) Command: {args.Context?.Command} - ignore any keys that are not hotkeys");
 

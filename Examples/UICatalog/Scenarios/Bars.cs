@@ -13,17 +13,18 @@ public class Bars : Scenario
         app.Init ();
 
         using Runnable mainWindow = new ();
+        mainWindow.Id = "mainWindow";
 
-        mainWindow.IsModalChanged += App_Loaded;
+        mainWindow.IsModalChanged += OnIsModalChanged;
 
         app.Run (mainWindow);
     }
 
     // Setting everything up in Loaded handler because we change the
     // QuitKey it only sticks if changed after init
-    private void App_Loaded (object sender, EventArgs e)
+    private void OnIsModalChanged (object sender, EventArgs e)
     {
-        if (sender is not Runnable mainWindow)
+        if (sender is not Runnable { IsRunning: true } mainWindow)
         {
             return;
         }
@@ -39,125 +40,119 @@ public class Bars : Scenario
             Arrangement = ViewArrangement.LeftResizable
         };
 
-        FrameView menuBarLikeExamples = new ()
-        {
-            Title = "MenuBar-Like Examples",
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (eventLog),
-            Height = Dim.Percent (33)
-        };
-        mainWindow.Add (menuBarLikeExamples);
-
-        Label label = new () { Title = "      Bar:", X = 0, Y = 0 };
-        menuBarLikeExamples.Add (label);
-
-        Bar bar = new () { Id = "menuBar-like", X = Pos.Right (label), Y = Pos.Top (label), Width = Dim.Fill () };
-
-        ConfigMenuBar (bar);
-        menuBarLikeExamples.Add (bar);
-
-        label = new Label { Title = "  MenuBar:", X = 0, Y = Pos.Bottom (bar) + 1 };
-        menuBarLikeExamples.Add (label);
-
-        //bar = new MenuBar
+        //FrameView menuBarLikeExamples = new ()
         //{
-        //    Id = "menuBar",
-        //    X = Pos.Right (label),
-        //    Y = Pos.Top (label),
+        //    Title = "MenuBar-Like Examples",
+        //    X = 0,
+        //    Y = 0,
+        //    Width = Dim.Fill (eventLog),
+        //    Height = Dim.Percent (33)
         //};
+        //mainWindow.Add (menuBarLikeExamples);
+
+        //Label label = new () { Title = "      Bar:", X = 0, Y = 0 };
+        //menuBarLikeExamples.Add (label);
+
+        //Bar bar = new () { Id = "menuBar-like", X = Pos.Right (label), Y = Pos.Top (label), Width = Dim.Fill () };
 
         //ConfigMenuBar (bar);
         //menuBarLikeExamples.Add (bar);
+
+        //label = new Label { Title = "  MenuBar:", X = 0, Y = Pos.Bottom (bar) + 1 };
+        //menuBarLikeExamples.Add (label);
 
         FrameView menuLikeExamples = new ()
         {
             Title = "Menu-Like Examples",
             X = 0,
             Y = Pos.Center (),
-            Width = Dim.Width (menuBarLikeExamples),
+            Width = Dim.Fill (eventLog),
             Height = Dim.Percent (33)
         };
         mainWindow.Add (menuLikeExamples);
 
-        label = new Label { Title = "Bar:", X = 0, Y = 0 };
-        menuLikeExamples.Add (label);
+        Label barLabel = new () { Title = "Bar:", X = 0, Y = 0 };
+        menuLikeExamples.Add (barLabel);
 
-        bar = new Bar
+        var menuLikeBar = new Bar
         {
             Id = "menu-like",
             X = 0,
-            Y = Pos.Bottom (label),
+            Y = Pos.Bottom (barLabel),
 
             //Width = Dim.Percent (40),
             Orientation = Orientation.Vertical
         };
-        ConfigureMenu (bar);
+        ConfigureMenu (menuLikeBar);
 
-        menuLikeExamples.Add (bar);
+        menuLikeExamples.Add (menuLikeBar);
 
-        label = new Label { Title = "Menu:", X = Pos.Right (bar) + 1, Y = Pos.Top (label) };
-        menuLikeExamples.Add (label);
+        barLabel = new Label { Title = "Menu:", X = Pos.Right (menuLikeBar) + 1, Y = Pos.Top (barLabel) };
+        menuLikeExamples.Add (barLabel);
 
-        bar = new Bar { Id = "menu", X = Pos.Left (label), Y = Pos.Bottom (label) };
-        ConfigureMenu (bar);
-        bar.Arrangement = ViewArrangement.RightResizable;
+        menuLikeBar = new Bar { Id = "menu", X = Pos.Left (barLabel), Y = Pos.Bottom (barLabel) };
+        ConfigureMenu (menuLikeBar);
+        menuLikeBar.Arrangement = ViewArrangement.RightResizable;
 
-        menuLikeExamples.Add (bar);
+        menuLikeExamples.Add (menuLikeBar);
 
-        label = new Label { Title = "PopOver Menu (Right click to show):", X = Pos.Right (bar) + 1, Y = Pos.Top (label) };
-        menuLikeExamples.Add (label);
+        barLabel = new Label { Title = "PopOver Menu (Right click to show):", X = Pos.Right (menuLikeBar) + 1, Y = Pos.Top (barLabel) };
+        menuLikeExamples.Add (barLabel);
 
-        Menu popOverMenu = new () { Id = "popupMenu", X = Pos.Left (label), Y = Pos.Bottom (label) };
-        ConfigureMenu (popOverMenu);
+        //Menu popOverMenu = new () { Id = "popupMenu", X = Pos.Left (barlabel), Y = Pos.Bottom (barlabel) };
+        //ConfigureMenu (popOverMenu);
 
-        popOverMenu.Arrangement = ViewArrangement.Overlapped;
-        popOverMenu.Visible = false;
+        //popOverMenu.Arrangement = ViewArrangement.Overlapped;
+        //popOverMenu.Visible = false;
 
-        //popOverMenu.Enabled = false;
+        //Shortcut toggleShortcut = new () { Title = "Toggle Hide", Text = "App", BindKeyToApplication = true, Key = Key.F4.WithCtrl };
+        //popOverMenu.Add (toggleShortcut);
 
-        Shortcut toggleShortcut = new () { Title = "Toggle Hide", Text = "App", BindKeyToApplication = true, Key = Key.F4.WithCtrl };
-        popOverMenu.Add (toggleShortcut);
+        //popOverMenu.Accepting += PopOverMenuOnAccept;
 
-        popOverMenu.Accepting += PopOverMenuOnAccept;
+        //menuLikeExamples.Add (popOverMenu);
 
-        menuLikeExamples.Add (popOverMenu);
+        //menuLikeExamples.MouseEvent += MenuLikeExamplesMouseEvent;
 
-        menuLikeExamples.MouseEvent += MenuLikeExamplesMouseEvent;
+        //FrameView statusBarLikeExamples = new ()
+        //{
+        //    Title = "StatusBar-Like Examples",
+        //    X = 0,
+        //    Y = Pos.AnchorEnd (),
+        //    Width = Dim.Fill (eventLog),
+        //    Height = Dim.Percent (33)
+        //};
+        //mainWindow.Add (statusBarLikeExamples);
 
-        FrameView statusBarLikeExamples = new ()
-        {
-            Title = "StatusBar-Like Examples",
-            X = 0,
-            Y = Pos.AnchorEnd (),
-            Width = Dim.Width (menuLikeExamples),
-            Height = Dim.Percent (33)
-        };
-        mainWindow.Add (statusBarLikeExamples);
+        //Label statusBarBarLabel = new Label { Title = "      Bar:", X = 0, Y = 0 };
+        //statusBarLikeExamples.Add (statusBarBarLabel);
 
-        label = new Label { Title = "      Bar:", X = 0, Y = 0 };
-        statusBarLikeExamples.Add (label);
+        //Bar statusBarLikeBar = new Bar
+        //{
+        //    Id = "statusBar-like",
+        //    X = Pos.Right (statusBarBarLabel),
+        //    Y = Pos.Top (statusBarBarLabel),
+        //    Width = Dim.Fill (),
+        //    Orientation = Orientation.Horizontal
+        //};
+        //ConfigStatusBar (menuLikeBar);
+        //statusBarLikeExamples.Add (menuLikeBar);
 
-        bar = new Bar
-        {
-            Id = "statusBar-like",
-            X = Pos.Right (label),
-            Y = Pos.Top (label),
-            Width = Dim.Fill (),
-            Orientation = Orientation.Horizontal
-        };
-        ConfigStatusBar (bar);
-        statusBarLikeExamples.Add (bar);
+        //statusBarBarLabel = new Label { Title = "StatusBar:", X = 0, Y = Pos.Bottom (menuLikeBar) + 1 };
+        //statusBarLikeExamples.Add (statusBarBarLabel);
 
-        label = new Label { Title = "StatusBar:", X = 0, Y = Pos.Bottom (bar) + 1 };
-        statusBarLikeExamples.Add (label);
+        //menuLikeBar = new Bar { Id = "statusBar", X = Pos.Right (statusBarBarLabel), Y = Pos.Top (statusBarBarLabel), Width = Dim.Fill () };
+        //ConfigStatusBar (menuLikeBar);
+        //statusBarLikeExamples.Add (menuLikeBar);
 
-        bar = new Bar { Id = "statusBar", X = Pos.Right (label), Y = Pos.Top (label), Width = Dim.Fill () };
-        ConfigStatusBar (bar);
-        statusBarLikeExamples.Add (bar);
+        //mainWindow.CommandsToBubbleUp = [Command.Accept];
+        eventLog.SetViewToLog (mainWindow);
 
         foreach (FrameView frameView in mainWindow.SubViews.OfType<FrameView> ())
         {
+            frameView.CommandsToBubbleUp = [Command.Accept, Command.Activate];
+            eventLog.SetViewToLog (frameView);
+
             foreach (Bar barView in frameView.SubViews.OfType<Bar> ())
             {
                 eventLog.SetViewToLog (barView);
@@ -172,39 +167,37 @@ public class Bars : Scenario
 
         mainWindow.Add (eventLog);
 
-        return;
+        //void MenuLikeExamplesMouseEvent (object _, Mouse mouse)
+        //{
+        //    if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
+        //    {
+        //        popOverMenu.X = mouse.Position!.Value.X;
+        //        popOverMenu.Y = mouse.Position!.Value.Y;
+        //        popOverMenu.Visible = true;
 
-        void MenuLikeExamplesMouseEvent (object _, Mouse mouse)
-        {
-            if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
-            {
-                popOverMenu.X = mouse.Position!.Value.X;
-                popOverMenu.Y = mouse.Position!.Value.Y;
-                popOverMenu.Visible = true;
+        //        //popOverMenu.Enabled = popOverMenu.Visible;
+        //        popOverMenu.SetFocus ();
+        //    }
+        //    else
+        //    {
+        //        popOverMenu.Visible = false;
 
-                //popOverMenu.Enabled = popOverMenu.Visible;
-                popOverMenu.SetFocus ();
-            }
-            else
-            {
-                popOverMenu.Visible = false;
+        //        //popOverMenu.Enabled = popOverMenu.Visible;
+        //    }
+        //}
 
-                //popOverMenu.Enabled = popOverMenu.Visible;
-            }
-        }
-
-        void PopOverMenuOnAccept (object o, CommandEventArgs args)
-        {
-            if (popOverMenu.Visible)
-            {
-                popOverMenu.Visible = false;
-            }
-            else
-            {
-                popOverMenu.Visible = true;
-                popOverMenu.SetFocus ();
-            }
-        }
+        //void PopOverMenuOnAccept (object o, CommandEventArgs args)
+        //{
+        //    if (popOverMenu.Visible)
+        //    {
+        //        popOverMenu.Visible = false;
+        //    }
+        //    else
+        //    {
+        //        popOverMenu.Visible = true;
+        //        popOverMenu.SetFocus ();
+        //    }
+        //}
     }
 
     //private void SetupContentMenu ()
@@ -349,33 +342,47 @@ public class Bars : Scenario
 
     private void ConfigMenuBar (Bar bar)
     {
-        Shortcut fileMenuBarItem = new () { Title = Strings.menuFile, HelpText = "File Menu", Key = Key.D0.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut fileMenuBarItem = new () { Title = Strings.menuFile, HelpText = "File Menu", Key = Key.D0.WithAlt };
 
-        Shortcut editMenuBarItem = new () { Title = "_Edit", HelpText = "Edit Menu", Key = Key.D1.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut editMenuBarItem = new () { Title = "_Edit", HelpText = "Edit Menu", Key = Key.D1.WithAlt };
 
-        Shortcut helpMenuBarItem = new () { Title = Strings.menuHelp, HelpText = "Halp Menu", Key = Key.D2.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut helpMenuBarItem = new () { Title = Strings.menuHelp, HelpText = "Halp Menu", Key = Key.D2.WithAlt };
 
         bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
     }
 
     private void ConfigureMenu (Bar bar)
     {
-        Shortcut shortcut1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag", MouseHighlightStates = MouseState.In };
+        Shortcut shortcut1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
 
-        Shortcut shortcut2 = new () { Title = "Za_G", Text = "Gonna zag", Key = Key.G.WithAlt, MouseHighlightStates = MouseState.In };
+        Line line = new ();
 
-        Shortcut shortcut3 = new () { Title = "_Three", Text = "The 3rd item", Key = Key.D3.WithAlt, MouseHighlightStates = MouseState.In };
+        Shortcut shortcut4 = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+        shortcut4.CommandView = new CheckBox { Title = shortcut4.Title, CanFocus = false };
 
-        Line line = new () { X = -1, Width = Dim.Fill ()! + 1 };
-
-        Shortcut shortcut4 = new () { Title = "_Four", Text = "Below the line", Key = Key.D3.WithAlt, MouseHighlightStates = MouseState.In };
-
-        shortcut4.CommandView = new CheckBox { Title = shortcut4.Title, MouseHighlightStates = MouseState.None, CanFocus = false };
+        shortcut4.Action += () =>
+                            {
+                                if (shortcut4.CommandView is CheckBox cb)
+                                {
+                                    bar.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                }
+                            };
 
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
         shortcut4.Accepting += (_, args) => args.Handled = true;
 
-        bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
+        OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+        Shortcut schemeShortcut = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+
+        schemeOptionSelector!.ValueChanged += (_, args) =>
+                                              {
+                                                  if (args.Value is { } scheme)
+                                                  {
+                                                      bar.SchemeName = scheme.ToString ();
+                                                  }
+                                              };
+
+        bar.Add (shortcut1, line, shortcut4, schemeShortcut);
     }
 
     public void ConfigStatusBar (Bar bar)

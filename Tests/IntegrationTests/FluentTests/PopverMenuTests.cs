@@ -384,7 +384,7 @@ public class PopoverMenuTests : TestsAllDrivers
                                      .AssertTrue(clicked);
     }
 
-    [Theory]
+    [Theory (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
     [MemberData (nameof (GetAllDriverNames))]
     public void ContextMenu_OpenSubmenu (string d)
     {

@@ -71,7 +71,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.False (label.HasFocus);
         Assert.False (nextSubView.HasFocus);
 
-        label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonReleased });
+        label.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased });
         Assert.False (label.HasFocus);
         Assert.Equal (hasHotKey, nextSubView.HasFocus);
     }
@@ -99,7 +99,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (string.Empty, label.Text);
         Assert.Equal (Alignment.Start, label.TextAlignment);
         Assert.False (label.CanFocus);
-        Assert.Equal (new (0, 0, 0, 0), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), label.Frame);
         Assert.Equal (KeyCode.Null, label.HotKey);
     }
 
@@ -210,7 +210,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         otherView.SetFocus ();
 
         // click on label
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = label.Frame.Location, Flags = MouseFlags.LeftButtonReleased });
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
     }
@@ -270,12 +270,12 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (otherView.HasFocus);
 
         // label can focus, so clicking on it set focus
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased });
         Assert.True (label.HasFocus);
         Assert.False (otherView.HasFocus);
 
         // click on view
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 1), Flags = MouseFlags.LeftButtonReleased });
         Assert.False (label.HasFocus);
         Assert.True (otherView.HasFocus);
     }
@@ -290,13 +290,13 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         app.Begin (runnable);
 
         var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
-        label.Margin!.Thickness = new (0, 1, 0, 0);
-        label.Border!.Thickness = new (1, 0, 1, 1);
+        label.Margin!.Thickness = new Thickness (0, 1, 0, 0);
+        label.Border!.Thickness = new Thickness (1, 0, 1, 1);
         runnable.Add (label);
         app.LayoutAndDraw ();
 
-        Assert.Equal (new (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
+        Assert.Equal (new Rectangle (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), label.Viewport);
 
         DriverAssert.AssertDriverContentsWithFrameAre (@"
 │Test│
@@ -315,12 +315,12 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         app.Begin (runnable);
 
         var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        label.Border!.Thickness = new (1, 0, 1, 1);
+        label.Border!.Thickness = new Thickness (1, 0, 1, 1);
         runnable.Add (label);
         app.LayoutAndDraw ();
 
-        Assert.Equal (new (0, 0, 6, 2), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
+        Assert.Equal (new Rectangle (0, 0, 6, 2), label.Frame);
+        Assert.Equal (new Rectangle (0, 0, 4, 1), label.Viewport);
 
         DriverAssert.AssertDriverContentsWithFrameAre (@"
 │Test│
@@ -351,12 +351,11 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
     {
         Label label = new () { Text = "_Test" };
 
-        // Label's HotKey command forwards to the next focusable view
-        // When there's no next focusable view and Label can't focus, HotKey returns false
+        // Label's HotKey command is always handled by the default handler even when
+        // there's no next focusable view - DefaultHotKeyHandler returns true
         bool? result = label.InvokeCommand (Command.HotKey);
 
-        // Returns false because Label cannot take focus
-        Assert.False (result);
+        Assert.True (result);
 
         label.Dispose ();
     }

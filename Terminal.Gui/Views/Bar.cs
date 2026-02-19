@@ -1,13 +1,16 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a horizontally or vertically oriented container for <see cref="Shortcut"/>s to be used as a menu, toolbar, or status
+///     Provides a horizontally or vertically oriented container for <see cref="Shortcut"/>s to be used as a menu, toolbar,
+///     or status
 ///     bar.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Any <see cref="View"/> can be added to a <see cref="Bar"/>. However, the <see cref="Bar"/> is designed to work with
-///         <see cref="Shortcut"/> objects. The <see cref="Shortcut"/> class provides a way to display a command, help, and key and
+///         Any <see cref="View"/> can be added to a <see cref="Bar"/>. However, the <see cref="Bar"/> is designed to work
+///         with
+///         <see cref="Shortcut"/> objects. The <see cref="Shortcut"/> class provides a way to display a command, help, and
+///         key and
 ///         align them in a specific order.
 ///     </para>
 /// </remarks>
@@ -27,10 +30,12 @@ public class Bar : View, IOrientation, IDesignable
         Height = Dim.Auto ();
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new (this);
+        _orientationHelper = new OrientationHelper (this);
 
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
+
+        CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
         if (shortcuts is null)
         {
@@ -39,13 +44,13 @@ public class Bar : View, IOrientation, IDesignable
 
         foreach (View shortcut in shortcuts)
         {
-            base.Add (shortcut);
+            Add (shortcut);
         }
     }
 
     private void OnMouseEvent (object? sender, Mouse e)
     {
-        NavigationDirection direction = NavigationDirection.Backward;
+        var direction = NavigationDirection.Backward;
 
         if (e.Flags == MouseFlags.WheeledDown)
         {
@@ -83,16 +88,14 @@ public class Bar : View, IOrientation, IDesignable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Horizontal orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from right to left
-    ///         Vertical orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from left to right.
+    ///         Horizontal orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from right to
+    ///         left
+    ///         Vertical orientation arranges the command, help, and key parts of each <see cref="Shortcut"/>s from left to
+    ///         right.
     ///     </para>
     /// </remarks>
 
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
 #pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
@@ -104,14 +107,12 @@ public class Bar : View, IOrientation, IDesignable
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation)
-    {
+    public void OnOrientationChanged (Orientation newOrientation) =>
+
         // BUGBUG: this should not be SuperView.GetContentSize
         LayoutBarItems (SuperView?.GetContentSize () ?? App?.Screen.Size ?? Size.Empty);
-    }
-    #endregion
 
-    private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd;
+    #endregion
 
     /// <summary>
     ///     Gets or sets the <see cref="AlignmentModes"/> for this <see cref="Bar"/>. The default is
@@ -119,14 +120,15 @@ public class Bar : View, IOrientation, IDesignable
     /// </summary>
     public AlignmentModes AlignmentModes
     {
-        get => _alignmentModes;
+        get;
         set
         {
-            _alignmentModes = value;
+            field = value;
+
             //SetNeedsDraw ();
             SetNeedsLayout ();
         }
-    }
+    } = AlignmentModes.StartToEnd;
 
     // TODO: Move this to View
     /// <summary>Inserts a <see cref="Shortcut"/> in the specified index of <see cref="View.SubViews"/>.</summary>
@@ -175,6 +177,7 @@ public class Bar : View, IOrientation, IDesignable
         if (toRemove is { })
         {
             Remove (toRemove);
+
             //SetNeedsDraw ();
             SetNeedsLayout ();
         }
@@ -182,11 +185,8 @@ public class Bar : View, IOrientation, IDesignable
         return toRemove as Shortcut;
     }
 
-    /// <inheritdoc />
-    protected override void OnSubViewLayout (LayoutEventArgs args)
-    {
-        LayoutBarItems (args.OldContentSize);
-    }
+    /// <inheritdoc/>
+    protected override void OnSubViewLayout (LayoutEventArgs args) => LayoutBarItems (args.OldContentSize);
 
     private void LayoutBarItems (Size contentSize)
     {
@@ -206,6 +206,11 @@ public class Bar : View, IOrientation, IDesignable
                     if (barItem is Shortcut sc)
                     {
                         sc.Width = sc.GetWidthDimAuto ();
+                    }
+
+                    if (barItem is Line line)
+                    {
+                        line.Orientation = Orientation.Vertical;
                     }
                 }
 
@@ -232,8 +237,7 @@ public class Bar : View, IOrientation, IDesignable
                     {
                         View barItem = SubViews.ElementAt (index);
 
-
-                       // barItem.Scheme = Scheme;
+                        // barItem.Scheme = Scheme;
 
                         if (!barItem.Visible)
                         {
@@ -262,20 +266,23 @@ public class Bar : View, IOrientation, IDesignable
                         }
 
                         prevBarItem = barItem;
-
                     }
 
-                    foreach (var subView in SubViews)
+                    foreach (View subView in SubViews)
                     {
-                        if (subView is not Line)
+                        if (subView is Line line)
                         {
-                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth, maximumContentDim: maxBarItemWidth);
+                            line.Orientation = Orientation.Horizontal;
+                        }
+                        else
+                        {
+                            subView.Width = Dim.Auto (DimAutoStyle.Auto, maxBarItemWidth, maxBarItemWidth);
                         }
                     }
                 }
                 else
                 {
-                    foreach (var subView in SubViews)
+                    foreach (View subView in SubViews)
                     {
                         if (subView is not Line)
                         {
@@ -288,37 +295,19 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public virtual bool EnableForDesign ()
     {
-        var shortcut = new Shortcut
-        {
-            Text = "Quit",
-            Title = "Q_uit",
-            Key = Key.Z.WithCtrl,
-        };
+        Shortcut shortcut = new ();
+        shortcut.EnableForDesign ();
 
         Add (shortcut);
 
-        shortcut = new Shortcut
-        {
-            Text = "Help Text",
-            Title = "Help",
-            Key = Key.F1,
-        };
+        shortcut = new Shortcut { Text = "Help Text", Title = "Help", Key = Key.F1 };
 
         Add (shortcut);
 
-        shortcut = new Shortcut
-        {
-            Text = "Czech",
-            CommandView = new CheckBox ()
-            {
-                Title = "_Check"
-            },
-            Key = Key.F9,
-            CanFocus = false
-        };
+        shortcut = new Shortcut { Text = "Czech", CommandView = new CheckBox { Title = "_Check" }, Key = Key.F9, CanFocus = false };
 
         Add (shortcut);
 

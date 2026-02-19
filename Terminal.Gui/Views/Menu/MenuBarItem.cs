@@ -61,7 +61,12 @@ public class MenuBarItem : MenuItem
     public MenuBarItem (string commandText, IEnumerable<View> menuItems) : this (null,
                                                                                  Command.NotBound,
                                                                                  commandText,
-                                                                                 new PopoverMenu (menuItems) { Title = $"PopoverMenu for {commandText}" })
+                                                                                 new PopoverMenu (menuItems)
+                                                                                 {
+#if DEBUG
+                                                                                     Id = $"PopoverMenu ({commandText})"
+#endif
+                                                                                 })
     { }
 
     /// <summary>
@@ -128,6 +133,7 @@ public class MenuBarItem : MenuItem
                 PopoverMenuOpen = _popoverMenu.Visible;
                 _popoverMenu.VisibleChanged += OnPopoverVisibleChanged;
                 _popoverMenu.Accepted += OnPopoverMenuOnAccepted;
+                _popoverMenu.Activated += OnPopoverMenuOnActivated;
             }
 
             return;
@@ -142,6 +148,12 @@ public class MenuBarItem : MenuItem
                 // Logging.Debug ($"OnPopoverMenuOnAccepted - {this.ToIdentifyingString ()} - {args.Context?.Source} - {args.Context?.Command}");
                 RaiseAccepted (args.Context);
         }
+    }
+
+    private void OnPopoverMenuOnActivated (object? sender, EventArgs<ICommandContext?> e)
+    {
+        // Logging.Debug ($"OnPopoverMenuOnActivated - {this.ToIdentifyingString ()} - {e.Value?.Source} - {e.Value?.Command}");
+//        RaiseActivated (e.Value);
     }
 
     private bool _popoverMenuOpen;

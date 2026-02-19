@@ -81,14 +81,6 @@ public class MenuBar : Menu, IDesignable
                         return false; // RaiseAccepted (ctx);
                     });
 
-        // Override Menu's Activate handler: MenuBar needs the full DefaultActivateHandler
-        // so that OnActivating fires when a MenuBarItem's Activate bubbles up (to toggle the popover).
-        AddCommand (Command.Activate, DefaultActivateHandler);
-
-        // Override Menu's Accept handler: MenuBar needs the full DefaultAcceptHandler
-        // so that OnAccepting fires when a MenuBarItem's Accept bubbles up (to open the popover).
-        AddCommand (Command.Accept, DefaultAcceptHandler);
-
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
 
@@ -169,28 +161,23 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Gets all menu items with the specified Title, anywhere in the menu hierarchy.
+    ///     Gets all <see cref="MenuItem"/>s in the menu hierarchy that match <paramref name="predicate"/>.
     /// </summary>
-    /// <param name="title"></param>
-    /// <returns></returns>
-    public IEnumerable<MenuItem> GetMenuItemsWithTitle (string title)
+    /// <param name="predicate">A function to test each <see cref="MenuItem"/>.</param>
+    /// <returns>All matching <see cref="MenuItem"/>s across all <see cref="PopoverMenu"/>s.</returns>
+    public IEnumerable<MenuItem> GetMenuItemsWith (Func<MenuItem, bool> predicate)
     {
         List<MenuItem> menuItems = [];
-
-        if (string.IsNullOrEmpty (title))
-        {
-            return menuItems;
-        }
 
         foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
         {
             if (mbi.PopoverMenu is { })
             {
-                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus ());
+                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus (predicate));
             }
         }
 
-        return menuItems.Where (mi => mi.Title == title);
+        return menuItems;
     }
 
     /// <summary>
@@ -588,13 +575,38 @@ public class MenuBar : Menu, IDesignable
 
         Id = "DemoBar";
 
-        var bordersCb = new CheckBox { Title = "_Borders", Value = DefaultBorderStyle == LineStyle.None ? CheckState.UnChecked : CheckState.Checked };
+        var bordersCb = new CheckBox
+        {
+            Title = "_Borders",
 
-        var autoSaveCb = new CheckBox { Title = "_Auto Save" };
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false,
+            Value = DefaultBorderStyle == LineStyle.None ? CheckState.UnChecked : CheckState.Checked
+        };
 
-        var enableOverwriteCb = new CheckBox { Title = "Enable _Overwrite" };
+        var autoSaveCb = new CheckBox
+        {
+            Title = "_Auto Save",
 
-        var mutuallyExclusiveOptionsSelector = new OptionSelector { Labels = ["G_ood", "_Bad", "U_gly"], Value = 0 };
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false
+        };
+
+        var enableOverwriteCb = new CheckBox
+        {
+            Title = "Enable _Overwrite",
+
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false
+        };
+
+        OptionSelector<Schemes> mutuallyExclusiveOptionsSelector = new () { Title = "Scheme", CanFocus = true };
 
         var menuBgColorCp = new ColorPicker { Width = 30 };
 
@@ -655,7 +667,8 @@ public class MenuBar : Menu, IDesignable
                                                               },
                                                               new MenuItem
                                                               {
-                                                                  HelpText = "3 Mutually Exclusive Options",
+                                                                  Id = "mutuallyExclusiveOptions",
+                                                                  HelpText = "Mutually Exclusive Options",
                                                                   CommandView = mutuallyExclusiveOptionsSelector,
                                                                   Key = Key.F7
                                                               },
@@ -713,9 +726,16 @@ public class MenuBar : Menu, IDesignable
 
             var nestedSubMenu = new MenuItem { Title = "_Moar Details", SubMenu = new Menu (ConfigureMoreDetailsSubMenu ()) };
 
-            var editMode = new MenuItem
+            // This menu item is used to test Application Key binding. See the Menus Scenario.
+            // F5 will toggle the Edit Mode checkbox, and the menu item text will update to show the Command it's bound to.
+            MenuItem editMode = new ()
             {
-                Text = "App Binding to Command.Edit", Id = "EditMode", Command = Command.Edit, CommandView = new CheckBox { Title = "E_dit Mode" }
+                Text = "App Binding to Command.Edit",
+                Id = "EditMode",
+                Command = Command.Edit,
+                CommandView = new CheckBox { Title = "E_dit Mode" },
+                Key = Key.F5,
+                BindKeyToApplication = true
             };
 
             return [detail, nestedSubMenu, null!, editMode];

@@ -826,4 +826,48 @@ public class OptionSelectorTests
     }
 
     #endregion
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Per OptionSelector spec: "Enter key - Activate and Accept the focused item."
+    ///     Pressing Enter on a focused but non-active item should:
+    ///     1. Activate (select) that item — Value changes, Activating fires.
+    ///     2. Accept — Accepting fires.
+    ///     Currently, Enter only triggers Accept (via the default View Enter→Command.Accept binding),
+    ///     but does not invoke Activate, so Activating never fires.
+    /// </summary>
+    [Fact]
+    public void Enter_Key_Activates_And_Accepts_Focused_Item ()
+    {
+        // Arrange
+        OptionSelector optionSelector = new ();
+        optionSelector.Labels = ["Option1", "Option2", "Option3"];
+        optionSelector.Value = 0;
+        optionSelector.SetFocus ();
+        optionSelector.Layout ();
+
+        // Focus the second item (which is NOT the active/selected item)
+        CheckBox [] checkBoxes = optionSelector.SubViews.OfType<CheckBox> ().ToArray ();
+        checkBoxes [1].SetFocus ();
+        Assert.True (checkBoxes [1].HasFocus);
+        Assert.Equal (0, optionSelector.Value); // Option1 is still selected
+
+        var activatingCount = 0;
+        optionSelector.Activating += (_, _) => activatingCount++;
+
+        var acceptingCount = 0;
+        optionSelector.Accepting += (_, _) => acceptingCount++;
+
+        var valueChangedCount = 0;
+        optionSelector.ValueChanged += (_, _) => valueChangedCount++;
+
+        // Act - Press Enter on the focused (but not selected) checkbox
+        checkBoxes [1].NewKeyDownEvent (Key.Enter);
+
+        // Assert - Per spec: Enter should Activate AND Accept
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptingCount);
+        Assert.Equal (1, valueChangedCount);
+        Assert.Equal (1, optionSelector.Value); // Should now be Option2
+    }
 }

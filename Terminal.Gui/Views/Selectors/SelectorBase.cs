@@ -103,17 +103,17 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 break;
 
             default:
+            {
+                if (Styles.HasFlag (SelectorStyles.ShowValue))
                 {
-                    if (Styles.HasFlag (SelectorStyles.ShowValue))
-                    {
-                        _valueField?.SetFocus ();
+                    _valueField?.SetFocus ();
 
-                        return true;
-                    }
-                    active = SubViews.OfType<CheckBox> ().Count () - 1;
-
-                    break;
+                    return true;
                 }
+                active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                break;
+            }
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
 
@@ -148,7 +148,31 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return true;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
+
+        // Per spec: Enter key should Activate AND Accept for both OptionSelector and FlagSelector.
+        // Enter only triggers Command.Accept (View's default key binding), so invoke Activate here
+        // before continuing with Accept processing. Also handle direct programmatic Accept invocations
+        // (Binding is null) by activating the currently focused checkbox.
+        bool enterFromCheckBox = args.Context?.Binding is KeyBinding { Key: { } key }
+                                 && key == Key.Enter
+                                 && args.Context?.Source?.TryGetTarget (out View? enterSource) == true
+                                 && enterSource is CheckBox;
+
+        bool directAccept = args.Context?.Binding is null && Focused is CheckBox;
+
+        if (enterFromCheckBox || directAccept)
+        {
+            // Create a fresh context with Command.Activate (not Accept) and IsBubblingUp=false.
+            // The original args.Context may have Command=Accept and IsBubblingUp=true from a bubble,
+            // which would cause TryBubbleUp to bubble the wrong command to SuperView.
+            // For direct invocations, use the focused CheckBox as the source so OnActivated
+            // identifies which item to activate.
+            WeakReference<View> source = enterFromCheckBox ? args.Context!.Source! : new WeakReference<View> (Focused!);
+
+            CommandContext activateCtx = new (Command.Activate, source, args.Context?.Binding);
+            InvokeCommand (Command.Activate, activateCtx);
+        }
 
         return args.Context?.Binding switch
                {
@@ -186,7 +210,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 return;
             }
 
-            // Logging.Debug ($"{this.ToIdentifyingString ()} ({field}->{value})");
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({field}->{value})");
 
             field = value;
 
@@ -206,6 +230,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     /// <returns><see langword="true"/> if the change was cancelled.</returns>
     protected bool RaiseValueChanging (int? currentValue, int? newValue)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({currentValue}->{newValue})");
+
         ValueChangingEventArgs<int?> args = new (currentValue, newValue);
         ValueChanging?.Invoke (this, args);
 
@@ -337,7 +363,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     /// <summary>
     ///     Creates the subviews for this selector.
     /// </summary>
-    public void CreateSubViews ()
+    public virtual void CreateSubViews ()
     {
         // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
@@ -355,8 +381,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return;
         }
 
-        OnCreatingSubViews ();
-
         for (var index = 0; index < Labels?.Count; index++)
         {
             Add (CreateCheckBox (Labels.ElementAt (index), Values!.ElementAt (index)));
@@ -367,9 +391,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             _valueField = new TextField
             {
                 CanFocus = false,
-
                 Id = "valueField",
                 Text = Value.ToString ()!,
+
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
                 ReadOnly = true,
@@ -379,22 +403,10 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             Add (_valueField);
         }
 
-        OnCreatedSubViews ();
-
         // Note: Hotkey assignment is now handled automatically by the base class
         // when SubViews are added via Add(). No need to call AssignUniqueHotKeys() here.
         SetLayout ();
     }
-
-    /// <summary>
-    ///     Called before <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
-    /// </summary>
-    protected virtual void OnCreatingSubViews () { }
-
-    /// <summary>
-    ///     Called after <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
-    /// </summary>
-    protected virtual void OnCreatedSubViews () { }
 
     /// <summary>
     ///     INTERNAL: Creates a checkbox subview
@@ -434,7 +446,10 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
     }
 
-    private void SetLayout ()
+    /// <summary>
+    ///     Updates the layout of the subviews based on <see cref="Orientation"/>.
+    /// </summary>
+    protected void SetLayout ()
     {
         var maxNaturalCheckBoxWidth = 0;
 

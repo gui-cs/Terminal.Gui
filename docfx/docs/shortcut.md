@@ -149,6 +149,14 @@ protected override void OnActivated (ICommandContext? ctx)
 }
 ```
 
+### CommandView_Activated — Deferred Activation
+
+Shortcut subscribes to `CommandView.Activated`. When a command bubbles up from within CommandView and reaches Shortcut's `HandleActivate` with `IsBubblingUp = true`, Shortcut defers its own `RaiseActivated` until `CommandView.Activated` fires. This ensures the CommandView completes its state change (e.g., CheckBox toggles) before Shortcut raises its own Activated event.
+
+`CommandView_Activated` handles two cases:
+1. **Deferred path**: `HandleActivate` set `_activationBubbledUp = true` — fires deferred `RaiseActivated` with the saved context.
+2. **Consumed-by-CommandView path**: The CommandView (e.g., `OptionSelector`, `FlagSelector`) consumed the bubble in its `OnActivating` (before it reached Shortcut's `HandleActivate`), then called `RaiseActivated` directly. In this case, the event context has `IsBubblingUp = true` — Shortcut's `CommandView_Activated` detects this and fires `RaiseActivated`.
+
 ## Detailed Command Flows
 
 ### Flow 1: Click on CommandView

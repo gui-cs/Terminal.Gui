@@ -207,8 +207,9 @@ By default, `CommandsToBubbleUp` is empty (no bubbling). Views that need hierarc
 | View | `CommandsToBubbleUp` |
 |------|---------------------|
 | **Shortcut** | `[Command.Activate, Command.Accept]` |
+| **Bar** | `[Command.Accept, Command.Activate]` |
 | **Dialog** | `[Command.Accept]` |
-| **Menu** | `[Command.Accept, Command.Activate]` |
+| **Menu** (inherits Bar) | `[Command.Accept, Command.Activate]` |
 | **SelectorBase** (OptionSelector, FlagSelector) | `[Command.Activate, Command.Accept]` |
 
 #### `TryBubbleUp`
@@ -328,7 +329,7 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
   1. Calls `OnActivating (args)` - subclasses can handle/cancel
   2. Raises `Activating` event - subscribers can handle/cancel
   3. If not handled, calls `TryBubbleUp` - bubbles if SuperView's `CommandsToBubbleUp` includes `Command.Activate`
-  - **Default Behavior**: If not handled, the default handler (`DefaultActivateHandler`) sets focus (if `CanFocus` is true), raises `Activated`, and returns `true`.
+  - **Default Behavior**: If not handled, the default handler (`DefaultActivateHandler`) sets focus (if `CanFocus` is true), raises `Activated`, and returns `true`. When `IsBubblingUp` is true (command bubbled from a SubView), the default handler returns `false` — only the `Activating` notification fires; `Activated`, `SetFocus`, and other side effects are skipped. Views that need to consume bubbled activations (e.g., `OptionSelector`, `FlagSelector`) override `OnActivating` to apply state changes and return `true`.
   - **Cancellation**: `args.Handled` or `OnActivating` returning `true` halts the command.
   - **Context**: `ICommandContext` provides invocation details (source view, binding).
 
@@ -351,9 +352,9 @@ These concepts are opinionated, reflecting Terminal.Gui's view that most UI inte
   2. Raises `Accepting` event - subscribers can handle/cancel
   3. If not handled, calls `TryBubbleUp` - handles `DefaultAcceptView` redirection and `CommandsToBubbleUp` bubbling
   - **Default Behavior**: If `RaiseAccepting` is not handled, `DefaultAcceptHandler` performs additional steps:
-    1. Checks for `DefaultAcceptView` and calls `BubbleDown` to it (if it exists and is not the source)
+    1. Checks for `DefaultAcceptView` and calls `BubbleDown` to it — but skips this redirect if Accept will also bubble to an ancestor via `CommandsToBubbleUp` (prevents double-path reaching the same ancestor)
     2. Calls `RaiseAccepted`
-    3. Returns `true` if: Accept was redirected to `DefaultAcceptView`, the command is bubbling up (`IsBubblingUp`), or the view implements `IAcceptTarget`
+    3. Returns `true` if: Accept was redirected to `DefaultAcceptView`, Accept will bubble to an ancestor, the command is bubbling up (`IsBubblingUp`), or the view implements `IAcceptTarget`
   - **Cancellation**: `args.Handled` or `OnAccepting` returning `true` halts the command.
   - **Context**: `ICommandContext` provides invocation details.
 

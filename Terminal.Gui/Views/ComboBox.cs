@@ -81,16 +81,6 @@ public class ComboBox : View, IDesignable
                             };
 
         // Things this view knows how to do
-        AddCommand (Command.Accept,
-                    ctx =>
-                    {
-                        if (ctx?.Source?.TryGetTarget (out View sourceView) == true && sourceView == _search)
-                        {
-                            return null;
-                        }
-
-                        return ActivateSelected (ctx);
-                    });
         AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
@@ -381,6 +371,22 @@ public class ComboBox : View, IDesignable
             _listview.SetSource (source);
             Source = _listview.Source;
         }
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        if (args.Context?.Source?.TryGetTarget (out View sourceView) == true && sourceView == _search)
+        {
+            return false;
+        }
+
+        if (HasItems ())
+        {
+            SelectText ();
+        }
+
+        return false;
     }
 
     private bool ActivateSelected (ICommandContext commandContext)

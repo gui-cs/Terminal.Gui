@@ -283,16 +283,18 @@ public class UICatalog
         {
             List<BenchmarkResults> results = runner.BenchmarkAllScenarios (UICatalogRunnable.CachedScenarios!);
 
-            if (results.Count > 0)
+            if (results.Count <= 0)
             {
-                if (!string.IsNullOrEmpty (Options.ResultsFile))
-                {
-                    Runner.SaveResultsToFile (results, Options.ResultsFile);
-                }
-                else
-                {
-                    Runner.DisplayResultsUI (results);
-                }
+                return;
+            }
+
+            if (!string.IsNullOrEmpty (Options.ResultsFile))
+            {
+                Runner.SaveResultsToFile (results, Options.ResultsFile);
+            }
+            else
+            {
+                Runner.DisplayResultsUI (results);
             }
 
             return;

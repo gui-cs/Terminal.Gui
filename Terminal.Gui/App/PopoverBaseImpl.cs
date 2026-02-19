@@ -52,7 +52,9 @@ public abstract class PopoverBaseImpl : View, IPopover
     /// </remarks>
     protected PopoverBaseImpl ()
     {
+#if DEBUG
         Id = "popoverBaseImpl";
+#endif
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
@@ -82,16 +84,14 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
     }
 
-    private IRunnable? _current;
-
     /// <inheritdoc/>
     public IRunnable? Current
     {
-        get => _current;
+        get;
         set
         {
-            _current = value;
-            App ??= (_current as View)?.App;
+            field = value;
+            App ??= (field as View)?.App;
         }
     }
 

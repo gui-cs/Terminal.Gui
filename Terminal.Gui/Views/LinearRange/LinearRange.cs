@@ -12,19 +12,13 @@ public class LinearRange : LinearRange<object>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
 
-
     /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
-    public LinearRange ()
-    {
-        Cursor = new () { Style = DefaultCursorStyle };
-    }
+    public LinearRange () => Cursor = new Cursor { Style = DefaultCursorStyle };
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
     /// <param name="options">Initial options.</param>
     /// <param name="orientation">Initial orientation.</param>
-    public LinearRange (List<object> options, Orientation orientation = Orientation.Horizontal) :
-        base (options, orientation)
-    { }
+    public LinearRange (List<object> options, Orientation orientation = Orientation.Horizontal) : base (options, orientation) { }
 }
 
 /// <summary>
@@ -47,10 +41,7 @@ public class LinearRange<T> : View, IOrientation
 
     #region Initialize
 
-    private void SetInitialProperties (
-        List<LinearRangeOption<T>> options,
-        Orientation orientation = Orientation.Horizontal
-    )
+    private void SetInitialProperties (List<LinearRangeOption<T>> options, Orientation orientation = Orientation.Horizontal)
     {
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
@@ -59,16 +50,16 @@ public class LinearRange<T> : View, IOrientation
         _options = options;
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new (this); // Do not use object initializer!
+        _orientationHelper = new OrientationHelper (this); // Do not use object initializer!
         _orientationHelper.Orientation = _config._linearRangeOrientation = orientation;
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
+        _orientationHelper.OrientationChanging += (_, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (_, e) => OrientationChanged?.Invoke (this, e);
 
         SetDefaultStyle ();
         SetCommands ();
         SetContentSize ();
 
-        SubViewLayout += (s, e) => { SetContentSize (); };
+        SubViewLayout += (_, _) => { SetContentSize (); };
     }
 
     // TODO: Make configurable via ConfigurationManager
@@ -79,24 +70,25 @@ public class LinearRange<T> : View, IOrientation
         switch (_config._linearRangeOrientation)
         {
             case Orientation.Horizontal:
-                Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () }; // '─'
-                Style.OptionChar = new () { Grapheme = Glyphs.BlackCircle.ToString () }; // '┼●🗹□⏹'
+                Style.SpaceChar = new Cell { Grapheme = Glyphs.HLine.ToString () }; // '─'
+                Style.OptionChar = new Cell { Grapheme = Glyphs.BlackCircle.ToString () }; // '┼●🗹□⏹'
 
                 break;
+
             case Orientation.Vertical:
-                Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
-                Style.OptionChar = new () { Grapheme = Glyphs.BlackCircle.ToString () };
+                Style.SpaceChar = new Cell { Grapheme = Glyphs.VLine.ToString () };
+                Style.OptionChar = new Cell { Grapheme = Glyphs.BlackCircle.ToString () };
 
                 break;
         }
 
         _config._legendsOrientation = _config._linearRangeOrientation;
-        Style.EmptyChar = new () { Grapheme = " " };
-        Style.SetChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () }; // ■
-        Style.RangeChar = new () { Grapheme = Glyphs.Stipple.ToString () }; // ░ ▒ ▓   // Medium shade not blinking on curses.
-        Style.StartRangeChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
-        Style.EndRangeChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
-        Style.DragChar = new () { Grapheme = Glyphs.Diamond.ToString () };
+        Style.EmptyChar = new Cell { Grapheme = " " };
+        Style.SetChar = new Cell { Grapheme = Glyphs.ContinuousMeterSegment.ToString () }; // ■
+        Style.RangeChar = new Cell { Grapheme = Glyphs.Stipple.ToString () }; // ░ ▒ ▓   // Medium shade not blinking on curses.
+        Style.StartRangeChar = new Cell { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
+        Style.EndRangeChar = new Cell { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
+        Style.DragChar = new Cell { Grapheme = Glyphs.Diamond.ToString () };
     }
 
     #endregion
@@ -104,14 +96,14 @@ public class LinearRange<T> : View, IOrientation
     #region Constructors
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
-    public LinearRange () : this (new ())  { }
+    public LinearRange () : this (new List<T> ()) { }
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
     /// <param name="options">Initial options.</param>
     /// <param name="orientation">Initial orientation.</param>
     public LinearRange (List<T>? options, Orientation orientation = Orientation.Horizontal)
     {
-        Cursor = new () { Style = LinearRange.DefaultCursorStyle };
+        Cursor = new Cursor { Style = LinearRange.DefaultCursorStyle };
 
         if (options is null)
         {
@@ -124,23 +116,17 @@ public class LinearRange<T> : View, IOrientation
         }
         else
         {
-            SetInitialProperties (
-                                  options.Select (e =>
+            SetInitialProperties (options.Select (e =>
                                                   {
                                                       var legend = e?.ToString ();
 
                                                       return new LinearRangeOption<T>
                                                       {
-                                                          Data = e,
-                                                          Legend = legend,
-                                                          LegendAbbr =
-                                                              (Rune)(legend?.Length > 0 ? legend [0] : ' ')
+                                                          Data = e, Legend = legend, LegendAbbr = (Rune)(legend?.Length > 0 ? legend [0] : ' ')
                                                       };
-                                                  }
-                                                 )
+                                                  })
                                          .ToList (),
-                                  orientation
-                                 );
+                                  orientation);
         }
     }
 
@@ -192,8 +178,7 @@ public class LinearRange<T> : View, IOrientation
         {
             int current = _config._minInnerSpacing;
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref current,
                                               value,
                                               OnMinimumInnerSpacingChanging,
@@ -205,8 +190,7 @@ public class LinearRange<T> : View, IOrientation
                                               },
                                               OnMinimumInnerSpacingChanged,
                                               MinimumInnerSpacingChanged,
-                                              out int _
-                                             );
+                                              out int _);
         }
     }
 
@@ -217,7 +201,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<int>>? MinimumInnerSpacingChanged;
 
     /// <summary>Called before <see cref="MinimumInnerSpacing"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnMinimumInnerSpacingChanging (ValueChangingEventArgs<int> args) { return false; }
+    protected virtual bool OnMinimumInnerSpacingChanging (ValueChangingEventArgs<int> args) => false;
 
     /// <summary>Called after <see cref="MinimumInnerSpacing"/> has changed.</summary>
     protected virtual void OnMinimumInnerSpacingChanged (ValueChangedEventArgs<int> args) { }
@@ -230,8 +214,7 @@ public class LinearRange<T> : View, IOrientation
         {
             LinearRangeType current = _config._type;
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref current,
                                               value,
                                               OnTypeChanging,
@@ -246,8 +229,7 @@ public class LinearRange<T> : View, IOrientation
                                               },
                                               OnTypeChanged,
                                               TypeChanged,
-                                              out LinearRangeType _
-                                             );
+                                              out LinearRangeType _);
         }
     }
 
@@ -258,7 +240,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<LinearRangeType>>? TypeChanged;
 
     /// <summary>Called before <see cref="Type"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnTypeChanging (ValueChangingEventArgs<LinearRangeType> args) { return false; }
+    protected virtual bool OnTypeChanging (ValueChangingEventArgs<LinearRangeType> args) => false;
 
     /// <summary>Called after <see cref="Type"/> has changed.</summary>
     protected virtual void OnTypeChanged (ValueChangedEventArgs<LinearRangeType> args) { }
@@ -266,11 +248,7 @@ public class LinearRange<T> : View, IOrientation
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/>. The default is <see cref="Orientation.Horizontal"/>.
     /// </summary>
-    public Orientation Orientation
-    {
-        get => _orientationHelper!.Orientation;
-        set => _orientationHelper!.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper!.Orientation; set => _orientationHelper!.Orientation = value; }
 
     #region IOrientation members
 
@@ -288,11 +266,12 @@ public class LinearRange<T> : View, IOrientation
         switch (_config._linearRangeOrientation)
         {
             case Orientation.Horizontal:
-                Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () }; // '─'
+                Style.SpaceChar = new Cell { Grapheme = Glyphs.HLine.ToString () }; // '─'
 
                 break;
+
             case Orientation.Vertical:
-                Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
+                Style.SpaceChar = new Cell { Grapheme = Glyphs.VLine.ToString () };
 
                 break;
         }
@@ -311,8 +290,7 @@ public class LinearRange<T> : View, IOrientation
         {
             Orientation current = _config._legendsOrientation;
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref current,
                                               value,
                                               OnLegendsOrientationChanging,
@@ -324,8 +302,7 @@ public class LinearRange<T> : View, IOrientation
                                               },
                                               OnLegendsOrientationChanged,
                                               LegendsOrientationChanged,
-                                              out Orientation _
-                                             );
+                                              out Orientation _);
         }
     }
 
@@ -336,7 +313,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<Orientation>>? LegendsOrientationChanged;
 
     /// <summary>Called before <see cref="LegendsOrientation"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnLegendsOrientationChanging (ValueChangingEventArgs<Orientation> args) { return false; }
+    protected virtual bool OnLegendsOrientationChanging (ValueChangingEventArgs<Orientation> args) => false;
 
     /// <summary>Called after <see cref="LegendsOrientation"/> has changed.</summary>
     protected virtual void OnLegendsOrientationChanged (ValueChangedEventArgs<Orientation> args) { }
@@ -363,11 +340,7 @@ public class LinearRange<T> : View, IOrientation
     }
 
     /// <summary>Allow range start and end be in the same option, as a single option.</summary>
-    public bool RangeAllowSingle
-    {
-        get => _config._rangeAllowSingle;
-        set => _config._rangeAllowSingle = value;
-    }
+    public bool RangeAllowSingle { get => _config._rangeAllowSingle; set => _config._rangeAllowSingle = value; }
 
     /// <summary>Show/Hide spacing before and after the first and last option.</summary>
     public bool ShowEndSpacing
@@ -377,8 +350,7 @@ public class LinearRange<T> : View, IOrientation
         {
             bool current = _config._showEndSpacing;
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref current,
                                               value,
                                               OnShowEndSpacingChanging,
@@ -390,8 +362,7 @@ public class LinearRange<T> : View, IOrientation
                                               },
                                               OnShowEndSpacingChanged,
                                               ShowEndSpacingChanged,
-                                              out bool _
-                                             );
+                                              out bool _);
         }
     }
 
@@ -402,7 +373,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<bool>>? ShowEndSpacingChanged;
 
     /// <summary>Called before <see cref="ShowEndSpacing"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnShowEndSpacingChanging (ValueChangingEventArgs<bool> args) { return false; }
+    protected virtual bool OnShowEndSpacingChanging (ValueChangingEventArgs<bool> args) => false;
 
     /// <summary>Called after <see cref="ShowEndSpacing"/> has changed.</summary>
     protected virtual void OnShowEndSpacingChanged (ValueChangedEventArgs<bool> args) { }
@@ -415,8 +386,7 @@ public class LinearRange<T> : View, IOrientation
         {
             bool current = _config._showLegends;
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref current,
                                               value,
                                               OnShowLegendsChanging,
@@ -428,8 +398,7 @@ public class LinearRange<T> : View, IOrientation
                                               },
                                               OnShowLegendsChanged,
                                               ShowLegendsChanged,
-                                              out bool _
-                                             );
+                                              out bool _);
         }
     }
 
@@ -440,7 +409,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<bool>>? ShowLegendsChanged;
 
     /// <summary>Called before <see cref="ShowLegends"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnShowLegendsChanging (ValueChangingEventArgs<bool> args) { return false; }
+    protected virtual bool OnShowLegendsChanging (ValueChangingEventArgs<bool> args) => false;
 
     /// <summary>Called after <see cref="ShowLegends"/> has changed.</summary>
     protected virtual void OnShowLegendsChanged (ValueChangedEventArgs<bool> args) { }
@@ -455,8 +424,7 @@ public class LinearRange<T> : View, IOrientation
         {
             bool current = _config._useMinimumSize;
 
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref current,
                                               value,
                                               OnUseMinimumSizeChanging,
@@ -468,8 +436,7 @@ public class LinearRange<T> : View, IOrientation
                                               },
                                               OnUseMinimumSizeChanged,
                                               UseMinimumSizeChanged,
-                                              out bool _
-                                             );
+                                              out bool _);
         }
     }
 
@@ -480,7 +447,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<bool>>? UseMinimumSizeChanged;
 
     /// <summary>Called before <see cref="UseMinimumSize"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnUseMinimumSizeChanging (ValueChangingEventArgs<bool> args) { return false; }
+    protected virtual bool OnUseMinimumSizeChanging (ValueChangingEventArgs<bool> args) => false;
 
     /// <summary>Called after <see cref="UseMinimumSize"/> has changed.</summary>
     protected virtual void OnUseMinimumSizeChanged (ValueChangedEventArgs<bool> args) { }
@@ -498,15 +465,14 @@ public class LinearRange<T> : View, IOrientation
     /// </summary>
     public virtual void OnOptionsChanged ()
     {
-        OptionsChanged?.Invoke (this, new (GetSetOptionDictionary ()));
+        OptionsChanged?.Invoke (this, new LinearRangeEventArgs<T> (GetSetOptionDictionary ()));
         SetNeedsDraw ();
     }
 
     /// <summary>Event raised When the option is hovered with the keys or the mouse.</summary>
     public event EventHandler<LinearRangeEventArgs<T>>? OptionFocused;
 
-    private int
-        _lastFocusedOption; // for Range type; the most recently focused option. Used to determine shrink direction
+    private int _lastFocusedOption; // for Range type; the most recently focused option. Used to determine shrink direction
 
     /// <summary>Overridable function that fires the <see cref="OptionFocused"/> event.</summary>
     /// <param name="args"></param>
@@ -521,11 +487,12 @@ public class LinearRange<T> : View, IOrientation
 
         OptionFocused?.Invoke (this, args);
 
-        if (!args.Cancel)
+        if (args.Cancel)
         {
-            _lastFocusedOption = FocusedOption;
-            FocusedOption = newFocusedOption;
+            return args.Cancel;
         }
+        _lastFocusedOption = FocusedOption;
+        FocusedOption = newFocusedOption;
 
         return args.Cancel;
     }
@@ -534,19 +501,18 @@ public class LinearRange<T> : View, IOrientation
 
     #region Public Methods
 
-    private int _focusedOption;
-
     /// <summary>The focused option (has the cursor).</summary>
     public int FocusedOption
     {
-        get => _focusedOption;
+        get;
         set
         {
-            if (_focusedOption != value)
+            if (field == value)
             {
-                _focusedOption = value;
-                UpdateCursor ();
+                return;
             }
+            field = value;
+            UpdateCursor ();
         }
     }
 
@@ -556,37 +522,33 @@ public class LinearRange<T> : View, IOrientation
         // TODO: Handle range type.
         // Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
 
-        if (!_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options!.Count)
+        if (_setOptions.Contains (optionIndex) || optionIndex < 0 || optionIndex >= _options!.Count)
         {
-            FocusedOption = optionIndex;
-            SetFocusedOption ();
-
-            return true;
+            return false;
         }
+        FocusedOption = optionIndex;
+        SetFocusedOption ();
 
-        return false;
+        return true;
+
     }
 
     /// <summary>Causes the specified option to be un-set and be focused.</summary>
     public bool UnSetOption (int optionIndex)
     {
-        if (!AllowEmpty && _setOptions.Count > 2 && _setOptions.Contains (optionIndex))
+        if (AllowEmpty || _setOptions.Count <= 2 || !_setOptions.Contains (optionIndex))
         {
-            FocusedOption = optionIndex;
-            SetFocusedOption ();
-
-            return true;
+            return false;
         }
+        FocusedOption = optionIndex;
+        SetFocusedOption ();
 
-        return false;
+        return true;
+
     }
 
     /// <summary>Get the indexes of the set options.</summary>
-    public List<int> GetSetOptions ()
-    {
-        // Copy
-        return _setOptions.OrderBy (e => e).ToList ();
-    }
+    public List<int> GetSetOptions () => _setOptions.OrderBy (e => e).ToList ();
 
     #endregion Public Methods
 
@@ -623,7 +585,7 @@ public class LinearRange<T> : View, IOrientation
             CalcSpacingConfig (horizontal ? Viewport.Width : Viewport.Height);
         }
 
-        SetContentSize (new (GetIdealWidth (), GetIdealHeight ()));
+        SetContentSize (new Size (GetIdealWidth (), GetIdealHeight ()));
 
         return;
 
@@ -821,7 +783,7 @@ public class LinearRange<T> : View, IOrientation
     {
         position = (-1, -1);
 
-        if (option < 0 || option >= _options!.Count ())
+        if (option < 0 || option >= _options!.Count)
         {
             return false;
         }
@@ -830,14 +792,7 @@ public class LinearRange<T> : View, IOrientation
         offset += _config._startSpacing;
         offset += option * (_config._cachedInnerSpacing + 1);
 
-        if (_config._linearRangeOrientation == Orientation.Vertical)
-        {
-            position = (0, offset);
-        }
-        else
-        {
-            position = (offset, 0);
-        }
+        position = _config._linearRangeOrientation == Orientation.Vertical ? (0, offset) : (offset, 0);
 
         return true;
     }
@@ -913,19 +868,14 @@ public class LinearRange<T> : View, IOrientation
     /// </remarks>
     private void UpdateCursor ()
     {
-        if (!TryGetPositionByOption (FocusedOption, out (int x, int y) position)
-            || !IsInitialized
-            || !Viewport.Contains (position.x, position.y))
+        if (!TryGetPositionByOption (FocusedOption, out (int x, int y) position) || !IsInitialized || !Viewport.Contains (position.x, position.y))
         {
             Cursor = Cursor with { Position = null }; // Hide cursor
 
             return;
         }
 
-        Cursor = Cursor with
-        {
-            Position = ViewportToScreen (new Point (position.x, position.y))
-        };
+        Cursor = Cursor with { Position = ViewportToScreen (new Point (position.x, position.y)) };
     }
 
     #endregion Cursor and Position
@@ -980,8 +930,10 @@ public class LinearRange<T> : View, IOrientation
         {
             case Alignment.Fill:
                 return TextFormatter.Justify (text, width);
+
             case Alignment.Start:
                 return text + s1 + s1 + s2;
+
             case Alignment.Center:
                 if (text.Length % 2 != 0)
                 {
@@ -989,8 +941,10 @@ public class LinearRange<T> : View, IOrientation
                 }
 
                 return s1 + s2 + text + s1;
+
             case Alignment.End:
                 return s1 + s1 + s2 + text;
+
             default:
                 return text;
         }
@@ -1021,11 +975,9 @@ public class LinearRange<T> : View, IOrientation
         // Left Spacing
         if (_config is { _showEndSpacing: true, _startSpacing: > 0 })
         {
-            SetAttribute (
-                          isSet && _config._type == LinearRangeType.LeftRange
+            SetAttribute (isSet && _config._type == LinearRangeType.LeftRange
                               ? Style.RangeChar.Attribute ?? normalAttr
-                              : Style.SpaceChar.Attribute ?? normalAttr
-                         );
+                              : Style.SpaceChar.Attribute ?? normalAttr);
             string text = isSet && _config._type == LinearRangeType.LeftRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
 
             for (var i = 0; i < _config._startSpacing; i++)
@@ -1076,20 +1028,21 @@ public class LinearRange<T> : View, IOrientation
                             drawRange = i < _setOptions [0];
 
                             break;
+
                         case LinearRangeType.RightRange when i >= _setOptions [0]:
                             drawRange = i >= _setOptions [0];
 
                             break;
+
                         case LinearRangeType.Range when _setOptions.Count == 1:
                             drawRange = false;
 
                             break;
+
                         case LinearRangeType.Range when _setOptions.Count == 2:
-                            if ((i >= _setOptions [0] && i <= _setOptions [1])
-                                || (i >= _setOptions [1] && i <= _setOptions [0]))
+                            if ((i >= _setOptions [0] && i <= _setOptions [1]) || (i >= _setOptions [1] && i <= _setOptions [0]))
                             {
-                                drawRange = (i >= _setOptions [0] && i < _setOptions [1])
-                                            || (i >= _setOptions [1] && i < _setOptions [0]);
+                                drawRange = (i >= _setOptions [0] && i < _setOptions [1]) || (i >= _setOptions [1] && i < _setOptions [0]);
                             }
 
                             break;
@@ -1097,10 +1050,8 @@ public class LinearRange<T> : View, IOrientation
                 }
 
                 // Draw Option
-                SetAttribute (
-                              isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAttr :
-                              drawRange ? Style.RangeChar.Attribute ?? setAttr : Style.OptionChar.Attribute ?? normalAttr
-                             );
+                SetAttribute (isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAttr :
+                              drawRange ? Style.RangeChar.Attribute ?? setAttr : Style.OptionChar.Attribute ?? normalAttr);
 
                 string text = drawRange ? Style.RangeChar.Grapheme : Style.OptionChar.Grapheme;
 
@@ -1138,11 +1089,7 @@ public class LinearRange<T> : View, IOrientation
                 }
 
                 // Skip if is the Last Spacing.
-                SetAttribute (
-                              drawRange && isSet
-                                  ? Style.RangeChar.Attribute ?? setAttr
-                                  : Style.SpaceChar.Attribute ?? normalAttr
-                             );
+                SetAttribute (drawRange && isSet ? Style.RangeChar.Attribute ?? setAttr : Style.SpaceChar.Attribute ?? normalAttr);
 
                 for (var s = 0; s < _config._cachedInnerSpacing; s++)
                 {
@@ -1165,11 +1112,9 @@ public class LinearRange<T> : View, IOrientation
         // Right Spacing
         if (_config._showEndSpacing)
         {
-            SetAttribute (
-                          isSet && _config._type == LinearRangeType.RightRange
+            SetAttribute (isSet && _config._type == LinearRangeType.RightRange
                               ? Style.RangeChar.Attribute ?? normalAttr
-                              : Style.SpaceChar.Attribute ?? normalAttr
-                         );
+                              : Style.SpaceChar.Attribute ?? normalAttr);
             string text = isSet && _config._type == LinearRangeType.RightRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
 
             for (var i = 0; i < remaining; i++)
@@ -1230,13 +1175,12 @@ public class LinearRange<T> : View, IOrientation
 
         switch (_config._linearRangeOrientation)
         {
-            case Orientation.Horizontal
-                when _config._legendsOrientation == Orientation.Vertical:
+            case Orientation.Horizontal when _config._legendsOrientation == Orientation.Vertical:
                 x += _config._startSpacing;
 
                 break;
-            case Orientation.Vertical
-                when _config._legendsOrientation == Orientation.Horizontal:
+
+            case Orientation.Vertical when _config._legendsOrientation == Orientation.Horizontal:
                 y += _config._startSpacing;
 
                 break;
@@ -1267,6 +1211,7 @@ public class LinearRange<T> : View, IOrientation
                     }
 
                     break;
+
                 case LinearRangeType.LeftRange:
                     if (isSet && i <= _setOptions [0])
                     {
@@ -1274,6 +1219,7 @@ public class LinearRange<T> : View, IOrientation
                     }
 
                     break;
+
                 case LinearRangeType.RightRange:
                     if (isSet && i >= _setOptions [0])
                     {
@@ -1281,6 +1227,7 @@ public class LinearRange<T> : View, IOrientation
                     }
 
                     break;
+
                 case LinearRangeType.Range when _setOptions.Count == 1:
                     if (isSet && i == _setOptions [0])
                     {
@@ -1288,15 +1235,15 @@ public class LinearRange<T> : View, IOrientation
                     }
 
                     break;
+
                 case LinearRangeType.Range:
-                    if (isSet
-                        && ((i >= _setOptions [0] && i <= _setOptions [1])
-                            || (i >= _setOptions [1] && i <= _setOptions [0])))
+                    if (isSet && ((i >= _setOptions [0] && i <= _setOptions [1]) || (i >= _setOptions [1] && i <= _setOptions [0])))
                     {
                         isOptionSet = true;
                     }
 
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException ();
             }
@@ -1314,6 +1261,7 @@ public class LinearRange<T> : View, IOrientation
                             text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Center);
 
                             break;
+
                         case Orientation.Vertical:
                             y = 1;
 
@@ -1321,6 +1269,7 @@ public class LinearRange<T> : View, IOrientation
                     }
 
                     break;
+
                 case Orientation.Vertical:
                     switch (_config._legendsOrientation)
                     {
@@ -1328,6 +1277,7 @@ public class LinearRange<T> : View, IOrientation
                             x = 1;
 
                             break;
+
                         case Orientation.Vertical:
                             text = AlignText (text, _config._cachedInnerSpacing + 1, Alignment.Center);
 
@@ -1410,13 +1360,12 @@ public class LinearRange<T> : View, IOrientation
 
             switch (_config._linearRangeOrientation)
             {
-                case Orientation.Horizontal
-                    when _config._legendsOrientation == Orientation.Vertical:
+                case Orientation.Horizontal when _config._legendsOrientation == Orientation.Vertical:
                     x += _config._cachedInnerSpacing + 1;
 
                     break;
-                case Orientation.Vertical
-                    when _config._legendsOrientation == Orientation.Horizontal:
+
+                case Orientation.Vertical when _config._legendsOrientation == Orientation.Horizontal:
                     y += _config._cachedInnerSpacing + 1;
 
                     break;
@@ -1464,9 +1413,7 @@ public class LinearRange<T> : View, IOrientation
         bool success;
         int option;
 
-        if (_dragPosition.HasValue
-            && mouse.Flags.HasFlag (MouseFlags.PositionReport)
-            && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.PositionReport) && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             // Continue Drag
             _dragPosition = mouse.Position;
@@ -1484,7 +1431,7 @@ public class LinearRange<T> : View, IOrientation
 
             if (!_config._allowEmpty && success)
             {
-                if (!OnOptionFocused (option, new (GetSetOptionDictionary (), FocusedOption)))
+                if (!OnOptionFocused (option, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption)))
                 {
                     SetFocusedOption ();
                 }
@@ -1495,8 +1442,7 @@ public class LinearRange<T> : View, IOrientation
             return true;
         }
 
-        if ((_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
-            || mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if ((_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased)) || mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             return mouse.Handled;
         }
@@ -1512,6 +1458,7 @@ public class LinearRange<T> : View, IOrientation
                 success = TryGetOptionByPosition (mouse.Position!.Value.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
 
                 break;
+
             default:
                 success = TryGetOptionByPosition (0, mouse.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
 
@@ -1520,7 +1467,7 @@ public class LinearRange<T> : View, IOrientation
 
         if (success)
         {
-            if (!OnOptionFocused (option, new (GetSetOptionDictionary (), FocusedOption)))
+            if (!OnOptionFocused (option, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption)))
             {
                 SetFocusedOption ();
             }
@@ -1540,7 +1487,7 @@ public class LinearRange<T> : View, IOrientation
                 int width = _options!.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
                 int right = left + width - 1;
                 int clampedX = Clamp (position.X, left, right);
-                position = new (clampedX, 0);
+                position = new Point (clampedX, 0);
             }
             else
             {
@@ -1548,12 +1495,12 @@ public class LinearRange<T> : View, IOrientation
                 int height = _options!.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
                 int bottom = top + height - 1;
                 int clampedY = Clamp (position.Y, top, bottom);
-                position = new (0, clampedY);
+                position = new Point (0, clampedY);
             }
 
             return position;
 
-            static int Clamp (int value, int min, int max) { return Math.Max (min, Math.Min (max, value)); }
+            static int Clamp (int value, int min, int max) => Math.Max (min, Math.Min (max, value));
         }
     }
 
@@ -1567,8 +1514,6 @@ public class LinearRange<T> : View, IOrientation
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
-        AddCommand (Command.Activate, () => Select ());
-        AddCommand (Command.Accept, ctx => Accept (ctx));
 
         SetKeyBindings ();
     }
@@ -1611,7 +1556,7 @@ public class LinearRange<T> : View, IOrientation
         KeyBindings.Add (Key.Space, Command.Activate);
     }
 
-    private Dictionary<int, LinearRangeOption<T>> GetSetOptionDictionary () { return _setOptions.ToDictionary (e => e, e => _options! [e]); }
+    private Dictionary<int, LinearRangeOption<T>> GetSetOptionDictionary () => _setOptions.ToDictionary (e => e, e => _options! [e]);
 
     /// <summary>
     ///     Sets or unsets <paramref name="optionIndex"/> based on <paramref name="set"/>.
@@ -1687,10 +1632,11 @@ public class LinearRange<T> : View, IOrientation
                 changed = true;
 
                 break;
+
             case LinearRangeType.Multiple:
                 if (_setOptions.Contains (FocusedOption))
                 {
-                    if (!_config._allowEmpty && _setOptions.Count () == 1)
+                    if (!_config._allowEmpty && _setOptions.Count == 1)
                     {
                         break;
                     }
@@ -1817,9 +1763,7 @@ public class LinearRange<T> : View, IOrientation
                             _options [_setOptions [1]].OnUnSet ();
                             _setOptions [1] = FocusedOption;
                         }
-                        else if (FocusedOption >= _setOptions [0]
-                                 && FocusedOption <= _setOptions [1]
-                                 && _setOptions [1] - _setOptions [0] > 1)
+                        else if (FocusedOption >= _setOptions [0] && FocusedOption <= _setOptions [1] && _setOptions [1] - _setOptions [0] > 1)
                         {
                             if (FocusedOption < _lastFocusedOption)
                             {
@@ -1842,6 +1786,7 @@ public class LinearRange<T> : View, IOrientation
                 changed = true;
 
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException (_config._type.ToString ());
         }
@@ -1853,14 +1798,7 @@ public class LinearRange<T> : View, IOrientation
     {
         int next = _options is { } && FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption;
 
-        if (next != FocusedOption
-            && !OnOptionFocused (
-                                 next,
-                                 new (
-                                      GetSetOptionDictionary (),
-                                      FocusedOption
-                                     )
-                                ))
+        if (next != FocusedOption && !OnOptionFocused (next, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption)))
         {
             SetFocusedOption ();
         }
@@ -1872,14 +1810,7 @@ public class LinearRange<T> : View, IOrientation
     {
         int prev = FocusedOption > 0 ? FocusedOption - 1 : FocusedOption;
 
-        if (prev != FocusedOption
-            && !OnOptionFocused (
-                                 prev,
-                                 new (
-                                      GetSetOptionDictionary (),
-                                      FocusedOption
-                                     )
-                                ))
+        if (prev != FocusedOption && !OnOptionFocused (prev, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption)))
         {
             SetFocusedOption ();
         }
@@ -1887,7 +1818,22 @@ public class LinearRange<T> : View, IOrientation
         return true;
     }
 
-    internal bool Select () { return SetFocusedOption (); }
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+        SetFocusedOption ();
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        SetFocusedOption ();
+
+        return false;
+    }
+
+    internal bool Select () => SetFocusedOption ();
 
     internal bool Accept (ICommandContext? commandContext)
     {
@@ -1898,10 +1844,7 @@ public class LinearRange<T> : View, IOrientation
 
     internal bool MovePlus ()
     {
-        bool cancelled = OnOptionFocused (
-                                          FocusedOption + 1,
-                                          new (GetSetOptionDictionary (), FocusedOption)
-                                         );
+        bool cancelled = OnOptionFocused (FocusedOption + 1, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
 
         if (cancelled)
         {
@@ -1918,10 +1861,7 @@ public class LinearRange<T> : View, IOrientation
 
     internal bool MoveMinus ()
     {
-        bool cancelled = OnOptionFocused (
-                                          FocusedOption - 1,
-                                          new (GetSetOptionDictionary (), FocusedOption)
-                                         );
+        bool cancelled = OnOptionFocused (FocusedOption - 1, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
 
         if (cancelled)
         {
@@ -1938,7 +1878,7 @@ public class LinearRange<T> : View, IOrientation
 
     internal bool MoveStart ()
     {
-        if (OnOptionFocused (0, new (GetSetOptionDictionary (), FocusedOption)))
+        if (OnOptionFocused (0, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption)))
         {
             return false;
         }
@@ -1953,7 +1893,7 @@ public class LinearRange<T> : View, IOrientation
 
     internal bool MoveEnd ()
     {
-        if (OnOptionFocused (_options!.Count - 1, new (GetSetOptionDictionary (), FocusedOption)))
+        if (OnOptionFocused (_options!.Count - 1, new LinearRangeEventArgs<T> (GetSetOptionDictionary (), FocusedOption)))
         {
             return false;
         }

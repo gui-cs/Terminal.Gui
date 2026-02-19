@@ -6,6 +6,12 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class Menu : Bar
 {
+    /// <summary>
+    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+
     /// <inheritdoc/>
     public Menu () : this ([]) { }
 
@@ -29,35 +35,6 @@ public class Menu : Bar
 
         CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
-        // When a MenuItem's Activate bubbles up to this Menu, run the full handler
-        // (so Activating/Activated events fire on Menu) but return false so the originating
-        // MenuItem can complete its own activation (RaiseActivated → Action?.Invoke()).
-        AddCommand (Command.Activate,
-                    ctx =>
-                    {
-                        if (ctx?.IsBubblingUp != true)
-                        {
-                            return DefaultActivateHandler (ctx);
-                        }
-                        DefaultActivateHandler (ctx);
-
-                        return false;
-                    });
-
-        // Same for Accept: run the handler (fires Accepting/Accepted events) but return false
-        // so the originating MenuItem completes its own Accept processing.
-        AddCommand (Command.Accept,
-                    ctx =>
-                    {
-                        if (ctx?.IsBubblingUp != true)
-                        {
-                            return DefaultAcceptHandler (ctx);
-                        }
-                        DefaultAcceptHandler (ctx);
-
-                        return false;
-                    });
-
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 
@@ -69,12 +46,13 @@ public class Menu : Bar
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
 
+    //if (ctx.IsBubblingUp)
+    //{
+    //    SuperMenuItem?.InvokeCommand (ctx.Command);
+    //}
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
     /// </summary>

@@ -147,7 +147,7 @@ public class CommandBubblingTests
     ///     The activation stops at MenuItem because RaiseActivating() does not call TryBubbleToSuperView().
     ///     This test documents the DESIRED behavior that will be enabled by CommandsToBubbleUp.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not bubble - RaiseActivating lacks TryBubbleToSuperView call")]
+    [Fact (Skip = "Fix in #4620 - Command.Activate does not bubble - RaiseActivating lacks TryBubbleToSuperView call")]
     public void Activate_Propagates_FromCheckBox_ToMenuBar ()
     {
         // Arrange: Build the complete hierarchy
@@ -200,39 +200,6 @@ public class CommandBubblingTests
         Assert.IsType<KeyBinding> (binding); // Binding type should be preserved
     }
 
-    /// <summary>
-    ///     Tests that Command.Activate bubbles through the FlagSelector to the containing view.
-    ///     This verifies FlagSelector intercepts CheckBox events and forwards them.
-    /// </summary>
-    [Fact (Skip = "Command.Activate does not bubble - RaiseActivating lacks TryBubbleToSuperView call")]
-    public void Activate_Propagates_FromCheckBox_ToFlagSelector ()
-    {
-        // Arrange
-        FlagSelector<TestFlags> flagSelector = new () { Id = "flagSelector" };
-        FlagSelectorEventTracker tracker = new ();
-        tracker.AttachTo (flagSelector);
-        flagSelector.Layout ();
-
-        CheckBox? checkBox = flagSelector.SubViews.OfType<CheckBox> ().FirstOrDefault ();
-        Assert.NotNull (checkBox);
-
-        // Act: Invoke Command.Activate on the CheckBox
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = checkBox };
-        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (checkBox), Binding = keyBinding };
-
-        checkBox.InvokeCommand (Command.Activate, ctx);
-
-        // Assert: FlagSelector should have received the Activating event
-        // This should PASS because FlagSelector intercepts CheckBox.Activating and forwards it
-        Assert.NotEmpty (tracker.EventLog);
-
-        (string eventName, View? source, ICommandBinding? _) = tracker.EventLog.First ();
-        Assert.Equal ("Activating", eventName);
-
-        // Note: Source might be flagSelector (not checkBox) depending on how FlagSelector forwards the event
-        // This is acceptable - the key is that the event reached FlagSelector
-    }
-
     #endregion
 
     #region Test 2: Accept Bubbling Through Full Hierarchy
@@ -242,7 +209,7 @@ public class CommandBubblingTests
     ///     Command.Accept DOES bubble by default (hard-coded in RaiseAccepting), so this test
     ///     might pass, BUT the event interception in FlagSelector and Shortcut may interfere.
     /// </summary>
-    [Fact (Skip = "Event interception in FlagSelector/Shortcut blocks Accept propagation through hierarchy")]
+    [Fact (Skip = "Fix in #4620 - Event interception in FlagSelector/Shortcut blocks Accept propagation through hierarchy")]
     public void Accept_Propagates_FromCheckBox_ToMenuBar ()
     {
         // Arrange: Build the complete hierarchy (same as Activate test)
@@ -295,7 +262,7 @@ public class CommandBubblingTests
     ///     EXPECTED TO FAIL: Current implementation doesn't bubble Activate, so we can't
     ///     verify source preservation at higher levels.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not bubble - cannot verify source preservation")]
+    [Fact (Skip = "Fix in #4620 - Command.Activate does not bubble - cannot verify source preservation")]
     public void Source_RemainsConstant_DuringActivateBubbling ()
     {
         // Arrange
@@ -349,7 +316,7 @@ public class CommandBubblingTests
     ///     Tests that ctx.Binding is preserved during propagation.
     ///     EXPECTED TO FAIL for same reason as source preservation test.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not bubble - cannot verify binding preservation")]
+    [Fact (Skip = "Fix in #4620 - Command.Activate does not bubble - cannot verify binding preservation")]
     public void Binding_IsPreserved_DuringActivateBubbling ()
     {
         // Arrange
@@ -424,7 +391,7 @@ public class CommandBubblingTests
     ///     EXPECTED TO FAIL: Current implementation doesn't bubble Activate at all,
     ///     so we can't test the "handled stops propagation" behavior.
     /// </summary>
-    [Fact (Skip = "Command.Activate does not bubble - cannot test handled-stops-propagation")]
+    [Fact (Skip = "Fix in #4620 - Command.Activate does not bubble - cannot test handled-stops-propagation")]
     public void Activate_HandledAtMenu_DoesNotReachMenuBar ()
     {
         // Arrange
@@ -470,7 +437,7 @@ public class CommandBubblingTests
     ///     Tests that when Menu handles Accepting, MenuBar does NOT receive the event.
     ///     Command.Accept already bubbles, so this tests the "handled stops propagation" behavior.
     /// </summary>
-    [Fact (Skip = "Event interception blocks Accept before reaching Menu - cannot test handled-stops-propagation")]
+    [Fact]
     public void Accept_HandledAtMenu_DoesNotReachMenuBar ()
     {
         // Arrange

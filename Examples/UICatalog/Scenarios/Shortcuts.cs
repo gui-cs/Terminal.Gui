@@ -25,8 +25,6 @@ public class Shortcuts : Scenario
         _app.Dispose ();
     }
 
-    // Setting everything up in Loaded handler because we change the
-    // QuitKey and it only sticks if changed after init
     private void HandleOnIsRunningChanged (object? sender, EventArgs<bool> e)
     {
         if (!e.Value)
@@ -48,7 +46,7 @@ public class Shortcuts : Scenario
             Title = "E_vents"
         };
 
-        eventLog.Width = Dim.Auto (minimumContentDim: 40, maximumContentDim: Dim.Percent (50));
+        eventLog.Width = Dim.Auto (minimumContentDim: 3, maximumContentDim: Dim.Percent (50));
         _window.Add (eventLog);
 
         CheckBox canFocusCb = new ()
@@ -57,6 +55,10 @@ public class Shortcuts : Scenario
             Y = 0,
             Id = "canFocusCB",
             Text = "*._CommandView.CanFocus",
+
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
             CanFocus = false
         };
         _window.Add (canFocusCb);
@@ -143,34 +145,64 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (appShortcut),
             Width = Dim.Fill (eventLog),
             HelpText = "Accepting pops MB",
-            CommandView = new Button { Id = "buttonBtn", Title = "_Button", ShadowStyle = ShadowStyle.None },
+            CommandView = new Button
+            {
+                Id = "buttonBtn",
+                Title = "_Button",
+
+                // Set the ShadowStyle to None as shadows look awkward on a single-line Button CommandView, and the Shortcut/MenuItem default
+                ShadowStyle = ShadowStyle.None,
+
+                // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+                // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox or Button),
+                // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+                CanFocus = false
+            },
             Key = Key.K
         };
         buttonShortcut.Activated += ButtonShortcutOnActivated;
 
         _window.Add (buttonShortcut);
 
+        OptionSelector optionSelector = new () { Id = "optionSelector", Orientation = Orientation.Vertical };
+        optionSelector.EnableForDesign ();
+
         Shortcut optionSelectorShortcut = new ()
         {
             Id = "optionSelector",
-            HelpText = "Linear Range Orientation",
+            HelpText = "Activating a Shortcut with an OptionSelector CommandView will cycle the options",
             X = 0,
             Y = Pos.Bottom (buttonShortcut),
             Key = Key.F2,
             Width = Dim.Fill (eventLog),
-            CommandView = new OptionSelector<Orientation>
-                {
-                    Id = "optionSelectorOS", Orientation = Orientation.Vertical, MouseHighlightStates = MouseState.None
-                }
+            CommandView = optionSelector
         };
 
         _window.Add (optionSelectorShortcut);
+
+        FlagSelector<ViewDiagnosticFlags> flagSelector = new () { Styles = SelectorStyles.ShowNoneFlag };
+        flagSelector.AssignHotKeys = true;
+        flagSelector.Value = View.Diagnostics;
+
+        flagSelector.ValueChanged += (_, args) => { View.Diagnostics = args.Value ?? ViewDiagnosticFlags.Off; };
+
+        Shortcut diagnosticShortcut = new ()
+        {
+            Id = "diagnosticShortcut",
+            Y = Pos.Bottom (optionSelectorShortcut),
+            Key = Key.F3,
+            Width = Dim.Fill (eventLog),
+            CommandView = flagSelector,
+            HelpText = "View Diagnostics"
+        };
+
+        _window.Add (diagnosticShortcut);
 
         Shortcut sliderShortcut = new ()
         {
             Id = "sliderShortcut",
             X = 0,
-            Y = Pos.Bottom (optionSelectorShortcut),
+            Y = Pos.Bottom (diagnosticShortcut),
             Width = Dim.Fill (eventLog),
             HelpText = "LinearRanges work!",
             CommandView = new LinearRange<string> { Id = "sliderLR", Orientation = Orientation.Horizontal, AllowEmpty = true },
@@ -194,12 +226,6 @@ public class Shortcuts : Scenario
                                                                                     }");
                                                                                 }
                                                                             };
-
-        optionSelectorShortcut.Action += () =>
-                                         {
-                                             ((LinearRange<string>)sliderShortcut.CommandView).Orientation =
-                                                 ((OptionSelector<Orientation>)optionSelectorShortcut.CommandView).Value!.Value;
-                                         };
 
         _window.Add (sliderShortcut);
 
@@ -318,6 +344,35 @@ public class Shortcuts : Scenario
 
         framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable);
         _window.Add (framedShortcut);
+
+        if (ConfigurationManager.IsEnabled)
+        {
+            OptionSelector themesSelector = new ();
+            themesSelector.Id = "themesSelector";
+            themesSelector.Labels = ThemeManager.GetThemeNames ().ToArray ();
+            themesSelector.Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
+
+            themesSelector.ValueChanged += (_, args) =>
+                                           {
+                                               if (args.NewValue is null)
+                                               {
+                                                   return;
+                                               }
+                                               ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.NewValue];
+                                           };
+
+            Shortcut themesShortcut = new ()
+            {
+                Id = "themes",
+                Width = Dim.Fill (eventLog),
+                Y = Pos.Bottom (framedShortcut) + 1,
+                CommandView = themesSelector,
+                HelpText = "Cycle Through Themes",
+                Key = Key.T.WithCtrl
+            };
+
+            _window.Add (themesShortcut);
+        }
 
         // Horizontal
         Shortcut progressShortcut = new ()
@@ -461,8 +516,6 @@ public class Shortcuts : Scenario
         }
 
         AlignKeys (true);
-
-        SetCommandViewsCanFocus (false);
 
         alignKeysShortcut.SetFocus ();
 
