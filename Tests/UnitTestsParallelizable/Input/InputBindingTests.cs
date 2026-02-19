@@ -227,13 +227,17 @@ public class CommandBindingTests
     #region Record Equality Tests
 
     [Fact ]
+    // Claude - Opus 4.6
     public void RecordEquality_SameValues_AreEqual ()
     {
         Command [] commands = [Command.Activate];
         View source = new () { Id = "source" };
+        WeakReference<View> weakSource = new (source);
 
-        CommandBinding binding1 = new (commands, source, "data");
-        CommandBinding binding2 = new (commands, source, "data");
+        // Share the same WeakReference instance — two distinct WeakReferences to the same target
+        // are not reference-equal, so record equality requires the same instance.
+        CommandBinding binding1 = new () { Commands = commands, Source = weakSource, Data = "data" };
+        CommandBinding binding2 = new () { Commands = commands, Source = weakSource, Data = "data" };
 
         Assert.Equal (binding1, binding2);
     }
