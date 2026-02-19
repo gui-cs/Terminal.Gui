@@ -1,5 +1,6 @@
-﻿using System.Diagnostics.Metrics;
+using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -17,11 +18,36 @@ namespace Terminal.Gui.App;
 /// </remarks>
 public static class Logging
 {
+    private static readonly AsyncLocal<ILogger?> _ambientLogger = new ();
+    private static ILogger _globalLogger = NullLogger.Instance;
+
+    private static ILogger CurrentLogger => _ambientLogger.Value ?? _globalLogger;
+
     /// <summary>
-    ///     Logger, defaults to NullLogger (i.e. no logging).  Set this to a
+    ///     Logger, defaults to NullLogger (i.e. no logging). Set this to a
     ///     file logger to enable logging of Terminal.Gui internals.
     /// </summary>
-    public static ILogger Logger { get; set; } = NullLogger.Instance;
+    public static ILogger Logger
+    {
+        get => CurrentLogger;
+        set => _globalLogger = value ?? NullLogger.Instance;
+    }
+
+    /// <summary>
+    ///     Pushes a logger into ambient async context. Dispose the returned scope
+    ///     to restore the previous logger for the current async flow.
+    /// </summary>
+    /// <param name="logger">The logger to route Terminal.Gui logs to for the current scope.</param>
+    /// <returns>An <see cref="IDisposable"/> scope that restores the previous logger when disposed.</returns>
+    public static IDisposable PushLogger (ILogger logger)
+    {
+        ArgumentNullException.ThrowIfNull (logger);
+
+        ILogger? previousLogger = _ambientLogger.Value;
+        _ambientLogger.Value = logger;
+
+        return new LoggerScope (previousLogger);
+    }
 
     /// <summary>
     ///     Metrics reporting meter for internal Terminal.Gui processes. To use
@@ -63,7 +89,7 @@ public static class Logging
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        Logger.LogError ($"[{className}] [{caller}] {message}");
+        CurrentLogger.LogError ($"[{className}] [{caller}] {message}");
     }
 
     /// <summary>
@@ -79,7 +105,7 @@ public static class Logging
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        Logger.LogCritical ($"[{className}] [{caller}] {message}");
+        CurrentLogger.LogCritical ($"[{className}] [{caller}] {message}");
     }
 
     /// <summary>
@@ -95,7 +121,7 @@ public static class Logging
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        Logger.LogDebug ($"[{className}] [{caller}] {message}");
+        CurrentLogger.LogDebug ($"[{className}] [{caller}] {message}");
     }
 
     /// <summary>
@@ -111,7 +137,7 @@ public static class Logging
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        Logger.LogInformation ($"[{className}] [{caller}] {message}");
+        CurrentLogger.LogInformation ($"[{className}] [{caller}] {message}");
     }
 
     /// <summary>
@@ -127,7 +153,7 @@ public static class Logging
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        Logger.LogTrace ($"[{className}] [{caller}] {message}");
+        CurrentLogger.LogTrace ($"[{className}] [{caller}] {message}");
     }
 
     /// <summary>
@@ -143,6 +169,22 @@ public static class Logging
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        Logger.LogWarning ($"[{className}] [{caller}] {message}");
+        CurrentLogger.LogWarning ($"[{className}] [{caller}] {message}");
+    }
+
+    private sealed class LoggerScope (ILogger? previousLogger) : IDisposable
+    {
+        private bool _isDisposed;
+
+        public void Dispose ()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _ambientLogger.Value = previousLogger;
+            _isDisposed = true;
+        }
     }
 }

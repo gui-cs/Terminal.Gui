@@ -45,9 +45,6 @@ public partial class TestContext : IDisposable
 
     private readonly string _driverName;
 
-    // ===== Application State Preservation (for restoration) =====
-    private ILogger? _originalLogger;
-
     // ===== Test Configuration =====
     private readonly bool _runApplication;
     private TimeSpan _timeout;
@@ -55,6 +52,7 @@ public partial class TestContext : IDisposable
     // ===== Logging =====
     private readonly object _logsLock = new ();
     private readonly TextWriter? _logWriter;
+    private IDisposable? _loggerScope;
     private StringBuilder? _logsSb;
 
     /// <summary>
@@ -202,14 +200,13 @@ public partial class TestContext : IDisposable
     private void CommonInit (int width, int height, TimeSpan? timeout)
     {
         _timeout = timeout ?? TimeSpan.FromSeconds (30);
-        _originalLogger = Logging.Logger;
         _logsSb = new StringBuilder ();
 
         ILogger logger = LoggerFactory
                          .Create (builder => builder.SetMinimumLevel (LogLevel.Trace)
                                                     .AddProvider (new TextWriterLoggerProvider (new ThreadSafeStringWriter (_logsSb, _logsLock))))
                          .CreateLogger ("Test Logging");
-        Logging.Logger = logger;
+        _loggerScope = Logging.PushLogger (logger);
 
         // ✅ Link _runCancellationTokenSource with a timeout
         // This creates a token that responds to EITHER the run cancellation OR timeout
@@ -542,7 +539,8 @@ public partial class TestContext : IDisposable
         _ansiInput.ExternalCancellationTokenSource = null;
 
         App?.ResetState (true);
-        Logging.Logger = _originalLogger!;
+        _loggerScope?.Dispose ();
+        _loggerScope = null;
         Finished = true;
 
         Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
