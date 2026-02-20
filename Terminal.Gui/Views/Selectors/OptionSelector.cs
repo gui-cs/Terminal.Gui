@@ -29,9 +29,7 @@ public class OptionSelector : SelectorBase, IDesignable
     /// <inheritdoc/>
     public OptionSelector () => base.Value = 0;
 
-    // ──── Command Coordination ────
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override View? GetDispatchTarget (ICommandContext? ctx)
     {
         // Only dispatch Activate, not Accept. Accept should bubble naturally.
@@ -40,7 +38,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return null;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
+        //Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
 
         if (ctx.Source?.TryGetTarget (out View? source) != true || source is not CheckBox cb)
         {
@@ -64,7 +62,7 @@ public class OptionSelector : SelectorBase, IDesignable
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         base.OnActivated (ctx);
 
         // Apply the value change. Runs for ALL activation paths uniformly.
@@ -77,7 +75,7 @@ public class OptionSelector : SelectorBase, IDesignable
     /// </summary>
     private void ApplyActivation (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         // TODO: When OptionSelector is a CommandView inside a MenuItem/Shortcut and activation
         // arrives via DispatchingDown from the Shortcut, ctx.Source is the OptionSelector itself
@@ -124,7 +122,7 @@ public class OptionSelector : SelectorBase, IDesignable
 
     private void Cycle ()
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()}");
+        // Logging.Debug ($"{this.ToIdentifyingString ()}");
 
         int valueIndex = Values.IndexOf (v => v == Value);
 
@@ -151,7 +149,6 @@ public class OptionSelector : SelectorBase, IDesignable
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             var value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
-            Logging.Debug ($"{this.ToIdentifyingString ()} {cb.ToIdentifyingString ()}.Value = {value}");
 
             cb.Value = value == Value ? CheckState.Checked : CheckState.UnChecked;
         }

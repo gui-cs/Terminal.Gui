@@ -274,7 +274,7 @@ public class OptionSelectorTests
         CheckBox checkBoxC = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "C");
 
         // Simulate: LeftButtonPressed (sets focus) then LeftButtonReleased (triggers Activate on Shortcut)
-        System.Drawing.Point pos = checkBoxC.FrameToScreen ().Location;
+        Point pos = checkBoxC.FrameToScreen ().Location;
         app.InjectMouse (new Mouse { ScreenPosition = pos, Position = pos, Flags = MouseFlags.LeftButtonPressed });
         app.InjectMouse (new Mouse { ScreenPosition = pos, Position = pos, Flags = MouseFlags.LeftButtonReleased });
 

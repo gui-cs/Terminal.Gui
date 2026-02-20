@@ -27,8 +27,6 @@ public class FlagSelector : SelectorBase, IDesignable
         KeyBindings.Remove (Key.Enter);
     }
 
-    // ──── Command Coordination ────
-
     /// <summary>
     ///     Returns the dispatch target for composite command handling.
     ///     Only dispatches for Activate commands — Accept should bubble normally.
@@ -93,8 +91,6 @@ public class FlagSelector : SelectorBase, IDesignable
         return false;
     }
 
-    // _suppressHotKeyActivate is checked and cleared in GetDispatchTarget
-
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
@@ -144,7 +140,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
+        //Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
 
         if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
@@ -160,7 +156,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
+        //Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
 
         int newValue = Value ?? 0;
 

@@ -575,7 +575,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         try
         {
-             Logging.Debug ($"{this.ToIdentifyingString ()} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
 
             // If there's a visible submenu, remove / hide it
             if (menu?.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
@@ -660,6 +660,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         if (e.Context?.Binding is not KeyBinding { Key: { } key })
         {
             Logging.Debug ($"{this.ToIdentifyingString ()} ({e}) - not KeyBinding");
+
             return;
         }
 
@@ -673,9 +674,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     private void MenuOnActivated (object? sender, EventArgs<ICommandContext?> e)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({e})");
+
         if (e.Value?.Source?.TryGetTarget (out View? sourceView) == true)
         {
             Visible = false;
+
             if (sourceView is MenuItem { SubMenu: null })
             {
                 HideAndRemoveSubMenu (_root);
@@ -734,7 +737,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
@@ -814,8 +817,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                              new MenuItem (targetView as View, Command.SelectAll),
                              new Line (),
                              new MenuItem (targetView as View, Command.Quit)
-                         ])
-        { Title = "Popover Demo Root" };
+                         ]) { Title = "Popover Demo Root" };
 
         // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
         // NOTE: without being activated via App?.Popover. But we want it to be visible.

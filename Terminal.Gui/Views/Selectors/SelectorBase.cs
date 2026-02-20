@@ -105,17 +105,17 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 break;
 
             default:
-            {
-                if (Styles.HasFlag (SelectorStyles.ShowValue))
                 {
-                    _valueField?.SetFocus ();
+                    if (Styles.HasFlag (SelectorStyles.ShowValue))
+                    {
+                        _valueField?.SetFocus ();
 
-                    return true;
+                        return true;
+                    }
+                    active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                    break;
                 }
-                active = SubViews.OfType<CheckBox> ().Count () - 1;
-
-                break;
-            }
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
 
@@ -163,27 +163,36 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
         bool directAccept = args.Context?.Binding is null && Focused is CheckBox;
 
-        if (enterFromCheckBox || directAccept)
+        if (!enterFromCheckBox && !directAccept)
         {
-            // Create a fresh context with Command.Activate (not Accept) and IsBubblingUp=false.
-            // The original args.Context may have Command=Accept and IsBubblingUp=true from a bubble,
-            // which would cause TryBubbleUp to bubble the wrong command to SuperView.
-            // For direct invocations, use the focused CheckBox as the source so OnActivated
-            // identifies which item to activate.
-            WeakReference<View> source = enterFromCheckBox ? args.Context!.Source! : new WeakReference<View> (Focused!);
-
-            CommandContext activateCtx = new (Command.Activate, source, args.Context?.Binding);
-            InvokeCommand (Command.Activate, activateCtx);
+            return args.Context?.Binding switch
+            {
+                { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
+                MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+                KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
+                null => false,
+                _ => true
+            };
         }
 
+        // Create a fresh context with Command.Activate (not Accept) and IsBubblingUp=false.
+        // The original args.Context may have Command=Accept and IsBubblingUp=true from a bubble,
+        // which would cause TryBubbleUp to bubble the wrong command to SuperView.
+        // For direct invocations, use the focused CheckBox as the source so OnActivated
+        // identifies which item to activate.
+        WeakReference<View> source = enterFromCheckBox ? args.Context!.Source! : new WeakReference<View> (Focused!);
+
+        CommandContext activateCtx = new (Command.Activate, source, args.Context?.Binding);
+        InvokeCommand (Command.Activate, activateCtx);
+
         return args.Context?.Binding switch
-               {
-                   { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
-                   MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
-                   KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
-                   null => false,
-                   _ => true
-               };
+        {
+            { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
+            MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+            KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
+            null => false,
+            _ => true
+        };
     }
 
     /// <summary>

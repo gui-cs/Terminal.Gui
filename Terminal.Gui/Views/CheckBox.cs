@@ -62,23 +62,21 @@ public class CheckBox : View, IValue<CheckState>
     /// <inheritdoc/>
     public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
-    private bool _allowNone;
-
     /// <summary>
     ///     If <see langword="true"/> allows <see cref="Value"/> to be <see cref="CheckState.None"/>. The default is
     ///     <see langword="false"/>.
     /// </summary>
     public bool AllowCheckStateNone
     {
-        get => _allowNone;
+        get;
         set
         {
-            if (_allowNone == value)
+            if (field == value)
             {
                 return;
             }
 
-            _allowNone = value;
+            field = value;
 
             if (Value == CheckState.None)
             {

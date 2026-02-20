@@ -678,7 +678,7 @@ public partial class View // Mouse APIs
     ///     <see langword="false"/> if the click was inside (should continue to invoke commands).
     /// </returns>
     private bool HandleAutoGrabClicked (Mouse mouse)
-    { 
+    {
         Logging.Debug ($"{this.ToIdentifyingString ()} {mouse}");
 
         if (!mouse.IsSingleDoubleOrTripleClicked)

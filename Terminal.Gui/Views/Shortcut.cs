@@ -260,7 +260,7 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     // TODO: Enable setting of the margin thickness
-    private Thickness GetMarginThickness () => new (1, 0, 1, 0);
+    private static Thickness GetMarginThickness () => new (1, 0, 1, 0);
 
     #region Accept/Activate/HotKey Command Handling
 
@@ -283,7 +283,7 @@ public class Shortcut : View, IOrientation, IDesignable
         _activatedFiredThisCycle = true;
         base.OnActivated (ctx);
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
 
         // Translate the incoming command to Command via immutable context
@@ -303,7 +303,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (target is { })
         {
-            Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({target.Title})...");
+            // Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({target.Title})...");
             target.InvokeCommand (Command, ctx);
 
             return;
@@ -315,7 +315,7 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         // Is this an Application-bound command?
-        Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
         App?.Keyboard.InvokeCommandsBoundToKey (Key);
     }
 
@@ -323,7 +323,8 @@ public class Shortcut : View, IOrientation, IDesignable
     protected override void OnAccepted (ICommandContext? ctx)
     {
         base.OnAccepted (ctx);
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
+
+        //Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
 
         // Translate the incoming command to Command via immutable context
