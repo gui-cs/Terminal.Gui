@@ -313,6 +313,19 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         Assert.Null (exception);
     }
 
+    [Theory]
+    [InlineData (MouseFlags.None)]
+    [InlineData (MouseFlags.PositionReport)]
+    [InlineData (MouseFlags.Button4Pressed)]
+    public void MouseHoldRepeat_Throws_On_Invalid_Flags (MouseFlags mouseFlags)
+    {
+        // Arrange
+        View view = new ();
+
+        // Act & Assert - Setting invalid flags should throw
+        Assert.Throws<ArgumentException> (() => view.MouseHoldRepeat = mouseFlags);
+    }
+
     #region Input Injection Tests (Application Level)
 
     [Theory]
