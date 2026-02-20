@@ -213,8 +213,8 @@ public partial class View // Mouse APIs
             // Validate that only null, Pressed, or Clicked flags are allowed
             if (value.HasValue)
             {
-                bool isReleased = (value.Value & (MouseFlags.LeftButtonReleased | MouseFlags.MiddleButtonReleased | MouseFlags.RightButtonReleased)) != 0;
                 bool isPressed = (value.Value & (MouseFlags.LeftButtonPressed | MouseFlags.MiddleButtonPressed | MouseFlags.RightButtonPressed)) != 0;
+                bool isReleased = (value.Value & (MouseFlags.LeftButtonReleased | MouseFlags.MiddleButtonReleased | MouseFlags.RightButtonReleased)) != 0;
 
                 bool isClicked = (value.Value
                                   & (MouseFlags.LeftButtonClicked
@@ -230,7 +230,7 @@ public partial class View // Mouse APIs
 
                 if (!isReleased && !isPressed && !isClicked)
                 {
-                    throw new ArgumentException (@"MouseHoldRepeat only accepts null, Pressed, or Clicked mouse flags.", nameof (value));
+                    throw new ArgumentException (@"MouseHoldRepeat only accepts null, Pressed, Released or Clicked mouse flags.", nameof (value));
                 }
             }
 
