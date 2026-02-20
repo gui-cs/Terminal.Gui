@@ -193,7 +193,7 @@ public class MenuBar : Menu, IDesignable
     /// <returns><see langword="true"/> if the popover was hidden</returns>
     public bool HideItem (MenuBarItem? activeItem)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+        Logging.Debug ($"{this.ToIdentifyingString ()} {activeItem?.ToIdentifyingString ()}");
 
         if (activeItem is null || !activeItem.PopoverMenu!.Visible)
         {
@@ -272,6 +272,8 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
+
         // Mouse click (LeftButtonReleased) on a MenuBarItem triggers Activate.
         // The source may be a SubView of the MenuBarItem (e.g., CommandView), so walk up the SuperView chain.
         if (!Visible || !Enabled || args.Context?.Source?.TryGetTarget (out View? sourceView) != true)
@@ -496,7 +498,7 @@ public class MenuBar : Menu, IDesignable
     /// <param name="menuBarItem"></param>
     private void ShowItem (MenuBarItem? menuBarItem)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} - {menuBarItem?.Id}");
+        Logging.Debug ($"{this.ToIdentifyingString ()} {menuBarItem?.ToIdentifyingString ()}");
 
         if (!Active || !Visible)
         {
@@ -515,7 +517,8 @@ public class MenuBar : Menu, IDesignable
         // If the active Application Popover is part of this MenuBar, hide it.
         if (App?.Popover?.GetActivePopover () is PopoverMenu popoverMenu && popoverMenu.Root?.SuperMenuItem?.SuperView == this)
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - Calling App?.Popover?.Hide ({popoverMenu.Title})");
+            Logging.Debug ($"{this.ToIdentifyingString ()} {menuBarItem?.ToIdentifyingString ()} - Calling App?.Popover?.Hide");
+
             App?.Popover.Hide (popoverMenu);
         }
 
@@ -535,9 +538,10 @@ public class MenuBar : Menu, IDesignable
             menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
         if (menuBarItem.PopoverMenu is { })
         {
+            Logging.Debug ($"{this.ToIdentifyingString ()} {menuBarItem?.ToIdentifyingString ()} - Calling MakeVisible");
+
             menuBarItem.PopoverMenu.App ??= App;
             menuBarItem.PopoverMenu.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
         }
@@ -548,7 +552,7 @@ public class MenuBar : Menu, IDesignable
 
         void OnMenuItemAccepted (object? sender, EventArgs args)
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - OnMenuItemAccepted");
+            Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
             if (menuBarItem.PopoverMenu is { })
             {
                 menuBarItem.PopoverMenu.VisibleChanged -= OnMenuItemAccepted;
@@ -606,7 +610,11 @@ public class MenuBar : Menu, IDesignable
             CanFocus = false
         };
 
-        OptionSelector<Schemes> mutuallyExclusiveOptionsSelector = new () { Title = "Scheme", CanFocus = true };
+        OptionSelector<Schemes> mutuallyExclusiveOptionsSelector = new ()
+        {
+            Title = "Scheme", CanFocus = true,
+            MouseHighlightStates = MouseState.None
+        };
 
         var menuBgColorCp = new ColorPicker { Width = 30 };
 
@@ -670,7 +678,8 @@ public class MenuBar : Menu, IDesignable
                                                                   Id = "mutuallyExclusiveOptions",
                                                                   HelpText = "Mutually Exclusive Options",
                                                                   CommandView = mutuallyExclusiveOptionsSelector,
-                                                                  Key = Key.F7
+                                                                  Key = Key.F7,
+                                                                  MouseHighlightStates = MouseState.None
                                                               },
                                                               new Line (),
                                                               new MenuItem { HelpText = "MenuBar BG Color", CommandView = menuBgColorCp, Key = Key.F8 }

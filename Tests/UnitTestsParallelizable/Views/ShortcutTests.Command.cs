@@ -753,11 +753,12 @@ public partial class ShortcutTests
     /// <summary>
     ///     Verifies correct event ordering for compound views in Shortcut when activation
     ///     is triggered via BubbleDown (e.g., clicking on Shortcut's HelpView area).
-    ///     OnActivating calls BubbleDown when the activation source is not the CommandView.
+    ///     The framework dispatches BubbleDown after OnActivating but before Activated.
     ///     Expected order:
-    ///     1. Shortcut.Activating (fires in RaiseActivating, after OnActivating/BubbleDown)
-    ///     2. Shortcut.Activated (direct path, not deferred since IsBubblingUp is false)
-    ///     BubbleDown also triggers CommandView events, but inside OnActivating (before Shortcut.Activating).
+    ///     1. Shortcut.Activating (fires from RaiseActivating before framework dispatch)
+    ///     2. CheckBox.Activating (from BubbleDown during framework dispatch, after Activating event)
+    ///     3. CheckBox.Activated
+    ///     4. Shortcut.Activated (from CommandView_Activated deferred callback)
     /// </summary>
     [Fact]
     public void BubbleDown_Activate_Event_Ordering_With_Binding_Source ()
@@ -788,13 +789,18 @@ public partial class ShortcutTests
         CommandContext ctx = new (Command.Activate, new WeakReference<View> (shortcut), binding);
         shortcut.InvokeCommand (Command.Activate, ctx);
 
-        // Assert - BubbleDown fires CommandView events during OnActivating (before Shortcut.Activating),
-        // then Shortcut.Activating fires, then Shortcut.Activated (direct path).
+        // Assert - Shortcut.Activating fires first (notification before dispatch),
+        // then BubbleDown fires CommandView events. Shortcut.Activated fires from
+        // CommandView_Activated (subscribed before test handler), so it interleaves
+        // with CheckBox.Activated.
         Assert.Equal (4, eventLog.Count);
-        Assert.Equal ("CheckBox.Activating", eventLog [0]);
-        Assert.Equal ("CheckBox.Activated", eventLog [1]);
-        Assert.Equal ("Shortcut.Activating", eventLog [2]);
-        Assert.Equal ("Shortcut.Activated", eventLog [3]);
+        Assert.Equal ("Shortcut.Activating", eventLog [0]);
+        Assert.Equal ("CheckBox.Activating", eventLog [1]);
+
+        // Shortcut.Activated fires during CheckBox.Activated event dispatch
+        // (CommandView_Activated subscribed before test handler)
+        Assert.Equal ("Shortcut.Activated", eventLog [2]);
+        Assert.Equal ("CheckBox.Activated", eventLog [3]);
 
         // CheckBox should have toggled
         Assert.Equal (CheckState.Checked, checkBox.Value);
@@ -848,15 +854,16 @@ public partial class ShortcutTests
         CommandContext ctx = new (Command.Activate, new WeakReference<View> (firstCheckBox), binding);
         firstCheckBox.InvokeCommand (Command.Activate, ctx);
 
-        // Assert - Value changes exactly once. FlagSelector consumes the bubble in OnActivating
-        // (preventing CheckBox double-toggle). This means Shortcut.Activating doesn't fire
-        // (bubble doesn't reach Shortcut), but Shortcut.Activated fires via the deferred path
-        // (FlagSelector.RaiseActivated → CommandView_Activated). FlagSelector.Activating event
-        // doesn't fire because OnActivating consumes before the event is raised.
+        // Assert - Value changes exactly once. In the new design, the Activating event always fires
+        // as a notification before the framework dispatch consumes the command. This means
+        // FlagSelector.Activating fires (subscribers get a chance to cancel before dispatch),
+        // but Shortcut.Activating doesn't fire (bubble doesn't reach Shortcut because FlagSelector
+        // consumes during dispatch). Shortcut.Activated fires via the deferred path
+        // (FlagSelector.RaiseActivated → CommandView_Activated).
         Assert.Equal (1, valueChangedCount);
         Assert.Equal (0, shortcutActivatingCount);
         Assert.Equal (1, shortcutActivatedCount);
-        Assert.Equal (0, flagSelectorActivatingCount);
+        Assert.Equal (1, flagSelectorActivatingCount);
 
         // The checkbox should be checked (toggled once, not toggled twice back to unchecked)
         Assert.Equal (CheckState.Checked, firstCheckBox.Value);

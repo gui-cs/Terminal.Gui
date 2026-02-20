@@ -31,7 +31,9 @@ public class CommandBindingTests
         CommandBinding binding = new (commands, source);
 
         Assert.Equal (commands, binding.Commands);
-        Assert.Equal (source, binding.Source);
+        View? sv = null;
+        Assert.True (binding.Source?.TryGetTarget (out sv) == true);
+        Assert.Equal (source, sv);
         Assert.Null (binding.Data);
     }
 
@@ -45,7 +47,9 @@ public class CommandBindingTests
         CommandBinding binding = new (commands, source, data);
 
         Assert.Equal (commands, binding.Commands);
-        Assert.Equal (source, binding.Source);
+        View? sv = null;
+        Assert.True (binding.Source?.TryGetTarget (out sv) == true);
+        Assert.Equal (source, sv);
         Assert.Equal ("test data", binding.Data);
     }
 
@@ -93,12 +97,12 @@ public class CommandBindingTests
     [Fact ]
     public void ImplementsICommandBinding ()
     {
-        CommandBinding binding = new ([Command.Activate]) { Source = new View { Id = "test" }, Data = "data" };
+        CommandBinding binding = new ([Command.Activate]) { Source = new WeakReference<View> (new View { Id = "test" }), Data = "data" };
 
         ICommandBinding iBinding = binding;
 
         Assert.Equal (binding.Commands, iBinding.Commands);
-        Assert.Equal (binding.Source, iBinding.Source);
+        Assert.Same (binding.Source, iBinding.Source);
         Assert.Equal (binding.Data, iBinding.Data);
     }
 
@@ -109,7 +113,9 @@ public class CommandBindingTests
 
         Assert.Single (binding.Commands);
         Assert.Equal (Command.Accept, binding.Commands [0]);
-        Assert.Equal ("polymorphic", binding.Source?.Id);
+        View? sv = null;
+        Assert.True (binding.Source?.TryGetTarget (out sv) == true);
+        Assert.Equal ("polymorphic", sv?.Id);
     }
 
     #endregion
@@ -206,7 +212,9 @@ public class CommandBindingTests
         // Can pattern match the binding from the interface
         if (ctx.Binding is CommandBinding ib)
         {
-            Assert.Equal ("test", ib.Source?.Id);
+            View? sv = null;
+            Assert.True (ib.Source?.TryGetTarget (out sv) == true);
+            Assert.Equal ("test", sv?.Id);
         }
         else
         {
@@ -219,13 +227,17 @@ public class CommandBindingTests
     #region Record Equality Tests
 
     [Fact ]
+    // Claude - Opus 4.6
     public void RecordEquality_SameValues_AreEqual ()
     {
         Command [] commands = [Command.Activate];
         View source = new () { Id = "source" };
+        WeakReference<View> weakSource = new (source);
 
-        CommandBinding binding1 = new (commands, source, "data");
-        CommandBinding binding2 = new (commands, source, "data");
+        // Share the same WeakReference instance — two distinct WeakReferences to the same target
+        // are not reference-equal, so record equality requires the same instance.
+        CommandBinding binding1 = new () { Commands = commands, Source = weakSource, Data = "data" };
+        CommandBinding binding2 = new () { Commands = commands, Source = weakSource, Data = "data" };
 
         Assert.Equal (binding1, binding2);
     }

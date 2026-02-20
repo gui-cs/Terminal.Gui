@@ -31,31 +31,35 @@ public class OptionSelector : SelectorBase, IDesignable
         // really wants that.
         base.Value = 0;
 
-    /// <inheritdoc/>
-    protected override bool OnActivating (CommandEventArgs args)
+    // ──── Command Coordination ────
+
+    /// <summary>
+    ///     Returns the dispatch target for composite command handling.
+    ///     Only dispatches for Activate commands — Accept should bubble normally.
+    /// </summary>
+    protected override View? GetDispatchTarget (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args}");
-
-        if (base.OnActivating (args) || args.Handled)
+        // Only dispatch Activate, not Accept. Accept should bubble to Menu/MenuBar normally.
+        if (ctx?.Command != Command.Activate)
         {
-            return true;
+            return null;
         }
 
-        // When a CheckBox SubView's activation bubbles up, apply the value change here
-        // and consume the command so the originating CheckBox does not independently toggle
-        // via AdvanceCheckState. DefaultActivateHandler returns false for IsBubblingUp
-        // by default (notification), but OptionSelector returns true (consumption) because
-        // it owns the selection state, not the individual CheckBoxes.
-        if (args.Context?.IsBubblingUp == true)
-        {
-            ApplyActivation (args.Context);
-            RaiseActivated (args.Context);
+        Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
 
-            return true;
+        // When a CheckBox's activation bubbles up, the source IS the CheckBox.
+        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
+        {
+            return source;
         }
 
-        return false;
+        return Focused;
     }
+
+    /// <summary>
+    ///     Consumes: OptionSelector owns selection state, not the individual CheckBoxes.
+    /// </summary>
+    protected override bool ConsumeDispatch => true;
 
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
@@ -63,22 +67,25 @@ public class OptionSelector : SelectorBase, IDesignable
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         base.OnActivated (ctx);
 
-        // For direct invocations (not bubbling), apply the value change in the completion phase.
-        // Skip when IsBubblingUp — OnActivating already applied the change and called RaiseActivated.
-        if (ctx?.IsBubblingUp != true)
-        {
-            ApplyActivation (ctx);
-        }
+        // Apply the value change. Runs for ALL activation paths uniformly.
+        // No routing-direction check needed — the framework handled dispatch/consumption.
+        ApplyActivation (ctx);
     }
 
     /// <summary>
-    ///     Applies the value change based on the activation source. Shared by both
-    ///     <see cref="OnActivating"/> (for bubble consumption) and <see cref="OnActivated"/> (for direct invocation).
+    ///     Applies the value change based on the activation source.
     /// </summary>
     private void ApplyActivation (ICommandContext? ctx)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
+        // TODO: When OptionSelector is a CommandView inside a MenuItem/Shortcut and activation
+        // arrives via DispatchingDown from the Shortcut, ctx.Source is the OptionSelector itself
+        // (not the clicked CheckBox). This causes the fallback to Cycle() instead of selecting
+        // the correct item. The root cause is that LeftButtonReleased is not bound on CheckBox
+        // (it uses LeftButtonClicked), so the event propagates to the parent Shortcut which
+        // dispatches down with Source=CommandView. Need to identify the correct CheckBox from
+        // the Focused state or mouse position when Source is not a CheckBox.
         if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
         {
             Cycle ();

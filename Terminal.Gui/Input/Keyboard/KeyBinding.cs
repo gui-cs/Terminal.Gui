@@ -44,7 +44,7 @@ public record struct KeyBinding : ICommandBinding
     public KeyBinding (Command [] commands, Key newKey, View? source = null, View? target = null, object? data = null)
     {
         Commands = commands;
-        Source = source;
+        Source = source is { } ? new WeakReference<View> (source) : null;
         Key = newKey;
         Target = target;
         Data = data;
@@ -62,7 +62,7 @@ public record struct KeyBinding : ICommandBinding
     public Key? Key { get; set; }
 
     /// <inheritdoc/>
-    public View? Source { get; init; }
+    public WeakReference<View>? Source { get; init; }
 
     // TODO: Determine if Target is duplicative of Source
     /// <summary>
@@ -80,5 +80,22 @@ public record struct KeyBinding : ICommandBinding
     public View? Target { get; set; }
 
     /// <inheritdoc />
-    public override string ToString () => $"[{string.Join (", ", Commands)}], Key={Key}{(Source is { } ? $", Source={Source.ToIdentifyingString ()}" : "")}{(Target is { } ? $", Source={Target.ToIdentifyingString ()}" : "")}{(Data is { } ? ", Data=" : "")}";
+    public override string ToString ()
+    {
+        string sourceStr = "";
+
+        if (Source?.TryGetTarget (out View? sv) == true)
+        {
+            sourceStr = $", Source={sv.ToIdentifyingString ()}";
+        }
+
+        string targetStr = "";
+
+        if (Target is { })
+        {
+            targetStr = $", Target={Target.ToIdentifyingString ()}";
+        }
+
+        return $"[{string.Join (", ", Commands)}], Key={Key}{sourceStr}{targetStr}{(Data is { } ? ", Data=" : "")}";
+    }
 }

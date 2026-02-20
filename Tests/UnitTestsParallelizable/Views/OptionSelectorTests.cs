@@ -247,6 +247,65 @@ public class OptionSelectorTests
         Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     MINIMAL REPRO: OptionSelector inside a Shortcut with Application context.
+    ///     LeftButtonReleased on "C" checkbox propagates to Shortcut (CheckBox doesn't handle it),
+    ///     Shortcut dispatches down to OptionSelector. Value should change to 2 ("C"), not Cycle to 1.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_Shortcut_MouseClick_Selects_Correct_Item ()
+    {
+        // Need Application context for focus propagation (LeftButtonPressed sets focus)
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        OptionSelector optionSelector = new () { Labels = ["A", "B", "C"] };
+        Shortcut shortcut = new () { Key = Key.F5, CommandView = optionSelector };
+
+        ((View)runnable).Add (shortcut);
+        app.Begin (runnable);
+
+        Assert.Equal (0, optionSelector.Value);
+
+        // Find "C" checkbox (index 2)
+        CheckBox checkBoxC = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "C");
+
+        // Simulate: LeftButtonPressed (sets focus) then LeftButtonReleased (triggers Activate on Shortcut)
+        System.Drawing.Point pos = checkBoxC.FrameToScreen ().Location;
+        app.InjectMouse (new Mouse { ScreenPosition = pos, Position = pos, Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = pos, Position = pos, Flags = MouseFlags.LeftButtonReleased });
+
+        // Assert: Value should be 2 ("C"), not 1 (Cycle from 0)
+        Assert.Equal (2, optionSelector.Value);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     OptionSelector inside a Shortcut. LeftButtonClicked (which CheckBox handles) on a
+    ///     non-selected checkbox. This is the event that the real driver synthesizes after
+    ///     Pressed+Released. If this fails, the Shortcut dispatch is intercepting it.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_Shortcut_LeftButtonClicked_Selects_Correct_Item ()
+    {
+        OptionSelector optionSelector = new () { Labels = ["A", "B", "C"] };
+        Shortcut shortcut = new () { Key = Key.F5, CommandView = optionSelector };
+        shortcut.Layout ();
+
+        Assert.Equal (0, optionSelector.Value);
+
+        CheckBox checkBoxC = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "C");
+
+        // LeftButtonClicked — this is what CheckBox binds to Command.Activate
+        Mouse mouse = new () { Position = checkBoxC.Frame.Location, Flags = MouseFlags.LeftButtonClicked };
+        checkBoxC.NewMouseEvent (mouse);
+
+        Assert.Equal (2, optionSelector.Value);
+    }
+
     [Fact]
     public void Values_ShouldUseOptions_WhenValuesIsNull ()
     {

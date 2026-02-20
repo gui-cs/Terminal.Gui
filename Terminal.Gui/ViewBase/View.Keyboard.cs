@@ -603,7 +603,7 @@ public partial class View // Keyboard APIs
 
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({binding})");
 
-        return InvokeCommands (binding.Commands, binding with { Source = this });
+        return InvokeCommands (binding.Commands, binding with { Source = new WeakReference<View> (this) });
     }
 
     /// <summary>
@@ -634,7 +634,7 @@ public partial class View // Keyboard APIs
                 binding.Key = hotKey;
             }
 
-            if (InvokeCommands (binding.Commands, binding with { Source = this }) is true)
+            if (InvokeCommands (binding.Commands, binding with { Source = new WeakReference<View> (this) }) is true)
             {
                 return true;
             }

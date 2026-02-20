@@ -721,3 +721,98 @@ Each phase is independently shippable and testable.
 
 3. **`CommandBridge` is one-way.** Remote fires event → owner receives command.
    If bidirectional is needed, create two bridges.
+
+---
+
+## Implementation Status (Updated 2026-02-19)
+
+### Completed
+
+| Phase | Status | Commit | Notes |
+|-------|--------|--------|-------|
+| **A — Foundation** | Done | `be22792b2` | As planned. All types added, WeakRef migration complete. |
+| **B — Dispatch** | Done | `bc48676af` | Significant deviations from plan — see below. |
+| **C — Bridge** | Done | `9045e3050` | CommandBridge implemented. Only MenuBarItem migrated (pragmatic scope). |
+| **D — Outcome** | **Deferred** | — | 267 `AddCommand` call sites across 28 files. Conversion shims exist for incremental migration. |
+| **E — Cleanup** | Done | `4262441ca` | IsBubblingUp/IsBubblingDown removed. Route tracing not yet added. |
+
+### Deviations from Plan
+
+#### Phase B — Dispatch Deviations
+
+1. **Shortcut still uses `CommandView_Activated` callback.**
+   The plan said "No event-subscription machinery needed" for deferred completion, but this
+   proved incorrect. When `IsBubblingUp`, the originator (CheckBox) hasn't called `RaiseActivated`
+   yet when Shortcut's `DefaultActivateHandler` runs. `CommandView_Activated` fires AFTER the
+   originator completes, ensuring correct ordering (CheckBox toggles before Shortcut.Action reads
+   the value). The callback is simplified from the old version (no `_activationBubbledUp` flag).
+
+2. **ConsumeDispatch=true does NOT BubbleDown for IsBubblingUp.**
+   The plan's framework behavior said "Dispatch to target with Routing = DispatchingDown"
+   unconditionally. In practice, for consume views (OptionSelector, FlagSelector), dispatching
+   back to the originating CheckBox would cause double-toggle. The actual behavior:
+   - IsBubblingUp → mark as consumed, NO BubbleDown (OnActivated handles state mutation)
+   - Direct/programmatic → BubbleDown to target (forwards the command)
+
+3. **Selectors dispatch Activate only, not Accept.**
+   The plan showed `GetDispatchTarget` returning unconditionally. In practice, Accept must bubble
+   normally through the Menu hierarchy (MenuItem → Menu → PopoverMenu → MenuBarItem → MenuBar).
+   Selectors check `ctx?.Command != Command.Activate` and return null for non-Activate commands.
+
+4. **Selectors use context-dependent dispatch targets.**
+   The plan showed `GetDispatchTarget => Focused`. In practice, `Focused` is null in tests without
+   Application.Init. Selectors now return the source CheckBox (from `ctx.Source`) for IsBubblingUp,
+   and `Focused` for direct invocations.
+
+5. **FlagSelector retains `_suppressHotKeyActivate`.**
+   The plan said this flag was unnecessary because "DefaultHotKeyHandler calls InvokeCommand(Activate)
+   without a binding." In practice, DefaultHotKeyHandler passes the original binding through
+   (`ctx?.Binding`), so the binding guard doesn't suppress dispatch. The flag is checked in
+   `GetDispatchTarget` and returns null to skip dispatch when set.
+
+6. **Event ordering changed: Activating fires BEFORE dispatch.**
+   The plan placed dispatch at step 4 (after OnActivating + Activating event). The old code
+   dispatched in OnActivating (step 2, before the event). This means subscribers now get
+   notified BEFORE dispatch occurs — they can cancel before the target is activated. Tests
+   were updated to reflect the new ordering.
+
+7. **Binding guard is ConsumeDispatch-dependent.**
+   The plan said "skip dispatch for programmatic invocations (no binding)." This is only needed
+   for relay dispatch (ConsumeDispatch=false, e.g., Shortcut) to prevent loops. Consume dispatch
+   views (selectors) need programmatic invocations to dispatch so `InvokeCommand(Activate)`
+   forwards to the focused item.
+
+#### Phase C — Bridge Deviations
+
+1. **Only MenuBarItem migrated, not Menu or PopoverMenu.**
+   The plan called for replacing all manual event wiring in Menu.OnSubViewAdded and
+   PopoverMenu.Root setter. These are same-tree (containment) wiring, not cross-boundary.
+   CommandBridge is designed for cross-boundary routing (non-containment). The existing
+   same-tree wiring works correctly and is lower risk to leave in place.
+
+2. **ItemSelected event on Menu not added.**
+   The plan proposed separating "close the menu" concern from command routing. The current
+   pattern (menuItem.Activated → Menu.RaiseAccepted → PopoverMenu closes) works correctly.
+   This can be added later as a separate improvement.
+
+3. **`RaiseAccepted`/`RaiseActivated` made `internal protected`.**
+   CommandBridge needs to call these from outside the View class hierarchy. The plan didn't
+   address this access issue. Changed from `protected` to `internal protected`.
+
+#### Phase D — Deferred
+
+267 `AddCommand` handler signatures across 28 files need `bool?` → `CommandOutcome` migration.
+This is purely mechanical with no behavioral change. The `CommandOutcomeExtensions.ToBool()`
+and `ToOutcome()` shims enable incremental migration. Recommended approach: migrate one file
+at a time with a sub-agent, verifying tests after each file.
+
+#### Phase E — Partial
+
+Route tracing (`TraceRoute` with `[Conditional("DEBUG")]`) not yet implemented. The
+`IsBubblingUp`/`IsBubblingDown` removal is complete. `docfx/docs/command.md` not yet updated.
+
+### Test Results
+
+- **UnitTestsParallelizable**: 13,980 passed, 0 failed, 22 skipped
+- **UnitTests**: 1,001 passed, 0 failed, 22 skipped
+- **Total**: 14,981 passed, 0 failed

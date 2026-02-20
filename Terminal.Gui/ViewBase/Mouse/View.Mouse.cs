@@ -759,10 +759,12 @@ public partial class View // Mouse APIs
             return args.Handled = false;
         }
 
-        //Logging.Trace ($"Invoking commands bound to mouse: {args.Flags}");
+        Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
+
         // By default, this will raise Activating/OnActivating - Subclasses can override this via
         // ReplaceCommand (Command.Activate ...).
         args.Handled = InvokeCommandsBoundToMouse (args) == true;
+        Logging.Debug ($"{this.ToIdentifyingString ()} handled={args.Handled}");
 
         return args.Handled;
     }
@@ -815,7 +817,7 @@ public partial class View // Mouse APIs
             return null;
         }
 
-        return InvokeCommands (binding.Commands, binding with { MouseEvent = mouseEventArgs, Source = this });
+        return InvokeCommands (binding.Commands, binding with { MouseEvent = mouseEventArgs, Source = new WeakReference<View> (this) });
     }
 
     #endregion Command Invocation

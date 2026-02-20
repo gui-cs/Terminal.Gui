@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Globalization;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
@@ -372,6 +373,399 @@ public class MenuBarTests : TestsAllDrivers
                                   .KeyDown (Application.QuitKey)
                                   .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                   .AssertTrue (app?.TopRunnable!.IsRunning);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that clicking the "Error" checkbox in the OptionSelector&lt;Schemes&gt;
+    ///     inside File → Preferences SubMenu changes Value from Base (0) to Error (4).
+    ///     Exercises the full Shortcut → OptionSelector dispatch path inside a PopoverMenu SubMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_SubMenu_Click_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Set up MenuBar with EnableForDesign
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+                                       menuBar = new MenuBar ();
+                                       View top = app.TopRunnableView!;
+                                       top.Add (new View { CanFocus = true, Id = "focusableView" });
+                                       menuBar.EnableForDesign (ref top);
+                                       app.TopRunnableView!.Add (menuBar);
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the File menu via F9 then verify it's open
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "File menu should be open after F9");
+
+        // Step 3: Navigate down to "Preferences" (it's after several items + a Line)
+        // File menu items: New, Open, Save, SaveAs, Line, FileOptions, Line, Preferences, Line, Quit
+        c = c.KeyDown (Key.CursorDown); // New → Open
+        c = c.KeyDown (Key.CursorDown); // Open → Save
+        c = c.KeyDown (Key.CursorDown); // Save → SaveAs
+        c = c.KeyDown (Key.CursorDown); // SaveAs → (skips Line) → File Options
+        c = c.KeyDown (Key.CursorDown); // File Options → (skips Line) → Preferences
+
+        // Step 4: Open the Preferences SubMenu by pressing Right or Enter
+        c = c.KeyDown (Key.CursorRight);
+
+        // Step 5: Find the OptionSelector and subscribe to ValueChanged
+        c = c.Then (_ =>
+                    {
+                        // Find the mutuallyExclusiveOptions MenuItem
+                        IEnumerable<MenuItem> allMenuItems = menuBar!.GetMenuItemsWith (mi => mi.Id == "mutuallyExclusiveOptions");
+                        MenuItem? optionMenuItem = allMenuItems.FirstOrDefault ();
+                        Assert.NotNull (optionMenuItem);
+
+                        optionSelector = optionMenuItem!.CommandView as OptionSelector<Schemes>;
+                        Assert.NotNull (optionSelector);
+                        Assert.Equal (Schemes.Base, optionSelector!.Value);
+
+                        optionSelector.ValueChanged += (_, args) =>
+                                                       {
+                                                           Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
+                                                           capturedNewValue = args.Value;
+                                                           valueChangedCount++;
+                                                       };
+                    });
+
+        // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        // This simulates the real user scenario where the user opens the menu and clicks
+        // directly on a checkbox without using arrow keys.
+        CheckBox? errorCheckBox = null;
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        Assert.NotNull (errorCheckBox);
+                        Point pos = errorCheckBox!.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c.WriteOutLogs (_out);
+
+        // Assert — Value should change from Base (0) to Error (4), not to Menu (1)
+        Assert.Equal (Schemes.Error, optionSelector?.Value);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Tests a Bar with Shortcuts as the CommandView of a MenuItem in a PopoverMenu.
+    ///     Clicks on the second Shortcut's text area to verify the correct Shortcut activates
+    ///     (not Cycle or wrong dispatch). This tests whether the dispatch issue is general
+    ///     to compound CommandViews, not specific to OptionSelector.
+    /// </summary>
+    [Fact]
+    public void Bar_CommandView_In_Menu_Click_Activates_Correct_Shortcut ()
+    {
+        var d = "ansi";
+        IApplication? app = null;
+        MenuBar? menuBar = null;
+        var shortcut1ActivatedCount = 0;
+        var shortcut2ActivatedCount = 0;
+        var shortcut3ActivatedCount = 0;
+        Shortcut? shortcut2 = null;
+
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       Shortcut s1 = new () { Title = "First", Key = Key.F1, Id = "s1" };
+                                       s1.Activated += (_, _) => shortcut1ActivatedCount++;
+
+                                       shortcut2 = new Shortcut { Title = "Second", Key = Key.F2, Id = "s2" };
+                                       shortcut2.Activated += (_, _) => shortcut2ActivatedCount++;
+
+                                       Shortcut s3 = new () { Title = "Third", Key = Key.F3, Id = "s3" };
+                                       s3.Activated += (_, _) => shortcut3ActivatedCount++;
+
+                                       Bar bar = new () { Orientation = Orientation.Vertical };
+                                       bar.Add (s1, shortcut2, s3);
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus =
+                                               [
+                                                   new MenuBarItem ("_Test",
+                                                                    [new MenuItem { Id = "barItem", HelpText = "Bar with shortcuts", CommandView = bar }])
+                                               ]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Open the menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        c = c.ScreenShot ("Menu open with Bar CommandView", _out);
+
+        // Click on the second shortcut ("Second")
+        var screenX = 0;
+        var screenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        Point pos = shortcut2!.FrameToScreen ().Location;
+                        screenX = pos.X + 1; // offset into the text area
+                        screenY = pos.Y;
+                    });
+
+        c = c.LeftClick (screenX, screenY);
+
+        c = c.ScreenShot ("After clicking Second shortcut", _out);
+
+        // Assert — only the second shortcut should activate
+        Assert.Equal (0, shortcut1ActivatedCount);
+        Assert.True (shortcut2ActivatedCount >= 1, $"shortcut2 Activated should fire (fired {shortcut2ActivatedCount} times)");
+        Assert.Equal (0, shortcut3ActivatedCount);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Simpler variant: OptionSelector directly in the root Menu (no SubMenu nesting).
+    ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_RootMenu_Space_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus =
+                                               [
+                                                   new MenuBarItem ("_Test",
+                                                                    [
+                                                                        new MenuItem
+                                                                            {
+                                                                                Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
+                                                                            }
+                                                                    ])
+                                               ]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+
+                                       optionSelector.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          capturedNewValue = args.Value;
+                                                                          valueChangedCount++;
+                                                                      };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the Test menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        c = c.ScreenShot ("After F9 - menu open", _out);
+
+        // Step 3: Navigate within the OptionSelector to Error
+        // Items: Base(0), Menu(1), Dialog(2), Runnable(3), Error(4)
+        c = c.KeyDown (Key.CursorDown); // Base → Menu
+        c = c.KeyDown (Key.CursorDown); // Menu → Dialog
+        c = c.KeyDown (Key.CursorDown); // Dialog → Runnable
+        c = c.KeyDown (Key.CursorDown); // Runnable → Error
+
+        c = c.ScreenShot ("After navigating to Error", _out);
+
+        // Step 4: Press Space to activate
+        c = c.KeyDown (Key.Space);
+
+        c = c.ScreenShot ("After Space on Error", _out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (Schemes.Error, capturedNewValue);
+        Assert.Equal (Schemes.Error, optionSelector!.Value);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Simpler variant: OptionSelector directly in the root Menu (no SubMenu nesting).
+    ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_Menu_Click_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        Menu? menu = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+
+                                       menu = new Menu ([new MenuItem { Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector }]);
+
+                                       app.TopRunnableView!.Add (menu);
+
+                                       optionSelector.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {
+                                                                              args.Value
+                                                                          }");
+                                                                          capturedNewValue = args.Value;
+                                                                          valueChangedCount++;
+                                                                      };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        CheckBox? errorCheckBox = null;
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        Assert.NotNull (errorCheckBox);
+                        Point pos = errorCheckBox!.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c.WriteOutLogs (_out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (Schemes.Error, capturedNewValue);
+        Assert.Equal (Schemes.Error, optionSelector!.Value);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Simpler variant: OptionSelector directly in the root Menu (no SubMenu nesting).
+    ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_RootMenu_Click_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus =
+                                               [
+                                                   new MenuBarItem ("_Test",
+                                                                    [
+                                                                        new MenuItem
+                                                                            {
+                                                                                Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
+                                                                            }
+                                                                    ])
+                                               ]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+
+                                       optionSelector.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {
+                                                                              args.Value
+                                                                          }");
+                                                                          capturedNewValue = args.Value;
+                                                                          valueChangedCount++;
+                                                                      };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the Test menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        // This simulates the real user scenario where the user opens the menu and clicks
+        // directly on a checkbox without using arrow keys.
+        CheckBox? errorCheckBox = null;
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        Assert.NotNull (errorCheckBox);
+                        Point pos = errorCheckBox!.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c.WriteOutLogs (_out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (Schemes.Error, capturedNewValue);
+        Assert.Equal (Schemes.Error, optionSelector!.Value);
+
+        c.Dispose ();
     }
 
     [Theory]

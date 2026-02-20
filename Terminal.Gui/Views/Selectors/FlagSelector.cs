@@ -29,18 +29,47 @@ public class FlagSelector : SelectorBase, IDesignable
         MouseBindings.Clear ();
     }
 
-    // Set by OnHandlingHotKey to suppress the Activate that DefaultHotKeyHandler
-    // fires after RaiseHandlingHotKey. Checked and cleared in OnActivating.
-    private bool _suppressHotKeyActivate;
+    // ──── Command Coordination ────
 
     /// <summary>
-    ///     Overrides the base method to handle the FlagSelector's HotKey.
-    ///     Per spec: When focused, HotKey is a complete no-op (returns <see langword="true"/> to stop processing).
-    ///     When not focused, restores focus and sets a flag to suppress the Activate that
-    ///     <see cref="View.DefaultHotKeyHandler"/> would otherwise invoke. Returns <see langword="false"/>
-    ///     so the <see cref="View.HandlingHotKey"/> event still fires.
+    ///     Returns the dispatch target for composite command handling.
+    ///     Only dispatches for Activate commands — Accept should bubble normally.
     /// </summary>
-    /// <param name="args">The command event arguments.</param>
+    protected override View? GetDispatchTarget (ICommandContext? ctx)
+    {
+        // Only dispatch Activate, not Accept. Accept should bubble to Menu/MenuBar normally.
+        if (ctx?.Command != Command.Activate)
+        {
+            return null;
+        }
+
+        // When a CheckBox's activation bubbles up, the source IS the CheckBox.
+        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
+        {
+            return source;
+        }
+
+        // Suppress dispatch when the HotKey flag is set (HotKey → SetFocus only, no toggle).
+        if (_suppressHotKeyActivate)
+        {
+            _suppressHotKeyActivate = false;
+
+            return null;
+        }
+
+        return Focused;
+    }
+
+    /// <summary>
+    ///     Consumes: FlagSelector owns toggle semantics.
+    /// </summary>
+    protected override bool ConsumeDispatch => true;
+
+    // Set by OnHandlingHotKey to suppress the Activate that DefaultHotKeyHandler
+    // fires after RaiseHandlingHotKey. Checked and cleared in GetDispatchTarget.
+    private bool _suppressHotKeyActivate;
+
+    /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         if (base.OnHandlingHotKey (args))
@@ -54,7 +83,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return true;
         }
 
-        // Not focused: restore focus, suppress the Activate that DefaultHotKeyHandler will invoke
+        // Not focused: restore focus, suppress the Activate dispatch that DefaultHotKeyHandler will invoke.
         _suppressHotKeyActivate = true;
 
         if (CanFocus)
@@ -66,62 +95,24 @@ public class FlagSelector : SelectorBase, IDesignable
         return false;
     }
 
-    /// <inheritdoc/>
-    protected override bool OnActivating (CommandEventArgs args)
-    {
-        if (base.OnActivating (args) || args.Handled)
-        {
-            return true;
-        }
-
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
-
-        // HotKey-triggered Activate: OnHandlingHotKey set the flag to suppress toggling
-        if (_suppressHotKeyActivate)
-        {
-            _suppressHotKeyActivate = false;
-
-            return false;
-        }
-
-        // When a CheckBox SubView's activation bubbles up, toggle it and raise Activated
-        // (so Shortcut's deferred activation path completes via CommandView_Activated).
-        // Return true to consume — prevents the originator CheckBox from double-toggling
-        // via AdvanceCheckState.
-        if (args.Context?.IsBubblingUp == true
-            && args.Context.Source?.TryGetTarget (out View? source) == true
-            && source is CheckBox checkBox)
-        {
-            checkBox.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
-            RaiseActivated (args.Context);
-
-            return true;
-        }
-
-        // Skip BubbleDown when:
-        // - IsBubblingDown is true (re-entry prevention)
-        // - No Focused view to dispatch to
-        // - Source is a SubView that already bubbled up (not this selector)
-        if (args.Context?.IsBubblingDown == true || Focused is null || (args.Context?.TryGetSource (out View? ctxSource) is true && ctxSource != this))
-        {
-            return false;
-        }
-
-        // Programmatic invocation: BubbleDown to the focused checkbox so it activates and toggles.
-        // Return false so FlagSelector.Activating event still fires.
-        BubbleDown (Focused, args.Context);
-
-        return false;
-    }
+    // _suppressHotKeyActivate is checked and cleared in GetDispatchTarget
 
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
         base.OnActivated (ctx);
 
-        // No additional toggle here — OnActivating handles the bubble case
-        // and calls RaiseActivated directly. For direct invocations, the
-        // BubbleDown in OnActivating triggers the CheckBox toggle via AdvanceCheckState.
+        // Toggle only when the source is a CheckBox (IsBubblingUp path where consume prevented
+        // CheckBox.AdvanceCheckState). For programmatic invocations, BubbleDown already activated
+        // the focused CheckBox and AdvanceCheckState ran, so no additional toggle is needed.
+        if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox checkBox)
+        {
+            checkBox.Value = checkBox.Value == CheckState.Checked
+                                 ? CheckState.UnChecked
+                                 : CheckState.Checked;
+        }
+
+        // CheckboxOnValueChanged handler updates FlagSelector.Value bitmask
     }
 
     /// <inheritdoc/>

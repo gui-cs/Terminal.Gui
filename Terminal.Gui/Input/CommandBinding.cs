@@ -11,9 +11,9 @@ namespace Terminal.Gui.Input;
 ///         but is not associated with a specific key or mouse event.
 ///     </para>
 ///     <para>
-///         <see cref="Source"/> is the View that called <see cref="View.InvokeCommand(Command)"/>g. If
-///         <see langword="null"/> the
-///         CommandBinding instance was created dynamically (not from a mouse or keyboard binding).
+///         <see cref="Source"/> is a weak reference to the View that called <see cref="View.InvokeCommand(Command)"/>.
+///         If <see langword="null"/> the CommandBinding instance was created dynamically (not from a mouse or keyboard
+///         binding).
 ///     </para>
 ///     <para>
 ///         Pattern match on binding types to discriminate between input sources:
@@ -36,7 +36,7 @@ public readonly record struct CommandBinding : ICommandBinding
     public CommandBinding (Command [] commands, View? source = null, object? data = null)
     {
         Commands = commands;
-        Source = source;
+        Source = source is { } ? new WeakReference<View> (source) : null;
         Data = data;
     }
 
@@ -47,8 +47,18 @@ public readonly record struct CommandBinding : ICommandBinding
     public object? Data { get; init; }
 
     /// <inheritdoc/>
-    public View? Source { get; init; }
+    public WeakReference<View>? Source { get; init; }
 
     /// <inheritdoc/>
-    public override string ToString () => $"[{string.Join (", ", Commands)}], Source={Source}, Data={Data}";
+    public override string ToString ()
+    {
+        string sourceStr = "null";
+
+        if (Source?.TryGetTarget (out View? sv) == true)
+        {
+            sourceStr = sv.ToIdentifyingString ();
+        }
+
+        return $"[{string.Join (", ", Commands)}], Source={sourceStr}, Data={Data}";
+    }
 }

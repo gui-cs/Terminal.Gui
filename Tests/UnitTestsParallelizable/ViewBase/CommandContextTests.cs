@@ -74,19 +74,20 @@ public class CommandContextTests
         Assert.NotNull (iCtx.Source);
     }
 
+    // Claude - Opus 4.6
     [Fact]
-    public void Source_IsMutable_ThroughInterface ()
+    public void Source_IsImmutable_ThroughInterface ()
     {
         View originalSource = new () { Id = "original" };
-        View newSource = new () { Id = "new" };
 
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (originalSource) };
 
         ICommandContext iCtx = ctx;
-        iCtx.Source = new WeakReference<View> (newSource);
 
-        // Phase 2: Temporarily commented - will fix in Phase 4
-        // Assert.Equal (newSource, iCtx.Source);
+        // Source is read-only through the interface — immutability is enforced
+        Assert.NotNull (iCtx.Source);
+        iCtx.Source.TryGetTarget (out View? retrieved);
+        Assert.Equal ("original", retrieved?.Id);
     }
 
     #endregion
@@ -115,7 +116,7 @@ public class CommandContextTests
     [Fact]
     public void PatternMatching_MouseBinding_WithMouseEvent_Works ()
     {
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new View { Id = "mouseSource" } };
+        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
         mouseBinding.MouseEvent = new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (10, 20) };
 
         ICommandContext ctx = new CommandContext { Command = Command.Activate, Source = new WeakReference<View> (new View ()), Binding = mouseBinding };
@@ -172,7 +173,7 @@ public class CommandContextTests
         View bindingSource = new () { Id = "bindingSource" };
         View contextSource = new () { Id = "contextSource" };
 
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.A, Source = bindingSource };
+        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.A, Source = new WeakReference<View> (bindingSource) };
 
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (contextSource), Binding = keyBinding };
 
@@ -183,7 +184,9 @@ public class CommandContextTests
 
         if (ctx.Binding is KeyBinding kb)
         {
-            Assert.Equal ("bindingSource", kb.Source?.Id);
+            View? kbSource = null;
+            Assert.True (kb.Source?.TryGetTarget (out kbSource) == true);
+            Assert.Equal ("bindingSource", kbSource?.Id);
         }
         else
         {
@@ -197,7 +200,7 @@ public class CommandContextTests
         View bindingSource = new () { Id = "bindingSource" };
         View contextSource = new () { Id = "contextSource" };
 
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = bindingSource };
+        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new WeakReference<View> (bindingSource) };
 
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (contextSource), Binding = mouseBinding };
 
@@ -208,7 +211,9 @@ public class CommandContextTests
 
         if (ctx.Binding is MouseBinding mb)
         {
-            Assert.Equal ("bindingSource", mb.Source?.Id);
+            View? mbSource = null;
+            Assert.True (mb.Source?.TryGetTarget (out mbSource) == true);
+            Assert.Equal ("bindingSource", mbSource?.Id);
         }
         else
         {
@@ -223,7 +228,7 @@ public class CommandContextTests
     [Fact]
     public void CommandEventArgs_Context_WithKeyBinding_Works ()
     {
-        KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter, Source = new View { Id = "keySource" } };
+        KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter, Source = new WeakReference<View> (new View { Id = "keySource" }) };
 
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (new View { Id = "invoker" }), Binding = keyBinding };
 
@@ -245,7 +250,7 @@ public class CommandContextTests
     [Fact]
     public void CommandEventArgs_Context_WithMouseBinding_Works ()
     {
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new View { Id = "mouseSource" } };
+        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
 
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (new View { Id = "invoker" }), Binding = mouseBinding };
 
@@ -325,7 +330,9 @@ public class CommandContextTests
         // Pattern match on Binding from the interface
         if (ctx.Binding is CommandBinding ib)
         {
-            Assert.Equal ("programmatic", ib.Source?.Id);
+            View? sv = null;
+            Assert.True (ib.Source?.TryGetTarget (out sv) == true);
+            Assert.Equal ("programmatic", sv?.Id);
             Assert.Equal ("data", ib.Data);
         }
         else
@@ -427,44 +434,78 @@ public class CommandContextTests
         Assert.Equal ("weakRefTest", retrievedView?.Id);
     }
 
+    // Claude - Opus 4.6
     [Fact]
-    public void Source_WeakReference_CanBeUpdated ()
+    public void Source_WithExpression_CreatesNewContext ()
     {
         View originalView = new () { Id = "original" };
         View newView = new () { Id = "new" };
 
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (originalView) };
 
-        // Update Source
-        ctx.Source = new WeakReference<View> (newView);
+        // Use `with` expression to create a new context with different Source
+        CommandContext updated = ctx with { Source = new WeakReference<View> (newView) };
 
-        View? retrievedView = null;
-        ctx.Source?.TryGetTarget (out retrievedView);
-        Assert.Equal ("new", retrievedView?.Id);
+        // Original is unchanged
+        View? originalRetrieved = null;
+        ctx.Source?.TryGetTarget (out originalRetrieved);
+        Assert.Equal ("original", originalRetrieved?.Id);
+
+        // Updated has new source
+        View? updatedRetrieved = null;
+        updated.Source?.TryGetTarget (out updatedRetrieved);
+        Assert.Equal ("new", updatedRetrieved?.Id);
     }
 
     #endregion
 
-    #region Command Property Mutability Tests
+    #region Command Property Immutability Tests
 
+    // Claude - Opus 4.6
     [Fact]
-    public void Command_Property_CanBeChanged ()
+    public void WithCommand_CreatesNewContext_PreservesOtherFields ()
     {
-        CommandContext ctx = new () { Command = Command.Accept };
+        View sourceView = new () { Id = "source" };
+        KeyBinding binding = new ([Command.Accept]) { Key = Key.Enter };
 
-        ctx.Command = Command.Activate;
+        CommandContext ctx = new ()
+        {
+            Command = Command.Accept,
+            Source = new WeakReference<View> (sourceView),
+            Binding = binding,
+            Routing = CommandRouting.BubblingUp
+        };
 
-        Assert.Equal (Command.Activate, ctx.Command);
+        CommandContext updated = ctx.WithCommand (Command.Activate);
+
+        // Original unchanged
+        Assert.Equal (Command.Accept, ctx.Command);
+
+        // Updated has new command, everything else preserved
+        Assert.Equal (Command.Activate, updated.Command);
+        Assert.Equal (ctx.Source, updated.Source);
+        Assert.Equal (ctx.Binding, updated.Binding);
+        Assert.Equal (CommandRouting.BubblingUp, updated.Routing);
     }
 
+    // Claude - Opus 4.6
     [Fact]
-    public void Command_Property_CanBeChangedThroughInterface ()
+    public void WithRouting_CreatesNewContext_PreservesOtherFields ()
     {
-        ICommandContext ctx = new CommandContext { Command = Command.Accept };
+        CommandContext ctx = new ()
+        {
+            Command = Command.Accept,
+            Routing = CommandRouting.Direct
+        };
 
-        ctx.Command = Command.HotKey;
+        CommandContext updated = ctx.WithRouting (CommandRouting.DispatchingDown);
 
-        Assert.Equal (Command.HotKey, ctx.Command);
+        // Original unchanged
+        Assert.Equal (CommandRouting.Direct, ctx.Routing);
+
+        // Updated has new routing
+        Assert.Equal (CommandRouting.DispatchingDown, updated.Routing);
+        Assert.Equal (Command.Accept, updated.Command);
     }
 
     #endregion

@@ -100,40 +100,42 @@ public class MenuBarItem : MenuItem
     /// <exception cref="InvalidOperationException"></exception>
     public new Menu? SubMenu { get => null; set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead."); }
 
-    private PopoverMenu? _popoverMenu;
+    private CommandBridge? _popoverBridge;
 
     /// <summary>
     ///     The Popover Menu that will be displayed when this item is selected.
     /// </summary>
     public PopoverMenu? PopoverMenu
     {
-        get => _popoverMenu;
+        get;
         set
         {
-            if (_popoverMenu == value)
+            if (field == value)
             {
                 return;
             }
 
-            if (_popoverMenu is { })
+            if (field is { })
             {
-                _popoverMenu.VisibleChanged -= OnPopoverVisibleChanged;
-                _popoverMenu.Accepted -= OnPopoverMenuOnAccepted;
+                field.VisibleChanged -= OnPopoverVisibleChanged;
+                _popoverBridge?.Dispose ();
+                _popoverBridge = null;
             }
 
-            _popoverMenu = value;
+            field = value;
 
-            if (_popoverMenu is { })
+            if (field is { })
             {
-                _popoverMenu.App = App;
+                field.App = App;
 #if DEBUG
-                Id = $"{Id}.{_popoverMenu.Id}";
+                Id = $"{Id}.{field.Id}";
 #endif
 
-                PopoverMenuOpen = _popoverMenu.Visible;
-                _popoverMenu.VisibleChanged += OnPopoverVisibleChanged;
-                _popoverMenu.Accepted += OnPopoverMenuOnAccepted;
-                _popoverMenu.Activated += OnPopoverMenuOnActivated;
+                PopoverMenuOpen = field.Visible;
+                field.VisibleChanged += OnPopoverVisibleChanged;
+
+                // Bridge Accept from PopoverMenu → MenuBarItem across the non-containment boundary.
+                _popoverBridge = CommandBridge.Connect (this, field, Command.Accept);
             }
 
             return;
@@ -141,19 +143,8 @@ public class MenuBarItem : MenuItem
             void OnPopoverVisibleChanged (object? sender, EventArgs args) =>
 
                 // Logging.Debug ($"OnPopoverVisibleChanged - {this.ToIdentifyingString ()} - Visible = {_popoverMenu?.Visible} ");
-                PopoverMenuOpen = _popoverMenu?.Visible ?? false;
-
-            void OnPopoverMenuOnAccepted (object? sender, CommandEventArgs args) =>
-
-                // Logging.Debug ($"OnPopoverMenuOnAccepted - {this.ToIdentifyingString ()} - {args.Context?.Source} - {args.Context?.Command}");
-                RaiseAccepted (args.Context);
+                PopoverMenuOpen = field?.Visible ?? false;
         }
-    }
-
-    private void OnPopoverMenuOnActivated (object? sender, EventArgs<ICommandContext?> e)
-    {
-        // Logging.Debug ($"OnPopoverMenuOnActivated - {this.ToIdentifyingString ()} - {e.Value?.Source} - {e.Value?.Command}");
-//        RaiseActivated (e.Value);
     }
 
     private bool _popoverMenuOpen;
@@ -195,7 +186,7 @@ public class MenuBarItem : MenuItem
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)
     {
-        //Logging.Trace ($"{key}");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({key})");
 
         if (PopoverMenu is { Visible: true } && HotKeyBindings.TryGet (key, out _))
         {

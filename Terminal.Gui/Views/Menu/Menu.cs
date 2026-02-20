@@ -73,7 +73,7 @@ public class Menu : Bar
 
                 // When a MenuItem is activated (e.g., via HotKey → Activate flow),
                 // raise Accepted on this Menu so PopoverMenu can close.
-                menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
+                //menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
 
                 break;
             }
