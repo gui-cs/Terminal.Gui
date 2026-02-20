@@ -106,17 +106,13 @@ internal class DriverImpl : IDriver
             return;
         }
 
+        // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
         _output.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
         try
         {
-            // BUGBUG: We should NOT be calling Console. APIs here. We should use native
-            // BUGBUG: OS capabilities or ANSI sequences
-            Console.ResetColor ();
-
-            // BUGBUG: We should NOT be calling Console. APIs here. We should use native
-            // BUGBUG: OS capabilities or ANSI sequences
-            Console.Clear ();
+            // Save terminal state before suspending to ensure it can be restored correctly.
+            UnixTerminalHelper.SaveTerminalState ();
 
             //Disable alternative screen buffer.
             _output.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
@@ -127,6 +123,9 @@ internal class DriverImpl : IDriver
             // BUGBUG: This is unix-specific and should not be implemented here.
             if (SuspendHelper.Suspend ())
             {
+                // Restore terminal state after resuming.
+                UnixTerminalHelper.RestoreTerminalState ();
+
                 //Enable alternative screen buffer.
                 _output.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
             }
@@ -136,6 +135,7 @@ internal class DriverImpl : IDriver
             Logging.Error ($"Error suspending terminal: {ex.Message}");
         }
 
+        // Enable mouse events to allow mouse events to be sent to the application when it is resumed.
         _output.Write (EscSeqUtils.CSI_EnableMouseEvents);
     }
 
