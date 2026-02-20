@@ -144,9 +144,9 @@ public class OutputBaseTests
 
         output.Write (buffer);
 
-        // Assert: both characters were written (use Contains to avoid CI side effects)
-        Assert.Contains ("A", output.GetLastOutput ());
-        Assert.Contains ("C", output.GetLastOutput ());
+        // Assert: only the most recently written frame is captured (not accumulated history)
+        Assert.Contains ("X", output.GetLastOutput ());
+        Assert.DoesNotContain ("A", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells
         Assert.False (buffer.Contents! [0, 0].IsDirty);
