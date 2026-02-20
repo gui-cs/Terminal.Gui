@@ -275,7 +275,6 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                     () =>
                     {
                         App?.Driver?.Suspend ();
-                        App?.ClearScreenNextIteration = true;
 
                         // When the app is resumed, we need to force a full redraw to clear out any artifacts from the suspended console.
                         App?.ClearScreenNextIteration = true;
