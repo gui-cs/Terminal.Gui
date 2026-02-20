@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Globalization;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
@@ -383,7 +384,7 @@ public class MenuBarTests : TestsAllDrivers
     [Fact]
     public void OptionSelector_In_SubMenu_Click_Sets_Correct_Value ()
     {
-        string d = "ansi";
+        var d = "ansi";
         MenuBar? menuBar = null;
         IApplication? app = null;
         OptionSelector<Schemes>? optionSelector = null;
@@ -433,6 +434,7 @@ public class MenuBarTests : TestsAllDrivers
 
                         optionSelector.ValueChanged += (_, args) =>
                                                        {
+                                                           Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
                                                            capturedNewValue = args.Value;
                                                            valueChangedCount++;
                                                        };
@@ -447,20 +449,19 @@ public class MenuBarTests : TestsAllDrivers
 
         c = c.Then (_ =>
                     {
-                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ()
-                                                       .FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
                         Assert.NotNull (errorCheckBox);
-                        System.Drawing.Point pos = errorCheckBox!.FrameToScreen ().Location;
+                        Point pos = errorCheckBox!.FrameToScreen ().Location;
                         errorScreenX = pos.X;
                         errorScreenY = pos.Y;
                     });
 
         c = c.LeftClick (errorScreenX, errorScreenY);
 
-        c = c.ScreenShot ("After clicking Error (full driver sequence)", _out);
+        c.WriteOutLogs (_out);
 
         // Assert — Value should change from Base (0) to Error (4), not to Menu (1)
-        Assert.Equal (Schemes.Error, optionSelector!.Value);
+        Assert.Equal (Schemes.Error, optionSelector?.Value);
 
         c.Dispose ();
     }
@@ -475,7 +476,7 @@ public class MenuBarTests : TestsAllDrivers
     [Fact]
     public void Bar_CommandView_In_Menu_Click_Activates_Correct_Shortcut ()
     {
-        string d = "ansi";
+        var d = "ansi";
         IApplication? app = null;
         MenuBar? menuBar = null;
         var shortcut1ActivatedCount = 0;
@@ -503,17 +504,10 @@ public class MenuBarTests : TestsAllDrivers
                                        menuBar = new MenuBar
                                        {
                                            Menus =
-                                           [
-                                               new MenuBarItem ("_Test",
-                                                                [
-                                                                    new MenuItem
-                                                                    {
-                                                                        Id = "barItem",
-                                                                        HelpText = "Bar with shortcuts",
-                                                                        CommandView = bar
-                                                                    }
-                                                                ])
-                                           ]
+                                               [
+                                                   new MenuBarItem ("_Test",
+                                                                    [new MenuItem { Id = "barItem", HelpText = "Bar with shortcuts", CommandView = bar }])
+                                               ]
                                        };
 
                                        app.TopRunnableView!.Add (menuBar);
@@ -533,7 +527,7 @@ public class MenuBarTests : TestsAllDrivers
 
         c = c.Then (_ =>
                     {
-                        System.Drawing.Point pos = shortcut2!.FrameToScreen ().Location;
+                        Point pos = shortcut2!.FrameToScreen ().Location;
                         screenX = pos.X + 1; // offset into the text area
                         screenY = pos.Y;
                     });
@@ -558,7 +552,7 @@ public class MenuBarTests : TestsAllDrivers
     [Fact]
     public void OptionSelector_In_RootMenu_Space_Sets_Correct_Value ()
     {
-        string d = "ansi";
+        var d = "ansi";
         MenuBar? menuBar = null;
         IApplication? app = null;
         OptionSelector<Schemes>? optionSelector = null;
@@ -576,17 +570,15 @@ public class MenuBarTests : TestsAllDrivers
                                        menuBar = new MenuBar
                                        {
                                            Menus =
-                                           [
-                                               new MenuBarItem ("_Test",
-                                                                [
-                                                                    new MenuItem
-                                                                    {
-                                                                        Id = "selectorItem",
-                                                                        HelpText = "Pick a scheme",
-                                                                        CommandView = optionSelector
-                                                                    }
-                                                                ])
-                                           ]
+                                               [
+                                                   new MenuBarItem ("_Test",
+                                                                    [
+                                                                        new MenuItem
+                                                                            {
+                                                                                Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
+                                                                            }
+                                                                    ])
+                                               ]
                                        };
 
                                        app.TopRunnableView!.Add (menuBar);
@@ -619,6 +611,154 @@ public class MenuBarTests : TestsAllDrivers
         c = c.KeyDown (Key.Space);
 
         c = c.ScreenShot ("After Space on Error", _out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (Schemes.Error, capturedNewValue);
+        Assert.Equal (Schemes.Error, optionSelector!.Value);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Simpler variant: OptionSelector directly in the root Menu (no SubMenu nesting).
+    ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_Menu_Click_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        Menu? menu = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+
+                                       menu = new Menu ([new MenuItem { Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector }]);
+
+                                       app.TopRunnableView!.Add (menu);
+
+                                       optionSelector.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {
+                                                                              args.Value
+                                                                          }");
+                                                                          capturedNewValue = args.Value;
+                                                                          valueChangedCount++;
+                                                                      };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        CheckBox? errorCheckBox = null;
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        Assert.NotNull (errorCheckBox);
+                        Point pos = errorCheckBox!.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c.WriteOutLogs (_out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (Schemes.Error, capturedNewValue);
+        Assert.Equal (Schemes.Error, optionSelector!.Value);
+
+        c.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Simpler variant: OptionSelector directly in the root Menu (no SubMenu nesting).
+    ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
+    /// </summary>
+    [Fact]
+    public void OptionSelector_In_RootMenu_Click_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        OptionSelector<Schemes>? optionSelector = null;
+        Schemes? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus =
+                                               [
+                                                   new MenuBarItem ("_Test",
+                                                                    [
+                                                                        new MenuItem
+                                                                            {
+                                                                                Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
+                                                                            }
+                                                                    ])
+                                               ]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+
+                                       optionSelector.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {
+                                                                              args.Value
+                                                                          }");
+                                                                          capturedNewValue = args.Value;
+                                                                          valueChangedCount++;
+                                                                      };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the Test menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        // This simulates the real user scenario where the user opens the menu and clicks
+        // directly on a checkbox without using arrow keys.
+        CheckBox? errorCheckBox = null;
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        Assert.NotNull (errorCheckBox);
+                        Point pos = errorCheckBox!.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c.WriteOutLogs (_out);
 
         // Step 5: Assert
         Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");

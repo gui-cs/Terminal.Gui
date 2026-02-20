@@ -45,6 +45,8 @@ public class OptionSelector : SelectorBase, IDesignable
             return null;
         }
 
+        Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
+
         // When a CheckBox's activation bubbles up, the source IS the CheckBox.
         if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
         {
