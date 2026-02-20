@@ -198,7 +198,7 @@ public partial class TextView : View, IDesignable
                         // Calculate columns to next tab stop
                         // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
                         // If we're at visual column col, advance to next tab stop
-                        cols = TabWidth - col % TabWidth;
+                        cols = TabWidth;
                     }
                     else
                     {

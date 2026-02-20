@@ -58,7 +58,7 @@ public partial class TextView
                     {
                         // Calculate columns to next tab stop
                         // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
-                        cols = TabWidth - col % TabWidth;
+                        cols = TabWidth;
                     }
                     else
                     {

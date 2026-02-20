@@ -469,7 +469,6 @@ public partial class TextView
             {
                 Viewport = Viewport with { X = Viewport.X - 1 };
             }
-            UpdateWrapModel ();
         }
         else
         {
@@ -504,8 +503,9 @@ public partial class TextView
             _historyText.Add ([GetCurrentLine ()], new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Replaced);
 
             CurrentColumn = prevCount;
-            UpdateWrapModel ();
         }
+        UpdateWrapModel ();
+        OnContentsChanged ();
 
         return true;
     }

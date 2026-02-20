@@ -776,7 +776,7 @@ internal class TextModel
 
             if (s == "\t")
             {
-                size += tabWidth + 1;
+                size += tabWidth;
             }
 
             if (i == pX || size > pX)

@@ -2452,14 +2452,18 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, "\tTest")]
-    [InlineData (4, "Test\t")]
-    public void Tab_And_Shift_Tab_With_TabKeyAddsTab_True_AddsRemovesTabCharacter (int col, string expected)
+    [InlineData (0, 4, "\tTest", "    Test")]
+    [InlineData (4, 8, "Test\t", "Test    ")]
+    [InlineData (1, 5, "T\test", "T    est")]
+    public void Tab_And_Shift_Tab_ContentsChanged_With_TabKeyAddsTab_True_AddsRemovesTabCharacter (int col, int expectedCursor, string expectedText, string expectedOutput)
     {
         using IApplication app = Application.Create ().Init ();
         Runnable runnable = new ();
         View view1 = new () { CanFocus = true };
-        TextView textView = new () { Text = "Test" };
+        TextView textView = CreateTextView ();
+        textView.Text = "Test";
+        int count = 0;
+        textView.ContentsChanged += (_, _) => count++;
         View view2 = new () { CanFocus = true };
         runnable.Add (view1, textView, view2);
 
@@ -2474,13 +2478,19 @@ public class TextViewTests (ITestOutputHelper output)
 
         // Press Tab - should add tab character
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
-        Assert.Equal (expected, textView.Text);
+        Assert.Equal (expectedText, textView.Text);
         Assert.True (textView.HasFocus);
+        Assert.Equal (expectedCursor, textView.Cursor.Position!.Value.X);
+        Assert.Equal (1, count);
+        textView.Draw ();
+        DriverAssert.AssertDriverContentsAre (expectedOutput, output, app.Driver);
 
         // Press Shift+Tab - should remove tab character
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
         Assert.Equal ("Test", textView.Text);
         Assert.True (textView.HasFocus);
+        Assert.Equal (col, textView.Cursor.Position!.Value.X);
+        Assert.Equal (2, count);
     }
 
     [Fact]
@@ -2722,6 +2732,82 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorUp));
         Assert.False (textView.HasFocus);
         Assert.True (previousView.HasFocus);
+    }
+
+    [Fact]
+    public void Mouse_Click_On_Text_With_Tabs_Sets_Cursor_At_Correct_Position ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        TextView textView = CreateTextView ();
+        textView.Text = "\t\t1\t2\t3";
+        Runnable runnable = new ();
+        runnable.Add (textView);
+
+        app.Begin (runnable);
+
+        Assert.Equal (4, textView.TabWidth);
+
+        textView.SetRelativeLayout (new Size (100, 100));
+
+        // Click at position "0" stay in first
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (0, textView.CurrentColumn);
+        Assert.Equal (0, textView.Cursor.Position!.Value.X);
+
+        // Click at position "4" in first tab
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (1, textView.CurrentColumn);
+        Assert.Equal (4, textView.Cursor.Position!.Value.X);
+
+        // Click at position "5" stay in first tab
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (5, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (1, textView.CurrentColumn);
+        Assert.Equal (4, textView.Cursor.Position!.Value.X);
+
+        // Click at position "8" in second tab
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (8, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (2, textView.CurrentColumn);
+        Assert.Equal (8, textView.Cursor.Position!.Value.X);
+
+        // Click at position "9" in "1"
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (9, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (3, textView.CurrentColumn);
+        Assert.Equal (9, textView.Cursor.Position!.Value.X);
+
+        // Click at position "10" stay in "1"
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (10, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (3, textView.CurrentColumn);
+        Assert.Equal (9, textView.Cursor.Position!.Value.X);
+
+        // Click at position "13" in third tab
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (13, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (4, textView.CurrentColumn);
+        Assert.Equal (13, textView.Cursor.Position!.Value.X);
+
+        // Click at position "14" in "2"
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (14, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (5, textView.CurrentColumn);
+        Assert.Equal (14, textView.Cursor.Position!.Value.X);
+
+        // Click at position "14" stay in "2"
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (15, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (5, textView.CurrentColumn);
+        Assert.Equal (14, textView.Cursor.Position!.Value.X);
+
+        // Click at position "18" in fourth tab
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (18, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (6, textView.CurrentColumn);
+        Assert.Equal (18, textView.Cursor.Position!.Value.X);
+
+        // Click at position "19" in "3"
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (19, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (7, textView.CurrentColumn);
+        Assert.Equal (19, textView.Cursor.Position!.Value.X);
+
+        // Click at position "20" stay in "3" having reached the end of the columns
+        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (20, 0), Flags = MouseFlags.LeftButtonClicked }));
+        Assert.Equal (7, textView.CurrentColumn);
+        Assert.Equal (19, textView.Cursor.Position!.Value.X);
     }
 
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
