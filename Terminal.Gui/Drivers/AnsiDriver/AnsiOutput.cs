@@ -59,10 +59,9 @@ public class AnsiOutput : OutputBase, IOutput
 
         try
         {
-            // Check if console is available (not redirected)
-            if (Console.IsOutputRedirected || Console.IsInputRedirected)
+            if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
             {
-                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                Logging.Warning ($"Console redirected (Output: {!outputAttached}, Input: {!inputAttached}). Running in degraded mode.");
 
                 return;
             }
@@ -108,8 +107,7 @@ public class AnsiOutput : OutputBase, IOutput
             Write (EscSeqUtils.CSI_EnableMouseEvents);
 
             // Flush to ensure all sequences are sent
-            // NOTE: Default implementation of Flush does nothing.
-            Console.Out.Flush ();
+            AnsiTerminalHelper.FlushNative (_platform);
 
             //Logging.Information ("ANSIOutput initialized successfully");
 
