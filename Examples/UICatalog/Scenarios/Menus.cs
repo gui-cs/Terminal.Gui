@@ -78,6 +78,12 @@ public class Menus : Scenario
 
                                     if (menuHostView?.ContextMenu is { })
                                     {
+                                        foreach (MenuItem menuItem in menuHostView?.ContextMenu?.GetMenuItemsOfAllSubMenus (v => true) ?? [])
+                                        {
+                                            _eventLog.SetViewToLog (menuItem);
+                                            _eventLog.SetViewToLog (menuItem.CommandView);
+                                            menuItem.Action += () => _eventLog.Log ($"{menuItem.ToIdentifyingString ()} Action!");
+                                        }
                                         _eventLog.SetViewToLog (menuHostView.ContextMenu);
                                     }
                                 };
@@ -142,17 +148,9 @@ public class Menus : Scenario
 
             MenuBar = new MenuBar { Title = "MenuHost MenuBar" };
             MenuBar.CommandsToBubbleUp = [Command.Accept, Command.Activate, Command.HotKey];
-
-            Add (MenuBar);
-
             MenuHost host = this;
             MenuBar?.EnableForDesign (ref host);
-
-            // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
-            foreach (MenuBarItem? mbi in MenuBar?.SubViews.Select (s => s as MenuBarItem)!)
-            {
-                App?.Popover?.Register (mbi?.PopoverMenu);
-            }
+            Add (MenuBar);
 
             Label lastAcceptedLabel = new () { Title = "Last Accepted:", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastCommandLabel) };
 
@@ -168,7 +166,7 @@ public class Menus : Scenario
             // set a Key (F10). MenuBar adds this key as a hotkey and thus if it's pressed, it toggles the MenuItem
             // CB.
             // So that is needed is to mirror the two check boxes.
-            var autoSaveMenuItemCb = MenuBar.GetMenuItemsWith (mi => mi.Id == "AutoSave").FirstOrDefault ()?.CommandView as CheckBox;
+            var autoSaveMenuItemCb = MenuBar?.GetMenuItemsWith (mi => mi.Id == "AutoSave").FirstOrDefault ()?.CommandView as CheckBox;
             Debug.Assert (autoSaveMenuItemCb is { });
 
             CheckBox autoSaveStatusCb = new ()
@@ -336,8 +334,15 @@ public class Menus : Scenario
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             menuItemBorders.Accepting += (_, args) => args.Handled = true;
 
-            OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
-            MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+            OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = false };
+
+            MenuItem menuItemScheme = new ()
+            {
+                Title = "Scheme",
+                Text = "Scheme",
+                Key = Key.S.WithCtrl,
+                CommandView = schemeOptionSelector
+            };
 
             schemeOptionSelector!.ValueChanged += (_, args) =>
                                                   {

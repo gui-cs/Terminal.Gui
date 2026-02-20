@@ -69,6 +69,9 @@ public abstract class PopoverBaseImpl : View, IPopover
         KeyBindings.Add (Application.QuitKey, Command.Quit);
         KeyBindings.Remove (Key.Enter);
 
+        // Clear all mouse bindings so there's no conflict with subviews
+        MouseBindings.Clear ();
+
         return;
 
         bool? Quit (ICommandContext? ctx)

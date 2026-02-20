@@ -27,7 +27,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         _orientationHelper = new OrientationHelper (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
-        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+        // Clear all mouse bindings; the selector's SubViews will handle all
+        // mouse events.
+        MouseBindings.Clear ();
 
         CommandsToBubbleUp = [Command.Activate, Command.Accept];
 

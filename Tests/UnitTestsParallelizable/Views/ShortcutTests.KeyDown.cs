@@ -222,4 +222,236 @@ public partial class ShortcutTests
         Assert.Equal (expectedAccept, accepting);
         Assert.Equal (expectedActivate, activated);
     }
+
+
+    [Fact]
+    public void Mouse_Click_On_CommandView_Causes_Activation ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F1;
+        shortcut.HelpText = "Help text";
+        shortcut.Title = "Command";
+        shortcut.Width = 40; // Wide enough to create gaps between subviews
+        shortcut.Height = 1;
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var activatingCount = 0;
+
+        shortcut.Activating += (_, _) => { activatingCount++; };
+
+        // Verify layout created gaps
+        Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
+        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
+        Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
+
+        // Act & Assert - Click at various X positions across the entire CommandView
+        Rectangle screen = shortcut.CommandView.FrameToScreen ();
+        for (var x = screen.X; x < screen.X + screen.Width; x++)
+        {
+            int expectedCount = activatingCount + 1;
+
+            // Simulate mouse click at position x
+            app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (x, 0)));
+
+            Assert.True (activatingCount == expectedCount,
+                         $"Click at X={x} should activate the Shortcut. Expected: {expectedCount}, Actual: {activatingCount}");
+        }
+    }
+
+    [Fact]
+    public void Mouse_Click_On_HelpView_Causes_Activation ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F1;
+        shortcut.HelpText = "Help text";
+        shortcut.Title = "Command";
+        shortcut.Width = 40; // Wide enough to create gaps between subviews
+        shortcut.Height = 1;
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var activatingCount = 0;
+
+        shortcut.Activating += (_, _) => { activatingCount++; };
+
+        // Verify layout created gaps
+        Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
+        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
+        Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
+
+        // Act & Assert - Click at various X positions across the entire HelpView
+        Rectangle screen = shortcut.HelpView.FrameToScreen ();
+        for (var x = screen.X; x < screen.X + screen.Width; x++)
+        {
+            int expectedCount = activatingCount + 1;
+
+            // Simulate mouse click at position x
+            app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (x, 0)));
+
+            Assert.True (activatingCount == expectedCount,
+                         $"Click at X={x} should activate the Shortcut. Expected: {expectedCount}, Actual: {activatingCount}");
+        }
+    }
+
+
+    [Fact]
+    public void Mouse_Click_On_KeyView_Causes_Activation ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F1;
+        shortcut.HelpText = "Help text";
+        shortcut.Title = "Command";
+        shortcut.Width = 40; // Wide enough to create gaps between subviews
+        shortcut.Height = 1;
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var activatingCount = 0;
+
+        shortcut.Activating += (_, _) => { activatingCount++; };
+
+        // Verify layout created gaps
+        Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
+        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
+        Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
+
+        // Act & Assert - Click at various X positions across the entire KeyView
+        Rectangle screen = shortcut.KeyView.FrameToScreen ();
+        for (var x = screen.X+1; x < screen.X + screen.Width; x++)
+        {
+            int expectedCount = activatingCount + 1;
+
+            // Simulate mouse click at position x
+            app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (x, 0)));
+
+            Assert.True (activatingCount == expectedCount,
+                         $"Click at X={x} should activate the Shortcut. Expected: {expectedCount}, Actual: {activatingCount}");
+        }
+    }
+
+    /// <summary>
+    ///     Verifies that clicking anywhere across the entire width of a Shortcut causes activation,
+    ///     including clicks in gaps between CommandView, HelpView, and KeyView.
+    /// </summary>
+    [Fact]
+    public void Mouse_Click_Anywhere_On_Shortcut_Causes_Activation ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        using Shortcut shortcut = new ();
+        shortcut.Key = Key.F1;
+        shortcut.HelpText = "Help text";
+        shortcut.Title = "Command";
+        shortcut.Width = 40; // Wide enough to create gaps between subviews
+        shortcut.Height = 1;
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        var activatingCount = 0;
+
+        shortcut.Activating += (_, _) => { activatingCount++; };
+
+        // Verify layout created gaps
+        Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
+        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
+        Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
+
+        // Act & Assert - Click at various X positions across the entire width
+        for (var x = 0; x < shortcut.Frame.Width; x++)
+        {
+            int expectedCount = activatingCount + 1;
+
+            // Simulate mouse click at position x
+            app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (x, 0)));
+
+            Assert.True (activatingCount == expectedCount,
+                         $"Click at X={x} should activate the Shortcut. Expected: {expectedCount}, Actual: {activatingCount}");
+        }
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that clicking directly on a Button CommandView routes through Accept (not Activate),
+    ///     because Button maps <see cref="MouseFlags.LeftButtonClicked"/> to <see cref="Command.Accept"/>.
+    ///     The Accept bubbles up to the Shortcut, which also raises its Accepting event.
+    ///     Neither Activating event fires because the click goes through the Accept path.
+    /// </summary>
+    [Theory]
+    [CombinatorialData]
+    public void Mouse_Click_Button_CommandView_Raises_Accepting_On_Both (bool commandViewCanFocus)
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        Button button = new () { Title = "C", NoDecorations = true, NoPadding = true, CanFocus = commandViewCanFocus };
+
+        Shortcut shortcut = new () { Key = Key.A, Text = "0", CommandView = button };
+
+        (runnable as View)?.Add (shortcut);
+        app.Begin (runnable);
+
+        // Verify the Shortcut and Button have been laid out
+        Assert.True (shortcut.Frame.Width > 0, "Shortcut should have width");
+        Assert.True (button.Frame.Width > 0, "Button should have width");
+
+        var shortcutAcceptingCount = 0;
+        shortcut.Accepting += (_, _) => shortcutAcceptingCount++;
+
+        var shortcutActivatingCount = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingCount++;
+
+        var buttonAcceptingCount = 0;
+        button.Accepting += (_, _) => buttonAcceptingCount++;
+
+        var buttonActivatingCount = 0;
+        button.Activating += (_, _) => buttonActivatingCount++;
+
+        // Act - click directly on the Button (CommandView)
+        // Button maps LeftButtonClicked → Command.Accept, so this goes through Accept path
+        Point buttonScreenPos = button.ViewportToScreen (Point.Empty);
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (buttonScreenPos));
+
+        // Assert - Accept fires on Button, then bubbles to Shortcut
+        Assert.Equal (1, buttonAcceptingCount);
+        Assert.Equal (1, shortcutAcceptingCount);
+
+        // Activating does NOT fire because the click was routed to Accept by Button
+        Assert.Equal (0, buttonActivatingCount);
+        Assert.Equal (0, shortcutActivatingCount);
+    }
+
 }

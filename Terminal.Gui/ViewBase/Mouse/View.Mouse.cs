@@ -381,6 +381,8 @@ public partial class View // Mouse APIs
     /// <seealso cref="MouseHighlightStates"/>
     public bool? NewMouseEvent (Mouse mouse)
     {
+        //Logging.Debug ($"{this.ToIdentifyingString ()} {mouse}");
+
         // 1. Pre-conditions
         mouse.Position ??= mouse.ScreenPosition;
 
@@ -567,6 +569,8 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/> if processing should stop; <see langword="false"/> otherwise.</returns>
     private bool HandleAutoGrabPress (Mouse mouse)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} {mouse}");
+
         if (!mouse.IsPressed)
         {
             return false;
@@ -581,12 +585,13 @@ public partial class View // Mouse APIs
 
             for (int i = cached.Count - 1; i >= 0; i--)
             {
-                if (cached [i] is { Enabled: true } candidate)
+                if (cached [i] is not { Enabled: true } candidate)
                 {
-                    deepestEnabledView = candidate;
-
-                    break;
+                    continue;
                 }
+                deepestEnabledView = candidate;
+
+                break;
             }
 
             if (deepestEnabledView is { } && deepestEnabledView != this)
@@ -630,6 +635,8 @@ public partial class View // Mouse APIs
     /// <param name="mouse">The mouse event.</param>
     private bool HandleAutoGrabRelease (Mouse mouse)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} {mouse}");
+
         if (!mouse.IsReleased)
         {
             return false;
@@ -671,7 +678,9 @@ public partial class View // Mouse APIs
     ///     <see langword="false"/> if the click was inside (should continue to invoke commands).
     /// </returns>
     private bool HandleAutoGrabClicked (Mouse mouse)
-    {
+    { 
+        Logging.Debug ($"{this.ToIdentifyingString ()} {mouse}");
+
         if (!mouse.IsSingleDoubleOrTripleClicked)
         {
             return false;
@@ -812,6 +821,8 @@ public partial class View // Mouse APIs
     /// </returns>
     protected bool? InvokeCommandsBoundToMouse (Mouse mouseEventArgs)
     {
+        // Logging.Debug ($"{this.ToIdentifyingString ()} {mouseEventArgs}");
+
         if (!MouseBindings.TryGet (mouseEventArgs.Flags, out MouseBinding binding))
         {
             return null;

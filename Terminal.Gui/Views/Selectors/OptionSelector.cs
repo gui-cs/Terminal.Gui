@@ -24,22 +24,17 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class OptionSelector : SelectorBase, IDesignable
 {
+    // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
+    // really wants that.
     /// <inheritdoc/>
-    public OptionSelector () =>
-
-        // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
-        // really wants that.
-        base.Value = 0;
+    public OptionSelector () => base.Value = 0;
 
     // ──── Command Coordination ────
 
-    /// <summary>
-    ///     Returns the dispatch target for composite command handling.
-    ///     Only dispatches for Activate commands — Accept should bubble normally.
-    /// </summary>
+    /// <inheritdoc />
     protected override View? GetDispatchTarget (ICommandContext? ctx)
     {
-        // Only dispatch Activate, not Accept. Accept should bubble to Menu/MenuBar normally.
+        // Only dispatch Activate, not Accept. Accept should bubble naturally.
         if (ctx?.Command != Command.Activate)
         {
             return null;
@@ -47,13 +42,18 @@ public class OptionSelector : SelectorBase, IDesignable
 
         Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
 
-        // When a CheckBox's activation bubbles up, the source IS the CheckBox.
-        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
+        if (ctx.Source?.TryGetTarget (out View? source) != true || source is not CheckBox cb)
         {
-            return source;
+            return Focused;
         }
 
-        return Focused;
+        if (ctx.Binding is { } && ctx.Binding.Commands.Contains (Command.Accept) && cb.Value == CheckState.Checked)
+        {
+            return null;
+        }
+
+        // When a CheckBox's activation bubbles up, the source IS the CheckBox
+        return source;
     }
 
     /// <summary>

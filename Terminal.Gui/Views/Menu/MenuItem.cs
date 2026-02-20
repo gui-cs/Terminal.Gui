@@ -65,14 +65,19 @@ public class MenuItem : Shortcut
         get;
         set
         {
+            if (field == value)
+            {
+                return;
+            }
+
             field = value;
 
             if (field is null)
             {
                 return;
             }
-            SubMenu!.App ??= App;
-            SubMenu!.Visible = false;
+            field!.App ??= App;
+            field!.Visible = false;
 
             // TODO: This is a temporary hack - add a flag or something instead
             KeyView.Text = $"{Glyphs.RightArrow}";

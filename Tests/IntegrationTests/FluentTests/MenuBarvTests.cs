@@ -462,6 +462,7 @@ public class MenuBarTests : TestsAllDrivers
 
         // Assert — Value should change from Base (0) to Error (4), not to Menu (1)
         Assert.Equal (Schemes.Error, optionSelector?.Value);
+        Assert.Equal (1, valueChangedCount);
 
         c.Dispose ();
     }
@@ -550,7 +551,7 @@ public class MenuBarTests : TestsAllDrivers
     ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
     /// </summary>
     [Fact]
-    public void OptionSelector_In_RootMenu_Space_Sets_Correct_Value ()
+    public void OptionSelector_CommandView_In_RootMenu_Space_Sets_Correct_Value ()
     {
         var d = "ansi";
         MenuBar? menuBar = null;
@@ -565,6 +566,7 @@ public class MenuBarTests : TestsAllDrivers
                                    {
                                        app = a;
 
+                                       // Must have CanFocus=true for keyboard nav to work in a selector
                                        optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
 
                                        menuBar = new MenuBar
@@ -596,8 +598,6 @@ public class MenuBarTests : TestsAllDrivers
         c = c.KeyDown (MenuBar.DefaultKey);
         Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
 
-        c = c.ScreenShot ("After F9 - menu open", _out);
-
         // Step 3: Navigate within the OptionSelector to Error
         // Items: Base(0), Menu(1), Dialog(2), Runnable(3), Error(4)
         c = c.KeyDown (Key.CursorDown); // Base → Menu
@@ -605,17 +605,19 @@ public class MenuBarTests : TestsAllDrivers
         c = c.KeyDown (Key.CursorDown); // Dialog → Runnable
         c = c.KeyDown (Key.CursorDown); // Runnable → Error
 
-        c = c.ScreenShot ("After navigating to Error", _out);
+       // c = c.ScreenShot ("After navigating to Error", _out);
 
         // Step 4: Press Space to activate
+        Logging.Debug ($"KeyDown ({Key.Space})");
         c = c.KeyDown (Key.Space);
 
-        c = c.ScreenShot ("After Space on Error", _out);
+        //c = c.ScreenShot ("After Space on Error", _out);
 
         // Step 5: Assert
         Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
         Assert.Equal (Schemes.Error, capturedNewValue);
         Assert.Equal (Schemes.Error, optionSelector!.Value);
+        Assert.Equal (1, valueChangedCount);
 
         c.Dispose ();
     }
@@ -626,7 +628,7 @@ public class MenuBarTests : TestsAllDrivers
     ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
     /// </summary>
     [Fact]
-    public void OptionSelector_In_Menu_Click_Sets_Correct_Value ()
+    public void OptionSelector_CommandView_In_Menu_Click_Sets_Correct_Value ()
     {
         var d = "ansi";
         Menu? menu = null;
@@ -649,9 +651,7 @@ public class MenuBarTests : TestsAllDrivers
 
                                        optionSelector.ValueChanged += (_, args) =>
                                                                       {
-                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {
-                                                                              args.Value
-                                                                          }");
+                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
                                                                           capturedNewValue = args.Value;
                                                                           valueChangedCount++;
                                                                       };
@@ -669,10 +669,11 @@ public class MenuBarTests : TestsAllDrivers
                         errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
                         Assert.NotNull (errorCheckBox);
                         Point pos = errorCheckBox!.FrameToScreen ().Location;
-                        errorScreenX = pos.X;
+                        errorScreenX = pos.X+1;
                         errorScreenY = pos.Y;
                     });
 
+        Logging.Debug ($"LeftClick ({errorScreenX}, {errorScreenY})");
         c = c.LeftClick (errorScreenX, errorScreenY);
 
         c.WriteOutLogs (_out);
@@ -681,6 +682,7 @@ public class MenuBarTests : TestsAllDrivers
         Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
         Assert.Equal (Schemes.Error, capturedNewValue);
         Assert.Equal (Schemes.Error, optionSelector!.Value);
+        Assert.Equal (1, valueChangedCount);
 
         c.Dispose ();
     }
@@ -691,7 +693,7 @@ public class MenuBarTests : TestsAllDrivers
     ///     Isolates whether the bug is SubMenu-specific or general to PopoverMenu.
     /// </summary>
     [Fact]
-    public void OptionSelector_In_RootMenu_Click_Sets_Correct_Value ()
+    public void OptionSelector_CommandView_In_RootMenu_Click_Sets_Correct_Value ()
     {
         var d = "ansi";
         MenuBar? menuBar = null;
@@ -726,9 +728,7 @@ public class MenuBarTests : TestsAllDrivers
 
                                        optionSelector.ValueChanged += (_, args) =>
                                                                       {
-                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {
-                                                                              args.Value
-                                                                          }");
+                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
                                                                           capturedNewValue = args.Value;
                                                                           valueChangedCount++;
                                                                       };
@@ -752,10 +752,11 @@ public class MenuBarTests : TestsAllDrivers
                         errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
                         Assert.NotNull (errorCheckBox);
                         Point pos = errorCheckBox!.FrameToScreen ().Location;
-                        errorScreenX = pos.X;
+                        errorScreenX = pos.X+1;
                         errorScreenY = pos.Y;
                     });
 
+        Logging.Debug ($"LeftClick ({errorScreenX}, {errorScreenY})");
         c = c.LeftClick (errorScreenX, errorScreenY);
 
         c.WriteOutLogs (_out);
@@ -764,6 +765,143 @@ public class MenuBarTests : TestsAllDrivers
         Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
         Assert.Equal (Schemes.Error, capturedNewValue);
         Assert.Equal (Schemes.Error, optionSelector!.Value);
+        Assert.Equal (1, valueChangedCount);
+
+        c.Dispose ();
+    }
+
+    [Fact]
+    public void Checkbox_CommandView_In_RootMenu_Click_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        CheckBox? checkBox = null;
+        CheckState? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       checkBox = new CheckBox { Title = "_Checkbox", CanFocus = true };
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus = [new MenuBarItem ("_Test", [new MenuItem { Id = "czechMi", HelpText = "Czech me", CommandView = checkBox }])]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+
+                                       checkBox.ValueChanged += (_, args) =>
+                                                                {
+                                                                    Logging.Debug ($"Checkbox ValueChanged event fired with new value: {args.NewValue}");
+                                                                    capturedNewValue = args.NewValue;
+                                                                    valueChangedCount++;
+                                                                };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the Test menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        // This simulates the real user scenario where the user opens the menu and clicks
+        // directly on a checkbox without using arrow keys.
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        Point pos = checkBox!.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c.ScreenShot ("before LeftClick", _out);
+
+        Logging.Debug ($"LeftClick ({errorScreenX}, {errorScreenY})");
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c.WriteOutLogs (_out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (CheckState.Checked, capturedNewValue);
+        Assert.Equal (CheckState.Checked, checkBox!.Value);
+
+        c.Dispose ();
+    }
+
+    [Fact]
+    public void Checkbox_CommandView_In_RootMenu_Click_On_HelpView_Sets_Correct_Value ()
+    {
+        var d = "ansi";
+        MenuBar? menuBar = null;
+        IApplication? app = null;
+        CheckBox? checkBox = null;
+        CheckState? capturedNewValue = null;
+        var valueChangedCount = 0;
+
+        // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
+        TestContext c = With.A<Window> (80, 30, d, _out)
+                            .Then (a =>
+                                   {
+                                       app = a;
+
+                                       checkBox = new CheckBox { Title = "_Checkbox", CanFocus = true };
+
+                                       menuBar = new MenuBar
+                                       {
+                                           Menus = [new MenuBarItem ("_Test", [new MenuItem { Id = "czechMi", HelpText = "Czech me", CommandView = checkBox }])]
+                                       };
+
+                                       app.TopRunnableView!.Add (menuBar);
+
+                                       checkBox.ValueChanged += (_, args) =>
+                                                                {
+                                                                    Logging.Debug ($"Checkbox ValueChanged event fired with new value: {args.NewValue}");
+                                                                    capturedNewValue = args.NewValue;
+                                                                    valueChangedCount++;
+                                                                };
+                                   });
+
+        c = c.WaitIteration ();
+
+        // Step 2: Open the Test menu
+        c = c.KeyDown (MenuBar.DefaultKey);
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+
+        // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
+        // This simulates the real user scenario where the user opens the menu and clicks
+        // directly on a checkbox without using arrow keys.
+        var errorScreenX = 0;
+        var errorScreenY = 0;
+
+        c = c.Then (_ =>
+                    {
+                        var mbi = menuBar.SubViews.ElementAt (0) as MenuBarItem;
+                        MenuItem? mi = mbi.PopoverMenu.Root.SelectedMenuItem;
+                        Point pos = mi!.HelpView.FrameToScreen ().Location;
+                        errorScreenX = pos.X;
+                        errorScreenY = pos.Y;
+                    });
+
+        c.ScreenShot ("before LeftClick", _out);
+
+        Logging.Debug ($"LeftClick ({errorScreenX}, {errorScreenY})");
+        c = c.LeftClick (errorScreenX, errorScreenY);
+
+        c.WriteOutLogs (_out);
+
+        // Step 5: Assert
+        Assert.True (valueChangedCount >= 1, $"ValueChanged should fire (fired {valueChangedCount} times)");
+        Assert.Equal (CheckState.Checked, capturedNewValue);
+        Assert.Equal (CheckState.Checked, checkBox!.Value);
 
         c.Dispose ();
     }

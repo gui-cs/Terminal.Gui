@@ -165,6 +165,8 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
+        // Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
+
         return implementation! (ctx);
     }
 
@@ -210,6 +212,8 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseCommandNotBound (ICommandContext? ctx)
     {
+        // Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
+
         CommandEventArgs args = new () { Context = ctx };
 
         // For robustness' sake, even if the virtual method returns true, if the args
@@ -299,7 +303,6 @@ public partial class View // Command APIs
         // the view hierarchy to reach a SuperView that can redirect to DefaultAcceptView.
         return redirected || acceptWillBubble || ctx?.Routing == CommandRouting.BubblingUp || this is IAcceptTarget;
     }
-
 
     /// <summary>
     ///     Called when the user is accepting the state of the View and the <see cref="Command.Accept"/> has been invoked.
@@ -398,7 +401,7 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="ctx">The command context.</param>
     /// <seealso cref="RaiseAccepting"/>
-    internal protected void RaiseAccepted (ICommandContext? ctx)
+    protected internal void RaiseAccepted (ICommandContext? ctx)
     {
         OnAccepted (ctx);
         Accepted?.Invoke (this, new CommandEventArgs { Context = ctx });
@@ -437,7 +440,7 @@ public partial class View // Command APIs
 
     internal bool? DefaultActivateHandler (ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         if (RaiseActivating (ctx) is true)
         {
@@ -521,7 +524,8 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseActivating (ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
@@ -580,9 +584,10 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="ctx">The command context.</param>
     /// <seealso cref="RaiseActivating"/>
-    internal protected void RaiseActivated (ICommandContext? ctx)
+    protected internal void RaiseActivated (ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
         OnActivated (ctx);
         Activated?.Invoke (this, new EventArgs<ICommandContext?> (ctx));
     }
@@ -714,7 +719,7 @@ public partial class View // Command APIs
     /// <summary>
     ///     Gets the SubView to dispatch commands to. Return <see langword="null"/> to skip dispatch.
     ///     The framework calls this during <see cref="RaiseActivating"/>/<see cref="RaiseAccepting"/>
-    ///     after the <c>OnXxxing</c> virtual and <c>Xxxing</c> event have had a chance to cancel.
+    ///     after the <c>OnActivating</c> virtual and <c>OnAccepting</c> event have had a chance to cancel.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -767,6 +772,8 @@ public partial class View // Command APIs
     /// <returns><see langword="true"/> if the command was consumed (ConsumeDispatch=true and dispatch conditions met).</returns>
     private bool TryDispatchToTarget (ICommandContext? ctx)
     {
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+
         _lastDispatchOccurred = false;
 
         View? target = GetDispatchTarget (ctx);
@@ -809,11 +816,12 @@ public partial class View // Command APIs
         }
 
         // Relay pattern (Shortcut): dispatch to target if source is not within target.
-        if (!IsSourceWithinView (target, ctx))
+        if (IsSourceWithinView (target, ctx))
         {
-            BubbleDown (target, ctx);
-            _lastDispatchOccurred = true;
+            return false;
         }
+        BubbleDown (target, ctx);
+        _lastDispatchOccurred = true;
 
         return false;
     }
@@ -876,7 +884,8 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Dispatches a command downward to a SubView with bubbling suppressed. Creates a new
-    ///     <see cref="CommandContext"/> with <see cref="ICommandContext.Routing"/> set to <see cref="CommandRouting.DispatchingDown"/>,
+    ///     <see cref="CommandContext"/> with <see cref="ICommandContext.Routing"/> set to
+    ///     <see cref="CommandRouting.DispatchingDown"/>,
     ///     which causes <see cref="TryBubbleUp"/> to skip bubbling on the target, preventing re-entry.
     /// </summary>
     /// <param name="target">The SubView to dispatch the command to.</param>
@@ -886,7 +895,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? BubbleDown (View target, ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.DispatchingDown };
 
@@ -917,17 +926,21 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? TryBubbleUp (ICommandContext? ctx, bool handled)
     {
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}, {handled})");
+
         if (handled)
         {
             return true;
         }
 
-        if (ctx?.Routing == CommandRouting.DispatchingDown)
+        if (ctx is null || ctx.Routing == CommandRouting.DispatchingDown)
         {
             return false;
         }
 
-        if (ctx?.Command == Command.Accept)
+        CommandContext? upCtx;
+
+        if (ctx.Command == Command.Accept)
         {
             // Check this view's DefaultAcceptView first (for when Accept is invoked directly on this view),
             // then check SuperView's DefaultAcceptView (for when Accept bubbles up from a subview)
@@ -948,7 +961,7 @@ public partial class View // Command APIs
                         return false;
                     }
 
-                    CommandContext upCtx = new (Command.Accept, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
+                    upCtx = new CommandContext (Command.Accept, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
                     // DefaultAcceptView redirect is a special case — it IS a consumption (not just a notification)
                     return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
@@ -959,36 +972,33 @@ public partial class View // Command APIs
         }
 
         // Check if SuperView wants this command bubbled up to it
-        if (SuperView?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
+        if (SuperView?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
             // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-            CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.BubblingUp };
+            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
-            return SuperView.InvokeCommand (upCtx.Command, upCtx);
+            return SuperView.InvokeCommand (ctx.Command, upCtx);
         }
 
-        if (SuperView is Padding padding)
+        if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
             // Check if Padding's Parent wants this command bubbled up to it
-            if (padding.Parent?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
-            {
-                // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-                CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.BubblingUp };
+            // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
-                return padding.Parent.InvokeCommand (upCtx.Command, upCtx);
-            }
+            return padding.Parent.InvokeCommand (ctx.Command, upCtx);
+        }
+
+        if (this is not Padding selfPadding || selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
+        {
+            return handled;
         }
 
         // Handle when THIS view is a Padding
-        if (this is Padding selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx!.Command) == true)
-        {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-            CommandContext upCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.BubblingUp };
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
-            return selfPadding.Parent.InvokeCommand (upCtx.Command, upCtx);
-        }
-
-        return handled;
+        return selfPadding.Parent.InvokeCommand (ctx.Command, upCtx);
     }
 
     #endregion Command Bubbling

@@ -25,8 +25,6 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
-
-        MouseBindings.Clear ();
     }
 
     // ──── Command Coordination ────
@@ -44,7 +42,7 @@ public class FlagSelector : SelectorBase, IDesignable
         }
 
         // When a CheckBox's activation bubbles up, the source IS the CheckBox.
-        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
+        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox cb)
         {
             return source;
         }
@@ -105,12 +103,20 @@ public class FlagSelector : SelectorBase, IDesignable
         // Toggle only when the source is a CheckBox (IsBubblingUp path where consume prevented
         // CheckBox.AdvanceCheckState). For programmatic invocations, BubbleDown already activated
         // the focused CheckBox and AdvanceCheckState ran, so no additional toggle is needed.
-        if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox checkBox)
+        if (ctx?.Source?.TryGetTarget (out View? source) != true || source is not CheckBox checkBox)
         {
-            checkBox.Value = checkBox.Value == CheckState.Checked
-                                 ? CheckState.UnChecked
-                                 : CheckState.Checked;
+            return;
         }
+
+        if (ctx.Binding is { } && ctx.Binding.Commands.Contains (Command.Accept))
+        {
+            // If the binding was via Accept, don't change the state
+            return;
+        }
+
+        checkBox.Value = checkBox.Value == CheckState.Checked
+                             ? CheckState.UnChecked
+                             : CheckState.Checked;
 
         // CheckboxOnValueChanged handler updates FlagSelector.Value bitmask
     }

@@ -309,11 +309,19 @@ public sealed class UICatalogRunnable : Runnable
             return;
         }
 
-        //_themesSelector.Value = null;
-        _themesSelector.AssignHotKeys = true;
-        _themesSelector.UsedHotKeys.Clear ();
-        _themesSelector.Labels = ThemeManager.GetThemeNames ().ToArray ();
-        _themesSelector.Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
+        string [] labels = ThemeManager.GetThemeNames ().ToArray ();
+
+        // Prevent resetting the selector if the themes have not changed
+        // BUGBUG: Just comparing the size of the arrays is not really sufficient. We should actually
+        // BUGBUG: deep compare the arrays.
+        if (_themesSelector.Labels is null || labels.Length != _themesSelector.Labels.Count)
+        {
+            _themesSelector.Value = null;
+            _themesSelector.AssignHotKeys = true;
+            _themesSelector.UsedHotKeys.Clear ();
+            _themesSelector.Labels = labels;
+            _themesSelector.Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.GetCurrentThemeName ());
+        }
 
         if (_topSchemesSelector is null)
         {

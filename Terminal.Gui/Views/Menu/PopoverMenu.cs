@@ -89,7 +89,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         bool? Quit (ICommandContext? ctx)
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} Command.Quit - {ctx?.Source?.Title}");
+            Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
 
             if (!Visible)
             {
@@ -270,7 +270,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     protected override void OnVisibleChanged ()
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} - Visible: {Visible}");
+        Logging.Debug ($"{this.ToIdentifyingString ()} - Visible: {Visible}");
         base.OnVisibleChanged ();
 
         if (Visible)
@@ -456,7 +456,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <remarks>
     ///     This method traverses all menus returned by <see cref="GetAllSubMenus"/> and collects their menu items.
     /// </remarks>
-    internal IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus (Func<MenuItem, bool>? predicate = null)
+    public IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus (Func<MenuItem, bool>? predicate = null)
     {
         List<MenuItem> result = [];
 
@@ -536,30 +536,32 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void AddAndShowSubMenu (Menu? menu)
     {
-        if (menu is { SuperView: null, Visible: false })
+        if (menu is not { SuperView: null, Visible: false })
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
-
-            // TODO: Find the menu item below the mouse, if any, and select it
-
-            if (!menu!.IsInitialized)
-            {
-                menu.App ??= App;
-                menu.BeginInit ();
-                menu.EndInit ();
-            }
-
-            menu.ClearFocus ();
-            Add (menu);
-
-            // IMPORTANT: This must be done after adding the menu to the super view or Add will try
-            // to set focus to it.
-            menu.Visible = true;
-
-            // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-            // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-            menu.Layout ();
+            return;
         }
+
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
+
+        // TODO: Find the menu item below the mouse, if any, and select it
+
+        if (!menu!.IsInitialized)
+        {
+            menu.App ??= App;
+            menu.BeginInit ();
+            menu.EndInit ();
+        }
+
+        menu.ClearFocus ();
+        Add (menu);
+
+        // IMPORTANT: This must be done after adding the menu to the super view or Add will try
+        // to set focus to it.
+        menu.Visible = true;
+
+        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
+        menu.Layout ();
     }
 
     private void HideAndRemoveSubMenu (Menu? menu)
@@ -573,23 +575,20 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         try
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
+             Logging.Debug ($"{this.ToIdentifyingString ()} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
 
             // If there's a visible submenu, remove / hide it
-            if (menu.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
+            if (menu?.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
             {
                 HideAndRemoveSubMenu (visiblePeer.SubMenu);
                 visiblePeer.ForceFocusColors = false;
             }
 
             // Reset ForceFocusColors on the SuperMenuItem that owns this menu
-            if (menu.SuperMenuItem is { })
-            {
-                menu.SuperMenuItem.ForceFocusColors = false;
-            }
+            menu?.SuperMenuItem?.ForceFocusColors = false;
 
-            menu.Visible = false;
-            menu.ClearFocus ();
+            menu?.Visible = false;
+            menu?.ClearFocus ();
             Remove (menu);
 
             if (menu == Root)
@@ -647,13 +646,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         RaiseAccepted (e.Context);
     }
 
-
     private void MenuOnActivating (object? sender, CommandEventArgs e)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({e})");
         var senderView = sender as View;
-
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({e.Context?.Source?.Title}) Command: {e.Context?.Command} - Sender: {senderView?.GetType ().Name}");
 
         if (e.Context?.Command != Command.HotKey)
         {
@@ -663,12 +659,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (e.Context?.Binding is not KeyBinding { Key: { } key })
         {
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({e}) - not KeyBinding");
             return;
         }
 
         if (key == Application.QuitKey && SuperView is { Visible: true })
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
+            Logging.Debug ($"{this.ToIdentifyingString ()} ({e}) - KeyBinding, Setting e.Handled");
             e.Handled = true;
         }
     }
@@ -678,6 +675,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         Logging.Debug ($"{this.ToIdentifyingString ()} ({e})");
         if (e.Value?.Source?.TryGetTarget (out View? sourceView) == true)
         {
+            Visible = false;
             if (sourceView is MenuItem { SubMenu: null })
             {
                 HideAndRemoveSubMenu (_root);

@@ -35,6 +35,9 @@ public class Menu : Bar
 
         CommandsToBubbleUp = [Command.Accept, Command.Activate];
 
+        KeyBindings.Clear ();
+        MouseBindings.Clear ();
+
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 
@@ -66,17 +69,17 @@ public class Menu : Bar
         switch (view)
         {
             case MenuItem menuItem:
-            {
-                menuItem.CanFocus = true;
+                {
+                    menuItem.CanFocus = true;
 
-                menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
+                    menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
 
-                // When a MenuItem is activated (e.g., via HotKey → Activate flow),
-                // raise Accepted on this Menu so PopoverMenu can close.
-                //menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
+                    // When a MenuItem is activated (e.g., via HotKey → Activate flow),
+                    // raise Accepted on this Menu so PopoverMenu can close.
+                    //menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
 
-                break;
-            }
+                    break;
+                }
 
             case Line line:
                 // Grow line so we get auto-join line
