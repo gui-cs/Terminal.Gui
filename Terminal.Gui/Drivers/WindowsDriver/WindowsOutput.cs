@@ -307,16 +307,29 @@ internal partial class WindowsOutput : OutputBase, IOutput
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
 
-        WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (!IsLegacyConsole ? _outputHandle : _screenBuffer);
-        short newCols = Math.Min (cols, maxWinSize.X);
-        short newRows = Math.Min (rows, maxWinSize.Y);
+        // Try the requested size first. GetLargestConsoleWindowSize returns
+        // incorrect values in modern terminals (e.g. Windows Terminal with
+        // non-default font sizes), so clamping to it can shrink the buffer
+        // below the actual window size. Fall back to clamped if rejected.
+        short newCols = cols;
+        short newRows = rows;
         csbi.dwSize = new (newCols, Math.Max (newRows, (short)1));
         csbi.srWindow = new (0, 0, newCols, newRows);
         csbi.dwMaximumWindowSize = new (newCols, newRows);
 
         if (!SetConsoleScreenBufferInfoEx (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref csbi))
         {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
+            WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (!IsLegacyConsole ? _outputHandle : _screenBuffer);
+            newCols = Math.Min (cols, maxWinSize.X);
+            newRows = Math.Min (rows, maxWinSize.Y);
+            csbi.dwSize = new (newCols, Math.Max (newRows, (short)1));
+            csbi.srWindow = new (0, 0, newCols, newRows);
+            csbi.dwMaximumWindowSize = new (newCols, newRows);
+
+            if (!SetConsoleScreenBufferInfoEx (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref csbi))
+            {
+                throw new Win32Exception (Marshal.GetLastWin32Error ());
+            }
         }
 
         var winRect = new WindowsConsole.SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
@@ -549,9 +562,11 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 return Size.Empty;
             }
 
-            Size sz = new (
-                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+            // Use Console.WindowWidth/Height instead of csbi.srWindow because
+            // GetConsoleScreenBufferInfoEx returns smaller srWindow dimensions
+            // than the actual window size in some terminals. The non-Ex API
+            // (used by Console class) returns the correct values.
+            Size sz = new (Console.WindowWidth, Console.WindowHeight);
 
             cursorPosition = csbi.dwCursorPosition;
 
