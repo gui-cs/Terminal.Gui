@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace ApplicationTests;
 
 [CollectionDefinition ("Logging Tests", DisableParallelization = true)]

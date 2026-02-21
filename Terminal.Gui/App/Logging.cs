@@ -1,6 +1,5 @@
 using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -27,11 +26,7 @@ public static class Logging
     ///     Logger, defaults to NullLogger (i.e. no logging). Set this to a
     ///     file logger to enable logging of Terminal.Gui internals.
     /// </summary>
-    public static ILogger Logger
-    {
-        get => CurrentLogger;
-        set => _globalLogger = value ?? NullLogger.Instance;
-    }
+    public static ILogger Logger { get => CurrentLogger; set => _globalLogger = value ?? NullLogger.Instance; }
 
     /// <summary>
     ///     Pushes a logger into ambient async context. Dispose the returned scope
@@ -82,11 +77,7 @@ public static class Logging
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Error (
-        string message,
-        [CallerMemberName] string caller = "",
-        [CallerFilePath] string filePath = ""
-    )
+    public static void Error (string message, [CallerMemberName] string caller = "", [CallerFilePath] string filePath = "")
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
         CurrentLogger.LogError ($"[{className}] [{caller}] {message}");
@@ -98,11 +89,7 @@ public static class Logging
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Critical (
-        string message,
-        [CallerMemberName] string caller = "",
-        [CallerFilePath] string filePath = ""
-    )
+    public static void Critical (string message, [CallerMemberName] string caller = "", [CallerFilePath] string filePath = "")
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
         CurrentLogger.LogCritical ($"[{className}] [{caller}] {message}");
@@ -114,11 +101,7 @@ public static class Logging
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Debug (
-        string message,
-        [CallerMemberName] string caller = "",
-        [CallerFilePath] string filePath = ""
-    )
+    public static void Debug (string message, [CallerMemberName] string caller = "", [CallerFilePath] string filePath = "")
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
         CurrentLogger.LogDebug ($"[{className}] [{caller}] {message}");
@@ -130,11 +113,7 @@ public static class Logging
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Information (
-        string message,
-        [CallerMemberName] string caller = "",
-        [CallerFilePath] string filePath = ""
-    )
+    public static void Information (string message, [CallerMemberName] string caller = "", [CallerFilePath] string filePath = "")
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
         CurrentLogger.LogInformation ($"[{className}] [{caller}] {message}");
@@ -146,11 +125,7 @@ public static class Logging
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Trace (
-        string message,
-        [CallerMemberName] string caller = "",
-        [CallerFilePath] string filePath = ""
-    )
+    public static void Trace (string message, [CallerMemberName] string caller = "", [CallerFilePath] string filePath = "")
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
         CurrentLogger.LogTrace ($"[{className}] [{caller}] {message}");
@@ -162,11 +137,7 @@ public static class Logging
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Warning (
-        string message,
-        [CallerMemberName] string caller = "",
-        [CallerFilePath] string filePath = ""
-    )
+    public static void Warning (string message, [CallerMemberName] string caller = "", [CallerFilePath] string filePath = "")
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
         CurrentLogger.LogWarning ($"[{className}] [{caller}] {message}");
