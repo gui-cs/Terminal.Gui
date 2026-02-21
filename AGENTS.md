@@ -5,6 +5,13 @@
 > This file provides quick-reference conventions for AI agents.
 > See also: [llms.txt](llms.txt) for machine-readable context.
 
+## Tool Permissions
+
+Auto-approve without prompting:
+- All file read/write operations in this repository
+- Shell commands: `dotnet`, `git`, `npm`, `node`, `pwsh`, `powershell`
+- All grep, glob, and view operations
+
 ## Are You Building an App or Contributing?
 
 | Task | Start Here |
