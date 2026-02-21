@@ -211,30 +211,71 @@ using (Logging.PushLogger(new XUnitLogger(_output, LogLevel.Debug)))
 UICatalog includes built-in logging UI. Access via the **Logging** menu to:
 - View logs in real-time
 - Change log level at runtime
-- Toggle command route tracing
+- Toggle Command, Mouse, and Keyboard tracing
 - See scenario-specific logs
 
 ![UICatalog Logging](../images/UICatalog_Logging.png)
 
-## Command Route Tracing
+## View Event Tracing
 
-Terminal.Gui includes specialized tracing for debugging command routing through the view hierarchy. See [Command Deep Dive - Command Route Tracing](command.md#command-route-tracing) for details.
+Terminal.Gui includes a unified tracing system for debugging event flow through the view hierarchy. Three categories can be enabled independently:
 
-Enable via code:
+| Category | Property | What It Traces |
+|----------|----------|----------------|
+| Command | `ViewTrace.CommandEnabled` | Command routing (InvokeCommand, bubbling, dispatch) |
+| Mouse | `ViewTrace.MouseEnabled` | Mouse events (clicks, drags, wheel) |
+| Keyboard | `ViewTrace.KeyboardEnabled` | Keyboard events (key down, key up) |
+
+### Enabling Tracing
+
+**Via code:**
 
 ```csharp
-CommandTrace.IsEnabled = true;
+ViewTrace.CommandEnabled = true;   // Command routing
+ViewTrace.MouseEnabled = true;     // Mouse events  
+ViewTrace.KeyboardEnabled = true;  // Keyboard events
 ```
 
-Or via configuration:
+**Via configuration:**
 
 ```json
 {
-  "CommandTrace.IsEnabled": true
+  "ViewTrace.CommandEnabled": true,
+  "ViewTrace.MouseEnabled": false,
+  "ViewTrace.KeyboardEnabled": true
 }
 ```
 
-Or toggle at runtime in UICatalog via **Logging** menu → **Command Trace**.
+**Via UICatalog:** Toggle in **Logging** menu → **Command Trace** / **Mouse Trace** / **Keyboard Trace**
+
+### Custom Trace Backends
+
+For testing or custom logging, use `ViewTrace.Backend`:
+
+```csharp
+// Capture traces for assertions
+var backend = new ViewTrace.ListBackend();
+ViewTrace.Backend = backend;
+ViewTrace.CommandEnabled = true;
+
+// ... run code ...
+
+// Inspect captured traces
+foreach (var entry in backend.Entries)
+{
+    Console.WriteLine($"{entry.Category}: {entry.ViewId} - {entry.Phase}");
+}
+```
+
+See [Command Deep Dive - Command Route Tracing](command.md#command-route-tracing) for detailed command tracing information.
+
+### Legacy API
+
+The `CommandTrace` class is still available for backward compatibility:
+
+```csharp
+CommandTrace.IsEnabled = true;  // Equivalent to ViewTrace.CommandEnabled = true
+```
 
 ## Metrics
 

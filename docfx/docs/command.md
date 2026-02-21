@@ -318,23 +318,26 @@ When an inner CheckBox activates (via click/space), the command bubbles up to th
 
 ## Command Route Tracing
 
-For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.Input.CommandTrace. Tracing captures detailed information about command flow through the view hierarchy.
+For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.ViewTrace. Command tracing captures detailed information about command flow through the view hierarchy.
+
+> [!TIP]
+> `ViewTrace` also supports Mouse and Keyboard tracing. See [Logging - View Event Tracing](logging.md#view-event-tracing) for the full tracing API.
 
 ### Enabling Tracing
 
 ```csharp
-// Enable via property (uses LoggingBackend)
-CommandTrace.IsEnabled = true;
+// Enable command tracing
+ViewTrace.CommandEnabled = true;
 
-// Or set a custom backend
-CommandTrace.Backend = new CommandTrace.LoggingBackend ();
+// Or use the legacy API (equivalent)
+CommandTrace.IsEnabled = true;
 ```
 
 Tracing can also be enabled via configuration:
 
 ```json
 {
-  "CommandTrace.IsEnabled": true
+  "ViewTrace.CommandEnabled": true
 }
 ```
 
