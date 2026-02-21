@@ -601,7 +601,7 @@ public partial class View // Keyboard APIs
             binding.Key = key;
         }
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({binding})");
+        ViewTrace.Keyboard (this, key, "InvokeCommands");
 
         return InvokeCommands (binding.Commands, binding with { Source = new WeakReference<View> (this) });
     }

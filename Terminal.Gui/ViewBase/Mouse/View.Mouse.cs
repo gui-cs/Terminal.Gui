@@ -381,7 +381,7 @@ public partial class View // Mouse APIs
     /// <seealso cref="MouseHighlightStates"/>
     public bool? NewMouseEvent (Mouse mouse)
     {
-        //Logging.Debug ($"{this.ToIdentifyingString ()} {mouse}");
+        ViewTrace.Mouse (this, mouse, "Entry");
 
         // 1. Pre-conditions
         mouse.Position ??= mouse.ScreenPosition;
@@ -821,7 +821,7 @@ public partial class View // Mouse APIs
     /// </returns>
     protected bool? InvokeCommandsBoundToMouse (Mouse mouseEventArgs)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} {mouseEventArgs}");
+        ViewTrace.Mouse (this, mouseEventArgs, "InvokeCommands");
 
         if (!MouseBindings.TryGet (mouseEventArgs.Flags, out MouseBinding binding))
         {

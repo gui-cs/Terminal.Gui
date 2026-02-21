@@ -289,11 +289,18 @@ public sealed class UICatalogRunnable : Runnable
             // add a separator
             menuItems.Add (new Line ());
 
-            // Command trace toggle
-            CheckBox commandTraceCheckBox = new () { Text = "Command _Trace", Value = CommandTrace.IsEnabled ? CheckState.Checked : CheckState.UnChecked };
-            commandTraceCheckBox.ValueChanging += (_, e) => { CommandTrace.IsEnabled = e.NewValue == CheckState.Checked; };
-
+            // Trace toggles
+            CheckBox commandTraceCheckBox = new () { Text = "Command _Trace", Value = Terminal.Gui.ViewTrace.CommandEnabled ? CheckState.Checked : CheckState.UnChecked };
+            commandTraceCheckBox.ValueChanging += (_, e) => { Terminal.Gui.ViewTrace.CommandEnabled = e.NewValue == CheckState.Checked; };
             menuItems.Add (new MenuItem { CommandView = commandTraceCheckBox, HelpText = "Toggle command route tracing" });
+
+            CheckBox mouseTraceCheckBox = new () { Text = "_Mouse Trace", Value = Terminal.Gui.ViewTrace.MouseEnabled ? CheckState.Checked : CheckState.UnChecked };
+            mouseTraceCheckBox.ValueChanging += (_, e) => { Terminal.Gui.ViewTrace.MouseEnabled = e.NewValue == CheckState.Checked; };
+            menuItems.Add (new MenuItem { CommandView = mouseTraceCheckBox, HelpText = "Toggle mouse event tracing" });
+
+            CheckBox keyboardTraceCheckBox = new () { Text = "_Keyboard Trace", Value = Terminal.Gui.ViewTrace.KeyboardEnabled ? CheckState.Checked : CheckState.UnChecked };
+            keyboardTraceCheckBox.ValueChanging += (_, e) => { Terminal.Gui.ViewTrace.KeyboardEnabled = e.NewValue == CheckState.Checked; };
+            menuItems.Add (new MenuItem { CommandView = keyboardTraceCheckBox, HelpText = "Toggle keyboard event tracing" });
 
             // add a separator
             menuItems.Add (new Line ());

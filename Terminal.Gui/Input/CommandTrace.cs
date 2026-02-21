@@ -4,18 +4,13 @@ using System.Runtime.CompilerServices;
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Provides command routing tracing for debugging and testing. Traces are only captured
-///     in DEBUG builds and when a non-null backend is configured.
+///     Provides command routing tracing for debugging and testing.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         By default, tracing uses <see cref="NullBackend"/> which does nothing.
-///         Set <see cref="Backend"/> to a different implementation to enable tracing:
+///         This class delegates to the unified <see cref="ViewTrace"/> system.
+///         For new code, consider using <see cref="ViewTrace"/> directly.
 ///     </para>
-///     <list type="bullet">
-///         <item><see cref="LoggingBackend"/> - forwards traces to <see cref="Logging.Debug"/></item>
-///         <item><see cref="ListBackend"/> - captures traces to a list for testing</item>
-///     </list>
 ///     <para>
 ///         All <c>TraceRoute</c> methods are marked with <c>[Conditional("DEBUG")]</c>,
 ///         so they have zero overhead in Release builds.
@@ -23,21 +18,29 @@ namespace Terminal.Gui.Input;
 /// </remarks>
 public static class CommandTrace
 {
-    private static readonly AsyncLocal<ICommandTraceBackend?> _asyncLocalBackend = new ();
-    private static readonly NullBackend _defaultBackend = new ();
-
     /// <summary>
-    ///     Gets or sets whether command tracing is enabled. When enabled, uses <see cref="LoggingBackend"/>.
-    ///     When disabled (default), uses <see cref="NullBackend"/>.
+    ///     Gets or sets whether command tracing is enabled.
+    ///     This property syncs with <see cref="ViewTrace.CommandEnabled"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool IsEnabled { get => Backend is not NullBackend; set => Backend = value ? new LoggingBackend () : _defaultBackend; }
+    public static bool IsEnabled { get => ViewTrace.CommandEnabled; set => ViewTrace.CommandEnabled = value; }
 
     /// <summary>
-    ///     Gets or sets the trace backend for the current async context. Default is <see cref="NullBackend"/>.
-    ///     Each async flow (test, thread) has its own backend instance.
+    ///     Gets or sets the trace backend for the current async context.
+    ///     This property syncs with <see cref="ViewTrace.Backend"/>.
     /// </summary>
-    public static ICommandTraceBackend Backend { get => _asyncLocalBackend.Value ?? _defaultBackend; set => _asyncLocalBackend.Value = value; }
+    /// <remarks>
+    ///     For type compatibility, this uses the command-specific backend interface.
+    ///     Use <see cref="Trace.Backend"/> directly for the unified backend.
+    /// </remarks>
+    public static ICommandTraceBackend Backend
+    {
+        get => _asyncLocalBackend.Value ?? _defaultBackend;
+        set => _asyncLocalBackend.Value = value;
+    }
+
+    private static readonly AsyncLocal<ICommandTraceBackend?> _asyncLocalBackend = new ();
+    private static readonly NullBackend _defaultBackend = new ();
 
     /// <summary>
     ///     Traces a command routing step.
@@ -54,8 +57,14 @@ public static class CommandTrace
                                    CommandRouting routing,
                                    CommandTracePhase phase,
                                    string? message = null,
-                                   [CallerMemberName] string method = "") =>
+                                   [CallerMemberName] string method = "")
+    {
+        // Log to unified ViewTrace system
+        ViewTrace.Command (view, command, routing, phase.ToString (), message, method);
+
+        // Also log to legacy backend for tests that use ListBackend
         Backend.Log (new RouteTraceEntry (view.ToIdentifyingString (), command, routing, phase, method, message, DateTime.UtcNow));
+    }
 
     /// <summary>
     ///     Traces a command routing step from a context.
@@ -66,14 +75,17 @@ public static class CommandTrace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void TraceRoute (View view, ICommandContext? ctx, CommandTracePhase phase, string? message = null, [CallerMemberName] string method = "") =>
-        Backend.Log (new RouteTraceEntry (view.ToIdentifyingString (),
-                                          ctx?.Command ?? Command.NotBound,
-                                          ctx?.Routing ?? CommandRouting.Direct,
-                                          phase,
-                                          method,
-                                          message,
-                                          DateTime.UtcNow));
+    public static void TraceRoute (View view, ICommandContext? ctx, CommandTracePhase phase, string? message = null, [CallerMemberName] string method = "")
+    {
+        Command command = ctx?.Command ?? Command.NotBound;
+        CommandRouting routing = ctx?.Routing ?? CommandRouting.Direct;
+
+        // Log to unified ViewTrace system
+        ViewTrace.Command (view, command, routing, phase.ToString (), message, method);
+
+        // Also log to legacy backend for tests that use ListBackend
+        Backend.Log (new RouteTraceEntry (view.ToIdentifyingString (), command, routing, phase, method, message, DateTime.UtcNow));
+    }
 
     /// <summary>
     ///     A no-op backend that discards all trace entries. This is the default.
@@ -103,7 +115,7 @@ public static class CommandTrace
                                _ => "•"
                            };
 
-            var message = $"[{entry.Phase}] {arrow} {entry.Command} @ {entry.ViewId} ({entry.Method})";
+            string message = $"[{entry.Phase}] {arrow} {entry.Command} @ {entry.ViewId} ({entry.Method})";
 
             if (!string.IsNullOrEmpty (entry.Message))
             {
