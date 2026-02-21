@@ -133,25 +133,36 @@ public class OutputBaseTests
         // Dirty flags cleared for the written cells
         Assert.False (buffer.Contents! [0, 0].IsDirty);
         Assert.False (buffer.Contents! [0, 2].IsDirty);
+    }
 
-        // Now write 'X' at col 0 to verify subsequent writes also work
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void GetLastOutput_Returns_Only_Most_Recent_Frame (bool isLegacyConsole)
+    {
+        // Arrange
+        AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (3, 1);
+
+        // Write 'A' at col 0 and 'C' at col 2 in the first frame
         buffer.Move (0, 0);
-        buffer.AddStr ("X");
-
-        // Confirm dirtiness state before to write
-        Assert.True (buffer.Contents! [0, 0].IsDirty);
-        Assert.False (buffer.Contents! [0, 2].IsDirty);
+        buffer.AddStr ("A");
+        buffer.Move (2, 0);
+        buffer.AddStr ("C");
 
         output.Write (buffer);
 
-        // Assert: only the most recently written frame is captured (not accumulated history)
+        // Write 'X' at col 0 in the second frame
+        buffer.Move (0, 0);
+        buffer.AddStr ("X");
+
+        output.Write (buffer);
+
+        // Assert: only the second frame's output is returned, not accumulated history
         Assert.Contains ("X", output.GetLastOutput ());
         Assert.DoesNotContain ("A", output.GetLastOutput ());
         Assert.DoesNotContain ("C", output.GetLastOutput ());
-
-        // Dirty flags cleared for the written cells
-        Assert.False (buffer.Contents! [0, 0].IsDirty);
-        Assert.False (buffer.Contents! [0, 2].IsDirty);
     }
 
     [Theory]
