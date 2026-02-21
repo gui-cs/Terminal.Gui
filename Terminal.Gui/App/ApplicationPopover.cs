@@ -2,7 +2,7 @@ namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Helper class for support of <see cref="IPopover"/> views for <see cref="IApplication"/>. Held by
-///     <see cref="IApplication.Popover"/>
+///     <see cref="IApplication.Popovers"/>
 /// </summary>
 public sealed class ApplicationPopover : IDisposable
 {

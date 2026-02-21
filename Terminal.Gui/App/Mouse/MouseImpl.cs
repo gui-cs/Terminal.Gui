@@ -83,7 +83,7 @@ internal class MouseImpl : IMouse, IDisposable
 
         // Dismiss the Popover if the user presses mouse outside of it
         if (mouseEvent.IsPressed
-            && App?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
+            && App?.Popovers?.GetActivePopover () as View is { Visible: true } visiblePopover
             && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, true) is false)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
@@ -109,7 +109,7 @@ internal class MouseImpl : IMouse, IDisposable
         // if the mouse is outside the Application.TopRunnable or Popover hierarchy, we don't want to
         // send the mouse event to the deepest view under the mouse.
         if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true)
-            && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
+            && !View.IsInHierarchy (App?.Popovers?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }

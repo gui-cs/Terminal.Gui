@@ -146,8 +146,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    private Key _key = DefaultKey;
-
     /// <summary>
     ///     Gets or sets the key that will activate the popover menu when it is registered but not visible.
     /// </summary>
@@ -158,14 +156,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     public Key Key
     {
-        get => _key;
+        get;
         set
         {
-            Key oldKey = _key;
-            _key = value;
-            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, _key));
+            Key oldKey = field;
+            field = value;
+            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, field));
         }
-    }
+    } = DefaultKey;
 
     /// <summary>
     ///     Raised when the <see cref="Key"/> property is changed.
@@ -219,7 +217,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         UpdateKeyBindings ();
         SetPosition (idealScreenPosition);
-        App!.Popover?.Show (this);
+        App!.Popovers?.Show (this);
     }
 
     /// <summary>
@@ -280,12 +278,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         else
         {
             HideAndRemoveSubMenu (_root);
-            App?.Popover?.Hide (this);
+            App?.Popovers?.Hide (this);
         }
     }
 
     private Menu? _root;
     private bool _isHiding;
+    private CommandBridge? _rootCommandBridge;
 
     /// <summary>
     ///     Gets or sets the <see cref="Menu"/> that is the root of the popover menu hierarchy.
@@ -318,14 +317,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             {
                 IEnumerable<Menu> oldMenus = GetAllSubMenus ();
 
+
                 foreach (Menu menu in oldMenus)
                 {
-                    menu.Accepting -= MenuOnAccepting;
-                    menu.Accepted -= MenuAccepted;
-                    menu.Activating -= MenuOnActivating;
-                    menu.Activated -= MenuOnActivated;
+                    //menu.Accepting -= MenuOnAccepting;
+                    //menu.Accepted -= MenuAccepted;
+                    //menu.Activating -= MenuOnActivating;
+                    //menu.Activated -= MenuOnActivated;
                     menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
                 }
+
+                // BUGBUG: Dispose _root?
             }
 
             HideAndRemoveSubMenu (_root);
@@ -345,11 +347,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             {
                 menu.App = App;
                 menu.Visible = false;
-                menu.Accepting += MenuOnAccepting;
-                menu.Accepted += MenuAccepted;
+                //menu.Accepting += MenuOnAccepting;
+                ////menu.Accepted += MenuAccepted;
                 menu.Activating += MenuOnActivating;
                 menu.Activated += MenuOnActivated;
                 menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
+            }
+
+            // Bridge Activate from Root → PopoverMenu across the non-containment boundary.
+            if (_root is { })
+            {
+                _rootCommandBridge = CommandBridge.Connect (this, _root, Command.Activate);
             }
         }
     }
@@ -646,6 +654,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         RaiseAccepted (e.Context);
     }
 
+    
+
     private void MenuOnActivating (object? sender, CommandEventArgs e)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({e})");
@@ -745,6 +755,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         return base.OnActivating (args);
     }
 
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+        Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
+    }
+
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} {e.ToIdentifyingString ()}");
@@ -786,6 +803,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 menu.Accepted -= MenuAccepted;
                 menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
             }
+
+            _rootCommandBridge?.Dispose ();
+            _rootCommandBridge = null;
 
             _root?.Dispose ();
             _root = null;

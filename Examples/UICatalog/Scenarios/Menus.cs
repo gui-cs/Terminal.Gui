@@ -307,7 +307,7 @@ public class Menus : Scenario
             //appWindow.Add (enableBtn);
 
             autoSaveStatusCb.SetFocus ();
-            App?.Popover?.Register (ContextMenu);
+            App?.Popovers?.Register (ContextMenu);
 
             Menu testMenu = new () { Y = Pos.Bottom (editModeStatusCb) + 1, Id = "TestMenu" };
             ConfigureTestMenu (testMenu);

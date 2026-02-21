@@ -524,7 +524,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseActivating (ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         CommandEventArgs args = new () { Context = ctx };
 
@@ -586,7 +586,7 @@ public partial class View // Command APIs
     /// <seealso cref="RaiseActivating"/>
     protected internal void RaiseActivated (ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
+        Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
         OnActivated (ctx);
         Activated?.Invoke (this, new EventArgs<ICommandContext?> (ctx));

@@ -246,7 +246,7 @@ internal partial class ApplicationImpl
         }
 
         // === 2. Close and dispose popover ===
-        if (Popover?.GetActivePopover () is View popover)
+        if (Popovers?.GetActivePopover () is View popover)
         {
             // This forcefully closes the popover; invoking Command.Quit would be more graceful
             // but since this is shutdown, doing this is ok.
@@ -254,8 +254,8 @@ internal partial class ApplicationImpl
         }
 
         // Any popovers added to Popover have their lifetime controlled by Popover
-        Popover?.Dispose ();
-        Popover = null;
+        Popovers?.Dispose ();
+        Popovers = null;
 
         // === 3. Clean up runnables ===
         SessionStack?.Clear ();

@@ -171,7 +171,7 @@ public class ContextMenus : Scenario
                                                new Line (),
                                                new MenuItem { Title = Strings.cmdQuit, Action = () => app!.RequestStop () }
                                            ]) { Key = _winContextMenuKey };
-        app!.Popover?.Register (_winContextMenu);
+        app!.Popovers?.Register (_winContextMenu);
     }
 
     private Menu GetSupportedCultureMenu ()

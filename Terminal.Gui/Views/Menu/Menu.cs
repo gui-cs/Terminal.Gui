@@ -49,9 +49,6 @@ public class Menu : Bar
         }
     }
 
-    /// <inheritdoc/>
-    protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
-
     //if (ctx.IsBubblingUp)
     //{
     //    SuperMenuItem?.InvokeCommand (ctx.Command);

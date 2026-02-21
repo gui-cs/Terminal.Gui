@@ -1,10 +1,12 @@
+using System.ComponentModel;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBar"/>.
 ///     MenuBarItems hold a <see cref="PopoverMenu"/> instead of a <see cref="SubMenu"/>.
 /// </summary>
-public class MenuBarItem : MenuItem
+public class MenuBarItem : MenuItem, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="MenuBarItem"/>.
@@ -94,6 +96,60 @@ public class MenuBarItem : MenuItem
                         return true;
                     });
 
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
+
+        if (base.OnActivating (args))
+        {
+            return true;
+        }
+
+        if (PopoverMenuOpen)
+        {
+            PopoverMenuOpen = false;
+        }
+        else
+        {
+            RegisterPopover ();
+
+            PopoverMenuOpen = true;
+        }
+
+        return false;
+    }
+
+    private void RegisterPopover ()
+    {
+        if (App is { Popovers: { } } && !App.Popovers.IsRegistered (PopoverMenu))
+        {
+            App.Popovers.Register (PopoverMenu);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnAccepted (ICommandContext? ctx)
+    {
+        base.OnAccepted (ctx);
+
+    }
+
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        base.EndInit ();
+
+        if (PopoverMenu?.IsInitialized is true)
+        {
+            return;
+        }
+        PopoverMenu?.BeginInit ();
+        PopoverMenu?.EndInit ();
+        PopoverMenu?.App = App;
+        RegisterPopover ();
+    }
+
     /// <summary>
     ///     Do not use this property. MenuBarItem does not support SubMenu. Use <see cref="PopoverMenu"/> instead.
     /// </summary>
@@ -126,16 +182,16 @@ public class MenuBarItem : MenuItem
 
             if (field is { })
             {
-                field.App = App;
 #if DEBUG
                 Id = $"{Id}.{field.Id}";
 #endif
 
+                RegisterPopover ();
                 PopoverMenuOpen = field.Visible;
                 field.VisibleChanged += OnPopoverVisibleChanged;
 
-                // Bridge Accept from PopoverMenu → MenuBarItem across the non-containment boundary.
-                _popoverBridge = CommandBridge.Connect (this, field, Command.Accept);
+                // Bridge Activate from PopoverMenu → MenuBarItem across the non-containment boundary.
+                _popoverBridge = CommandBridge.Connect (this, field, Command.Activate);
             }
 
             return;
@@ -147,41 +203,59 @@ public class MenuBarItem : MenuItem
         }
     }
 
-    private bool _popoverMenuOpen;
-
     /// <summary>
-    ///     Gets or sets whether the MenuBarItem is active. This is used to determine if the MenuBarItem should be
+    ///     Gets whether the PopoverMenu is open and visible or not.
     /// </summary>
     public bool PopoverMenuOpen
     {
-        get => _popoverMenuOpen;
+        get; 
         set
         {
-            if (_popoverMenuOpen == value)
+            if (field == value)
             {
                 return;
             }
-            _popoverMenuOpen = value;
 
-            RaisePopoverMenuOpenChanged ();
+            CWPPropertyHelper.ChangeProperty (this,
+                                              ref field,
+                                              value,
+                                              OnPopoverMenuOpenChanging,
+                                              PopoverMenuOpenChanging,
+                                              newValue =>
+                                              {
+                                                  field = newValue;
+
+                                                  if (field)
+                                                  {
+                                                      PopoverMenu?.MakeVisible (new Point (FrameToScreen ().X, FrameToScreen ().Bottom));
+                                                  }
+                                                  else
+                                                  {
+                                                      PopoverMenu?.Visible = false;
+                                                  }
+                                              },
+                                              OnPopoverMenuOpenChanged,
+                                              PopoverMenuOpenChanged,
+                                              out _);
         }
     }
 
     /// <summary>
     /// </summary>
-    public void RaisePopoverMenuOpenChanged ()
-    {
-        OnPopoverMenuOpenChanged ();
-        PopoverMenuOpenChanged?.Invoke (this, new EventArgs<bool> (PopoverMenuOpen));
-    }
+    protected virtual bool OnPopoverMenuOpenChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<bool>>? PopoverMenuOpenChanging;
 
     /// <summary>
     /// </summary>
-    protected virtual void OnPopoverMenuOpenChanged () { }
+    protected virtual void OnPopoverMenuOpenChanged (ValueChangedEventArgs<bool> args) { }
 
     /// <summary>
     /// </summary>
-    public event EventHandler<EventArgs<bool>>? PopoverMenuOpenChanged;
+    public event EventHandler<ValueChangedEventArgs<bool>>? PopoverMenuOpenChanged;
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)
@@ -207,6 +281,23 @@ public class MenuBarItem : MenuItem
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
         // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+
+        if (newHasFocus)
+        {
+            return;
+        }
+
+        PopoverMenuOpen = false;
+    }
+
+    /// <inheritdoc/>
+    public new bool EnableForDesign ()
+    {
+        PopoverMenu = new PopoverMenu ();
+        PopoverMenu.Root = new Menu ();
+        PopoverMenu.Root.EnableForDesign ();
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -214,6 +305,11 @@ public class MenuBarItem : MenuItem
     {
         if (disposing)
         {
+            if (App is { Popovers: { } } && !App.Popovers.IsRegistered (PopoverMenu))
+            {
+                App.Popovers.DeRegister (PopoverMenu);
+            }
+
             PopoverMenu?.Dispose ();
             PopoverMenu = null;
         }

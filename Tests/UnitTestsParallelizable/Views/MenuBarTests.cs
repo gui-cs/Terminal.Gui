@@ -5,6 +5,281 @@ namespace ViewsTests;
 
 public class MenuBarTests
 {
+    [Fact]
+    public void Command_HotKey_Activates ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new ()
+        {
+            Id = "host",
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        Assert.False (menuBar.Active);
+
+        menuBar.InvokeCommand (Command.HotKey);
+
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: true });
+    }
+
+    [Fact]
+    public void DefaultKey_Activates ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new ()
+        {
+            Id = "host",
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        Assert.False (menuBar.Active);
+
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: true });
+    }
+
+    [Fact]
+    public void DefaultKey_Deactivates ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new ()
+        {
+            Id = "host",
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Arrange
+        Assert.False (menuBar.Active);
+
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: true });
+
+        // Act
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.IsOpen ());
+        Assert.False (menuBar.HasFocus);
+        Assert.False (menuBar.CanFocus);
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: false });
+    }
+
+    [Fact]
+    public void Command_Activate_Focuses_MenuBarItem_PopoverMenu_And_First_MenuItem ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new ()
+        {
+            Id = "host",
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        MenuBarItem? menuBarItem = menuBar.SubViews.OfType<MenuBarItem> ().First ();
+        PopoverMenu? popoverMenu = menuBarItem.PopoverMenu;
+        Menu? menu = popoverMenu?.Root;
+        MenuItem? menuItem = menu?.SubViews.OfType<MenuItem> ().First ();
+
+        // Activate focuses MenuBarItem
+        menuBar.InvokeCommand (Command.Activate);
+
+        Assert.True (menuBar.HasFocus);
+        Assert.True (menuBarItem.HasFocus);
+        Assert.True (popoverMenu?.HasFocus);
+        Assert.True (menu?.HasFocus);
+        Assert.True (menuItem?.HasFocus);
+
+        Assert.Equal (menu, popoverMenu?.Focused);
+        Assert.Equal (menuItem, menu?.Focused);
+        Assert.Equal (menuItem, app.Navigation?.GetFocused ());
+
+        menuBar.Dispose ();
+    }
+
+    [Fact]
+    public void Command_Activate_Activates ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new ()
+        {
+            Id = "host",
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        Assert.False (menuBar.Active);
+
+        menuBar.InvokeCommand (Command.Activate);
+
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: true });
+    }
+
+    [Fact]
+    public void Command_Activate_Activates_Command_Activate_Deactivates ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new ()
+        {
+            Id = "host",
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        Assert.False (menuBar.Active);
+
+        menuBar.InvokeCommand (Command.Activate);
+
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: true });
+
+        menuBar.InvokeCommand (Command.Activate);
+
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.IsOpen ());
+        Assert.False (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: true });
+    }
+
+    [Fact]
+    public void Command_Activate_WhenActive_Deactivates ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new ()
+        {
+            Id = "host",
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Arrange
+        Assert.False (menuBar.Active);
+
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: true });
+
+        MenuBarItem? menuBarItem = menuBar.SubViews.OfType<MenuBarItem> ().First ();
+        PopoverMenu? popoverMenu = menuBarItem.PopoverMenu;
+        Menu? menu = popoverMenu?.Root;
+        MenuItem? menuItem = menu?.SubViews.OfType<MenuItem> ().First ();
+
+        MenuItem? focused = app.Navigation?.GetFocused () as MenuItem;
+        Assert.Equal (menuItem, focused);
+
+        // Act
+        menuBar.InvokeCommand (Command.Activate);
+
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.IsOpen ());
+        Assert.False (menuBar.HasFocus);
+        Assert.False (menuBar.CanFocus);
+        Assert.True (menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0).PopoverMenu is { Visible: false });
+
+        Assert.Equal (hostView, app.Navigation?.GetFocused ());
+    }
+
     // Claude - Opus 4.6
     /// <summary>
     ///     Verifies that clicking the "Error" checkbox in the OptionSelector&lt;Schemes&gt; inside
@@ -263,6 +538,8 @@ public class MenuBarTests
 
         // Focus something else, like in the real scenario
         hostView.SetFocus ();
+
+        Assert.False (menuBar.HasFocus);
 
         Assert.False (menuBar.Active);
         Assert.False (menuBar.IsOpen ());

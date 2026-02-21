@@ -972,7 +972,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        App!.Popover?.Register (contextMenu);
+        App!.Popovers?.Register (contextMenu);
 
         contextMenu?.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 

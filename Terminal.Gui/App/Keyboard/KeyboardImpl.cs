@@ -164,7 +164,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             return true;
         }
 
-        if (App?.Popover?.DispatchKeyDown (key) is true)
+        if (App?.Popovers?.DispatchKeyDown (key) is true)
         {
             return true;
         }

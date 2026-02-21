@@ -84,6 +84,8 @@ public class CommandBridge : IDisposable
             return;
         }
 
+        Logging.Debug ($"{_owner.ToIdentifyingString ()} ({e})");
+
         CommandContext bridgedCtx = new ()
         {
             Command = Command.Accept,
@@ -101,6 +103,8 @@ public class CommandBridge : IDisposable
         {
             return;
         }
+
+        Logging.Debug ($"{_owner.ToIdentifyingString ()} ({e})");
 
         CommandContext bridgedCtx = new ()
         {

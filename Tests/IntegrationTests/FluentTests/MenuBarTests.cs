@@ -142,7 +142,7 @@ public class MenuBarTests : TestsAllDrivers
                                   .WaitIteration ()
                                   .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                   .AssertEqual ("_New", top?.App?.Navigation!.GetFocused ()!.Title)
-                                  .AssertTrue (top?.App?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertTrue (top?.App?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertTrue (menuBar?.IsOpen ());
     }
 
@@ -226,12 +226,12 @@ public class MenuBarTests : TestsAllDrivers
                                   .WaitIteration ()
                                   .ScreenShot ("MenuBar initial state", _out)
                                   .KeyDown (MenuBar.DefaultKey)
-                                  .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertTrue (menuBar?.IsOpen ())
                                   .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
                                   .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                   .KeyDown (Key.CursorRight)
-                                  .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .ScreenShot ("After right arrow", _out)
                                   .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
                                   .KeyDown (Key.CursorRight)
@@ -268,12 +268,12 @@ public class MenuBarTests : TestsAllDrivers
                                   .ScreenShot ("MenuBar initial state", _out)
                                   .KeyDown (MenuBar.DefaultKey)
                                   .AssertEqual ("_New", app.Navigation!.GetFocused ()!.Title)
-                                  .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertTrue (menuBar?.IsOpen ())
                                   .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
                                   .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                   .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ());
     }
 
@@ -300,12 +300,12 @@ public class MenuBarTests : TestsAllDrivers
                                   .KeyDown (MenuBar.DefaultKey)
                                   .KeyDown (Key.CursorRight)
                                   .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
-                                  .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertTrue (menuBar?.IsOpen ())
                                   .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
                                   .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                   .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertIsNotType<MenuItem> (app?.Navigation?.GetFocused ());
     }
 
@@ -335,7 +335,7 @@ public class MenuBarTests : TestsAllDrivers
                                   .AssertTrue (app?.TopRunnable!.IsRunning)
                                   .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                   .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertTrue (app!.TopRunnable!.IsRunning);
     }
 
@@ -371,7 +371,7 @@ public class MenuBarTests : TestsAllDrivers
                                   .AssertEqual ("_New", app?.Navigation!.GetFocused ()!.Title)
                                   .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
                                   .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
+                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                   .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 

@@ -162,7 +162,7 @@ public partial class TextView : View, IDesignable
         if (newHasFocus)
         {
             PositionCursor ();
-            App?.Popover?.Register (ContextMenu);
+            App?.Popovers?.Register (ContextMenu);
 
             if (ContextMenu?.Key is { })
             {
@@ -175,7 +175,7 @@ public partial class TextView : View, IDesignable
             {
                 KeyBindings.Remove (ContextMenu.Key);
             }
-            App?.Popover?.DeRegister (ContextMenu);
+            App?.Popovers?.DeRegister (ContextMenu);
         }
     }
 

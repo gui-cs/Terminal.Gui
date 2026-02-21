@@ -46,7 +46,7 @@ public class PopoverMenuTests
         // Arrange
         ApplicationImpl app = new ();
         ApplicationPopover popoverManager = new () { App = app };
-        app.Popover = popoverManager;
+        app.Popovers = popoverManager;
 
         PopoverMenu popoverMenu = new () { App = app };
         Menu root = new ([new MenuItem { Title = "Item1" }]) { Title = "Root" };
@@ -119,7 +119,7 @@ public class PopoverMenuTests
         // Arrange
         ApplicationImpl app = new ();
         ApplicationPopover popoverManager = new () { App = app };
-        app.Popover = popoverManager;
+        app.Popovers = popoverManager;
 
         MenuItem subItem = new () { Title = "SubItem" };
         Menu subMenu = new ([subItem]) { Title = "SubMenu" };

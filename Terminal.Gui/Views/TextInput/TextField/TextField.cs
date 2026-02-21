@@ -140,7 +140,7 @@ public partial class TextField : View, IDesignable, IValue<string>
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
-        App?.Popover?.Register (ContextMenu);
+        App?.Popovers?.Register (ContextMenu);
     }
 
     private void DisposeContextMenu ()
@@ -150,7 +150,7 @@ public partial class TextField : View, IDesignable, IValue<string>
             return;
         }
         ContextMenu.Visible = false;
-        App?.Popover?.DeRegister (ContextMenu);
+        App?.Popovers?.DeRegister (ContextMenu);
         ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
         ContextMenu.Dispose ();
         ContextMenu = null;

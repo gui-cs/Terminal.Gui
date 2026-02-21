@@ -289,7 +289,7 @@ public class FileDialog : Dialog, IDesignable
 
             // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
             // and the context menu is disposed when it is closed.
-            App!.Popover?.Register (contextMenu);
+            App!.Popovers?.Register (contextMenu);
 
             var pos = new Point (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight ());
             contextMenu?.MakeVisible (pos);
@@ -1183,7 +1183,7 @@ public class FileDialog : Dialog, IDesignable
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        App!.Popover?.Register (contextMenu);
+        App!.Popovers?.Register (contextMenu);
 
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
@@ -1201,7 +1201,7 @@ public class FileDialog : Dialog, IDesignable
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        App!.Popover?.Register (contextMenu);
+        App!.Popovers?.Register (contextMenu);
 
         contextMenu?.MakeVisible (e.ScreenPosition);
     }

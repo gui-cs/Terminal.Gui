@@ -299,7 +299,7 @@ internal partial class ApplicationImpl
 
         // TODO: Move Poppover to utilize IRunnable arch; Get all refs to anyting
         // TODO: View-related out of ApplicationImpl.
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        if (Popovers?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
         }

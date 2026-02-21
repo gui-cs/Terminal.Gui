@@ -581,7 +581,7 @@ public interface IApplication : IDisposable
     ///         Manages application-level popover views. Initialized during <see cref="Init"/>.
     ///     </para>
     /// </remarks>
-    ApplicationPopover? Popover { get; set; }
+    ApplicationPopover? Popovers { get; set; }
 
     #endregion Navigation and Popover
 
