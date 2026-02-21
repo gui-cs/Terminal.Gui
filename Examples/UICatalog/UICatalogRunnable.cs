@@ -289,6 +289,15 @@ public sealed class UICatalogRunnable : Runnable
             // add a separator
             menuItems.Add (new Line ());
 
+            // Command trace toggle
+            CheckBox commandTraceCheckBox = new () { Text = "Command _Trace", Value = CommandTrace.IsEnabled ? CheckState.Checked : CheckState.UnChecked };
+            commandTraceCheckBox.ValueChanging += (_, e) => { CommandTrace.IsEnabled = e.NewValue == CheckState.Checked; };
+
+            menuItems.Add (new MenuItem { CommandView = commandTraceCheckBox, HelpText = "Toggle command route tracing" });
+
+            // add a separator
+            menuItems.Add (new Line ());
+
             menuItems.Add (new MenuItem ("_Open Log Folder", string.Empty, () => OpenUrl (UICatalog.LOGFILE_LOCATION)));
 
             return menuItems.ToArray ()!;

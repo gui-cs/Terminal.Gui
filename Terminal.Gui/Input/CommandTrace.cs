@@ -27,14 +27,17 @@ public static class CommandTrace
     private static readonly NullBackend _defaultBackend = new ();
 
     /// <summary>
+    ///     Gets or sets whether command tracing is enabled. When enabled, uses <see cref="LoggingBackend"/>.
+    ///     When disabled (default), uses <see cref="NullBackend"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static bool IsEnabled { get => Backend is not NullBackend; set => Backend = value ? new LoggingBackend () : _defaultBackend; }
+
+    /// <summary>
     ///     Gets or sets the trace backend for the current async context. Default is <see cref="NullBackend"/>.
     ///     Each async flow (test, thread) has its own backend instance.
     /// </summary>
-    public static ICommandTraceBackend Backend
-    {
-        get => _asyncLocalBackend.Value ?? _defaultBackend;
-        set => _asyncLocalBackend.Value = value;
-    }
+    public static ICommandTraceBackend Backend { get => _asyncLocalBackend.Value ?? _defaultBackend; set => _asyncLocalBackend.Value = value; }
 
     /// <summary>
     ///     Traces a command routing step.
@@ -65,12 +68,12 @@ public static class CommandTrace
     [Conditional ("DEBUG")]
     public static void TraceRoute (View view, ICommandContext? ctx, CommandTracePhase phase, string? message = null, [CallerMemberName] string method = "") =>
         Backend.Log (new RouteTraceEntry (view.ToIdentifyingString (),
-                                           ctx?.Command ?? Command.NotBound,
-                                           ctx?.Routing ?? CommandRouting.Direct,
-                                           phase,
-                                           method,
-                                           message,
-                                           DateTime.UtcNow));
+                                          ctx?.Command ?? Command.NotBound,
+                                          ctx?.Routing ?? CommandRouting.Direct,
+                                          phase,
+                                          method,
+                                          message,
+                                          DateTime.UtcNow));
 
     /// <summary>
     ///     A no-op backend that discards all trace entries. This is the default.
@@ -100,7 +103,7 @@ public static class CommandTrace
                                _ => "•"
                            };
 
-            string message = $"[{entry.Phase}] {arrow} {entry.Command} @ {entry.ViewId} ({entry.Method})";
+            var message = $"[{entry.Phase}] {arrow} {entry.Command} @ {entry.ViewId} ({entry.Method})";
 
             if (!string.IsNullOrEmpty (entry.Message))
             {

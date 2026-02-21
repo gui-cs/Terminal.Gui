@@ -211,9 +211,30 @@ using (Logging.PushLogger(new XUnitLogger(_output, LogLevel.Debug)))
 UICatalog includes built-in logging UI. Access via the **Logging** menu to:
 - View logs in real-time
 - Change log level at runtime
+- Toggle command route tracing
 - See scenario-specific logs
 
 ![UICatalog Logging](../images/UICatalog_Logging.png)
+
+## Command Route Tracing
+
+Terminal.Gui includes specialized tracing for debugging command routing through the view hierarchy. See [Command Deep Dive - Command Route Tracing](command.md#command-route-tracing) for details.
+
+Enable via code:
+
+```csharp
+CommandTrace.IsEnabled = true;
+```
+
+Or via configuration:
+
+```json
+{
+  "CommandTrace.IsEnabled": true
+}
+```
+
+Or toggle at runtime in UICatalog via **Logging** menu → **Command Trace**.
 
 ## Metrics
 
