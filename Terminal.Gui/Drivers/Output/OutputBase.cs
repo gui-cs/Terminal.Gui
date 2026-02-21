@@ -171,12 +171,46 @@ public abstract class OutputBase
     ///     <paramref name="redrawTextStyle"/>.
     ///     If command can be buffered in line with other output (e.g. CSI sequence) then it should be appended to
     ///     <paramref name="output"/>
-    ///     otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method)
+    ///     otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method).
+    ///     <para>
+    ///         When a color is <see cref="Color.Transparent"/> (alpha = 0), the terminal's default foreground or
+    ///         background color is used via ANSI reset sequences (CSI 39m / CSI 49m), allowing native terminal
+    ///         transparency to show through.
+    ///     </para>
     /// </summary>
     /// <param name="output"></param>
     /// <param name="attr"></param>
     /// <param name="redrawTextStyle"></param>
-    protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
+    protected virtual void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
+    {
+        if (attr.Foreground == Color.Transparent)
+        {
+            EscSeqUtils.CSI_AppendResetForegroundColor (output);
+        }
+        else if (Force16Colors)
+        {
+            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
+        }
+
+        if (attr.Background == Color.Transparent)
+        {
+            EscSeqUtils.CSI_AppendResetBackgroundColor (output);
+        }
+        else if (Force16Colors)
+        {
+            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
+        }
+
+        EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+    }
 
     /// <summary>
     ///     When overriden in derived class, positions the terminal draw cursor to the specified point on the screen.

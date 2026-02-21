@@ -16,6 +16,11 @@ public static class ColorStrings
     /// <returns>Standard color name for the specified color; otherwise <see langword="null"/>.</returns>
     public static string? GetColorName (Color color)
     {
+        if (color == Color.Transparent)
+        {
+            return "Transparent";
+        }
+
         if (_standard.TryNameColor (color, out string? name))
         {
             return name;
@@ -40,6 +45,12 @@ public static class ColorStrings
     /// <returns><see langword="true"/> if <paramref name="name"/> was parsed successfully.</returns>
     public static bool TryParseStandardColorName (ReadOnlySpan<char> name, out Color color)
     {
+        if (name.Equals ("Transparent", StringComparison.OrdinalIgnoreCase))
+        {
+            color = Color.Transparent;
+            return true;
+        }
+
         if (_standard.TryParseColor (name, out color))
         {
             return true;
@@ -56,6 +67,12 @@ public static class ColorStrings
     /// <returns><see langword="true"/> if <paramref name="name"/> was parsed successfully.</returns>
     public static bool TryParseNamedColor (ReadOnlySpan<char> name, out Color color)
     {
+        if (name.Equals ("Transparent", StringComparison.OrdinalIgnoreCase))
+        {
+            color = Color.Transparent;
+            return true;
+        }
+
         if (_standard.TryParseColor (name, out color))
         {
             return true;

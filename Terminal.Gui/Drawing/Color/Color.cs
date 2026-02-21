@@ -41,6 +41,17 @@ namespace Terminal.Gui.Drawing;
 public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
                                               IUtf8SpanFormattable, IMinMaxValue<Color>
 {
+    /// <summary>
+    ///     Transparent color (alpha = 0). When used in an <see cref="Attribute"/>, the terminal's default
+    ///     foreground or background color is used instead of an explicit color. This allows the terminal's native
+    ///     background (including any transparency or acrylic effects) to show through.
+    /// </summary>
+    /// <remarks>
+    ///     Uses ARGB 0x00FFFFFF (alpha=0, RGB=white) as the sentinel value, following the .NET convention
+    ///     (e.g., <c>System.Drawing.Color.Transparent</c>). This ensures it is distinguishable from
+    ///     <c>default(Color)</c> which has all bytes zeroed.
+    /// </remarks>
+    public static readonly Color Transparent = new (255, 255, 255, 0);
     /// <summary>The value of the alpha channel component</summary>
     /// <remarks>
     ///     <para>

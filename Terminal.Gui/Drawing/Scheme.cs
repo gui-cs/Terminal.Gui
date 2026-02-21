@@ -307,7 +307,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Focus =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
+                                       Foreground = ResolveTransparentToBlack (GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
                                        Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
                                    },
 
@@ -575,4 +575,11 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                + $"Active: {Active}; HotActive: {HotActive}; Highlight: {Highlight}; Editable: {Editable}; "
                + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}";
     }
+
+    /// <summary>
+    ///     When inverting colors for derived roles (e.g., Focus = inverted Normal), a Transparent background
+    ///     would become a Transparent foreground, making text invisible. This method substitutes Black instead.
+    /// </summary>
+    private static Color ResolveTransparentToBlack (Color color) =>
+        color == Color.Transparent ? new Color (0, 0, 0) : color;
 }
