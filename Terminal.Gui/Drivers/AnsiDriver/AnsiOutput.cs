@@ -62,7 +62,7 @@ public class AnsiOutput : OutputBase, IOutput
             // Check if console is available (not redirected)
             if (Console.IsOutputRedirected || Console.IsInputRedirected)
             {
-                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
                 return;
             }
@@ -77,7 +77,7 @@ public class AnsiOutput : OutputBase, IOutput
                     _windowsVTOutput.Dispose ();
                     _windowsVTOutput = null;
 
-                    Logging.Warning ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Logging.Information ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }
@@ -90,7 +90,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 if (fdCopy == -1)
                 {
-                    Logging.Warning ("Console output stream is not writable. Running in degraded mode.");
+                    Logging.Information ("Console output stream is not writable. Running in degraded mode.");
 
                     return;
                 }

@@ -44,12 +44,12 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
         }
         catch (DllNotFoundException ex)
         {
-            Logging.Warning ($"UnixInput: libc not available: {ex.Message}. Running in degraded mode.");
+            Logging.Information ($"UnixInput: libc not available: {ex.Message}. Running in degraded mode.");
             _terminalInitialized = false;
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"UnixInput: Failed to initialize terminal: {ex.Message}. Running in degraded mode.");
+            Logging.Information ($"UnixInput: Failed to initialize terminal: {ex.Message}. Running in degraded mode.");
             _terminalInitialized = false;
         }
     }
