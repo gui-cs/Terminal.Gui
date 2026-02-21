@@ -208,19 +208,35 @@ Keep existing architecture, add only the tracing system from Idea #2:
    - Entry/exit of `DispatchDown`
 3. ✅ Replace all commented `Logging.Debug()` with `TraceRoute()`
 4. ✅ Add tests using `ListBackend` to verify routing paths
+5. ✅ Add `ConfigurationProperty` for runtime control (`CommandTrace.IsEnabled`)
+6. ✅ Add UICatalog menu toggle (Logging → Command Trace)
+7. ✅ Document in `command.md` and `logging.md`
 
 **Files Added:**
 - `Terminal.Gui/Input/CommandTrace.cs` - Core infrastructure with:
+  - `[ConfigurationProperty] IsEnabled` for runtime control
   - `RouteTraceEntry` record for capturing trace data
   - `CommandTracePhase` enum (Entry, Exit, Routing, Event, Handler)
   - `ICommandTraceBackend` interface
   - `NullBackend` (default no-op)
   - `LoggingBackend` (forwards to `Logging.Debug`)
   - `ListBackend` (captures for testing)
+- `Terminal.Gui/Input/CommandTracePhase.cs` - Phase enum (one type per file)
+- `Terminal.Gui/Input/RouteTraceEntry.cs` - Trace entry record
+- `Terminal.Gui/Input/ICommandTraceBackend.cs` - Backend interface
 - `Tests/UnitTestsParallelizable/Input/CommandTraceTests.cs` - 10 unit tests
 
 **Files Modified:**
 - `Terminal.Gui/ViewBase/View.Command.cs` - Replaced 19 commented `Logging.Debug()` calls with `CommandTrace.TraceRoute()`
+- `Examples/UICatalog/UICatalogRunnable.cs` - Added "Command Trace" CheckBox to Logging menu
+- `docfx/docs/command.md` - Added "Command Route Tracing" section
+- `docfx/docs/logging.md` - Added command tracing reference
+
+**Key Technical Decisions:**
+- **AsyncLocal for thread safety**: Used `AsyncLocal<ICommandTraceBackend?>` instead of static field. Required for parallel test execution where each test needs isolated backend state.
+- **Nested backend classes**: `NullBackend`, `LoggingBackend`, `ListBackend` are nested in `CommandTrace`. Follows "one type per file" rule (nested classes allowed).
+- **ConfigurationProperty scope**: Used `SettingsScope` (not `AppSettingsScope`) since this is a Terminal.Gui internal setting.
+- **Trace output format**: `[Phase] Arrow Command @ ViewId (Method) - Message` with arrows: ↑ (BubblingUp), ↓ (DispatchingDown), ↔ (Bridged), • (Direct)
 
 **Benefits**:
 - Minimal change, low risk
@@ -228,10 +244,14 @@ Keep existing architecture, add only the tracing system from Idea #2:
 - Foundation for future refactoring
 - Completes Phase E
 - Zero overhead in Release builds (`[Conditional("DEBUG")]`)
+- Runtime-controllable via config or UICatalog menu
 
 **Challenges**:
 - Doesn't address encapsulation or testability
 - Tracing alone may not be sufficient for complex routing debugging
+
+**Commits:**
+- `c6914341b` - Add CommandTrace.IsEnabled config property and UICatalog menu toggle
 
 ## Investigation Plan
 
@@ -305,15 +325,30 @@ The file is already well-organized with regions. The mixing of concerns isn't in
 ## Success Criteria
 
 This exploration is successful if:
-1. We can demonstrate easier testing of command flow (fewer setup lines)
-2. We can enable/disable detailed logging without code changes
-3. The solution is maintainable (not over-engineered)
-4. The approach is compatible with existing Phase A-E work
-5. There's a clear migration path if adopted
+1. ✅ We can demonstrate easier testing of command flow (fewer setup lines) - `ListBackend` captures traces for assertions
+2. ✅ We can enable/disable detailed logging without code changes - `CommandTrace.IsEnabled` config property + UICatalog toggle
+3. ✅ The solution is maintainable (not over-engineered) - Minimal API surface, nested backends
+4. ✅ The approach is compatible with existing Phase A-E work - Completes Phase E
+5. ✅ There's a clear migration path if adopted - Already implemented, no migration needed
+
+## Lessons Learned
+
+1. **Static state in parallel tests**: Static fields cause test interference in parallel test execution. Use `AsyncLocal<T>` for per-test isolation.
+
+2. **CheckBox API in v2**: Uses `Value`/`ValueChanging`, not `CheckedState`/`CheckedStateChanging`.
+
+3. **ConfigurationProperty pattern**: Add `[ConfigurationProperty(Scope = typeof(SettingsScope))]` attribute; property is auto-discovered by ConfigurationManager.
+
+4. **[Conditional("DEBUG")]**: Methods with this attribute compile to no-ops in Release builds - zero runtime cost.
+
+5. **One type per file**: Project rule allows nested classes in the containing type's file.
 
 ## Next Steps
 
-1. Examine existing test patterns in ViewCommandTests.cs
-2. Prototype minimal route tracing (Idea #4)
-3. Compare before/after test code complexity
-4. Document findings and recommendation
+With Phase E (route tracing) complete, potential future work:
+
+1. **Phase D Migration** - Convert 267 `AddCommand` call sites from `bool?` → `CommandOutcome` returns
+2. **CommandRouter extraction** (Idea #1) - If testing isolation becomes a pain point
+3. **Pipeline pattern** (Idea #3) - If command flow becomes more complex
+
+For now, the tracing infrastructure provides visibility into command routing without architectural changes.
