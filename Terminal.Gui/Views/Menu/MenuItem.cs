@@ -57,6 +57,8 @@ public class MenuItem : Shortcut
     public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText) =>
         SubMenu = subMenu;
 
+    private CommandBridge? _subMenuBridge;
+
     /// <summary>
     ///     The submenu to display when the user selects this menu item.
     /// </summary>
@@ -70,18 +72,28 @@ public class MenuItem : Shortcut
                 return;
             }
 
+            // Tear down old bridge
+            _subMenuBridge?.Dispose ();
+            _subMenuBridge = null;
+
             field = value;
 
             if (field is null)
             {
                 return;
             }
+
             field!.App ??= App;
             field!.Visible = false;
 
             // TODO: This is a temporary hack - add a flag or something instead
             KeyView.Text = $"{Glyphs.RightArrow}";
             field.SuperMenuItem = this;
+
+            // Bridge Activate and Accept from SubMenu → this MenuItem across the
+            // non-containment boundary. SubMenu is not a SubView of this MenuItem,
+            // so commands can't bubble naturally; the bridge relays completion events.
+            _subMenuBridge = CommandBridge.Connect (this, field, Command.Activate, Command.Accept);
         }
     }
 
@@ -101,6 +113,9 @@ public class MenuItem : Shortcut
     {
         if (disposing)
         {
+            _subMenuBridge?.Dispose ();
+            _subMenuBridge = null;
+
             SubMenu?.Dispose ();
             SubMenu = null;
         }

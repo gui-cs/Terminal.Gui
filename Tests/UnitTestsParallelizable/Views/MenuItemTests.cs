@@ -282,4 +282,202 @@ public class MenuItemTests
 
         menu.Dispose ();
     }
+
+    #region SubMenu Command Propagation
+
+    // ────────────────────────────────────────────────────────────────────
+    //  Tests that commands from MenuItems inside a SubMenu propagate
+    //  correctly through Menu/MenuItem:
+    //
+    //    rootMenu (Menu)
+    //      └─ parentMenuItem (MenuItem, has SubMenu)
+    //           └─ subMenu (Menu)
+    //                └─ childMenuItem (MenuItem)
+    //
+    //  MenuItem.SubMenu is of type Menu (NOT PopoverMenu). The SubMenu
+    //  is NOT in the rootMenu's containment hierarchy — it is set via
+    //  a property. Menu.SuperMenuItem links back to the owning MenuItem.
+    //  CommandBridge connects SubMenu → parentMenuItem across the
+    //  non-containment boundary.
+    //
+    //  Question: when childMenuItem is activated/accepted, does the
+    //  command reach (a) subMenu, (b) parentMenuItem, (c) rootMenu?
+    // ────────────────────────────────────────────────────────────────────
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Activating a child MenuItem inside a SubMenu should bubble to the SubMenu (Menu)
+    ///     via CommandsToBubbleUp.
+    /// </summary>
+    [Fact]
+    public void SubMenu_ChildActivate_Bubbles_To_SubMenu ()
+    {
+        MenuItem childItem = new () { Title = "Child" };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var subMenuActivatingCount = 0;
+        subMenu.Activating += (_, _) => subMenuActivatingCount++;
+
+        childItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, subMenuActivatingCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Accepting a child MenuItem inside a SubMenu should bubble to the SubMenu (Menu)
+    ///     via CommandsToBubbleUp.
+    /// </summary>
+    [Fact]
+    public void SubMenu_ChildAccept_Bubbles_To_SubMenu ()
+    {
+        MenuItem childItem = new () { Title = "Child" };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var subMenuAcceptingCount = 0;
+        subMenu.Accepting += (_, _) => subMenuAcceptingCount++;
+
+        childItem.InvokeCommand (Command.Accept);
+
+        Assert.Equal (1, subMenuAcceptingCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Accepting a child MenuItem inside a SubMenu fires Accepted on the SubMenu exactly once,
+    ///     via bubbling through CommandsToBubbleUp=[Accept].
+    /// </summary>
+    [Fact]
+    public void SubMenu_ChildAccept_Fires_Accepted_On_SubMenu ()
+    {
+        MenuItem childItem = new () { Title = "Child" };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var subMenuAcceptedCount = 0;
+        subMenu.Accepted += (_, _) => subMenuAcceptedCount++;
+
+        childItem.InvokeCommand (Command.Accept);
+
+        // Fixed: removed redundant menuItem.Accepting += RaiseAccepted from Menu.OnSubViewAdded.
+        // Now only the bubbling path fires Accepted.
+        Assert.Equal (1, subMenuAcceptedCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Activating a child in a SubMenu should bubble to the SubMenu. But the SubMenu is NOT
+    ///     in the rootMenu's containment hierarchy (it's set on parentMenuItem.SubMenu, not Add'd
+    ///     to rootMenu). So Activating should NOT reach rootMenu via normal bubbling.
+    /// </summary>
+    [Fact]
+    public void SubMenu_ChildActivate_Does_Not_Reach_RootMenu_Without_Containment ()
+    {
+        MenuItem childItem = new () { Title = "Child" };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var rootActivatingCount = 0;
+        rootMenu.Activating += (_, _) => rootActivatingCount++;
+
+        childItem.InvokeCommand (Command.Activate);
+
+        // SubMenu is not a SubView of rootMenu — it can't bubble there.
+        Assert.Equal (0, rootActivatingCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     CommandBridge fires Activated (not Activating) on the parent MenuItem. Activating is a
+    ///     cancellable pre-notification; the bridge only relays completion events.
+    /// </summary>
+    [Fact]
+    public void SubMenu_ChildActivate_Does_Not_Fire_Activating_On_ParentMenuItem ()
+    {
+        MenuItem childItem = new () { Title = "Child" };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var parentActivatingCount = 0;
+        parentItem.Activating += (_, _) => parentActivatingCount++;
+
+        childItem.InvokeCommand (Command.Activate);
+
+        // Bridge fires Activated (completion), not Activating (cancellable).
+        Assert.Equal (0, parentActivatingCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     CommandBridge from SubMenu → parent MenuItem fires Activated on the parent
+    ///     when a child MenuItem in the SubMenu is activated.
+    /// </summary>
+    [Fact]
+    public void SubMenu_ChildActivate_Bridges_Activated_To_ParentMenuItem ()
+    {
+        MenuItem childItem = new () { Title = "Child" };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var parentActivatedCount = 0;
+        parentItem.Activated += (_, _) => parentActivatedCount++;
+
+        childItem.InvokeCommand (Command.Activate);
+
+        // CommandBridge relays SubMenu.Activated → parentMenuItem.RaiseActivated
+        Assert.Equal (1, parentActivatedCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     CommandBridge from SubMenu → parent MenuItem fires Accepted on the parent
+    ///     when a child MenuItem in the SubMenu is accepted.
+    /// </summary>
+    [Fact]
+    public void SubMenu_ChildAccept_Bridges_Accepted_To_ParentMenuItem ()
+    {
+        MenuItem childItem = new () { Title = "Child" };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var parentAcceptedCount = 0;
+        parentItem.Accepted += (_, _) => parentAcceptedCount++;
+
+        childItem.InvokeCommand (Command.Accept);
+
+        // CommandBridge relays SubMenu.Accepted → parentMenuItem.RaiseAccepted
+        Assert.Equal (1, parentAcceptedCount);
+
+        rootMenu.Dispose ();
+    }
+
+    #endregion SubMenu Command Propagation
 }

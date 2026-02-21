@@ -1024,4 +1024,402 @@ public class MenuTests
     #endregion HotKey Activation
 
     #endregion CommandView Activation Propagation to Menu and SuperView
+
+    #region CommandView Round-Trip: Dispatch Down + Bubble Up with Value Verification
+
+    // ────────────────────────────────────────────────────────────────────
+    //  These tests verify the "round-trip" flow:
+    //
+    //    SuperView → Menu → MenuItem (Shortcut) → CommandView
+    //
+    //  A key press on the MenuItem dispatches down to the CommandView,
+    //  the CommandView changes state, and the activation/acceptance bubbles
+    //  back up to Menu and SuperView. The SuperView's event handler can
+    //  query the CommandView and see the updated value.
+    //
+    //  CheckBox uses relay dispatch (ConsumeDispatch=false) — activation
+    //  bubbles normally after dispatch. Button raises Accept, which bubbles
+    //  via CommandsToBubbleUp. FlagSelector uses ConsumeDispatch=true —
+    //  inner CheckBox clicks are consumed and do NOT propagate to Menu.
+    // ────────────────────────────────────────────────────────────────────
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Space on a MenuItem with CheckBox CommandView dispatches to the CheckBox (relay),
+    ///     toggles its state, and Activating bubbles to Menu and SuperView. The SuperView's
+    ///     Activating handler sees the updated CheckBox value.
+    /// </summary>
+    [Fact]
+    public void Space_Activate_CheckBoxCommandView_Updates_Value_And_Propagates_To_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        CheckState? valueSeenBySuperView = null;
+
+        superView.Activating += (_, _) =>
+                                {
+                                    // At this point, the CheckBox should already be toggled
+                                    valueSeenBySuperView = checkBox.Value;
+                                };
+
+        // Space triggers Command.Activate with a binding → Shortcut dispatches to CheckBox
+        menuItem.NewKeyDownEvent (Key.Space);
+
+        // CheckBox state was toggled by OnActivated → AdvanceCheckState
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+
+        // SuperView's Activating handler saw the updated value
+        Assert.Equal (CheckState.Checked, valueSeenBySuperView);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Enter on a MenuItem with Button CommandView raises Accept, which bubbles to
+    ///     Menu and SuperView via CommandsToBubbleUp=[Accept].
+    /// </summary>
+    [Fact]
+    public void Enter_Accept_ButtonCommandView_Propagates_Accept_To_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        Button button = new () { Title = "_Click", CanFocus = false };
+        MenuItem menuItem = new () { Title = "Test", CommandView = button };
+        menu.Add (menuItem);
+
+        var superViewAcceptingCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCount++;
+
+        // Enter triggers Command.Accept → bubbles through Menu to SuperView
+        menuItem.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, superViewAcceptingCount);
+
+        superView.Dispose ();
+    }
+
+    #endregion CommandView Round-Trip: Dispatch Down + Bubble Up with Value Verification
+
+    #region SubMenu CommandView Propagation
+
+    // ────────────────────────────────────────────────────────────────────
+    //  Tests that non-default CommandViews (CheckBox, Button, FlagSelector)
+    //  in SubMenu MenuItems properly propagate commands through the bridge.
+    //
+    //    superView (CommandsToBubbleUp=[Activate, Accept])
+    //      └─ rootMenu (Menu)
+    //           └─ parentMenuItem (MenuItem, SubMenu = subMenu)
+    //                └─ subMenu (Menu)  [NOT a SubView of rootMenu]
+    //                     └─ childMenuItem (MenuItem, CommandView = X)
+    //
+    //  The CommandBridge on parentMenuItem.SubMenu bridges completion
+    //  events (Activated/Accepted) from subMenu → parentMenuItem.
+    //  The bridge fires RaiseActivated/RaiseAccepted (direct event fire),
+    //  which does NOT re-enter the command pipeline and therefore does NOT
+    //  bubble further to rootMenu or superView.
+    // ────────────────────────────────────────────────────────────────────
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Space on a childMenuItem with CheckBox CommandView in a SubMenu dispatches to the
+    ///     CheckBox, toggles its state, bubbles Activating to subMenu, and bridges Activated
+    ///     to parentMenuItem. The parentMenuItem's Activated handler sees the updated CheckBox value.
+    /// </summary>
+    [Fact]
+    public void SubMenu_Space_Activate_CheckBoxCommandView_Bridges_To_ParentMenuItem_With_Updated_Value ()
+    {
+        MenuItem childItem = new () { Title = "Child", CommandView = new CheckBox { Title = "_Toggle" } };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        CheckBox checkBox = (CheckBox)childItem.CommandView!;
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        CheckState? valueSeenByParent = null;
+
+        parentItem.Activated += (_, _) =>
+                                {
+                                    valueSeenByParent = checkBox.Value;
+                                };
+
+        // Space triggers Activate with binding → Shortcut dispatches to CheckBox
+        childItem.NewKeyDownEvent (Key.Space);
+
+        // CheckBox toggled
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+
+        // Bridge relayed Activated to parentMenuItem with updated value visible
+        Assert.Equal (CheckState.Checked, valueSeenByParent);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Enter on a childMenuItem with Button CommandView in a SubMenu raises Accept,
+    ///     which bubbles to subMenu and bridges Accepted to parentMenuItem.
+    /// </summary>
+    [Fact]
+    public void SubMenu_Enter_Accept_ButtonCommandView_Bridges_Accepted_To_ParentMenuItem ()
+    {
+        Button button = new () { Title = "_Click", CanFocus = false };
+        MenuItem childItem = new () { Title = "Child", CommandView = button };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var parentAcceptedCount = 0;
+        parentItem.Accepted += (_, _) => parentAcceptedCount++;
+
+        var subMenuAcceptingCount = 0;
+        subMenu.Accepting += (_, _) => subMenuAcceptingCount++;
+
+        // Enter triggers Command.Accept → bubbles to subMenu → bridges to parentMenuItem
+        childItem.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, subMenuAcceptingCount);
+        Assert.Equal (1, parentAcceptedCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Direct Activate on a childMenuItem with FlagSelector CommandView in a SubMenu
+    ///     bubbles to subMenu and bridges Activated to parentMenuItem. Note: direct invocation
+    ///     (no binding) does NOT dispatch to FlagSelector — the value does not change.
+    ///     This verifies the command propagation path, not the FlagSelector state change.
+    /// </summary>
+    [Fact]
+    public void SubMenu_Direct_Activate_FlagSelectorCommandView_Bridges_Activated_To_ParentMenuItem ()
+    {
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem childItem = new () { Title = "Child", CommandView = flagSelector };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu rootMenu = new ([parentItem]);
+
+        var parentActivatedCount = 0;
+        parentItem.Activated += (_, _) => parentActivatedCount++;
+
+        var subMenuActivatingCount = 0;
+        subMenu.Activating += (_, _) => subMenuActivatingCount++;
+
+        // Direct InvokeCommand (no binding → dispatch to FlagSelector is skipped)
+        childItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, subMenuActivatingCount);
+        Assert.Equal (1, parentActivatedCount);
+
+        rootMenu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     The CommandBridge fires RaiseActivated/RaiseAccepted directly on the parentMenuItem.
+    ///     These are completion events that do NOT re-enter the command pipeline. Therefore,
+    ///     bridged commands do NOT bubble from parentMenuItem to rootMenu or superView.
+    ///     This documents the current bridge boundary — higher-level propagation (to PopoverMenu,
+    ///     MenuBar) requires additional bridging at that level.
+    /// </summary>
+    [Fact]
+    public void SubMenu_Bridge_Does_Not_Propagate_Beyond_ParentMenuItem ()
+    {
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem childItem = new () { Title = "Child", CommandView = checkBox };
+        Menu subMenu = new ([childItem]);
+
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu rootMenu = new ([parentItem]);
+        superView.Add (rootMenu);
+
+        var parentActivatedCount = 0;
+        parentItem.Activated += (_, _) => parentActivatedCount++;
+
+        var rootMenuActivatingCount = 0;
+        rootMenu.Activating += (_, _) => rootMenuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        childItem.InvokeCommand (Command.Activate);
+
+        // Bridge fires Activated on parentMenuItem
+        Assert.Equal (1, parentActivatedCount);
+
+        // Bridge does NOT re-enter command pipeline — no bubbling to rootMenu or superView
+        Assert.Equal (0, rootMenuActivatingCount);
+        Assert.Equal (0, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    #endregion SubMenu CommandView Propagation
+
+    #region Dispatch Down and Round-Trip Value Verification
+
+    // ────────────────────────────────────────────────────────────────────
+    //  Tests that verify the complete round-trip:
+    //    1. Command dispatches DOWN from MenuItem to CommandView
+    //    2. CommandView changes state (value updated)
+    //    3. Activation bubbles UP to Menu and SuperView
+    //    4. SuperView's event handler queries CommandView and sees the new value
+    //
+    //  This works for CheckBox (relay dispatch, ConsumeDispatch=false):
+    //    Space key → Shortcut dispatches to CheckBox → AdvanceCheckState →
+    //    Activating bubbles to Menu → SuperView sees updated value.
+    //
+    //  FlagSelector (ConsumeDispatch=true) has a DispatchingDown guard that
+    //  prevents multi-level dispatch. When Shortcut dispatches to FlagSelector,
+    //  FlagSelector cannot further dispatch to its inner CheckBoxes. The value
+    //  does NOT change through the Space key path. Inner CheckBox clicks DO
+    //  change the value, but FlagSelector consumes the activation (it does not
+    //  propagate to Menu or SuperView).
+    //
+    //  Menu does NOT override GetDispatchTarget (unlike MenuBar), so
+    //  menu.InvokeCommand(Activate) fires Menu's own Activating but does NOT
+    //  dispatch to any MenuItem or its CommandView.
+    // ────────────────────────────────────────────────────────────────────
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Menu does not override GetDispatchTarget. Invoking Activate on the Menu fires
+    ///     Menu.Activating and SuperView.Activating, but does NOT dispatch to any MenuItem
+    ///     or its CommandView. The FlagSelector value is unchanged.
+    /// </summary>
+    [Fact]
+    public void Menu_InvokeActivate_Does_Not_Dispatch_To_MenuItem_CommandView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        var menuItemActivatingCount = 0;
+        menuItem.Activating += (_, _) => menuItemActivatingCount++;
+
+        // menu.InvokeCommand fires Menu's own Activating but does NOT dispatch to MenuItem
+        menu.InvokeCommand (Command.Activate);
+
+        // Menu's Activating fires and bubbles to SuperView
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        // MenuItem was NOT activated — Menu has no GetDispatchTarget override
+        Assert.Equal (0, menuItemActivatingCount);
+
+        // FlagSelector value unchanged (Values setter auto-initializes to first entry)
+        Assert.Equal (1, flagSelector.Value);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Space key on a MenuItem with CheckBox CommandView: the full round-trip.
+    ///     Dispatch down to CheckBox changes state, then Activating bubbles up to
+    ///     Menu and SuperView. The SuperView's Activating handler can query the CheckBox
+    ///     and see the correctly updated value.
+    /// </summary>
+    [Fact]
+    public void RoundTrip_Space_CheckBox_Value_Visible_To_SuperView_Activating ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        CheckState? valueSeenByMenu = null;
+        CheckState? valueSeenBySuperView = null;
+
+        menu.Activating += (_, _) => { valueSeenByMenu = checkBox.Value; };
+        superView.Activating += (_, _) => { valueSeenBySuperView = checkBox.Value; };
+
+        // Space triggers Activate with binding → Shortcut dispatches to CheckBox →
+        // CheckBox.OnActivated toggles state → Activating bubbles to Menu → SuperView
+        menuItem.NewKeyDownEvent (Key.Space);
+
+        // Value toggled
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+
+        // Both Menu and SuperView handlers saw the updated value
+        Assert.Equal (CheckState.Checked, valueSeenByMenu);
+        Assert.Equal (CheckState.Checked, valueSeenBySuperView);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Space key on a MenuItem with FlagSelector CommandView: Shortcut dispatches down
+    ///     to FlagSelector, but the DispatchingDown guard prevents FlagSelector from further
+    ///     dispatching to its inner CheckBoxes. FlagSelector.OnActivated checks source — since
+    ///     the source is the MenuItem (not a CheckBox), it returns without toggling.
+    ///     Activating DOES bubble to Menu and SuperView, but FlagSelector value is unchanged.
+    /// </summary>
+    [Fact]
+    public void RoundTrip_Space_FlagSelector_Value_Does_Not_Change_Via_DispatchDown ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        int? initialValue = flagSelector.Value; // Values setter auto-initializes to first entry (1)
+
+        // Space triggers Activate with binding → Shortcut dispatches to FlagSelector (DispatchDown)
+        // FlagSelector.TryDispatchToTarget is blocked (DispatchingDown guard) → no inner CheckBox toggle
+        // FlagSelector.OnActivated: source is MenuItem, not CheckBox → returns without toggling
+        menuItem.NewKeyDownEvent (Key.Space);
+
+        // Activating still bubbles to Menu and SuperView (relay dispatch in Shortcut)
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        // FlagSelector value is unchanged — DispatchDown cannot reach inner CheckBoxes
+        Assert.Equal (initialValue, flagSelector.Value);
+
+        superView.Dispose ();
+    }
+
+    #endregion Dispatch Down and Round-Trip Value Verification
 }

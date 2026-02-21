@@ -69,11 +69,8 @@ public class Menu : Bar
                 {
                     menuItem.CanFocus = true;
 
-                    menuItem.Accepting += (_, e) => RaiseAccepted (e.Context);
-
-                    // When a MenuItem is activated (e.g., via HotKey → Activate flow),
-                    // raise Accepted on this Menu so PopoverMenu can close.
-                    //menuItem.Activated += (_, e) => RaiseAccepted (e.Value);
+                    // Accept propagation is handled by CommandsToBubbleUp=[Accept] (line 36).
+                    // An explicit Accepting subscription here caused double-fire of Accepted.
 
                     break;
                 }
