@@ -422,9 +422,66 @@ public class ViewCommandTests
         Assert.Equal (1, superViewActivatingCalledCount);
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_BubblingUp_Fires_Activated_On_SuperView ()
+    {
+        View superView = new () { CommandsToBubbleUp = [Command.Activate] };
+        View subView = new ();
+        superView.Add (subView);
+
+        var activatedCount = 0;
+        superView.Activated += (_, _) => activatedCount++;
+
+        subView.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, activatedCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_BubblingUp_Fires_Activated_In_Deep_Hierarchy ()
+    {
+        View grandSuperView = new () { CommandsToBubbleUp = [Command.Activate] };
+        View superView = new () { CommandsToBubbleUp = [Command.Activate] };
+        View subView = new ();
+        grandSuperView.Add (superView);
+        superView.Add (subView);
+
+        var grandActivatedCount = 0;
+        grandSuperView.Activated += (_, _) => grandActivatedCount++;
+
+        subView.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, grandActivatedCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void ConsumeDispatch_Blocks_Further_Bubbling ()
+    {
+        // OptionSelector uses ConsumeDispatch=true — activation should NOT
+        // propagate from its inner CheckBox to OptionSelector's SuperView
+        View superView = new () { CommandsToBubbleUp = [Command.Activate] };
+        OptionSelector selector = new () { Labels = ["Option1", "Option2"] };
+        superView.Add (selector);
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Activate an inner CheckBox with a binding (required for dispatch to occur)
+        CheckBox innerCb = selector.SubViews.OfType<CheckBox> ().First ();
+        KeyBinding binding = new ([Command.Activate], Key.Space, innerCb);
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (innerCb), binding);
+        innerCb.InvokeCommand (Command.Activate, ctx);
+
+        // Consume-dispatch blocks propagation to SuperView
+        Assert.Equal (0, superViewActivatingCount);
+    }
+
     // Claude - Sonnet 4.5
     [Fact]
-    public void TryBubbleToSuperView_StopsWhenHandled ()
+    public void CommandsToBubbleUp_StopsWhenHandled ()
     {
         View superView = new () { CommandsToBubbleUp = [Command.Accept] };
         View subView = new ();
@@ -444,7 +501,7 @@ public class ViewCommandTests
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void TryBubbleToSuperView_WorksInDeepHierarchy ()
+    public void CommandsToBubbleUp_WorksInDeepHierarchy ()
     {
         View grandSuperView = new () { CommandsToBubbleUp = [Command.Accept] };
         View superView = new () { CommandsToBubbleUp = [Command.Accept] };
@@ -456,15 +513,19 @@ public class ViewCommandTests
         var grandSuperViewAcceptingCalledCount = 0;
         grandSuperView.Accepting += (_, _) => grandSuperViewAcceptingCalledCount++;
 
+        var grandSuperViewAcceptedCalledCount = 0;
+        grandSuperView.Accepted += (_, _) => grandSuperViewAcceptedCalledCount++;
+
         subView.InvokeCommand (Command.Accept);
 
         // Should propagate all the way up
         Assert.Equal (1, grandSuperViewAcceptingCalledCount);
+        Assert.Equal (1, grandSuperViewAcceptedCalledCount);
     }
 
     // Claude - Sonnet 4.5
     [Fact]
-    public void TryBubbleToSuperView_StopsAtIntermediateHandler ()
+    public void CommandsToBubbleUp_StopsAtIntermediateHandler ()
     {
         View grandSuperView = new () { CommandsToBubbleUp = [Command.Accept] };
         View superView = new () { CommandsToBubbleUp = [Command.Accept] };
@@ -1091,8 +1152,8 @@ public class ViewCommandTests
         Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleDefaultView
         Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleDefaultView is an IAcceptTarget and should handle Accepting
         Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because Accept bubbled up, so middleDefaultView's DefaultAcceptHandler returned early
-        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via BubbleDown
-        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after BubbleDown
+        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via DispatchDown
+        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after DispatchDown
     }
 
     [Fact]
@@ -1144,8 +1205,8 @@ public class ViewCommandTests
         Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleView
         Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleView (non-default IAcceptTarget) fires Accepting
         Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because Accept bubbled up, so middleView's DefaultAcceptHandler returned early
-        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via BubbleDown
-        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after BubbleDown
+        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via DispatchDown
+        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after DispatchDown
     }
 
     [Fact]
@@ -1197,8 +1258,8 @@ public class ViewCommandTests
         Assert.Equal (1, rootAcceptedCount); // 1 because root should receive the Accepted event after bubbling through middleView
         Assert.Equal (1, middleDefaultViewAcceptingCount); // 1 because middleView (plain View) fires Accepting
         Assert.Equal (0, middleDefaultViewAcceptedCount); // 0 because Accept bubbled up, so middleView's DefaultAcceptHandler returned early
-        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via BubbleDown
-        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after BubbleDown
+        Assert.Equal (1, rootIsDefaultViewAcceptingCount); // 1 because root's DefaultAcceptView is invoked via DispatchDown
+        Assert.Equal (1, rootIsDefaultViewAcceptedCount); // 1 because root's DefaultAcceptView receives Accepted after DispatchDown
     }
 
     // CoPilot - ChatGPT o1
@@ -1248,15 +1309,15 @@ public class ViewCommandTests
 
     #endregion
 
-    #region BubbleDown Tests
+    #region DispatchDown Tests
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Exposes the protected <see cref="View.BubbleDown"/> method for testing.
+    ///     Exposes the protected <see cref="View.DispatchDown"/> method for testing.
     /// </summary>
     private class BubbleDownTestView : View
     {
-        public bool? TestBubbleDown (View target, ICommandContext? ctx) => BubbleDown (target, ctx);
+        public bool? TestBubbleDown (View target, ICommandContext? ctx) => DispatchDown (target, ctx);
     }
 
     // Claude - Opus 4.6
@@ -1426,7 +1487,7 @@ public class ViewCommandTests
         var middleActivatingCount = 0;
         middle.Activating += (_, _) => middleActivatingCount++;
 
-        // BubbleDown from root to leaf — should not bubble to middle or root
+        // DispatchDown from root to leaf — should not bubble to middle or root
         CommandContext ctx = new (Command.Activate, new WeakReference<View> (root), null);
         root.TestBubbleDown (leaf, ctx);
 
@@ -1436,7 +1497,7 @@ public class ViewCommandTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void TryBubbleToSuperView_SkipsWhenIsBubblingDown ()
+    public void CommandsToBubbleUp_SkipsWhenIsBubblingDown ()
     {
         View superView = new () { Id = "superView" };
         superView.CommandsToBubbleUp = [Command.Activate];
@@ -1468,7 +1529,7 @@ public class ViewCommandTests
         var superViewActivatingCount = 0;
         superView.Activating += (_, _) => superViewActivatingCount++;
 
-        // First: BubbleDown — should NOT bubble
+        // First: DispatchDown — should NOT bubble
         CommandContext downCtx = new (Command.Activate, new WeakReference<View> (superView), null);
         superView.TestBubbleDown (target, downCtx);
         Assert.Equal (0, superViewActivatingCount);

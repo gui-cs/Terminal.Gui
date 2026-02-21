@@ -44,7 +44,7 @@ public class BarTests
         // Invoke on Bar
         bar.InvokeCommand (Command.Activate);
 
-        // Bar does not BubbleDown to shortcuts; it fires its own events
+        // Bar does not DispatchDown to shortcuts; it fires its own events
         Assert.Equal (0, shortcut1ActivatingFired);
         Assert.Equal (0, shortcut2ActivatingFired);
         Assert.Equal (1, barActivatingFired);
@@ -457,7 +457,7 @@ public class BarTests
         // Invoke Activate directly on Bar
         bar.InvokeCommand (Command.Activate);
 
-        // Bar fires its own events, does NOT BubbleDown to shortcuts
+        // Bar fires its own events, does NOT DispatchDown to shortcuts
         Assert.Equal (0, shortcutActivatingFired);
 
         bar.Dispose ();
@@ -575,7 +575,7 @@ public class BarTests
 
         bar.InvokeCommand (Command.Accept);
 
-        // Bar fires its own events, does NOT BubbleDown to shortcuts
+        // Bar fires its own events, does NOT DispatchDown to shortcuts
         Assert.Equal (0, shortcutAcceptingFired);
 
         bar.Dispose ();

@@ -351,13 +351,14 @@ When handling command events, rich context is available through `ICommandContext
 ```csharp
 public interface ICommandContext
 {
-    Command Command { get; set; }               // The command being invoked
-    WeakReference<View>? Source { get; set; }    // Weak ref to the originating view
-    ICommandBinding? Binding { get; }            // The binding that triggered the command
-    bool IsBubblingDown { get; }                 // True when dispatched downward via BubbleDown
-    bool IsBubblingUp { get; }                   // True when bubbling up to a SuperView
+    Command Command { get; }                    // The command being invoked
+    WeakReference<View>? Source { get; }        // Weak ref to the originating view
+    ICommandBinding? Binding { get; }           // The binding that triggered the command
+    CommandRouting Routing { get; }             // Direct, BubblingUp, DispatchingDown, or Bridged
 }
 ```
+
+`CommandContext` is an immutable record struct. Use `WithCommand()` or `WithRouting()` to create modified copies.
 
 > [!NOTE]
 > `Source` is a `WeakReference<View>` to prevent memory leaks during command propagation.
@@ -410,6 +411,7 @@ Understanding the difference between sources is important during event propagati
 | Property | Description | Changes During Propagation? |
 |----------|-------------|----------------------------|
 | `ICommandContext.Source` | `WeakReference<View>` to the view that first invoked the command | No (constant) |
+| `ICommandContext.Routing` | `CommandRouting` enum: `Direct`, `BubblingUp`, `DispatchingDown`, `Bridged` | **Yes** (changes at each hop) |
 | `ICommandBinding.Source` | View where binding was defined | No (constant) |
 | `sender` (event parameter) | View currently raising the event | **Yes** |
 

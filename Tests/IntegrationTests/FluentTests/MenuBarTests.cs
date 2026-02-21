@@ -885,7 +885,7 @@ public class MenuBarTests : TestsAllDrivers
         c = c.Then (_ =>
                     {
                         var mbi = menuBar.SubViews.ElementAt (0) as MenuBarItem;
-                        MenuItem? mi = mbi.PopoverMenu.Root.SelectedMenuItem;
+                        MenuItem? mi = mbi?.PopoverMenu?.Root?.SelectedMenuItem;
                         Point pos = mi!.HelpView.FrameToScreen ().Location;
                         errorScreenX = pos.X;
                         errorScreenY = pos.Y;

@@ -5,7 +5,7 @@
 The current v2 command system works, but it is hard to reason about and hard to evolve
 safely. Behavior is distributed across `View.Command` default handlers, view-specific
 overrides, keyboard/mouse binding layers, and special-case routing (`CommandsToBubbleUp`,
-`DefaultAcceptView`, `BubbleDown`, boundary bridging). The result is high coupling, subtle
+`DefaultAcceptView`, `DispatchDown`, boundary bridging). The result is high coupling, subtle
 ordering dependencies, and fragile composite-view behavior.
 
 This redesign is clean-slate. v2 is alpha, so compatibility is negotiable. Correctness,
@@ -291,7 +291,7 @@ internal static void TraceRoute (
     string phase);
 ```
 
-Built into `RaiseActivating`, `RaiseAccepting`, `RaiseHandlingHotKey`, `BubbleDown`,
+Built into `RaiseActivating`, `RaiseAccepting`, `RaiseHandlingHotKey`, `DispatchDown`,
 `TryBubbleUp`, and `CommandBridge`. Outputs structured log entries via `Logging.Trace`.
 
 In DEBUG builds, also detects:
@@ -715,9 +715,9 @@ Each phase is independently shippable and testable.
    `RaiseAccepting` (step 4 in the flow), not from view overrides. Views that need
    to skip dispatch return `null`. This keeps the dispatch logic in one place.
 
-2. **Deferred completion is synchronous.** `BubbleDown` is already synchronous and
+2. **Deferred completion is synchronous.** `DispatchDown` is already synchronous and
    returns after the target completes, so the framework fires `RaiseActivated`
-   immediately after `BubbleDown` returns. No event-subscription machinery needed.
+   immediately after `DispatchDown` returns. No event-subscription machinery needed.
 
 3. **`CommandBridge` is one-way.** Remote fires event → owner receives command.
    If bidirectional is needed, create two bridges.
@@ -747,12 +747,12 @@ Each phase is independently shippable and testable.
    originator completes, ensuring correct ordering (CheckBox toggles before Shortcut.Action reads
    the value). The callback is simplified from the old version (no `_activationBubbledUp` flag).
 
-2. **ConsumeDispatch=true does NOT BubbleDown for IsBubblingUp.**
+2. **ConsumeDispatch=true does NOT DispatchDown for IsBubblingUp.**
    The plan's framework behavior said "Dispatch to target with Routing = DispatchingDown"
    unconditionally. In practice, for consume views (OptionSelector, FlagSelector), dispatching
    back to the originating CheckBox would cause double-toggle. The actual behavior:
-   - IsBubblingUp → mark as consumed, NO BubbleDown (OnActivated handles state mutation)
-   - Direct/programmatic → BubbleDown to target (forwards the command)
+   - IsBubblingUp → mark as consumed, NO DispatchDown (OnActivated handles state mutation)
+   - Direct/programmatic → DispatchDown to target (forwards the command)
 
 3. **Selectors dispatch Activate only, not Accept.**
    The plan showed `GetDispatchTarget` returning unconditionally. In practice, Accept must bubble

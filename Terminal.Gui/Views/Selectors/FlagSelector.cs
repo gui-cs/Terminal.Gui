@@ -97,7 +97,7 @@ public class FlagSelector : SelectorBase, IDesignable
         base.OnActivated (ctx);
 
         // Toggle only when the source is a CheckBox (IsBubblingUp path where consume prevented
-        // CheckBox.AdvanceCheckState). For programmatic invocations, BubbleDown already activated
+        // CheckBox.AdvanceCheckState). For programmatic invocations, DispatchDown already activated
         // the focused CheckBox and AdvanceCheckState ran, so no additional toggle is needed.
         if (ctx?.Source?.TryGetTarget (out View? source) != true || source is not CheckBox checkBox)
         {

@@ -179,6 +179,49 @@ public partial class ShortcutTests
         Assert.Equal (1, shortcutActivatingRaised);
         Assert.Equal (1, commandViewActivatingRaised);
     }
+    
+    [Fact]
+    public void CommandView_Command_Activate_Bubbles_To_Shortcut_SuperView ()
+    {
+        // Arrange
+        View? superView = new () { CanFocus = true };
+        superView.CommandsToBubbleUp = [Command.Activate];
+
+        TestCommandView testCommandView = new () { Title = "_Test", CanFocus = false };
+
+        Shortcut shortcut = new () { Key = Key.T, CommandView = testCommandView };
+
+        superView.Add (shortcut);
+
+        var shortcutActivatingRaised = 0;
+        shortcut.Activating += (_, _) => shortcutActivatingRaised++;
+
+        var shortcutActivatedRaised = 0;
+        shortcut.Activated += (_, _) => shortcutActivatedRaised++;
+
+        var commandViewActivatingRaised = 0;
+        testCommandView.Activating += (_, _) => commandViewActivatingRaised++;
+
+        var commandViewActivatedRaised = 0;
+        testCommandView.Activated += (_, _) => commandViewActivatedRaised++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        var superViewActivatedCount = 0;
+        superView.Activated += (_, _) => superViewActivatedCount++;
+
+        // Act - Invoke Command.HotKey directly on CheckBox
+        testCommandView.InvokeCommand (Command.Activate);
+
+        // Assert - Shortcut.Activating should have been raised
+        Assert.Equal (1, commandViewActivatingRaised);
+        Assert.Equal (1, commandViewActivatedRaised);
+        Assert.Equal (1, shortcutActivatingRaised);
+        Assert.Equal (1, shortcutActivatedRaised);
+        Assert.Equal (1, superViewActivatingCount);
+        Assert.Equal (1, superViewActivatedCount);
+    }
 
     [Fact]
     public void CommandView_Command_Accept_Forwards_To_Accepting ()
@@ -575,7 +618,7 @@ public partial class ShortcutTests
         shortcut.Title = "Save";
         shortcut.TargetView = target;
         shortcut.Command = Command.Save;
-        shortcut.Action = () => actionFired ++;
+        shortcut.Action = () => actionFired++;
 
         // Act
         shortcut.InvokeCommand (Command.Accept);
@@ -751,12 +794,67 @@ public partial class ShortcutTests
 
     // Claude - Opus 4.6
     /// <summary>
+    ///     Verifies that cancelling activation (Activating.Handled=true) after a prior dispatch
+    ///     does NOT fire Activated. This guards against stale _lastDispatchOccurred: if the flag
+    ///     is not reset before RaiseActivating, a prior dispatch would cause RaiseActivated to
+    ///     fire even though the activation was cancelled.
+    /// </summary>
+    [Fact]
+    public void Activate_Cancelled_After_Dispatch_Does_Not_Fire_Activated ()
+    {
+        CheckBox cb = new () { Title = "_Test" };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = cb };
+        var activatedCount = 0;
+        shortcut.Activated += (_, _) => activatedCount++;
+
+        // First: normal activation with binding (triggers dispatch, which sets _lastDispatchOccurred)
+        KeyBinding kb = new ([Command.Activate], Key.Space, shortcut);
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (shortcut), kb);
+        shortcut.InvokeCommand (Command.Activate, ctx);
+        int afterFirst = activatedCount;
+
+        // Second: cancel activation via Activating handler
+        shortcut.Activating += (_, args) => args.Handled = true;
+        shortcut.InvokeCommand (Command.Activate, ctx);
+
+        // Activated should NOT have fired again (cancelled)
+        Assert.Equal (afterFirst, activatedCount);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that a programmatic InvokeCommand on Shortcut (no binding, dispatch skipped)
+    ///     does not prevent a subsequent user click from firing Action. Before the fix,
+    ///     _activatedFiredThisCycle would get stuck at true after the programmatic invoke,
+    ///     causing CommandView_Activated to skip RaiseActivated on the next real activation.
+    /// </summary>
+    [Fact]
+    public void Shortcut_Programmatic_Activate_Then_User_Click_Both_Fire_Action ()
+    {
+        var actionCount = 0;
+        CheckBox cb = new () { Title = "_Test" };
+        Shortcut shortcut = new () { Key = Key.T, CommandView = cb, Action = () => actionCount++ };
+
+        // Programmatic invoke (no binding → dispatch skipped, Action fires via OnActivated)
+        shortcut.InvokeCommand (Command.Activate);
+        Assert.Equal (1, actionCount);
+
+        // Simulate user click (with binding → dispatch runs → CheckBox activates → CommandView_Activated fires)
+        KeyBinding kb = new ([Command.Activate], Key.Space, cb);
+        CommandContext ctx = new (Command.Activate, new WeakReference<View> (cb), kb);
+        cb.InvokeCommand (Command.Activate, ctx);
+
+        Assert.Equal (2, actionCount);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
     ///     Verifies correct event ordering for compound views in Shortcut when activation
-    ///     is triggered via BubbleDown (e.g., clicking on Shortcut's HelpView area).
-    ///     The framework dispatches BubbleDown after OnActivating but before Activated.
+    ///     is triggered via DispatchDown (e.g., clicking on Shortcut's HelpView area).
+    ///     The framework dispatches DispatchDown after OnActivating but before Activated.
     ///     Expected order:
     ///     1. Shortcut.Activating (fires from RaiseActivating before framework dispatch)
-    ///     2. CheckBox.Activating (from BubbleDown during framework dispatch, after Activating event)
+    ///     2. CheckBox.Activating (from DispatchDown during framework dispatch, after Activating event)
     ///     3. CheckBox.Activated
     ///     4. Shortcut.Activated (from CommandView_Activated deferred callback)
     /// </summary>
@@ -782,7 +880,7 @@ public partial class ShortcutTests
                                   eventLog.Add ("Shortcut.Activated");
                               };
 
-        // Act - Invoke Activate with a binding source (the Shortcut), which triggers BubbleDown
+        // Act - Invoke Activate with a binding source (the Shortcut), which triggers DispatchDown
         // to the CommandView. This simulates what happens on HotKey press or mouse click on
         // the Shortcut's non-CommandView area (e.g., HelpView or KeyView).
         KeyBinding binding = new ([Command.Activate], Key.T, shortcut);
@@ -790,7 +888,7 @@ public partial class ShortcutTests
         shortcut.InvokeCommand (Command.Activate, ctx);
 
         // Assert - Shortcut.Activating fires first (notification before dispatch),
-        // then BubbleDown fires CommandView events. Shortcut.Activated fires from
+        // then DispatchDown fires CommandView events. Shortcut.Activated fires from
         // CommandView_Activated (subscribed before test handler), so it interleaves
         // with CheckBox.Activated.
         Assert.Equal (4, eventLog.Count);
@@ -815,7 +913,7 @@ public partial class ShortcutTests
     ///     Verifies that when a FlagSelector is used as a Shortcut's CommandView, activating an
     ///     individual checkbox inside the FlagSelector (with a binding whose Source is the inner
     ///     checkbox) causes exactly one ValueChanged and one Shortcut.Activating. Before the
-    ///     IsWithinCommandView fix, the Shortcut would BubbleDown back to the FlagSelector
+    ///     IsWithinCommandView fix, the Shortcut would DispatchDown back to the FlagSelector
     ///     (because Source was the inner checkbox, not the FlagSelector itself), causing duplicate
     ///     activations and multiple ValueChanged events.
     /// </summary>
@@ -849,7 +947,7 @@ public partial class ShortcutTests
         // Act - Invoke Activate on the inner checkbox with a binding that has Source = the
         // checkbox. This simulates a mouse click, which creates a MouseBinding with Source
         // pointing to the clicked view. The binding is key: without it, HandleActivate's
-        // `ctx.Binding is { Source: { } source }` check fails and BubbleDown is never called.
+        // `ctx.Binding is { Source: { } source }` check fails and DispatchDown is never called.
         KeyBinding binding = new ([Command.Activate], Key.Space, firstCheckBox);
         CommandContext ctx = new (Command.Activate, new WeakReference<View> (firstCheckBox), binding);
         firstCheckBox.InvokeCommand (Command.Activate, ctx);

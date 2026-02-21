@@ -278,6 +278,17 @@ public class Shortcut : View, IOrientation, IDesignable
     // (e.g., CheckBox.OnActivated calls AdvanceCheckState).
 
     /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // Reset the deferred-completion flag at the start of each activation cycle.
+        // Without this, a programmatic InvokeCommand (no binding → dispatch skipped) leaves the
+        // flag stuck at true, causing the next CommandView_Activated callback to skip RaiseActivated.
+        _activatedFiredThisCycle = false;
+
+        return base.OnActivating (args);
+    }
+
+    /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
         _activatedFiredThisCycle = true;

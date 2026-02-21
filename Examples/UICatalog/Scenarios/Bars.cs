@@ -371,7 +371,7 @@ public class Bars : Scenario
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
         shortcut4.Accepting += (_, args) => args.Handled = true;
 
-        OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+        OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
         Shortcut schemeShortcut = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
 
         schemeOptionSelector!.ValueChanged += (_, args) =>

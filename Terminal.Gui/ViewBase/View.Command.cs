@@ -251,6 +251,11 @@ public partial class View // Command APIs
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
+        // Reset before RaiseAccepting — early-exit paths (OnAccepting returns true, Accepting
+        // event sets Handled=true) skip TryDispatchToTarget. Without this reset, the flag would
+        // retain its value from a prior invocation, causing spurious completion events.
+        _lastDispatchOccurred = false;
+
         if (RaiseAccepting (ctx) is true)
         {
             // If dispatch consumed the command, the composite view needs completion.
@@ -278,7 +283,7 @@ public partial class View // Command APIs
 
         if (!acceptWillBubble && defaultAcceptView is { } && defaultAcceptView != this && defaultAcceptView != source)
         {
-            BubbleDown (defaultAcceptView, ctx);
+            DispatchDown (defaultAcceptView, ctx);
             redirected = true;
         }
 
@@ -294,7 +299,7 @@ public partial class View // Command APIs
         RaiseAccepted (ctx);
 
         // Report as handled if:
-        // - Accept was redirected to DefaultAcceptView (BubbleDown performed), or
+        // - Accept was redirected to DefaultAcceptView (DispatchDown performed), or
         // - Accept will bubble to ancestor (so DefaultAcceptView redirect was skipped), or
         // - Accept bubbled up from a SubView (the full chain processed the command), or
         // - This view is an IAcceptTarget (e.g. Button) that genuinely handles Accept.
@@ -442,6 +447,11 @@ public partial class View // Command APIs
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
+        // Reset before RaiseActivating — early-exit paths (OnActivating returns true, Activating
+        // event sets Handled=true) skip TryDispatchToTarget. Without this reset, the flag would
+        // retain its value from a prior invocation, causing spurious completion events.
+        _lastDispatchOccurred = false;
+
         if (RaiseActivating (ctx) is true)
         {
             // If dispatch consumed the command, the composite view needs completion.
@@ -454,7 +464,7 @@ public partial class View // Command APIs
         }
 
         // When a SubView's activation bubbles up, the default behavior is notification:
-        // Activating fires (above), but Activated and side effects (SetFocus) are skipped.
+        // Activating fires (above), but side effects (SetFocus) are skipped.
         // The originating view completes its own activation. Returning false tells TryBubbleUp
         // "not consumed" so the originator continues.
         //
@@ -463,6 +473,21 @@ public partial class View // Command APIs
         // dispatch target's Activated event to fire their own RaiseActivated after the originator completes.
         if (ctx?.Routing == CommandRouting.BubblingUp)
         {
+            // For plain views (no dispatch target), fire Activated to complete the two-phase notification
+            // (matching DefaultAcceptHandler's behavior for bubble-up). This enables SuperViews to observe
+            // activation of their SubViews via the Activated event.
+            //
+            // Relay-dispatch views (Shortcut, ConsumeDispatch=false) skip this — they fire Activated via
+            // the deferred CommandView_Activated callback AFTER the originator has completed its activation
+            // (e.g., CheckBox has toggled state). This ensures Action sees the updated state.
+            //
+            // Consume-dispatch views (Selectors, ConsumeDispatch=true) already completed above
+            // (RaiseActivating returned true at line 445).
+            if (!_lastDispatchOccurred && GetDispatchTarget (ctx) is null)
+            {
+                RaiseActivated (ctx);
+            }
+
             return false;
         }
 
@@ -766,7 +791,7 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Attempts to dispatch the command to the <see cref="GetDispatchTarget"/> view.
-    ///     For <see cref="ConsumeDispatch"/>=false (relay), performs a <see cref="BubbleDown"/>.
+    ///     For <see cref="ConsumeDispatch"/>=false (relay), performs a <see cref="DispatchDown"/>.
     ///     For <see cref="ConsumeDispatch"/>=true (consume), marks the command as handled without dispatching.
     /// </summary>
     /// <returns><see langword="true"/> if the command was consumed (ConsumeDispatch=true and dispatch conditions met).</returns>
@@ -803,11 +828,11 @@ public partial class View // Command APIs
             // Consume pattern (OptionSelector, FlagSelector).
             // When a SubView's command bubbles up (BubblingUp), consume without dispatching.
             // The composite handles state mutation in OnActivated/OnAccepted.
-            // For programmatic/direct invocations, forward to the target via BubbleDown
-            // so the target gets activated (matching the old BubbleDown-in-OnActivating behavior).
+            // For programmatic/direct invocations, forward to the target via DispatchDown
+            // so the target gets activated.
             if (ctx?.Routing != CommandRouting.BubblingUp)
             {
-                BubbleDown (target, ctx);
+                DispatchDown (target, ctx);
             }
 
             _lastDispatchOccurred = true;
@@ -820,7 +845,7 @@ public partial class View // Command APIs
         {
             return false;
         }
-        BubbleDown (target, ctx);
+        DispatchDown (target, ctx);
         _lastDispatchOccurred = true;
 
         return false;
@@ -893,7 +918,7 @@ public partial class View // Command APIs
     /// <returns>
     ///     The result of invoking the command on the target.
     /// </returns>
-    protected bool? BubbleDown (View target, ICommandContext? ctx)
+    protected bool? DispatchDown (View target, ICommandContext? ctx)
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 

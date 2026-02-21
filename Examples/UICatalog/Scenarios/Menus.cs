@@ -84,7 +84,7 @@ public class Menus : Scenario
                                             _eventLog.SetViewToLog (menuItem.CommandView);
                                             menuItem.Action += () => _eventLog.Log ($"{menuItem.ToIdentifyingString ()} Action!");
                                         }
-                                        _eventLog.SetViewToLog (menuHostView.ContextMenu);
+                                        _eventLog.SetViewToLog (menuHostView?.ContextMenu);
                                     }
                                 };
 
@@ -190,7 +190,7 @@ public class Menus : Scenario
             };
 
             // The source of truth is our status CB; any time it changes, update the menu item
-            var enableOverwriteMenuItemCb = MenuBar.GetMenuItemsWith (mi => mi.Id == "Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
+            var enableOverwriteMenuItemCb = MenuBar?.GetMenuItemsWith (mi => mi.Id == "Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
 
             enableOverwriteStatusCb.ValueChanged += (_, _) => { enableOverwriteMenuItemCb?.Value = enableOverwriteStatusCb.Value; };
 

@@ -129,7 +129,7 @@ See the [Command Deep Dive](command.md).
 - [View.InvokeCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Invokes a command
 - [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
 - <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp> - Opt-in list of commands that bubble from SubViews to this View
-- [View.BubbleDown](~/api/Terminal.Gui.ViewBase.View.yml) - Dispatches a command downward to a SubView with bubbling suppressed (inverse of `TryBubbleToSuperView`)
+- [View.DispatchDown](~/api/Terminal.Gui.ViewBase.View.yml) - Dispatches a command downward to a SubView with bubbling suppressed (inverse of `TryBubbleToSuperView`)
 - <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> - The SubView that receives `Command.Accept` when no other SubView handles it
 
 ### Input Handling

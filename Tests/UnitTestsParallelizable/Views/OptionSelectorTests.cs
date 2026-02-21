@@ -495,7 +495,7 @@ public class OptionSelectorTests
 
         Assert.Equal (0, optionSelector.Value);
 
-        // Activate should BubbleDown to the focused CheckBox, triggering Cycle
+        // Activate should DispatchDown to the focused CheckBox, triggering Cycle
         optionSelector.InvokeCommand (Command.Activate);
 
         Assert.Equal (1, optionSelector.Value);

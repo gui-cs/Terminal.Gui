@@ -402,4 +402,626 @@ public class MenuTests
 
         bar.Dispose ();
     }
+
+    #region CommandView Activation Propagation to Menu and SuperView
+
+    // ────────────────────────────────────────────────────────────────────
+    //  Tests that various forms of activating a CommandView inside a MenuItem
+    //  cause Activating to be raised on the Menu and on the Menu's SuperView.
+    //
+    //  Matrix:
+    //    Activation methods:  Direct, Mouse, Space, Enter (Accept), HotKey
+    //    CommandView types:   Default (View), CheckBox, OptionSelector, FlagSelector
+    //
+    //  OptionSelector and FlagSelector use ConsumeDispatch=true — when an inner
+    //  CheckBox fires Activate with a binding, the selector consumes it. Direct
+    //  invocations on the MenuItem itself still propagate normally.
+    // ────────────────────────────────────────────────────────────────────
+
+    #region Direct Activation (InvokeCommand on MenuItem)
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Direct_Activate_DefaultCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Direct_Activate_CheckBoxCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Direct_Activate_OptionSelectorCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        OptionSelector selector = new () { Labels = ["Opt1", "Opt2"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = selector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Direct InvokeCommand on MenuItem (no binding → relay dispatch skipped)
+        // MenuItem's own Activating fires and bubbles to Menu and SuperView
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Direct_Activate_FlagSelectorCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Direct InvokeCommand on MenuItem (no binding → relay dispatch skipped)
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    #endregion Direct Activation
+
+    #region Mouse Activation (InjectMouse through Application pipeline)
+
+    // These tests use app.InjectMouse / app.InjectSequence to simulate real mouse clicks
+    // through the full Application mouse dispatch pipeline. This is more realistic than
+    // crafting CommandContext objects manually.
+    //
+    // For OptionSelector/FlagSelector CommandViews, SelectorBase clears all mouse bindings
+    // (the selector's inner CheckBoxes handle their own mouse). Clicking an inner CheckBox
+    // causes the selector to consume the activation via ConsumeDispatch=true.
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Mouse_Activate_DefaultCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        ((View)runnable).Add (superView);
+        app.Begin (runnable);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Click on the MenuItem via full Application mouse pipeline
+        Point screenPos = menuItem.FrameToScreen ().Location;
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (screenPos));
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        ((View)runnable).Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Mouse_Activate_CheckBoxCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        ((View)runnable).Add (superView);
+        app.Begin (runnable);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        Point screenPos = menuItem.FrameToScreen ().Location;
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (screenPos));
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        ((View)runnable).Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     OptionSelector uses ConsumeDispatch=true. When an inner CheckBox is clicked via mouse,
+    ///     the selector consumes the activation. The consumption prevents Activating from bubbling
+    ///     to Menu or SuperView. This documents the current ConsumeDispatch behavior.
+    /// </summary>
+    [Fact]
+    public void Mouse_Activate_OptionSelectorCommandView_InnerCheckBox_Consumed ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        OptionSelector selector = new () { Labels = ["Opt1", "Opt2"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = selector };
+        menu.Add (menuItem);
+
+        ((View)runnable).Add (superView);
+        app.Begin (runnable);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Click on an inner CheckBox of the OptionSelector
+        CheckBox innerCb = selector.SubViews.OfType<CheckBox> ().First ();
+        Point screenPos = innerCb.FrameToScreen ().Location;
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (screenPos));
+
+        // OptionSelector consumes dispatch — Activating does NOT propagate to Menu/SuperView
+        Assert.Equal (0, menuActivatingCount);
+        Assert.Equal (0, superViewActivatingCount);
+
+        ((View)runnable).Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     FlagSelector uses ConsumeDispatch=true. Same as OptionSelector: inner CheckBox
+    ///     activation is consumed and does not bubble Activating to Menu or SuperView.
+    /// </summary>
+    [Fact]
+    public void Mouse_Activate_FlagSelectorCommandView_InnerCheckBox_Consumed ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        flagSelector.Value = null;
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        ((View)runnable).Add (superView);
+        app.Begin (runnable);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Click on an inner CheckBox of the FlagSelector
+        CheckBox innerCb = flagSelector.SubViews.OfType<CheckBox> ().First ();
+        Point screenPos = innerCb.FrameToScreen ().Location;
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (screenPos));
+
+        // FlagSelector consumes dispatch — Activating does NOT propagate to Menu/SuperView
+        Assert.Equal (0, menuActivatingCount);
+        Assert.Equal (0, superViewActivatingCount);
+
+        ((View)runnable).Dispose ();
+    }
+
+    #endregion Mouse Activation
+
+    #region Space Key Activation
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Space_Activate_DefaultCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Space is bound to Command.Activate in View.SetupKeyboard
+        menuItem.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Space_Activate_CheckBoxCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menuItem.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Space_Activate_OptionSelectorCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        OptionSelector selector = new () { Labels = ["Opt1", "Opt2"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = selector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // Space key on the MenuItem
+        menuItem.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Space_Activate_FlagSelectorCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menuItem.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    #endregion Space Key Activation
+
+    #region Enter Key Activation (Accept path)
+
+    // Enter is bound to Command.Accept, not Command.Activate. These tests verify that
+    // the Accept path (Accepting event) bubbles from MenuItem through Menu to SuperView.
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Enter_Accept_DefaultCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuAcceptingCount = 0;
+        menu.Accepting += (_, _) => menuAcceptingCount++;
+
+        var superViewAcceptingCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCount++;
+
+        menuItem.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, menuAcceptingCount);
+        Assert.Equal (1, superViewAcceptingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Enter_Accept_CheckBoxCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        var menuAcceptingCount = 0;
+        menu.Accepting += (_, _) => menuAcceptingCount++;
+
+        var superViewAcceptingCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCount++;
+
+        menuItem.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, menuAcceptingCount);
+        Assert.Equal (1, superViewAcceptingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Enter_Accept_OptionSelectorCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        OptionSelector selector = new () { Labels = ["Opt1", "Opt2"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = selector };
+        menu.Add (menuItem);
+
+        var menuAcceptingCount = 0;
+        menu.Accepting += (_, _) => menuAcceptingCount++;
+
+        var superViewAcceptingCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCount++;
+
+        menuItem.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, menuAcceptingCount);
+        Assert.Equal (1, superViewAcceptingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Enter_Accept_FlagSelectorCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        var menuAcceptingCount = 0;
+        menu.Accepting += (_, _) => menuAcceptingCount++;
+
+        var superViewAcceptingCount = 0;
+        superView.Accepting += (_, _) => superViewAcceptingCount++;
+
+        menuItem.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, menuAcceptingCount);
+        Assert.Equal (1, superViewAcceptingCount);
+
+        superView.Dispose ();
+    }
+
+    #endregion Enter Key Activation
+
+    #region HotKey Activation
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_Activate_DefaultCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        MenuItem menuItem = new () { Title = "Test" };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        // HotKey handler in View calls SetFocus then invokes Command.Activate
+        menuItem.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_Activate_CheckBoxCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menuItem.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_Activate_OptionSelectorCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        OptionSelector selector = new () { Labels = ["Opt1", "Opt2"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = selector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menuItem.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_Activate_FlagSelectorCommandView_Raises_Activating_On_Menu_And_SuperView ()
+    {
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        var menuActivatingCount = 0;
+        menu.Activating += (_, _) => menuActivatingCount++;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menuItem.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, menuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
+
+        superView.Dispose ();
+    }
+
+    #endregion HotKey Activation
+
+    #endregion CommandView Activation Propagation to Menu and SuperView
 }

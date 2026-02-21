@@ -91,7 +91,7 @@ public partial class ShortcutTests
     ///     Verifies that pressing the Shortcut's Key (not the CommandView's HotKey) correctly
     ///     bubbles down to the CommandView, toggling a CheckBox. This tests the fix where
     ///     DefaultHotKeyHandler passes the binding through to InvokeCommand(Command.Activate)
-    ///     so Shortcut.OnActivating can detect a user-initiated action and call BubbleDown.
+    ///     so Shortcut.OnActivating can detect a user-initiated action and call DispatchDown.
     /// </summary>
     [Theory]
     [CombinatorialData]
@@ -261,7 +261,7 @@ public partial class ShortcutTests
         // Act - Press Space while Shortcut has focus
         app.Keyboard.RaiseKeyDownEvent (Key.Space);
 
-        // Assert - CheckBox should toggle (BubbleDown from Shortcut to CommandView)
+        // Assert - CheckBox should toggle (DispatchDown from Shortcut to CommandView)
         Assert.Equal (CheckState.Checked, checkBox.Value);
         Assert.Equal (1, shortcutActivatingCount);
         Assert.Equal (1, checkBoxActivatingCount);
