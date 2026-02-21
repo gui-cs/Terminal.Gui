@@ -38,8 +38,6 @@ public class OptionSelector : SelectorBase, IDesignable
             return null;
         }
 
-        //Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
-
         if (ctx.Source?.TryGetTarget (out View? source) != true || source is not CheckBox cb)
         {
             return Focused;
@@ -62,7 +60,6 @@ public class OptionSelector : SelectorBase, IDesignable
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
         base.OnActivated (ctx);
 
         // Apply the value change. Runs for ALL activation paths uniformly.
@@ -75,8 +72,6 @@ public class OptionSelector : SelectorBase, IDesignable
     /// </summary>
     private void ApplyActivation (ICommandContext? ctx)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
-
         // TODO: When OptionSelector is a CommandView inside a MenuItem/Shortcut and activation
         // arrives via DispatchingDown from the Shortcut, ctx.Source is the OptionSelector itself
         // (not the clicked CheckBox). This causes the fallback to Cycle() instead of selecting
@@ -122,8 +117,6 @@ public class OptionSelector : SelectorBase, IDesignable
 
     private void Cycle ()
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()}");
-
         int valueIndex = Values.IndexOf (v => v == Value);
 
         Value = valueIndex == Values?.Count - 1 ? Values! [0] : Values! [valueIndex + 1];
