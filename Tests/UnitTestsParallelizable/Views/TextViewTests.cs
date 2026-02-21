@@ -2734,12 +2734,43 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.True (previousView.HasFocus);
     }
 
-    [Fact]
-    public void Mouse_Click_On_Text_With_Tabs_Sets_Cursor_At_Correct_Position ()
+    [Theory]
+    [InlineData (1, 0, 0, 0, 0, 0)]
+    [InlineData (4, 0, 1, 0, 4, 0)]
+    [InlineData (5, 0, 1, 0, 4, 0)]
+    [InlineData (8, 0, 2, 0, 8, 0)]
+    [InlineData (9, 0, 3, 0, 9, 0)]
+    [InlineData (10, 0, 3, 0, 9, 0)]
+    [InlineData (13, 0, 4, 0, 13, 0)]
+    [InlineData (14, 0, 5, 0, 14, 0)]
+    [InlineData (15, 0, 5, 0, 14, 0)]
+    [InlineData (18, 0, 6, 0, 18, 0)]
+    [InlineData (19, 0, 7, 0, 19, 0)]
+    [InlineData (20, 0, 7, 0, 19, 0)]
+    [InlineData (1, 1, 0, 1, 0, 1)]
+    [InlineData (4, 1, 1, 1, 4, 1)]
+    [InlineData (5, 1, 2, 1, 5, 1)]
+    [InlineData (6, 1, 2, 1, 5, 1)]
+    [InlineData (9, 1, 3, 1, 9, 1)]
+    [InlineData (10, 1, 3, 1, 9, 1)]
+    [InlineData (13, 1, 4, 1, 13, 1)]
+    [InlineData (14, 1, 5, 1, 14, 1)]
+    [InlineData (15, 1, 6, 1, 15, 1)]
+    [InlineData (16, 1, 6, 1, 15, 1)]
+    [InlineData (19, 1, 7, 1, 19, 1)]
+    [InlineData (20, 1, 7, 1, 19, 1)]
+    [InlineData (23, 1, 8, 1, 23, 1)]
+    [InlineData (24, 1, 8, 1, 23, 1)]
+    public void Mouse_Click_On_Text_With_Tabs_Sets_Cursor_At_Correct_Position (int x,
+                                                                               int y,
+                                                                               int expectedColumn,
+                                                                               int expectedRow,
+                                                                               int expectedCursorX,
+                                                                               int expectedCursorY)
     {
         using IApplication app = Application.Create ().Init ();
         TextView textView = CreateTextView ();
-        textView.Text = "\t\t1\t2\t3";
+        textView.Text = "\t\t1\t2\t3\n\t4\t\t56\t\t";
         Runnable runnable = new ();
         runnable.Add (textView);
 
@@ -2747,67 +2778,12 @@ public class TextViewTests (ITestOutputHelper output)
 
         Assert.Equal (4, textView.TabWidth);
 
-        textView.SetRelativeLayout (new Size (100, 100));
-
         // Click at position "0" stay in first
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (0, textView.CurrentColumn);
-        Assert.Equal (0, textView.Cursor.Position!.Value.X);
-
-        // Click at position "4" in first tab
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (1, textView.CurrentColumn);
-        Assert.Equal (4, textView.Cursor.Position!.Value.X);
-
-        // Click at position "5" stay in first tab
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (5, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (1, textView.CurrentColumn);
-        Assert.Equal (4, textView.Cursor.Position!.Value.X);
-
-        // Click at position "8" in second tab
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (8, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (2, textView.CurrentColumn);
-        Assert.Equal (8, textView.Cursor.Position!.Value.X);
-
-        // Click at position "9" in "1"
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (9, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (3, textView.CurrentColumn);
-        Assert.Equal (9, textView.Cursor.Position!.Value.X);
-
-        // Click at position "10" stay in "1"
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (10, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (3, textView.CurrentColumn);
-        Assert.Equal (9, textView.Cursor.Position!.Value.X);
-
-        // Click at position "13" in third tab
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (13, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (4, textView.CurrentColumn);
-        Assert.Equal (13, textView.Cursor.Position!.Value.X);
-
-        // Click at position "14" in "2"
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (14, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (5, textView.CurrentColumn);
-        Assert.Equal (14, textView.Cursor.Position!.Value.X);
-
-        // Click at position "14" stay in "2"
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (15, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (5, textView.CurrentColumn);
-        Assert.Equal (14, textView.Cursor.Position!.Value.X);
-
-        // Click at position "18" in fourth tab
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (18, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (6, textView.CurrentColumn);
-        Assert.Equal (18, textView.Cursor.Position!.Value.X);
-
-        // Click at position "19" in "3"
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (19, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (7, textView.CurrentColumn);
-        Assert.Equal (19, textView.Cursor.Position!.Value.X);
-
-        // Click at position "20" stay in "3" having reached the end of the columns
-        Assert.True (textView.NewMouseEvent (new Mouse { Position = new Point (20, 0), Flags = MouseFlags.LeftButtonClicked }));
-        Assert.Equal (7, textView.CurrentColumn);
-        Assert.Equal (19, textView.Cursor.Position!.Value.X);
+        textView.NewMouseEvent (new Mouse { Position = new Point (x, y), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (expectedColumn, textView.CurrentColumn);
+        Assert.Equal (expectedRow, textView.CurrentRow);
+        Assert.Equal (expectedCursorX, textView.Cursor.Position!.Value.X);
+        Assert.Equal (expectedCursorY, textView.Cursor.Position!.Value.Y);
     }
 
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
