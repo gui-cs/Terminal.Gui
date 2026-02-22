@@ -15,7 +15,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Constructor_Defaults ()
     {
-        var link = new Link ();
+        Link link = new();
 
         Assert.Equal (Link.DEFAULT_URL, link.Url);
         Assert.Equal (Link.DEFAULT_URL, link.Text);
@@ -27,7 +27,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Text_Set_Updates_Title ()
     {
-        var link = new Link { Text = "Click here" };
+        Link link = new () { Text = "Click here" };
 
         Assert.Equal ("Click here", link.Text);
         Assert.Equal ("Click here", link.Title);
@@ -36,7 +36,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Text_Returns_Url_When_Title_Is_Empty ()
     {
-        var link = new Link { Url = "https://github.com" };
+        Link link = new () { Url = "https://github.com" };
 
         Assert.Equal ("https://github.com", link.Text);
     }
@@ -44,7 +44,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Url_Set_Validates_Uri ()
     {
-        var link = new Link ();
+        Link link = new();
 
         Assert.Throws<UriFormatException> (() => link.Url = "not a valid url");
         Assert.Throws<UriFormatException> (() => link.Url = "");
@@ -53,7 +53,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Url_Set_Fires_UrlChanged_Event ()
     {
-        var link = new Link ();
+        Link link = new();
         var eventFired = false;
 
         link.UrlChanged += (s, e) => eventFired = true;
@@ -70,7 +70,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
 
-        var link = new Link { App = app, Url = "https://github.com" };
+        Link link = new () { App = app, Url = "https://github.com" };
         
         var copied = link.Copy ();
 
@@ -85,7 +85,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
 
-        var link = new Link
+        Link link = new ()
         {
             App = app,
             Url = "https://github.com/gui-cs/Terminal.Gui",
@@ -118,7 +118,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
 
-        var link = new Link
+        Link link = new ()
         {
             App = app,
             Text = "Not a link"
@@ -142,9 +142,9 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Link_With_HotKey_Passes_To_Next_View ()
     {
-        var superView = new View { CanFocus = true };
-        var link = new Link { Text = "_Link", CanFocus = false };
-        var nextView = new View { CanFocus = true };
+        View superView = new () { CanFocus = true };
+        Link link = new () { Text = "_Link", CanFocus = false };
+        View nextView = new () { CanFocus = true };
         
         superView.Add (link, nextView);
         superView.BeginInit ();
@@ -169,7 +169,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
 
-        var link1 = new Link
+        Link link1 = new ()
         {
             App = app,
             X = 0,
@@ -178,7 +178,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Text = "GitHub"
         };
 
-        var link2 = new Link
+        Link link2 = new ()
         {
             App = app,
             X = 0,
@@ -217,7 +217,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
 
-        var link = new Link
+        Link link = new ()
         {
             App = app,
             Url = "https://example.com",
@@ -251,7 +251,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
 
-        var link = new Link
+        Link link = new ()
         {
             App = app,
             Url = "https://github.com",
@@ -283,8 +283,8 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void IDesignable_EnableForDesign_Sets_Default_Text ()
     {
-        var link = new Link ();
-        var designable = link as IDesignable;
+        Link link = new();
+        IDesignable designable = link as IDesignable;
 
         var result = designable.EnableForDesign ();
 
@@ -297,9 +297,9 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Link_LeftButtonReleased_InvokesHotKey_OnNextView ()
     {
-        var superView = new View { CanFocus = true, Height = 1, Width = 15 };
-        var link = new Link { X = 0, HotKey = Key.L.WithAlt, CanFocus = false };
-        var nextView = new View { CanFocus = true, X = 10, Width = 4, Height = 1 };
+        View superView = new () { CanFocus = true, Height = 1, Width = 15 };
+        Link link = new () { X = 0, HotKey = Key.L.WithAlt, CanFocus = false };
+        View nextView = new () { CanFocus = true, X = 10, Width = 4, Height = 1 };
         
         superView.Add (link, nextView);
         superView.BeginInit ();
@@ -324,7 +324,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
 
-        var link = new Link
+        Link link = new ()
         {
             App = app,
             X = 0,
