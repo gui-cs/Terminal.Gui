@@ -1196,5 +1196,95 @@ public class MenuBarTests
         Assert.False (menuBar.IsOpen ());
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void QuitKey_With_PopoverMenu_Visible_Fully_Deactivates ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        MenuItem menuItem = new () { Id = "menuItem", Title = "Menu_Item" };
+        Menu menu = new ([menuItem]) { Id = "menu" };
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_MenuBarItem" };
+        PopoverMenu menuBarItemPopover = new ();
+        menuBarItem.PopoverMenu = menuBarItemPopover;
+        menuBarItemPopover.Root = menu;
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.Add (menuBarItem);
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Open the menu so PopoverMenu is visible
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBarItem.PopoverMenu!.Visible);
+
+        // Act — single Escape (QuitKey) should fully deactivate everything
+        app.InjectKey (Application.QuitKey);
+
+        // Assert — MenuBar should be completely inactive after ONE press
+        Assert.False (menuBarItem.PopoverMenu!.Visible);
+        Assert.False (menuBar.IsOpen ());
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.HasFocus);
+        Assert.False (menuBar.CanFocus);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Activate_Fully_Deactivates_MenuBar ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        var actionCount = 0;
+        MenuItem menuItem = new () { Id = "menuItem", Title = "Menu_Item", Action = () => actionCount++ };
+        Menu menu = new ([menuItem]) { Id = "menu" };
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_MenuBarItem" };
+        PopoverMenu menuBarItemPopover = new ();
+        menuBarItem.PopoverMenu = menuBarItemPopover;
+        menuBarItemPopover.Root = menu;
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.Add (menuBarItem);
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Open the menu
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBarItem.PopoverMenu!.Visible);
+
+        // Act — activate MenuItem via its HotKey ('I' for "Menu_Item")
+        app.InjectKey (Key.I);
+
+        // Assert — Action should have fired
+        Assert.Equal (1, actionCount);
+
+        // Assert — MenuBar should be completely inactive after MenuItem activation
+        Assert.False (menuBarItem.PopoverMenu!.Visible);
+        Assert.False (menuBar.IsOpen ());
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.HasFocus);
+        Assert.False (menuBar.CanFocus);
+    }
+
     #endregion
 }
