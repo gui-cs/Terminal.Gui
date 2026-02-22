@@ -57,10 +57,8 @@ public class FileDialog : Dialog, IDesignable
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem? fileSystem)
     {
-        HorizontalScrollBar.AutoShow = false;
-        HorizontalScrollBar.Visible = false;
-        VerticalScrollBar.AutoShow = false;
-        VerticalScrollBar.Visible = false;
+        // Scrollbars are disabled by default (VisibilityMode.Manual and Visible = false)
+        // No need to explicitly set them
 
         _fileSystem = fileSystem;
         Style = new FileDialogStyle (fileSystem);
@@ -152,7 +150,7 @@ public class FileDialog : Dialog, IDesignable
 
         _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (1), FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
-        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
         _tableView.Activating += OnTableViewActivating;
         Style.TableStyle = _tableView.Style;
 
