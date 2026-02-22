@@ -2,6 +2,9 @@
 
 namespace Terminal.Gui.Views;
 
+/// <summary>
+/// Search matcher that uses the name only (not file path, icon etc)
+/// </summary>
 internal class FileSystemCollectionNavigationMatcher : DefaultCollectionNavigatorMatcher
 {
 
