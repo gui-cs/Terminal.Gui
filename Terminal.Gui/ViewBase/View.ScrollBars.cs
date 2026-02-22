@@ -38,7 +38,9 @@ public partial class View
     ///     <para>
     ///         See the Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
-    ///     </para>    /// </remarks>
+    ///     </para>
+    ///     ///
+    /// </remarks>
     public ScrollBar VerticalScrollBar => _verticalScrollBar.Value;
 
     /// <summary>
@@ -171,6 +173,47 @@ public partial class View
                                             Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom - 1
                                         };
                                     };
+    }
+
+    /// <summary>
+    ///     Synchronizes the ScrollBar states with the ViewportSettings flags.
+    ///     Called when ViewportSettings changes to enable/disable built-in scrollbars.
+    /// </summary>
+    private void SyncScrollBarsToSettings (ViewportSettingsFlags oldFlags, ViewportSettingsFlags newFlags)
+    {
+        if (this is Adornment)
+        {
+            return;
+        }
+
+        SyncOneScrollBar (oldFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
+                          newFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
+                          Orientation.Vertical);
+
+        SyncOneScrollBar (oldFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
+                          newFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
+                          Orientation.Horizontal);
+    }
+
+    private void SyncOneScrollBar (bool hadFlag, bool hasFlag, Orientation orientation)
+    {
+        if (!hadFlag && hasFlag)
+        {
+            // Enabling: access triggers lazy creation, then set Auto mode
+            ScrollBar scrollBar = orientation == Orientation.Vertical ? VerticalScrollBar : HorizontalScrollBar;
+            scrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
+        }
+        else if (hadFlag && !hasFlag)
+        {
+            // Disabling: only if the scrollbar was ever created
+            Lazy<ScrollBar> lazy = orientation == Orientation.Vertical ? _verticalScrollBar : _horizontalScrollBar;
+
+            if (!lazy.IsValueCreated)
+            {
+                return;
+            }
+            lazy.Value.VisibilityMode = ScrollBarVisibilityMode.None;
+        }
     }
 
     /// <summary>

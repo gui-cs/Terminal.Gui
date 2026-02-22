@@ -298,6 +298,34 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         view.Dispose ();
     }
 
+    [Fact]
+    public void MouseHoldRepeat_Changing_In_SubViews_Works_Correctly ()
+    {
+        // Arrange
+        View view = new ()
+        {
+            Width = 10,
+            Height = 10,
+            MouseHoldRepeat = MouseFlags.LeftButtonPressed
+        };
+
+        Exception? exception = Record.Exception (() => new View { MouseHoldRepeat = view.MouseHoldRepeat }); // Inherit from parent
+        Assert.Null (exception);
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.None)]
+    [InlineData (MouseFlags.PositionReport)]
+    [InlineData (MouseFlags.Button4Pressed)]
+    public void MouseHoldRepeat_Throws_On_Invalid_Flags (MouseFlags mouseFlags)
+    {
+        // Arrange
+        View view = new ();
+
+        // Act & Assert - Setting invalid flags should throw
+        Assert.Throws<ArgumentException> (() => view.MouseHoldRepeat = mouseFlags);
+    }
+
     #region Input Injection Tests (Application Level)
 
     [Theory]
