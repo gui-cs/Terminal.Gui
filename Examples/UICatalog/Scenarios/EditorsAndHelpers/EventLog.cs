@@ -34,8 +34,7 @@ public class EventLog : ListView
 
         Initialized += EventLog_Initialized;
 
-        HorizontalScrollBar.AutoShow = true;
-        VerticalScrollBar.AutoShow = true;
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         AddCommand (Command.DeleteAll,
                     () =>

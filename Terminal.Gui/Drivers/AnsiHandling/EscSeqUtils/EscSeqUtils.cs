@@ -732,6 +732,19 @@ public static class EscSeqUtils
         // InterpolatedStringHandler is composed in stack, skipping the string allocation.
         builder.Append ($"{CSI}48;2;{r};{g};{b}m");
 
+    /// <summary>
+    ///     ESC[39m - Resets the foreground color to the terminal's default.
+    /// </summary>
+    public static void CSI_AppendResetForegroundColor (StringBuilder builder) =>
+        builder.Append ($"{CSI}39m");
+
+    /// <summary>
+    ///     ESC[49m - Resets the background color to the terminal's default. This allows the terminal's
+    ///     native background (including any transparency or acrylic effects) to show through.
+    /// </summary>
+    public static void CSI_AppendResetBackgroundColor (StringBuilder builder) =>
+        builder.Append ($"{CSI}49m");
+
     #endregion Colors
 
     #region Text Styles

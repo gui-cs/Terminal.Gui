@@ -1323,10 +1323,10 @@ Item 6",
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var lv = new ListView { Width = 10, Height = 3 };
-        lv.VerticalScrollBar.AutoShow = true;
+        ListView lv = new () { Width = 10, Height = 3 };
+        lv.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
-        var top = new Runnable ();
+        Runnable top = new ();
         top.Add (lv);
         app.Begin (top);
 

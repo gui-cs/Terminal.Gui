@@ -866,6 +866,30 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (11, tf.SelectedLength);
     }
 
+    [Fact]
+    public void Mouse_Right_Click_Open_ContextMenuAndKeepTextSelected ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World", Width = 20, Height = 1 };
+        tf.App = app;
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Select all text
+        tf.SelectAll ();
+        Assert.Equal ("Hello World", tf.SelectedText);
+
+        // Right click
+        Mouse ev = new () { Position = new Point (5, 0), Flags = MouseFlags.RightButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Should open context menu and keep text selected
+        Assert.True (tf.ContextMenu?.Visible);
+        Assert.Equal (11, tf.SelectedLength);
+    }
+
     // Claude - Opus 4.5
     [Fact]
     public void Text_Polymorphism_Works ()

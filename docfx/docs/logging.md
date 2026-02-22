@@ -234,7 +234,7 @@ Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` na
 using Terminal.Gui.Tracing;
 
 Trace.CommandEnabled = true;   // Command routing
-Trace.MouseEnabled = true;     // Mouse events  
+Trace.MouseEnabled = true;     // Mouse events
 Trace.KeyboardEnabled = true;  // Keyboard events
 ```
 

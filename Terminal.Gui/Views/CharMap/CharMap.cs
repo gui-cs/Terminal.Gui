@@ -73,8 +73,8 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // Initial content size; height will be corrected by RebuildVisibleRows()
         SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, HEADER_HEIGHT + _rowHeight));
 
-        // Set up the horizontal scrollbar. Turn off AutoShow since we do it manually.
-        HorizontalScrollBar.AutoShow = false;
+        // Set up the horizontal scrollbar with manual visibility control.
+        HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
         HorizontalScrollBar.Increment = COLUMN_WIDTH;
 
         // This prevents scrolling past the last column
@@ -89,7 +89,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
 
         // We want the horizontal scrollbar to only show when needed.
-        // We can't use ScrollBar.AutoShow because we are using custom ContentSize
+        // We can't use ScrollBarVisibilityMode.Auto because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
         ViewportChanged += (_, _) =>
                            {
@@ -97,9 +97,8 @@ public class CharMap : View, IDesignable, IValue<Rune>
                                UpdateCursor ();
                            };
 
-        // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
-        VerticalScrollBar.AutoShow = true;
-        VerticalScrollBar.Visible = false;
+        // Set up the vertical scrollbar with auto-show behavior.
+        ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
 
@@ -156,19 +155,21 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
                 UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (cp);
 
-                if (cat == ShowUnicodeCategory.Value)
+                if (cat != ShowUnicodeCategory.Value)
                 {
-                    anyVisible = true;
-
-                    break;
+                    continue;
                 }
+                anyVisible = true;
+
+                break;
             }
 
-            if (anyValid && (!ShowUnicodeCategory.HasValue ? anyValid : anyVisible))
+            if (!anyValid || (ShowUnicodeCategory.HasValue && !anyVisible))
             {
-                _rowStartToVisibleIndex [start] = _visibleRowStarts.Count;
-                _visibleRowStarts.Add (start);
+                continue;
             }
+            _rowStartToVisibleIndex [start] = _visibleRowStarts.Count;
+            _visibleRowStarts.Add (start);
         }
 
         // Update content size to match visible rows
@@ -244,7 +245,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
     public Rune Value { get => new (SelectedCodePoint); set => SelectedCodePoint = value.Value; }
 
     /// <inheritdoc/>
-    object? IValue.GetValue () => new Rune (SelectedCodePoint);
+    object IValue.GetValue () => new Rune (SelectedCodePoint);
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
@@ -300,23 +301,21 @@ public class CharMap : View, IDesignable, IValue<Rune>
         }
     }
 
-    private UnicodeCategory? _showUnicodeCategory;
-
     /// <summary>
     ///     When set, only glyphs whose UnicodeCategory matches the value are rendered. If <see langword="null"/> (default),
     ///     all glyphs are rendered.
     /// </summary>
     public UnicodeCategory? ShowUnicodeCategory
     {
-        get => _showUnicodeCategory;
+        get;
         set
         {
-            if (_showUnicodeCategory == value)
+            if (field == value)
             {
                 return;
             }
 
-            _showUnicodeCategory = value;
+            field = value;
             RebuildVisibleRows ();
 
             // Ensure selection is on a visible row
@@ -404,7 +403,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         var decResponse = string.Empty;
         var getCodePointError = string.Empty;
 
-        Dialog? waitIndicator = new () { Title = Strings.charMapCPInfoDlgTitle, Buttons = [new Button { Text = Strings.btnCancel }] };
+        Dialog waitIndicator = new () { Title = Strings.charMapCPInfoDlgTitle, Buttons = [new Button { Text = Strings.btnCancel }] };
 
         Label errorLabel = new () { Text = UcdApiClient.BaseUrl, X = 0, Y = 0, TextAlignment = Alignment.Center };
 
@@ -511,7 +510,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
         label = new Label { Text = "Category: ", X = 0, Y = Pos.Bottom (label) };
         dlg.Add (label);
         Span<char> utf16 = stackalloc char [2];
-        int charCount = rune.EncodeToUtf16 (utf16);
 
         // Get the bidi class for the first code unit
         // For most bidi characters, the first code unit is sufficient
@@ -627,29 +625,30 @@ public class CharMap : View, IDesignable, IValue<Rune>
         int firstColumnX = RowLabelWidth - Viewport.X;
 
         // Header
-        var x = 0;
+        int x;
 
         for (var hexDigit = 0; hexDigit < 16; hexDigit++)
         {
             x = firstColumnX + hexDigit * COLUMN_WIDTH;
 
-            if (x > RowLabelWidth - 2)
+            if (x <= RowLabelWidth - 2)
             {
-                Move (x, 0);
-                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
-                AddStr (" ");
-
-                // Swap Active/Focus so the selected column is highlighted
-                if (hexDigit == selectedCol)
-
-                {
-                    SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
-                }
-
-                AddStr ($"{hexDigit:x}");
-                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
-                AddStr (" ");
+                continue;
             }
+            Move (x, 0);
+            SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+            AddStr (" ");
+
+            // Swap Active/Focus so the selected column is highlighted
+            if (hexDigit == selectedCol)
+
+            {
+                SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
+            }
+
+            AddStr ($"{hexDigit:x}");
+            SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+            AddStr (" ");
         }
 
         // Start at 1 because Header.
@@ -795,7 +794,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
                     break;
 
-                // Format character that affects the layout of text or the operation of text processes, but is not normally rendered. 
+                // Format character that affects the layout of text or the operation of text processes, but is not normally rendered.
                 // These report width of 0 and don't render on their own.
                 case UnicodeCategory.Format:
                     SetAttributeForRole (VisualRole.Highlight);
@@ -806,7 +805,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
                 // Nonspacing character that indicates modifications of a base character.
                 case UnicodeCategory.NonSpacingMark:
-                // Spacing character that indicates modifications of a base character and affects the width of the glyph for that base character. 
+                // Spacing character that indicates modifications of a base character and affects the width of the glyph for that base character.
                 case UnicodeCategory.SpacingCombiningMark:
                 // Enclosing mark character, which is a nonspacing combining character that surrounds all previous characters up to and including a base character.
                 case UnicodeCategory.EnclosingMark:
@@ -845,11 +844,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
                     }
                     else
                     {
-                        throw new InvalidOperationException ($"The Rune \"{
-                            grapheme
-                        }\" (U+{
-                            Rune.GetRuneAt (grapheme, 0).Value
-                            :x6}) has zero width and no special-case UnicodeCategory logic applies.");
+                        throw new InvalidOperationException ($"The Rune \"{grapheme}\" (U+{Rune.GetRuneAt (grapheme, 0).Value:x6}) has zero width and no special-case UnicodeCategory logic applies.");
                     }
 
                     break;
@@ -909,15 +904,17 @@ public class CharMap : View, IDesignable, IValue<Rune>
             return;
         }
 
-        if (cp != SelectedCodePoint)
+        if (cp == SelectedCodePoint)
         {
-            if (!HasFocus && CanFocus)
-            {
-                SetFocus ();
-            }
-
-            SelectedCodePoint = cp;
+            return;
         }
+
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
+        SelectedCodePoint = cp;
     }
 
     /// <inheritdoc/>
@@ -965,7 +962,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // This demonstrates how to create an ephemeral Popover; one that exists
         // ony as long as the popover is visible.
         // Note, for ephemeral Popovers, hotkeys are not supported.
-        PopoverMenu? contextMenu = new ([
+        PopoverMenu contextMenu = new ([
                                             new MenuItem (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
                                             new MenuItem (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
                                         ]);
@@ -974,7 +971,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // and the context menu is disposed when it is closed.
         App!.Popovers?.Register (contextMenu);
 
-        contextMenu?.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
+        contextMenu.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 
         return true;
     }
