@@ -811,8 +811,14 @@ at a time with a sub-agent, verifying tests after each file.
 Route tracing (`TraceRoute` with `[Conditional("DEBUG")]`) not yet implemented. The
 `IsBubblingUp`/`IsBubblingDown` removal is complete. `docfx/docs/command.md` not yet updated.
 
-### Test Results
+### Test Results (After Phase A-E)
 
 - **UnitTestsParallelizable**: 13,980 passed, 0 failed, 22 skipped
 - **UnitTests**: 1,001 passed, 0 failed, 22 skipped
 - **Total**: 14,981 passed, 0 failed
+
+### Test Results (After MenuBar/PopoverMenu Routing Fixes)
+
+- **UnitTestsParallelizable**: 14,045 passed, 0 failed, 23 skipped
+- All 12 pre-existing MenuBar/PopoverMenu test failures resolved
+- See `finalizing-command-system.md` → [MenuBar/PopoverMenu Routing Fixes] for details

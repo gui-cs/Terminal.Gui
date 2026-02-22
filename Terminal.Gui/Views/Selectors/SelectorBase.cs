@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
@@ -150,8 +151,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return true;
         }
 
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({args})");
-
         // Per spec: Enter key should Activate AND Accept for both OptionSelector and FlagSelector.
         // Enter only triggers Command.Accept (View's default key binding), so invoke Activate here
         // before continuing with Accept processing. Also handle direct programmatic Accept invocations
@@ -221,8 +220,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 return;
             }
 
-            Logging.Debug ($"{this.ToIdentifyingString ()} ({field}->{value})");
-
+            Tracing.Trace.Command (this, "Value", $"{previousValue}->{value}");
             field = value;
 
             UpdateChecked ();
@@ -241,8 +239,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     /// <returns><see langword="true"/> if the change was cancelled.</returns>
     protected bool RaiseValueChanging (int? currentValue, int? newValue)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({currentValue}->{newValue})");
-
         ValueChangingEventArgs<int?> args = new (currentValue, newValue);
         ValueChanging?.Invoke (this, args);
 

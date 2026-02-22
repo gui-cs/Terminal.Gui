@@ -106,6 +106,13 @@ public class MenuBarItem : MenuItem, IDesignable
             return true;
         }
 
+        // Bridged commands come FROM the PopoverMenu (e.g., a MenuItem was activated inside it).
+        // This is a notification — do not toggle the PopoverMenu open/closed.
+        if (args.Context?.Routing == CommandRouting.Bridged)
+        {
+            return false;
+        }
+
         if (PopoverMenuOpen)
         {
             PopoverMenuOpen = false;
@@ -227,7 +234,13 @@ public class MenuBarItem : MenuItem, IDesignable
 
                                                   if (field)
                                                   {
-                                                      PopoverMenu?.MakeVisible (new Point (FrameToScreen ().X, FrameToScreen ().Bottom));
+                                                      // MakeVisible requires the Application's popover infrastructure.
+                                                      // Guard against calls when App is not available (e.g., in design mode
+                                                      // or unit tests without Application.Init).
+                                                      if (PopoverMenu is { } && IsInitialized)
+                                                      {
+                                                          PopoverMenu.MakeVisible (new Point (FrameToScreen ().X, FrameToScreen ().Bottom));
+                                                      }
                                                   }
                                                   else
                                                   {

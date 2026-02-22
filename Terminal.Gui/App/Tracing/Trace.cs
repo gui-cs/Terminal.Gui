@@ -148,6 +148,24 @@ public static class Trace
                                      (ctx?.Command ?? Input.Command.NotBound, ctx?.Routing ?? CommandRouting.Direct)));
     }
 
+    /// <summary>
+    ///     Traces a command routing step from a context.
+    /// </summary>
+    /// <param name="view">The view where routing is occurring.</param>
+    /// <param name="phase">The phase of routing (e.g., "Entry", "Exit", "Handler", "Event", "Routing").</param>
+    /// <param name="message">Optional additional context.</param>
+    /// <param name="method">Automatically captured caller method name.</param>
+    [Conditional ("DEBUG")]
+    public static void Command (View view, string phase, string? message = null, [CallerMemberName] string method = "")
+    {
+        if (!CommandEnabled)
+        {
+            return;
+        }
+
+        Backend.Log (new TraceEntry (TraceCategory.Command, view.ToIdentifyingString (), phase, method, message, DateTime.UtcNow, null));
+    }
+
     #endregion
 
     #region Mouse Tracing

@@ -28,22 +28,20 @@ public class CommandBridge : IDisposable
 {
     private readonly WeakReference<View> _owner;
     private readonly WeakReference<View> _remote;
-    private readonly Command [] _commands;
     private bool _disposed;
 
     private CommandBridge (View owner, View remote, Command [] commands)
     {
         _owner = new WeakReference<View> (owner);
         _remote = new WeakReference<View> (remote);
-        _commands = commands;
 
         // Subscribe to the remote view's completion events for bridged commands.
-        if (_commands.Contains (Command.Accept))
+        if (commands.Contains (Command.Accept))
         {
             remote.Accepted += OnRemoteAccepted;
         }
 
-        if (_commands.Contains (Command.Activate))
+        if (commands.Contains (Command.Activate))
         {
             remote.Activated += OnRemoteActivated;
         }
@@ -73,11 +71,12 @@ public class CommandBridge : IDisposable
 
         _disposed = true;
 
-        if (_remote.TryGetTarget (out View? remote))
+        if (!_remote.TryGetTarget (out View? remote))
         {
-            remote.Accepted -= OnRemoteAccepted;
-            remote.Activated -= OnRemoteActivated;
+            return;
         }
+        remote.Accepted -= OnRemoteAccepted;
+        remote.Activated -= OnRemoteActivated;
     }
 
     private void OnRemoteAccepted (object? sender, CommandEventArgs e)
@@ -87,7 +86,7 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Logging.Debug ($"{_owner.ToIdentifyingString ()} ({e})");
+        Tracing.Trace.Command (owner, e.Context, "Bridge", $"{_remote.ToIdentifyingString ()}->({_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {
@@ -107,7 +106,7 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Logging.Debug ($"{_owner.ToIdentifyingString ()} ({e})");
+        Tracing.Trace.Command (owner, e.Value, "Bridge", $"{_remote.ToIdentifyingString ()}->({_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {

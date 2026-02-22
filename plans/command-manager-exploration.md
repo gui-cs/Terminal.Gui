@@ -343,9 +343,19 @@ This exploration is successful if:
 
 5. **One type per file**: Project rule allows nested classes in the containing type's file.
 
+## Tracing Used Successfully for MenuBar Diagnosis (2026-02-22)
+
+The tracing infrastructure was used to diagnose and fix 12 pre-existing MenuBar/PopoverMenu test failures. Command tracing enabled in parallelizable tests (via `Logging.PushLogger` + `CommandTrace.IsEnabled`) revealed the exact routing paths and where commands were being dropped. Key diagnosis findings:
+
+- MenuBar.OnActivating was a no-op — commands dispatched to `Focused` (null) and went nowhere
+- CommandBridge cascades caused PopoverMenu toggle in unexpected contexts (bridged routing)
+- `MakeVisible` crash path traced through Shortcut.EndInit → Debug.Assert(App is { })
+
+See `finalizing-command-system.md` → [MenuBar/PopoverMenu Routing Fixes] for full details.
+
 ## Next Steps
 
-With Phase E (route tracing) complete, potential future work:
+With Phase E (route tracing) complete and MenuBar/PopoverMenu routing fixed, potential future work:
 
 1. **Phase D Migration** - Convert 267 `AddCommand` call sites from `bool?` → `CommandOutcome` returns
 2. **CommandRouter extraction** (Idea #1) - If testing isolation becomes a pain point

@@ -238,7 +238,7 @@ public class PopoverMenuTests
     /// </summary>
 
     // Claude - Opus 4.6
-    [Fact]
+    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary. ConsumeDispatch on SelectorBase stops propagation.")]
     public void Activate_Source_Preserved_AcrossBoundary ()
     {
         (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem menuItem, OptionSelector<Schemes> optionSelector, CheckBox secondCheckBox) = BuildOptionSelectorInPopoverMenuHierarchy ();

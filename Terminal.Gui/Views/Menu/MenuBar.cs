@@ -110,6 +110,28 @@ public class MenuBar : Menu, IDesignable
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
 
+        // When a SubView's activation bubbles up, don't re-dispatch — let normal bubbling proceed.
+        if (args.Context?.Routing == CommandRouting.BubblingUp)
+        {
+            return false;
+        }
+
+        if (Active)
+        {
+            // Already active — toggle off
+            Active = false;
+
+            return true;
+        }
+
+        // Not yet active — activate and show the first MenuBarItem with a PopoverMenu.
+        if (SubViews.OfType<MenuBarItem> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is { } first)
+        {
+            Active = true;
+            ShowItem (first);
+
+            return true;
+        }
 
         return false;
     }
