@@ -158,4 +158,65 @@ public class FileSystemCollectionNavigationMatcherTests
 
         treeView.Dispose ();
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void TreeView_LetterBasedNavigation_CustomAspectGetter_SearchUsesAspectNotToString ()
+    {
+        // Arrange - Create objects where AspectGetter returns different values than ToString
+        var item1 = new TestItem { Id = 1, Name = "Zebra" }; // ToString = "1", AspectGetter = "Zebra"
+        var item2 = new TestItem { Id = 2, Name = "Apple" }; // ToString = "2", AspectGetter = "Apple"
+        var item3 = new TestItem { Id = 3, Name = "Banana" }; // ToString = "3", AspectGetter = "Banana"
+
+        var treeView = new TreeView<TestItem> { Width = 20, Height = 10 };
+        treeView.TreeBuilder = new DelegateTreeBuilder<TestItem> (_ => null);
+        
+        // AspectGetter returns Name property
+        treeView.AspectGetter = item => item.Name;
+        
+        // Use default matcher (not FileSystemCollectionNavigationMatcher)
+        // This should use ToString() on the collection items passed to it
+        // Since TreeView now passes the actual objects and uses AspectGetter to build the collection,
+        // the matcher will search based on the aspect (Name), not ToString (Id)
+
+        treeView.AddObject (item1); // Zebra
+        treeView.AddObject (item2); // Apple
+        treeView.AddObject (item3); // Banana
+
+        treeView.BeginInit ();
+        treeView.EndInit ();
+        Application.Begin (treeView);
+
+        // Act & Assert
+        // Select Zebra (item1)
+        treeView.SelectedObject = item1;
+        Assert.Equal (item1, treeView.SelectedObject);
+
+        // Press 'a' - should navigate to Apple (based on Name via AspectGetter), NOT fail
+        // If it was using ToString(), 'a' wouldn't match anything (IDs are 1, 2, 3)
+        Application.RaiseKeyDownEvent (Key.A);
+        Assert.Equal (item2, treeView.SelectedObject); // Should go to Apple
+
+        // Press 'b' - should navigate to Banana
+        Application.RaiseKeyDownEvent (Key.B);
+        Assert.Equal (item3, treeView.SelectedObject); // Should go to Banana
+
+        // Press 'z' - should cycle to Zebra
+        Application.RaiseKeyDownEvent (Key.Z);
+        Assert.Equal (item1, treeView.SelectedObject); // Should go to Zebra
+
+        // Verify that pressing '1', '2', '3' (the ToString values) does NOT work
+        Application.RaiseKeyDownEvent (Key.D1);
+        // Should stay on Zebra since no items start with '1' in their Name
+        Assert.Equal (item1, treeView.SelectedObject);
+
+        treeView.Dispose ();
+    }
+
+    private class TestItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public override string ToString () => Id.ToString ();
+    }
 }
