@@ -849,13 +849,17 @@ public class TableEditor : Scenario
                                                           { "FileSize", GetHumanReadableFileSize }
                                                       });
 
-        HashSet<string> seen = new ();
-
+        bool isWindows = OperatingSystem.IsWindows ();
         try
         {
-            foreach (string path in Environment.GetLogicalDrives ())
+            foreach (DriveInfo di in DriveInfo.GetDrives ())
             {
-                tree.AddObject (new DirectoryInfo (path));
+                if (isWindows && di is { DriveType: DriveType.Network, IsReady: false })
+                {
+                    continue;
+                }
+
+                tree.AddObject (new DirectoryInfo (di.Name));
             }
         }
         catch (Exception e)
