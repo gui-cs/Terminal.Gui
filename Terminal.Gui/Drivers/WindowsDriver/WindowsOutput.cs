@@ -307,9 +307,11 @@ internal partial class WindowsOutput : OutputBase, IOutput
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
 
-        WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (!IsLegacyConsole ? _outputHandle : _screenBuffer);
-        short newCols = Math.Min (cols, maxWinSize.X);
-        short newRows = Math.Min (rows, maxWinSize.Y);
+        // Use the requested size directly. GetLargestConsoleWindowSize can underreport
+        // in modern terminals with non-default font sizes, causing the buffer to be
+        // clamped smaller than the actual window (visible as a gap at the bottom/right).
+        short newCols = cols;
+        short newRows = rows;
         csbi.dwSize = new (newCols, Math.Max (newRows, (short)1));
         csbi.srWindow = new (0, 0, newCols, newRows);
         csbi.dwMaximumWindowSize = new (newCols, newRows);
@@ -520,11 +522,13 @@ internal partial class WindowsOutput : OutputBase, IOutput
             // buffer will be wrong size, recreate it to ensure it doesn't result in
             // differing active and back buffer sizes (which causes flickering of window size)
             Size? bufSize = null;
+            int retries = 0;
 
-            while (bufSize != newSize)
+            while (bufSize != newSize && retries < 5)
             {
                 _lockResize = true;
                 bufSize = ResizeBuffer (newSize);
+                retries++;
             }
 
             _lockResize = false;
