@@ -502,9 +502,10 @@ public class ScrollBarTests (ITestOutputHelper output)
             Height = height + 2,
         };
 
-        var scrollBar = new ScrollBar
+        ScrollBar scrollBar = new ()
         {
-            AutoShow = false,
+            VisibilityMode = ScrollBarVisibilityMode.Manual,
+            Visible = true,
             Orientation = orientation,
         };
 

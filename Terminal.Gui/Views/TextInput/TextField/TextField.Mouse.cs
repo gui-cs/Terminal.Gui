@@ -96,7 +96,6 @@ public partial class TextField
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            SetInsertionPointFromMouse (ev);
             ShowContextMenu (false);
         }
 

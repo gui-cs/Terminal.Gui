@@ -193,7 +193,8 @@ public partial class View // Mouse APIs
     ///         Valid values are:
     ///         <list type="bullet">
     ///             <item><see langword="null"/> - Disabled (default)</item>
-    ///             <item><see cref="MouseFlags.LeftButtonReleased"/> - Commands invoked on Press during hold</item>
+    ///             <item><see cref="MouseFlags.LeftButtonPressed"/> - Commands invoked on Press during hold</item>
+    ///             <item><see cref="MouseFlags.LeftButtonReleased"/> - Commands invoked on Released during hold</item>
     ///             <item><see cref="MouseFlags.LeftButtonClicked"/> - Commands invoked on Click after hold</item>
     ///             <item>Other xxxReleased or xxxClicked flags for other mouse buttons</item>
     ///         </list>
@@ -212,6 +213,7 @@ public partial class View // Mouse APIs
             // Validate that only null, Pressed, or Clicked flags are allowed
             if (value.HasValue)
             {
+                bool isPressed = (value.Value & (MouseFlags.LeftButtonPressed | MouseFlags.MiddleButtonPressed | MouseFlags.RightButtonPressed)) != 0;
                 bool isReleased = (value.Value & (MouseFlags.LeftButtonReleased | MouseFlags.MiddleButtonReleased | MouseFlags.RightButtonReleased)) != 0;
 
                 bool isClicked = (value.Value
@@ -226,9 +228,9 @@ public partial class View // Mouse APIs
                                      | MouseFlags.RightButtonTripleClicked))
                                  != 0;
 
-                if (!isReleased && !isClicked)
+                if (!isReleased && !isPressed && !isClicked)
                 {
-                    throw new ArgumentException (@"MouseHoldRepeat only accepts null, Pressed, or Clicked mouse flags.", nameof (value));
+                    throw new ArgumentException (@"MouseHoldRepeat only accepts null, Pressed, Released or Clicked mouse flags.", nameof (value));
                 }
             }
 

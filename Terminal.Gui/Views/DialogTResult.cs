@@ -148,8 +148,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
         // HACK: Ensure scrollbars are shown as needed before calculating sizes
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
         UpdateSizes ();
         base.OnSubViewLayout (args);
     }

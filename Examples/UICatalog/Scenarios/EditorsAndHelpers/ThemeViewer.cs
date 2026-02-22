@@ -2,7 +2,7 @@
 
 namespace UICatalog.Scenarios;
 
-public class ThemeViewer : FrameView
+public sealed class ThemeViewer : FrameView
 {
     public ThemeViewer ()
     {
@@ -15,8 +15,7 @@ public class ThemeViewer : FrameView
         Width = Dim.Auto ();
         Title = $"{ThemeManager.Theme}";
 
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         SubViewsLaidOut += (sender, _) =>
                            {
@@ -32,8 +31,7 @@ public class ThemeViewer : FrameView
         AddCommand (Command.PageUp, () => ScrollVertical (-SubViews.OfType<SchemeViewer> ().First ().Frame.Height));
         AddCommand (Command.PageDown, () => ScrollVertical (SubViews.OfType<SchemeViewer> ().First ().Frame.Height));
 
-        AddCommand (
-                    Command.Start,
+        AddCommand (Command.Start,
                     () =>
                     {
                         Viewport = Viewport with { Y = 0 };
@@ -41,8 +39,7 @@ public class ThemeViewer : FrameView
                         return true;
                     });
 
-        AddCommand (
-                    Command.End,
+        AddCommand (Command.End,
                     () =>
                     {
                         Viewport = Viewport with { Y = GetContentSize ().Height };
@@ -77,19 +74,15 @@ public class ThemeViewer : FrameView
 
         foreach (KeyValuePair<string, Scheme?> kvp in SchemeManager.GetSchemesForCurrentTheme ())
         {
-            var schemeViewer = new SchemeViewer
-            {
-                Id = $"schemeViewer for {kvp.Key}",
-                SchemeName = kvp.Key
-            };
+            var schemeViewer = new SchemeViewer { Id = $"schemeViewer for {kvp.Key}", SchemeName = kvp.Key };
 
-            if (prevSchemeViewer is not null)
+            if (prevSchemeViewer is { })
             {
                 schemeViewer.Y = Pos.Bottom (prevSchemeViewer);
             }
 
             prevSchemeViewer = schemeViewer;
-            base.Add (schemeViewer);
+            Add (schemeViewer);
         }
 
         ThemeManager.ThemeChanged += OnThemeManagerOnThemeChanged;
@@ -100,13 +93,13 @@ public class ThemeViewer : FrameView
     {
         base.OnFocusedChanged (previousFocused, focused);
 
-        if (focused is not null)
+        if (focused is { })
         {
             SchemeName = focused.Title;
         }
     }
 
-    private void OnThemeManagerOnThemeChanged (object? _, EventArgs<string> args) { Title = args.Value!; }
+    private void OnThemeManagerOnThemeChanged (object? _, EventArgs<string> args) => Title = args.Value;
 
     protected override void Dispose (bool disposing)
     {
