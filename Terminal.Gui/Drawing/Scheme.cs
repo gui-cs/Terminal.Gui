@@ -307,7 +307,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Focus =>
                                    GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                    {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
+                                       Foreground = ResolveNoneToBlack (GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
                                        Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
                                    },
 
@@ -575,4 +575,11 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                + $"Active: {Active}; HotActive: {HotActive}; Highlight: {Highlight}; Editable: {Editable}; "
                + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}";
     }
+
+    /// <summary>
+    ///     When inverting colors for derived roles (e.g., Focus = inverted Normal), a None background
+    ///     would become a None foreground, making text invisible. This method substitutes Black instead.
+    /// </summary>
+    private static Color ResolveNoneToBlack (Color color) =>
+        color == Color.None ? new Color (0, 0, 0) : color;
 }
