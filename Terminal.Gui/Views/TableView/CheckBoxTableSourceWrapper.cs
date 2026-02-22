@@ -1,5 +1,5 @@
 #nullable disable
-﻿
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -28,7 +28,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         Wrapping = toWrap;
         this.tableView = tableView;
 
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
 
         tableView.Activating += TableView_Activating;
         tableView.CellToggled += TableView_CellToggled;
@@ -156,7 +156,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     private void TableView_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+        if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
         {
             return;
         }
@@ -198,5 +198,4 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             tableView.SetNeedsDraw ();
         }
     }
-#nullable restore
 }

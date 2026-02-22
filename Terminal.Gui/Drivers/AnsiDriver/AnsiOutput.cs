@@ -62,7 +62,7 @@ public class AnsiOutput : OutputBase, IOutput
             // Check if console is available (not redirected)
             if (Console.IsOutputRedirected || Console.IsInputRedirected)
             {
-                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
                 return;
             }
@@ -77,7 +77,7 @@ public class AnsiOutput : OutputBase, IOutput
                     _windowsVTOutput.Dispose ();
                     _windowsVTOutput = null;
 
-                    Logging.Warning ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Logging.Information ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }
@@ -90,7 +90,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 if (fdCopy == -1)
                 {
-                    Logging.Warning ("Console output stream is not writable. Running in degraded mode.");
+                    Logging.Information ("Console output stream is not writable. Running in degraded mode.");
 
                     return;
                 }
@@ -266,23 +266,6 @@ public class AnsiOutput : OutputBase, IOutput
         Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
 
         return true;
-    }
-
-    /// <inheritdoc/>
-    protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
-    {
-        if (Force16Colors)
-        {
-            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
-        }
-        else
-        {
-            EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-
-            EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
-            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-        }
     }
 
     /// <summary>

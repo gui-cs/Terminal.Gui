@@ -13,80 +13,38 @@ public class MouseTester : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Runnable runnable = new ()
-        {
-            Id = "runnable"
-        };
+        using Runnable runnable = new () { Id = "runnable" };
 
         MenuBar menuBar = new ();
         menuBar.Add (new MenuBarItem (Strings.menuFile, [new MenuItem { Title = Strings.cmdQuit, Action = () => app.RequestStop () }]));
 
-        FlagSelector<DemoMouseFlags> mouseFlagsFilter = new ()
-        {
-            AssignHotKeys = true,
-            Value = DemoMouseFlags.All & ~DemoMouseFlags.PositionReport
-        };
+        FlagSelector<DemoMouseFlags> mouseFlagsFilter = new () { AssignHotKeys = true, Value = DemoMouseFlags.All & ~DemoMouseFlags.PositionReport };
 
-        menuBar.Add (
-                     new MenuBarItem (
-                                      "_Filter",
-                                      [
-                                          new MenuItem
-                                          {
-                                              CommandView = mouseFlagsFilter
-                                          }
-                                      ]
-                                     ),
-                     new MenuBarItem (runnable, Command.DeleteAll, "_Clear Logs")
-                    );
+        menuBar.Add (new MenuBarItem ("_Filter", [new MenuItem { CommandView = mouseFlagsFilter }]),
+                     new MenuBarItem (runnable, Command.DeleteAll, "_Clear Logs"));
         runnable.Add (menuBar);
 
-        View lastDriverEvent = new ()
-        {
-            Height = 1,
-            Width = Dim.Auto (),
-            Y = Pos.Bottom (menuBar),
-            Text = "Last Driver Event: "
-        };
+        View lastDriverEvent = new () { Height = 1, Width = Dim.Auto (), Y = Pos.Bottom (menuBar), Text = "Last Driver Event: " };
 
         runnable.Add (lastDriverEvent);
 
-        View lastAppEvent = new ()
-        {
-            Height = 1,
-            Width = Dim.Auto (),
-            Y = Pos.Bottom (lastDriverEvent),
-            Text = "Last App Event: "
-        };
+        View lastAppEvent = new () { Height = 1, Width = Dim.Auto (), Y = Pos.Bottom (lastDriverEvent), Text = "Last App Event: " };
 
         runnable.Add (lastAppEvent);
 
-        View lastViewEvent = new ()
-        {
-            Height = 1,
-            Width = Dim.Auto (),
-            Y = Pos.Bottom (lastAppEvent),
-            Text = "Last View Event: "
-        };
+        View lastViewEvent = new () { Height = 1, Width = Dim.Auto (), Y = Pos.Bottom (lastAppEvent), Text = "Last View Event: " };
 
         runnable.Add (lastViewEvent);
 
-
         FlagSelector<MouseState> mouseHighlightStates = new ()
         {
-            BorderStyle = LineStyle.Dotted,
-            Title = "_Highlight States",
-            Y = Pos.Bottom (lastViewEvent),
-            Width = 20
+            BorderStyle = LineStyle.Dotted, Title = "_Highlight States", Y = Pos.Bottom (lastViewEvent), Width = 20
         };
         runnable.Add (mouseHighlightStates);
 
         CheckBox cbRepeatOnHold = new ()
         {
-            X = Pos.Right(mouseHighlightStates) + 1,
-            Y = Pos.Top (mouseHighlightStates),
-            BorderStyle = LineStyle.Dotted,
-            Title = "_Repeat On Hold"
+            X = Pos.Right (mouseHighlightStates) + 1, Y = Pos.Top (mouseHighlightStates), BorderStyle = LineStyle.Dotted, Title = "_Repeat On Hold"
         };
 
         runnable.Add (cbRepeatOnHold);
@@ -139,15 +97,18 @@ public class MouseTester : Scenario
         runnable.Add (demo);
 
         mouseHighlightStates.Value = demo.MouseHighlightStates;
+
         mouseHighlightStates.ValueChanged += (sender, _) =>
                                              {
                                                  if (sender is FlagSelector<MouseState> optionSelector)
                                                  {
                                                      demo.MouseHighlightStates = optionSelector.Value!.Value;
+
                                                      foreach (View subview in demo.SubViews)
                                                      {
                                                          subview.MouseHighlightStates = optionSelector.Value!.Value;
                                                      }
+
                                                      foreach (View subview in demo.Padding.SubViews)
                                                      {
                                                          subview.MouseHighlightStates = optionSelector.Value!.Value;
@@ -155,20 +116,20 @@ public class MouseTester : Scenario
                                                  }
                                              };
 
-        cbRepeatOnHold.CheckedStateChanging += (_, _) =>
-                                               {
-                                                   demo.MouseHoldRepeat = demo.MouseHoldRepeat is null ? MouseFlags.LeftButtonPressed : null;
+        cbRepeatOnHold.ValueChanging += (_, _) =>
+                                        {
+                                            demo.MouseHoldRepeat = demo.MouseHoldRepeat is null ? MouseFlags.LeftButtonPressed : null;
 
-                                                   foreach (View subview in demo.SubViews)
-                                                   {
-                                                       subview.MouseHoldRepeat = demo.MouseHoldRepeat;
-                                                   }
+                                            foreach (View subview in demo.SubViews)
+                                            {
+                                                subview.MouseHoldRepeat = demo.MouseHoldRepeat;
+                                            }
 
-                                                   foreach (View subview in demo.Padding.SubViews)
-                                                   {
-                                                       subview.MouseHoldRepeat = demo.MouseHoldRepeat;
-                                                   }
-                                               };
+                                            foreach (View subview in demo.Padding.SubViews)
+                                            {
+                                                subview.MouseHoldRepeat = demo.MouseHoldRepeat;
+                                            }
+                                        };
 
         Label label = new ()
         {
@@ -207,12 +168,7 @@ public class MouseTester : Scenario
                                       }
                                   };
 
-        label = new ()
-        {
-            Text = "_App Events:",
-            X = Pos.Right (driverLog) + 1,
-            Y = Pos.Bottom (demo)
-        };
+        label = new Label { Text = "_App Events:", X = Pos.Right (driverLog) + 1, Y = Pos.Bottom (demo) };
 
         ObservableCollection<string> appLogList = new ();
 
@@ -242,12 +198,7 @@ public class MouseTester : Scenario
                                     }
                                 };
 
-        label = new ()
-        {
-            Text = "_View Events:",
-            X = Pos.Right (appLog) + 1,
-            Y = Pos.Top (label)
-        };
+        label = new Label { Text = "_View Events:", X = Pos.Right (appLog) + 1, Y = Pos.Top (label) };
         ObservableCollection<string> viewLogList = [];
 
         ListView viewLog = new ()
@@ -301,12 +252,7 @@ public class MouseTester : Scenario
                                }
                            };
 
-        label = new ()
-        {
-            Text = "_Commands:",
-            X = Pos.Right (viewLog) + 1,
-            Y = Pos.Top (label)
-        };
+        label = new Label { Text = "_Commands:", X = Pos.Right (viewLog) + 1, Y = Pos.Top (label) };
         ObservableCollection<string> commandLogList = [];
 
         ListView commandLog = new ()
@@ -322,56 +268,63 @@ public class MouseTester : Scenario
 
         demo.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         demo.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
 
+        demo.CommandNotBound += (_, args) =>
+                                {
+                                    commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
+                                    commandLog.MoveEnd ();
+                                    args.Handled = true;
+                                };
+
         demoInPadding.Activating += (_, args) =>
                                     {
-                                        commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                        commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                         commandLog.MoveEnd ();
                                         args.Handled = true;
                                     };
 
         demoInPadding.Accepting += (_, args) =>
                                    {
-                                       commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                       commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                        commandLog.MoveEnd ();
                                        args.Handled = true;
                                    };
 
         sub1.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         sub1.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
 
         sub2.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         sub2.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source.ToIdentifyingString()}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
@@ -396,7 +349,7 @@ public class MouseTester : Scenario
 
         return;
 
-        void DemoPaddingOnInitialized (object? o, EventArgs eventArgs) { demo.Padding!.Thickness = demo.Padding.Thickness with { Top = 5 }; }
+        void DemoPaddingOnInitialized (object? o, EventArgs eventArgs) => demo.Padding!.Thickness = demo.Padding.Thickness with { Top = 5 };
     }
 
     public class MouseEventDemoView : View
@@ -408,6 +361,12 @@ public class MouseTester : Scenario
 
             MouseLeave += (_, _) => { Text = "Leave"; };
             MouseEnter += (_, _) => { Text = "Enter"; };
+
+            // Bind mouse events to commands that will illustrate command handling
+            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed, Command.Down);
+            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Up);
+            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Accept);
+            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonDoubleClicked, Command.Open);
         }
 
         /// <inheritdoc/>
@@ -418,11 +377,11 @@ public class MouseTester : Scenario
             TextAlignment = Alignment.Center;
             VerticalTextAlignment = Alignment.Center;
 
-            Padding!.Thickness = new (1, 1, 1, 1);
-            Padding!.SetScheme (new (new Attribute (Color.DarkGray)));
+            Padding!.Thickness = new Thickness (1, 1, 1, 1);
+            Padding!.SetScheme (new Scheme (new Attribute (Color.DarkGray)));
             Padding.Id = $"{Id}.Padding";
 
-            Border!.Thickness = new (1);
+            Border!.Thickness = new Thickness (1);
             Border.LineStyle = LineStyle.Rounded;
             Border.Id = $"{Id}.Border";
             base.EndInit ();
@@ -446,6 +405,7 @@ public class MouseTester : Scenario
                     currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
 
                     return true;
+
                 default:
                     return base.OnGettingAttributeForRole (in role, ref currentAttribute);
             }

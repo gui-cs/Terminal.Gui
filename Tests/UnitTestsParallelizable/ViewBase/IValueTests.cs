@@ -209,4 +209,218 @@ public class IValueTests
 
         Assert.Null (view.Value);
     }
+
+    // Tests for non-generic IValue interface
+
+    [Fact]
+    public void GetValue_ReturnsBoxedValue_ForInt ()
+    {
+        TestIntValueView view = new ();
+        view.Value = 42;
+
+        IValue nonGeneric = view;
+        object? result = nonGeneric.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<int> (result);
+        Assert.Equal (42, result);
+    }
+
+    [Fact]
+    public void GetValue_ReturnsNull_WhenValueIsNull ()
+    {
+        TestIntValueView view = new ();
+        view.Value = null;
+
+        IValue nonGeneric = view;
+        object? result = nonGeneric.GetValue ();
+
+        Assert.Null (result);
+    }
+
+    [Fact]
+    public void GetValue_ReturnsBoxedValue_ForString ()
+    {
+        TestStringValueView view = new ();
+        view.Value = "Hello World";
+
+        IValue nonGeneric = view;
+        object? result = nonGeneric.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<string> (result);
+        Assert.Equal ("Hello World", result);
+    }
+
+    [Fact]
+    public void GetValue_ReturnsUpdatedValue_AfterValueChange ()
+    {
+        TestIntValueView view = new ();
+        view.Value = 10;
+
+        IValue nonGeneric = view;
+        Assert.Equal (10, nonGeneric.GetValue ());
+
+        view.Value = 99;
+        Assert.Equal (99, nonGeneric.GetValue ());
+    }
+
+    [Fact]
+    public void IValue_CanBeUsedPolymorphically ()
+    {
+        // Demonstrates that different IValue<T> implementations can be used through IValue
+        TestIntValueView intView = new () { Value = 42 };
+        TestStringValueView stringView = new () { Value = "test" };
+
+        List<IValue> values = [intView, stringView];
+
+        Assert.Equal (42, values [0].GetValue ());
+        Assert.Equal ("test", values [1].GetValue ());
+    }
+
+    // Tests for concrete views implementing IValue
+
+    [Fact]
+    public void CheckBox_GetValue_ReturnsCheckedState ()
+    {
+        CheckBox checkBox = new () { Value = CheckState.Checked };
+
+        IValue valueProvider = checkBox;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<CheckState> (result);
+        Assert.Equal (CheckState.Checked, result);
+    }
+
+    [Fact]
+    public void CheckBox_GetValue_ReturnsUnCheckedState ()
+    {
+        CheckBox checkBox = new () { Value = CheckState.UnChecked };
+
+        IValue valueProvider = checkBox;
+        object? result = valueProvider.GetValue ();
+
+        Assert.Equal (CheckState.UnChecked, result);
+    }
+
+    [Fact]
+    public void TextField_GetValue_ReturnsText ()
+    {
+        TextField textField = new () { Text = "Hello World" };
+
+        IValue valueProvider = textField;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<string> (result);
+        Assert.Equal ("Hello World", result);
+    }
+
+    [Fact]
+    public void TextField_GetValue_ReturnsEmptyString_WhenEmpty ()
+    {
+        TextField textField = new ();
+
+        IValue valueProvider = textField;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.Equal ("", result);
+    }
+
+    [Fact]
+    public void OptionSelector_GetValue_ReturnsSelectedValue ()
+    {
+        OptionSelector optionSelector = new ()
+        {
+            Labels = ["Option 1", "Option 2", "Option 3"],
+            Value = 1
+        };
+
+        IValue valueProvider = optionSelector;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<int> (result);
+        Assert.Equal (1, result);
+    }
+
+    [Fact]
+    public void OptionSelectorT_GetValue_ReturnsTypedValue ()
+    {
+        OptionSelector<Alignment> optionSelector = new ()
+        {
+            Value = Alignment.Center
+        };
+
+        IValue valueProvider = optionSelector;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<Alignment> (result);
+        Assert.Equal (Alignment.Center, result);
+    }
+
+    [Fact]
+    public void FlagSelectorT_GetValue_ReturnsTypedValue ()
+    {
+        FlagSelector<AlignmentModes> flagSelector = new ()
+        {
+            Value = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems
+        };
+
+        IValue valueProvider = flagSelector;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<AlignmentModes> (result);
+        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, result);
+    }
+
+    [Fact]
+    public void NumericUpDown_GetValue_ReturnsValue ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 42 };
+
+        IValue valueProvider = numericUpDown;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<int> (result);
+        Assert.Equal (42, result);
+    }
+
+    [Fact]
+    public void ColorPicker_GetValue_ReturnsColor ()
+    {
+        // ColorPicker implements IValue<Color?> with Value property delegating to SelectedColor
+        ColorPicker colorPicker = new () { Value = Color.Red };
+
+        IValue valueProvider = colorPicker;
+        object? result = valueProvider.GetValue ();
+
+        // The getter returns the SelectedColor which may differ from the set value
+        // Just verify we get a Color back
+        Assert.NotNull (result);
+        Assert.IsType<Color> (result);
+    }
+
+    [Fact]
+    public void SenderOfEvents_IsCorrect ()
+    {
+        // Verify that the sender parameter of ValueChanging and ValueChanged events is the view raising the event
+        TestIntValueView view = new ();
+        object? changingSender = null;
+        object? changedSender = null;
+        view.ValueChanging += (sender, _) => changingSender = sender;
+        view.ValueChanged += (sender, _) => changedSender = sender;
+        view.Value = 42;
+
+        // Both events should have the view as sender
+        Assert.NotNull (changingSender);
+        Assert.NotNull (changedSender);
+        Assert.Equal (view, changingSender);
+        Assert.Equal (view, changedSender);
+    }
 }

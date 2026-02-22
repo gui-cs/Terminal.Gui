@@ -46,6 +46,7 @@ internal partial class ApplicationImpl
             {
                 throw new ArgumentException ($"Driver '{driverName}' is not registered in DriverRegistry.");
             }
+
             // Determine which driver to use
             if (!string.IsNullOrEmpty (driverName) && DriverRegistry.TryGetDriver (driverName, out DriverRegistry.DriverDescriptor? descriptor))
             {
@@ -74,18 +75,22 @@ internal partial class ApplicationImpl
                     Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
 
                     break;
+
                 case DriverRegistry.Names.DOTNET:
                     Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
 
                     break;
+
                 case DriverRegistry.Names.UNIX:
                     Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
 
                     break;
+
                 case DriverRegistry.Names.ANSI:
                     Coordinator = CreateSubcomponents (() => new AnsiComponentFactory ());
 
                     break;
+
                 default:
                     throw new InvalidOperationException ($"Unknown driver name: {_driverName}");
             }
@@ -100,7 +105,7 @@ internal partial class ApplicationImpl
             throw new InvalidOperationException ("Driver was null even after booting MainLoopCoordinator");
         }
 
-        Driver.Force16Colors = Terminal.Gui.Drivers.Driver.Force16Colors;
+        Driver.Force16Colors = Drivers.Driver.Force16Colors;
     }
 
     private readonly IComponentFactory? _componentFactory;
@@ -159,14 +164,15 @@ internal partial class ApplicationImpl
             cf = fallbackFactory ();
         }
 
-        return new MainLoopCoordinator<TInputRecord> (_timedEvents, inputQueue, loop, cf, _timeProvider);
+        return new MainLoopCoordinator<TInputRecord> (TimedEvents, inputQueue, loop, cf, _timeProvider);
     }
 
     internal void SubscribeDriverEvents ()
     {
         if (Driver is null)
         {
-            Logging.Error($"Driver is null");
+            Logging.Error ("Driver is null");
+
             return;
         }
 
@@ -179,7 +185,8 @@ internal partial class ApplicationImpl
     {
         if (Driver is null)
         {
-            Logging.Error ($"Driver is null");
+            Logging.Error ("Driver is null");
+
             return;
         }
 
@@ -188,7 +195,7 @@ internal partial class ApplicationImpl
         Driver.MouseEvent -= Driver_MouseEvent;
     }
 
-    private void Driver_KeyDown (object? sender, Key e) { Keyboard.RaiseKeyDownEvent (e); }
+    private void Driver_KeyDown (object? sender, Key e) => Keyboard.RaiseKeyDownEvent (e);
 
-    private void Driver_MouseEvent (object? sender, Mouse e) { Mouse.RaiseMouseEvent (e); }
+    private void Driver_MouseEvent (object? sender, Mouse e) => Mouse.RaiseMouseEvent (e);
 }

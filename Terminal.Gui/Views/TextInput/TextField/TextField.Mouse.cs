@@ -62,7 +62,7 @@ public partial class TextField
             _isButtonReleased = false;
             PrepareSelection (x);
 
-            if (App?.Mouse.MouseGrabView is null)
+            if (App is null || !App.Mouse.IsGrabbed (this))
             {
                 App?.Mouse.GrabMouse (this);
             }
@@ -96,7 +96,6 @@ public partial class TextField
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            SetInsertionPointFromMouse (ev);
             ShowContextMenu (false);
         }
 

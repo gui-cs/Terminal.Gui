@@ -5,32 +5,32 @@ public class TimeFieldTests
     [Fact]
     public void Constructors_Defaults ()
     {
-        var tf = new TimeField ();
+        TimeField tf = new ();
         tf.Layout ();
         Assert.False (tf.IsShortFormat);
-        Assert.Equal (TimeSpan.MinValue, tf.Time);
+        Assert.Equal (TimeSpan.MinValue, tf.Value);
         Assert.Equal (1, tf.InsertionPoint);
         Assert.Equal (new Rectangle (0, 0, 10, 1), tf.Frame);
 
         TimeSpan time = DateTime.Now.TimeOfDay;
-        tf = new TimeField { Time = time };
+        tf = new TimeField { Value = time };
         tf.Layout ();
         Assert.False (tf.IsShortFormat);
-        Assert.Equal (time, tf.Time);
+        Assert.Equal (time, tf.Value);
         Assert.Equal (1, tf.InsertionPoint);
         Assert.Equal (new Rectangle (0, 0, 10, 1), tf.Frame);
 
-        tf = new TimeField { X = 1, Y = 2, Time = time };
+        tf = new TimeField { X = 1, Y = 2, Value = time };
         tf.Layout ();
         Assert.False (tf.IsShortFormat);
-        Assert.Equal (time, tf.Time);
+        Assert.Equal (time, tf.Value);
         Assert.Equal (1, tf.InsertionPoint);
         Assert.Equal (new Rectangle (1, 2, 10, 1), tf.Frame);
 
-        tf = new TimeField { X = 3, Y = 4, Time = time, IsShortFormat = true };
+        tf = new TimeField { X = 3, Y = 4, Value = time, IsShortFormat = true };
         tf.Layout ();
         Assert.True (tf.IsShortFormat);
-        Assert.Equal (time, tf.Time);
+        Assert.Equal (time, tf.Value);
         Assert.Equal (1, tf.InsertionPoint);
         Assert.Equal (new Rectangle (3, 4, 7, 1), tf.Frame);
 
@@ -49,8 +49,8 @@ public class TimeFieldTests
 
         try
         {
-            var tf1 = new TimeField { Time = TimeSpan.Parse ("12:12:19"), App = app };
-            var tf2 = new TimeField { Time = TimeSpan.Parse ("12:59:01"), App = app };
+            TimeField tf1 = new () { Value = TimeSpan.Parse ("12:12:19"), App = app };
+            TimeField tf2 = new () { Value = TimeSpan.Parse ("12:59:01"), App = app };
 
             // Select all text
             Assert.True (tf2.NewKeyDownEvent (Key.End.WithShift));
@@ -75,7 +75,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
     {
-        var tf = new TimeField ();
+        TimeField tf = new ();
         Assert.Equal (1, tf.InsertionPoint);
         tf.InsertionPoint = 0;
         Assert.Equal (1, tf.InsertionPoint);
@@ -91,7 +91,7 @@ public class TimeFieldTests
     [Fact]
     public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
     {
-        var tf = new TimeField ();
+        TimeField tf = new ();
 
         // Start selection
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
@@ -134,7 +134,7 @@ public class TimeFieldTests
     [Fact]
     public void KeyBindings_Command ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
+        TimeField tf = new () { Value = TimeSpan.Parse ("12:12:19") };
         tf.BeginInit ();
         tf.EndInit ();
         Assert.Equal (9, tf.InsertionPoint);
@@ -185,7 +185,7 @@ public class TimeFieldTests
     [Fact]
     public void Typing_With_Selection_Normalize_Format ()
     {
-        var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
+        TimeField tf = new () { Value = TimeSpan.Parse ("12:12:19") };
 
         // Start selection at before the first separator :
         tf.InsertionPoint = 2;

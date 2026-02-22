@@ -14,7 +14,6 @@ namespace TerminalGuiFluentTesting;
 /// </summary>
 public partial class TestContext : IDisposable
 {
-
     // ===== Threading & Synchronization =====
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
     private readonly CancellationTokenSource? _timeoutCts;
@@ -32,7 +31,6 @@ public partial class TestContext : IDisposable
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
-    private readonly ITimeProvider _timeProvider = new VirtualTimeProvider ();
 
     /// <summary>
     ///     The IApplication instance that was created.
@@ -43,12 +41,9 @@ public partial class TestContext : IDisposable
     ///     The ITimeProvider for time operations in tests.
     ///     Uses VirtualTimeProvider for fast, deterministic testing with full time control.
     /// </summary>
-    public ITimeProvider TimeProvider => _timeProvider;
+    public ITimeProvider TimeProvider { get; } = new VirtualTimeProvider ();
 
-    private string _driverName;
-
-    // ===== Application State Preservation (for restoration) =====
-    private ILogger? _originalLogger;
+    private readonly string _driverName;
 
     // ===== Test Configuration =====
     private readonly bool _runApplication;
@@ -57,8 +52,9 @@ public partial class TestContext : IDisposable
     // ===== Logging =====
     private readonly object _logsLock = new ();
     private readonly TextWriter? _logWriter;
+    private ILogger? _testLogger;
+    private IDisposable? _loggerScope;
     private StringBuilder? _logsSb;
-
 
     /// <summary>
     ///     Constructor for tests that only need Application.Init without running the main loop.
@@ -69,11 +65,12 @@ public partial class TestContext : IDisposable
         _driverName = driverName;
         _logWriter = logWriter;
         _runApplication = false;
-        _booting = new (0, 1);
+        _booting = new SemaphoreSlim (0, 1);
         _timeoutCts = new CancellationTokenSource (timeout ?? TimeSpan.FromSeconds (10)); // NEW
 
         // Don't force a size - let the driver determine it
         CommonInit (0, 0, timeout);
+        _loggerScope = Logging.PushLogger (_testLogger!);
 
         try
         {
@@ -83,8 +80,7 @@ public partial class TestContext : IDisposable
             // After Init, Application.Screen should be set by the driver
             if (_applicationImpl?.Screen == Rectangle.Empty)
             {
-                throw new InvalidOperationException (
-                                                     "Driver bug: Application.Screen is empty after Init. The driver should set the screen size during Init.");
+                throw new InvalidOperationException ("Driver bug: Application.Screen is empty after Init. The driver should set the screen size during Init.");
             }
         }
         catch (Exception ex)
@@ -99,14 +95,14 @@ public partial class TestContext : IDisposable
                 WriteOutLogs (_logWriter);
             }
 
-            throw new ("Application initialization failed", ex);
+            throw new Exception ("Application initialization failed", ex);
         }
 
         lock (_backgroundExceptionLock) // NEW: Thread-safe check
         {
             if (_backgroundException != null)
             {
-                throw new ("Application initialization failed", _backgroundException);
+                throw new Exception ("Application initialization failed", _backgroundException);
             }
         }
     }
@@ -119,14 +115,15 @@ public partial class TestContext : IDisposable
         _driverName = driverName;
         _logWriter = logWriter;
         _runApplication = true;
-        _booting = new (0, 1);
+        _booting = new SemaphoreSlim (0, 1);
 
         CommonInit (width, height, timeout);
 
         // Start the application in a background thread
-        _runTask = Task.Run (
-                             () =>
+        _runTask = Task.Run (() =>
                              {
+                                 _loggerScope = Logging.PushLogger (_testLogger!);
+
                                  try
                                  {
                                      try
@@ -146,6 +143,7 @@ public partial class TestContext : IDisposable
                                      if (App is { Initialized: true })
                                      {
                                          IRunnable runnable = runnableBuilder ();
+
                                          runnable.IsRunningChanged += (s, e) =>
                                                                       {
                                                                           if (!e.Value)
@@ -159,6 +157,7 @@ public partial class TestContext : IDisposable
                                          {
                                              runnableView.Dispose ();
                                          }
+
                                          //Logging.Trace ("Application.Run completed");
                                          App?.Dispose ();
                                          _runCancellationTokenSource.Cancel ();
@@ -176,6 +175,7 @@ public partial class TestContext : IDisposable
                                  finally
                                  {
                                      CleanupApplication ();
+
                                      if (_logWriter != null)
                                      {
                                          WriteOutLogs (_logWriter);
@@ -194,10 +194,9 @@ public partial class TestContext : IDisposable
 
         if (_backgroundException is { })
         {
-            throw new ("Application crashed", _backgroundException);
+            throw new Exception ("Application crashed", _backgroundException);
         }
     }
-
 
     /// <summary>
     ///     Common initialization for both constructors.
@@ -205,23 +204,17 @@ public partial class TestContext : IDisposable
     private void CommonInit (int width, int height, TimeSpan? timeout)
     {
         _timeout = timeout ?? TimeSpan.FromSeconds (30);
-        _originalLogger = Logging.Logger;
-        _logsSb = new ();
+        _logsSb = new StringBuilder ();
 
-        ILogger logger = LoggerFactory.Create (builder =>
-                                                   builder.SetMinimumLevel (LogLevel.Trace)
-                                                          .AddProvider (
-                                                                        new TextWriterLoggerProvider (
-                                                                                                      new ThreadSafeStringWriter (_logsSb, _logsLock))))
-                                      .CreateLogger ("Test Logging");
-        Logging.Logger = logger;
+        _testLogger = LoggerFactory
+                      .Create (builder => builder.SetMinimumLevel (LogLevel.Trace)
+                                                 .AddProvider (new TextWriterLoggerProvider (new ThreadSafeStringWriter (_logsSb, _logsLock))))
+                      .CreateLogger ("Test Logging");
 
         // ✅ Link _runCancellationTokenSource with a timeout
         // This creates a token that responds to EITHER the run cancellation OR timeout
         _ansiInput.ExternalCancellationTokenSource =
-            CancellationTokenSource.CreateLinkedTokenSource (
-                                                             _runCancellationTokenSource.Token,
-                                                             new CancellationTokenSource (_timeout).Token);
+            CancellationTokenSource.CreateLinkedTokenSource (_runCancellationTokenSource.Token, new CancellationTokenSource (_timeout).Token);
 
         // Now when InputImpl.Run receives this ExternalCancellationTokenSource,
         // it will create ANOTHER linked token internally that combines:
@@ -250,40 +243,39 @@ public partial class TestContext : IDisposable
         switch (_driverName)
         {
             case DriverRegistry.Names.DOTNET:
-                _sizeMonitor = new (_output);
+                _sizeMonitor = new SizeMonitorImpl (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
+
             case DriverRegistry.Names.WINDOWS:
-                _sizeMonitor = new (_output);
+                _sizeMonitor = new SizeMonitorImpl (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
+
             case DriverRegistry.Names.UNIX:
-                _sizeMonitor = new (_output);
+                _sizeMonitor = new SizeMonitorImpl (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
+
             case DriverRegistry.Names.ANSI:
-                _sizeMonitor = new (_output);
+                _sizeMonitor = new SizeMonitorImpl (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
         }
 
-        _applicationImpl = new (cf!, _timeProvider, testMode: true);
+        _applicationImpl = new ApplicationImpl (cf!, TimeProvider);
+
         //Logging.Trace ($"Driver: {_driverName}. Timeout: {_timeout}");
     }
 
     /// <summary>
     ///     Gets whether the application has finished running; aka Stop has been called and the main loop has exited.
     /// </summary>
-    public bool Finished
-    {
-        get => _finished;
-        private set => _finished = value;
-    }
-
+    public bool Finished { get => _finished; private set => _finished = value; }
 
     /// <summary>
     ///     Performs the supplied <paramref name="doAction"/> immediately.
@@ -333,7 +325,7 @@ public partial class TestContext : IDisposable
         //Logging.Trace ($"WaitIteration started");
         if (action is null)
         {
-            action = (app) => { };
+            action = app => { };
         }
         CancellationTokenSource ctsActionCompleted = new ();
 
@@ -357,11 +349,7 @@ public partial class TestContext : IDisposable
         // Blocks until either the token or the hardStopToken is cancelled.
         // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
         // ExternalCancellationTokenSource is redundant because it's linked to _runCancellationTokenSource
-        WaitHandle.WaitAny (
-                            [
-                                _runCancellationTokenSource.Token.WaitHandle,
-                                ctsActionCompleted.Token.WaitHandle
-                            ]);
+        WaitHandle.WaitAny ([_runCancellationTokenSource.Token.WaitHandle, ctsActionCompleted.Token.WaitHandle]);
 
         // Logging.Trace ($"Return from WaitIteration");
         return this;
@@ -374,7 +362,8 @@ public partial class TestContext : IDisposable
 
         //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
 
-        int count = 0;
+        var count = 0;
+
         while (!condition ())
         {
             if (sw.Elapsed > _timeout)
@@ -387,9 +376,9 @@ public partial class TestContext : IDisposable
         }
 
         Logging.Trace ($"WaitUntil completed after {sw.ElapsedMilliseconds}ms and {count} iterations");
+
         return c ?? this;
     }
-
 
     /// <summary>
     ///     Returns the last set position of the cursor.
@@ -398,6 +387,7 @@ public partial class TestContext : IDisposable
     public Point? GetCursorPosition ()
     {
         App?.Navigation?.UpdateCursor ();
+
         return _output!.GetCursor ().Position;
     }
 
@@ -407,34 +397,29 @@ public partial class TestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public TestContext ResizeConsole (int width, int height)
-    {
-        return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); });
-    }
+    public TestContext ResizeConsole (int width, int height) => WaitIteration (app => { app.Driver!.SetScreenSize (width, height); });
 
-    public TestContext ScreenShot (string title, TextWriter? writer)
-    {
+    public TestContext ScreenShot (string title, TextWriter? writer) =>
+
         //Logging.Trace ($"{title}");
-        return WaitIteration ((app) =>
-                              {
-                                  writer?.WriteLine (title + ":");
-                                  var text = app.Driver?.ToString ();
+        WaitIteration (app =>
+                       {
+                           writer?.WriteLine (title + ":");
+                           var text = app.Driver?.ToString ();
 
-                                  writer?.WriteLine (text);
-                              });
-    }
+                           writer?.WriteLine (text);
+                       });
 
-    public TestContext AnsiScreenShot (string title, TextWriter? writer)
-    {
+    public TestContext AnsiScreenShot (string title, TextWriter? writer) =>
+
         //Logging.Trace ($"{title}");
-        return WaitIteration ((app) =>
-                              {
-                                  writer?.WriteLine (title + ":");
-                                  var text = app.Driver?.ToAnsi ();
+        WaitIteration (app =>
+                       {
+                           writer?.WriteLine (title + ":");
+                           string? text = app.Driver?.ToAnsi ();
 
-                                  writer?.WriteLine (text);
-                              });
-    }
+                           writer?.WriteLine (text);
+                       });
 
     /// <summary>
     ///     Stops the application and waits for the background thread to exit.
@@ -463,7 +448,7 @@ public partial class TestContext : IDisposable
             return this;
         }
 
-        WaitIteration ((app) => { app.RequestStop (); });
+        WaitIteration (app => { app.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
         const int WAIT_TIMEOUT_MS = 1000;
@@ -496,6 +481,7 @@ public partial class TestContext : IDisposable
         if (_backgroundException != null)
         {
             Logging.Critical ($"Exception occurred: {_backgroundException}");
+
             //throw _ex; // Propagate any exception that happened in the background task
         }
 
@@ -547,7 +533,7 @@ public partial class TestContext : IDisposable
         Logging.Error ($"{reason}");
         WriteOutLogs (_logWriter);
 
-        throw new (reason);
+        throw new Exception (reason);
     }
 
     private void CleanupApplication ()
@@ -556,12 +542,12 @@ public partial class TestContext : IDisposable
         _ansiInput.ExternalCancellationTokenSource = null;
 
         App?.ResetState (true);
-        Logging.Logger = _originalLogger!;
+        _loggerScope?.Dispose ();
+        _loggerScope = null;
         Finished = true;
 
         Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
     }
-
 
     /// <summary>
     ///     Cleanup to avoid state bleed between tests
@@ -571,7 +557,7 @@ public partial class TestContext : IDisposable
         //Logging.Trace ($"Disposing TestContext");
         Stop ();
 
-        bool shouldThrow = false;
+        var shouldThrow = false;
         Exception? exToThrow = null;
 
         lock (_cancellationLock) // NEW: Thread-safe check
@@ -579,6 +565,7 @@ public partial class TestContext : IDisposable
             if (_ansiInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
             {
                 shouldThrow = true;
+
                 lock (_backgroundExceptionLock)
                 {
                     exToThrow = _backgroundException;
@@ -597,8 +584,7 @@ public partial class TestContext : IDisposable
 
         if (shouldThrow)
         {
-            throw new ("Application was hard stopped...", exToThrow);
+            throw new Exception ("Application was hard stopped...", exToThrow);
         }
     }
-
 }

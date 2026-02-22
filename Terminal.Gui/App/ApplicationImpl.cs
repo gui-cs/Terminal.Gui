@@ -7,23 +7,19 @@ namespace Terminal.Gui.App;
 internal partial class ApplicationImpl : IApplication
 {
     private readonly ITimeProvider _timeProvider;
-    private readonly bool _testMode;
     private IInputInjector? _inputInjector;
-    private readonly ITimedEvents _timedEvents;
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
     ///     events.
     /// </summary>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    /// <param name="testMode">If <see langword="true"/>, configures application for testing with TestInputSource.</param>
-    internal ApplicationImpl (ITimeProvider timeProvider, bool testMode)
+    internal ApplicationImpl (ITimeProvider timeProvider)
     {
         _timeProvider = timeProvider;
-        _testMode = testMode;
 
         // Initialize TimedEvents with the time provider for testable timing
-        _timedEvents = new TimedEvents (timeProvider);
+        TimedEvents = new TimedEvents (timeProvider);
 
         ForceDriver = Application.ForceDriver;
 
@@ -35,29 +31,26 @@ internal partial class ApplicationImpl : IApplication
     ///     INTERNAL: Creates a new instance of the Application backend for legacy static model.
     ///     Uses SystemTimeProvider and production mode by default.
     /// </summary>
-    internal ApplicationImpl () : this (new SystemTimeProvider (), false) { }
+    internal ApplicationImpl () : this (new SystemTimeProvider ()) { }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
+    internal ApplicationImpl (IComponentFactory componentFactory) : this () => _componentFactory = componentFactory;
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend for testing.
     /// </summary>
     /// <param name="componentFactory">The component factory.</param>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    /// <param name="testMode">If <see langword="true"/>, configures application for testing with TestInputSource.</param>
-    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider, bool testMode) : this (timeProvider, testMode)
-    {
+    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider) : this (timeProvider) =>
         _componentFactory = componentFactory;
-    }
 
     private string? _driverName;
 
     /// <inheritdoc/>
-    public new string ToString () { return Driver?.ToString () ?? string.Empty; }
+    public new string ToString () => Driver?.ToString () ?? string.Empty;
 
     #region Singleton - Legacy Static Support
 
@@ -184,13 +177,7 @@ internal partial class ApplicationImpl : IApplication
     public IClipboard? Clipboard
     {
         get => Driver?.Clipboard;
-        set
-        {
-            if (Driver != null)
-            {
-                Driver.Clipboard = value;
-            }
-        }
+        set => Driver?.Clipboard = value;
     }
 
     #endregion Screen and Driver
@@ -200,16 +187,18 @@ internal partial class ApplicationImpl : IApplication
     /// <inheritdoc/>
     public IInputInjector GetInputInjector ()
     {
-        if (_inputInjector is null)
+        if (_inputInjector is { })
         {
-            if (Driver is null)
-            {
-                throw new InvalidOperationException ("Driver not initialized. Call Init() first.");
-            }
-
-            IInputProcessor processor = Driver.GetInputProcessor ();
-            _inputInjector = new InputInjector (processor, _timeProvider);
+            return _inputInjector;
         }
+
+        if (Driver is null)
+        {
+            throw new InvalidOperationException ("Driver not initialized. Call Init() first.");
+        }
+
+        IInputProcessor processor = Driver.GetInputProcessor ();
+        _inputInjector = new InputInjector (processor, _timeProvider);
 
         return _inputInjector;
     }
@@ -246,32 +235,28 @@ internal partial class ApplicationImpl : IApplication
 
     #region Navigation and Popover
 
-    private ApplicationNavigation? _navigation;
-
     /// <inheritdoc/>
     public ApplicationNavigation? Navigation
     {
         get
         {
-            _navigation ??= new () { App = this };
+            field ??= new ApplicationNavigation { App = this };
 
-            return _navigation;
+            return field;
         }
-        set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
+        set => field = value ?? throw new ArgumentNullException (nameof (value));
     }
-
-    private ApplicationPopover? _popover;
 
     /// <inheritdoc/>
     public ApplicationPopover? Popover
     {
         get
         {
-            _popover ??= new () { App = this };
+            field ??= new ApplicationPopover { App = this };
 
-            return _popover;
+            return field;
         }
-        set => _popover = value;
+        set;
     }
 
     #endregion Navigation and Popover

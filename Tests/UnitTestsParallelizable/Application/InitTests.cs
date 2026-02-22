@@ -1,3 +1,4 @@
+using Terminal.Gui.Tests;
 using Xunit.Abstractions;
 
 namespace ApplicationTests.Init;
@@ -7,74 +8,84 @@ namespace ApplicationTests.Init;
 ///     These tests ensure the fragile state management logic is robust and catches regressions.
 ///     Tests work directly with ApplicationImpl instances to avoid global Application state issues.
 /// </summary>
-[Collection("Application Tests")]
+[Collection ("Application Tests")]
 public class InitTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
-    
+
     [Fact]
     public void Init_Unbalanced_Throws ()
     {
-        IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        using (TestLogging.Verbose (_output))
+        {
+            IApplication? app = Application.Create ();
+            app.Init (DriverRegistry.Names.ANSI);
 
-        Assert.Throws<InvalidOperationException> (() =>
-                                                      app.Init (DriverRegistry.Names.ANSI)
-                                                 );
+            Assert.Throws<InvalidOperationException> (() => app.Init (DriverRegistry.Names.ANSI));
+        }
     }
 
     [Fact]
     public void Init_Null_Driver_Should_Pick_A_Driver ()
     {
-        IApplication app = Application.Create ();
-        app.Init ();
+        using (TestLogging.Verbose (_output))
+        {
+            IApplication app = Application.Create ();
+            app.Init ();
 
-        Assert.NotNull (app.Driver);
+            Assert.NotNull (app.Driver);
 
-        app.Dispose ();
+            app.Dispose ();
+        }
     }
 
     [Fact]
     public void Init_Dispose_Cleans_Up ()
     {
-        IApplication app = Application.Create ();
+        using (TestLogging.Verbose (_output))
+        {
+            IApplication app = Application.Create ();
 
-        app.Init (DriverRegistry.Names.ANSI);
+            app.Init (DriverRegistry.Names.ANSI);
 
-        app.Dispose ();
+            app.Dispose ();
+        }
     }
 
     [Fact]
     public void Init_Dispose_Fire_InitializedChanged ()
     {
-        var initialized = false;
-        var Dispose = false;
-
-        IApplication app = Application.Create ();
-
-        app.InitializedChanged += OnApplicationOnInitializedChanged;
-
-        app.Init (driverName: DriverRegistry.Names.ANSI);
-        Assert.True (initialized);
-        Assert.False (Dispose);
-
-        app.Dispose ();
-        Assert.True (initialized);
-        Assert.True (Dispose);
-
-        app.InitializedChanged -= OnApplicationOnInitializedChanged;
-
-        return;
-
-        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
+        using (TestLogging.Verbose (_output))
         {
-            if (a.Value)
+            var initialized = false;
+            var Dispose = false;
+
+            IApplication app = Application.Create ();
+
+            app.InitializedChanged += OnApplicationOnInitializedChanged;
+
+            app.Init (DriverRegistry.Names.ANSI);
+            Assert.True (initialized);
+            Assert.False (Dispose);
+
+            app.Dispose ();
+            Assert.True (initialized);
+            Assert.True (Dispose);
+
+            app.InitializedChanged -= OnApplicationOnInitializedChanged;
+
+            return;
+
+            void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
             {
-                initialized = true;
-            }
-            else
-            {
-                Dispose = true;
+                if (a.Value)
+                {
+                    initialized = true;
+                }
+                else
+                {
+                    Dispose = true;
+                }
             }
         }
     }
@@ -82,73 +93,86 @@ public class InitTests (ITestOutputHelper output)
     [Fact]
     public void Init_KeyBindings_Are_Not_Reset ()
     {
-        IApplication app = Application.Create ();
+        using (TestLogging.Verbose (_output))
+        {
+            IApplication app = Application.Create ();
 
-        // Set via Keyboard property (modern API)
-        app.Keyboard.QuitKey = Key.Q;
-        Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+            // Set via Keyboard property (modern API)
+            app.Keyboard.QuitKey = Key.Q;
+            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
-        app.Init (DriverRegistry.Names.ANSI);
+            app.Init (DriverRegistry.Names.ANSI);
 
-        Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
-        app.Dispose ();
+            app.Dispose ();
+        }
     }
 
     [Fact]
     public void Init_NoParam_ForceDriver_Works ()
     {
-        using IApplication app = Application.Create ();
+        using (TestLogging.Verbose (_output))
+        {
+            using IApplication app = Application.Create ();
 
-        app.ForceDriver = DriverRegistry.Names.ANSI;
-        // Note: Init() without params picks up driver configuration
-        app.Init ();
+            app.ForceDriver = DriverRegistry.Names.ANSI;
 
-        Assert.Equal (DriverRegistry.Names.ANSI, app.Driver!.GetName ());
+            // Note: Init() without params picks up driver configuration
+            app.Init ();
+
+            Assert.Equal (DriverRegistry.Names.ANSI, app.Driver!.GetName ());
+        }
     }
 
     [Fact]
     public void Init_Invalid_DriverName_Throws ()
     {
-        using IApplication app = Application.Create ();
-        Assert.Throws<ArgumentException> (() => app.Init ("nonexistent_driver"));
-        Assert.Throws<ArgumentException> (() => app.Init ("fake"));
+        using (TestLogging.Verbose (_output))
+        {
+            using IApplication app = Application.Create ();
+            Assert.Throws<ArgumentException> (() => app.Init ("nonexistent_driver"));
+            Assert.Throws<ArgumentException> (() => app.Init ("fake"));
+        }
     }
 
     [Fact]
     public void Init_Dispose_Resets_Instance_Properties ()
     {
-        IApplication app = Application.Create ();
+        using (TestLogging.Verbose (_output))
+        {
+            IApplication app = Application.Create ();
 
-        // Init the app
-        app.Init (driverName: DriverRegistry.Names.ANSI);
+            // Init the app
+            app.Init (DriverRegistry.Names.ANSI);
 
-        // Verify initialized
-        Assert.True (app.Initialized);
-        Assert.NotNull (app.Driver);
+            // Verify initialized
+            Assert.True (app.Initialized);
+            Assert.NotNull (app.Driver);
 
-        // Dispose cleans up
-        app.Dispose ();
+            // Dispose cleans up
+            app.Dispose ();
 
-        // Check reset state on the instance
-        CheckReset (app);
+            // Check reset state on the instance
+            CheckReset (app);
 
-        // Create a new instance and set values
-        app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+            // Create a new instance and set values
+            app = Application.Create ();
+            app.Init (DriverRegistry.Names.ANSI);
 
-        app.StopAfterFirstIteration = true;
-        app.Keyboard.PrevTabGroupKey = Key.A;
-        app.Keyboard.NextTabGroupKey = Key.B;
-        app.Keyboard.QuitKey = Key.C;
-        app.Keyboard.KeyBindings.Add (Key.D, Command.Cancel);
+            app.StopAfterFirstIteration = true;
+            app.Keyboard.PrevTabGroupKey = Key.A;
+            app.Keyboard.NextTabGroupKey = Key.B;
+            app.Keyboard.QuitKey = Key.C;
+            app.Keyboard.KeyBindings.Add (Key.D, Command.Cancel);
 
-        app.Mouse.CachedViewsUnderMouse.Clear ();
-        app.Mouse.LastMousePosition = new Point (1, 1);
+            app.Mouse.CachedViewsUnderMouse.Clear ();
+            app.Mouse.LastMousePosition = new Point (1, 1);
 
-        // Dispose and check reset
-        app.Dispose ();
-        CheckReset (app);
+            // Dispose and check reset
+            app.Dispose ();
+            CheckReset (app);
+        }
 
         return;
 
@@ -158,7 +182,6 @@ public class InitTests (ITestOutputHelper output)
 
             // Public Properties
             Assert.Null (application.TopRunnableView);
-            Assert.Null (application.Mouse.MouseGrabView);
             Assert.Null (application.Driver);
             Assert.False (application.StopAfterFirstIteration);
 
@@ -168,5 +191,4 @@ public class InitTests (ITestOutputHelper output)
             Assert.Empty (application.Mouse.CachedViewsUnderMouse);
         }
     }
-
 }

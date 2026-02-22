@@ -1,35 +1,46 @@
-﻿
-namespace Terminal.Gui.Input;
+﻿namespace Terminal.Gui.Input;
 
 #pragma warning disable CS1574, CS0419 // XML comment has cref attribute that could not be resolved
 /// <summary>
 ///     Provides context for a <see cref="Command"/> invocation.
 /// </summary>
-/// <seealso cref="View.InvokeCommand"/>.
+/// <remarks>
+///     <para>
+///         Use pattern matching to access specific binding types:
+///         <code>
+///         if (ctx.Binding is KeyBinding kb) { /* key input */ }
+///         else if (ctx.Binding is MouseBinding mb) { /* mouse input */ }
+///         else if (ctx.Binding is InputBinding ib) { /* programmatic */ }
+///         </code>
+///     </para>
+/// </remarks>
+/// <seealso cref="View.InvokeCommand"/>
+/// .
 #pragma warning restore CS1574, CS0419 // XML comment has cref attribute that could not be resolved
-public record struct CommandContext<TBinding> : ICommandContext
+public record struct CommandContext : ICommandContext
 {
     /// <summary>
-    ///     Initializes a new instance with the specified <see cref="Command"/>,
+    ///     Initializes a new instance with the specified <see cref="Command"/>.
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="source"></param>
-    /// <param name="binding"></param>
-    public CommandContext (Command command, View? source, TBinding? binding)
+    /// <param name="command">The command being invoked.</param>
+    /// <param name="source">A weak reference to the view that is the source of the command invocation.</param>
+    /// <param name="binding">The binding that triggered the command, if any.</param>
+    public CommandContext (Command command, WeakReference<View>? source, IInputBinding? binding)
     {
         Command = command;
         Binding = binding;
         Source = source;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Command Command { get; set; }
 
-    /// <inheritdoc />
-    public View? Source { get; set; }
+    /// <inheritdoc/>
+    public WeakReference<View>? Source { get; set; }
 
-    /// <summary>
-    /// The keyboard or mouse minding that was used to invoke the <see cref="Command"/>, if any.
-    /// </summary>
-    public TBinding? Binding { get; set; }
+    /// <inheritdoc/>
+    public IInputBinding? Binding { get; set; }
+
+    /// <inheritdoc/>
+    public override string ToString () => $"{Command} (Source={Source.ToIdentifyingString ()}, Binding={Binding})";
 }

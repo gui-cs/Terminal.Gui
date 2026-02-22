@@ -10,30 +10,44 @@
   href: migratingfromv1.md  
 - name: Lexicon & Taxonomy
   href: lexicon.md
-- name: Application Deep Dive
+- name: Views
+  href: views.md
+- name: ANSI Handling
+  href: ansihandling.md
+- name: Application
   href: application.md
 - name: Arrangement
   href: arrangement.md
 - name: Cancellable Work Pattern
   href: cancellable-work-pattern.md
+- name: Character Map Scenario
+  href: CharacterMap.md
+- name: Command
+  href: command.md
+- name: Command Diagrams
+  href: command-diagrams.md
 - name: Configuration
   href: config.md
-- name: Command Deep Dive
-  href: command.md
 - name: Cursor
   href: cursor.md
-- name: Dim.Auto Deep Dive
+- name: Dim.Auto
   href: dimauto.md
 - name: Drawing
   href: drawing.md
 - name: Drivers
   href: drivers.md
-- name: Events Deep Dive
+- name: Events
   href: events.md
+- name: Input Injection
+  href: input-injection.md
 - name: Keyboard
   href: keyboard.md
-- name: Layout Engine
+- name: Layout
   href: layout.md
+- name: Logging
+  href: logging.md
+- name: Menus
+  href: menus.md
 - name: Mouse
   href: mouse.md
 - name: Multi-Tasking
@@ -42,16 +56,16 @@
   href: navigation.md
 - name: Popovers
   href: Popovers.md
-- name: Scheme Deep Dive
+- name: Prompt
+  href: prompt.md
+- name: Scheme
   href: scheme.md
 - name: Scrolling
   href: scrolling.md
-- name: TableView Deep Dive
+- name: TableView
   href: tableview.md
-- name: TreeView Deep Dive
+- name: TreeView
   href: treeview.md
-- name: View Deep Dive
-  href: View.md  
-- name: View List
-  href: views.md
+- name: View
+  href: View.md
 

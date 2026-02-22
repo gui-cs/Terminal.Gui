@@ -12,8 +12,8 @@ namespace Terminal.Gui.App;
 public interface IMouse : IMouseGrabHandler
 {
     /// <summary>
-    /// Sets the application instance that this mouse handler is associated with.
-    /// This provides access to application state without coupling to static Application class.
+    ///     Sets the application instance that this mouse handler is associated with.
+    ///     This provides access to application state without coupling to static Application class.
     /// </summary>
     IApplication? App { get; set; }
 
@@ -33,7 +33,8 @@ public interface IMouse : IMouseGrabHandler
     List<View?> CachedViewsUnderMouse { get; }
 
     /// <summary>
-    ///     Raised when a mouse event occurs. Can be cancelled by setting <see cref="HandledEventArgs.Handled"/> to <see langword="true"/>.
+    ///     Raised when a mouse event occurs. Can be cancelled by setting <see cref="HandledEventArgs.Handled"/> to
+    ///     <see langword="true"/>.
     /// </summary>
     /// <remarks>
     ///     <para>

@@ -56,9 +56,7 @@ public class TextValidateField : View, IDesignable
 
             if (_provider!.Fixed)
             {
-                Width = _provider.DisplayText == string.Empty
-                            ? DEFAULT_LENGTH
-                            : _provider.DisplayText.Length;
+                Width = _provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length;
             }
 
             // HomeKeyHandler already call SetNeedsDisplay
@@ -67,7 +65,7 @@ public class TextValidateField : View, IDesignable
     }
 
     /// <summary>Text</summary>
-    public new string Text
+    public override string Text
     {
         get => _provider is null ? string.Empty : _provider.Text;
         set
@@ -84,6 +82,7 @@ public class TextValidateField : View, IDesignable
     }
 
     private int _insertionPoint;
+
     private int InsertionPoint
     {
         get => _insertionPoint;
@@ -111,13 +110,10 @@ public class TextValidateField : View, IDesignable
                 curPos = _insertionPoint + left;
             }
 
-            Cursor = Cursor with
-            {
-                Position = ViewportToScreen (new Point (curPos, 0)),
-                Style = CursorStyle.Default
-            };
+            Cursor = Cursor with { Position = ViewportToScreen (new Point (curPos, 0)), Style = CursorStyle.Default };
         }
     }
+
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
@@ -295,12 +291,12 @@ public class TextValidateField : View, IDesignable
         int total = width - count;
 
         return TextAlignment switch
-        {
-            Alignment.Start => (0, total),
-            Alignment.Center => (total / 2, total / 2 + total % 2),
-            Alignment.End => (total, 0),
-            _ => (0, total)
-        };
+               {
+                   Alignment.Start => (0, total),
+                   Alignment.Center => (total / 2, total / 2 + total % 2),
+                   Alignment.End => (total, 0),
+                   _ => (0, total)
+               };
     }
 
     /// <summary>Moves the cursor to first char.</summary>

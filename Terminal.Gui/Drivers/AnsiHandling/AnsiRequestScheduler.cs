@@ -19,22 +19,33 @@ public class AnsiRequestScheduler
     internal Func<DateTime> Now { get; set; }
 
     private readonly HashSet<Tuple<AnsiEscapeSequenceRequest, DateTime>> _queuedRequests = new ();
+    private readonly object _lockQueuedRequests = new ();
 
-    internal IReadOnlyCollection<AnsiEscapeSequenceRequest> QueuedRequests => _queuedRequests.Select (r => r.Item1).ToList ();
+    internal IReadOnlyCollection<AnsiEscapeSequenceRequest> QueuedRequests
+    {
+        get
+        {
+            lock (_lockQueuedRequests)
+            {
+                return _queuedRequests.Select (r => r.Item1).ToList ();
+            }
+        }
+    }
 
     /// <summary>
     ///     <para>
-    ///         Dictionary where key is ansi request terminator and value is when we last sent a request for
-    ///         this terminator. Combined with <see cref="_throttle"/> this prevents hammering the console
-    ///         with too many requests in sequence which can cause console to freeze as there is no space for
-    ///         regular screen drawing / mouse events etc to come in.
+    ///         Dictionary where key is ansi request terminator and value tuple, when we last sent a request for
+    ///         this terminator, preventing different requests with the same terminator (e.g. 't' with value "6" vs "8").
+    ///         Combined with <see cref="_throttle"/> this prevents hammering the console with too many requests in sequence
+    ///         which can cause console to freeze as there is no space for regular screen drawing / mouse events etc to come
+    ///         in.
     ///     </para>
     ///     <para>
     ///         When user exceeds the throttle, new requests accumulate in <see cref="_queuedRequests"/> (i.e. remain
     ///         queued).
     ///     </para>
     /// </summary>
-    private readonly ConcurrentDictionary<string, DateTime> _lastSend = new ();
+    private readonly ConcurrentDictionary<(string, string?), DateTime> _lastSend = new ();
 
     /// <summary>
     ///     Number of milliseconds after sending a request that we allow
@@ -80,13 +91,15 @@ public class AnsiRequestScheduler
         {
             Send (driver, request);
 
+            //Logging.Trace ($"AnsiRequestScheduler: Sent request '{request.Request}' (Terminator='{request.Terminator}', Value='{request.Value ?? "<null>"}')");
+
             return true;
         }
 
         if (reason == ReasonCannotSend.OutstandingRequest)
         {
             // If we can evict an old request (no response from terminal after ages)
-            if (EvictStaleRequests (request.Terminator))
+            if (EvictStaleRequests (request.Terminator, request.Value))
             {
                 // Try again after evicting
                 if (CanSend (request, out _))
@@ -100,7 +113,12 @@ public class AnsiRequestScheduler
 
         if (addToQueue)
         {
-            _queuedRequests.Add (Tuple.Create (request, Now ()));
+            lock (_lockQueuedRequests)
+            {
+                _queuedRequests.Add (Tuple.Create (request, Now ()));
+
+                //Logging.Trace ($"AnsiRequestScheduler: Queued request '{request.Request}' (QueueSize={_queuedRequests.Count})");
+            }
         }
 
         return false;
@@ -108,9 +126,9 @@ public class AnsiRequestScheduler
 
     private void EvictStaleRequests ()
     {
-        foreach (string stale in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
+        foreach ((string stale, string? value) in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
         {
-            EvictStaleRequests (stale);
+            EvictStaleRequests (stale, value);
         }
     }
 
@@ -122,10 +140,11 @@ public class AnsiRequestScheduler
     ///     can proceed with a new request for this terminator (returning <see langword="true"/>).
     /// </summary>
     /// <param name="withTerminator"></param>
+    /// <param name="withValue"></param>
     /// <returns></returns>
-    private bool EvictStaleRequests (string? withTerminator)
+    private bool EvictStaleRequests (string? withTerminator, string? withValue)
     {
-        if (!_lastSend.TryGetValue (withTerminator!, out DateTime dt))
+        if (!_lastSend.TryGetValue ((withTerminator!, withValue), out DateTime dt))
         {
             return false;
         }
@@ -134,7 +153,8 @@ public class AnsiRequestScheduler
         {
             return false;
         }
-        _parser.StopExpecting (withTerminator, false);
+
+        _parser.StopExpecting (withTerminator, withValue, false);
 
         return true;
     }
@@ -160,14 +180,22 @@ public class AnsiRequestScheduler
         }
 
         // Get oldest request
-        Tuple<AnsiEscapeSequenceRequest, DateTime>? opportunity = _queuedRequests.MinBy (r => r.Item2);
+        Tuple<AnsiEscapeSequenceRequest, DateTime>? opportunity;
+
+        lock (_lockQueuedRequests)
+        {
+            opportunity = _queuedRequests.MinBy (r => r.Item2);
+        }
 
         if (opportunity != null)
         {
             // Give it another go
             if (SendOrSchedule (driver, opportunity.Item1, false))
             {
-                _queuedRequests.Remove (opportunity);
+                lock (_lockQueuedRequests)
+                {
+                    _queuedRequests.Remove (opportunity);
+                }
 
                 return true;
             }
@@ -180,8 +208,10 @@ public class AnsiRequestScheduler
 
     private void Send (IDriver? driver, AnsiEscapeSequenceRequest r)
     {
-        _lastSend.AddOrUpdate (r.Terminator!, _ => Now (), (_, _) => Now ());
-        _parser.ExpectResponse (r.Terminator, r.ResponseReceived, r.Abandoned, false);
+        //Logging.Trace ($"AnsiRequestScheduler.Send: Terminator='{r.Terminator}' Value='{r.Value ?? "<null>"}'");
+
+        _lastSend.AddOrUpdate ((r.Terminator!, r.Value), _ => Now (), (_, _) => Now ());
+        _parser.ExpectResponse (r.Terminator, r.Value, r.ResponseReceived, r.Abandoned, false);
         r.Send (driver);
     }
 
@@ -194,7 +224,7 @@ public class AnsiRequestScheduler
             return false;
         }
 
-        if (_parser.IsExpecting (r.Terminator))
+        if (_parser.IsExpecting (r.Terminator, r.Value))
         {
             reason = ReasonCannotSend.OutstandingRequest;
 
@@ -208,7 +238,7 @@ public class AnsiRequestScheduler
 
     private bool ShouldThrottle (AnsiEscapeSequenceRequest r)
     {
-        if (_lastSend.TryGetValue (r.Terminator!, out DateTime value))
+        if (_lastSend.TryGetValue ((r.Terminator!, r.Value), out DateTime value))
         {
             return Now () - value < _throttle;
         }

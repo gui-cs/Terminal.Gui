@@ -51,7 +51,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5E0F-4986-AB37-A6BF89966C12}"
 	ProjectSection(SolutionItems) = preProject
-		docfx\docs\ansiparser.md = docfx\docs\ansiparser.md
+		docfx\docs\ansihandling.md = docfx\docs\ansihandling.md
 		docfx\docs\application.md = docfx\docs\application.md
 		docfx\docs\arrangement.md = docfx\docs\arrangement.md
 		docfx\docs\cancellable-work-pattern.md = docfx\docs\cancellable-work-pattern.md
@@ -69,6 +69,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		docfx\docs\events.md = docfx\docs\events.md
 		docfx\docs\getting-started.md = docfx\docs\getting-started.md
 		docfx\docs\index.md = docfx\docs\index.md
+		docfx\docs\input-injection.md = docfx\docs\input-injection.md
 		docfx\docs\keyboard.md = docfx\docs\keyboard.md
 		docfx\docs\layout.md = docfx\docs\layout.md
 		docfx\docs\lexicon.md = docfx\docs\lexicon.md

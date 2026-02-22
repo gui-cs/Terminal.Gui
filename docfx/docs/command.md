@@ -44,10 +44,101 @@ flowchart TD
 | **Example: CheckBox** | Toggles `CheckedState` (spacebar) | Confirms current `CheckedState` (Enter) |
 | **Example: ListView** | Selects item (single click, navigation) | Opens/enters selected item (double-click or Enter) |
 | **Example: Menu/MenuBar** | Focuses `MenuItem` (arrow keys, mouse enter)<br>Raises `SelectedMenuItemChanged` | Executes command / opens submenu (Enter)<br>Raises `Accepted` to close menu |
-| **Mouse → Command Pipeline** | See [Mouse Pipeline](mouse.md#complete-mouse-event-pipeline)<br>**Current:** `LeftButtonClicked` → `Activate`<br>**Recommended:** `LeftButtonClicked` → `Activate` (first click)<br>`LeftButtonDoubleClicked` → `Accept` (framework-provided) | See [Mouse Pipeline](mouse.md#complete-mouse-event-pipeline)<br>**Current:** Applications track timing manually<br>**Recommended:** `LeftButtonDoubleClicked` → `Accept` |
+| **Mouse → Command Pipeline** | See [Mouse Pipeline](mouse.md#complete-mouse-event-pipeline)<br>**Default:** `LeftButtonReleased` → `Activate` (aligns with industry standards - allows cancellation)<br>**Alternative:** `LeftButtonPressed` → `Activate` (immediate feedback, no cancellation)<br>`LeftButtonDoubleClicked` → `Accept` (framework-provided) | See [Mouse Pipeline](mouse.md#complete-mouse-event-pipeline)<br>**Current:** Applications track timing manually<br>**Recommended:** `LeftButtonDoubleClicked` → `Accept` |
 | **Return Value Semantics** | `null`: no handler<br>`false`: executed but not handled<br>`true`: handled/canceled | Same as Activate |
 | **Current Limitation** | No generic propagation mechanism for hierarchical views | Relies on view-specific logic (e.g., `SuperMenuItem`) instead of generic propagation |
 | **Proposed Enhancement** | [#4473](https://github.com/gui-cs/Terminal.Gui/issues/4473) | Standardize propagation via subscription model instead of special properties |
+
+## View Command Behaviors
+
+The following table documents how each View subclass binds or handles keyboard and mouse events. This provides a comprehensive reference for understanding which commands are bound to specific inputs or whether views handle events directly through method overrides.
+
+| View | Space | Enter | HotKey | Pressed | Released | Clicked | DoubleClicked |
+|------|-------|-------|--------|---------|----------|---------|---------------|
+| **View** (base) | `Command.Activate` (default) | `Command.Accept` (default) | `Command.HotKey` (default) | Base OnMouseEvent (updates MouseState) | `Command.Activate` (default) | Not bound by default | Not bound by default |
+| **Button** | `Command.HotKey` | `Command.HotKey` | `Command.HotKey` | OnMouseEvent (updates MouseState) | OnMouseEvent (updates MouseState) | `Command.HotKey` | `Command.HotKey` |
+| **CheckBox** | `Command.Activate` | `Command.Accept` | `Command.HotKey` | `Command.Activate` | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
+| **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **ListView** | Custom handler (selection) | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (selects item) | `Command.Accept` |
+| **TableView** | Custom handler (toggle selection) | `Command.Accept` | `Command.HotKey` | OnMouseEvent (cell selection) | OnMouseEvent (end drag) | OnMouseEvent (cell selection) | `Command.Accept` |
+| **TreeView** | `Command.Accept` | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | OnMouseEvent (node selection) | `Command.Accept` |
+| **TextField** | OnKeyDown (inserts space) | `Command.Accept` | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
+| **TextView** | OnKeyDown (inserts space) | OnKeyDown (inserts newline) | `Command.HotKey` | OnMouseEvent (set cursor) | OnMouseEvent (end drag) | OnMouseEvent (position cursor) | OnMouseEvent (select word) |
+| **OptionSelector** | Forwards to SubView | `Command.Accept` | Forwards to SubView HotKey | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **FlagSelector** | Forwards to SubView | `Command.Accept` | Forwards to SubView HotKey | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Menu** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **MenuBar** | Handled by SubViews | `Command.Accept` | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **MenuItem** | Base handler | `Command.Accept` | `Command.HotKey` | Base OnMouseEvent | Base OnMouseEvent | `Command.Activate` | `Command.Accept` |
+| **Shortcut** | `Command.HotKey` | `Command.HotKey` | `Command.HotKey` | OnMouseEvent (updates MouseState) | OnMouseEvent (updates MouseState) | `Command.HotKey` | `Command.HotKey` |
+| **Dialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Wizard** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **FileDialog** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **TabView** | Not bound | Not bound | `Command.HotKey` | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
+| **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent (auto-repeat/jump) | OnMouseEvent (auto-repeat) | OnMouseEvent (jump position) | Not bound |
+| **HexView** | OnKeyDown (custom) | Not bound | Not bound | OnMouseEvent (position cursor) | Base OnMouseEvent | OnMouseEvent (position cursor) | OnMouseEvent (toggle side) |
+| **NumericUpDown** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **DatePicker** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **ColorPicker** | OnKeyDown (custom) | Not bound | Handled by SubViews | OnMouseEvent (adjust value) | Base OnMouseEvent | OnMouseEvent (adjust value) | `Command.Accept` |
+| **ProgressBar** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
+| **SpinnerView** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |
+| **Bar** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **Label** | Not bound | Not bound | Forwards to next focusable | Not bound | Not bound | Not bound | Not bound |
+
+### Notes on Command Behaviors
+
+#### Table Notation
+
+The table shows how each view handles keyboard and mouse input using one of these approaches:
+
+- **`Command.X`** - Input is bound to a command via KeyBinding or MouseBinding (e.g., `Command.HotKey`, `Command.Activate`, `Command.Accept`)
+- **OnKeyDown (custom)** - Input is handled directly by overriding `OnKeyDown` with view-specific logic
+- **OnMouseEvent (description)** - Input is handled directly by overriding `OnMouseEvent` with view-specific behavior
+- **Base OnMouseEvent** - Input uses the base `View.OnMouseEvent` implementation (updates MouseState)
+- **Custom handler** - Input uses a view-specific handler method (not a command)
+- **Handled by SubViews** - Composite views delegate input handling to their contained SubViews
+- **Forwards to SubView** - Input is forwarded to a specific SubView (e.g., OptionSelector → CheckBox)
+- **Not bound** - Input is not handled or bound by this view
+
+#### Key Points
+
+1. **View Base Class**: The first row shows the default behavior provided by the base `View` class. Space and Enter are bound to `Command.Activate` and `Command.Accept` respectively in `SetupCommands()`. Mouse events use the base `OnMouseEvent` implementation which updates `MouseState`. Subclasses typically override these bindings or add MouseBindings for Clicked/DoubleClicked events.
+
+2. **Composite Views** (Dialog, Wizard, FileDialog, DatePicker, NumericUpDown, Bar): These views delegate input handling to their SubViews. The parent view may intercept commands to coordinate actions (e.g., Dialog intercepting `Accept` to set `Result`).
+
+3. **Display-Only Views** (ProgressBar, SpinnerView, Label): These views typically have `CanFocus = false` and do not handle keyboard or mouse input directly.
+
+4. **Command Bindings vs. Event Handlers**: Views with simple, standardized behaviors use **command bindings** (KeyBinding/MouseBinding → Command). Views requiring custom logic (e.g., text editing, cursor positioning, drag selection) override **OnKeyDown** or **OnMouseEvent** directly.
+
+5. **TreeView Special Case**: Both Space and Enter are bound to `Command.Accept`, which invokes the same handler (`ActivateSelectedObjectIfAny`).
+
+6. **Shortcut and Button Unified Handling**: Space, Enter, Clicked, and DoubleClicked all map to `Command.HotKey`, providing consistent activation behavior.
+
+7. **Selector Views** (OptionSelector, FlagSelector): These forward Space and HotKey inputs to the focused CheckBox's handlers, enabling keyboard-driven selection changes.
+
+8. **Text Input Views** (TextField, TextView): These override OnKeyDown to handle Space (inserts space character) and OnMouseEvent for cursor positioning, text selection, and drag operations. Enter is bound to `Command.Accept` in TextField (submit), but handled directly in TextView (inserts newline).
+
+9. **Mouse Event Columns**:
+   - **Pressed**: `MouseFlags.LeftButtonPressed` - button initially pressed down
+   - **Released**: `MouseFlags.LeftButtonReleased` - button released after press
+   - **Clicked**: `MouseFlags.LeftButtonClicked` - synthesized from press+release in same location
+   - **DoubleClicked**: `MouseFlags.LeftButtonDoubleClicked` - synthesized from timing of two clicks
+   - For detailed information about the mouse event pipeline and how events are synthesized, see the [Mouse Deep Dive](mouse.md).
+
+10. **Implementation Patterns**: To understand how bindings work, see:
+    - `Terminal.Gui/ViewBase/Mouse/View.Mouse.cs` - Base mouse handling and MouseBindings
+    - `Terminal.Gui/ViewBase/Keyboard/View.Keyboard.cs` - Base keyboard handling and KeyBindings
+    - Individual view source files for view-specific overrides and custom handlers
+
+11. **Default Activation on Release**: The base `View` class binds `LeftButtonReleased` to `Command.Activate`, following industry-standard GUI conventions. This allows users to:
+    - Press the button → See visual feedback (MouseState.Pressed)
+    - Drag away → Realize mistake
+    - Release outside → Cancel action without triggering
+
+    This matches behavior in Windows (WPF/WinForms), macOS (Cocoa), Web (HTML click), GTK4, and Qt. To activate on press instead (immediate feedback, no cancellation), replace the binding:
+    ```csharp
+    view.MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed, Command.Activate);
+    view.MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+    ```
 
 ### Key Takeaways
 
@@ -145,7 +236,7 @@ Most commands route directly to the target view. `Command.Activate` and `Command
 ```csharp
 protected bool? RaiseAccepting(ICommandContext? ctx)
 {
-    CommandEventArgs args = new() { Context = ctx };
+    CommandEventArgs args = new () { Context = ctx };
     args.Cancel = OnAccepting(args) || args.Cancel;
     if (!args.Cancel && Accepting is {})
     {
@@ -153,7 +244,7 @@ protected bool? RaiseAccepting(ICommandContext? ctx)
     }
     if (!args.Cancel)
     {
-        var isDefaultView = SuperView?.InternalSubViews.FirstOrDefault(v => v is Button { IsDefault: true });
+        View? isDefaultView = SuperView?.InternalSubViews.FirstOrDefault(v => v is Button { IsDefault: true });
         if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
         {
             bool? handled = isDefaultView.InvokeCommand(Command.Accept, ctx);
@@ -189,7 +280,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
   ```csharp
   protected bool? RaiseActivating(ICommandContext? ctx)
   {
-      CommandEventArgs args = new() { Context = ctx };
+      CommandEventArgs args = new () { Context = ctx };
       if (OnActivating(args) || args.Cancel)
       {
           return true;
@@ -266,7 +357,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
     ```csharp
     protected void RaiseAccepted(ICommandContext? ctx)
     {
-        CommandEventArgs args = new() { Context = ctx };
+        CommandEventArgs args = new () { Context = ctx };
         OnAccepted(args);
         Accepted?.Invoke(this, args);
     }
@@ -285,7 +376,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
     ```csharp
     protected override bool OnAccepting(CommandEventArgs args)
     {
-        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
         {
             return true;
         }
@@ -437,7 +528,7 @@ The need for `Selected` and `Accepted` events is under consideration, with `Acce
       ```csharp
       protected void RaiseAccepted(ICommandContext? ctx)
       {
-          CommandEventArgs args = new() { Context = ctx };
+          CommandEventArgs args = new () { Context = ctx };
           OnAccepted(args);
           Accepted?.Invoke(this, args);
       }
@@ -472,12 +563,12 @@ The need for `Selected` and `Accepted` events is under consideration, with `Acce
     ```csharp
     protected void RaiseAccepted(ICommandContext? ctx)
     {
-        CommandEventArgs args = new() { Context = ctx };
+        CommandEventArgs args = new () { Context = ctx };
         OnAccepted(args);
         Accepted?.Invoke(this, args);
     }
     ```
-    In contrast, `CheckBox` and `FlagSelector` do not use `Accepted`, relying on `Accepting`’s completion or view-specific events like `CheckedStateChanged` or `ValueChanged`. This suggests that `Accepted` is particularly valuable in composite views with hierarchical interactions but not universally needed across all views. The absence of `Accepted` in `CheckBox` and `FlagSelector` indicates that `Accepting` is often sufficient for simple confirmation scenarios, but the hierarchical use in menus and potential dialog applications highlight its potential for broader adoption in specific contexts.
+    In contrast, `CheckBox` and `FlagSelector` do not use `Accepted`
   - **Verdict**: The `Accepted` event is highly valuable in composite and hierarchical views like `Menu`, `MenuBar`, and potentially `Dialog`, where it supports coordinated action completion (e.g., closing menus or dialogs). However, adding it to the base `View` class is premature without broader validation across more view types, as many views (e.g., `CheckBox`, `FlagSelector`) function effectively without it, using `Accepting` or custom events. Implementing `Accepted` in specific views or base classes like `Bar` or `Runnable` (e.g., for menus and dialogs) and reassessing its necessity for the base `View` class later is a prudent approach. This balances the demonstrated utility in hierarchical scenarios with the need to avoid unnecessary complexity in simpler views.
 
 **Recommendation**: Avoid adding `Selected` or `Accepted` events to the base `View` class for now. Instead:
@@ -532,17 +623,18 @@ The current implementation of `Command.Activate` is local, but `MenuBar` require
     - In `Button`, `Activating` sets focus, which is inherently local.
 
 - **Accepting**: `Command.Accept` propagates to a default button (if present), the superview, or a `SuperMenuItem` (in menus), enabling hierarchical handling.
-  - **Rationale**: `Accepting` often involves actions that affect the broader UI context (e.g., closing a dialog, executing a menu command), requiring coordination with parent views. This is evident in `Menu`’s propagation to `SuperMenuItem` and `MenuBar`’s handling of `Accepted`:
+  - **Rationale**: `Accepting` often involves actions that affect the broader UI context (e.g., closing a dialog, executing a menu command), requiring coordination with parent views. This is evident in `Menu`'s propagation to `SuperMenuItem` and `MenuBar`'s handling of `Accepted`:
     ```csharp
-    protected override void OnAccepting(CommandEventArgs args)
+    protected override void OnAccepting (CommandEventArgs args)
     {
-        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+        // Pattern match on binding type using ICommandContext.Binding
+        if (args.Context?.Binding is KeyBinding kb && kb.Key == Application.QuitKey)
         {
             return true;
         }
-        if (SuperView is null && SuperMenuItem is {})
+        if (SuperView is null && SuperMenuItem is { })
         {
-            return SuperMenuItem?.InvokeCommand(Command.Accept, args.Context) is true;
+            return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
         return false;
     }
@@ -628,32 +720,39 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
    - This ensures `Activating` only propagates state changes to the parent `FlagSelector` via `RaiseActivating`, and `Accepting` is triggered separately (e.g., via Enter on the `FlagSelector` itself) to confirm the `Value`.
 
 3. **Enhance ICommandContext with View-Specific State**:
-   - Enrich `ICommandContext` with a `State` property to include view-specific data (e.g., the selected `MenuItem` in `Menu`, the new `CheckedState` in `CheckBox`, the updated `Value` in `FlagSelector`). This enables more informed event handlers without requiring view-specific subscriptions.
-   - Proposed interface update:
-     ```csharp
-     public interface ICommandContext
-     {
-         Command Command { get; }
-         View? Source { get; }
-         object? Binding { get; }
-         object? State { get; } // View-specific state (e.g., selected item, CheckState)
-     }
-     ```
-   - Example: In `Menu`, include the `SelectedMenuItem` in `ICommandContext.State` for `Activating` handlers:
-     ```csharp
-     protected bool? RaiseActivating(ICommandContext? ctx)
-     {
-         ctx.State = SelectedMenuItem; // Provide selected MenuItem
-         CommandEventArgs args = new() { Context = ctx };
-         if (OnActivating(args) || args.Cancel)
-         {
-             return true;
+   - The `ICommandContext` interface includes a `Binding` property that provides polymorphic access to the binding that triggered the command.
+   - **Note**: `CommandContext` (the implementation of `ICommandContext`) is now **non-generic**. Previous versions used `CommandContext<T>` with a generic type parameter for the binding. This was removed to simplify the type system and enable easier pattern matching.
+      ```csharp
+      public interface ICommandContext
+      {
+          Command Command { get; }
+          View? Source { get; set; }
+          IInputBinding? Binding { get; }  // Polymorphic access to the binding
+      }
+
+      public record struct CommandContext : ICommandContext  // Non-generic
+      {
+          public Command Command { get; set; }
+          public View? Source { get; set; }
+          public IInputBinding? Binding { get; set; }
+      }
+      ```
+   - Pattern match on `ctx.Binding` to access specific binding types:
+      ```csharp
+      if (ctx.Binding is KeyBinding kb)
+      {
+          // Handle key binding - access kb.Key, kb.Target, etc.
          }
-         Activating?.Invoke(this, args);
-         return Activating is null ? null : args.Cancel;
-     }
-     ```
-   - This enhances the flexibility of event handlers, allowing external code to react to state changes without subscribing to view-specific events like `SelectedMenuItemChanged` or `CheckedStateChanged`.
+         else if (ctx.Binding is MouseBinding mb)
+         {
+             // Handle mouse binding - access mb.MouseEvent, etc.
+         }
+         else if (ctx.Binding is InputBinding ib)
+         {
+             // Handle programmatic/generic binding
+         }
+         ```
+      - A future `State` property could include view-specific data (e.g., the selected `MenuItem` in `Menu`, the new `CheckedState` in `CheckBox`). This would enhance the flexibility of event handlers.
 
 4. **Monitor Use Cases for Propagation Needs**:
    - Track the usage of `Activating` and `Accepting` in real-world applications, particularly in `Menu`, `MenuBar`, `CheckBox`, and `FlagSelector`, to identify scenarios where propagation of `Activating` events could simplify hierarchical coordination.

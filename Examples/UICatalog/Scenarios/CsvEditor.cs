@@ -81,19 +81,19 @@ public class CsvEditor : Scenario
         {
             Title = "_Align Left"
         };
-        _miLeftCheckBox.CheckedStateChanged += (_, _) => Align (Alignment.Start);
+        _miLeftCheckBox.ValueChanged += (_, _) => Align (Alignment.Start);
 
         _miRightCheckBox = new ()
         {
             Title = "_Align Right"
         };
-        _miRightCheckBox.CheckedStateChanged += (_, _) => Align (Alignment.End);
+        _miRightCheckBox.ValueChanged += (_, _) => Align (Alignment.End);
 
         _miCenteredCheckBox = new ()
         {
             Title = "_Align Centered"
         };
-        _miCenteredCheckBox.CheckedStateChanged += (_, _) => Align (Alignment.Center);
+        _miCenteredCheckBox.ValueChanged += (_, _) => Align (Alignment.Center);
 
         MenuBarItem fileMenu = new (
                                     Strings.menuFile,
@@ -285,17 +285,17 @@ public class CsvEditor : Scenario
 
         if (_miLeftCheckBox is not null)
         {
-            _miLeftCheckBox.CheckedState = style.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
+            _miLeftCheckBox.Value = style.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miRightCheckBox is not null)
         {
-            _miRightCheckBox.CheckedState = style.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
+            _miRightCheckBox.Value = style.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miCenteredCheckBox is not null)
         {
-            _miCenteredCheckBox.CheckedState = style.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
+            _miCenteredCheckBox.Value = style.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
         }
 
         _tableView.Update ();
@@ -503,17 +503,17 @@ public class CsvEditor : Scenario
 
         if (_miLeftCheckBox is not null)
         {
-            _miLeftCheckBox.CheckedState = style?.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
+            _miLeftCheckBox.Value = style?.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miRightCheckBox is not null)
         {
-            _miRightCheckBox.CheckedState = style?.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
+            _miRightCheckBox.Value = style?.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miCenteredCheckBox is not null)
         {
-            _miCenteredCheckBox.CheckedState = style?.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
+            _miCenteredCheckBox.Value = style?.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
         }
     }
 

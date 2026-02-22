@@ -2,8 +2,6 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-    private bool _enterKeyAddsLine = true;
-
     /// <summary>
     ///     Gets or sets whether pressing ENTER in a <see cref="TextView"/> adds a new line of text
     ///     invokes the <see cref="View.Accepting"/> event.
@@ -22,18 +20,18 @@ public partial class TextView
     /// </remarks>
     public bool EnterKeyAddsLine
     {
-        get => _enterKeyAddsLine;
+        get;
         set
         {
-            _enterKeyAddsLine = value;
+            field = value;
 
-            if (_enterKeyAddsLine && !_multiline)
+            if (field && !_multiline)
             {
                 // BUGBUG: Setting properties should not have side effects like this. Multiline and AllowsReturn should be independent.
                 Multiline = true;
             }
 
-            if (!_enterKeyAddsLine && _multiline)
+            if (!field && _multiline)
             {
                 Multiline = false;
 
@@ -43,7 +41,7 @@ public partial class TextView
 
             SetNeedsDraw ();
         }
-    }
+    } = true;
 
     private bool _tabKeyAddsTab = true;
 
@@ -126,7 +124,7 @@ public partial class TextView
         }
 
         // Ignore control characters and other special keys
-        if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))
+        if (a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {
             return false;
         }
@@ -177,7 +175,7 @@ public partial class TextView
         // draw autocomplete
         GenerateSuggestions ();
 
-        var renderAt = new Point (Autocomplete.Context.CursorPosition, Autocomplete.PopupInsideContainer ? InsertionPoint.Y + 1 - TopRow : 0);
+        var renderAt = new Point (Autocomplete.Context.CursorPosition, Autocomplete.PopupInsideContainer ? InsertionPoint.Y + 1 - Viewport.Y : 0);
 
         Autocomplete.RenderOverlay (renderAt);
     }
@@ -187,7 +185,7 @@ public partial class TextView
         List<Cell> currentLine = GetCurrentLine ();
         int cursorPosition = Math.Min (CurrentColumn, currentLine.Count);
 
-        Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
+        Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context?.Canceled ?? false);
 
         Autocomplete.GenerateSuggestions (Autocomplete.Context);
     }

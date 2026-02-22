@@ -10,7 +10,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     See <see href="../docs/CharacterMap.md"/> for details.
 /// </remarks>
-public class CharMap : View, IDesignable
+public class CharMap : View, IDesignable, IValue<Rune>
 {
     /// <summary>
     ///     Gets or sets the default cursor style.
@@ -72,10 +72,10 @@ public class CharMap : View, IDesignable
         MouseBindings.Add (MouseFlags.WheeledRight, Command.ScrollRight);
 
         // Initial content size; height will be corrected by RebuildVisibleRows()
-        SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, HEADER_HEIGHT + _rowHeight));
+        SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, HEADER_HEIGHT + _rowHeight));
 
-        // Set up the horizontal scrollbar. Turn off AutoShow since we do it manually.
-        HorizontalScrollBar.AutoShow = false;
+        // Set up the horizontal scrollbar with manual visibility control.
+        HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
         HorizontalScrollBar.Increment = COLUMN_WIDTH;
 
         // This prevents scrolling past the last column
@@ -84,8 +84,13 @@ public class CharMap : View, IDesignable
         HorizontalScrollBar.Y = Pos.AnchorEnd ();
         HorizontalScrollBar.Width = Dim.Fill (1);
 
+        // CharMap has fixed row labels on the left that don't scroll, with scrollable content to the right.
+        // The default viewport clamping (which prevents blank space) doesn't work well with this model,
+        // so we allow the viewport to extend beyond content bounds.
+        ViewportSettings |= ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize;
+
         // We want the horizontal scrollbar to only show when needed.
-        // We can't use ScrollBar.AutoShow because we are using custom ContentSize
+        // We can't use ScrollBarVisibilityMode.Auto because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
         ViewportChanged += (_, _) =>
                            {
@@ -93,9 +98,8 @@ public class CharMap : View, IDesignable
                                UpdateCursor ();
                            };
 
-        // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
-        VerticalScrollBar.AutoShow = true;
-        VerticalScrollBar.Visible = false;
+        // Set up the vertical scrollbar with auto-show behavior.
+        ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
 
@@ -106,12 +110,12 @@ public class CharMap : View, IDesignable
         // Build initial visible rows (all rows with at least one valid codepoint)
         RebuildVisibleRows ();
 
-        Cursor = new () { Style = DefaultCursorStyle };
+        Cursor = new Cursor { Style = DefaultCursorStyle };
     }
 
     // Visible rows management: each entry is the starting code point of a 16-wide row
-    private readonly List<int> _visibleRowStarts = new ();
-    private readonly Dictionary<int, int> _rowStartToVisibleIndex = new ();
+    private readonly List<int> _visibleRowStarts = [];
+    private readonly Dictionary<int, int> _rowStartToVisibleIndex = [];
 
     private void RebuildVisibleRows ()
     {
@@ -123,12 +127,13 @@ public class CharMap : View, IDesignable
         for (var row = 0; row <= maxRow; row++)
         {
             int start = row * 16;
-            bool anyValid = false;
-            bool anyVisible = false;
+            var anyValid = false;
+            var anyVisible = false;
 
             for (var col = 0; col < 16; col++)
             {
                 int cp = start + col;
+
                 if (cp > RuneExtensions.MaxUnicodeCodePoint)
                 {
                     break;
@@ -145,26 +150,31 @@ public class CharMap : View, IDesignable
                 {
                     // With no filter, a row is displayed if it has any valid codepoint
                     anyVisible = true;
+
                     break;
                 }
 
                 UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (cp);
-                if (cat == ShowUnicodeCategory.Value)
+
+                if (cat != ShowUnicodeCategory.Value)
                 {
-                    anyVisible = true;
-                    break;
+                    continue;
                 }
+                anyVisible = true;
+
+                break;
             }
 
-            if (anyValid && (!ShowUnicodeCategory.HasValue ? anyValid : anyVisible))
+            if (!anyValid || (ShowUnicodeCategory.HasValue && !anyVisible))
             {
-                _rowStartToVisibleIndex [start] = _visibleRowStarts.Count;
-                _visibleRowStarts.Add (start);
+                continue;
             }
+            _rowStartToVisibleIndex [start] = _visibleRowStarts.Count;
+            _visibleRowStarts.Add (start);
         }
 
         // Update content size to match visible rows
-        SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, _visibleRowStarts.Count * _rowHeight + HEADER_HEIGHT));
+        SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, _visibleRowStarts.Count * _rowHeight + HEADER_HEIGHT));
 
         // Keep vertical scrollbar aligned with new content size
         VerticalScrollBar.ScrollableContentSize = GetContentSize ().Height;
@@ -173,12 +183,11 @@ public class CharMap : View, IDesignable
     private int VisibleRowIndexForCodePoint (int codePoint)
     {
         int start = codePoint / 16 * 16;
+
         return _rowStartToVisibleIndex.GetValueOrDefault (start, -1);
     }
 
     private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
-    private int _selectedCodepoint; // Currently selected codepoint
-    private int _startCodepoint; // The codepoint that will be displayed at the top of the Viewport
 
     /// <summary>
     ///     Gets or sets the currently selected codepoint. Causes the Viewport to scroll to make the selected code point
@@ -186,33 +195,78 @@ public class CharMap : View, IDesignable
     /// </summary>
     public int SelectedCodePoint
     {
-        get => _selectedCodepoint;
+        get;
         set
         {
-            if (_selectedCodepoint == value)
+            if (field == value)
             {
                 return;
             }
 
+            int oldSelectedCodePoint = field;
             int newSelectedCodePoint = Math.Clamp (value, 0, MAX_CODE_POINT);
+
+            Rune oldValue = new (oldSelectedCodePoint);
+            Rune newValue = new (newSelectedCodePoint);
+
+            ValueChangingEventArgs<Rune> changingArgs = new (oldValue, newValue);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
 
             Point offsetToNewCursor = GetCursor (newSelectedCodePoint);
 
-            _selectedCodepoint = newSelectedCodePoint;
+            field = newSelectedCodePoint;
 
             // Ensure the new cursor position is visible
             ScrollToMakeCursorVisible (offsetToNewCursor);
 
             SetNeedsDraw ();
             UpdateCursor ();
-            SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint));
+
+            ValueChangedEventArgs<Rune> changedArgs = new (oldValue, new Rune (field));
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
     }
 
+    #region IValue<Rune> Implementation
+
+    /// <inheritdoc/>
+    public Rune Value { get => new (SelectedCodePoint); set => SelectedCodePoint = value.Value; }
+
+    /// <inheritdoc/>
+    object IValue.GetValue () => new Rune (SelectedCodePoint);
+
     /// <summary>
-    ///     Raised when the selected code point changes.
+    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> is changing.
     /// </summary>
-    public event EventHandler<EventArgs<int>>? SelectedCodePointChanged;
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<Rune> args) => false;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<Rune>>? ValueChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<Rune> args) { }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<Rune>>? ValueChanged;
+
+    #endregion
 
     /// <summary>
     ///     Gets or sets whether the number of columns each glyph is displayed.
@@ -223,6 +277,7 @@ public class CharMap : View, IDesignable
         set
         {
             _rowHeight = value ? 2 : 1;
+
             // height changed => content height depends on row height
             RebuildVisibleRows ();
             SetNeedsDraw ();
@@ -235,16 +290,13 @@ public class CharMap : View, IDesignable
     /// </summary>
     public int StartCodePoint
     {
-        get => _startCodepoint;
+        get;
         set
         {
-            _startCodepoint = value;
+            field = value;
             SelectedCodePoint = value;
         }
     }
-
-
-    private UnicodeCategory? _showUnicodeCategory;
 
     /// <summary>
     ///     When set, only glyphs whose UnicodeCategory matches the value are rendered. If <see langword="null"/> (default),
@@ -252,27 +304,30 @@ public class CharMap : View, IDesignable
     /// </summary>
     public UnicodeCategory? ShowUnicodeCategory
     {
-        get => _showUnicodeCategory;
+        get;
         set
         {
-            if (_showUnicodeCategory == value)
+            if (field == value)
             {
                 return;
             }
 
-            _showUnicodeCategory = value;
+            field = value;
             RebuildVisibleRows ();
 
             // Ensure selection is on a visible row
             int desiredRowStart = SelectedCodePoint / 16 * 16;
+
             if (!_rowStartToVisibleIndex.ContainsKey (desiredRowStart))
             {
                 // Find nearest visible row (prefer next; fallback to last)
                 int idx = _visibleRowStarts.FindIndex (s => s >= desiredRowStart);
+
                 if (idx < 0 && _visibleRowStarts.Count > 0)
                 {
                     idx = _visibleRowStarts.Count - 1;
                 }
+
                 if (idx >= 0)
                 {
                     SelectedCodePoint = _visibleRowStarts [idx];
@@ -283,8 +338,8 @@ public class CharMap : View, IDesignable
         }
     }
 
-    private void CopyCodePoint () { App?.Clipboard?.SetClipboardData ($"U+{SelectedCodePoint:x5}"); }
-    private void CopyGlyph () { App?.Clipboard?.SetClipboardData ($"{new Rune (SelectedCodePoint)}"); }
+    private void CopyCodePoint () => App?.Clipboard?.SetClipboardData ($"U+{SelectedCodePoint:x5}");
+    private void CopyGlyph () => App?.Clipboard?.SetClipboardData ($"{new Rune (SelectedCodePoint)}");
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
     {
@@ -347,48 +402,33 @@ public class CharMap : View, IDesignable
         var decResponse = string.Empty;
         var getCodePointError = string.Empty;
 
-        Dialog? waitIndicator = new ()
-        {
-            Title = Strings.charMapCPInfoDlgTitle,
-            Buttons = [new () { Text = Strings.btnCancel }]
-        };
+        Dialog waitIndicator = new () { Title = Strings.charMapCPInfoDlgTitle, Buttons = [new Button { Text = Strings.btnCancel }] };
 
-        var errorLabel = new Label
-        {
-            Text = UcdApiClient.BaseUrl,
-            X = 0,
-            Y = 0,
-            TextAlignment = Alignment.Center
-        };
+        Label errorLabel = new () { Text = UcdApiClient.BaseUrl, X = 0, Y = 0, TextAlignment = Alignment.Center };
 
-        var spinner = new SpinnerView
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (errorLabel),
-            Style = new SpinnerStyle.Aesthetic ()
-        };
+        SpinnerView spinner = new () { X = Pos.Center (), Y = Pos.Bottom (errorLabel), Style = new SpinnerStyle.Aesthetic () };
         spinner.AutoSpin = true;
         waitIndicator.Add (errorLabel);
         waitIndicator.Add (spinner);
 
         waitIndicator.IsModalChanged += async (s, a) =>
-                               {
-                                   if (!a.Value)
-                                   {
-                                       return;
-                                   }
+                                        {
+                                            if (!a.Value)
+                                            {
+                                                return;
+                                            }
 
-                                   try
-                                   {
-                                       decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
-                                       App?.Invoke ((_) => (s as Dialog)?.RequestStop ());
-                                   }
-                                   catch (HttpRequestException e)
-                                   {
-                                       getCodePointError = errorLabel.Text = e.Message;
-                                       App?.Invoke ((_) => (s as Dialog)?.RequestStop ());
-                                   }
-                               };
+                                            try
+                                            {
+                                                decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
+                                                App?.Invoke (_ => (s as Dialog)?.RequestStop ());
+                                            }
+                                            catch (HttpRequestException e)
+                                            {
+                                                getCodePointError = errorLabel.Text = e.Message;
+                                                App?.Invoke (_ => (s as Dialog)?.RequestStop ());
+                                            }
+                                        };
         App?.Run (waitIndicator);
         waitIndicator.Dispose ();
 
@@ -406,12 +446,7 @@ public class CharMap : View, IDesignable
                 name = nameElement.GetString ();
             }
 
-            decResponse = JsonSerializer.Serialize (
-                                                    document.RootElement,
-                                                    new
-                                                        JsonSerializerOptions
-                                                    { WriteIndented = true }
-                                                   );
+            decResponse = JsonSerializer.Serialize (document.RootElement, new JsonSerializerOptions { WriteIndented = true });
         }
         else
         {
@@ -429,75 +464,71 @@ public class CharMap : View, IDesignable
         dlg.Title = title;
 
         var rune = (Rune)SelectedCodePoint;
-        var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
+        Label label = new () { Text = "IsAscii: ", X = 0, Y = 0 };
         dlg.Add (label);
 
-        label = new () { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
+        label = new Label { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
         dlg.Add (label);
 
-        label = new () { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new () { Text = "Category: ", X = 0, Y = Pos.Bottom (label) };
+        label = new Label { Text = "Category: ", X = 0, Y = Pos.Bottom (label) };
         dlg.Add (label);
         Span<char> utf16 = stackalloc char [2];
-        int charCount = rune.EncodeToUtf16 (utf16);
 
         // Get the bidi class for the first code unit
         // For most bidi characters, the first code unit is sufficient
         UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory (utf16 [0]);
 
-        label = new () { Text = $"{category}", X = Pos.Right (label), Y = Pos.Top (label) };
+        label = new Label { Text = $"{category}", X = Pos.Right (label), Y = Pos.Top (label) };
         dlg.Add (label);
 
-        label = new ()
+        label = new Label
         {
-            Text =
-                $"{Strings.charMapInfoDlgInfoLabel} {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
-            X = 0,
-            Y = Pos.Bottom (label)
+            Text = $"{Strings.charMapInfoDlgInfoLabel} {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:", X = 0, Y = Pos.Bottom (label)
         };
         dlg.Add (label);
 
-        var json = new TextView
+        TextView json = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
-            Width = Dim.Fill (0, minimumContentDim: 60),
-            Height = Dim.Fill (0, minimumContentDim: 5),
+            Width = Dim.Fill (0, 60),
+            Height = Dim.Fill (0, 5),
             ReadOnly = true,
             WordWrap = true,
             Text = decResponse
@@ -505,7 +536,8 @@ public class CharMap : View, IDesignable
 
         dlg.Add (json);
 
-        int? result = App?.Run (dlg) as int?;
+        var result = App?.Run (dlg) as int?;
+
         switch (result!)
         {
             case 0:
@@ -530,16 +562,18 @@ public class CharMap : View, IDesignable
         int x = codePoint % 16 * COLUMN_WIDTH + RowLabelWidth + 1 - Viewport.X;
 
         int visibleRowIndex = VisibleRowIndexForCodePoint (codePoint);
+
         if (visibleRowIndex < 0)
         {
             // If filtered out, stick to current Y to avoid jumping; caller will clamp
             int fallbackY = HEADER_HEIGHT - Viewport.Y;
-            return new (x, fallbackY);
+
+            return new Point (x, fallbackY);
         }
 
         int y = visibleRowIndex * _rowHeight + HEADER_HEIGHT - Viewport.Y;
 
-        return new (x, y);
+        return new Point (x, y);
     }
 
     /// <summary>Updates the cursor position based on the selected code point.</summary>
@@ -551,10 +585,7 @@ public class CharMap : View, IDesignable
     {
         Point cursor = GetCursor (SelectedCodePoint);
 
-        if (cursor.X >= RowLabelWidth
-            && cursor.X < Viewport.Width
-            && cursor.Y > 0
-            && cursor.Y < Viewport.Height)
+        if (cursor.X >= RowLabelWidth && cursor.X < Viewport.Width && cursor.Y > 0 && cursor.Y < Viewport.Height)
         {
             // Convert to Screen coordinates
             Cursor = Cursor with { Position = ViewportToScreen (cursor) };
@@ -588,34 +619,35 @@ public class CharMap : View, IDesignable
         // Clear the header area
         Move (0, 0);
         SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
-        AddStr (new (' ', Viewport.Width));
+        AddStr (new string (' ', Viewport.Width));
 
         int firstColumnX = RowLabelWidth - Viewport.X;
 
         // Header
-        var x = 0;
+        int x;
 
         for (var hexDigit = 0; hexDigit < 16; hexDigit++)
         {
             x = firstColumnX + hexDigit * COLUMN_WIDTH;
 
-            if (x > RowLabelWidth - 2)
+            if (x <= RowLabelWidth - 2)
             {
-                Move (x, 0);
-                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
-                AddStr (" ");
-
-                // Swap Active/Focus so the selected column is highlighted
-                if (hexDigit == selectedCol)
-
-                {
-                    SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
-                }
-
-                AddStr ($"{hexDigit:x}");
-                SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
-                AddStr (" ");
+                continue;
             }
+            Move (x, 0);
+            SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+            AddStr (" ");
+
+            // Swap Active/Focus so the selected column is highlighted
+            if (hexDigit == selectedCol)
+
+            {
+                SetAttributeForRole (HasFocus ? VisualRole.Active : VisualRole.Focus);
+            }
+
+            AddStr ($"{hexDigit:x}");
+            SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
+            AddStr (" ");
         }
 
         // Start at 1 because Header.
@@ -628,7 +660,7 @@ public class CharMap : View, IDesignable
             {
                 // No row at this y; clear label area and continue
                 Move (0, y);
-                AddStr (new (' ', Viewport.Width));
+                AddStr (new string (' ', Viewport.Width));
 
                 continue;
             }
@@ -651,7 +683,7 @@ public class CharMap : View, IDesignable
             }
             else
             {
-                AddStr (new (' ', RowLabelWidth));
+                AddStr (new string (' ', RowLabelWidth));
             }
 
             // Draw the row
@@ -680,14 +712,16 @@ public class CharMap : View, IDesignable
                 if (scalar > MAX_CODE_POINT)
                 {
                     AddStr (" ");
+
                     if (visibleRow == selectedRowIndex && col == selectedCol)
                     {
                         SetAttributeForRole (VisualRole.Normal);
                     }
+
                     continue;
                 }
 
-                string grapheme = "?";
+                var grapheme = "?";
 
                 if (Rune.IsValid (scalar))
                 {
@@ -698,6 +732,7 @@ public class CharMap : View, IDesignable
 
                 // Compute visibility based on ShowUnicodeCategory
                 bool isVisible = Rune.IsValid (scalar);
+
                 if (isVisible && ShowUnicodeCategory.HasValue)
                 {
                     UnicodeCategory cat = CharUnicodeInfo.GetUnicodeCategory (scalar);
@@ -758,7 +793,7 @@ public class CharMap : View, IDesignable
 
                     break;
 
-                // Format character that affects the layout of text or the operation of text processes, but is not normally rendered. 
+                // Format character that affects the layout of text or the operation of text processes, but is not normally rendered.
                 // These report width of 0 and don't render on their own.
                 case UnicodeCategory.Format:
                     SetAttributeForRole (VisualRole.Highlight);
@@ -769,7 +804,7 @@ public class CharMap : View, IDesignable
 
                 // Nonspacing character that indicates modifications of a base character.
                 case UnicodeCategory.NonSpacingMark:
-                // Spacing character that indicates modifications of a base character and affects the width of the glyph for that base character. 
+                // Spacing character that indicates modifications of a base character and affects the width of the glyph for that base character.
                 case UnicodeCategory.SpacingCombiningMark:
                 // Enclosing mark character, which is a nonspacing combining character that surrounds all previous characters up to and including a base character.
                 case UnicodeCategory.EnclosingMark:
@@ -788,6 +823,7 @@ public class CharMap : View, IDesignable
                     AddStr (grapheme);
 
                     break;
+
                 case UnicodeCategory.OtherLetter:
                     AddStr (grapheme);
 
@@ -797,6 +833,7 @@ public class CharMap : View, IDesignable
                     }
 
                     break;
+
                 default:
 
                     // Draw the rune
@@ -842,10 +879,10 @@ public class CharMap : View, IDesignable
     {
         Point position = GetCursor (SelectedCodePoint);
 
-        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
+        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             // If the mouse is clicked on the headers, map it to the first glyph of the row/col
-            position = mouseCommandContext.Binding.MouseEventArgs.Position!.Value;
+            position = mouse.Position!.Value;
 
             if (position.Y == 0)
             {
@@ -868,15 +905,17 @@ public class CharMap : View, IDesignable
             return false;
         }
 
-        if (cp != SelectedCodePoint)
+        if (cp == SelectedCodePoint)
         {
-            if (!HasFocus && CanFocus)
-            {
-                SetFocus ();
-            }
-
-            SelectedCodePoint = cp;
+            return true;
         }
+
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
+        SelectedCodePoint = cp;
 
         return true;
     }
@@ -890,14 +929,14 @@ public class CharMap : View, IDesignable
             return true;
         }
 
-        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
+        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             if (!HasFocus && CanFocus)
             {
                 SetFocus ();
             }
 
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out int cp))
+            if (!TryGetCodePointFromPosition (mouse.Position!.Value, out int cp))
             {
                 return false;
             }
@@ -914,9 +953,9 @@ public class CharMap : View, IDesignable
     {
         int newCodePoint = SelectedCodePoint;
 
-        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
+        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out newCodePoint))
+            if (!TryGetCodePointFromPosition (mouse.Position!.Value, out newCodePoint))
             {
                 return false;
             }
@@ -932,17 +971,16 @@ public class CharMap : View, IDesignable
         // This demonstrates how to create an ephemeral Popover; one that exists
         // ony as long as the popover is visible.
         // Note, for ephemeral Popovers, hotkeys are not supported.
-        PopoverMenu? contextMenu = new (
-                                        [
-                                            new (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
-                                            new (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
+        PopoverMenu contextMenu = new ([
+                                            new MenuItem (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
+                                            new MenuItem (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
                                         ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
         App!.Popover?.Register (contextMenu);
 
-        contextMenu?.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
+        contextMenu.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 
         return true;
     }
@@ -961,6 +999,7 @@ public class CharMap : View, IDesignable
         if (visibleRow < 0 || visibleRow >= _visibleRowStarts.Count)
         {
             codePoint = 0;
+
             return false;
         }
 
