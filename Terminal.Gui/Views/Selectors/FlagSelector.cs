@@ -145,8 +145,6 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        //Logging.Debug ($"{this.ToIdentifyingString ()} ({args.CurrentValue}->{args.NewValue})");
-
         if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
             // None flag was already checked; prevent changing again
@@ -160,8 +158,6 @@ public class FlagSelector : SelectorBase, IDesignable
         {
             return;
         }
-
-        //Logging.Debug ($"{this.ToIdentifyingString ()} ({args.OldValue}->{args.NewValue})");
 
         int newValue = Value ?? 0;
 

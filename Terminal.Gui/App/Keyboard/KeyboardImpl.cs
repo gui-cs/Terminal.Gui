@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -147,14 +148,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
-        // TODO: Add a way to ignore certain keys, esp for debugging.
-        //#if DEBUG
-        //        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
-        //        {
-        //            Logging.Debug ($"Ignoring {key}");
-        //            return false;
-        //        }
-        //#endif
+        Trace.Keyboard ("app", key, "Entry");
 
         // TODO: This should match standard event patterns
         KeyDown?.Invoke (this, key);
@@ -215,6 +209,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         // foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.GetBindings (key))
         if (KeyBindings.TryGet (key, out KeyBinding binding))
         {
+            Trace.Keyboard ("app", key, "Entry");
+
             if (binding.Target is { })
             {
                 if (!binding.Target.Enabled)

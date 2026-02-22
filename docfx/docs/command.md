@@ -320,3 +320,98 @@ When an inner CheckBox activates (via click/space), the command bubbles up to th
 6. **Shortcut/MenuItem**: Use relay dispatch (`ConsumeDispatch=false`). Commands propagate through `GetDispatchTarget` → `CommandView`. MenuItem inherits from Shortcut.
 
 7. **MenuBar**: Uses consume dispatch (`ConsumeDispatch=true`, `GetDispatchTarget` → `Focused`). Being redesigned — see source for current behavior.
+
+## Command Route Tracing
+
+For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.Tracing.Trace. Command tracing captures detailed information about command flow through the view hierarchy.
+
+> [!TIP]
+> `Trace` also supports Mouse and Keyboard tracing. See [Logging - View Event Tracing](logging.md#view-event-tracing) for the full tracing API.
+
+### Enabling Tracing
+
+```csharp
+using Terminal.Gui.Tracing;
+
+// Enable command tracing
+Trace.CommandEnabled = true;
+```
+
+When enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
+
+Tracing can also be enabled via configuration:
+
+```json
+{
+  "Trace.CommandEnabled": true
+}
+```
+
+In **UICatalog**, use the **Logging** menu → **Command Trace** checkbox to toggle tracing at runtime.
+
+### Trace Output
+
+When enabled, trace entries are logged via `Logging.Trace` with the format:
+
+```
+[Phase] Arrow Command @ ViewId (Method) - Message
+```
+
+- **Phase**: `Entry`, `Exit`, `Routing`, `Event`, or `Handler`
+- **Arrow**: `↑` (BubblingUp), `↓` (DispatchingDown), `↔` (Bridged), `•` (Direct)
+- **Command**: The command being routed (e.g., `Activate`, `Accept`)
+- **ViewId**: The view's identifying string
+- **Method**: The method where the trace occurred
+
+Example output:
+
+```
+[Entry] • Activate @ Button("OK"){X=10,Y=5} (DefaultActivateHandler)
+[Entry] • Activate @ Button("OK"){X=10,Y=5} (RaiseActivating)
+[Event] • Activate @ Button("OK"){X=10,Y=5} (RaiseActivating) - Invoking Activating event
+[Routing] ↑ Activate @ Button("OK"){X=10,Y=5} (TryBubbleUp) - BubblingUp to Dialog("Confirm")
+[Event] • Activate @ Button("OK"){X=10,Y=5} (RaiseActivated)
+```
+
+### Custom Backends
+
+Implement `ITraceBackend` for custom trace handling:
+
+```csharp
+using Terminal.Gui.Tracing;
+
+public class MyTraceBackend : ITraceBackend
+{
+    public void Log (TraceEntry entry)
+    {
+        // Custom handling - write to file, send to debugger, etc.
+    }
+    
+    public void Clear () { }
+}
+
+Trace.Backend = new MyTraceBackend ();
+```
+
+### Testing with ListBackend
+
+Use `ListBackend` to capture traces for test assertions:
+
+```csharp
+using Terminal.Gui.Tracing;
+
+ListBackend backend = new ();
+Trace.Backend = backend;
+Trace.CommandEnabled = true;
+
+view.InvokeCommand (Command.Activate);
+
+Assert.Contains (backend.Entries, e => e.Phase == "Entry");
+Assert.Contains (backend.Entries, e => e.Category == TraceCategory.Command);
+```
+
+### Performance
+
+- All `Trace.Command` calls are marked with `[Conditional("DEBUG")]` — **zero overhead in Release builds**
+- The backend uses `AsyncLocal<T>` for thread safety in parallel test execution
+- When tracing is disabled, all methods early-return with minimal overhead

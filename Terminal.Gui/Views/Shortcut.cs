@@ -294,7 +294,6 @@ public class Shortcut : View, IOrientation, IDesignable
         _activatedFiredThisCycle = true;
         base.OnActivated (ctx);
 
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
 
         // Translate the incoming command to Command via immutable context
@@ -314,7 +313,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (target is { })
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - InvokeCommand on TargetView ({target.Title})...");
             target.InvokeCommand (Command, ctx);
 
             return;
@@ -326,7 +324,6 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         // Is this an Application-bound command?
-        // Logging.Debug ($"{this.ToIdentifyingString ()} - Application.InvokeCommandsBoundToKey ({Key})...");
         App?.Keyboard.InvokeCommandsBoundToKey (Key);
     }
 
@@ -335,7 +332,6 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         base.OnAccepted (ctx);
 
-        //Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx}) - Invoke Action...");
         Action?.Invoke ();
 
         // Translate the incoming command to Command via immutable context

@@ -1,10 +1,11 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace UICatalog;
 
@@ -285,6 +286,22 @@ public sealed class UICatalogRunnable : Runnable
             _logLevelSelector.ValueChanged += OnLogLevelSelectorOnValueChanged;
 
             menuItems.Add (logMenu);
+
+            // add a separator
+            menuItems.Add (new Line ());
+
+            // Trace toggles
+            CheckBox commandTraceCheckBox = new () { Text = "Command _Trace", Value = Trace.CommandEnabled ? CheckState.Checked : CheckState.UnChecked };
+            commandTraceCheckBox.ValueChanging += (_, e) => { Trace.CommandEnabled = e.NewValue == CheckState.Checked; };
+            menuItems.Add (new MenuItem { CommandView = commandTraceCheckBox, HelpText = "Toggle command route tracing" });
+
+            CheckBox mouseTraceCheckBox = new () { Text = "_Mouse Trace", Value = Trace.MouseEnabled ? CheckState.Checked : CheckState.UnChecked };
+            mouseTraceCheckBox.ValueChanging += (_, e) => { Trace.MouseEnabled = e.NewValue == CheckState.Checked; };
+            menuItems.Add (new MenuItem { CommandView = mouseTraceCheckBox, HelpText = "Toggle mouse event tracing" });
+
+            CheckBox keyboardTraceCheckBox = new () { Text = "_Keyboard Trace", Value = Trace.KeyboardEnabled ? CheckState.Checked : CheckState.UnChecked };
+            keyboardTraceCheckBox.ValueChanging += (_, e) => { Trace.KeyboardEnabled = e.NewValue == CheckState.Checked; };
+            menuItems.Add (new MenuItem { CommandView = keyboardTraceCheckBox, HelpText = "Toggle keyboard event tracing" });
 
             // add a separator
             menuItems.Add (new Line ());

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -41,7 +42,6 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public void RaiseMouseEvent (Mouse mouseEvent)
     {
-        //Debug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
         if (App?.Initialized is true)
         {
             // LastMousePosition is only set if the application is initialized.
@@ -61,8 +61,6 @@ internal class MouseImpl : IMouse, IDisposable
 
         View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();
 
-        //Logging.Debug ($"{mouseEvent} - {deepestViewUnderMouse.ToIdentifyingString ()}");
-
         if (deepestViewUnderMouse is { })
         {
 #if DEBUG_IDISPOSABLE
@@ -74,6 +72,7 @@ internal class MouseImpl : IMouse, IDisposable
             mouseEvent.View = deepestViewUnderMouse;
         }
 
+        Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Entry", "Invoking MouseEvent");
         MouseEvent?.Invoke (this, mouseEvent);
 
         if (mouseEvent.Handled)
@@ -86,6 +85,8 @@ internal class MouseImpl : IMouse, IDisposable
             && App?.Popovers?.GetActivePopover () as View is { Visible: true } visiblePopover
             && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, true) is false)
         {
+            Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Hide Visible Popover");
+
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
 
             // Recurse once so the event can be handled below the popover
@@ -157,6 +158,8 @@ internal class MouseImpl : IMouse, IDisposable
             RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
         }
 
+        Trace.Mouse ("app", viewMouseEvent.Flags, viewMouseEvent.ScreenPosition, "Dispatch");
+
         while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && _mouseGrabViewRef is null)
         {
             if (deepestViewUnderMouse is Adornment adornmentView)
@@ -183,12 +186,18 @@ internal class MouseImpl : IMouse, IDisposable
                 ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
+
+            Trace.Mouse ("app", viewMouseEvent.Flags, viewMouseEvent.ScreenPosition, "Dispatch");
         }
+
+        Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Exit");
     }
 
     /// <inheritdoc/>
     public void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
+        Trace.Mouse ("app", MouseFlags.None, screenPosition, "Enter/Leave");
+
         // Tell any views that are no longer under the mouse that the mouse has left
         List<View?> viewsToLeave = CachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();
 
@@ -286,6 +295,8 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public void GrabMouse (View? view)
     {
+        Trace.Mouse ("app", MouseFlags.None, LastMousePosition ?? Point.Empty, "Grab");
+
         if (RaiseGrabbingMouseEvent (view))
         {
             return;
@@ -311,6 +322,8 @@ internal class MouseImpl : IMouse, IDisposable
         {
             return;
         }
+
+        Trace.Mouse ("app", MouseFlags.None, LastMousePosition ?? Point.Empty, "Grab");
 
         if (RaiseUnGrabbingMouseEvent (grabbedView))
         {
@@ -420,7 +433,7 @@ internal class MouseImpl : IMouse, IDisposable
             View = grabbed // Always set to the grab view. See Issue #4370
         };
 
-        //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
+        Trace.Mouse ("app", mouse.Flags, mouse.ScreenPosition, "Grab");
         grabbed.NewMouseEvent (viewRelativeMouseEvent);
 
         // When the mouse is grabbed, always return true to prevent the event from propagating
