@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Tracing;
 
 /// <summary>
 ///     Interface for trace backends. Implement this to capture trace events

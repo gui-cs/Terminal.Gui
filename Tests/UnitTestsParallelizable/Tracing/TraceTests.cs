@@ -1,8 +1,6 @@
-// Claude - Opus 4.5
+using Terminal.Gui.Tracing;
 
-using Xunit;
-
-namespace Terminal.Gui.Tests.Tracing;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Tests for the unified <see cref="Trace"/> system.
@@ -40,22 +38,22 @@ public class TraceTests
     public void Backend_Default_IsNullBackend ()
     {
         // Reset
-        Trace.Backend = new Trace.NullBackend ();
+        Trace.Backend = new NullBackend ();
 
-        Assert.IsType<Trace.NullBackend> (Trace.Backend);
+        Assert.IsType<NullBackend> (Trace.Backend);
     }
 
     [Fact]
     public void ListBackend_CapturesEntries ()
     {
-        Trace.ListBackend backend = new ();
+        ListBackend backend = new ();
         Trace.Backend = backend;
         Trace.CommandEnabled = true;
 
         try
         {
             View view = new () { Id = "test" };
-            Trace.Command (view, Input.Command.Accept, Input.CommandRouting.Direct, "TestPhase", "TestMessage");
+            Trace.Command (view, Command.Accept, CommandRouting.Direct, "TestPhase", "TestMessage");
 
             Assert.Single (backend.Entries);
             Assert.Equal (TraceCategory.Command, backend.Entries [0].Category);
@@ -65,14 +63,14 @@ public class TraceTests
         finally
         {
             Trace.CommandEnabled = false;
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 
     [Fact]
     public void MouseTrace_CapturesMouseEvents ()
     {
-        Trace.ListBackend backend = new ();
+        ListBackend backend = new ();
         Trace.Backend = backend;
         Trace.MouseEnabled = true;
 
@@ -89,14 +87,14 @@ public class TraceTests
         finally
         {
             Trace.MouseEnabled = false;
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 
     [Fact]
     public void KeyboardTrace_CapturesKeyEvents ()
     {
-        Trace.ListBackend backend = new ();
+        ListBackend backend = new ();
         Trace.Backend = backend;
         Trace.KeyboardEnabled = true;
 
@@ -113,14 +111,14 @@ public class TraceTests
         finally
         {
             Trace.KeyboardEnabled = false;
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 
     [Fact]
     public void Trace_Disabled_DoesNotCapture ()
     {
-        Trace.ListBackend backend = new ();
+        ListBackend backend = new ();
         Trace.Backend = backend;
         Trace.CommandEnabled = false;
         Trace.MouseEnabled = false;
@@ -129,7 +127,7 @@ public class TraceTests
         try
         {
             View view = new () { Id = "test" };
-            Trace.Command (view, Input.Command.Accept, Input.CommandRouting.Direct, "Test");
+            Trace.Command (view, Command.Accept, CommandRouting.Direct, "Test");
             Trace.Mouse (view, MouseFlags.LeftButtonClicked, Point.Empty, "Test");
             Trace.Keyboard (view, Key.A, "Test");
 
@@ -137,14 +135,14 @@ public class TraceTests
         }
         finally
         {
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 
     [Fact]
     public void IndependentCategories_OnlyEnabledCategoriesCaptured ()
     {
-        Trace.ListBackend backend = new ();
+        ListBackend backend = new ();
         Trace.Backend = backend;
         Trace.CommandEnabled = true;
         Trace.MouseEnabled = false;
@@ -154,7 +152,7 @@ public class TraceTests
         {
             View view = new () { Id = "test" };
 
-            Trace.Command (view, Input.Command.Accept, Input.CommandRouting.Direct, "Cmd");
+            Trace.Command (view, Command.Accept, CommandRouting.Direct, "Cmd");
             Trace.Mouse (view, MouseFlags.LeftButtonClicked, Point.Empty, "Mouse");
             Trace.Keyboard (view, Key.A, "Key");
 
@@ -167,7 +165,7 @@ public class TraceTests
         {
             Trace.CommandEnabled = false;
             Trace.KeyboardEnabled = false;
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 
@@ -175,16 +173,15 @@ public class TraceTests
     public void LoggingBackend_FormatsCommandCorrectly ()
     {
         // Just verify it doesn't throw - actual logging is hard to test
-        Trace.LoggingBackend backend = new ();
+        LoggingBackend backend = new ();
 
-        TraceEntry entry = new (
-                                TraceCategory.Command,
+        TraceEntry entry = new (TraceCategory.Command,
                                 "View(test)",
                                 "Entry",
                                 "TestMethod",
                                 "TestMessage",
                                 DateTime.UtcNow,
-                                (Input.Command.Accept, Input.CommandRouting.BubblingUp));
+                                (Command.Accept, CommandRouting.BubblingUp));
 
         backend.Log (entry);
 
@@ -195,10 +192,9 @@ public class TraceTests
     [Fact]
     public void LoggingBackend_FormatsMouseCorrectly ()
     {
-        Trace.LoggingBackend backend = new ();
+        LoggingBackend backend = new ();
 
-        TraceEntry entry = new (
-                                TraceCategory.Mouse,
+        TraceEntry entry = new (TraceCategory.Mouse,
                                 "View(test)",
                                 "Click",
                                 "TestMethod",
@@ -214,16 +210,9 @@ public class TraceTests
     [Fact]
     public void LoggingBackend_FormatsKeyboardCorrectly ()
     {
-        Trace.LoggingBackend backend = new ();
+        LoggingBackend backend = new ();
 
-        TraceEntry entry = new (
-                                TraceCategory.Keyboard,
-                                "View(test)",
-                                "KeyDown",
-                                "TestMethod",
-                                null,
-                                DateTime.UtcNow,
-                                Key.A.WithCtrl);
+        TraceEntry entry = new (TraceCategory.Keyboard, "View(test)", "KeyDown", "TestMethod", null, DateTime.UtcNow, Key.A.WithCtrl);
 
         backend.Log (entry);
 
@@ -233,14 +222,14 @@ public class TraceTests
     [Fact]
     public void Clear_RemovesAllEntries ()
     {
-        Trace.ListBackend backend = new ();
+        ListBackend backend = new ();
         Trace.Backend = backend;
         Trace.CommandEnabled = true;
 
         try
         {
             View view = new () { Id = "test" };
-            Trace.Command (view, Input.Command.Accept, Input.CommandRouting.Direct, "Test");
+            Trace.Command (view, Command.Accept, CommandRouting.Direct, "Test");
 
             Assert.Single (backend.Entries);
 
@@ -251,7 +240,7 @@ public class TraceTests
         finally
         {
             Trace.CommandEnabled = false;
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 
@@ -259,25 +248,25 @@ public class TraceTests
     public void Enabling_AutoSetsLoggingBackend ()
     {
         // Reset to NullBackend
-        Trace.Backend = new Trace.NullBackend ();
+        Trace.Backend = new NullBackend ();
         Trace.CommandEnabled = false;
         Trace.MouseEnabled = false;
         Trace.KeyboardEnabled = false;
 
         // Verify starting state
-        Assert.IsType<Trace.NullBackend> (Trace.Backend);
+        Assert.IsType<NullBackend> (Trace.Backend);
 
         try
         {
             // Enable a category - should auto-switch to LoggingBackend
             Trace.MouseEnabled = true;
 
-            Assert.IsType<Trace.LoggingBackend> (Trace.Backend);
+            Assert.IsType<LoggingBackend> (Trace.Backend);
         }
         finally
         {
             Trace.MouseEnabled = false;
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 
@@ -285,7 +274,7 @@ public class TraceTests
     public void ExplicitBackend_NotOverwritten ()
     {
         // Set explicit ListBackend
-        Trace.ListBackend backend = new ();
+        ListBackend backend = new ();
         Trace.Backend = backend;
         Trace.CommandEnabled = false;
 
@@ -299,7 +288,7 @@ public class TraceTests
         finally
         {
             Trace.CommandEnabled = false;
-            Trace.Backend = new Trace.NullBackend ();
+            Trace.Backend = new NullBackend ();
         }
     }
 }

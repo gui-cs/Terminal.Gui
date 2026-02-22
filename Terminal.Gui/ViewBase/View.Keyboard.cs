@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Keyboard APIs
@@ -440,6 +442,8 @@ public partial class View // Keyboard APIs
     /// <returns><see langword="true"/> if the event was handled.</returns>
     public bool NewKeyDownEvent (Key key)
     {
+        Trace.Keyboard (this, key, "Entry");
+
         if (!Enabled)
         {
             return false;

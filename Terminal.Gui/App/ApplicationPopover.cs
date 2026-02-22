@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -195,6 +197,8 @@ public sealed class ApplicationPopover : IDisposable
     /// <returns></returns>
     internal bool DispatchKeyDown (Key key)
     {
+        Trace.Keyboard ("Popovers", key, "Entry");
+
         // Do active first - Active gets all key down events.
         var activePopover = GetActivePopover () as View;
 

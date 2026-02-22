@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Tracing;
 
 /// <summary>
 ///     Captures information about a trace event for debugging and testing.

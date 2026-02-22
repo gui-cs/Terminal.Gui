@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Command APIs

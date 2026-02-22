@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Tracing;
 
 /// <summary>
 ///     Provides unified tracing for debugging and testing. Supports independent enable/disable
@@ -88,19 +88,14 @@ public static class Trace
     ///     When any trace category is enabled and no backend has been explicitly set,
     ///     <see cref="LoggingBackend"/> is automatically used.
     /// </remarks>
-    public static ITraceBackend Backend
-    {
-        get => _asyncLocalBackend.Value ?? _nullBackend;
-        set => _asyncLocalBackend.Value = value;
-    }
+    public static ITraceBackend Backend { get => _asyncLocalBackend.Value ?? _nullBackend; set => _asyncLocalBackend.Value = value; }
 
     private static void EnsureBackendIfEnabled ()
     {
         // Auto-switch to LoggingBackend if:
         // 1. Any category is enabled, AND
         // 2. No backend has been set (null) OR the backend is NullBackend
-        if ((_commandEnabled || _mouseEnabled || _keyboardEnabled)
-            && (_asyncLocalBackend.Value is null || _asyncLocalBackend.Value is NullBackend))
+        if ((_commandEnabled || _mouseEnabled || _keyboardEnabled) && (_asyncLocalBackend.Value is null || _asyncLocalBackend.Value is NullBackend))
         {
             _asyncLocalBackend.Value = _loggingBackend;
         }
@@ -118,13 +113,7 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Command (
-        View view,
-        Command command,
-        CommandRouting routing,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Command (View view, Command command, CommandRouting routing, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!CommandEnabled)
         {
@@ -143,20 +132,14 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Command (
-        View view,
-        ICommandContext? ctx,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Command (View view, ICommandContext? ctx, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!CommandEnabled)
         {
             return;
         }
 
-        Backend.Log (new TraceEntry (
-                                     TraceCategory.Command,
+        Backend.Log (new TraceEntry (TraceCategory.Command,
                                      view.ToIdentifyingString (),
                                      phase,
                                      method,
@@ -179,13 +162,7 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Mouse (
-        string source,
-        MouseFlags flags,
-        Point position,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Mouse (string source, MouseFlags flags, Point position, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!MouseEnabled)
         {
@@ -205,13 +182,7 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Mouse (
-        View view,
-        MouseFlags flags,
-        Point position,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Mouse (View view, MouseFlags flags, Point position, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!MouseEnabled)
         {
@@ -230,12 +201,7 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Mouse (
-        View view,
-        Mouse mouse,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Mouse (View view, Mouse mouse, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!MouseEnabled)
         {
@@ -254,12 +220,7 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Mouse (
-        string source,
-        Mouse mouse,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Mouse (string source, Mouse mouse, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!MouseEnabled)
         {
@@ -282,12 +243,7 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Keyboard (
-        string source,
-        Key key,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Keyboard (string source, Key key, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!KeyboardEnabled)
         {
@@ -306,12 +262,7 @@ public static class Trace
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>
     [Conditional ("DEBUG")]
-    public static void Keyboard (
-        View view,
-        Key key,
-        string phase,
-        string? message = null,
-        [CallerMemberName] string method = "")
+    public static void Keyboard (View view, Key key, string phase, string? message = null, [CallerMemberName] string method = "")
     {
         if (!KeyboardEnabled)
         {
@@ -319,116 +270,6 @@ public static class Trace
         }
 
         Backend.Log (new TraceEntry (TraceCategory.Keyboard, view.ToIdentifyingString (), phase, method, message, DateTime.UtcNow, key));
-    }
-
-    #endregion
-
-    #region Backends
-
-    /// <summary>
-    ///     A no-op backend that discards all trace entries. This is the default.
-    /// </summary>
-    public sealed class NullBackend : ITraceBackend
-    {
-        /// <inheritdoc/>
-        public void Log (TraceEntry entry) { }
-
-        /// <inheritdoc/>
-        public void Clear () { }
-    }
-
-    /// <summary>
-    ///     A backend that forwards trace entries to <see cref="Logging.Debug"/>.
-    /// </summary>
-    public sealed class LoggingBackend : ITraceBackend
-    {
-        /// <inheritdoc/>
-        public void Log (TraceEntry entry)
-        {
-            string prefix = entry.Category switch
-                            {
-                                TraceCategory.Command => FormatCommand (entry),
-                                TraceCategory.Mouse => FormatMouse (entry),
-                                TraceCategory.Keyboard => FormatKeyboard (entry),
-                                _ => $"[{entry.Category}]"
-                            };
-
-            var message = $"{prefix} @ {entry.ViewId} ({entry.Method})";
-
-            if (!string.IsNullOrEmpty (entry.Message))
-            {
-                message += $" - {entry.Message}";
-            }
-
-            Logging.Debug (message);
-        }
-
-        private static string FormatCommand (TraceEntry entry)
-        {
-            if (entry.Data is (Command cmd, CommandRouting routing))
-            {
-                string arrow = routing switch
-                               {
-                                   CommandRouting.BubblingUp => "↑",
-                                   CommandRouting.DispatchingDown => "↓",
-                                   CommandRouting.Bridged => "↔",
-                                   _ => "•"
-                               };
-
-                return $"[{entry.Phase}] {arrow} {cmd}";
-            }
-
-            return $"[Command:{entry.Phase}]";
-        }
-
-        private static string FormatMouse (TraceEntry entry)
-        {
-            if (entry.Data is (MouseFlags flags, Point pos))
-            {
-                return $"[Mouse:{entry.Phase}] {flags} @({pos.X},{pos.Y})";
-            }
-
-            if (entry.Data is Mouse mouse)
-            {
-                Point mousePos = mouse.Position ?? Point.Empty;
-
-                return $"[Mouse:{entry.Phase}] {mouse.Flags} @({mousePos.X},{mousePos.Y})";
-            }
-
-            return $"[Mouse:{entry.Phase}]";
-        }
-
-        private static string FormatKeyboard (TraceEntry entry)
-        {
-            if (entry.Data is Key key)
-            {
-                return $"[Key:{entry.Phase}] {key}";
-            }
-
-            return $"[Key:{entry.Phase}]";
-        }
-
-        /// <inheritdoc/>
-        public void Clear () { }
-    }
-
-    /// <summary>
-    ///     A backend that captures trace entries to a list for testing and inspection.
-    /// </summary>
-    public sealed class ListBackend : ITraceBackend
-    {
-        private readonly List<TraceEntry> _entries = [];
-
-        /// <summary>
-        ///     Gets the captured trace entries.
-        /// </summary>
-        public IReadOnlyList<TraceEntry> Entries => _entries;
-
-        /// <inheritdoc/>
-        public void Log (TraceEntry entry) => _entries.Add (entry);
-
-        /// <inheritdoc/>
-        public void Clear () => _entries.Clear ();
     }
 
     #endregion

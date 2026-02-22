@@ -48,12 +48,7 @@ internal class DriverImpl : IDriver
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
-
-        _inputProcessor.SyntheticMouseEvent += (s, e) =>
-                                               {
-                                                   //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
-                                                   MouseEvent?.Invoke (s, e);
-                                               };
+        _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
         _ansiRequestScheduler = ansiRequestScheduler;
