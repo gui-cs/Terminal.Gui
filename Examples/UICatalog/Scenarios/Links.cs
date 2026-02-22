@@ -14,9 +14,9 @@ public class Links : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-
-        _app = Application.Create ();
-        _app.Init ();
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
         _appWindow = new ()
         {
