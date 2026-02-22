@@ -104,4 +104,58 @@ public class FileSystemCollectionNavigationMatcherTests
 
         treeView.Dispose ();
     }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void TreeView_LetterBasedNavigation_MixedObjectTypes_FileSystemMatcherFallsBackToToString ()
+    {
+        // Arrange - Mix file system objects with regular objects
+        var mockFileSystem = new MockFileSystem (new Dictionary<string, MockFileData> ());
+        mockFileSystem.AddFile ("apple.csv", new MockFileData (""));
+        mockFileSystem.AddFile ("cherry.csv", new MockFileData (""));
+
+        var apple = mockFileSystem.FileInfo.New ("apple.csv");
+        var cherry = mockFileSystem.FileInfo.New ("cherry.csv");
+
+        // Create TreeView that accepts any object type
+        var treeView = new TreeView<object> { Width = 20, Height = 10 };
+        treeView.TreeBuilder = new DelegateTreeBuilder<object> (_ => null);
+        treeView.AspectGetter = obj => obj switch
+        {
+            IFileSystemInfo fsi => $"[FILE] {fsi.Name}",
+            _ => obj.ToString ()
+        };
+        
+        // Use FileSystemCollectionNavigationMatcher which handles both types
+        treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
+
+        // Add mixed objects: file, string, file
+        treeView.AddObject (apple);
+        treeView.AddObject ("banana"); // Regular string object
+        treeView.AddObject (cherry);
+
+
+        // Act & Assert
+        // Select apple (file system object)
+        treeView.SelectedObject = apple;
+        Assert.Equal (apple, treeView.SelectedObject);
+
+        // Press 'b' - should navigate to "banana" (string object, falls back to ToString)
+        treeView.NewKeyDownEvent (Key.B);
+        Assert.Equal ("banana", treeView.SelectedObject);
+
+        // Press 'c' - should navigate to cherry (file system object)
+        treeView.NewKeyDownEvent (Key.C);
+        Assert.Equal (cherry, treeView.SelectedObject);
+
+        // Press 'a' - should cycle back to apple
+        treeView.NewKeyDownEvent (Key.A);
+        Assert.Equal (apple, treeView.SelectedObject);
+
+        // Press 'b' again - from apple, should go to banana
+        treeView.NewKeyDownEvent (Key.B);
+        Assert.Equal ("banana", treeView.SelectedObject);
+
+        treeView.Dispose ();
+    }
 }
