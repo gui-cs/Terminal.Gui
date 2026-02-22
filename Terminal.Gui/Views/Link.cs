@@ -29,10 +29,11 @@ public class Link : View, IDesignable
     }
 
     /// <summary>
-    /// Représente l'URL par défaut utilisée lorsque aucune URL spécifique n'est fournie.
+    /// Represents the default URL used when no specific URL is provided.
     /// </summary>
-    /// <remarks>Cette constante peut être utilisée pour initialiser des navigateurs ou des composants Web à
-    /// une page vierge ou à un état neutre.</remarks>
+    /// <remarks>
+    /// This constant can be used to initialize browsers or web components to a blank page or neutral state.
+    /// </remarks>
     public const string DEFAULT_URL = "about:blank";
 
     private string _url = DEFAULT_URL;
