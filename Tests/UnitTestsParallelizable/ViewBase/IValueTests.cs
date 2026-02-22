@@ -405,4 +405,22 @@ public class IValueTests
         Assert.NotNull (result);
         Assert.IsType<Color> (result);
     }
+
+    [Fact]
+    public void SenderOfEvents_IsCorrect ()
+    {
+        // Verify that the sender parameter of ValueChanging and ValueChanged events is the view raising the event
+        TestIntValueView view = new ();
+        object? changingSender = null;
+        object? changedSender = null;
+        view.ValueChanging += (sender, _) => changingSender = sender;
+        view.ValueChanged += (sender, _) => changedSender = sender;
+        view.Value = 42;
+
+        // Both events should have the view as sender
+        Assert.NotNull (changingSender);
+        Assert.NotNull (changedSender);
+        Assert.Equal (view, changingSender);
+        Assert.Equal (view, changedSender);
+    }
 }
