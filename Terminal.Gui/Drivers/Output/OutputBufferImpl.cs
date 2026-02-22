@@ -25,6 +25,12 @@ public class OutputBufferImpl : IOutputBuffer
     /// </summary>
     public Attribute CurrentAttribute { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or <see cref="AddStr(string)"/>.
+    ///     When set, subsequent cells will include this URL for OSC 8 hyperlink rendering.
+    /// </summary>
+    public string? CurrentUrl { get; set; }
+
     /// <summary>The leftmost column in the terminal.</summary>
     public virtual int Left { get; set; } = 0;
 
@@ -209,6 +215,7 @@ public class OutputBufferImpl : IOutputBuffer
     private void SetAttributeAndDirty (int col, int row)
     {
         Contents! [row, col].Attribute = CurrentAttribute;
+        Contents [row, col].Url = CurrentUrl;
         Contents [row, col].IsDirty = true;
     }
 

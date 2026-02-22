@@ -49,6 +49,9 @@ public abstract class OutputBase
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
+    // Last URL used for tracking hyperlink state
+    private string? _lastUrl = null;
+
     StringBuilder _lastOutputStringBuilder = new ();
 
     /// <summary>
@@ -75,6 +78,7 @@ public abstract class OutputBase
             }
 
             outputStringBuilder.Clear ();
+            _lastUrl = null; // Reset URL state at the start of each row
 
             // Process columns in row
             for (int col = left; col < cols; col++)
@@ -137,6 +141,13 @@ public abstract class OutputBase
                 else
                 {
                     SetCursorPositionImpl (lastCol, row);
+
+                    // Close any open hyperlink before processing URLs
+                    if (_lastUrl is { })
+                    {
+                        outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                        _lastUrl = null;
+                    }
 
                     // Wrap URLs with OSC 8 hyperlink sequences
                     StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
@@ -257,6 +268,24 @@ public abstract class OutputBase
     protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol, ref int outputWidth)
     {
         Attribute? attribute = cell.Attribute;
+
+        // Handle URL hyperlink state changes
+        if (!IsLegacyConsole && cell.Url != _lastUrl)
+        {
+            // If we were in a hyperlink, end it
+            if (_lastUrl is { })
+            {
+                output.Append (EscSeqUtils.OSC_EndHyperlink ());
+            }
+
+            // If starting a new hyperlink, begin it
+            if (!string.IsNullOrEmpty (cell.Url))
+            {
+                output.Append (EscSeqUtils.OSC_StartHyperlink (cell.Url));
+            }
+
+            _lastUrl = cell.Url;
+        }
 
         // Add ANSI escape sequence for attribute change
         if (attribute.HasValue && attribute.Value != lastAttr)
