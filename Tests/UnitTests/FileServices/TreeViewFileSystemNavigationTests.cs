@@ -183,9 +183,6 @@ public class FileSystemCollectionNavigationMatcherTests
         treeView.AddObject (item2); // Apple
         treeView.AddObject (item3); // Banana
 
-        treeView.BeginInit ();
-        treeView.EndInit ();
-        Application.Begin (treeView);
 
         // Act & Assert
         // Select Zebra (item1)
@@ -194,19 +191,19 @@ public class FileSystemCollectionNavigationMatcherTests
 
         // Press 'a' - should navigate to Apple (based on Name via AspectGetter), NOT fail
         // If it was using ToString(), 'a' wouldn't match anything (IDs are 1, 2, 3)
-        Application.RaiseKeyDownEvent (Key.A);
+        treeView.NewKeyDownEvent (Key.A);
         Assert.Equal (item2, treeView.SelectedObject); // Should go to Apple
 
         // Press 'b' - should navigate to Banana
-        Application.RaiseKeyDownEvent (Key.B);
+        treeView.NewKeyDownEvent (Key.B);
         Assert.Equal (item3, treeView.SelectedObject); // Should go to Banana
 
         // Press 'z' - should cycle to Zebra
-        Application.RaiseKeyDownEvent (Key.Z);
+        treeView.NewKeyDownEvent (Key.Z);
         Assert.Equal (item1, treeView.SelectedObject); // Should go to Zebra
 
         // Verify that pressing '1', '2', '3' (the ToString values) does NOT work
-        Application.RaiseKeyDownEvent (Key.D1);
+        treeView.NewKeyDownEvent (Key.D1);
         // Should stay on Zebra since no items start with '1' in their Name
         Assert.Equal (item1, treeView.SelectedObject);
 
