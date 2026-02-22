@@ -53,6 +53,7 @@ public abstract class OutputBase
     private string? _lastUrl = null;
 
     StringBuilder _lastOutputStringBuilder = new ();
+    private bool _clearLastOutputPending;
 
     /// <summary>
     ///     Writes dirty cells from the buffer to the console. Hides cursor, iterates rows/cols,
@@ -61,6 +62,7 @@ public abstract class OutputBase
     /// </summary>
     public virtual void Write (IOutputBuffer buffer)
     {
+        _clearLastOutputPending = true;
         StringBuilder outputStringBuilder = new ();
         int top = 0;
         int left = 0;
@@ -204,6 +206,12 @@ public abstract class OutputBase
     /// <param name="output"></param>
     protected virtual void Write (StringBuilder output)
     {
+        if (_clearLastOutputPending)
+        {
+            _lastOutputStringBuilder.Clear ();
+            _clearLastOutputPending = false;
+        }
+
         _lastOutputStringBuilder.Append (output);
     }
 
