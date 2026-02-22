@@ -370,6 +370,7 @@ public partial class TextView
                                        CurrentColumn,
                                        _selectionStartRow,
                                        _selectionStartColumn,
+                                       _tabWidth,
                                        true);
             CurrentRow = nRow;
             CurrentColumn = nCol;

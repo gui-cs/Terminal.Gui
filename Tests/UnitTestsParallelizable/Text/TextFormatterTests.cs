@@ -3235,4 +3235,58 @@ ssb
 
         driver.Dispose ();
     }
+
+    [Fact]
+    public void Format_Instance_WordWrapFalse_PreserveTabsFalse_ReplacesTabsWithSpaces ()
+    {
+        var tf = new TextFormatter { Text = "A\tB\tC", PreserveTabs = false, WordWrap = false, TabWidth = 4 };
+
+        string formatted = tf.Format ();
+
+        Assert.DoesNotContain ('\t', formatted);
+        Assert.Equal ("A    B    C", formatted);
+    }
+
+    [Fact]
+    public void Format_Instance_WordWrapFalse_PreserveTabsTrue_PreservesTabs ()
+    {
+        var tf = new TextFormatter { Text = "A\tB\tC", PreserveTabs = true, WordWrap = false, TabWidth = 4 };
+
+        string formatted = tf.Format ();
+
+        Assert.Contains ('\t', formatted);
+        Assert.Equal ("A\tB\tC", formatted);
+    }
+
+    [Fact]
+    public void Format_Static_WordWrapTrue_PreserveTabsFalse_ReplacesTabsInLines ()
+    {
+        List<string> lines = TextFormatter.Format ("A\tB\tC", 6, false, true, false, 4);
+
+        Assert.NotEmpty (lines);
+        Assert.All (lines, l => Assert.DoesNotContain ('\t', l));
+
+        // ensure spaces are present as replacement
+        Assert.Contains (lines, l => l.Contains (' '));
+    }
+
+    [Fact]
+    public void Format_Static_WordWrapTrue_PreserveTabsTrue_PreservesTabsInLines ()
+    {
+        List<string> lines = TextFormatter.Format ("A\tB\tC",
+                                                   6,
+                                                   false,
+                                                   true,
+                                                   false,
+                                                   4,
+                                                   TextDirection.LeftRight_TopBottom,
+                                                   false,
+                                                   null,
+                                                   true);
+
+        Assert.NotEmpty (lines);
+
+        // At least one output line should contain a tab when preserving tabs
+        Assert.Contains (lines, l => l.Contains ('\t'));
+    }
 }

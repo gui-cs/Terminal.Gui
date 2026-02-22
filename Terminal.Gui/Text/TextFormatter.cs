@@ -647,7 +647,8 @@ public class TextFormatter
                              TabWidth,
                              Direction,
                              MultiLine,
-                             this
+                             this,
+                             PreserveTabs
                             );
 
             colsWidth = GetMaxColsForWidth (_lines, width, TabWidth);
@@ -668,7 +669,8 @@ public class TextFormatter
                              TabWidth,
                              Direction,
                              MultiLine,
-                             this
+                             this,
+                             PreserveTabs
                             );
 
             if (_lines.Count > height)
@@ -849,6 +851,13 @@ public class TextFormatter
         get => _preserveTrailingSpaces;
         set => _preserveTrailingSpaces = EnableNeedsFormat (value);
     }
+
+    /// <summary>
+    ///     Gets or sets whether tabs will be preserved, considering the tab width or replaced with spaces.
+    ///     If <see langword="true"/> tabs will be preserved, considering the spaces according to the provided <see cref="TabWidth"/>.
+    ///     If <see langword="false"/>, default, tabs will be replaced with spaces according to the provided <see cref="TabWidth"/>.
+    /// </summary>
+    public bool PreserveTabs { get; set => field = EnableNeedsFormat (value); }
 
     /// <summary>Gets or sets the number of columns used for a tab.</summary>
     public int TabWidth
@@ -1364,8 +1373,13 @@ public class TextFormatter
     }
 
     // TODO: Move to StringExtensions?
-    private static string ReplaceTABWithSpaces (string str, int tabWidth)
+    private static string ReplaceTABWithSpaces (string str, int tabWidth, bool preserveTabs = false)
     {
+        if (preserveTabs)
+        {
+            return str;
+        }
+
         if (tabWidth == 0)
         {
             return str.Replace ("\t", "");
@@ -1479,6 +1493,10 @@ public class TextFormatter
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textDirection">The text direction.</param>
     /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
+    /// <param name="preserveTabs">
+    ///     If <see langword="true"/> tabs will be preserved, considering the spaces according to the provided <see cref="TabWidth"/>.
+    ///     If <see langword="false"/>, default, tabs will be replaced with spaces according to the provided <see cref="TabWidth"/>.
+    /// </param>
     /// <returns>A list of word wrapped lines.</returns>
     /// <remarks>
     ///     <para>This method does not do any alignment.</para>
@@ -1495,7 +1513,8 @@ public class TextFormatter
         bool preserveTrailingSpaces = false,
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
-        TextFormatter? textFormatter = null
+        TextFormatter? textFormatter = null,
+        bool preserveTabs = false
     )
     {
         ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
@@ -1684,7 +1703,7 @@ public class TextFormatter
                                 return to + 1;
                             }
 
-                            if (length > cWidth && tabWidth > cWidth)
+                            if (length > cWidth && (tabWidth > cWidth || preserveTabs))
                             {
                                 return to;
                             }
@@ -1732,6 +1751,10 @@ public class TextFormatter
     /// <param name="textDirection">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
+    /// <param name="preserveTabs">
+    ///     If <see langword="true"/> tabs will be preserved, considering the spaces according to the provided <see cref="TabWidth"/>.
+    ///     If <see langword="false"/>, default, tabs will be replaced with spaces according to the provided <see cref="TabWidth"/>.
+    /// </param>
     /// <returns>Justified and clipped text.</returns>
     public static string ClipAndJustify (
         string text,
@@ -1739,10 +1762,11 @@ public class TextFormatter
         Alignment textAlignment,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         int tabWidth = 0,
-        TextFormatter? textFormatter = null
+        TextFormatter? textFormatter = null,
+        bool preserveTabs = false
     )
     {
-        return ClipAndJustify (text, width, textAlignment == Alignment.Fill, textDirection, tabWidth, textFormatter);
+        return ClipAndJustify (text, width, textAlignment == Alignment.Fill, textDirection, tabWidth, textFormatter, preserveTabs);
     }
 
     /// <summary>Justifies text within a specified width.</summary>
@@ -1755,6 +1779,10 @@ public class TextFormatter
     /// <param name="textDirection">The text direction.</param>
     /// <param name="tabWidth">The number of columns used for a tab.</param>
     /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
+    /// <param name="preserveTabs">
+    ///     If <see langword="true"/> tabs will be preserved, considering the spaces according to the provided <see cref="TabWidth"/>.
+    ///     If <see langword="false"/>, default, tabs will be replaced with spaces according to the provided <see cref="TabWidth"/>.
+    /// </param>
     /// <returns>Justified and clipped text.</returns>
     public static string ClipAndJustify (
         string text,
@@ -1762,7 +1790,8 @@ public class TextFormatter
         bool justify,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         int tabWidth = 0,
-        TextFormatter? textFormatter = null
+        TextFormatter? textFormatter = null,
+        bool preserveTabs = false
     )
     {
         ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
@@ -1772,7 +1801,7 @@ public class TextFormatter
             return text;
         }
 
-        text = ReplaceTABWithSpaces (text, tabWidth);
+        text = ReplaceTABWithSpaces (text, tabWidth, preserveTabs);
         List<string> graphemes = GraphemeHelper.GetGraphemes (text).ToList ();
         int zeroLength = graphemes.Sum (s => s.EnumerateRunes ().Sum (r => r.GetColumns() == 0 ? 1 : 0));
 
@@ -1962,6 +1991,10 @@ public class TextFormatter
     /// <param name="textDirection">The text direction.</param>
     /// <param name="multiLine">If <see langword="true"/> new lines are allowed.</param>
     /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
+    /// <param name="preserveTabs">
+    ///     If <see langword="true"/> tabs will be preserved, considering the spaces according to the provided <paramref name="tabWidth"/>.
+    ///     If <see langword="false"/>, default, tabs will be replaced with spaces according to the provided <paramref name="tabWidth"/>.
+    /// </param>
     /// <returns>A list of word wrapped lines.</returns>
     /// <remarks>
     ///     <para>An empty <paramref name="text"/> string will result in one empty line.</para>
@@ -1977,7 +2010,8 @@ public class TextFormatter
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         bool multiLine = false,
-        TextFormatter? textFormatter = null
+        TextFormatter? textFormatter = null,
+        bool preserveTabs = false
     )
     {
         return Format (
@@ -1989,7 +2023,8 @@ public class TextFormatter
                        tabWidth,
                        textDirection,
                        multiLine,
-                       textFormatter
+                       textFormatter,
+                       preserveTabs
                       );
     }
 
@@ -2010,6 +2045,10 @@ public class TextFormatter
     /// <param name="textDirection">The text direction.</param>
     /// <param name="multiLine">If <see langword="true"/> new lines are allowed.</param>
     /// <param name="textFormatter"><see cref="TextFormatter"/> instance to access any of his objects.</param>
+    /// <param name="preserveTabs">
+    ///     If <see langword="true"/> tabs will be preserved, considering the spaces according to the provided <paramref name="tabWidth"/>.
+    ///     If <see langword="false"/>, default, tabs will be replaced with spaces according to the provided <paramref name="tabWidth"/>.
+    /// </param>
     /// <returns>A list of word wrapped lines.</returns>
     /// <remarks>
     ///     <para>An empty <paramref name="text"/> string will result in one empty line.</para>
@@ -2025,7 +2064,8 @@ public class TextFormatter
         int tabWidth = 0,
         TextDirection textDirection = TextDirection.LeftRight_TopBottom,
         bool multiLine = false,
-        TextFormatter? textFormatter = null
+        TextFormatter? textFormatter = null,
+        bool preserveTabs = false
     )
     {
         ArgumentOutOfRangeException.ThrowIfNegative (width, nameof (width));
@@ -2041,7 +2081,7 @@ public class TextFormatter
 
         if (!wordWrap)
         {
-            text = ReplaceTABWithSpaces (text, tabWidth);
+            text = ReplaceTABWithSpaces (text, tabWidth, preserveTabs);
 
             if (multiLine)
             {
@@ -2075,14 +2115,15 @@ public class TextFormatter
                                                     justify,
                                                     textDirection,
                                                     tabWidth,
-                                                    textFormatter));
+                                                    textFormatter,
+                                                    preserveTabs));
                 }
 
                 return PerformCorrectFormatDirection (textDirection, lineResult);
             }
 
             text = ReplaceCRLFWithSpace (text);
-            lineResult.Add (ClipAndJustify (PerformCorrectFormatDirection (textDirection, text), width, justify, textDirection, tabWidth, textFormatter));
+            lineResult.Add (ClipAndJustify (PerformCorrectFormatDirection (textDirection, text), width, justify, textDirection, tabWidth, textFormatter, preserveTabs));
 
             return PerformCorrectFormatDirection (textDirection, lineResult);
         }
@@ -2104,12 +2145,13 @@ public class TextFormatter
                                   preserveTrailingSpaces,
                                   tabWidth,
                                   textDirection,
-                                  textFormatter
+                                  textFormatter,
+                                  preserveTabs
                                  );
 
                 foreach (string line in wrappedLines)
                 {
-                    lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth));
+                    lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth, preserveTabs: preserveTabs));
                 }
 
                 if (wrappedLines.Count == 0)
@@ -2127,10 +2169,11 @@ public class TextFormatter
                                               preserveTrailingSpaces,
                                               tabWidth,
                                               textDirection,
-                                              textFormatter
+                                              textFormatter,
+                                              preserveTabs
                                              ))
         {
-            lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth));
+            lineResult.Add (ClipAndJustify (line, width, justify, textDirection, tabWidth, preserveTabs: preserveTabs));
         }
 
         return PerformCorrectFormatDirection (textDirection, lineResult);

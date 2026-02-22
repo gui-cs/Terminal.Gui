@@ -2493,6 +2493,72 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (2, count);
     }
 
+    [Theory]
+    [InlineData (0, 0, 4, 0, "\tTesting WordWrap", """
+
+                                                   Testing
+                                                   WordWrap
+                                                   """)]
+    [InlineData (8, 1, 4, 2, "Testing WordWrap\t", """
+                                                   Testing 
+                                                   WordWrap
+
+                                                   """)]
+    [InlineData (1, 0, 5, 0, "T\testing WordWrap", """
+                                                   T    
+                                                   esting 
+                                                   WordWrap
+                                                   """)]
+    public void Tab_And_Shift_Tab_ContentsChanged_With_TabKeyAddsTab_And_WordWrap_True_AddsRemovesTabCharacter (
+        int col,
+        int row,
+        int expectedCursorX,
+        int expectedCursorY,
+        string expectedText,
+        string expectedOutput)
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable runnable = new ();
+        View view1 = new () { CanFocus = true };
+        TextView textView = new () { Width = 10, Height = 3 };
+        string text = "Testing WordWrap";
+        textView.Text = text;
+        var count = 0;
+        textView.ContentsChanged += (_, _) => count++;
+        View view2 = new () { CanFocus = true };
+        runnable.Add (view1, textView, view2);
+
+        app.Begin (runnable);
+
+        // Move focus to textView
+        textView.SetFocus ();
+        Assert.True (textView.TabKeyAddsTab);
+        Assert.False (textView.WordWrap);
+
+        textView.WordWrap = true;
+
+        // Move insertion point to specified column
+        textView.InsertionPoint = new Point (col, row);
+
+        // Press Tab - should add tab character
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab));
+        Assert.Equal (expectedText, textView.Text);
+        Assert.True (textView.HasFocus);
+        Assert.Equal (expectedCursorX, textView.Cursor.Position!.Value.X);
+        Assert.Equal (expectedCursorY, textView.Cursor.Position!.Value.Y);
+        Assert.Equal (1, count);
+        textView.Draw ();
+        DriverAssert.AssertDriverContentsAre (expectedOutput, output, app.Driver);
+
+        // Press Shift+Tab - should remove tab character
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab.WithShift));
+        Assert.Equal (text, textView.Text);
+        Assert.True (textView.HasFocus);
+        Assert.Equal (col, textView.Cursor.Position!.Value.X);
+        Assert.Equal (row, textView.Cursor.Position!.Value.Y);
+        Assert.Equal (2, count);
+    }
+
     [Fact]
     public void Tab_And_Shift_Tab_With_TabKeyAddsTab_False_DoesNotAddTabCharacter_AndMovesFocusToNextPreviousView ()
     {
