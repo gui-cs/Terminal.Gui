@@ -927,10 +927,10 @@ public partial class DimAutoTests (ITestOutputHelper output)
 
     // DimAutoStyle.Content tests
     [Fact]
-    public void DimAutoStyle_Content_UsesContentSize_WhenSet ()
+    public void DimAutoStyle_Content_WithoutSubViews_UsesContentSize_WhenSet ()
     {
         var view = new View ();
-        view.SetContentSize (new (10, 5));
+        view.SetContentSize (new Size (10, 5));
 
         Dim dim = Auto (DimAutoStyle.Content);
 
@@ -940,21 +940,41 @@ public partial class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void DimAutoStyle_Content_IgnoresSubViews_When_ContentSize_Is_Set ()
+    public void DimAutoStyle_Content_WithSubViews_IgnoresContentSize_WhenSet ()
     {
         var view = new View ();
 
         var subview = new View
         {
-            Frame = new (50, 50, 1, 1)
+            Frame = new Rectangle (50, 50, 1, 1)
         };
-        view.SetContentSize (new (10, 5));
+        view.Add (subview);
+
+        view.SetContentSize (new Size (10, 5));
 
         Dim dim = Auto (DimAutoStyle.Content);
 
         int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
 
-        Assert.Equal (10, calculatedWidth);
+        Assert.Equal (51, calculatedWidth);
+    }
+
+    [Fact]
+    public void DimAutoStyle_Content_WithSubViews_IgnoresContentSize_WhenNotSet ()
+    {
+        var view = new View ();
+
+        var subview = new View
+        {
+            Frame = new Rectangle (50, 50, 1, 1)
+        };
+        view.Add (subview);
+
+        Dim dim = Auto (DimAutoStyle.Content);
+
+        int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
+
+        Assert.Equal (51, calculatedWidth);
     }
 
     [Fact]
