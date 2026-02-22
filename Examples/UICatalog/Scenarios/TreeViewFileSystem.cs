@@ -39,12 +39,10 @@ public class TreeViewFileSystem : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window win = new ()
-        {
-            Title = GetName (),
-            Y = 1, // menu
-            Height = Dim.Fill ()
-        };
+        using Window win = new ();
+        win.Title = GetName ();
+        win.Y = 1; // menu
+        win.Height = Dim.Fill ();
 
         // MenuBar
         MenuBar menu = new ();
@@ -52,7 +50,7 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = Pos.Bottom (menu), Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
-        _treeViewFiles.VerticalScrollBar.AutoShow = false;
+        // Scrollbars are disabled by default (VisibilityMode.Manual)
 
         _detailsFrame = new DetailsFrame (_iconProvider)
         {
@@ -67,10 +65,7 @@ public class TreeViewFileSystem : Scenario
         SetupFileTree ();
 
         // Setup menu checkboxes
-        _miFullPathsCheckBox = new ()
-        {
-            Title = "_Full Paths"
-        };
+        _miFullPathsCheckBox = new () { Title = "_Full Paths" };
         _miFullPathsCheckBox.ValueChanged += (_, _) => SetFullName ();
 
         _miMultiSelectCheckBox = new CheckBox
@@ -81,81 +76,41 @@ public class TreeViewFileSystem : Scenario
         };
         _miMultiSelectCheckBox.ValueChanged += (_, _) => SetMultiSelect ();
 
-        _miShowLinesCheckBox = new ()
-        {
-            Title = "_Show Lines",
-            Value = CheckState.Checked
-        };
+        _miShowLinesCheckBox = new () { Title = "_Show Lines", Value = CheckState.Checked };
         _miShowLinesCheckBox.ValueChanged += (_, _) => ShowLines ();
 
-        _miPlusMinusCheckBox = new ()
-        {
-            Title = "_Plus Minus Symbols",
-            Value = CheckState.Checked
-        };
+        _miPlusMinusCheckBox = new () { Title = "_Plus Minus Symbols", Value = CheckState.Checked };
         _miPlusMinusCheckBox.ValueChanged += (_, _) => SetExpandableSymbols ((Rune)'+', (Rune)'-');
 
-        _miArrowSymbolsCheckBox = new ()
-        {
-            Title = "_Arrow Symbols"
-        };
+        _miArrowSymbolsCheckBox = new () { Title = "_Arrow Symbols" };
         _miArrowSymbolsCheckBox.ValueChanged += (_, _) => SetExpandableSymbols ((Rune)'>', (Rune)'v');
 
-        _miNoSymbolsCheckBox = new ()
-        {
-            Title = "_No Symbols"
-        };
+        _miNoSymbolsCheckBox = new () { Title = "_No Symbols" };
         _miNoSymbolsCheckBox.ValueChanged += (_, _) => SetExpandableSymbols (default (Rune), null);
 
-        _miColoredSymbolsCheckBox = new ()
-        {
-            Title = "_Colored Symbols"
-        };
+        _miColoredSymbolsCheckBox = new () { Title = "_Colored Symbols" };
         _miColoredSymbolsCheckBox.ValueChanged += (_, _) => ShowColoredExpandableSymbols ();
 
-        _miInvertSymbolsCheckBox = new ()
-        {
-            Title = "_Invert Symbols"
-        };
+        _miInvertSymbolsCheckBox = new () { Title = "_Invert Symbols" };
         _miInvertSymbolsCheckBox.ValueChanged += (_, _) => InvertExpandableSymbols ();
 
-        _miBasicIconsCheckBox = new ()
-        {
-            Title = "_Basic Icons"
-        };
+        _miBasicIconsCheckBox = new () { Title = "_Basic Icons" };
         _miBasicIconsCheckBox.ValueChanged += (_, _) => SetNoIcons ();
 
-        _miUnicodeIconsCheckBox = new ()
-        {
-            Title = "_Unicode Icons"
-        };
+        _miUnicodeIconsCheckBox = new () { Title = "_Unicode Icons" };
         _miUnicodeIconsCheckBox.ValueChanged += (_, _) => SetUnicodeIcons ();
 
-        _miNerdIconsCheckBox = new ()
-        {
-            Title = "_Nerd Icons"
-        };
+        _miNerdIconsCheckBox = new () { Title = "_Nerd Icons" };
         _miNerdIconsCheckBox.ValueChanged += (_, _) => SetNerdIcons ();
 
-        _miLeaveLastRowCheckBox = new ()
-        {
-            Title = "_Leave Last Row",
-            Value = CheckState.Checked
-        };
+        _miLeaveLastRowCheckBox = new () { Title = "_Leave Last Row", Value = CheckState.Checked };
         _miLeaveLastRowCheckBox.ValueChanged += (_, _) => SetLeaveLastRow ();
 
-        _miHighlightModelTextOnlyCheckBox = new ()
-        {
-            Title = "_Highlight Model Text Only",
-            Value = CheckState.Checked
-        };
+        _miHighlightModelTextOnlyCheckBox = new () { Title = "_Highlight Model Text Only", Value = CheckState.Checked };
         SetCheckHighlightModelTextOnly ();
         _miHighlightModelTextOnlyCheckBox.ValueChanged += (_, _) => SetCheckHighlightModelTextOnly ();
 
-        _miCustomColorsCheckBox = new ()
-        {
-            Title = "C_ustom Colors Hidden Files"
-        };
+        _miCustomColorsCheckBox = new () { Title = "C_ustom Colors Hidden Files" };
         _miCustomColorsCheckBox.ValueChanged += (_, _) => SetCustomColors ();
 
         _miCursorCheckBox = new CheckBox
@@ -294,20 +249,11 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        if (_miPlusMinusCheckBox is { })
-        {
-            _miPlusMinusCheckBox.Value = expand.Value == '+' ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miPlusMinusCheckBox?.Value = expand.Value == '+' ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miArrowSymbolsCheckBox is { })
-        {
-            _miArrowSymbolsCheckBox.Value = expand.Value == '>' ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miArrowSymbolsCheckBox?.Value = expand.Value == '>' ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miNoSymbolsCheckBox is { })
-        {
-            _miNoSymbolsCheckBox.Value = expand.Value == default (int) ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miNoSymbolsCheckBox?.Value = expand.Value == 0 ? CheckState.Checked : CheckState.UnChecked;
 
         _treeViewFiles.Style.ExpandableSymbol = expand;
         _treeViewFiles.Style.CollapseableSymbol = collapse;
@@ -427,10 +373,7 @@ public class TreeViewFileSystem : Scenario
 
     private void ShowPropertiesOf (IFileSystemInfo fileSystemInfo)
     {
-        if (_detailsFrame is { })
-        {
-            _detailsFrame.FileInfo = fileSystemInfo;
-        }
+        _detailsFrame?.FileInfo = fileSystemInfo;
     }
 
     private void TreeViewFiles_DrawLine (object? sender, DrawTreeViewLineEventArgs<IFileSystemInfo> e)
@@ -441,15 +384,18 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        if (_iconProvider.UseNerdIcons || _iconProvider.UseUnicodeCharacters)
+        if (_iconProvider is { UseNerdIcons: false, UseUnicodeCharacters: false })
         {
-            if (e.IndexOfModelText > 0 && e.IndexOfModelText < e.Cells.Count)
-            {
-                Cell cell = e.Cells [e.IndexOfModelText];
-
-                cell.Attribute = new Attribute (Color.BrightYellow, cell.Attribute!.Value.Background, cell.Attribute!.Value.Style);
-            }
+            return;
         }
+
+        if (e.IndexOfModelText <= 0 || e.IndexOfModelText >= e.Cells.Count)
+        {
+            return;
+        }
+        Cell cell = e.Cells [e.IndexOfModelText];
+
+        cell.Attribute = new Attribute (Color.BrightYellow, cell.Attribute!.Value.Background, cell.Attribute!.Value.Style);
     }
 
     private void TreeViewFiles_KeyPress (object? sender, Key obj)
@@ -459,26 +405,27 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        if (obj.KeyCode == (KeyCode.R | KeyCode.CtrlMask))
+        if (obj.KeyCode != (KeyCode.R | KeyCode.CtrlMask))
         {
-            IFileSystemInfo? selected = _treeViewFiles.SelectedObject;
-
-            // nothing is selected
-            if (selected is null)
-            {
-                return;
-            }
-
-            int? location = _treeViewFiles.GetObjectRow (selected);
-
-            //selected object is offscreen or somehow not found
-            if (location is null || location < 0 || location > _treeViewFiles.Frame.Height)
-            {
-                return;
-            }
-
-            ShowContextMenu (new Point (5 + _treeViewFiles.Frame.X, location.Value + _treeViewFiles.Frame.Y + 2), selected);
+            return;
         }
+        IFileSystemInfo? selected = _treeViewFiles.SelectedObject;
+
+        // nothing is selected
+        if (selected is null)
+        {
+            return;
+        }
+
+        int? location = _treeViewFiles.GetObjectRow (selected);
+
+        //selected object is offscreen or somehow not found
+        if (location is null || location < 0 || location > _treeViewFiles.Frame.Height)
+        {
+            return;
+        }
+
+        ShowContextMenu (new Point (5 + _treeViewFiles.Frame.X, location.Value + _treeViewFiles.Frame.Y + 2), selected);
     }
 
     private void TreeViewFiles_Selecting (object? sender, CommandEventArgs e)
@@ -495,40 +442,30 @@ public class TreeViewFileSystem : Scenario
         }
 
         // if user right clicks
-        if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
+        if (!mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
         {
-            IFileSystemInfo? rightClicked = _treeViewFiles.GetObjectOnRow (mouse.Position!.Value.Y);
-
-            // nothing was clicked
-            if (rightClicked is null)
-            {
-                return;
-            }
-
-            ShowContextMenu (new Point (mouse.Position!.Value.X + _treeViewFiles.Frame.X, mouse.Position!.Value.Y + _treeViewFiles.Frame.Y + 2), rightClicked);
+            return;
         }
+        IFileSystemInfo? rightClicked = _treeViewFiles.GetObjectOnRow (mouse.Position!.Value.Y);
+
+        // nothing was clicked
+        if (rightClicked is null)
+        {
+            return;
+        }
+
+        ShowContextMenu (new Point (mouse.Position!.Value.X + _treeViewFiles.Frame.X, mouse.Position!.Value.Y + _treeViewFiles.Frame.Y + 2), rightClicked);
     }
 
     private void TreeViewFiles_SelectionChanged (object? sender, SelectionChangedEventArgs<IFileSystemInfo> e) => ShowPropertiesOf (e.NewValue);
 
     private void UpdateIconCheckedness ()
     {
-        if (_miBasicIconsCheckBox is { })
-        {
-            _miBasicIconsCheckBox.Value = !_iconProvider.UseNerdIcons && !_iconProvider.UseUnicodeCharacters
-                                                     ? CheckState.Checked
-                                                     : CheckState.UnChecked;
-        }
+        _miBasicIconsCheckBox?.Value = _iconProvider is { UseNerdIcons: false, UseUnicodeCharacters: false } ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miUnicodeIconsCheckBox is { })
-        {
-            _miUnicodeIconsCheckBox.Value = _iconProvider.UseUnicodeCharacters ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miUnicodeIconsCheckBox?.Value = _iconProvider.UseUnicodeCharacters ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miNerdIconsCheckBox is { })
-        {
-            _miNerdIconsCheckBox.Value = _iconProvider.UseNerdIcons ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miNerdIconsCheckBox?.Value = _iconProvider.UseNerdIcons ? CheckState.Checked : CheckState.UnChecked;
 
         _treeViewFiles?.SetNeedsDraw ();
     }
@@ -548,7 +485,6 @@ public class TreeViewFileSystem : Scenario
 
         public IFileSystemInfo? FileInfo
         {
-            get => _fileInfo;
             set
             {
                 _fileInfo = value;

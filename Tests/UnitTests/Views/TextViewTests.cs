@@ -1706,9 +1706,10 @@ This is the second line.
     [TextViewTestsSetupFakeApplication]
     public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
     {
-        var top = new Runnable ();
+        Runnable top = new ();
         top.Add (_textView);
-        _textView.HorizontalScrollBar.AutoShow = false;
+        _textView.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
+        _textView.HorizontalScrollBar.Visible = false;
         Application.Begin (top);
 
         Assert.Equal (4, _textView.TabWidth);
