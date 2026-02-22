@@ -1438,9 +1438,6 @@ public class TableViewTests (ITestOutputHelper output)
         tv.Style.ShowHorizontalHeaderOverline = true;
         tv.Style.ShowHorizontalHeaderUnderline = true;
 
-        // Horizontal scrolling option is part of the underline
-        tv.Style.ShowHorizontalScrollIndicators = true;
-
         tv.Draw ();
 
         var expected = $@"
@@ -1500,9 +1497,6 @@ public class TableViewTests (ITestOutputHelper output)
         tv.Style.ShowHeaders = false;
         tv.Style.ShowHorizontalHeaderOverline = false;
         tv.Style.ShowHorizontalHeaderUnderline = true;
-
-        // Horizontal scrolling option is part of the underline
-        tv.Style.ShowHorizontalScrollIndicators = true;
 
         tv.Draw ();
 
@@ -1949,7 +1943,6 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
 
-        tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
         tableView.Update ();
@@ -2001,7 +1994,6 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
 
-        tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
 
         tableView.ColumnOffset = 1;
@@ -2053,7 +2045,6 @@ B│C│D│E
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
 
-        tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.LayoutSubViews ();
         tableView.SetNeedsDraw ();

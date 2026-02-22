@@ -47,8 +47,8 @@ public class ProcessTable : Scenario
 
     private void CreateProcessTable ()
     {
-        //int ro = _tableView.RowOffset;
-        //int co = _tableView.ColumnOffset;
+        int ro = _tableView.RowOffset;
+        int co = _tableView.ColumnOffset;
 
         _tableView.Table = new EnumerableTableSource<Process> (
                                                               Process.GetProcesses (),
@@ -62,8 +62,8 @@ public class ProcessTable : Scenario
                                                               }
                                                              );
 
-        //_tableView.RowOffset = ro;
-        //_tableView.ColumnOffset = co;
+        _tableView.RowOffset = ro;
+        _tableView.ColumnOffset = co;
         _tableView.EnsureValidScrollOffsets ();
     }
 }

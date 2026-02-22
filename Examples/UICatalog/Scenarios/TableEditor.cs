@@ -398,14 +398,6 @@ public class TableEditor : Scenario
                                                                                        _tableView!.Style.ShowHorizontalBottomline = state;
                                                                                        _tableView!.Update ();
                                                                                    }),
-                                                           CreateCheckBoxMenuItem ("HorizontalScrollIndicators",
-                                                                                   "_HorizontalScrollIndicators",
-                                                                                   _tableView!.Style.ShowHorizontalScrollIndicators,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowHorizontalScrollIndicators = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
                                                            CreateCheckBoxMenuItem ("FullRowSelect",
                                                                                    "_FullRowSelect",
                                                                                    _tableView!.FullRowSelect,
@@ -456,11 +448,17 @@ public class TableEditor : Scenario
                                                                                    }),
                                                            CreateCheckBoxMenuItem ("ScrollBarsAuto",
                                                                                    "_ScrollBarsAuto",
-                                                                                   _tableView!.HorizontalScrollBar.AutoShow || _tableView.VerticalScrollBar.AutoShow,
+                                                                                   _tableView!.ViewportSettings.HasFlag(ViewportSettingsFlags.HasScrollBars),
                                                                                    state =>
                                                                                    {
-                                                                                       _tableView!.HorizontalScrollBar.AutoShow = state;
-                                                                                       _tableView!.VerticalScrollBar.AutoShow = state;
+                                                                                       if (state)
+                                                                                       {
+                                                                                           _tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+                                                                                       }
+                                                                                       else
+                                                                                       {
+                                                                                           _tableView.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
+                                                                                       }
                                                                                        _tableView!.Update ();
                                                                                    }),
                                                            CreateCheckBoxMenuItem ("ScrollBarsVisible",
@@ -470,13 +468,6 @@ public class TableEditor : Scenario
                                                                                    {
                                                                                        _tableView!.HorizontalScrollBar.Visible = state;
                                                                                        _tableView!.VerticalScrollBar.Visible = state;
-
-                                                                                       if (!state)
-                                                                                       {
-                                                                                           _tableView!.HorizontalScrollBar.AutoShow = state;
-                                                                                           _tableView!.VerticalScrollBar.AutoShow = state;
-                                                                                       }
-
                                                                                        _tableView!.Update ();
                                                                                    }),
                                                            CreateCheckBoxMenuItem ("UseAllRowsForContentCalculation",

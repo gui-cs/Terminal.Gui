@@ -38,65 +38,17 @@ public partial class TableView : View, IDesignable
         CollectionNavigator = new TableCollectionNavigator (this);
 
         // Things this view knows how to do
-        AddCommand (Command.Right,
-                    () =>
-                    {
-                        var oldSelecteCol = SelectedColumn;
-                        var oldViewportX = Viewport.X;
-                        var result = ChangeSelectionByOffsetWithReturn (1, 0);
+        AddCommand (Command.Right, ctx => HandleRight (ctx));
 
-                        if (oldSelecteCol == SelectedColumn && Viewport.X < MaxViewPort().X)
-                        {
-                            var maxViewPort = MaxViewPort ();
-                            Viewport = Viewport with {X = Math.Min(oldViewportX + 1, maxViewPort.X)};
-                        }
-                        return result;
-                    });
         AddCommand (Command.Left,
                     () =>
                     {
                         return ChangeSelectionByOffsetWithReturn (-1, 0);
                     });
 
-        AddCommand (Command.Up,
-                    () =>
-                    {
-                        if (SelectedRow == 0 )
-                        {
-                            if (Viewport.Y > 0)
-                            {
-                                Viewport = Viewport with {Y = Viewport.Y - 1};
+        AddCommand (Command.Up, ctx => HandleUp (ctx));
 
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-
-                        return ChangeSelectionByOffsetWithReturn (0, -1);
-                    });
-
-        AddCommand (Command.Down,
-                    () =>
-                    {
-                        if (Table != null && SelectedRow >= Table.Rows - 1)
-                        {
-                            if (Viewport.Y < GetContentSize ().Height - Viewport.Height)
-                            {
-                                Viewport = Viewport with {Y = Viewport.Y + 1};
-
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-
-                        return ChangeSelectionByOffsetWithReturn (0, 1);
-                    });
+        AddCommand (Command.Down, ctx => HandleDown (ctx));
 
         AddCommand (Command.PageUp,
                     () =>
@@ -291,6 +243,12 @@ public partial class TableView : View, IDesignable
             {
                 value = 0;
             }
+
+            if (_columnsToRenderCache == null)
+            {
+                CalculateContentSize ();
+            }
+
             if (value >= (_columnsToRenderCache?.Length ?? 0))
             {
                 value = (_columnsToRenderCache?.Length ?? 0) - 1;
@@ -441,6 +399,58 @@ public partial class TableView : View, IDesignable
     }
 
     private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] MultiSelection);
+
+    private bool? HandleRight (ICommandContext? ctx)
+    {
+        var oldSelecteCol = SelectedColumn;
+        var oldViewportX = Viewport.X;
+        var result = ChangeSelectionByOffsetWithReturn (1, 0);
+
+        if (oldSelecteCol == SelectedColumn && Viewport.X < MaxViewPort ().X)
+        {
+            var maxViewPort = MaxViewPort ();
+            Viewport = Viewport with { X = Math.Min (oldViewportX + 1, maxViewPort.X) };
+        }
+        return result;
+    }
+
+    private bool? HandleUp (ICommandContext? ctx)
+    {
+        if (SelectedRow == 0)
+        {
+            if (Viewport.Y > 0)
+            {
+                Viewport = Viewport with { Y = Viewport.Y - 1 };
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return ChangeSelectionByOffsetWithReturn (0, -1);
+    }
+
+    private bool? HandleDown (ICommandContext? ctx)
+    {
+        if (Table != null && SelectedRow >= Table.Rows - 1)
+        {
+            if (Viewport.Y < GetContentSize ().Height - Viewport.Height)
+            {
+                Viewport = Viewport with { Y = Viewport.Y + 1 };
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return ChangeSelectionByOffsetWithReturn (0, 1);
+    }
 
     /// <summary>Moves the selection down by one page</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>

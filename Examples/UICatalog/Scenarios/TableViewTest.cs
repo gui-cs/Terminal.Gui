@@ -102,7 +102,18 @@ public class TableViewTest : Scenario
 
         (string text, Func<bool> iv, Action<bool> hndlr) [] options =
         [
-            ("Scrollbars Auto", () => tableView.HorizontalScrollBar.AutoShow, b => { tableView.HorizontalScrollBar.AutoShow = b; tableView.VerticalScrollBar.AutoShow = b; }),
+            ("Scrollbars Auto", () => tableView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars),
+             b =>
+             {
+                 if (b)
+                 {
+                     tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+                 }
+                 else
+                 {
+                     tableView.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
+                 }
+             }),
             ("AlwaysShowHeaders", () => tableView.Style.AlwaysShowHeaders, b => tableView.Style.AlwaysShowHeaders = b),
             ("ShowHeaders", () => tableView.Style.ShowHeaders, b => tableView.Style.ShowHeaders = b),
             ("ShowHorizontalHeaderOverline", () => tableView.Style.ShowHorizontalHeaderOverline, b => tableView.Style.ShowHorizontalHeaderOverline = b),
