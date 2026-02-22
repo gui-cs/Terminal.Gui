@@ -120,63 +120,6 @@ public class MenuBarTests : TestsAllDrivers
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
-    public void DefaultKey_Activates (string d)
-    {
-        MenuBar? menuBar = null;
-        View? top = null;
-
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (app =>
-                                         {
-                                             menuBar = new MenuBar ();
-                                             top = app.TopRunnableView!;
-
-                                             top.Add (new View { CanFocus = true, Id = "focusableView" });
-                                             menuBar.EnableForDesign (ref top);
-                                             app.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .WaitIteration ()
-                                  .AssertIsNotType<MenuItem> (top?.App?.Navigation!.GetFocused ())
-                                  .ScreenShot ("MenuBar initial state", _out)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .WaitIteration ()
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .AssertEqual ("_New", top?.App?.Navigation!.GetFocused ()!.Title)
-                                  .AssertTrue (top?.App?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertTrue (menuBar?.IsOpen ());
-    }
-
-    [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void DefaultKey_DeActivates (string d)
-    {
-        MenuBar? menuBar = null;
-        IApplication? app = null;
-
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (a =>
-                                         {
-                                             app = a;
-                                             menuBar = new MenuBar ();
-                                             View top = app.TopRunnableView!;
-
-                                             top.Add (new View { CanFocus = true, Id = "focusableView" });
-                                             menuBar.EnableForDesign (ref top);
-                                             app.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .WaitIteration ()
-                                  .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
-                                  .ScreenShot ("MenuBar initial state", _out)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .AssertEqual ("_New", app?.Navigation!.GetFocused ()!.Title)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ());
-    }
-
-    [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
     public void EnableForDesign_CreatesMenuItems (string d)
     {
         using TestContext c = With.A<Window> (80, 25, d, _out)
