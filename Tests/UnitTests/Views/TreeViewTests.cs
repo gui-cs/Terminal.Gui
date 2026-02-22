@@ -1310,6 +1310,296 @@ oot two
         public override int GetHashCode () { return Name?.GetHashCode () ?? base.GetHashCode (); }
     }
 
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_Default_IsTrue ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+        Assert.True (tv.AllowLetterBasedNavigation);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_NavigatesToNextNodeStartingWithLetter ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        var apple = new TreeNode ("apple");
+        var banana = new TreeNode ("banana");
+        var blueberry = new TreeNode ("blueberry");
+        var cherry = new TreeNode ("cherry");
+        tv.AddObject (apple);
+        tv.AddObject (banana);
+        tv.AddObject (blueberry);
+        tv.AddObject (cherry);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Initially select apple
+        tv.SelectedObject = apple;
+        Assert.Equal (apple, tv.SelectedObject);
+
+        // Press 'b' - should navigate to banana
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (banana, tv.SelectedObject);
+
+        // Press 'b' again - should navigate to blueberry
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (blueberry, tv.SelectedObject);
+
+        // Press 'b' again - should cycle back to banana
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (banana, tv.SelectedObject);
+
+        // Press 'c' - should navigate to cherry
+        tv.NewKeyDownEvent (Key.C);
+        Assert.Equal (cherry, tv.SelectedObject);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_WhenDisabled_DoesNotNavigate ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+        tv.AllowLetterBasedNavigation = false;
+
+        var apple = new TreeNode ("apple");
+        var banana = new TreeNode ("banana");
+        var cherry = new TreeNode ("cherry");
+        tv.AddObject (apple);
+        tv.AddObject (banana);
+        tv.AddObject (cherry);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Initially select apple
+        tv.SelectedObject = apple;
+        Assert.Equal (apple, tv.SelectedObject);
+
+        // Press 'b' - should NOT navigate since AllowLetterBasedNavigation is false
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (apple, tv.SelectedObject);
+
+        // Press 'c' - should still be on apple
+        tv.NewKeyDownEvent (Key.C);
+        Assert.Equal (apple, tv.SelectedObject);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_WorksWithNestedNodes ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        var fruits = new TreeNode ("Fruits");
+        var apple = new TreeNode ("apple");
+        var banana = new TreeNode ("banana");
+        fruits.Children.Add (apple);
+        fruits.Children.Add (banana);
+
+        var vegetables = new TreeNode ("Vegetables");
+        var carrot = new TreeNode ("carrot");
+        vegetables.Children.Add (carrot);
+
+        tv.AddObject (fruits);
+        tv.AddObject (vegetables);
+        tv.Expand (fruits);
+        tv.Expand (vegetables);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Initially select Fruits
+        tv.SelectedObject = fruits;
+        Assert.Equal (fruits, tv.SelectedObject);
+
+        // Press 'a' - should navigate to apple
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (apple, tv.SelectedObject);
+
+        // Press 'b' - should navigate to banana
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (banana, tv.SelectedObject);
+
+        // Press 'c' - should navigate to carrot
+        tv.NewKeyDownEvent (Key.C);
+        Assert.Equal (carrot, tv.SelectedObject);
+
+        // Press 'V' - should navigate to Vegetables
+        tv.NewKeyDownEvent (Key.V);
+        Assert.Equal (vegetables, tv.SelectedObject);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_CaseInsensitive ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        var apple = new TreeNode ("Apple");
+        var banana = new TreeNode ("Banana");
+        var Cherry = new TreeNode ("Cherry");
+        tv.AddObject (apple);
+        tv.AddObject (banana);
+        tv.AddObject (Cherry);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Initially select Apple
+        tv.SelectedObject = apple;
+        Assert.Equal (apple, tv.SelectedObject);
+
+        // Press lowercase 'b' - should navigate to Banana (case insensitive)
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (banana, tv.SelectedObject);
+
+        // Press lowercase 'c' - should navigate to Cherry
+        tv.NewKeyDownEvent (Key.C);
+        Assert.Equal (Cherry, tv.SelectedObject);
+
+        // Press lowercase 'a' - should navigate back to Apple
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (apple, tv.SelectedObject);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_NoMatchReturnsToStart ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        var apple = new TreeNode ("apple");
+        var banana = new TreeNode ("banana");
+        var cherry = new TreeNode ("cherry");
+        tv.AddObject (apple);
+        tv.AddObject (banana);
+        tv.AddObject (cherry);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Select cherry
+        tv.SelectedObject = cherry;
+        Assert.Equal (cherry, tv.SelectedObject);
+
+        // Press 'a' - should cycle back and find apple
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (apple, tv.SelectedObject);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_WorksWithNumbers ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        var item1 = new TreeNode ("1st item");
+        var item2 = new TreeNode ("2nd item");
+        var item3 = new TreeNode ("3rd item");
+        tv.AddObject (item1);
+        tv.AddObject (item2);
+        tv.AddObject (item3);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Initially select 1st item
+        tv.SelectedObject = item1;
+        Assert.Equal (item1, tv.SelectedObject);
+
+        // Press '2' - should navigate to 2nd item
+        tv.NewKeyDownEvent (Key.D2);
+        Assert.Equal (item2, tv.SelectedObject);
+
+        // Press '3' - should navigate to 3rd item
+        tv.NewKeyDownEvent (Key.D3);
+        Assert.Equal (item3, tv.SelectedObject);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_OnlyVisibleNodes ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        var root = new TreeNode ("Root");
+        var apple = new TreeNode ("apple");
+        var banana = new TreeNode ("banana");
+        root.Children.Add (apple);
+        root.Children.Add (banana);
+
+        tv.AddObject (root);
+        // Don't expand root, so children are not visible
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Select root
+        tv.SelectedObject = root;
+        Assert.Equal (root, tv.SelectedObject);
+
+        // Press 'a' - should not navigate to apple (not visible)
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (root, tv.SelectedObject);
+
+        // Now expand root to make children visible
+        tv.Expand (root);
+        tv.LayoutSubViews ();
+
+        // Press 'a' - should now navigate to apple
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (apple, tv.SelectedObject);
+
+        // Press 'b' - should navigate to banana
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (banana, tv.SelectedObject);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_SameLetterInRootAndSubtree ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        // Tree structure:
+        // Apple
+        // Peach
+        //   Abb
+        //   Acc
+        var appleRoot = new TreeNode ("Apple");
+        var peach = new TreeNode ("Peach");
+        var abb = new TreeNode ("Abb");
+        var acc = new TreeNode ("Acc");
+        peach.Children.Add (abb);
+        peach.Children.Add (acc);
+
+        tv.AddObject (appleRoot);
+        tv.AddObject (peach);
+        tv.Expand (peach);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Select Abb
+        tv.SelectedObject = abb;
+        Assert.Equal (abb, tv.SelectedObject);
+
+        // Press 'a' - should navigate to next 'A' item which is Acc
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (acc, tv.SelectedObject);
+
+        // Press 'a' again - should cycle to Apple (root level)
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (appleRoot, tv.SelectedObject);
+
+        // Press 'a' again - should cycle to Abb
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (abb, tv.SelectedObject);
+    }
+
     #region Test Setup Methods
 
     private class Factory
