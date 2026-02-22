@@ -1251,6 +1251,12 @@ public class TreeView<T> : View, ITreeView where T : class
             // Find the current selected object within the tree
             int current = map.IndexOf (b => b.Model == SelectedObject);
 
+            // The currently selected object is no longer in line map somehow
+            if(current < 0)
+            {
+                return false;
+            }
+
             int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)key);
 
             if (newIndex is int && newIndex != -1)
