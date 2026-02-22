@@ -1,6 +1,6 @@
 #nullable enable
+using JetBrains.Annotations;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewsTests;
 
@@ -8,10 +8,9 @@ namespace ViewsTests;
 ///     Unit tests for <see cref="Link"/> that don't require static Application dependencies.
 ///     These tests can run in parallel without interference.
 /// </summary>
-public class LinkTests (ITestOutputHelper output) : TestDriverBase
+[TestSubject (typeof (Link))]
+public class LinkTests : TestDriverBase
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public void Constructor_Defaults ()
     {
@@ -53,14 +52,49 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Url_Set_Fires_UrlChanged_Event ()
     {
-        Link link = new();
-        var eventFired = false;
+        string oldUrl = "http://oldvalue.io";
+        string newUrl = "http://newvalue.io";
 
-        link.UrlChanged += (s, e) => eventFired = true;
-        link.Url = "https://github.com";
+        Link link = new() { Url = oldUrl };
+        bool eventFired = false;
+        bool eventArgsValid = false;
+
+        link.UrlChanged += (s, e) =>
+        {
+            eventFired = true;
+            eventArgsValid = e.OldValue == oldUrl && e.NewValue == newUrl;
+        };
+        link.Url = newUrl;
 
         Assert.True (eventFired);
-        Assert.Equal ("https://github.com", link.Url);
+        Assert.True (eventArgsValid);
+        Assert.Equal (newUrl, link.Url);
+    }
+
+    [Fact]
+    public void Url_Set_Fires_UrlChanging_Event ()
+    {
+        string oldUrl = "http://oldvalue.io";
+        string newUrl = "http://newvalue.io";
+
+        Link link = new () { Url = oldUrl };
+        bool eventFired = false;
+        bool eventArgsValid = false;
+        bool valueChanged = false;
+
+        link.UrlChanging += (s, e) =>
+        {
+            eventFired = true;
+            eventArgsValid = e.CurrentValue == oldUrl && e.NewValue == newUrl;
+            // Should be false since the change hasn't happened yet
+            valueChanged = e.CurrentValue == newUrl || link.Url == newUrl;
+        };
+        link.Url = newUrl;
+
+        Assert.True (eventFired);
+        Assert.True (eventArgsValid);
+        Assert.False (valueChanged);
+        Assert.Equal (newUrl, link.Url);
     }
 
     [Fact]
