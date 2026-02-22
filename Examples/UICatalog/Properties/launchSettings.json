@@ -14,7 +14,7 @@
     },
     "UICatalog --driver ansi": {
       "commandName": "Project",
-      "commandLineArgs": "--driver ansi -dl Trace"
+      "commandLineArgs": "--driver ansi -dl Trace -dcm"
     },
     "WSL: UICatalog": {
       "commandName": "Executable",

@@ -28,7 +28,7 @@ namespace Terminal.Gui.Drawing;
 ///     <para>
 ///         <b>Immutability:</b> Scheme objects are immutable. Once constructed, their properties cannot be changed. To
 ///         modify a Scheme,
-///         create a new instance with the desired values (e.g., using the <see cref="Scheme(Scheme)"/> constructor).
+///         create a new instance with the desired values (e.g., using the <see cref="Scheme"/> constructor).
 ///     </para>
 ///     <para>
 ///         <b>Attribute Resolution Algorithm:</b>
@@ -157,57 +157,26 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// <returns></returns>
     internal static ImmutableSortedDictionary<string, Scheme> GetHardCodedSchemes ()
     {
-        return ImmutableSortedDictionary.CreateRange (
-                                                      StringComparer.InvariantCultureIgnoreCase,
+        return ImmutableSortedDictionary.CreateRange (StringComparer.InvariantCultureIgnoreCase,
                                                       [
                                                           new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Base)!, CreateBase ()),
-                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Dialog)!, CreateDialog ()),
-                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Error)!, CreateError ()),
-                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Menu)!, CreateMenu ()),
-                                                          new (SchemeManager.SchemesToSchemeName (Schemes.Runnable)!, CreateRunnable ()),
-                                                      ]
-                                                     );
+                                                          new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Dialog)!,
+                                                                                            CreateDialog ()),
+                                                          new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Error)!, CreateError ()),
+                                                          new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Menu)!, CreateMenu ()),
+                                                          new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Runnable)!,
+                                                                                            CreateRunnable ())
+                                                      ]);
 
-        Scheme CreateBase ()
-        {
-            return new ()
-            {
-                Normal = new (StandardColor.LightBlue, StandardColor.RaisinBlack)
-            };
-        }
+        Scheme CreateBase () => new () { Normal = new Attribute (StandardColor.LightBlue, Color.None) };
 
-        Scheme CreateError ()
-        {
-            return new ()
-            {
-                Normal = new (StandardColor.IndianRed, StandardColor.RaisinBlack)
-            };
-        }
+        Scheme CreateError () => new () { Normal = new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack) };
 
-        Scheme CreateDialog ()
-        {
-            return new ()
-            {
-                Normal = new (StandardColor.LightSkyBlue, StandardColor.OuterSpace)
-            };
-        }
+        Scheme CreateDialog () => new () { Normal = new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace) };
 
-        Scheme CreateMenu ()
-        {
-            return new ()
-            {
-                Normal = new (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold)
-            };
-        }
+        Scheme CreateMenu () => new () { Normal = new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold) };
 
-        Scheme CreateRunnable ()
-        {
-            return new ()
-            {
-                Normal = new (StandardColor.CadetBlue, StandardColor.Charcoal)
-            };
-        }
-
+        Scheme CreateRunnable () => new () { Normal = new Attribute (StandardColor.CadetBlue, Color.None) };
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
@@ -234,11 +203,10 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="attribute"/>.</summary>
     /// <param name="attribute">The attribute to initialize the new instance with.</param>
-    public Scheme (Attribute attribute)
-    {
+    public Scheme (Attribute attribute) =>
+
         // Only set Normal as explicitly set
         Normal = attribute;
-    }
 
     /// <summary>
     ///     Gets the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>,
@@ -249,11 +217,10 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     ///     The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>, possibly derived if not explicitly
     ///     set.
     /// </returns>
-    public Attribute GetAttributeForRole (VisualRole role)
-    {
+    public Attribute GetAttributeForRole (VisualRole role) =>
+
         // Use a HashSet to guard against recursion cycles
-        return GetAttributeForRoleCore (role, []);
-    }
+        GetAttributeForRoleCore (role, []);
 
     /// <summary>
     ///     Attempts to get the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>. If the
@@ -294,6 +261,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         }
 
         Attribute? attr = Normal;
+
         if (role == VisualRole.Normal || TryGetExplicitlySetAttributeForRole (role, out attr))
         {
             return attr!.Value;
@@ -304,65 +272,56 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         // Derivation algorithm as documented
         Attribute result = role switch
                            {
-                               VisualRole.Focus =>
-                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
-                                   {
-                                       Foreground = ResolveNoneToBlack (GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
-                                   },
+                               VisualRole.Focus => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               {
+                                   Foreground = ResolveNoneToBlack (GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
+                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
+                               },
 
-                               VisualRole.Active =>
-                                   GetAttributeForRoleCore (VisualRole.Focus, stack) with
-                                   {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground.GetBrighterColor (),
-                                       Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
-                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold
-                                   },
+                               VisualRole.Active => GetAttributeForRoleCore (VisualRole.Focus, stack) with
+                               {
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground.GetBrighterColor (),
+                                   Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
+                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold
+                               },
 
-                               VisualRole.Highlight =>
-                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
-                                   {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetBrighterColor (),
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
-                                       Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Italic
-                                   },
+                               VisualRole.Highlight => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               {
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetBrighterColor (),
+                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
+                                   Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Italic
+                               },
 
-                               VisualRole.Editable =>
-                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
-                                   {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
-                                       Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.5)
-                                   },
+                               VisualRole.Editable => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               {
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
+                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.5)
+                               },
 
-                               VisualRole.ReadOnly =>
-                                   GetAttributeForRoleCore (VisualRole.Editable, stack) with
-                                   {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Editable, stack).Foreground.GetDimColor (0.05),
-                                   },
+                               VisualRole.ReadOnly => GetAttributeForRoleCore (VisualRole.Editable, stack) with
+                               {
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Editable, stack).Foreground.GetDimColor (0.05)
+                               },
 
-                               VisualRole.Disabled =>
-                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
-                                   {
-                                       Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.05),
-                                   },
+                               VisualRole.Disabled => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               {
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.05)
+                               },
 
-                               VisualRole.HotNormal =>
-                                   GetAttributeForRoleCore (VisualRole.Normal, stack) with
-                                   {
-                                       Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Underline
-                                   },
+                               VisualRole.HotNormal => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               {
+                                   Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Underline
+                               },
 
-                               VisualRole.HotFocus =>
-                                   GetAttributeForRoleCore (VisualRole.Focus, stack) with
-                                   {
-                                       Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Underline
-                                   },
+                               VisualRole.HotFocus => GetAttributeForRoleCore (VisualRole.Focus, stack) with
+                               {
+                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Underline
+                               },
 
-                               VisualRole.HotActive =>
-                                   GetAttributeForRoleCore (VisualRole.Active, stack) with
-                                   {
-                                       Style = GetAttributeForRoleCore (VisualRole.Active, stack).Style | TextStyle.Underline
-                                   },
+                               VisualRole.HotActive => GetAttributeForRoleCore (VisualRole.Active, stack) with
+                               {
+                                   Style = GetAttributeForRoleCore (VisualRole.Active, stack).Style | TextStyle.Underline
+                               },
 
                                _ => GetAttributeForRoleCore (VisualRole.Normal, stack)
                            };
@@ -407,6 +366,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             return null;
         }
+
         return value;
     }
 
@@ -418,11 +378,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     ///     set, will be automatically generated. See the description for <see cref="Scheme"/> for details on the
     ///     algorithm used.
     /// </summary>
-    public Attribute Normal
-    {
-        get => _normal!.Value;
-        init => _normal = value;
-    }
+    public Attribute Normal { get => _normal!.Value; init => _normal = value; }
 
     private readonly Attribute? _hotNormal;
 
@@ -544,42 +500,32 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     }
 
     /// <inheritdoc/>
-    public virtual bool Equals (Scheme? other)
-    {
-        return other is { }
-               && EqualityComparer<Attribute>.Default.Equals (Normal, other.Normal)
-               && EqualityComparer<Attribute>.Default.Equals (HotNormal, other.HotNormal)
-               && EqualityComparer<Attribute>.Default.Equals (Focus, other.Focus)
-               && EqualityComparer<Attribute>.Default.Equals (HotFocus, other.HotFocus)
-               && EqualityComparer<Attribute>.Default.Equals (Active, other.Active)
-               && EqualityComparer<Attribute>.Default.Equals (HotActive, other.HotActive)
-               && EqualityComparer<Attribute>.Default.Equals (Highlight, other.Highlight)
-               && EqualityComparer<Attribute>.Default.Equals (Editable, other.Editable)
-               && EqualityComparer<Attribute>.Default.Equals (ReadOnly, other.ReadOnly)
-               && EqualityComparer<Attribute>.Default.Equals (Disabled, other.Disabled);
-    }
+    public virtual bool Equals (Scheme? other) =>
+        other is { }
+        && EqualityComparer<Attribute>.Default.Equals (Normal, other.Normal)
+        && EqualityComparer<Attribute>.Default.Equals (HotNormal, other.HotNormal)
+        && EqualityComparer<Attribute>.Default.Equals (Focus, other.Focus)
+        && EqualityComparer<Attribute>.Default.Equals (HotFocus, other.HotFocus)
+        && EqualityComparer<Attribute>.Default.Equals (Active, other.Active)
+        && EqualityComparer<Attribute>.Default.Equals (HotActive, other.HotActive)
+        && EqualityComparer<Attribute>.Default.Equals (Highlight, other.Highlight)
+        && EqualityComparer<Attribute>.Default.Equals (Editable, other.Editable)
+        && EqualityComparer<Attribute>.Default.Equals (ReadOnly, other.ReadOnly)
+        && EqualityComparer<Attribute>.Default.Equals (Disabled, other.Disabled);
 
     /// <inheritdoc/>
-    public override int GetHashCode ()
-    {
-        return HashCode.Combine (
-                                 HashCode.Combine (Normal, HotNormal, Focus, HotFocus, Active, HotActive, Highlight, Editable),
-                                 HashCode.Combine (ReadOnly, Disabled)
-                                );
-    }
+    public override int GetHashCode () =>
+        HashCode.Combine (HashCode.Combine (Normal, HotNormal, Focus, HotFocus, Active, HotActive, Highlight, Editable), HashCode.Combine (ReadOnly, Disabled));
 
     /// <inheritdoc/>
-    public override string ToString ()
-    {
-        return $"Normal: {Normal}; HotNormal: {HotNormal}; Focus: {Focus}; HotFocus: {HotFocus}; "
-               + $"Active: {Active}; HotActive: {HotActive}; Highlight: {Highlight}; Editable: {Editable}; "
-               + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}";
-    }
+    public override string ToString () =>
+        $"Normal: {Normal}; HotNormal: {HotNormal}; Focus: {Focus}; HotFocus: {HotFocus}; "
+        + $"Active: {Active}; HotActive: {HotActive}; Highlight: {Highlight}; Editable: {Editable}; "
+        + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}";
 
     /// <summary>
     ///     When inverting colors for derived roles (e.g., Focus = inverted Normal), a None background
     ///     would become a None foreground, making text invisible. This method substitutes Black instead.
     /// </summary>
-    private static Color ResolveNoneToBlack (Color color) =>
-        color == Color.None ? new Color (0, 0, 0) : color;
+    private static Color ResolveNoneToBlack (Color color) => color == Color.None ? new Color (0, 0) : color;
 }
