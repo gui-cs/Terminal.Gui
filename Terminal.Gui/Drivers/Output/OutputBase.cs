@@ -173,7 +173,7 @@ public abstract class OutputBase
     ///     <paramref name="output"/>
     ///     otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method).
     ///     <para>
-    ///         When a color is <see cref="Color.Transparent"/> (alpha = 0), the terminal's default foreground or
+    ///         When a color is <see cref="Color.None"/> (alpha = 0), the terminal's default foreground or
     ///         background color is used via ANSI reset sequences (CSI 39m / CSI 49m), allowing native terminal
     ///         transparency to show through.
     ///     </para>
@@ -183,7 +183,7 @@ public abstract class OutputBase
     /// <param name="redrawTextStyle"></param>
     protected virtual void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        if (attr.Foreground == Color.Transparent)
+        if (attr.Foreground == Color.None)
         {
             EscSeqUtils.CSI_AppendResetForegroundColor (output);
         }
@@ -196,7 +196,7 @@ public abstract class OutputBase
             EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
         }
 
-        if (attr.Background == Color.Transparent)
+        if (attr.Background == Color.None)
         {
             EscSeqUtils.CSI_AppendResetBackgroundColor (output);
         }
