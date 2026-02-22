@@ -435,7 +435,7 @@ public partial class View // Command APIs
             {
                 if (!_commandImplementations.ContainsKey (command))
                 {
-                    Logging.Warning (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
+                    Logging.Trace (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
                 }
 
                 // each command has its own return value
