@@ -318,6 +318,8 @@ public class TreeView<T> : View, ITreeView where T : class
 
         KeyBindings.Remove (ObjectActivationKey);
         KeyBindings.Add (ObjectActivationKey, Command.Activate);
+
+        KeystrokeNavigator.Matcher = new TreeViewCollectionNavigatorMatcher<T> (this);
     }
 
     /// <summary>
