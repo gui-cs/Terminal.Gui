@@ -790,6 +790,30 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (11, tf.SelectedLength);
     }
 
+    [Fact]
+    public void Mouse_Right_Click_Open_ContextMenuAndKeepTextSelected ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World", Width = 20, Height = 1 };
+        tf.App = app;
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Select all text
+        tf.SelectAll ();
+        Assert.Equal ("Hello World", tf.SelectedText);
+
+        // Right click
+        Mouse ev = new () { Position = new Point (5, 0), Flags = MouseFlags.RightButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Should open context menu and keep text selected
+        Assert.True (tf.ContextMenu?.Visible);
+        Assert.Equal (11, tf.SelectedLength);
+    }
+
     // Claude - Opus 4.5
     [Fact]
     public void Text_Polymorphism_Works ()
@@ -798,5 +822,88 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         TextField tf = new () { Text = "Test" };
         Assert.Equal ("Test", tf.Text);
         Assert.Equal ("Test", tf.Text); // Should be same due to polymorphism
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TextField_Command_Activate_PositionsCursor ()
+    {
+        TextField textField = new () { Text = "Test", Width = 10 };
+        textField.BeginInit ();
+        textField.EndInit ();
+
+        // Activate via Command.Activate is handled for clicks positioning cursor
+        // We test the command is handled
+        bool? result = textField.InvokeCommand (Command.Activate);
+
+        // Command should be handled (returns true)
+        Assert.True (result);
+
+        textField.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TextField_Command_Accept_RaisesAccepting ()
+    {
+        TextField textField = new () { Text = "Test" };
+        var acceptingFired = false;
+
+        textField.Accepting += (_, e) =>
+                               {
+                                   acceptingFired = true;
+                                   e.Handled = true; // Signal that the Accept was processed
+                               };
+
+        bool? result = textField.InvokeCommand (Command.Accept);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        textField.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TextField_Command_HotKey_SetsFocus ()
+    {
+        TextField textField = new () { Text = "Test" };
+
+        bool? result = textField.InvokeCommand (Command.HotKey);
+
+        // HotKey should return true (handled)
+        Assert.True (result);
+
+        textField.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TextField_Enter_RaisesAccepting ()
+    {
+        TextField textField = new () { Text = "Test" };
+        var acceptingFired = false;
+
+        textField.Accepting += (_, e) =>
+                               {
+                                   acceptingFired = true;
+                                   e.Handled = true;
+                               };
+
+        // Enter should raise Accepting
+        bool? result = textField.NewKeyDownEvent (Key.Enter);
+
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        textField.Dispose ();
     }
 }

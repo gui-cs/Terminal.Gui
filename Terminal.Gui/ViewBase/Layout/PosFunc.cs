@@ -22,7 +22,19 @@ public record PosFunc (Func<View?, int> Fn, View? View = null) : Pos
     public View? View { get; } = View;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"PosFunc({Fn (View)})"; }
+    public override string ToString () => $"PosFunc({Fn (View)})";
 
-    internal override int GetAnchor (int size) { return Fn (View); }
+    internal override int GetAnchor (int size) => Fn (View);
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        if (View is { })
+        {
+            yield return View;
+        }
+    }
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => true;
 }

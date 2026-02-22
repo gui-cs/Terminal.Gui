@@ -22,59 +22,26 @@ public class LayoutEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
-        if (_xEditor is not null)
-        {
-            _xEditor.ViewToEdit = ViewToEdit;
-        }
+        Enabled = ViewToEdit is { } and not Adornment;
 
-        if (_yEditor is not null)
-        {
-            _yEditor.ViewToEdit = ViewToEdit;
-        }
+        _xEditor?.ViewToEdit = ViewToEdit;
 
-        if (_widthEditor is not null)
-        {
-            _widthEditor.ViewToEdit = ViewToEdit;
-        }
+        _yEditor?.ViewToEdit = ViewToEdit;
 
-        if (_heightEditor is not null)
-        {
-            _heightEditor.ViewToEdit = ViewToEdit;
-        }
+        _widthEditor?.ViewToEdit = ViewToEdit;
+
+        _heightEditor?.ViewToEdit = ViewToEdit;
     }
 
     private void LayoutEditor_Initialized (object? sender, EventArgs e)
     {
-        _xEditor = new ()
-        {
-            Title = "_X",
-            BorderStyle = LineStyle.None,
-            Dimension = Dimension.Width
-        };
+        _xEditor = new PosEditor { Title = "_X", BorderStyle = LineStyle.None, Dimension = Dimension.Width };
 
-        _yEditor = new ()
-        {
-            Title = "_Y",
-            BorderStyle = LineStyle.None,
-            Dimension = Dimension.Height,
-            X = Pos.Right (_xEditor) + 1
-        };
+        _yEditor = new PosEditor { Title = "_Y", BorderStyle = LineStyle.None, Dimension = Dimension.Height, X = Pos.Right (_xEditor) + 1 };
 
-        _widthEditor = new ()
-        {
-            Title = "_Width",
-            BorderStyle = LineStyle.None,
-            Dimension = Dimension.Width,
-            X = Pos.Right (_yEditor) + 1
-        };
+        _widthEditor = new DimEditor { Title = "_Width", BorderStyle = LineStyle.None, Dimension = Dimension.Width, X = Pos.Right (_yEditor) + 1 };
 
-        _heightEditor = new ()
-        {
-            Title = "_Height",
-            BorderStyle = LineStyle.None,
-            Dimension = Dimension.Height,
-            X = Pos.Right (_widthEditor) + 1
-        };
+        _heightEditor = new DimEditor { Title = "_Height", BorderStyle = LineStyle.None, Dimension = Dimension.Height, X = Pos.Right (_widthEditor) + 1 };
 
         Add (_xEditor, _yEditor, _widthEditor, _heightEditor);
     }

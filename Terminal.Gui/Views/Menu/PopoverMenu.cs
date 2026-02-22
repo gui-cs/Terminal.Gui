@@ -65,10 +65,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Do this to support debugging traces where Title gets set
         base.HotKeySpecifier = (Rune)'\xffff';
 
-        if (Border is { })
-        {
-            Border.Settings &= ~BorderSettings.Title;
-        }
+        Border?.Settings &= ~BorderSettings.Title;
 
         Key = DefaultKey;
 
@@ -286,6 +283,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     private Menu? _root;
+    private bool _isHiding;
 
     /// <summary>
     ///     Gets or sets the <see cref="Menu"/> that is the root of the popover menu hierarchy.
@@ -307,6 +305,19 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             if (_root == value)
             {
                 return;
+            }
+
+            // Unsubscribe from old hierarchy before replacing
+            if (_root is { })
+            {
+                IEnumerable<Menu> oldMenus = GetAllSubMenus ();
+
+                foreach (Menu menu in oldMenus)
+                {
+                    menu.Accepting -= MenuOnAccepting;
+                    menu.Accepted -= MenuAccepted;
+                    menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
+                }
             }
 
             HideAndRemoveSubMenu (_root);
@@ -509,12 +520,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     internal Point GetMostVisibleLocationForSubMenu (Menu menu, Point idealLocation)
     {
-        var pos = Point.Empty;
-
         // Calculate the initial position to the right of the menu item
         GetLocationEnsuringFullVisibility (menu, idealLocation.X, idealLocation.Y, out int nx, out int ny);
 
-        return new Point (nx, ny);
+        return new (nx, ny);
     }
 
     private void AddAndShowSubMenu (Menu? menu)
@@ -547,7 +556,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void HideAndRemoveSubMenu (Menu? menu)
     {
-        if (menu is { Visible: true })
+        if (_isHiding || menu is not { Visible: true })
+        {
+            return;
+        }
+
+        _isHiding = true;
+
+        try
         {
             // Logging.Debug ($"{Title} ({menu?.Title}) - menu.Visible: {menu?.Visible}");
 
@@ -558,6 +574,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 visiblePeer.ForceFocusColors = false;
             }
 
+            // Reset ForceFocusColors on the SuperMenuItem that owns this menu
+            if (menu.SuperMenuItem is { })
+            {
+                menu.SuperMenuItem.ForceFocusColors = false;
+            }
+
             menu.Visible = false;
             menu.ClearFocus ();
             Remove (menu);
@@ -566,6 +588,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             {
                 Visible = false;
             }
+        }
+        finally
+        {
+            _isHiding = false;
         }
     }
 
@@ -581,25 +607,25 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Visible = false;
         }
 
-            if (e.Context?.Binding is KeyBinding { Key: { } key })
+        if (e.Context?.Binding is KeyBinding { Key: { } key })
+        {
+            if (key == Application.QuitKey && SuperView is { Visible: true })
             {
-                if (key == Application.QuitKey && SuperView is { Visible: true })
-                {
-                    // Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
-                    e.Handled = true;
-                }
+                // Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
+                e.Handled = true;
             }
         }
+    }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
     {
-        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
+        // Logging.Debug ($"{Title} ({e.Context?.Source.ToIdentifyingString ()}) Command: {e.Context?.Command}");
 
-        if (e.Context?.Source is MenuItem { SubMenu: null })
+        if (e.Context.TryGetSource (out View? sourceView) && sourceView is MenuItem { SubMenu: null })
         {
             HideAndRemoveSubMenu (_root);
         }
-        else if (e.Context?.Source is MenuItem { SubMenu: { } } menuItemWithSubMenu)
+        else if (e.Context.TryGetSource (out View? sourceView2) && sourceView2 is MenuItem { SubMenu: { } } menuItemWithSubMenu)
         {
             ShowSubMenu (menuItemWithSubMenu);
         }
@@ -642,7 +668,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
 
         // Only raise Accepted if the command came from one of our MenuItems
-        //if (GetMenuItemsOfAllSubMenus ().Contains (args.Context?.Source))
+        if (args.Context.TryGetSource (out View? sourceView) && GetMenuItemsOfAllSubMenus ().Contains (sourceView))
         {
             // Logging.Debug ($"{Title} - Calling RaiseAccepted {args.Context?.Command}");
             RaiseAccepted (args.Context);

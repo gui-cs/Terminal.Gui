@@ -83,13 +83,13 @@ int GetDynamicMinSize()
 
 ### Specifying a Maximum Size
 
-It is common to want to constrain how large a View can be sized. The `maximumContentDim` parameter to the `Dim.Auto()` method enables this. Like `minimumContentDim`, it is of type `Dim` and thus can represent a dynamic value. For example, by default, `Dialog` specifies `maximumContentDim` as `Dim.Percent(90)` to ensure a dialog box is never larger than 90% of the screen.
+It is common to want to constrain how large a View can be sized. The `maximumContentDim` parameter to the `Dim.Auto()` method enables this. Like `minimumContentDim`, it is of type `Dim` and thus can represent a dynamic value. For example, `Dialog` specifies `maximumContentDim` as `Dim.Percent(100)` minus its adornment thickness to ensure the dialog never overflows the screen.
 
 ```cs
 View dialog = new ()
 {
-    Width = Dim.Auto(DimAutoStyle.Content, maximumContentDim: Dim.Percent(90)),
-    Height = Dim.Auto(DimAutoStyle.Content, maximumContentDim: Dim.Percent(90)),
+    Width = Dim.Auto(maximumContentDim: Dim.Percent(100) - Dim.Func(_ => GetAdornmentsThickness().Horizontal)),
+    Height = Dim.Auto(maximumContentDim: Dim.Percent(100) - Dim.Func(_ => GetAdornmentsThickness().Vertical)),
 };
 ```
 
@@ -141,7 +141,7 @@ The table below describes the behavior of various `Pos` and `Dim` types when use
 | **PosFunc**   | Yes               | Impacts dimension if the function returns a value that, combined with subview dimension, exceeds content size. |
 | **DimView**   | Yes               | The dimension of `subview.Target` will contribute to the minimum `Dim.Auto` dimension.          |
 | **DimCombine**| Yes               | Impacts dimension if it includes a `Dim` type that affects dimension (like `DimView` or `DimAuto`). |
-| **DimFill**   | No                | Does not impact dimension as it fills remaining space, not contributing to content-based sizing. |
+| **DimFill**   | Only with `MinimumContentDim` | By default, does **not** impact dimension because it fills remaining space. If `Dim.Fill(margin, minimumContentDim)` is used, the `minimumContentDim` contributes a floor to the auto-sizing calculation. Without it, the SubView will be sized to 0. |
 | **DimPercent**| No                | Does not impact dimension as it is based on superview size, not content.                       |
 | **DimAuto**   | Yes               | Contributes to dimension based on its own content or text sizing, potentially increasing the superview's size. |
 | **DimAbsolute**| Yes              | Impacts dimension if the absolute size plus position exceeds current content size.              |
@@ -178,6 +178,165 @@ Views that use `Text` for their content can set `Width` and `Height` to `Dim.Aut
 - **Consider Minimum and Maximum Constraints**: Use `minimumContentDim` to prevent views from becoming too small to be usable, and `maximumContentDim` to prevent them from growing excessively large, especially in constrained terminal environments.
 - **Handle Adornments**: Be aware that `Dim.Auto` accounts for adornments in its sizing. If your view has custom adornments, ensure they are properly factored into the layout by the base `View` class.
 
+## How To: Non-Trivial Dim.Auto Patterns
+
+The following recipes address common but non-trivial scenarios drawn from real Terminal.Gui views.
+
+### Pin a View to Its Natural Size
+
+Set `minimumContentDim` and `maximumContentDim` to the **same value** to lock the dimension to a specific size while still using `Dim.Auto` for the calculation. The view auto-sizes once, then the result is clamped to that value.
+
+`Shortcut` uses this to pin its width to the natural width of its content:
+
+```cs
+// Both min and max reference the same Dim.Func, so the view can't grow or shrink beyond it
+Width = Dim.Auto (DimAutoStyle.Content,
+                  minimumContentDim: Dim.Func (_ => naturalWidth),
+                  maximumContentDim: Dim.Func (_ => naturalWidth));
+```
+
+### Dynamic Minimum That Tracks a Formatted Value
+
+Use `Dim.Func` as `minimumContentDim` when the minimum size depends on runtime state. The function is re-evaluated on every layout pass.
+
+`NumericUpDown` uses this so its number display is always wide enough for the formatted value:
+
+```cs
+_number = new ()
+{
+    X = Pos.Right (_down),
+    Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns ())),
+    Height = 1,
+};
+```
+
+As `Value` changes (e.g., from `9` to `100`), the `Dim.Func` returns a larger column count and the view grows automatically.
+
+### Clamp Auto-Sizing to the Container
+
+Pass a percentage-based `maximumContentDim` to prevent a view from exceeding the available Screen or SuperView size. Subtract adornment thickness so the frame (including borders) fits.
+
+`Dialog` uses this pattern:
+
+```cs
+Width = Dim.Auto (
+    minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()),
+    maximumContentDim: Dim.Percent (100) - Dim.Func (_ => GetAdornmentsThickness ().Horizontal));
+
+Height = Dim.Auto (
+    minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()),
+    maximumContentDim: Dim.Percent (100) - Dim.Func (_ => GetAdornmentsThickness ().Vertical));
+```
+
+The Dialog auto-sizes to its content but never overflows the container when `Margin`, `Border`, and `Padding` are present.
+
+### Uniform-Width Items in a Vertical List
+
+When a SuperView holds multiple auto-sized items that should all share the same width (e.g., a vertical menu), measure them all first, find the widest, then pin every item to that width.
+
+`Bar` (the base class for `Menu`) implements this:
+
+```cs
+// Phase 1 — measure each item at its natural width
+var maxWidth = 0;
+foreach (Shortcut shortcut in SubViews.OfType<Shortcut> ().Where (s => s.Visible))
+{
+    shortcut.Width = shortcut.GetWidthDimAuto ();
+    shortcut.Layout (screenSize);
+    maxWidth = Math.Max (maxWidth, shortcut.Frame.Width);
+}
+
+// Phase 2 — pin every item to the widest
+foreach (View subView in SubViews)
+{
+    if (subView is not Line)
+    {
+        subView.Width = Dim.Auto (DimAutoStyle.Auto,
+                                  minimumContentDim: maxWidth,
+                                  maximumContentDim: maxWidth);
+    }
+}
+```
+
+This two-pass approach ensures the menu is exactly as wide as its widest item—no wider, no narrower.
+
+### Cap a SubView Without Capping the Container
+
+A SuperView can use unconstrained `Dim.Auto` while one of its SubViews uses `maximumContentDim` to limit its own growth. This lets the SuperView size to the sum of its SubViews, while one SubView is capped.
+
+`Shortcut.HelpView` limits its text width to the remaining space after `CommandView` and `KeyView`:
+
+```cs
+HelpView.Width = Dim.Auto (DimAutoStyle.Text,
+                            maximumContentDim: Dim.Func (_ => maxHelpWidth));
+```
+
+When the `Shortcut` is constrained externally (e.g., `Width = Dim.Fill()`), `OnSubViewLayout` recalculates `maxHelpWidth` and the help text truncates gracefully.
+
+### Guarantee Minimum Width for Alignment Across Siblings
+
+Use `minimumContentDim` to ensure a SubView never shrinks below a value that keeps it visually aligned with the same SubView in sibling views.
+
+`Shortcut.KeyView` uses this so key labels (e.g., `Ctrl+S`, `F5`) align across multiple `Shortcut` instances in a `Bar`:
+
+```cs
+KeyView.Width = Dim.Auto (DimAutoStyle.Text,
+                          minimumContentDim: Dim.Func (_ => MinimumKeyTextSize));
+```
+
+The `Bar` calculates the widest key text across all shortcuts and sets `MinimumKeyTextSize` on each, producing a clean right-aligned column.
+
+### Nested Auto-Sizing (Container Wraps Auto-Sized Children)
+
+A SuperView using `Dim.Auto(DimAutoStyle.Content)` automatically expands to fit SubViews that are themselves auto-sized. Chain `Pos.Right` / `Pos.Bottom` to lay out SubViews sequentially.
+
+`NumericUpDown` is a compact example:
+
+```cs
+// Container
+Width = Dim.Auto (DimAutoStyle.Content);
+Height = Dim.Auto (DimAutoStyle.Content);
+
+// Children chain left-to-right
+_down   = new () { Width = 1, Height = 1 };
+_number = new () { X = Pos.Right (_down), Width = Dim.Auto (...), Height = 1 };
+_up     = new () { X = Pos.Right (_number), Width = 1, Height = 1 };
+
+Add (_down, _number, _up);
+```
+
+The SuperViews's `Dim.Auto` walks the SubViews, sees that `_up.X + _up.Width` is the rightmost extent, and sizes the SuperView accordingly. When `_number` grows (because the value got wider), the container grows too.
+
+### Use Dim.Fill Inside a Dim.Auto SuperView
+
+A SubView using `Dim.Fill()` inside a `Dim.Auto`-sized SuperView will receive a size of **0** by default. This is because `Dim.Fill` derives its size from the SuperView's ContentSize, but `Dim.Auto` computes ContentSize from its SubViews—creating a circular dependency that resolves to 0.
+
+**The fix:** use `Dim.Fill(margin, minimumContentDim)` to contribute a floor to the auto-sizing calculation:
+
+```cs
+// WRONG — SubView will be 0 wide because SuperView has no content-based size to fill against
+View superView = new () { Width = Dim.Auto (DimAutoStyle.Content) };
+View subView = new () { Width = Dim.Fill () }; // Gets 0!
+superView.Add (subView);
+
+// CORRECT — minimumContentDim breaks the circular dependency
+View superView = new () { Width = Dim.Auto (DimAutoStyle.Content) };
+View subView = new () { Width = Dim.Fill (margin: 0, minimumContentDim: 20) }; // At least 20 wide
+superView.Add (subView);
+```
+
+The `minimumContentDim` ensures the SuperView's `Dim.Auto` calculation sees a content size of at least 20, so the SubView's `Dim.Fill` can then fill that space. If the SuperView has other SubViews that push it wider, the `Dim.Fill` SubView will grow to match. `Dim.Func` can be used for a dynamic minimum.
+
+### Ensure a Minimum Height of One Line
+
+For text-based views, pass `1` as `minimumContentDim` to guarantee the view is visible even when `Text` is empty:
+
+```cs
+Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
+```
+
+`CheckBox`, `TextField`, `Shortcut`, and `Menu` all use this pattern.
+
 ## Debugging Dim.Auto Issues
 
 If you encounter unexpected sizing with `Dim.Auto`, consider the following debugging steps based on the codebase's diagnostic capabilities:
@@ -188,3 +347,15 @@ If you encounter unexpected sizing with `Dim.Auto`, consider the following debug
 - **Inspect Text Formatting**: For `Text` style, check `TextFormatter` settings and constraints (`ConstrainToWidth`, `ConstrainToHeight`). Ensure text is formatted correctly before sizing calculations.
 
 By understanding the intricacies of `Dim.Auto` as implemented in Terminal.Gui v2, developers can create responsive and adaptive terminal UIs that automatically adjust to content changes, enhancing user experience and maintainability.
+
+## Internal Architecture
+
+`Dim.Auto` uses a polymorphic design to minimize coupling with specific `Pos` and `Dim` types. The layout system uses virtual properties and methods to categorize and process layout elements:
+
+- **`DependsOnSuperViewContentSize`**: Identifies types that actively contribute to content size determination (e.g., `DimPercent`, `DimFill`, `PosAnchorEnd`, `PosAlign`)
+- **`CanContributeToAutoSizing`**: Indicates whether a `Dim` can meaningfully contribute to auto-sizing (returns `false` for `DimPercent` and `DimFill` without `MinimumContentDim`/`To`)
+- **`GetMinimumContribution()`**: Calculates the minimum size contribution during auto-sizing (overridden by `DimFill` to return its `MinimumContentDim`)
+- **`IsFixed`**: Identifies fixed-value types that don't depend on layout calculations (`DimAbsolute`, `PosAbsolute`, `DimFunc`, `PosFunc`, `DimAuto`)
+- **`RequiresTargetLayout`**: Indicates types requiring target view layout first (`DimView`, `PosView`)
+
+This design allows new `Pos`/`Dim` types to be added without modifying `DimAuto.Calculate()`.

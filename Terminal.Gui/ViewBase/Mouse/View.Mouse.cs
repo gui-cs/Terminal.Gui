@@ -14,9 +14,10 @@ public partial class View // Mouse APIs
     {
         MouseBindings = new MouseBindings ();
 
-        // By default, left click activates. No binding to Accept by default.
-        MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
-        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Context);
+        // By default, left button release activates (aligns with industry standards - allows cancellation).
+        // Users can press, see visual feedback, drag away, and release outside to cancel.
+        MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl, Command.Context);
 
         // Released bindings are added/removed dynamically when MouseHoldRepeat changes
         // See OnMouseHoldRepeatChanged
@@ -60,7 +61,7 @@ public partial class View // Mouse APIs
 
         MouseState |= MouseState.In;
 
-        if (MouseHighlightStates != MouseState.None)
+        if ((MouseHighlightStates & MouseState.In) != MouseState.None)
         {
             SetNeedsDraw ();
         }
@@ -146,7 +147,7 @@ public partial class View // Mouse APIs
 
         MouseState &= ~MouseState.In;
 
-        if (MouseHighlightStates != MouseState.None)
+        if ((MouseHighlightStates & MouseState.In) != MouseState.None)
         {
             SetNeedsDraw ();
         }
@@ -192,7 +193,8 @@ public partial class View // Mouse APIs
     ///         Valid values are:
     ///         <list type="bullet">
     ///             <item><see langword="null"/> - Disabled (default)</item>
-    ///             <item><see cref="MouseFlags.LeftButtonReleased"/> - Commands invoked on Press during hold</item>
+    ///             <item><see cref="MouseFlags.LeftButtonPressed"/> - Commands invoked on Press during hold</item>
+    ///             <item><see cref="MouseFlags.LeftButtonReleased"/> - Commands invoked on Released during hold</item>
     ///             <item><see cref="MouseFlags.LeftButtonClicked"/> - Commands invoked on Click after hold</item>
     ///             <item>Other xxxReleased or xxxClicked flags for other mouse buttons</item>
     ///         </list>
@@ -211,6 +213,7 @@ public partial class View // Mouse APIs
             // Validate that only null, Pressed, or Clicked flags are allowed
             if (value.HasValue)
             {
+                bool isPressed = (value.Value & (MouseFlags.LeftButtonPressed | MouseFlags.MiddleButtonPressed | MouseFlags.RightButtonPressed)) != 0;
                 bool isReleased = (value.Value & (MouseFlags.LeftButtonReleased | MouseFlags.MiddleButtonReleased | MouseFlags.RightButtonReleased)) != 0;
 
                 bool isClicked = (value.Value
@@ -225,9 +228,9 @@ public partial class View // Mouse APIs
                                      | MouseFlags.RightButtonTripleClicked))
                                  != 0;
 
-                if (!isReleased && !isClicked)
+                if (!isReleased && !isPressed && !isClicked)
                 {
-                    throw new ArgumentException (@"MouseHoldRepeat only accepts null, Pressed, or Clicked mouse flags.", nameof (value));
+                    throw new ArgumentException (@"MouseHoldRepeat only accepts null, Pressed, Released or Clicked mouse flags.", nameof (value));
                 }
             }
 
@@ -252,7 +255,7 @@ public partial class View // Mouse APIs
                 }
                 else
                 {
-                    // Disabled: Remove any hold-repeat bindings and restore default Pressed binding
+                    // Disabled: Remove any hold-repeat bindings and restore default Released binding
                     MouseBindings.Remove (MouseFlags.LeftButtonReleased);
                     MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
                     MouseBindings.Remove (MouseFlags.RightButtonReleased);
@@ -265,7 +268,7 @@ public partial class View // Mouse APIs
                     MouseBindings.Remove (MouseFlags.LeftButtonTripleClicked);
                     MouseBindings.Remove (MouseFlags.MiddleButtonTripleClicked);
                     MouseBindings.Remove (MouseFlags.RightButtonTripleClicked);
-                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed, Command.Activate);
+                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Activate);
                 }
 
                 field = newValue;
@@ -453,9 +456,9 @@ public partial class View // Mouse APIs
         }
 
         // 6. Command invocation
-        // When ShouldAutoGrab: Only Clicked events invoke commands (Pressed does visual feedback only)
-        // When MouseHoldRepeat: Only the configured event (Pressed or Clicked) invokes commands
-        // Otherwise: Both Pressed and Clicked invoke commands
+        // When ShouldAutoGrab: Pressed/Released invoke commands in HandleAutoGrabPress/Release, Clicked ungrabs
+        // When MouseHoldRepeat: Only the configured event (Released or Clicked) invokes commands
+        // Otherwise: Both Released and Clicked invoke commands (Pressed only when no bindings exist for Released)
 
         // For MouseHoldRepeat: Press starts timer, configured event invokes command via binding
         // Timer handler (MouseHoldRepeaterOnMouseIsHeldDownTick) invokes commands during hold
@@ -471,10 +474,9 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        // Normal behavior: Use Clicked events (or Pressed if not auto-grab)
-        bool shouldInvokeOnPressed = mouse.IsPressed && !ShouldAutoGrab;
-
-        if (mouse.IsSingleDoubleOrTripleClicked || shouldInvokeOnPressed)
+        // Normal behavior: Invoke commands for clicked (when not auto-grab), or pressed (when not auto-grab)
+        // Note: Released and Pressed are handled by HandleAutoGrabRelease/Press when ShouldAutoGrab
+        if (mouse.IsSingleDoubleOrTripleClicked || ((mouse.IsReleased || mouse.IsPressed) && !ShouldAutoGrab))
         {
             return RaiseCommandsBoundToButtonFlags (mouse);
         }
@@ -572,6 +574,30 @@ public partial class View // Mouse APIs
             return false;
         }
 
+        // Don't grab if an enabled SubView at the mouse position can handle the event.
+        // CachedViewsUnderMouse is already updated by RaiseMouseEnterLeaveEvents before NewMouseEvent runs.
+        // Disabled views are included in the cache, so we must find the deepest enabled view.
+        if (App?.Mouse.CachedViewsUnderMouse is { Count: > 0 } cached)
+        {
+            View? deepestEnabledView = null;
+
+            for (int i = cached.Count - 1; i >= 0; i--)
+            {
+                if (cached [i] is { Enabled: true } candidate)
+                {
+                    deepestEnabledView = candidate;
+
+                    break;
+                }
+            }
+
+            if (deepestEnabledView is { } && deepestEnabledView != this)
+            {
+                // An enabled SubView is under the cursor - let it handle its own events
+                return false;
+            }
+        }
+
         // If the user has just pressed the mouse, grab the mouse and set focus
         if (App is null || !App.Mouse.IsGrabbed (this))
         {
@@ -593,11 +619,15 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        return InvokeCommandsBoundToMouse (mouse) is true;
+        // Invoke commands (if any Pressed bindings exist) and continue processing
+        InvokeCommandsBoundToMouse (mouse);
+
+        return false; // Continue to allow Released/Clicked to be processed
     }
 
     /// <summary>
     ///     Handles the released event when auto-grab is enabled. Updates <see cref="MouseState"/>.
+    ///     Only invokes commands if the mouse is still within the viewport (allows cancellation).
     /// </summary>
     /// <param name="mouse">The mouse event.</param>
     private bool HandleAutoGrabRelease (Mouse mouse)
@@ -615,7 +645,23 @@ public partial class View // Mouse APIs
         // Update MouseState
         UpdateMouseStateOnRelease ();
 
-        return !MouseHoldRepeat.HasValue;
+        if (MouseHoldRepeat != null)
+        {
+            // Allow command invocation to proceed
+            return false;
+        }
+
+        // Only invoke commands if mouse is still in viewport (enables cancellation by releasing outside)
+        if (mouse.Position is { } pos && !Viewport.Contains (pos))
+        {
+            // Released outside - don't invoke commands (cancellation)
+            return false; // Continue processing (will reach Clicked handler to ungrab)
+        }
+
+        // Invoke commands and continue processing (Clicked event will ungrab)
+        InvokeCommandsBoundToMouse (mouse);
+
+        return false; // Continue to Clicked handler for ungrab
     }
 
     /// <summary>

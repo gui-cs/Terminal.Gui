@@ -4,6 +4,23 @@ Terminal.Gui provides a rich system for how [View](View.md) objects are laid out
 
 See [View Deep Dive](View.md), [Arrangement Deep Dive](arrangement.md), [Scrolling Deep Dive](scrolling.md), and [Drawing Deep Dive](drawing.md) for more.
 
+## Table of Contents
+
+- [Lexicon & Taxonomy](#lexicon--taxonomy)
+- [Arrangement Modes](#arrangement-modes)
+- [Composition](#composition)
+- [The Content Area](#the-content-area)
+- [The Viewport](#the-viewport)
+- [Layout Engine](#layout-engine)
+  - [Pos](#pos)
+  - [Dim](#dim)
+- [How To](#how-to)
+  - [Stretch a View Between Fixed Elements](#stretch-a-view-between-fixed-elements)
+  - [Align Multiple Views (Like Dialog Buttons)](#align-multiple-views-like-dialog-buttons)
+  - [Center with Auto-Sizing and Constraints (Like Dialog)](#center-with-auto-sizing-and-constraints-like-dialog)
+
+---
+
 ## Lexicon & Taxonomy
 
 [!INCLUDE [Layout Lexicon](~/includes/layout-lexicon.md)]
@@ -78,6 +95,8 @@ The flags are organized into categories:
 
 Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time @Terminal.Gui.Pos. The size is set via `Width` and `Height`, which are of type @Terminal.Gui.Dim.
 
+The layout system uses virtual properties for categorization without type checking: `ReferencesOtherViews()`, `DependsOnSuperViewContentSize`, `CanContributeToAutoSizing`, `GetMinimumContribution()`, `IsFixed`, and `RequiresTargetLayout`. This enables extensibility.
+
 ```cs
 var label1 = new Label () { X = 1, Y = 2, Width = 3, Height = 4, Title = "Absolute")
 
@@ -124,7 +143,7 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 * Automatic size based on the View's content (either SubViews or Text) - @Terminal.Gui.Dim.Auto* - See [Dim.Auto Deep Dive](dimauto.md).
 * Absolute size, by passing an integer - @Terminal.Gui.Dim.Absolute(System.Int32).
 * Percentage of the SuperView's Content Area  - @Terminal.Gui.Dim.Percent(System.Int32).
-* Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill*.
+* Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill*. **Note:** `Dim.Fill` does not contribute to a SuperView's @Terminal.Gui.Dim.Auto sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
 * Reference the Width or Height of another view - @Terminal.Gui.Dim.Width(Terminal.Gui.View), @Terminal.Gui.Dim.Height(Terminal.Gui.View).
 * An arbitrary function - @Terminal.Gui.Dim.Func(System.Func{System.Int32}).
 
@@ -144,35 +163,86 @@ anotherView.Height = Dim.Height (view) + 1;
 
 ```mermaid
 classDiagram
-    class View {
-    }
+    class View ["View — location and size relative to SuperView"]
+    class Frame ["Frame — Rectangle"]
+    class Viewport ["Viewport — visible portion of Content Area"]
+    class Margin ["Margin — where Shadows live"]
+    class Border ["Border — Title and Arrangement controls"]
+    class Padding ["Padding — where ScrollBars live"]
+    class Adornment
+    class Thickness ["Thickness — each side has a width"]
 
-    View --> Frame : is Rectangle
-    View --> Viewport : is Rectangle
-
-    class Border {
-    }
-
-    class Adornment {
-    }
-
-    class Thickness {
-    }
-
-
-    Margin --> Adornment : is
-    Border --> Adornment : is
-    Padding --> Adornment : is
-    Adornment --> Thickness : has
-
+    View --> Frame
+    View --> Viewport
     View --> Margin : has
     View --> Border : has
     View --> Padding : has
-
-    note for View "Defines location and size relative to SuperView"
-    note for Viewport "Defines the visible portion of the Content Area"
-    note for Margin "Where Shadows live"
-    note for Border "Where Border, Title, and Arrangement controls live"
-    note for Padding "Where ScrollBars live"
-    note for Thickness "A rectangle where each side can have a width"
+    Margin --|> Adornment
+    Border --|> Adornment
+    Padding --|> Adornment
+    Adornment --> Thickness : has
 ```
+
+## How To
+
+This section provides solutions to common layout scenarios.
+
+### Stretch a View Between Fixed Elements
+
+**Scenario:** A label on the left, a text field that stretches to fill available space, and a button anchored to the right:
+
+```
+[label][    stretching text field    ][button]
+```
+
+```cs
+Label label = new () { Text = "_Name:" };
+Button btn = new () { Text = "_OK", X = Pos.AnchorEnd () };
+TextField textField = new ()
+{
+    X = Pos.Right (label) + 1,
+    Width = Dim.Func (() => btn.Frame.X - label.Frame.Width - 1)
+};
+superView.Add (label, textField, btn);
+```
+
+### Align Multiple Views (Like Dialog Buttons)
+
+**Scenario:** Align buttons horizontally using @Terminal.Gui.Pos.Align, as `Dialog` does:
+
+```cs
+Button cancelBtn = new ()
+{
+    Text = "_Cancel",
+    X = Pos.Align (Alignment.End)
+};
+Button okBtn = new ()
+{
+    Text = "_OK",
+    X = Pos.Align (Alignment.End)
+};
+superView.Add (cancelBtn, okBtn);
+```
+
+The `Pos.Align` method supports different alignments (`Start`, `Center`, `End`, `Fill`) and can add spacing between items via `AlignmentModes`.
+
+### Center with Auto-Sizing and Constraints (Like Dialog)
+
+**Scenario:** A centered view that auto-sizes to its content, with minimum and maximum constraints that account for adornments (Border, Margin, Padding). This is how `Dialog` positions and sizes itself:
+
+```cs
+Window popup = new ()
+{
+    X = Pos.Center (),
+    Y = Pos.Center (),
+    Width = Dim.Auto (
+        minimumContentDim: 20,  // Minimum width
+        maximumContentDim: Dim.Percent (100) - Dim.Func (_ => popup.GetAdornmentsThickness ().Horizontal)),
+    Height = Dim.Auto (
+        minimumContentDim: 5,   // Minimum height
+        maximumContentDim: Dim.Percent (100) - Dim.Func (_ => popup.GetAdornmentsThickness ().Vertical))
+};
+```
+
+The key insight is `maximumContentDim` subtracts the adornments thickness from 100% to ensure the view (including its Border, Margin, and Padding) never exceeds the SuperView's bounds.
+

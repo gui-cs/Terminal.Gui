@@ -57,10 +57,8 @@ public class FileDialog : Dialog, IDesignable
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem? fileSystem)
     {
-        HorizontalScrollBar.AutoShow = false;
-        HorizontalScrollBar.Visible = false;
-        VerticalScrollBar.AutoShow = false;
-        VerticalScrollBar.Visible = false;
+        // Scrollbars are disabled by default (VisibilityMode.Manual and Visible = false)
+        // No need to explicitly set them
 
         _fileSystem = fileSystem;
         Style = new FileDialogStyle (fileSystem);
@@ -126,16 +124,6 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
-        // Create tree view container (left pane)
-        _treeView = new TreeView<IFileSystemInfo>
-        {
-            X = 0,
-            Y = Pos.Bottom (_btnBack),
-            Width = Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30),
-            Height = Dim.Func (_ => _tableViewContainer?.Frame.Height ?? 0),
-            Visible = false
-        };
-
         // Create table view container (right pane)
         _tableViewContainer = new View
         {
@@ -150,9 +138,19 @@ public class FileDialog : Dialog, IDesignable
             Id = "_tableViewContainer"
         };
 
+        // Create tree view container (left pane)
+        _treeView = new TreeView<IFileSystemInfo>
+        {
+            X = 0,
+            Y = Pos.Bottom (_btnBack),
+            Width = Dim.Fill (margin: 30, to: _tableViewContainer!),
+            Height = Dim.Height (_tableViewContainer),
+            Visible = false
+        };
+
         _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (1), FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
-        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
         _tableView.Activating += OnTableViewActivating;
         Style.TableStyle = _tableView.Style;
 
@@ -1390,7 +1388,7 @@ public class FileDialog : Dialog, IDesignable
         if (visible)
         {
             // When visible, the table view's left edge is a splitter next to the tree
-            _treeView.Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30));
+            _treeView.Width = Dim.Fill (to: _tableViewContainer);
             _tableViewContainer.X = 30;
             _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
             _tableViewContainer.Border!.Thickness = new Thickness (1, 0, 0, 0);

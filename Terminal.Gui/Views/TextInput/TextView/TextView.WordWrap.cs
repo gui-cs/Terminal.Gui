@@ -181,9 +181,8 @@ public partial class TextView
         }
     }
 
-    // TODO: Upgrade all TextView events to use CWP properly.
     /// <summary>
-    ///     Raises the <see cref="UnwrappedCursorPosition"/> event with the cursor position in the
+    ///     INTERNAL: Raises the <see cref="UnwrappedCursorPositionChanged"/> event with the cursor position in the
     ///     original unwrapped model coordinates.
     /// </summary>
     /// <param name="cRow">
@@ -197,7 +196,7 @@ public partial class TextView
     ///     refers to the wrapped model. This method translates that position back to the original
     ///     unwrapped model coordinates, which is useful for reporting the "true" position in the source text.
     /// </remarks>
-    public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
+    private void RaiseUnwrappedCursorPositionChanged (int? cRow = null, int? cCol = null)
     {
         int? row = cRow ?? CurrentRow;
         int? col = cCol ?? CurrentColumn;
@@ -208,18 +207,30 @@ public partial class TextView
             col = _wrapManager.GetModelColFromWrappedLines (CurrentRow, CurrentColumn);
         }
 
-        UnwrappedCursorPosition?.Invoke (this, new Point (col.Value, row.Value));
+        OnUnwrappedCursorPositionChanged (new Point (col.Value, row.Value));
+        UnwrappedCursorPositionChanged?.Invoke (this, new Point (col.Value, row.Value));
     }
 
     /// <summary>
-    ///     Occurs when the cursor position changes, providing the position in unwrapped model coordinates.
+    ///     Called when the cursor position changes, providing the position in unwrapped model coordinates.
     /// </summary>
     /// <remarks>
-    ///     This event is useful when you need to know the cursor position in the original text,
+    ///     This event is useful for knowing the cursor position in the original text,
     ///     independent of how the text is displayed (wrapped or unwrapped). The <see cref="Point"/>
     ///     provided contains (column, row) in the unwrapped model.
     /// </remarks>
-    public event EventHandler<Point>? UnwrappedCursorPosition;
+    /// <param name="newUnwrappedCursorPosition"></param>
+    protected virtual void OnUnwrappedCursorPositionChanged (Point newUnwrappedCursorPosition) { }
+
+    /// <summary>
+    ///     Raised when the cursor position changes, providing the position in unwrapped model coordinates.
+    /// </summary>
+    /// <remarks>
+    ///     This event is useful for knowing the cursor position in the original text,
+    ///     independent of how the text is displayed (wrapped or unwrapped). The <see cref="Point"/>
+    ///     provided contains (column, row) in the unwrapped model.
+    /// </remarks>
+    public event EventHandler<Point>? UnwrappedCursorPositionChanged;
 
     /// <summary>
     ///     INTERNAL: Converts a position in wrapped coordinates to unwrapped (original model) coordinates.
