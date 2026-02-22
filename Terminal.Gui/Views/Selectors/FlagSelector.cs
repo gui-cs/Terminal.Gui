@@ -40,20 +40,19 @@ public class FlagSelector : SelectorBase, IDesignable
         }
 
         // When a CheckBox's activation bubbles up, the source IS the CheckBox.
-        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox cb)
+        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
         {
             return source;
         }
 
         // Suppress dispatch when the HotKey flag is set (HotKey → SetFocus only, no toggle).
-        if (_suppressHotKeyActivate)
+        if (!_suppressHotKeyActivate)
         {
-            _suppressHotKeyActivate = false;
-
-            return null;
+            return Focused;
         }
+        _suppressHotKeyActivate = false;
 
-        return Focused;
+        return null;
     }
 
     /// <summary>
@@ -96,23 +95,29 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         base.OnActivated (ctx);
 
-        // Toggle only when the source is a CheckBox (IsBubblingUp path where consume prevented
-        // CheckBox.AdvanceCheckState). For programmatic invocations, DispatchDown already activated
-        // the focused CheckBox and AdvanceCheckState ran, so no additional toggle is needed.
-        if (ctx?.Source?.TryGetTarget (out View? source) != true || source is not CheckBox checkBox)
-        {
-            return;
-        }
-
-        if (ctx.Binding is { } && ctx.Binding.Commands.Contains (Command.Accept))
+        if (ctx?.Binding is { } && ctx.Binding.Commands.Contains (Command.Accept))
         {
             // If the binding was via Accept, don't change the state
             return;
         }
 
-        checkBox.Value = checkBox.Value == CheckState.Checked
-                             ? CheckState.UnChecked
-                             : CheckState.Checked;
+        CheckBox? checkBox = null;
+
+        // Toggle when the source is a CheckBox (BubblingUp path where consume prevented
+        // CheckBox.AdvanceCheckState).
+        if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox cb)
+        {
+            checkBox = cb;
+        }
+        else if (ctx?.Routing == CommandRouting.DispatchingDown && Focused is CheckBox focusedCb)
+        {
+            // External dispatch (e.g. Menu → MenuItem → FlagSelector): the DispatchingDown guard
+            // blocked dispatch to inner CheckBoxes. Use the currently focused CheckBox as the
+            // toggle target — SetFocus() was called before OnActivated, so Focused is reliable.
+            checkBox = focusedCb;
+        }
+
+        checkBox?.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
 
         // CheckboxOnValueChanged handler updates FlagSelector.Value bitmask
     }

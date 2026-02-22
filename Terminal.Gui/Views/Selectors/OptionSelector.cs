@@ -77,21 +77,28 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({ctx})");
 
-        // TODO: When OptionSelector is a CommandView inside a MenuItem/Shortcut and activation
-        // arrives via DispatchingDown from the Shortcut, ctx.Source is the OptionSelector itself
-        // (not the clicked CheckBox). This causes the fallback to Cycle() instead of selecting
-        // the correct item. The root cause is that LeftButtonReleased is not bound on CheckBox
-        // (it uses LeftButtonClicked), so the event propagates to the parent Shortcut which
-        // dispatches down with Source=CommandView. Need to identify the correct CheckBox from
-        // the Focused state or mouse position when Source is not a CheckBox.
-        if (ctx?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not CheckBox checkBox)
+        CheckBox? checkBox = null;
+
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is CheckBox cb)
+        {
+            checkBox = cb;
+        }
+        else if (ctx?.Routing == CommandRouting.DispatchingDown && Focused is CheckBox focusedCb)
+        {
+            // External dispatch (e.g. Menu → MenuItem → OptionSelector): the DispatchingDown guard
+            // blocked dispatch to inner CheckBoxes. Use the currently focused CheckBox as the
+            // selection target — SetFocus() was called before OnActivated, so Focused is reliable.
+            checkBox = focusedCb;
+        }
+
+        if (checkBox is null)
         {
             Cycle ();
 
             return;
         }
 
-        if (ctx.Binding is KeyBinding keyBinding && (int)checkBox.Data! == Value && keyBinding.Key is { } && keyBinding.Key == Key.Space)
+        if (ctx?.Binding is KeyBinding keyBinding && (int)checkBox.Data! == Value && keyBinding.Key is { } && keyBinding.Key == Key.Space)
         {
             // Caused by space. If the checkbox is already checked, we cycle to the next one.
             Cycle ();

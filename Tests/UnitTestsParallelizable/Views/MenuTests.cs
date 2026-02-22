@@ -326,7 +326,7 @@ public class MenuTests
     {
         Menu menu = new ();
 
-        int actionFired = 0;
+        var actionFired = 0;
         MenuItem menuItem = new () { Title = "Test", Action = () => actionFired++ };
         menu.Add (menuItem);
 
@@ -342,7 +342,7 @@ public class MenuTests
     {
         Menu menu = new ();
 
-        int actionFired = 0;
+        var actionFired = 0;
         MenuItem menuItem = new () { Title = "Test", Action = () => actionFired++ };
         menu.Add (menuItem);
 
@@ -1149,10 +1149,7 @@ public class MenuTests
 
         CheckState? valueSeenByParent = null;
 
-        parentItem.Activated += (_, _) =>
-                                {
-                                    valueSeenByParent = checkBox.Value;
-                                };
+        parentItem.Activated += (_, _) => { valueSeenByParent = checkBox.Value; };
 
         // Space triggers Activate with binding → Shortcut dispatches to CheckBox
         childItem.NewKeyDownEvent (Key.Space);
@@ -1434,7 +1431,14 @@ public class MenuTests
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        View superView = new () { Id = "superView", CanFocus = true, CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        View superView = new ()
+        {
+            Id = "superView",
+            CanFocus = true,
+            CommandsToBubbleUp = [Command.Activate],
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
         Menu menu = new () { Id = "menu" };
         superView.Add (menu);
 
@@ -1452,10 +1456,7 @@ public class MenuTests
 
         CheckState? valueSeenBySuperView = null;
 
-        superView.Activating += (_, _) =>
-                                {
-                                    valueSeenBySuperView = checkBox.Value;
-                                };
+        superView.Activating += (_, _) => { valueSeenBySuperView = checkBox.Value; };
 
         // Invoke Activate on the Menu — dispatches to focused MenuItem → CheckBox
         menu.InvokeCommand (Command.Activate);
@@ -1472,19 +1473,27 @@ public class MenuTests
     // Claude - Opus 4.6
     /// <summary>
     ///     With focus set, menu.InvokeCommand(Activate) dispatches to the focused MenuItem
-    ///     which dispatches to its FlagSelector CommandView. However, the DispatchingDown guard
-    ///     prevents FlagSelector from further dispatching to its inner CheckBoxes. The FlagSelector
-    ///     value does NOT change. Activating still bubbles to Menu and SuperView.
+    ///     which dispatches to its FlagSelector CommandView. The DispatchingDown guard prevents
+    ///     FlagSelector from dispatching to inner CheckBoxes, but FlagSelector.OnActivated uses
+    ///     the Focused CheckBox as a fallback target when DispatchingDown routing is detected.
+    ///     The focused CheckBox is toggled, and Activating bubbles to Menu and SuperView.
     /// </summary>
     [Fact]
-    public void Menu_InvokeActivate_With_Focus_FlagSelector_Value_Unchanged ()
+    public void Menu_InvokeActivate_With_Focus_FlagSelector_Toggles_Focused_CheckBox ()
     {
         VirtualTimeProvider time = new ();
         using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        View superView = new () { Id = "superView", CanFocus = true, CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        View superView = new ()
+        {
+            Id = "superView",
+            CanFocus = true,
+            CommandsToBubbleUp = [Command.Activate],
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
         Menu menu = new () { Id = "menu" };
         superView.Add (menu);
 
@@ -1499,7 +1508,7 @@ public class MenuTests
         menuItem.SetFocus ();
         Assert.Same (menuItem, menu.Focused);
 
-        int? initialValue = flagSelector.Value;
+        int? initialValue = flagSelector.Value; // Auto-initialized to first entry (1)
 
         var superViewActivatingCount = 0;
         superView.Activating += (_, _) => superViewActivatingCount++;
@@ -1509,8 +1518,65 @@ public class MenuTests
         // Activating propagated to SuperView
         Assert.Equal (1, superViewActivatingCount);
 
-        // FlagSelector value unchanged — DispatchingDown guard prevents inner CheckBox dispatch
-        Assert.Equal (initialValue, flagSelector.Value);
+        // FlagSelector value HAS changed — Focused fallback toggled the first CheckBox
+        Assert.NotEqual (initialValue, flagSelector.Value);
+
+        ((View)runnable).Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     With focus set, menu.InvokeCommand(Activate) dispatches to the focused MenuItem
+    ///     which dispatches to its OptionSelector CommandView. The DispatchingDown guard prevents
+    ///     OptionSelector from dispatching to inner CheckBoxes, but OptionSelector.ApplyActivation
+    ///     uses the Focused CheckBox as a fallback target when DispatchingDown routing is detected.
+    ///     The focused option is selected, and Activating bubbles to Menu and SuperView.
+    /// </summary>
+    [Fact]
+    public void Menu_InvokeActivate_With_Focus_OptionSelector_Selects_Focused_Item ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View superView = new ()
+        {
+            Id = "superView",
+            CanFocus = true,
+            CommandsToBubbleUp = [Command.Activate],
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        OptionSelector selector = new () { Labels = ["Opt1", "Opt2", "Opt3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = selector };
+        menu.Add (menuItem);
+
+        ((View)runnable).Add (superView);
+        app.Begin (runnable);
+
+        // Explicitly set focus to the MenuItem, then to the second CheckBox
+        menuItem.SetFocus ();
+        Assert.Same (menuItem, menu.Focused);
+
+        // Value starts at 0 (first option selected). Focus the second CheckBox.
+        Assert.Equal (0, selector.Value);
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        checkBoxes [1].SetFocus ();
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menu.InvokeCommand (Command.Activate);
+
+        // Activating propagated to SuperView
+        Assert.Equal (1, superViewActivatingCount);
+
+        // OptionSelector value changed — Focused fallback selected the second option
+        Assert.Equal (1, selector.Value);
 
         ((View)runnable).Dispose ();
     }
