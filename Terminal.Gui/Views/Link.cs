@@ -55,7 +55,7 @@ public class Link : View, IDesignable
     }
 
     /// <summary>
-    ///     Text changed event, raised when the text has changed.
+    ///     URL changed event, raised when the URL has changed.
     /// </summary>
     public event EventHandler? UrlChanged;
 
