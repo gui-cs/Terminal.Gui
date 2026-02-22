@@ -7,15 +7,21 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class Links : Scenario
 {
+    private IApplication? _app;
+    private Window? _appWindow;
+    private Link? _link;
+
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        using IApplication app = Application.Create ();
-        app.Init ();
 
-        using Window mainWindow = new ()
+        _app = Application.Create ();
+        _app.Init ();
+
+        _appWindow = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetName (),
+            BorderStyle = LineStyle.None
         };
 
         Label textLabel = new ()
@@ -24,7 +30,7 @@ public class Links : Scenario
             X = 1,
             Y = 1
         };
-        mainWindow.Add (textLabel);
+        _appWindow.Add (textLabel);
 
         TextField textField = new ()
         {
@@ -32,7 +38,7 @@ public class Links : Scenario
             Y = 1,
             Width = 20
         };
-        mainWindow.Add (textField);
+        _appWindow.Add (textField);
 
         Label urlLabel = new ()
         {
@@ -40,7 +46,7 @@ public class Links : Scenario
             X = 1,
             Y = Pos.Bottom (textField) + 1
         };
-        mainWindow.Add (urlLabel);
+        _appWindow.Add (urlLabel);
 
         TextField urlField = new ()
         {
@@ -48,14 +54,14 @@ public class Links : Scenario
             Y = Pos.Bottom (textField) + 1,
             Width = 64
         };
-        mainWindow.Add (urlField);
+        _appWindow.Add (urlField);
 
         Label simpleUrlLabel = new ()
         {
             X = 1,
             Y = Pos.Bottom (urlField) + 2
         };
-        mainWindow.Add (simpleUrlLabel);
+        _appWindow.Add (simpleUrlLabel);
 
         FrameView linkFrame = new ()
         {
@@ -67,7 +73,7 @@ public class Links : Scenario
             AssignHotKeys = true
         };
 
-        Link link = new ()
+        _link = new ()
         {
             X = 1,
             Y = 1,
@@ -75,10 +81,10 @@ public class Links : Scenario
             Width = 64
         };
 
-        link.UrlChanged += (s, e) => simpleUrlLabel.Text = link.Url;
-        textField.ValueChanged += (s, e) => link.Text = e.NewValue ?? link.Url;
-        urlField.ValueChanged += (s, e) => link.Url = e.NewValue ?? Link.DEFAULT_URL;
-        linkFrame.Add (link);
+        _link.UrlChanged += (s, e) => simpleUrlLabel.Text = _link.Url;
+        textField.ValueChanged += (s, e) => _link.Text = e.NewValue ?? _link.Url;
+        urlField.ValueChanged += (s, e) => _link.Url = e.NewValue ?? Link.DEFAULT_URL;
+        linkFrame.Add (_link);
 
         textField.Text = "GitHub repo";
         urlField.Text = "https://github.com/gui-cs/Terminal.Gui";
@@ -87,16 +93,29 @@ public class Links : Scenario
         {
             Title = "_Copy",
             X = Pos.Center (),
-            Y = Pos.Bottom (link) + 2,
+            Y = Pos.Bottom (_link) + 2,
             
         };
-        copyButton.Accepting += (s, e) => link.Copy ();
+        copyButton.Accepting += (s, e) => _link.Copy ();
 
         linkFrame.Add (copyButton);
 
-        mainWindow.Add (linkFrame);
+        _appWindow.Add (linkFrame);
 
-        app.Run (mainWindow);
+        // StatusBar
+        Shortcut urlIndicator = new (Key.Empty, "", null);
+
+        StatusBar statusBar = new ([
+            new (Application.QuitKey, "Quit", Quit),
+            urlIndicator
+        ]);
+        _link.MouseEnter += (s, e) => urlIndicator.Title = _link.Url;
+        _link.MouseLeave += (s, e) => urlIndicator.Title = "";
+        _appWindow.Add (statusBar);
+
+        _app.Run (_appWindow);
+        _appWindow.Dispose ();
     }
 
+    private void Quit () { _appWindow?.RequestStop (); }
 }

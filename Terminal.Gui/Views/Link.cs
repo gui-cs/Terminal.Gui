@@ -176,10 +176,8 @@ public class Link : View, IDesignable
 
     private void SetUrl(string value)
     {
-        // Will throw exception if not a valid URL
-        _ = new Uri (value);
-
-        if (_url != value)
+        // Do dot crach on invalid URLs
+        if (Uri.TryCreate(value, UriKind.Absolute, out _) && _url != value)
         {
             string oldValue = _url;
 
