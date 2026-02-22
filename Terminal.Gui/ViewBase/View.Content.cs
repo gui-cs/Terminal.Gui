@@ -278,7 +278,10 @@ public partial class View
                 return;
             }
 
+            ViewportSettingsFlags oldFlags = _viewportSettings;
             _viewportSettings = value;
+
+            SyncScrollBarsToSettings (oldFlags, value);
 
             if (IsInitialized)
             {
@@ -341,12 +344,13 @@ public partial class View
             if (Margin is null || Border is null || Padding is null)
             {
                 // CreateAdornments has not been called yet.
-                return new (_viewportLocation, Frame.Size);
+                return new Rectangle (_viewportLocation, Frame.Size);
             }
 
             Thickness thickness = GetAdornmentsThickness ();
 
-            return new (_viewportLocation, new (Math.Max (0, Frame.Size.Width - thickness.Horizontal), Math.Max (0, Frame.Size.Height - thickness.Vertical)));
+            return new Rectangle (_viewportLocation,
+                                  new Size (Math.Max (0, Frame.Size.Width - thickness.Horizontal), Math.Max (0, Frame.Size.Height - thickness.Vertical)));
         }
         set => SetViewport (value);
     }

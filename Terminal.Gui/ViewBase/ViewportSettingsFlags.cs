@@ -117,7 +117,8 @@ public enum ViewportSettingsFlags
     AllowYPlusHeightGreaterThanContentHeight = 0b_0000_1000_0000,
 
     /// <summary>
-    ///     Combines <see cref="AllowXPlusWidthGreaterThanContentWidth"/> and <see cref="AllowYPlusHeightGreaterThanContentHeight"/>.
+    ///     Combines <see cref="AllowXPlusWidthGreaterThanContentWidth"/> and
+    ///     <see cref="AllowYPlusHeightGreaterThanContentHeight"/>.
     ///     Allows blank space to appear when scrolling in either direction.
     /// </summary>
     AllowLocationPlusSizeGreaterThanContentSize = AllowXPlusWidthGreaterThanContentWidth | AllowYPlusHeightGreaterThanContentHeight,
@@ -161,5 +162,26 @@ public enum ViewportSettingsFlags
     ///         the mouse.
     ///     </para>
     /// </summary>
-    TransparentMouse = 0b_1000_0000_0000
+    TransparentMouse = 0b_1000_0000_0000,
+
+    /// <summary>
+    ///     If set, the built-in <see cref="View.VerticalScrollBar"/> is enabled with
+    ///     <see cref="ScrollBarVisibilityMode.Auto"/> behavior. Clearing this flag disables
+    ///     the scrollbar and sets its <see cref="ScrollBar.VisibilityMode"/> to
+    ///     <see cref="ScrollBarVisibilityMode.Manual"/> with <see cref="View.Visible"/> = false.
+    /// </summary>
+    HasVerticalScrollBar = 0b_0001_0000_0000_0000,
+
+    /// <summary>
+    ///     If set, the built-in <see cref="View.HorizontalScrollBar"/> is enabled with
+    ///     <see cref="ScrollBarVisibilityMode.Auto"/> behavior. Clearing this flag disables
+    ///     the scrollbar and sets its <see cref="ScrollBar.VisibilityMode"/> to
+    ///     <see cref="ScrollBarVisibilityMode.Manual"/> with <see cref="View.Visible"/> = false.
+    /// </summary>
+    HasHorizontalScrollBar = 0b_0010_0000_0000_0000,
+
+    /// <summary>
+    ///     Combines <see cref="HasVerticalScrollBar"/> and <see cref="HasHorizontalScrollBar"/>.
+    /// </summary>
+    HasScrollBars = HasVerticalScrollBar | HasHorizontalScrollBar
 }
