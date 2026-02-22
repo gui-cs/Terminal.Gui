@@ -152,7 +152,7 @@ public class FileDialog : Dialog, IDesignable
 
         _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (1), FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
-        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
         _tableView.Activating += OnTableViewActivating;
         Style.TableStyle = _tableView.Style;
 
