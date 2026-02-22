@@ -1484,7 +1484,7 @@ public class TreeView<T> : View, ITreeView where T : class
         cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
 
         // Update the collection used for search-typing
-        KeystrokeNavigator.Collection = cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
+        KeystrokeNavigator.Collection = cachedLineMap.Select (b => b.Model).ToArray ();
 
         return cachedLineMap;
     }

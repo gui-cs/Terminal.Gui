@@ -9,7 +9,7 @@ internal class FileSystemCollectionNavigationMatcher : DefaultCollectionNavigato
     {
         if(value is IFileSystemInfo fsi)
         {
-            fsi.Name.StartsWith (search, Comparer);
+            return fsi.Name.StartsWith (search, Comparer);
         }
 
         return base.IsMatch (search, value);
