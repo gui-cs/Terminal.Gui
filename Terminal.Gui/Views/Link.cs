@@ -43,26 +43,30 @@ public class Link : View, IDesignable
     /// </summary>
     public string Url
     {
-        get { return _url; }
-        set
-        {
-            // Will throw exception if not a valid URL
-            _ = new Uri (value);
-
-            _url = value; 
-            OnUrlChanged ();
-        }
+        get => _url;
+        set => SetUrl (value);
     }
+
+    /// <summary>
+    ///     Raised when <see cref="Url"/> is about to change.
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<string>>? UrlChanging;
 
     /// <summary>
     ///     URL changed event, raised when the URL has changed.
     /// </summary>
-    public event EventHandler? UrlChanged;
+    public event EventHandler<ValueChangedEventArgs<string>>? UrlChanged;
 
     /// <summary>
-    ///     Called when the <see cref="Url"/> has changed. Fires the <see cref="UrlChanged"/> event.
+    ///     Called before <see cref="Url"/> changes. Return <see langword="true"/> to cancel the change.
     /// </summary>
-    public void OnUrlChanged () => UrlChanged?.Invoke (this, EventArgs.Empty);
+    protected virtual bool OnUrlChanging (ValueChangingEventArgs<string> args) => false;
+
+    /// <summary>
+    ///     Called after <see cref="Url"/> has changed.
+    /// </summary>
+    protected virtual void OnUrlChanged (ValueChangedEventArgs<string> args) { }
 
     private bool? InvokeHotKeyOnNextPeer (ICommandContext commandContext)
     {
@@ -131,7 +135,7 @@ public class Link : View, IDesignable
         // Set the URL for cells that will be drawn
         if (!string.IsNullOrEmpty (Url) && Url != DEFAULT_URL && Driver is { })
         {
-            Rectangle drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
+            Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
 
             // Use GetDrawRegion to get precise drawn areas
             Region textRegion = TextFormatter.GetDrawRegion (drawRect);
@@ -168,6 +172,40 @@ public class Link : View, IDesignable
         }
 
         return base.OnDrawingText (context);
+    }
+
+    private void SetUrl(string value)
+    {
+        // Will throw exception if not a valid URL
+        _ = new Uri (value);
+
+        if (_url != value)
+        {
+            string oldValue = _url;
+
+            // CWP: Fire ValueChanging (allows cancellation)
+            ValueChangingEventArgs<string> changingArgs = new (oldValue, value);
+
+            if (OnUrlChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            UrlChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            // Do the work
+            _url = value;
+
+            // CWP: Fire ValueChanged
+            ValueChangedEventArgs<string> changedArgs = new (oldValue, value);
+            OnUrlChanged (changedArgs);
+            UrlChanged?.Invoke (this, changedArgs);
+        }
     }
 }
 
