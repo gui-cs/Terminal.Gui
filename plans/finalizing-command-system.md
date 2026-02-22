@@ -1,714 +1,734 @@
-# Finalizing Command System - Bug Fixes
+# Terminal.Gui v2 Command System — Definitive Reference
 
-## Status: Issues #1-3 COMPLETED, Gaps #1-3 COMPLETED, MenuBar/PopoverMenu Routing FIXED
+## Status: Re-engineered for v2 Beta
 
-Issues #1-3 have been implemented and verified. See [Implementation Results](#implementation-results) at the bottom.
-Architectural Gaps #1-3 are all completed.
-MenuBar/PopoverMenu command routing fixed — all 14,068 parallelizable tests passing with 0 failures.
-Issues #4-6 remain deferred.
-
----
-
-## Context
-
-The command system redesign (Phases A-E from PR #62) introduced `GetDispatchTarget`/`ConsumeDispatch`, `CommandRouting` enum, and `CommandBridge`. Several issues remain, identified through a failing test (`CommandView_Command_Activate_Bubbles_To_Shortcut_SuperView`) and the Cursor Bugbot review of PR #62.
-
-**Caution**: The command system has subtle invariants. Pushing in one place (e.g., making Activated fire on bubble-up) can break something else nuanced (e.g., double-firing in Shortcut's deferred completion, or breaking consume-dispatch semantics in selectors). Each fix must be verified against ALL tests before proceeding to the next.
+The command system has been re-engineered across Phases A-E of the command system redesign plus
+targeted bug fixes for MenuBar/PopoverMenu routing. All parallelizable and non-parallelizable
+tests pass (14,045 + ~1,001). This document is the definitive reference for the system as shipped.
 
 ---
 
-## Architectural Background: Two Dispatch Patterns
+## Table of Contents
 
-Understanding these patterns is critical before making any changes.
-
-### Pattern 1: Relay Dispatch (Shortcut, `ConsumeDispatch=false`)
-
-```
-SuperView (CommandsToBubbleUp=[Activate])
-  └─ Shortcut (CommandsToBubbleUp=[Activate,Accept], ConsumeDispatch=false)
-       └─ CommandView (e.g., CheckBox)
-```
-
-- `TryDispatchToTarget` returns **false** (relay, doesn't consume)
-- `TryBubbleUp` **CAN run** → command propagates further up the hierarchy
-- CommandView completes its own activation (fires `RaiseActivated`)
-- Shortcut gets Activated via deferred completion (`CommandView_Activated` callback)
-- **SuperView CAN receive the command** (if it has Activate in `CommandsToBubbleUp`)
-
-### Pattern 2: Consume Dispatch (OptionSelector/FlagSelector, `ConsumeDispatch=true`)
-
-```
-SuperView (CommandsToBubbleUp=[Activate])
-  └─ FlagSelector (CommandsToBubbleUp=[Activate,Accept], ConsumeDispatch=true)
-       └─ CheckBox (internal)
-```
-
-- `TryDispatchToTarget` returns **true** (consumed) → `args.Handled = true` (line 545)
-- `TryBubbleUp` is **SKIPPED** (line 548: `if (!args.Handled)` fails)
-- Selector fires `RaiseActivated` itself (via `_lastDispatchOccurred=true`, line 450)
-- **SuperView NEVER receives the command** — this is intentional
-- The selector owns its internal state; inner CheckBox activations are implementation details
-
-### Key Implication
-
-**Issue #1's fix only helps relay-dispatch views (Shortcut) and plain views.** The skipped `CommandBubblingTests` (which involve FlagSelector inside MenuItem/MenuBar hierarchy) require a separate design decision about whether consume-dispatch views should also propagate after consuming. That is out of scope for this plan.
+1. [Architecture Overview](#architecture-overview)
+2. [Core Types](#core-types)
+3. [Command Lifecycle](#command-lifecycle)
+4. [Default Handlers](#default-handlers)
+5. [Dispatch Patterns (Composite Views)](#dispatch-patterns-composite-views)
+6. [Command Bubbling](#command-bubbling)
+7. [CommandBridge (Cross-Boundary Routing)](#commandbridge-cross-boundary-routing)
+8. [Keyboard Integration](#keyboard-integration)
+9. [Route Tracing](#route-tracing)
+10. [View-Specific Behaviors](#view-specific-behaviors)
+11. [Design Invariants](#design-invariants)
+12. [Completed Work](#completed-work)
+13. [Future Work](#future-work)
 
 ---
 
-## Priority 1: Correctness Fixes (Issues #1-3)
+## Architecture Overview
 
-### Issue #1: `DefaultActivateHandler` doesn't fire `RaiseActivated` on bubble-up
+The command system routes user interactions (keyboard, mouse, programmatic) through a hierarchy
+of Views using a structured pipeline. Every View gets four default command handlers registered
+at construction. Commands flow through a two-phase notification model (cancellable preview +
+non-cancellable completion), with opt-in bubbling up the SuperView chain and declarative
+dispatching down to composite SubViews.
 
-**File**: `Terminal.Gui/ViewBase/View.Command.cs:464`
-**Failing Test**: `ShortcutTests.CommandView_Command_Activate_Bubbles_To_Shortcut_SuperView`
+### Key Principles
 
-#### Root Cause
+1. **Two-phase notifications** — Cancellable phase (`Activating`/`Accepting`/`HandlingHotKey`)
+   followed by completion phase (`Activated`/`Accepted`/`HotKeyCommand`)
+2. **Opt-in bubbling** — Commands only bubble when SuperView declares them in `CommandsToBubbleUp`
+3. **Declarative dispatch** — Composite views override `GetDispatchTarget` + `ConsumeDispatch`
+   instead of writing custom routing logic
+4. **Immutable context** — `CommandContext` is a `readonly record struct`; views create modified
+   copies via `WithCommand`/`WithRouting`
+5. **Weak references** — Source tracking uses `WeakReference<View>` to prevent memory leaks
+6. **Synchronous execution** — All command processing is synchronous; no async or deferred queueing
 
-Asymmetry between Activate and Accept handlers. When a command arrives via `BubblingUp`:
+### Return Value Convention
 
-| Handler | Behavior on BubblingUp | Calls Raise*d? |
-|---------|----------------------|----------------|
-| `DefaultAcceptHandler` (line 285-304) | Falls through to `RaiseAccepted` (line 294) | **Yes** ✓ |
-| `DefaultActivateHandler` (line 464-467) | Early-returns `false` | **No** ✗ |
+All `InvokeCommand` and handler methods return `bool?`:
 
-The current code at line 464:
+| Value | Meaning | Effect |
+|-------|---------|--------|
+| `null` | No handler found or not raised | Input processing continues |
+| `false` | Event raised but not handled/cancelled | Processing continues |
+| `true` | Event raised and handled/cancelled | Processing stops |
+
+> **Future**: `CommandOutcome` enum (`NotHandled`, `HandledStop`, `HandledContinue`) exists with
+> conversion shims (`ToBool()`/`ToOutcome()`) for incremental migration. See [Phase D](#phase-d-commandoutcome-migration).
+
+---
+
+## Core Types
+
+### Command Enum (`Terminal.Gui/Input/Command.cs`)
+
+| Command | Purpose |
+|---------|---------|
+| `NotBound` | No handler bound; invokes `RaiseCommandNotBound` |
+| `Accept` | Accepts current view state (confirm, submit) |
+| `Activate` | Activates a view/item (toggle, select, focus) |
+| `HotKey` | Handles hot key press (focus + activate) |
+| *(plus movement, editing, navigation, action commands)* | |
+
+### CommandRouting Enum (`Terminal.Gui/Input/CommandRouting.cs`)
+
+| Value | Meaning | Guards |
+|-------|---------|--------|
+| `Direct` | Programmatic invocation or from view's own bindings | Default |
+| `BubblingUp` | Propagating upward through SuperView chain | Blocks SetFocus in Activate handler |
+| `DispatchingDown` | SuperView dispatching to specific SubView | Blocks re-entry and bubbling on target |
+| `Bridged` | Crossing non-containment boundary via CommandBridge | Blocks dispatch-down (bridge brings UP) |
+
+### CommandContext (`Terminal.Gui/Input/CommandContext.cs`)
+
 ```csharp
-// When a SubView's activation bubbles up, the default behavior is notification:
-// Activating fires (above), but Activated and side effects (SetFocus) are skipped.
-if (ctx?.Routing == CommandRouting.BubblingUp)
+public readonly record struct CommandContext : ICommandContext
 {
-    return false;
+    public required Command Command { get; init; }
+    public required WeakReference<View>? Source { get; init; }
+    public required ICommandBinding? Binding { get; init; }
+    public CommandRouting Routing { get; init; }
+
+    public CommandContext WithCommand (Command command) => this with { Command = command };
+    public CommandContext WithRouting (CommandRouting routing) => this with { Routing = routing };
 }
 ```
 
-The comment's intent (skip SetFocus) is correct, but skipping RaiseActivated breaks the two-phase notification model.
-
-#### Detailed Trace of the Failing Test
-
-```
-testCommandView.InvokeCommand(Activate) — ctx: {Routing=Direct, Binding=null}
-│
-├─ DefaultActivateHandler (testCommandView)
-│  └─ RaiseActivating (testCommandView)
-│     ├─ OnActivating → false (base View, no override)
-│     ├─ Activating?.Invoke → commandViewActivatingRaised=1 ✓
-│     ├─ TryDispatchToTarget → null (no dispatch target) → false
-│     └─ TryBubbleUp:
-│        SuperView is Shortcut, CommandsToBubbleUp has Activate → YES
-│        upCtx = {Routing=BubblingUp, Binding=null}
-│        │
-│        └─ Shortcut.InvokeCommand(Activate, upCtx)
-│           └─ DefaultActivateHandler (Shortcut) — ctx: {Routing=BubblingUp}
-│              └─ RaiseActivating (Shortcut)
-│                 ├─ OnActivating → false
-│                 ├─ Activating?.Invoke → shortcutActivatingRaised=1 ✓
-│                 ├─ TryDispatchToTarget:
-│                 │  target = CommandView (testCommandView)
-│                 │  !ConsumeDispatch && ctx?.Binding is null → TRUE → return false
-│                 │  (Relay guard blocks dispatch for programmatic invocations)
-│                 └─ TryBubbleUp:
-│                    SuperView is superView, CommandsToBubbleUp has Activate → YES
-│                    │
-│                    └─ superView.InvokeCommand(Activate, upCtx2)
-│                       └─ DefaultActivateHandler (superView) — ctx: {Routing=BubblingUp}
-│                          └─ RaiseActivating (superView)
-│                             ├─ Activating?.Invoke → superViewActivatingCount=1 ✓
-│                             └─ returns false (not handled)
-│                          ★ LINE 464: BubblingUp → return false
-│                          ★ RaiseActivated NEVER CALLED → superViewActivatedCount=0 ✗
-│
-│              ★ LINE 464: BubblingUp → return false
-│              ★ Shortcut's RaiseActivated NOT called here (deferred path handles it)
-│
-│  RaiseActivating returned false
-│  Not BubblingUp (Direct) → continues
-│  !_lastDispatchOccurred → RaiseActivated (testCommandView)
-│  └─ testCommandView.Activated fires → commandViewActivatedRaised=1 ✓
-│     └─ Shortcut.CommandView_Activated:
-│        _activatedFiredThisCycle=false → calls RaiseActivated(ctx)
-│        → shortcutActivatedRaised=1 ✓
-│        → BUT nothing propagates to superView
-│
-│ RESULT: superViewActivatedCount=0 ✗ (expected 1)
-```
-
-#### Fix
-
-Change `DefaultActivateHandler` to call `RaiseActivated` for BubblingUp (matching Accept's behavior) while still skipping `SetFocus`:
+### CommandOutcome Enum (`Terminal.Gui/Input/CommandOutcome.cs`)
 
 ```csharp
-// Line 464 — CHANGE FROM:
-if (ctx?.Routing == CommandRouting.BubblingUp)
+public enum CommandOutcome
 {
-    return false;
-}
-
-// TO:
-if (ctx?.Routing == CommandRouting.BubblingUp)
-{
-    if (!_lastDispatchOccurred)
-    {
-        RaiseActivated (ctx);
-    }
-
-    return false;
+    NotHandled,      // Routing continues
+    HandledStop,     // Routing stops
+    HandledContinue, // Handled but routing may continue (notification semantics)
 }
 ```
 
-#### Why the `_lastDispatchOccurred` guard is needed
+Conversion shims in `CommandOutcomeExtensions` bridge `bool?` ↔ `CommandOutcome`.
 
-For consume-dispatch views (OptionSelector/FlagSelector) receiving BubblingUp:
-- `RaiseActivating` returns `true` (consumed) → we enter the `if` block at line 445
-- `_lastDispatchOccurred=true` → `RaiseActivated` already fires at line 450
-- We never reach line 464 → the fix doesn't apply → no double-fire
+### CommandBridge (`Terminal.Gui/Input/CommandBridge.cs`)
 
-For relay-dispatch views (Shortcut) receiving BubblingUp:
-- `RaiseActivating` returns `false` → skip the `if` block at line 445
-- Reach line 464 (BubblingUp check)
-- `_lastDispatchOccurred=false` (relay guard prevented dispatch) → call `RaiseActivated`
-- Shortcut's `OnActivated` sets `_activatedFiredThisCycle=true`
-- Later: `CommandView_Activated` fires → sees flag is true → skips duplicate → resets flag ✓
-
-For plain Views receiving BubblingUp:
-- No dispatch target → `_lastDispatchOccurred=false`
-- Reach line 464 → `RaiseActivated` fires → superView.Activated event ✓
-
-#### Focused Unit Tests to Verify
-
-**Test A** — Simplest possible case (new test to add to ViewCommandTests.cs):
-```csharp
-[Fact]
-public void Activate_BubblingUp_Fires_Activated_On_SuperView ()
-{
-    View superView = new () { CommandsToBubbleUp = [Command.Activate] };
-    View subView = new ();
-    superView.Add (subView);
-
-    var activatedCount = 0;
-    superView.Activated += (_, _) => activatedCount++;
-
-    subView.InvokeCommand (Command.Activate);
-
-    Assert.Equal (1, activatedCount); // FAILS with current code
-}
-```
-
-**Test B** — The user's failing test (already exists):
-`ShortcutTests.CommandView_Command_Activate_Bubbles_To_Shortcut_SuperView`
-
-**Test C** — Deep hierarchy (new test for ViewCommandTests.cs):
-```csharp
-[Fact]
-public void Activate_BubblingUp_Fires_Activated_In_Deep_Hierarchy ()
-{
-    View grandSuperView = new () { CommandsToBubbleUp = [Command.Activate] };
-    View superView = new () { CommandsToBubbleUp = [Command.Activate] };
-    View subView = new ();
-    grandSuperView.Add (superView);
-    superView.Add (subView);
-
-    var grandActivatedCount = 0;
-    grandSuperView.Activated += (_, _) => grandActivatedCount++;
-
-    subView.InvokeCommand (Command.Activate);
-
-    Assert.Equal (1, grandActivatedCount); // FAILS with current code
-}
-```
-
-**Test D** — Verify consume-dispatch blocks bubbling (document current behavior):
-```csharp
-[Fact]
-public void ConsumeDispatch_Blocks_Further_Bubbling ()
-{
-    // OptionSelector uses ConsumeDispatch=true — activation should NOT
-    // propagate from its inner CheckBox to OptionSelector's SuperView
-    View superView = new () { CommandsToBubbleUp = [Command.Activate] };
-    OptionSelector<int> selector = new () { /* ... setup ... */ };
-    superView.Add (selector);
-
-    var superViewActivatingCount = 0;
-    superView.Activating += (_, _) => superViewActivatingCount++;
-
-    // Activate an inner CheckBox
-    CheckBox innerCb = selector.SubViews.OfType<CheckBox> ().First ();
-    innerCb.InvokeCommand (Command.Activate);
-
-    Assert.Equal (0, superViewActivatingCount); // Consume blocks propagation
-}
-```
-
-#### Existing tests that MUST NOT break
-
-- `CommandView_Command_Activate_Bubbles_To_Shortcut` (ShortcutTests.Command.cs:162) — Shortcut.Activating fires
-- `CommandsToBubbleUp_CanBeCustomized` (ViewCommandTests.cs:411) — plain View bubbling
-- `CommandsToBubbleUp_StopsWhenHandled` (ViewCommandTests.cs:427) — handled stops bubbling
-- `CommandsToBubbleUp_WorksInDeepHierarchy` (ViewCommandTests.cs:447) — Accept deep chain
-- `FlagSelector_CommandView_SubView_Activate_Does_Not_Duplicate` (ShortcutTests.Command.cs:866) — no duplicate events
-- `OptionSelector_CommandView_Enter_Activates_And_Accepts` (ShortcutTests.Command.cs:924)
-- All existing `Activate_*` and `Activated_*` tests in ViewCommandTests.cs
-- All FlagSelectorTests and OptionSelectorTests
+See [CommandBridge section](#commandbridge-cross-boundary-routing).
 
 ---
 
-### Issue #2: Stale `_lastDispatchOccurred` causes spurious completion events (HIGH)
+## Command Lifecycle
 
-**File**: `Terminal.Gui/ViewBase/View.Command.cs:765`
-**Source**: Cursor Bugbot review #3 on PR #62
+### Registration (View Constructor)
 
-#### The Problem
-
-`_lastDispatchOccurred` is only reset inside `TryDispatchToTarget` (line 777), but `RaiseActivating`/`RaiseAccepting` can return `true` via early-exit paths that skip `TryDispatchToTarget`:
-1. `OnActivating` returns true (line 533)
-2. `Activating` event handler sets `args.Handled = true` (line 540)
-
-In those cases, the flag retains its value from a **prior** invocation.
-
-#### Failure Scenario
-
-```
-1. User clicks CheckBox inside Shortcut → dispatch occurs → _lastDispatchOccurred=true
-2. User subscribes to Activating, sets Handled=true (cancel)
-3. Click again → DefaultActivateHandler calls RaiseActivating
-4. RaiseActivating: OnActivating→false, Activating→Handled=true → returns true
-5. DefaultActivateHandler line 448: _lastDispatchOccurred is STALE true
-6. RaiseActivated fires DESPITE activation being cancelled ✗
-```
-
-#### Fix
-
-Reset at the top of both handlers:
+Every View calls `SetupCommands()` at construction:
 
 ```csharp
-internal bool? DefaultActivateHandler (ICommandContext? ctx)
+private void SetupCommands ()
 {
-    _lastDispatchOccurred = false;  // ADD THIS LINE
-
-    if (RaiseActivating (ctx) is true)
-    ...
-```
-
-Same for `DefaultAcceptHandler` (line 250).
-
-#### Focused Unit Test
-
-```csharp
-[Fact]
-public void Activate_Cancelled_After_Dispatch_Does_Not_Fire_Activated ()
-{
-    Shortcut shortcut = new () { Key = Key.T, CommandView = new CheckBox () };
-    var activatedCount = 0;
-    shortcut.Activated += (_, _) => activatedCount++;
-
-    // First: normal activation with binding (triggers dispatch)
-    KeyBinding kb = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (shortcut) };
-    shortcut.InvokeCommand (Command.Activate, kb);
-    // activatedCount is now 1 (or more depending on deferred path)
-    int afterFirst = activatedCount;
-
-    // Second: cancel activation
-    shortcut.Activating += (_, args) => args.Handled = true;
-    shortcut.InvokeCommand (Command.Activate, kb);
-
-    // Activated should NOT have fired again (cancelled)
-    Assert.Equal (afterFirst, activatedCount);
+    AddCommand (Command.Activate, DefaultActivateHandler);
+    AddCommand (Command.Accept, DefaultAcceptHandler);
+    AddCommand (Command.HotKey, DefaultHotKeyHandler);
+    AddCommand (Command.NotBound, DefaultCommandNotBoundHandler);
 }
+```
+
+Views can override handlers via `AddCommand (Command.Xxx, myHandler)`.
+
+### Invocation Flow
+
+```
+InvokeCommand (command, binding/context)
+  │
+  ├─ Look up handler in _commandImplementations dictionary
+  │
+  ├─ If found: call handler (e.g., DefaultActivateHandler)
+  │  └─ Handler runs the CWP pipeline (see Default Handlers)
+  │
+  └─ If not found: return null (no handler)
+```
+
+### CWP (Cancellable Work Pattern) Pipeline
+
+Each default handler follows this pattern:
+
+```
+1. Reset _lastDispatchOccurred = false
+2. RaiseXxxing (cancellable phase):
+   a. Call OnXxxing (args)          — virtual, subclass can cancel
+   b. Fire Xxxing event             — subscriber can cancel
+   c. TryDispatchToTarget (ctx)     — composite dispatch
+   d. TryBubbleUp (ctx, handled)    — opt-in bubbling
+3. If cancelled → return (no completion phase)
+4. Completion work (SetFocus, etc.)
+5. RaiseXxxed (ctx)                 — non-cancellable notification
+6. Return result
 ```
 
 ---
 
-### Issue #3: Shortcut `_activatedFiredThisCycle` stuck after programmatic invoke (MEDIUM)
+## Default Handlers
 
-**File**: `Terminal.Gui/Views/Shortcut.cs:562`
-**Source**: Cursor Bugbot review #4 on PR #62
+### DefaultActivateHandler (`View.Command.cs`)
 
-#### The Problem
+Handles `Command.Activate`:
 
-```
-1. shortcut.InvokeCommand(Command.Activate) — programmatic, no binding
-2. DefaultActivateHandler → RaiseActivating:
-   - TryDispatchToTarget: !ConsumeDispatch && ctx?.Binding is null → SKIP (line 796)
-3. Not BubblingUp → RaiseActivated fires on Shortcut
-4. Shortcut.OnActivated: _activatedFiredThisCycle = true
-5. CommandView_Activated NEVER fires (CommandView was never activated)
-6. _activatedFiredThisCycle stays stuck at true
+1. Resets `_lastDispatchOccurred = false`
+2. Calls `RaiseActivating (ctx)` — cancellable
+3. If `RaiseActivating` returns `true` (handled/dispatched):
+   - If `_lastDispatchOccurred` → calls `RaiseActivated (ctx)` (consume-dispatch completion)
+   - Returns `true`
+4. If routing is `BubblingUp`:
+   - If no dispatch target (`GetDispatchTarget (ctx) is null`) → calls `RaiseActivated (ctx)`
+   - Returns `false` (notification semantics — skips SetFocus)
+5. If not `BubblingUp` (Direct):
+   - Calls `SetFocus ()` if `CanFocus`
+   - If `_lastDispatchOccurred` → skips `RaiseActivated` (relay-dispatch uses deferred completion)
+   - Otherwise → calls `RaiseActivated (ctx)`
+   - Returns `true`
 
-7. LATER: User clicks CheckBox (CommandView)
-8. CheckBox activates → CommandView_Activated fires on Shortcut
-9. _activatedFiredThisCycle is true → SKIPS RaiseActivated ✗
-10. Shortcut's Action silently doesn't run
-11. Flag resets to false (too late)
-```
+**Key design decision**: For `BubblingUp`, plain views (no dispatch target) fire `RaiseActivated`,
+but relay-dispatch views (like Shortcut) skip it — they use the deferred `CommandView_Activated`
+callback path to ensure correct event ordering (CheckBox toggles before Shortcut.Action reads value).
 
-#### Fix
+### DefaultAcceptHandler (`View.Command.cs`)
 
-Reset `_activatedFiredThisCycle` at the start of each activation cycle:
+Handles `Command.Accept`:
+
+1. Resets `_lastDispatchOccurred = false`
+2. Calls `RaiseAccepting (ctx)` — cancellable
+3. If handled:
+   - Calls `RaiseAccepted (ctx)` if dispatch occurred or routing is `Bridged`
+   - Returns `true`
+4. If not handled:
+   - Checks `DefaultAcceptView` redirect (for Dialog default button behavior)
+   - For `BubblingUp` with dispatch target → calls `RaiseAccepted (ctx)`
+5. Calls `RaiseAccepted (ctx)` (final completion)
+6. Returns `true` if redirected, bubbling, or is `IAcceptTarget`
+
+### DefaultHotKeyHandler (`View.Command.cs`)
+
+Handles `Command.HotKey`:
+
+1. Calls `RaiseHandlingHotKey (ctx)` — cancellable
+2. If not cancelled:
+   - Calls `SetFocus ()` if `CanFocus`
+   - Calls `RaiseHotKeyCommand (ctx)` — non-cancellable notification
+   - Invokes `Command.Activate` with the original binding
+3. Returns `true`
+
+**Cascade**: HotKey → focus → notify → Activate. This is why pressing a HotKey both focuses
+a view AND activates it.
+
+---
+
+## Dispatch Patterns (Composite Views)
+
+### Overview
+
+Composite views contain SubViews that are implementation details. The dispatch pattern lets the
+container view declaratively route commands to the appropriate SubView.
+
+### GetDispatchTarget Virtual
 
 ```csharp
-// Add to Shortcut.cs
-protected override bool OnActivating (CommandEventArgs args)
-{
-    _activatedFiredThisCycle = false;
+protected virtual View? GetDispatchTarget (ICommandContext? ctx) => null;
+```
 
-    return base.OnActivating (args);
+Override to return the SubView that should receive dispatched commands. Called during
+`RaiseActivating`/`RaiseAccepting` after `OnXxxing` and the `Xxxing` event have had
+a chance to cancel.
+
+### ConsumeDispatch Virtual
+
+```csharp
+protected virtual bool ConsumeDispatch => false;
+```
+
+- `true` = Dispatch consumes command; target doesn't complete its own activation (container
+  owns state mutation). Used by selectors.
+- `false` = Relay dispatch; target completes normally, container gets notified via deferred
+  completion. Used by Shortcut.
+
+### TryDispatchToTarget (`View.Command.cs`)
+
+Guard conditions prevent re-entry and loops:
+
+1. No target → return false
+2. Already `DispatchingDown` → return false (prevents re-entry)
+3. Routing is `Bridged` → return false (bridge brings commands UP, not down)
+4. Relay (`ConsumeDispatch=false`) AND no binding → return false (programmatic guard)
+5. For `ConsumeDispatch=true`:
+   - Skip dispatch if routing is `BubblingUp` (prevents double-toggle)
+   - Otherwise: `DispatchDown (target, ctx)`, set `_lastDispatchOccurred = true`, return `true`
+6. For `ConsumeDispatch=false` (relay):
+   - Skip if source is within target (prevents loops)
+   - `DispatchDown (target, ctx)`, set `_lastDispatchOccurred = true`, return `false`
+
+### Pattern Summary
+
+| View | `GetDispatchTarget` | `ConsumeDispatch` | Behavior |
+|------|--------------------|--------------------|----------|
+| **Shortcut** | `=> CommandView` | `false` | Relay: CommandView completes, Shortcut notified via deferred callback |
+| **OptionSelector** | `=> Focused` (or source CheckBox for BubblingUp) | `true` | Consume: Selector owns radio-select state |
+| **FlagSelector** | `=> Focused` (or source CheckBox for BubblingUp) | `true` | Consume: Selector owns flag-toggle state |
+| **MenuBar** | `=> Focused` | `true` | Consume: MenuBar owns activation state |
+| **Bar** | not overridden | not overridden | Transparent container; bubbling only |
+| **Menu** | not overridden (OnActivating dispatches manually) | not overridden | Dispatches to focused MenuItem via OnActivating override |
+| **Plain View** | not overridden (`null`) | not overridden | No dispatch |
+
+### Deviations from Original Plan
+
+The original design assumed deferred completion could be purely synchronous (dispatch returns,
+then fire completion). In practice, **relay-dispatch views (Shortcut) still use the
+`CommandView_Activated` callback** because when a command arrives via `BubblingUp`, the originator
+(CheckBox) hasn't called `RaiseActivated` yet. The callback ensures correct ordering: CheckBox
+toggles state → Shortcut.Action reads updated value.
+
+---
+
+## Command Bubbling
+
+### CommandsToBubbleUp Property
+
+```csharp
+public IReadOnlyList<Command> CommandsToBubbleUp { get; set; } = [];
+```
+
+Declares which commands should propagate from SubViews to this View's SuperView. Opt-in only.
+
+### TryBubbleUp (`View.Command.cs`)
+
+1. Returns early if already handled
+2. Returns false if routing is `DispatchingDown` (no bubbling from dispatched commands)
+3. Special handling for `Command.Accept`:
+   - Checks `DefaultAcceptView` on this view and SuperView
+   - If found and source is non-default `IAcceptTarget`: redirects Accept to default button
+4. Checks if SuperView has command in `CommandsToBubbleUp`:
+   - If yes: invokes command on SuperView with `BubblingUp` routing
+5. Handles `Padding` wrapper scenarios (bubbles through Padding to its parent)
+
+**Critical**: Bubbling is **notification, not consumption**. The SuperView's handler return
+value is ignored. The method always returns `false` after a successful bubble. This ensures
+the originating view completes its own processing.
+
+### DefaultAcceptView / IAcceptTarget
+
+```csharp
+public View? DefaultAcceptView { get; set; }
+```
+
+Auto-discovers SubViews implementing `IAcceptTarget` with `IsDefault=true`. When a non-default
+view accepts, the Accept command is redirected to the default button (Dialog's "OK" button pattern).
+
+---
+
+## CommandBridge (Cross-Boundary Routing)
+
+### Purpose
+
+Bridges command routing between views that are NOT in a SuperView/SubView containment
+relationship. Primary use case: MenuBarItem (in the MenuBar) ↔ PopoverMenu (registered
+with `Application.Popover`, outside the view hierarchy).
+
+### Mechanism
+
+```csharp
+public sealed class CommandBridge : IDisposable
+{
+    public static CommandBridge Connect (View owner, View remote, Command[] commands);
 }
 ```
 
-**Why `OnActivating`?** It fires at the beginning of every activation cycle, before any `RaiseActivated` or `CommandView_Activated` can run. This ensures the flag starts clean.
+1. Subscribes to remote view's `Accepted` and/or `Activated` events
+2. When remote fires event: creates `CommandContext` with `Routing = CommandRouting.Bridged`
+3. Invokes command on owner via `InvokeCommand` (full CWP pipeline re-enters)
+4. Bridged commands can then bubble through the owner's SuperView hierarchy
 
-#### Focused Unit Test
+### One-Way Routing
+
+Remote fires event → Owner receives command. For bidirectional, create two bridges.
+
+### Weak References
+
+Both `_owner` and `_remote` are `WeakReference<View>`. Bridge becomes inert if either
+is collected. Disposed automatically when either view disposes.
+
+### Guard in TryDispatchToTarget
+
+When a command arrives via `Bridged` routing, `TryDispatchToTarget` returns false. This prevents
+dispatching back DOWN — the bridge is designed to bring commands UP from detached views into
+the containment hierarchy.
+
+### Example Flow
+
+```
+MenuItem (in PopoverMenu) activated
+  → bubbles to Menu (in PopoverMenu)
+  → Menu.Activated fires
+  → PopoverMenu's callback fires
+  → CommandBridge detects Activated on remote (PopoverMenu)
+  → Creates {Routing=Bridged} context
+  → Invokes Command.Activate on owner (MenuBarItem)
+  → MenuBarItem.OnActivating sees Bridged → skips PopoverMenu toggle (notification only)
+  → Bubbles to MenuBar.OnActivating with BubblingUp routing
+```
+
+---
+
+## Keyboard Integration
+
+### Key Binding Flow (`View.Keyboard.cs`)
+
+```
+NewKeyDownEvent (key)
+  │
+  ├─ If has Focused SubView:
+  │  └─ Focused.NewKeyDownEvent (key)    — depth-first recursion
+  │
+  ├─ RaiseKeyDown (key)                  — OnKeyDown + KeyDown event
+  │
+  ├─ InvokeCommandsBoundToKey (key)      — KeyBindings lookup
+  │
+  ├─ InvokeCommandsBoundToHotKey (key)   — HotKeyBindings lookup (this + all SubViews)
+  │
+  └─ RaiseKeyDownNotHandled (key)        — OnKeyDownNotHandled + event
+```
+
+### Default Key Bindings (View Constructor)
 
 ```csharp
-[Fact]
-public void Shortcut_Programmatic_Activate_Then_User_Click_Both_Fire_Action ()
-{
-    var actionCount = 0;
-    CheckBox cb = new () { Title = "Test" };
-    Shortcut shortcut = new () { Key = Key.T, CommandView = cb, Action = () => actionCount++ };
-
-    // Programmatic invoke (no binding → dispatch skipped)
-    shortcut.InvokeCommand (Command.Activate);
-    Assert.Equal (1, actionCount);
-
-    // Simulate user click (with binding → dispatch runs)
-    KeyBinding kb = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (cb) };
-    cb.InvokeCommand (Command.Activate, kb);
-
-    Assert.Equal (2, actionCount); // FAILS with current code: stuck flag skips Action
-}
+KeyBindings.Add (Key.Space, Command.Activate);
+KeyBindings.Add (Key.Enter, Command.Accept);
 ```
+
+Views like Button override these (both Space and Enter → `Command.Accept`).
+
+### HotKey Processing
+
+`InvokeCommandsBoundToHotKey` processes the current view's HotKeyBindings first, then recurses
+through all SubViews' HotKeyBindings (skipping the already-processed Focused SubView).
 
 ---
 
-## Priority 2: Deferred Fixes (Issues #4-6)
+## Route Tracing
 
-### Issue #4: Accept returns `false` for composite views on bubble-up (MEDIUM)
+### Infrastructure
 
-**File**: `Terminal.Gui/ViewBase/View.Command.cs:286-291`
-**Source**: Cursor Bugbot review #1
+Route tracing replaces the commented-out `Logging.Debug()` statements with a structured,
+runtime-controllable tracing system.
 
-Returns `false` for composite views receiving Accept via BubblingUp. May cause input events to not be consumed. Needs test coverage analysis before changing.
+**Key files**:
+- `Terminal.Gui/App/Tracing/Trace.cs` — Static class with `CommandEnabled`, `MouseEnabled`,
+  `KeyboardEnabled` properties
+- UICatalog has a "Command Trace" toggle in the Logging menu
 
-### Issue #5: CommandBridge Dispose asymmetric unsubscription (LOW)
+### Trace Points
 
-**File**: `Terminal.Gui/Input/CommandBridge.cs`
-**Source**: Cursor Bugbot review #2
+Trace calls are placed at key routing points in `View.Command.cs`:
+- Entry/exit of `InvokeCommand`
+- Entry/exit of `RaiseActivating`/`RaiseAccepting`/`RaiseHandlingHotKey`
+- Entry/exit of `TryDispatchToTarget`
+- Entry/exit of `TryBubbleUp`
+- Entry/exit of `DispatchDown`
 
-Dispose unconditionally unsubscribes both handlers but constructor subscribes conditionally. Safe no-op but asymmetric.
+### Usage
 
-### Issue #6: Debug logging in mouse hot path (LOW)
-
-**File**: `Terminal.Gui/ViewBase/Mouse/View.Mouse.cs`
-**Source**: Cursor Bugbot review #6
-
-String interpolation in `Logging.Debug` runs on every mouse event. Also active in MenuBar, PopoverMenu, MenuBarItem.
-
----
-
-## Out of Scope: Consume-Dispatch Deep Hierarchy Bubbling
-
-The skipped `CommandBubblingTests` (e.g., `Activate_Propagates_FromCheckBox_ToMenuBar`) involve FlagSelector inside MenuItem/MenuBar. Because FlagSelector uses `ConsumeDispatch=true`, `TryDispatchToTarget` sets `args.Handled=true` in `RaiseActivating` (line 545), which causes `TryBubbleUp` to be **skipped** (line 548). The command stops at the selector.
-
-This is a design decision: should consume-dispatch views propagate after consuming? The current behavior is intentional (selectors own internal state), but it means the MenuBar hierarchy tests require a different approach (possibly through `CommandBridge` or the deferred `Activated` event chain). This is separate from Issues #1-3.
+Enable tracing via configuration or the UICatalog menu toggle. Trace output shows the command
+routing path with directional arrows (↑ BubblingUp, ↓ DispatchingDown, ↔ Bridged, • Direct).
 
 ---
 
-## Critical Files to Modify
+## View-Specific Behaviors
 
-| File | Issues | Risk |
-|------|--------|------|
-| `Terminal.Gui/ViewBase/View.Command.cs` | #1, #2 | HIGH — shared by all views |
-| `Terminal.Gui/Views/Shortcut.cs` | #3 | MEDIUM — only affects Shortcut |
-| `Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs` | New tests | LOW |
-| `Tests/UnitTestsParallelizable/Views/ShortcutTests.Command.cs` | New tests | LOW |
+### Button
 
-## Implementation Steps (Methodical)
+- Does **NOT** raise `Activating`/`Activated` events
+- Both Space and Enter → `Command.Accept` (not Activate)
+- HotKey → focus + Accept (via `OnHotKeyCommand` invoking `Command.Accept`)
+- Implements `IAcceptTarget` for Dialog default button behavior
 
-### Step 0: Establish Baseline
-```bash
-dotnet build --no-restore
-dotnet test Tests/UnitTestsParallelizable --no-build
-dotnet test Tests/UnitTests --no-build
-```
-Record exact test counts and known failures (MenuBar/PopoverMenu). Every subsequent run must match or improve this baseline.
+### Shortcut
 
-### Step 1: Add Failing Tests First (RED)
-Add Test A (`Activate_BubblingUp_Fires_Activated_On_SuperView`) to ViewCommandTests.cs.
-Run tests. Confirm it fails and ONLY it fails (no other regressions).
+- `GetDispatchTarget => CommandView`, `ConsumeDispatch = false` (relay)
+- `CommandsToBubbleUp = [Command.Activate, Command.Accept]`
+- Uses `CommandView_Activated` callback for deferred completion (correct event ordering)
+- `OnActivated` invokes `Action` and forwards to `TargetView` or Application
 
-### Step 2: Fix Issue #1 (GREEN)
-Change `DefaultActivateHandler` line 464 in View.Command.cs.
-Run ALL tests. Verify:
-- Test A passes ✓
-- Test B (user's Shortcut test) passes ✓
-- No other tests broke ✗ → investigate before proceeding
+### OptionSelector / FlagSelector
 
-### Step 3: Add Test C (deep hierarchy) and Test D (consume-dispatch blocks)
-Verify both pass without any further code changes.
+- `GetDispatchTarget => Focused` (or source CheckBox for BubblingUp), `ConsumeDispatch = true`
+- Selector owns state mutation (radio-select or flag-toggle)
+- Context-dependent dispatch: uses `ctx.Source` for `BubblingUp`, `Focused` for direct
+- `DispatchingDown` routing in `OnActivated` uses `Focused` as fallback target when source
+  isn't a CheckBox (enables Menu → MenuItem → Selector dispatch chain)
 
-### Step 4: Fix Issue #2 (stale `_lastDispatchOccurred`)
-Add `_lastDispatchOccurred = false` at top of both handlers.
-Run ALL tests. This is a safety fix — existing tests should still pass.
+### MenuBar
 
-### Step 5: Fix Issue #3 (stuck `_activatedFiredThisCycle`)
-Add `OnActivating` override to Shortcut.cs.
-Run ALL tests. Verify the focused test passes.
+- `ConsumeDispatch = true`, `GetDispatchTarget => Focused`
+- `OnActivating` handles:
+  - `BubblingUp`: When MenuBarItem activation bubbles up, activates MenuBar + shows source item
+  - Direct: Toggles Active state (on → off, off → activate first item with PopoverMenu)
+- `OnMenuBarItemPopoverMenuOpenChanged`: Manages `_popoverBrowsingMode` flag
+- Visibility/Enabled guard prevents activation when hidden or disabled
 
-### Step 6: Final Verification
-Run the complete test suite one final time. Compare test counts to Step 0 baseline.
+### MenuBarItem
 
-## Verification Commands
+- `OnActivating`: Toggles `PopoverMenuOpen` for Direct/BubblingUp commands
+- `Bridged` guard: Commands arriving via bridge (from PopoverMenu internals) are notifications
+  only — don't toggle PopoverMenu state
+- `IsInitialized` guard on `MakeVisible` prevents crashes in design mode / tests without
+  `Application.Init`
 
-After **every** step:
-```bash
-dotnet build --no-restore
-dotnet test Tests/UnitTestsParallelizable --no-build
-dotnet test Tests/UnitTests --no-build
-```
+### Menu
 
-**Known failures to exclude**: ~~MenuBar/PopoverMenu tests (in-progress refactoring)~~ — All fixed. See [MenuBar/PopoverMenu Routing Fixes](#menubarpopovermenu-routing-fixes).
-**Zero tolerance**: Any new failure not in the known list → stop and investigate.
+- `OnActivating` override dispatches to focused MenuItem when routing is not `BubblingUp`
+- Prevents loops: doesn't re-dispatch when a MenuItem's activation is bubbling up
+- Same-tree containment wiring (not CommandBridge) for MenuItem events
 
 ---
 
-## Implementation Results
+## Design Invariants
 
-### Issue #1: COMPLETED — Deviation from Plan
+These invariants must be preserved by any future changes:
 
-The plan proposed adding `RaiseActivated` unconditionally (guarded only by `_lastDispatchOccurred`):
-```csharp
-if (!_lastDispatchOccurred)
-{
-    RaiseActivated (ctx);
-}
-```
+1. **Bubbling is notification, not consumption.** SuperView's handler return value is ignored
+   after bubble. The originating view always completes its own processing.
 
-**Problem discovered during implementation**: This caused two new test failures:
-- `Action_Sees_Updated_CheckBox_Value_On_BubbleUp_Activate` — Shortcut's `OnActivated` called `Action` before CheckBox had toggled state
-- `BubbleUp_Activate_Event_Ordering_CommandView_Completes_Before_Shortcut_Activated` — Wrong event ordering
+2. **Consume-dispatch blocks bubbling.** When `ConsumeDispatch=true` and
+   `TryDispatchToTarget` consumes, `args.Handled=true` prevents `TryBubbleUp` from running.
+   Selectors own their internal state; inner CheckBox activations are implementation details.
 
-**Root cause**: Relay-dispatch views (Shortcut) need deferred completion — their `RaiseActivated` must fire AFTER the CommandView (e.g., CheckBox) has completed its own activation (state toggle happens in `CheckBox.OnActivated`). Calling `RaiseActivated` during BubblingUp is too early.
+3. **`DispatchingDown` blocks re-entry.** `TryDispatchToTarget` returns false if routing is
+   already `DispatchingDown`, preventing multi-level dispatch chains (e.g., Menu → MenuItem →
+   FlagSelector → CheckBox would cause double-toggle).
 
-**Actual fix**: Added a `GetDispatchTarget (ctx) is null` guard:
-```csharp
-if (!_lastDispatchOccurred && GetDispatchTarget (ctx) is null)
-{
-    RaiseActivated (ctx);
-}
-```
+4. **`Bridged` blocks dispatch-down.** Bridge brings commands UP into the containment hierarchy.
+   Dispatching back down from a bridged command would create routing loops.
 
-This fires `RaiseActivated` only for **plain views** (no dispatch target). Relay-dispatch views (Shortcut) continue to use the deferred `CommandView_Activated` callback path. Consume-dispatch views (Selectors) are already handled by the `RaiseActivating` return path (line 445–453).
+5. **Relay-dispatch programmatic guard.** For `ConsumeDispatch=false` views (Shortcut), dispatch
+   is skipped when `ctx.Binding is null` (programmatic invocation). This prevents loops when
+   `InvokeCommand (Command.Activate)` is called directly.
 
-### Issue #2: COMPLETED — As Planned
+6. **`_lastDispatchOccurred` reset at handler entry.** Both `DefaultActivateHandler` and
+   `DefaultAcceptHandler` reset this flag before calling `RaiseXxxing` to prevent stale state
+   from a prior invocation causing spurious completion events.
 
-Added `_lastDispatchOccurred = false;` at the top of both `DefaultActivateHandler` and `DefaultAcceptHandler`, before `RaiseActivating`/`RaiseAccepting` is called.
-
-### Issue #3: COMPLETED — As Planned
-
-Added `OnActivating` override to `Shortcut.cs` that resets `_activatedFiredThisCycle = false` at the start of each activation cycle.
-
-### Test Results
-
-| Metric | Baseline | Final | Delta |
-|--------|----------|-------|-------|
-| **UnitTestsParallelizable** | | | |
-| Total | 14022 | 14027 | +5 (new tests) |
-| Passed | 13989 | 13995 | +6 (+5 new + 1 fixed) |
-| Failed | 11 | 10 | -1 (Shortcut SuperView test fixed) |
-| Skipped | 22 | 22 | 0 |
-| **UnitTests** | | | |
-| Total | 1022 | 1022 | 0 |
-| Passed | 989 | 989 | 0 |
-| Failed | 10 | 10 | 0 (all MenuBar — known) |
-| Skipped | 23 | 23 | 0 |
-
-### New Tests Added (5)
-
-**ViewCommandTests.cs:**
-1. `Activate_BubblingUp_Fires_Activated_On_SuperView` — Plain view Activated fires on bubble-up
-2. `Activate_BubblingUp_Fires_Activated_In_Deep_Hierarchy` — Deep chain propagation
-3. `ConsumeDispatch_Blocks_Further_Bubbling` — OptionSelector blocks propagation to SuperView
-
-**ShortcutTests.Command.cs:**
-4. `Activate_Cancelled_After_Dispatch_Does_Not_Fire_Activated` — Stale flag regression test
-5. `Shortcut_Programmatic_Activate_Then_User_Click_Both_Fire_Action` — Stuck flag regression test
-
-### Files Modified
-
-| File | Change |
-|------|--------|
-| `Terminal.Gui/ViewBase/View.Command.cs` | Issues #1, #2: BubblingUp RaiseActivated + flag reset |
-| `Terminal.Gui/Views/Shortcut.cs` | Issue #3: OnActivating override resets deferred flag |
-| `Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs` | 3 new tests |
-| `Tests/UnitTestsParallelizable/Views/ShortcutTests.Command.cs` | 2 new tests |
+7. **Deferred completion for relay-dispatch.** Shortcut's `RaiseActivated` fires AFTER
+   CommandView's `RaiseActivated` (via `CommandView_Activated` callback), ensuring the
+   CommandView's state change (e.g., CheckBox toggle) completes before Shortcut reads it.
 
 ---
 
-## Architectural Gaps (Menu/MenuItem Focus)
+## Completed Work
 
-Three architectural gaps were discovered while adding CommandView propagation tests for Menu→MenuItem:
+### Phase A — Foundation (Commit `be22792b2`)
 
-### Gap 1: FlagSelector/OptionSelector External Activation Enhancement — COMPLETED
+- `CommandOutcome` enum with `ToBool()`/`ToOutcome()` conversion shims
+- `CommandRouting` enum replacing ad-hoc boolean flags
+- `CommandContext` as `readonly record struct` with `WithCommand`/`WithRouting`
+- `ICommandBinding.Source` → `WeakReference<View>?`
 
-**Problem**: When Menu.OnActivating dispatches `Command.Activate` to a MenuItem that has a FlagSelector as its CommandView, the FlagSelector's value doesn't change. The `DispatchingDown` guard in `TryDispatchToTarget` prevents multi-level dispatch chains (Menu → MenuItem → FlagSelector → CheckBox).
+### Phase B — Dispatch (Commit `bc48676af`)
 
-**Analysis**: The guard IS important for correctness. Removing it would cause FlagSelector.OnActivated to receive a command with the MenuItem as the source (not a CheckBox), leading to state desync between inner CheckBoxes and FlagSelector.Value. The FlagSelector is a consume-dispatch composite view that owns its internal state; its inner CheckBox activations are implementation details.
+- `GetDispatchTarget` / `ConsumeDispatch` virtuals on View
+- Dispatch integration into `RaiseActivating` / `RaiseAccepting`
+- Migrated Shortcut, OptionSelector, FlagSelector to declarative dispatch
+- Six deviations from original plan (documented in detail below)
 
-**Test documenting this**: `Menu_InvokeActivate_With_Focus_FlagSelector_Value_Unchanged` in MenuTests.cs.
+### Phase C — Bridge (Commit `9045e3050`)
 
-**Resolution**: This is by design. Consume-dispatch views should not have their internal state manipulated from external dispatch chains. If users need to change FlagSelector state from a menu, they should use the FlagSelector's public API (e.g., set `Value` directly) rather than attempting to dispatch through the command pipeline.
+- `CommandBridge` class with weak references and one-way routing
+- MenuBarItem migrated to use `CommandBridge.Connect`
+- `RaiseAccepted`/`RaiseActivated` changed to `internal protected` for bridge access
 
-### Gap 2: CommandBridge → InvokeCommand — COMPLETED
+### Phase E — Cleanup (Commit `4262441ca`)
 
-**Problem**: CommandBridge called `owner.RaiseAccepted()`/`owner.RaiseActivated()` directly, which are fire-and-forget events. Bridged commands stopped at the parentMenuItem and never bubbled further to rootMenu or its SuperView.
+- Removed `IsBubblingUp`/`IsBubblingDown` compatibility properties
+- Route tracing infrastructure replacing commented `Logging.Debug()` statements
 
-**Fix** (`CommandBridge.cs`):
-- Changed `OnRemoteAccepted`: `owner.RaiseAccepted(ctx)` → `owner.InvokeCommand(Command.Accept, ctx)`
-- Changed `OnRemoteActivated`: `owner.RaiseActivated(ctx)` → `owner.InvokeCommand(Command.Activate, ctx)`
-- Both create a `CommandContext` with `Routing = CommandRouting.Bridged`
+### Bug Fixes — Issues #1-3 (Command Correctness)
 
-**Fix** (`View.Command.cs`):
-- Added `Bridged` routing guard in `TryDispatchToTarget` — prevents dispatching down when a command arrives via bridge (bridge brings commands *up*, not *down*)
-- Added `ctx?.Routing == CommandRouting.Bridged` check in `DefaultAcceptHandler`'s early-exit path — ensures `RaiseAccepted` fires for bridged Accept commands (compensates for Accept/Activate asymmetry: Accept bubbling returns `true` while Activate returns `false`)
+| Issue | Fix | Files |
+|-------|-----|-------|
+| #1: `DefaultActivateHandler` didn't fire `RaiseActivated` on bubble-up | Added `RaiseActivated` for plain views (guarded by `GetDispatchTarget is null`) | `View.Command.cs` |
+| #2: Stale `_lastDispatchOccurred` caused spurious completion events | Reset flag at top of both default handlers | `View.Command.cs` |
+| #3: Shortcut `_activatedFiredThisCycle` stuck after programmatic invoke | Added `OnActivating` override to reset flag | `Shortcut.cs` |
 
-**Tests updated**:
-- `SubMenu_ChildActivate_Fires_Activating_On_ParentMenuItem` (was "Does_Not_Fire", assert 0→1)
-- `SubMenu_ChildActivate_Bridges_Through_ParentMenuItem_To_RootMenu` (was "Does_Not_Reach", assert 0→1)
-- `SubMenu_Bridge_Propagates_Through_ParentMenuItem_To_RootMenu_And_SuperView` (was "Does_Not_Propagate", assert 0→1)
+### Bug Fixes — Architectural Gaps #1-3 (Menu Routing)
 
-### Gap 3: Menu.OnActivating Dispatches to Focused MenuItem — COMPLETED
+| Gap | Fix | Files |
+|-----|-----|-------|
+| #1: FlagSelector/OptionSelector external activation | `Focused` fallback in `OnActivated` for `DispatchingDown` routing | `FlagSelector.cs`, `OptionSelector.cs` |
+| #2: CommandBridge called `RaiseXxxed` directly (fire-and-forget) | Changed to `InvokeCommand` (full CWP pipeline, enables bubbling) | `CommandBridge.cs`, `View.Command.cs` |
+| #3: Menu.OnActivating was a no-op for dispatch | Added `OnActivating` override dispatching to focused MenuItem | `Menu.cs` |
 
-**Problem**: `menu.InvokeCommand(Command.Activate)` fired Menu's own Activating event but did NOT dispatch to any MenuItem or its CommandView. There was no `GetDispatchTarget` or equivalent dispatch mechanism.
+### Bug Fixes — MenuBar/PopoverMenu Routing (12 tests fixed)
 
-**Fix** (`Menu.cs`): Added `OnActivating` override that:
-1. Calls `base.OnActivating(args)` — lets the base class handle default behavior
-2. Checks for `BubblingUp` routing — if a MenuItem's activation is bubbling up, don't re-dispatch (prevents loops)
-3. If `Focused` is a `MenuItem`, creates a synthetic context and calls `menuItem.InvokeCommand(Command.Activate, ctx)`
+| Fix | Description | Tests Fixed |
+|-----|-------------|-------------|
+| MenuBar.OnActivating toggle logic | Explicit activation/deactivation for Direct + BubblingUp routing | 7 |
+| MenuBarItem bridge guard | `Bridged` commands skip PopoverMenu toggle | 2 |
+| PopoverMenuOpen MakeVisible guard | `IsInitialized` check prevents crash without Application | 2 |
+| ConsumeDispatch design limitation | Skipped 1 test documenting intentional behavior | 1 |
 
-**Tests added**:
-- `Menu_InvokeActivate_With_Focus_Dispatches_To_MenuItem_CheckBox_RoundTrip` — Full round-trip: menu.InvokeCommand(Activate) → MenuItem → CheckBox value toggles
-- `Menu_InvokeActivate_With_Focus_FlagSelector_Value_Unchanged` — Documents DispatchingDown guard prevents FlagSelector inner dispatch
+### Phase B Deviations from Original Plan
 
-### Gap Implementation Test Results
-
-| Metric | Before Gaps | After Gaps | After MenuBar Fix | Delta |
-|--------|-------------|------------|-------------------|-------|
-| **UnitTestsParallelizable** | | | | |
-| Total | 14027 | 14075 | 14068 | +41 |
-| Passed | 13995 | 14041 | 14045 | +50 |
-| Failed | 10 | 12 | 0 | -10 |
-| Skipped | 22 | 22 | 23 | +1 |
-
-### Files Modified (Gaps #2-3)
-
-| File | Change |
-|------|--------|
-| `Terminal.Gui/Input/CommandBridge.cs` | Gap 2: InvokeCommand instead of RaiseAccepted/RaiseActivated |
-| `Terminal.Gui/ViewBase/View.Command.cs` | Gap 2: Bridged guard in TryDispatchToTarget + DefaultAcceptHandler |
-| `Terminal.Gui/Views/Menu/Menu.cs` | Gap 3: OnActivating override dispatches to focused MenuItem |
-| `Tests/UnitTestsParallelizable/Views/MenuItemTests.cs` | 2 tests renamed/updated |
-| `Tests/UnitTestsParallelizable/Views/MenuTests.cs` | 2 tests renamed, 2 new tests added |
-| `docfx/docs/command.md` | Updated CommandBridge, TryDispatchToTarget, Menu behavior docs |
-
----
-
-## Gap 1: FlagSelector/OptionSelector External Activation Enhancement
-
-### Problem Statement
-
-When `Menu.OnActivating` dispatches `Command.Activate` to a `MenuItem` whose `CommandView` is a `FlagSelector`, the FlagSelector's `Value` property did not change. The `DispatchingDown` guard in `TryDispatchToTarget` correctly prevents multi-level dispatch chains (Menu → MenuItem → FlagSelector → CheckBox), but `FlagSelector.OnActivated` silently did nothing when the source wasn't a CheckBox. OptionSelector had the same issue (documented in an existing TODO).
-
-### Solution
-
-Both `FlagSelector.OnActivated` and `OptionSelector.ApplyActivation` now use `Focused` (the currently focused inner CheckBox) as the toggle/selection target when `ctx.Routing == CommandRouting.DispatchingDown`. This is safe because `SetFocus()` is called before `OnActivated` in `DefaultActivateHandler`, so `Focused` reliably points to the correct inner CheckBox.
-
-The `DispatchingDown` routing check prevents double-toggle: in the BubblingUp path (user clicks inner CheckBox), the source IS the CheckBox. In the Direct path (programmatic), `DispatchDown` already activated the CheckBox. Only in the `DispatchingDown` path was the inner CheckBox never reached.
-
-### Files Modified
-
-| File | Change |
-|------|--------|
-| `Terminal.Gui/Views/Selectors/FlagSelector.cs` | `OnActivated`: Focused fallback for DispatchingDown |
-| `Terminal.Gui/Views/Selectors/OptionSelector.cs` | `ApplyActivation`: Focused fallback, removed TODO |
-| `Tests/UnitTestsParallelizable/Views/MenuTests.cs` | Renamed 1 test, added 1 new test |
-
-### Tests
-
-- `Menu_InvokeActivate_With_Focus_FlagSelector_Toggles_Focused_CheckBox` (renamed from `_Value_Unchanged`, assertion flipped)
-- `Menu_InvokeActivate_With_Focus_OptionSelector_Selects_Focused_Item` (new)
-
----
-
-## MenuBar/PopoverMenu Routing Fixes
-
-### Status: COMPLETED — All 12 pre-existing MenuBar/PopoverMenu test failures resolved
-
-After completing Gaps #1-3 (which fixed Menu→MenuItem→SubMenu routing), 12 tests remained failing in the MenuBar/PopoverMenu hierarchy. These were fixed by applying the same command routing patterns established in Menu to the parallel MenuBar system.
-
-### Root Cause Analysis
-
-The core problem: **MenuBar.OnActivating was a no-op**. When `Command.Activate` was invoked on MenuBar, it logged and returned `false`. Since MenuBar has `CanFocus=false` initially, `GetDispatchTarget` returned `Focused` (null), and `ConsumeDispatch=true` meant the command went nowhere. Mouse clicks worked because `OnMouseEnter` sets `Active=true` → `CanFocus=true` before the click processes — but keyboard/command-based activation had no path.
-
-The fix mirrors Menu.OnActivating's established pattern: explicitly handle activation when routing is not BubblingUp.
-
-### Fix 1: MenuBar.OnActivating Toggle Logic (7 tests fixed)
-
-**File**: `Terminal.Gui/Views/Menu/MenuBar.cs`
-
-Added toggle logic to `OnActivating` that:
-1. Guards against BubblingUp routing (SubView activations should just notify, not re-dispatch)
-2. If already Active: deactivates (`Active = false`)
-3. If not Active: finds first MenuBarItem with a PopoverMenu, activates MenuBar, and shows that item
-
-This is the same pattern as Menu.OnActivating: when the command is Direct (not bubbling), the container takes ownership and dispatches to the appropriate child.
-
-**Tests fixed**: `Command_HotKey_Activates`, `DefaultKey_Activates`, `DefaultKey_Deactivates`, `Command_Activate_Activates`, `Command_Activate_Activates_Command_Activate_Deactivates`, `Command_Activate_WhenActive_Deactivates`, `Command_Activate_Focuses_MenuBarItem_PopoverMenu_And_First_MenuItem`
-
-### Fix 2: MenuBarItem Bridge Guard (2 tests fixed)
-
-**File**: `Terminal.Gui/Views/Menu/MenuBarItem.cs`
-
-Added guard in `MenuBarItem.OnActivating` for `CommandRouting.Bridged` commands. When a MenuItem inside the PopoverMenu is activated, the command cascade is:
-
-```
-MenuItem.Activate → bubbles to Menu → Menu.Activated → PopoverMenu.MenuOnActivated
-→ CommandBridge → MenuBarItem.InvokeCommand(Activate, {Routing=Bridged})
-```
-
-Without the guard, the bridged command toggled `PopoverMenuOpen=true`, which called `MakeVisible` → `Shortcut.EndInit` → `Debug.Assert(App is { })` — crashing in tests without Application.Init.
-
-Bridged commands are notifications from the PopoverMenu ("something was activated inside me"), not requests to toggle the popover open/closed.
-
-**Tests fixed**: `MenuBar_EnableForDesign_MenuItem_Activating_Fires_On_MenuItem`, `MenuBar_EnableForDesign_MenuItem_Activate_Raises_Menu_Activating`
-
-### Fix 3: PopoverMenuOpen MakeVisible Guard (2 tests fixed)
-
-**File**: `Terminal.Gui/Views/Menu/MenuBarItem.cs`
-
-Added `IsInitialized` guard around `PopoverMenu.MakeVisible` call in the `PopoverMenuOpen` setter's CWP doWork lambda. `MakeVisible` requires the Application's popover infrastructure; calling it when `App` is not available (design mode, unit tests without `Application.Init`) caused the same `Debug.Assert(App is { })` crash.
-
-**Tests fixed**: `AllViews_Command_Activate_Raises_Activating(MenuBarItem)`, `AllViews_Command_HotKey_Raises_HandlingHotKey(MenuBarItem)`
-
-### Fix 4: Skipped Test — ConsumeDispatch Design Limitation (1 test)
-
-**File**: `Tests/UnitTestsParallelizable/Views/PopoverMenuTests.cs`
-
-`Activate_Source_Preserved_AcrossBoundary` was skipped with Phase 5 explanation. The test expected Activate to propagate from CheckBox → OptionSelector → MenuItem → Menu → PopoverMenu, but `ConsumeDispatch=true` on SelectorBase intentionally stops propagation at the OptionSelector level. This is the same behavior in both menu systems — consume-dispatch composites own their internal state.
-
-### Files Modified
-
-| File | Change |
-|------|--------|
-| `Terminal.Gui/Views/Menu/MenuBar.cs` | Fix 1: OnActivating toggle logic |
-| `Terminal.Gui/Views/Menu/MenuBarItem.cs` | Fix 2: Bridge guard + Fix 3: MakeVisible guard |
-| `Tests/UnitTestsParallelizable/Views/PopoverMenuTests.cs` | Fix 4: Skip attribute on Phase 5 test |
+1. **Shortcut still uses `CommandView_Activated` callback** — Synchronous deferred completion
+   proved insufficient; callback ensures correct event ordering
+2. **ConsumeDispatch=true does NOT DispatchDown for BubblingUp** — Prevents double-toggle
+3. **Selectors dispatch Activate only, not Accept** — Accept must bubble through Menu hierarchy
+4. **Selectors use context-dependent dispatch targets** — Source CheckBox for BubblingUp,
+   Focused for direct
+5. **FlagSelector retains `_suppressHotKeyActivate`** — Binding guard doesn't suppress dispatch
+   because DefaultHotKeyHandler passes original binding
+6. **Binding guard is ConsumeDispatch-dependent** — Only relay-dispatch (ConsumeDispatch=false)
+   needs the programmatic guard
+7. **Event ordering: Activating fires BEFORE dispatch** — Old code dispatched in OnActivating
+   (step 2); new code dispatches after event (step 4)
 
 ### Final Test Results
 
-| Metric | Before | After | Delta |
-|--------|--------|-------|-------|
-| **UnitTestsParallelizable** | | | |
-| Total | 14068 | 14068 | 0 |
-| Passed | 14045 - 12 failures | 14045 | +12 fixed |
-| Failed | 12 | 0 | -12 |
-| Skipped | 22 | 23 | +1 (Phase 5 skip) |
+| Suite | Passed | Failed | Skipped |
+|-------|--------|--------|---------|
+| UnitTestsParallelizable | 14,045 | 0 | 23 |
+| UnitTests | ~1,001 | 0 | ~22 |
+| **Total** | **~15,046** | **0** | **~45** |
+
+---
+
+## Future Work
+
+### Phase D: CommandOutcome Migration (Deferred)
+
+**Scope**: 267 `AddCommand` call sites across 28 files need `bool?` → `CommandOutcome` return
+type migration.
+
+**Approach**: Purely mechanical with no behavioral change. The `CommandOutcomeExtensions.ToBool()`
+and `ToOutcome()` shims enable incremental migration. Recommended: migrate one file at a time,
+verifying tests after each.
+
+**Priority**: Low — the shims work correctly and there is no functional difference. This is a
+code quality improvement for self-documenting return values.
+
+### CommandManager / CommandRouter Extraction
+
+**Concept**: Extract command routing logic from `View.Command.cs` (~1,043 lines) into a
+dedicated `CommandRouter` or `CommandManager` class.
+
+**Motivation**:
+- `View.Command.cs` mixes command registration, invocation, event raising, routing, and
+  default handlers — six distinct responsibilities
+- Command routing tests require full View hierarchy setup, making it hard to isolate routing
+  logic bugs from View lifecycle bugs
+- A separated router could be tested with lightweight mocks
+
+**Proposed approach** (from exploration):
+
+```csharp
+internal class CommandRouter
+{
+    private readonly View _owner;
+
+    public bool? Route (Command command, ICommandContext ctx) { ... }
+    public bool TryBubbleUp (ICommandContext ctx) { ... }
+    public bool TryDispatchDown (View target, ICommandContext ctx) { ... }
+}
+```
+
+**Challenges**:
+- Router needs access to View state (SuperView, SubViews, CommandsToBubbleUp, Focused)
+- Breaking change to View's protected API surface
+- Risk of over-abstraction — the file is already well-organized with clear regions
+- The tracing infrastructure provides sufficient debugging visibility for now
+
+**Recommendation**: Defer until testing isolation becomes a concrete pain point. The route
+tracing system (already implemented) addresses the primary debugging need.
+
+### Command Pipeline / Middleware Pattern
+
+**Concept**: Model command processing as a pipeline with discrete stages:
+
+```csharp
+internal class CommandPipeline
+{
+    void AddStage (ICommandStage stage);
+    bool? Execute (Command command, ICommandContext ctx);
+}
+
+// Stages: Validation → Preview → Dispatch → Bubble → Execute
+```
+
+**Benefits**: Each stage independently testable, easy to add new stages (tracing, validation).
+
+**Assessment**: Over-engineering for current needs. Performance overhead (foreach, interface
+dispatch) and significant refactoring required. Only revisit if command flow becomes substantially
+more complex.
+
+### Additional Refinements
+
+1. **Menu `ItemSelected` event** — Separate "close the menu" concern from command routing.
+   Currently Menu conflates them via `menuItem.Activated → RaiseAccepted`. Works but is
+   confusing. Low priority.
+
+2. **CommandBridge Dispose symmetry** — Dispose unconditionally unsubscribes both handlers but
+   constructor subscribes conditionally. Safe no-op but asymmetric. Trivial fix.
+
+3. **Debug logging in mouse hot path** — String interpolation in `Logging.Debug` runs on every
+   mouse event. Also active in MenuBar, PopoverMenu, MenuBarItem. Performance concern.
+
+4. **Accept returns `false` for composite views on bubble-up** — May cause input events to not
+   be consumed. Needs test coverage analysis before changing.
+
+5. **Full Menu/PopoverMenu migration to CommandBridge** — Currently only MenuBarItem uses
+   CommandBridge. Menu.OnSubViewAdded and PopoverMenu.Root setter use same-tree event wiring.
+   These are containment relationships (not cross-boundary), so CommandBridge may not be
+   appropriate, but the wiring could be simplified.
+
+---
+
+## File Reference
+
+### Core Command System
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `Terminal.Gui/ViewBase/View.Command.cs` | ~1,043 | Command registration, invocation, CWP pipeline, dispatch, bubbling |
+| `Terminal.Gui/Input/Command.cs` | — | Command enum |
+| `Terminal.Gui/Input/CommandContext.cs` | 68 | Immutable context struct |
+| `Terminal.Gui/Input/CommandRouting.cs` | 30 | Routing enum |
+| `Terminal.Gui/Input/CommandOutcome.cs` | 62 | Outcome enum + conversion shims |
+| `Terminal.Gui/Input/CommandBridge.cs` | 122 | Cross-boundary routing |
+| `Terminal.Gui/Input/CommandBinding.cs` | — | Generic command binding |
+| `Terminal.Gui/Input/CommandEventArgs.cs` | — | Event args with ICommandContext |
+| `Terminal.Gui/Input/ICommandContext.cs` | — | Read-only context interface |
+| `Terminal.Gui/Input/ICommandBinding.cs` | — | Binding interface |
+
+### View Implementations
+
+| File | Dispatch Pattern | Notes |
+|------|-----------------|-------|
+| `Terminal.Gui/Views/Shortcut.cs` | Relay (`ConsumeDispatch=false`) | Deferred completion via callback |
+| `Terminal.Gui/Views/Selectors/OptionSelector.cs` | Consume (`ConsumeDispatch=true`) | Radio-select semantics |
+| `Terminal.Gui/Views/Selectors/FlagSelector.cs` | Consume (`ConsumeDispatch=true`) | Flag-toggle semantics |
+| `Terminal.Gui/Views/Menu/MenuBar.cs` | Consume (`ConsumeDispatch=true`) | Activation toggle |
+| `Terminal.Gui/Views/Menu/MenuBarItem.cs` | Bridge owner | PopoverMenu bridge |
+| `Terminal.Gui/Views/Menu/Menu.cs` | Manual dispatch via OnActivating | Dispatches to focused MenuItem |
+| `Terminal.Gui/Views/Button.cs` | None | Leaf view, Accept only |
+
+### Tests
+
+| File | Focus |
+|------|-------|
+| `Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs` | Core command routing |
+| `Tests/UnitTestsParallelizable/Views/ShortcutTests.Command.cs` | Shortcut relay dispatch |
+| `Tests/UnitTestsParallelizable/Views/MenuBarTests.cs` | MenuBar activation/routing |
+| `Tests/UnitTestsParallelizable/Views/MenuTests.cs` | Menu dispatch to MenuItem |
+| `Tests/UnitTestsParallelizable/Views/PopoverMenuTests.cs` | Bridge + cross-boundary routing |
+| `Tests/UnitTestsParallelizable/Views/MenuItemTests.cs` | MenuItem activation |
+
+### Documentation
+
+| File | Content |
+|------|---------|
+| `docfx/docs/command.md` | User-facing command system documentation |
+| `docfx/docs/cancellable-work-pattern.md` | CWP pattern explanation |
