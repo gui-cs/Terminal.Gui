@@ -15,7 +15,7 @@ public class OutputBaseTransparentTests
 
         // Set foreground to Transparent, background to a specific color
         Color bg = new (10, 20, 30);
-        buffer.CurrentAttribute = new (Color.Transparent, bg);
+        buffer.CurrentAttribute = new (Color.None, bg);
         buffer.AddStr ("X");
 
         // Act
@@ -37,7 +37,7 @@ public class OutputBaseTransparentTests
 
         // Set foreground to a specific color, background to Transparent
         Color fg = new (10, 20, 30);
-        buffer.CurrentAttribute = new (fg, Color.Transparent);
+        buffer.CurrentAttribute = new (fg, Color.None);
         buffer.AddStr ("X");
 
         // Act
@@ -58,7 +58,7 @@ public class OutputBaseTransparentTests
         buffer.SetSize (1, 1);
 
         // Set both foreground and background to Transparent
-        buffer.CurrentAttribute = new (Color.Transparent, Color.Transparent);
+        buffer.CurrentAttribute = new (Color.None, Color.None);
         buffer.AddStr ("X");
 
         // Act
@@ -114,7 +114,7 @@ public class OutputBaseTransparentTests
         buffer.SetSize (1, 1);
 
         Color bg = new (0, 128, 0); // Green
-        buffer.CurrentAttribute = new (Color.Transparent, bg);
+        buffer.CurrentAttribute = new (Color.None, bg);
         buffer.AddStr ("X");
 
         // Act
@@ -147,7 +147,7 @@ public class OutputBaseTransparentTests
         buffer.SetSize (1, 1);
 
         Color fg = new (255, 0, 0); // Red
-        buffer.CurrentAttribute = new (fg, Color.Transparent);
+        buffer.CurrentAttribute = new (fg, Color.None);
         buffer.AddStr ("X");
 
         // Act
