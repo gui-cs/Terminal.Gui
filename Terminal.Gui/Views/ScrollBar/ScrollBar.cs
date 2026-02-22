@@ -14,11 +14,11 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         By default, the built-in View scrollbars (<see cref="View.VerticalScrollBar"/>/
-///         <see cref="View.HorizontalScrollBar"/>) have both <see cref="View.Visible"/> and <see cref="AutoShow"/> set to
-///         <see langword="false"/>.
-///         To enable them, either set <see cref="AutoShow"/> set to <see langword="true"/> or explicitly set
-///         <see cref="View.Visible"/>
-///         to <see langword="true"/>.
+///         <see cref="View.HorizontalScrollBar"/>) have <see cref="View.Visible"/> set to <see langword="false"/> and
+///         <see cref="VisibilityMode"/> set to <see cref="ScrollBarVisibilityMode.Manual"/>.
+///         To enable them, use <see cref="ViewportSettingsFlags.HasVerticalScrollBar"/> or
+///         <see cref="ViewportSettingsFlags.HasHorizontalScrollBar"/> flags on the owning View's
+///         <see cref="View.ViewportSettings"/>.
 ///     </para>
 ///     <para>
 ///         By default, this view cannot be focused and does not support keyboard input.
@@ -97,9 +97,42 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
     private void ShowHide ()
     {
-        if (AutoShow)
+        switch (VisibilityMode)
         {
-            Visible = VisibleContentSize < ScrollableContentSize;
+            case ScrollBarVisibilityMode.Auto:
+                // If this scrollbar lives in a View's Padding, respect the View's
+                // ViewportSettings as the authority on whether it should be enabled.
+                if (SuperView is Padding { Parent: { } ownerView })
+                {
+                    ViewportSettingsFlags requiredFlag = Orientation == Orientation.Vertical
+                                                             ? ViewportSettingsFlags.HasVerticalScrollBar
+                                                             : ViewportSettingsFlags.HasHorizontalScrollBar;
+
+                    if (!ownerView.ViewportSettings.HasFlag (requiredFlag))
+                    {
+                        Visible = false;
+
+                        break;
+                    }
+                }
+
+                Visible = VisibleContentSize < ScrollableContentSize;
+
+                break;
+
+            case ScrollBarVisibilityMode.Always:
+                Visible = true;
+
+                break;
+
+            case ScrollBarVisibilityMode.Manual:
+                // Hands off — the developer controls Visible directly
+                break;
+
+            case ScrollBarVisibilityMode.None:
+                Visible = false;
+
+                break;
         }
 
         _slider.VisibleContentSize = VisibleContentSize;
@@ -187,34 +220,33 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// </remarks>
     public int Increment { get; set; } = 1;
 
-    // AutoShow should be false by default. Views should not be hidden by default.
-    private bool _autoShow;
-
     /// <summary>
-    ///     Gets or sets whether <see cref="View.Visible"/> will be set to <see langword="true"/> if the dimension of the
-    ///     scroll bar is less than  <see cref="ScrollableContentSize"/> and <see langword="false"/> if greater than or equal
-    ///     to.
+    ///     Gets or sets how this <see cref="ScrollBar"/> manages its own <see cref="View.Visible"/> state.
     /// </summary>
     /// <remarks>
-    ///     The default is <see langword="false"/>.
+    ///     <para>
+    ///         The default is <see cref="ScrollBarVisibilityMode.Manual"/>, meaning the scrollbar does not automatically
+    ///         manage its visibility.
+    ///     </para>
+    ///     <para>
+    ///         For built-in View scrollbars (<see cref="View.VerticalScrollBar"/> and <see cref="View.HorizontalScrollBar"/>),
+    ///         use the <see cref="ViewportSettingsFlags.HasVerticalScrollBar"/> and
+    ///         <see cref="ViewportSettingsFlags.HasHorizontalScrollBar"/> flags to enable them. Setting these flags
+    ///         automatically sets <see cref="VisibilityMode"/> to <see cref="ScrollBarVisibilityMode.Auto"/>.
+    ///     </para>
     /// </remarks>
-    public bool AutoShow
+    public ScrollBarVisibilityMode VisibilityMode
     {
-        get => _autoShow;
+        get;
         set
         {
-            if (_autoShow != value)
+            if (field == value)
             {
-                _autoShow = value;
-
-                if (!AutoShow)
-                {
-                    Visible = true;
-                }
-
-                ShowHide ();
-                SetNeedsLayout ();
+                return;
             }
+            field = value;
+            ShowHide ();
+            SetNeedsLayout ();
         }
     }
 
@@ -534,11 +566,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
 #if PROPORTIONAL_SCROLL_JUMP
         // TODO: This logic mostly works to provide a proportional jump. However, the math
-        // TODO: falls apart in edge cases. Most other scroll bars (e.g. Windows) do not do proportional
+        // TODO: falls apart in edge cases. Most scroll bars (e.g. Windows) do not do proportional
         // TODO: Thus, this is disabled; we just jump a page each click.
         // Ratio of the distance to the viewport dimension
         double ratio = (double)Math.Abs (distanceFromCenter) / (VisibleContentSize);
-        // Jump size based on the ratio and the total content size
+        // Jump based on the ratio and the total content size
         int jump = (int)(ratio * (Size - VisibleContentSize));
 #else
         int jump = VisibleContentSize;
