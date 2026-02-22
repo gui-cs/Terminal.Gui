@@ -11,33 +11,6 @@ namespace Terminal.Gui.Drivers;
 internal class UnixOutput : OutputBase, IOutput
 {
     /// <inheritdoc/>
-    protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
-    {
-        if (Force16Colors)
-        {
-            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
-        }
-        else
-        {
-            EscSeqUtils.CSI_AppendForegroundColorRGB (
-                                                      output,
-                                                      attr.Foreground.R,
-                                                      attr.Foreground.G,
-                                                      attr.Foreground.B
-                                                     );
-
-            EscSeqUtils.CSI_AppendBackgroundColorRGB (
-                                                      output,
-                                                      attr.Background.R,
-                                                      attr.Background.G,
-                                                      attr.Background.B
-                                                     );
-            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-        }
-    }
-
-    /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
         byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
