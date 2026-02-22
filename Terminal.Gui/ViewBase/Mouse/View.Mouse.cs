@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -381,7 +381,7 @@ public partial class View // Mouse APIs
     /// <seealso cref="MouseHighlightStates"/>
     public bool? NewMouseEvent (Mouse mouse)
     {
-        ViewTrace.Mouse (this, mouse, "Entry");
+        Trace.Mouse (this, mouse, "Entry");
 
         // 1. Pre-conditions
         mouse.Position ??= mouse.ScreenPosition;
@@ -821,7 +821,7 @@ public partial class View // Mouse APIs
     /// </returns>
     protected bool? InvokeCommandsBoundToMouse (Mouse mouseEventArgs)
     {
-        ViewTrace.Mouse (this, mouseEventArgs, "InvokeCommands");
+        Trace.Mouse (this, mouseEventArgs, "InvokeCommands");
 
         if (!MouseBindings.TryGet (mouseEventArgs.Flags, out MouseBinding binding))
         {

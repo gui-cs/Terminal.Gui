@@ -222,27 +222,29 @@ Terminal.Gui includes a unified tracing system for debugging event flow through 
 
 | Category | Property | What It Traces |
 |----------|----------|----------------|
-| Command | `ViewTrace.CommandEnabled` | Command routing (InvokeCommand, bubbling, dispatch) |
-| Mouse | `ViewTrace.MouseEnabled` | Mouse events (clicks, drags, wheel) |
-| Keyboard | `ViewTrace.KeyboardEnabled` | Keyboard events (key down, key up) |
+| Command | `Trace.CommandEnabled` | Command routing (InvokeCommand, bubbling, dispatch) |
+| Mouse | `Trace.MouseEnabled` | Mouse events (clicks, drags, wheel) |
+| Keyboard | `Trace.KeyboardEnabled` | Keyboard events (key down, key up) |
 
 ### Enabling Tracing
 
 **Via code:**
 
 ```csharp
-ViewTrace.CommandEnabled = true;   // Command routing
-ViewTrace.MouseEnabled = true;     // Mouse events  
-ViewTrace.KeyboardEnabled = true;  // Keyboard events
+Trace.CommandEnabled = true;   // Command routing
+Trace.MouseEnabled = true;     // Mouse events  
+Trace.KeyboardEnabled = true;  // Keyboard events
 ```
+
+When tracing is enabled, output automatically goes to `Logging.Debug` via the `LoggingBackend`.
 
 **Via configuration:**
 
 ```json
 {
-  "ViewTrace.CommandEnabled": true,
-  "ViewTrace.MouseEnabled": false,
-  "ViewTrace.KeyboardEnabled": true
+  "Trace.CommandEnabled": true,
+  "Trace.MouseEnabled": false,
+  "Trace.KeyboardEnabled": true
 }
 ```
 
@@ -250,13 +252,13 @@ ViewTrace.KeyboardEnabled = true;  // Keyboard events
 
 ### Custom Trace Backends
 
-For testing or custom logging, use `ViewTrace.Backend`:
+For testing or custom logging, use `Trace.Backend`:
 
 ```csharp
 // Capture traces for assertions
-var backend = new ViewTrace.ListBackend();
-ViewTrace.Backend = backend;
-ViewTrace.CommandEnabled = true;
+var backend = new Trace.ListBackend();
+Trace.Backend = backend;
+Trace.CommandEnabled = true;
 
 // ... run code ...
 
@@ -268,14 +270,6 @@ foreach (var entry in backend.Entries)
 ```
 
 See [Command Deep Dive - Command Route Tracing](command.md#command-route-tracing) for detailed command tracing information.
-
-### Legacy API
-
-The `CommandTrace` class is still available for backward compatibility:
-
-```csharp
-CommandTrace.IsEnabled = true;  // Equivalent to ViewTrace.CommandEnabled = true
-```
 
 ## Metrics
 

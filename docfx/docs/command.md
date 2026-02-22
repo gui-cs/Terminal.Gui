@@ -318,26 +318,25 @@ When an inner CheckBox activates (via click/space), the command bubbles up to th
 
 ## Command Route Tracing
 
-For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.ViewTrace. Command tracing captures detailed information about command flow through the view hierarchy.
+For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.Trace. Command tracing captures detailed information about command flow through the view hierarchy.
 
 > [!TIP]
-> `ViewTrace` also supports Mouse and Keyboard tracing. See [Logging - View Event Tracing](logging.md#view-event-tracing) for the full tracing API.
+> `Trace` also supports Mouse and Keyboard tracing. See [Logging - View Event Tracing](logging.md#view-event-tracing) for the full tracing API.
 
 ### Enabling Tracing
 
 ```csharp
 // Enable command tracing
-ViewTrace.CommandEnabled = true;
-
-// Or use the legacy API (equivalent)
-CommandTrace.IsEnabled = true;
+Trace.CommandEnabled = true;
 ```
+
+When enabled, output automatically goes to `Logging.Debug` via the `LoggingBackend`.
 
 Tracing can also be enabled via configuration:
 
 ```json
 {
-  "ViewTrace.CommandEnabled": true
+  "Trace.CommandEnabled": true
 }
 ```
 
@@ -369,12 +368,12 @@ Example output:
 
 ### Custom Backends
 
-Implement `ICommandTraceBackend` for custom trace handling:
+Implement `ITraceBackend` for custom trace handling:
 
 ```csharp
-public class MyTraceBackend : ICommandTraceBackend
+public class MyTraceBackend : ITraceBackend
 {
-    public void Log (RouteTraceEntry entry)
+    public void Log (TraceEntry entry)
     {
         // Custom handling - write to file, send to debugger, etc.
     }
@@ -382,25 +381,26 @@ public class MyTraceBackend : ICommandTraceBackend
     public void Clear () { }
 }
 
-CommandTrace.Backend = new MyTraceBackend ();
+Trace.Backend = new MyTraceBackend ();
 ```
 
 ### Testing with ListBackend
 
-Use `CommandTrace.ListBackend` to capture traces for test assertions:
+Use `Trace.ListBackend` to capture traces for test assertions:
 
 ```csharp
-var backend = new CommandTrace.ListBackend ();
-CommandTrace.Backend = backend;
+var backend = new Trace.ListBackend ();
+Trace.Backend = backend;
+Trace.CommandEnabled = true;
 
 view.InvokeCommand (Command.Activate);
 
-Assert.Contains (backend.Entries, e => e.Phase == CommandTracePhase.Entry);
-Assert.Contains (backend.Entries, e => e.Command == Command.Activate);
+Assert.Contains (backend.Entries, e => e.Phase == "Entry");
+Assert.Contains (backend.Entries, e => e.Category == TraceCategory.Command);
 ```
 
 ### Performance
 
-- All `TraceRoute` calls are marked with `[Conditional("DEBUG")]` — **zero overhead in Release builds**
+- All `Trace.Command` calls are marked with `[Conditional("DEBUG")]` — **zero overhead in Release builds**
 - The backend uses `AsyncLocal<T>` for thread safety in parallel test execution
-- Default `NullBackend` discards all traces with minimal overhead
+- When tracing is disabled, all methods early-return with minimal overhead

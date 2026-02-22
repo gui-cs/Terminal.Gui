@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.ViewBase;
 
 public partial class View // Command APIs
 {
@@ -165,7 +165,7 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Handler);
+        Trace.Command (this, ctx, "Handler");
 
         return implementation! (ctx);
     }
@@ -212,7 +212,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseCommandNotBound (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Event);
+        Trace.Command (this, ctx, "Event");
 
         CommandEventArgs args = new () { Context = ctx };
 
@@ -249,7 +249,7 @@ public partial class View // Command APIs
 
     internal bool? DefaultAcceptHandler (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Entry);
+        Trace.Command (this, ctx, "Entry");
 
         // Reset before RaiseAccepting — early-exit paths (OnAccepting returns true, Accepting
         // event sets Handled=true) skip TryDispatchToTarget. Without this reset, the flag would
@@ -295,7 +295,7 @@ public partial class View // Command APIs
             return false;
         }
 
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Routing, "Calling RaiseAccepted");
+        Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted");
         RaiseAccepted (ctx);
 
         // Report as handled if:
@@ -337,18 +337,18 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Entry);
+        Trace.Command (this, ctx, "Entry");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Handler, "Calling OnAccepting");
+        Trace.Command (this, ctx, "Handler", "Calling OnAccepting");
         args.Handled = OnAccepting (args) || args.Handled;
 
         if (!args.Handled && Accepting is { })
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Event, "Raising Accepting event");
+            Trace.Command (this, ctx, "Event", "Raising Accepting event");
             Accepting?.Invoke (this, args);
         }
 
@@ -445,7 +445,7 @@ public partial class View // Command APIs
 
     internal bool? DefaultActivateHandler (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Entry);
+        Trace.Command (this, ctx, "Entry");
 
         // Reset before RaiseActivating — early-exit paths (OnActivating returns true, Activating
         // event sets Handled=true) skip TryDispatchToTarget. Without this reset, the flag would
@@ -549,7 +549,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseActivating (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Entry);
+        Trace.Command (this, ctx, "Entry");
 
         CommandEventArgs args = new () { Context = ctx };
 
@@ -561,7 +561,7 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Event, "Invoking Activating event");
+        Trace.Command (this, ctx, "Event", "Invoking Activating event");
         Activating?.Invoke (this, args);
 
         // Framework dispatch: composite views delegate commands to a target SubView.
@@ -611,7 +611,7 @@ public partial class View // Command APIs
     /// <seealso cref="RaiseActivating"/>
     protected internal void RaiseActivated (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Event);
+        Trace.Command (this, ctx, "Event");
 
         OnActivated (ctx);
         Activated?.Invoke (this, new EventArgs<ICommandContext?> (ctx));
@@ -636,7 +636,7 @@ public partial class View // Command APIs
 
     internal bool? DefaultHotKeyHandler (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Entry);
+        Trace.Command (this, ctx, "Entry");
 
         if (RaiseHandlingHotKey (ctx) is true)
         {
@@ -683,7 +683,7 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Event, "Invoking HandlingHotKey event");
+        Trace.Command (this, ctx, "Event", "Invoking HandlingHotKey event");
         HandlingHotKey?.Invoke (this, args);
 
         if (!args.Handled)
@@ -797,7 +797,7 @@ public partial class View // Command APIs
     /// <returns><see langword="true"/> if the command was consumed (ConsumeDispatch=true and dispatch conditions met).</returns>
     private bool TryDispatchToTarget (ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Entry);
+        Trace.Command (this, ctx, "Entry");
 
         _lastDispatchOccurred = false;
 
@@ -920,7 +920,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? DispatchDown (View target, ICommandContext? ctx)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Routing, $"DispatchDown to {target.ToIdentifyingString ()}");
+        Trace.Command (this, ctx, "Routing", $"DispatchDown to {target.ToIdentifyingString ()}");
 
         CommandContext downCtx = new (ctx?.Command ?? Command.NotBound, ctx?.Source, ctx?.Binding) { Routing = CommandRouting.DispatchingDown };
 
@@ -951,7 +951,7 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? TryBubbleUp (ICommandContext? ctx, bool handled)
     {
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Entry, handled ? "already handled" : null);
+        Trace.Command (this, ctx, "Entry", handled ? "already handled" : null);
 
         if (handled)
         {
@@ -999,7 +999,7 @@ public partial class View // Command APIs
         // Check if SuperView wants this command bubbled up to it
         if (SuperView?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
-            CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Routing, $"BubblingUp to {SuperView.ToIdentifyingString ()}");
+            Trace.Command (this, ctx, "Routing", $"BubblingUp to {SuperView.ToIdentifyingString ()}");
             upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
             return SuperView.InvokeCommand (ctx.Command, upCtx);
@@ -1008,7 +1008,7 @@ public partial class View // Command APIs
         if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
             // Check if Padding's Parent wants this command bubbled up to it
-            CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Routing, $"BubblingUp to Padding.Parent {padding.Parent.ToIdentifyingString ()}");
+            Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Parent.ToIdentifyingString ()}");
             upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
             return padding.Parent.InvokeCommand (ctx.Command, upCtx);
@@ -1020,7 +1020,7 @@ public partial class View // Command APIs
         }
 
         // Handle when THIS view is a Padding
-        CommandTrace.TraceRoute (this, ctx, CommandTracePhase.Routing, $"BubblingUp from Padding to {selfPadding.Parent.ToIdentifyingString ()}");
+        Trace.Command (this, ctx, "Routing", $"BubblingUp from Padding to {selfPadding.Parent.ToIdentifyingString ()}");
         upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
 
         return selfPadding.Parent.InvokeCommand (ctx.Command, upCtx);

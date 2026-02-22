@@ -63,7 +63,7 @@ internal class MouseImpl : IMouse, IDisposable
 
         if (deepestViewUnderMouse is { })
         {
-            ViewTrace.Mouse (deepestViewUnderMouse, mouseEvent, "Dispatch");
+            Trace.Mouse (deepestViewUnderMouse, mouseEvent, "Dispatch");
 #if DEBUG_IDISPOSABLE
             if (View.EnableDebugIDisposableAsserts && deepestViewUnderMouse.WasDisposed)
             {

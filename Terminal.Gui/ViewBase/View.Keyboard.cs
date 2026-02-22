@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.ViewBase;
 
 public partial class View // Keyboard APIs
 {
@@ -601,7 +601,7 @@ public partial class View // Keyboard APIs
             binding.Key = key;
         }
 
-        ViewTrace.Keyboard (this, key, "InvokeCommands");
+        Trace.Keyboard (this, key, "InvokeCommands");
 
         return InvokeCommands (binding.Commands, binding with { Source = new WeakReference<View> (this) });
     }
