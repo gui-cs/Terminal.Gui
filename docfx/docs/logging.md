@@ -218,7 +218,7 @@ UICatalog includes built-in logging UI. Access via the **Logging** menu to:
 
 ## View Event Tracing
 
-Terminal.Gui includes a unified tracing system for debugging event flow through the view hierarchy. Three categories can be enabled independently:
+Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` namespace) for debugging event flow through the view hierarchy. Three categories can be enabled independently:
 
 | Category | Property | What It Traces |
 |----------|----------|----------------|
@@ -231,12 +231,14 @@ Terminal.Gui includes a unified tracing system for debugging event flow through 
 **Via code:**
 
 ```csharp
+using Terminal.Gui.Tracing;
+
 Trace.CommandEnabled = true;   // Command routing
 Trace.MouseEnabled = true;     // Mouse events  
 Trace.KeyboardEnabled = true;  // Keyboard events
 ```
 
-When tracing is enabled, output automatically goes to `Logging.Debug` via the `LoggingBackend`.
+When tracing is enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
 
 **Via configuration:**
 
@@ -255,17 +257,19 @@ When tracing is enabled, output automatically goes to `Logging.Debug` via the `L
 For testing or custom logging, use `Trace.Backend`:
 
 ```csharp
+using Terminal.Gui.Tracing;
+
 // Capture traces for assertions
-var backend = new Trace.ListBackend();
+ListBackend backend = new ();
 Trace.Backend = backend;
 Trace.CommandEnabled = true;
 
 // ... run code ...
 
 // Inspect captured traces
-foreach (var entry in backend.Entries)
+foreach (TraceEntry entry in backend.Entries)
 {
-    Console.WriteLine($"{entry.Category}: {entry.ViewId} - {entry.Phase}");
+    Console.WriteLine ($"{entry.Category}: {entry.ViewId} - {entry.Phase}");
 }
 ```
 

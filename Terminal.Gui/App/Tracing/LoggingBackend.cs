@@ -1,7 +1,7 @@
 namespace Terminal.Gui.Tracing;
 
 /// <summary>
-///     A backend that forwards trace entries to <see cref="Logging.Debug"/>.
+///     A backend that forwards trace entries to <see cref="Logging.Trace"/>.
 /// </summary>
 public sealed class LoggingBackend : ITraceBackend
 {

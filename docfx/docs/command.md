@@ -318,7 +318,7 @@ When an inner CheckBox activates (via click/space), the command bubbles up to th
 
 ## Command Route Tracing
 
-For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.Trace. Command tracing captures detailed information about command flow through the view hierarchy.
+For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.Tracing.Trace. Command tracing captures detailed information about command flow through the view hierarchy.
 
 > [!TIP]
 > `Trace` also supports Mouse and Keyboard tracing. See [Logging - View Event Tracing](logging.md#view-event-tracing) for the full tracing API.
@@ -326,11 +326,13 @@ For debugging command routing issues, Terminal.Gui provides a tracing system via
 ### Enabling Tracing
 
 ```csharp
+using Terminal.Gui.Tracing;
+
 // Enable command tracing
 Trace.CommandEnabled = true;
 ```
 
-When enabled, output automatically goes to `Logging.Debug` via the `LoggingBackend`.
+When enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
 
 Tracing can also be enabled via configuration:
 
@@ -344,7 +346,7 @@ In **UICatalog**, use the **Logging** menu → **Command Trace** checkbox to tog
 
 ### Trace Output
 
-When enabled, trace entries are logged via `Logging.Debug` with the format:
+When enabled, trace entries are logged via `Logging.Trace` with the format:
 
 ```
 [Phase] Arrow Command @ ViewId (Method) - Message
@@ -371,6 +373,8 @@ Example output:
 Implement `ITraceBackend` for custom trace handling:
 
 ```csharp
+using Terminal.Gui.Tracing;
+
 public class MyTraceBackend : ITraceBackend
 {
     public void Log (TraceEntry entry)
@@ -386,10 +390,12 @@ Trace.Backend = new MyTraceBackend ();
 
 ### Testing with ListBackend
 
-Use `Trace.ListBackend` to capture traces for test assertions:
+Use `ListBackend` to capture traces for test assertions:
 
 ```csharp
-var backend = new Trace.ListBackend ();
+using Terminal.Gui.Tracing;
+
+ListBackend backend = new ();
 Trace.Backend = backend;
 Trace.CommandEnabled = true;
 
