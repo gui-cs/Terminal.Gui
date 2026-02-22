@@ -94,9 +94,33 @@ public class MenuBar : Menu, IDesignable
 
         return;
 
-        bool? MoveLeft (ICommandContext? ctx) => AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        bool? MoveLeft (ICommandContext? ctx)
+        {
+            _isNavigating = true;
 
-        bool? MoveRight (ICommandContext? ctx) => AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            try
+            {
+                return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+            }
+            finally
+            {
+                _isNavigating = false;
+            }
+        }
+
+        bool? MoveRight (ICommandContext? ctx)
+        {
+            _isNavigating = true;
+
+            try
+            {
+                return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            }
+            finally
+            {
+                _isNavigating = false;
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -334,6 +358,14 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
+    ///     Guards against deactivation during arrow-key navigation between MenuBarItems.
+    ///     When navigating (MoveLeft/MoveRight), the old popover closes before the new one opens,
+    ///     which would trigger deactivation via <see cref="OnMenuBarItemPopoverMenuOpenChanged"/>.
+    ///     This flag prevents that.
+    /// </summary>
+    private bool _isNavigating;
+
+    /// <summary>
     ///     Tracks "popover browsing mode" — set when any popover opens, stays true during
     ///     item switching (bridging the brief gap when old popover closes before new one opens).
     ///     Reset only when <see cref="Active"/> goes false or <see cref="Command.Quit"/> is handled.
@@ -519,12 +551,18 @@ public class MenuBar : Menu, IDesignable
         if (e.NewValue)
         {
             _popoverBrowsingMode = true;
+
+            return;
         }
 
-        // _popoverBrowsingMode is intentionally NOT reset on close. During MenuBarItem switching
-        // (via arrow keys or hotkeys), there's a brief moment when no popovers are open while the
-        // new one is about to open. The flag stays true so OnSelectedMenuItemChanged can auto-open.
-        // It is reset when Active goes false or Command.Quit is handled.
+        // A PopoverMenu just closed. If no others are open and we're not in the middle of
+        // arrow-key navigation (where the old popover closes before the new one opens),
+        // deactivate the MenuBar entirely. HotKey switching (Alt+E while File is open)
+        // is safe because the new popover opens BEFORE the old one closes.
+        if (!_isNavigating && !SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen))
+        {
+            Active = false;
+        }
     }
 
     /// <summary>
