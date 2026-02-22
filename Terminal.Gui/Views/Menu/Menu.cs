@@ -49,14 +49,39 @@ public class Menu : Bar
         }
     }
 
-    //if (ctx.IsBubblingUp)
-    //{
-    //    SuperMenuItem?.InvokeCommand (ctx.Command);
-    //}
     /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
     /// </summary>
     public MenuItem? SuperMenuItem { get; set; }
+
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        if (base.OnActivating (args) || args.Handled)
+        {
+            return true;
+        }
+
+        // When a MenuItem's activation bubbles up, don't re-dispatch — let normal bubbling proceed.
+        if (args.Context?.Routing == CommandRouting.BubblingUp)
+        {
+            return false;
+        }
+
+        // Dispatch Activate to the focused MenuItem. This enables callers to invoke
+        // menu.InvokeCommand(Activate) and have it reach the selected MenuItem and its CommandView.
+        if (Focused is MenuItem menuItem)
+        {
+            KeyBinding binding = new ([Command.Activate]);
+            WeakReference<View> source = new (this);
+            CommandContext ctx = new (Command.Activate, source, binding);
+            menuItem.InvokeCommand (Command.Activate, ctx);
+
+            return true;
+        }
+
+        return false;
+    }
 
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)

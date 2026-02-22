@@ -1124,10 +1124,9 @@ public class MenuTests
     //                     └─ childMenuItem (MenuItem, CommandView = X)
     //
     //  The CommandBridge on parentMenuItem.SubMenu bridges completion
-    //  events (Activated/Accepted) from subMenu → parentMenuItem.
-    //  The bridge fires RaiseActivated/RaiseAccepted (direct event fire),
-    //  which does NOT re-enter the command pipeline and therefore does NOT
-    //  bubble further to rootMenu or superView.
+    //  events (Activated/Accepted) from subMenu → parentMenuItem via
+    //  InvokeCommand. This re-enters the full command pipeline, so bridged
+    //  commands bubble from parentMenuItem → rootMenu → superView.
     // ────────────────────────────────────────────────────────────────────
 
     // Claude - Opus 4.6
@@ -1231,14 +1230,11 @@ public class MenuTests
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     The CommandBridge fires RaiseActivated/RaiseAccepted directly on the parentMenuItem.
-    ///     These are completion events that do NOT re-enter the command pipeline. Therefore,
-    ///     bridged commands do NOT bubble from parentMenuItem to rootMenu or superView.
-    ///     This documents the current bridge boundary — higher-level propagation (to PopoverMenu,
-    ///     MenuBar) requires additional bridging at that level.
+    ///     The CommandBridge uses InvokeCommand on the parentMenuItem, re-entering the full
+    ///     command pipeline. Bridged commands bubble from parentMenuItem to rootMenu to superView.
     /// </summary>
     [Fact]
-    public void SubMenu_Bridge_Does_Not_Propagate_Beyond_ParentMenuItem ()
+    public void SubMenu_Bridge_Propagates_Through_ParentMenuItem_To_RootMenu_And_SuperView ()
     {
         CheckBox checkBox = new () { Title = "_Toggle" };
         MenuItem childItem = new () { Title = "Child", CommandView = checkBox };
@@ -1260,12 +1256,12 @@ public class MenuTests
 
         childItem.InvokeCommand (Command.Activate);
 
-        // Bridge fires Activated on parentMenuItem
+        // Bridge fires InvokeCommand → Activated on parentMenuItem
         Assert.Equal (1, parentActivatedCount);
 
-        // Bridge does NOT re-enter command pipeline — no bubbling to rootMenu or superView
-        Assert.Equal (0, rootMenuActivatingCount);
-        Assert.Equal (0, superViewActivatingCount);
+        // Bridge re-enters pipeline → TryBubbleUp → rootMenu and superView get Activating
+        Assert.Equal (1, rootMenuActivatingCount);
+        Assert.Equal (1, superViewActivatingCount);
 
         superView.Dispose ();
     }
@@ -1292,19 +1288,19 @@ public class MenuTests
     //  change the value, but FlagSelector consumes the activation (it does not
     //  propagate to Menu or SuperView).
     //
-    //  Menu does NOT override GetDispatchTarget (unlike MenuBar), so
-    //  menu.InvokeCommand(Activate) fires Menu's own Activating but does NOT
-    //  dispatch to any MenuItem or its CommandView.
+    //  Menu.OnActivating dispatches to the focused MenuItem when focus is set.
+    //  Without focus, menu.InvokeCommand(Activate) fires Menu's own Activating
+    //  but does NOT dispatch to any MenuItem.
     // ────────────────────────────────────────────────────────────────────
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Menu does not override GetDispatchTarget. Invoking Activate on the Menu fires
-    ///     Menu.Activating and SuperView.Activating, but does NOT dispatch to any MenuItem
-    ///     or its CommandView. The FlagSelector value is unchanged.
+    ///     Without focus, Menu.OnActivating has no Focused MenuItem to dispatch to.
+    ///     Invoking Activate on the Menu fires Menu.Activating and SuperView.Activating,
+    ///     but does NOT dispatch to any MenuItem or its CommandView.
     /// </summary>
     [Fact]
-    public void Menu_InvokeActivate_Does_Not_Dispatch_To_MenuItem_CommandView ()
+    public void Menu_InvokeActivate_Without_Focus_Does_Not_Dispatch_To_MenuItem_CommandView ()
     {
         View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
         Menu menu = new () { Id = "menu" };
@@ -1323,17 +1319,19 @@ public class MenuTests
         var menuItemActivatingCount = 0;
         menuItem.Activating += (_, _) => menuItemActivatingCount++;
 
-        // menu.InvokeCommand fires Menu's own Activating but does NOT dispatch to MenuItem
+        // Without a running app and focus, Menu.Focused is null
+        Assert.Null (menu.Focused);
+
         menu.InvokeCommand (Command.Activate);
 
         // Menu's Activating fires and bubbles to SuperView
         Assert.Equal (1, menuActivatingCount);
         Assert.Equal (1, superViewActivatingCount);
 
-        // MenuItem was NOT activated — Menu has no GetDispatchTarget override
+        // MenuItem was NOT activated — no Focused MenuItem to dispatch to
         Assert.Equal (0, menuItemActivatingCount);
 
-        // FlagSelector value unchanged (Values setter auto-initializes to first entry)
+        // FlagSelector value unchanged
         Assert.Equal (1, flagSelector.Value);
 
         superView.Dispose ();
@@ -1419,6 +1417,102 @@ public class MenuTests
         Assert.Equal (initialValue, flagSelector.Value);
 
         superView.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     With focus set, menu.InvokeCommand(Activate) dispatches to the focused MenuItem
+    ///     via Menu.OnActivating. The MenuItem dispatches to its CheckBox CommandView, which
+    ///     toggles state. Activating bubbles back to Menu and SuperView, where the handler
+    ///     can see the updated CheckBox value.
+    /// </summary>
+    [Fact]
+    public void Menu_InvokeActivate_With_Focus_Dispatches_To_MenuItem_CheckBox_RoundTrip ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View superView = new () { Id = "superView", CanFocus = true, CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        CheckBox checkBox = new () { Title = "_Toggle" };
+        MenuItem menuItem = new () { Title = "Test", CommandView = checkBox };
+        menu.Add (menuItem);
+
+        ((View)runnable).Add (superView);
+        app.Begin (runnable);
+
+        // Explicitly set focus to the MenuItem
+        menuItem.SetFocus ();
+        Assert.Same (menuItem, menu.Focused);
+        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+
+        CheckState? valueSeenBySuperView = null;
+
+        superView.Activating += (_, _) =>
+                                {
+                                    valueSeenBySuperView = checkBox.Value;
+                                };
+
+        // Invoke Activate on the Menu — dispatches to focused MenuItem → CheckBox
+        menu.InvokeCommand (Command.Activate);
+
+        // CheckBox toggled
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+
+        // SuperView saw the updated value during its Activating handler
+        Assert.Equal (CheckState.Checked, valueSeenBySuperView);
+
+        ((View)runnable).Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     With focus set, menu.InvokeCommand(Activate) dispatches to the focused MenuItem
+    ///     which dispatches to its FlagSelector CommandView. However, the DispatchingDown guard
+    ///     prevents FlagSelector from further dispatching to its inner CheckBoxes. The FlagSelector
+    ///     value does NOT change. Activating still bubbles to Menu and SuperView.
+    /// </summary>
+    [Fact]
+    public void Menu_InvokeActivate_With_Focus_FlagSelector_Value_Unchanged ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View superView = new () { Id = "superView", CanFocus = true, CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+        Menu menu = new () { Id = "menu" };
+        superView.Add (menu);
+
+        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["F1", "F2", "F3"] };
+        MenuItem menuItem = new () { Title = "Test", CommandView = flagSelector };
+        menu.Add (menuItem);
+
+        ((View)runnable).Add (superView);
+        app.Begin (runnable);
+
+        // Explicitly set focus to the MenuItem
+        menuItem.SetFocus ();
+        Assert.Same (menuItem, menu.Focused);
+
+        int? initialValue = flagSelector.Value;
+
+        var superViewActivatingCount = 0;
+        superView.Activating += (_, _) => superViewActivatingCount++;
+
+        menu.InvokeCommand (Command.Activate);
+
+        // Activating propagated to SuperView
+        Assert.Equal (1, superViewActivatingCount);
+
+        // FlagSelector value unchanged — DispatchingDown guard prevents inner CheckBox dispatch
+        Assert.Equal (initialValue, flagSelector.Value);
+
+        ((View)runnable).Dispose ();
     }
 
     #endregion Dispatch Down and Round-Trip Value Verification

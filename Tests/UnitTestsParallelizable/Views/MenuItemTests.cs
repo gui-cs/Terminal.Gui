@@ -380,12 +380,13 @@ public class MenuItemTests
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Activating a child in a SubMenu should bubble to the SubMenu. But the SubMenu is NOT
-    ///     in the rootMenu's containment hierarchy (it's set on parentMenuItem.SubMenu, not Add'd
-    ///     to rootMenu). So Activating should NOT reach rootMenu via normal bubbling.
+    ///     Activating a child in a SubMenu bridges to parentMenuItem via CommandBridge, and then
+    ///     parentMenuItem's activation bubbles to rootMenu (parentMenuItem IS a SubView of rootMenu).
+    ///     The SubMenu itself is NOT in rootMenu's containment hierarchy, but the bridge crosses
+    ///     that boundary by re-entering the command pipeline on parentMenuItem.
     /// </summary>
     [Fact]
-    public void SubMenu_ChildActivate_Does_Not_Reach_RootMenu_Without_Containment ()
+    public void SubMenu_ChildActivate_Bridges_Through_ParentMenuItem_To_RootMenu ()
     {
         MenuItem childItem = new () { Title = "Child" };
         Menu subMenu = new ([childItem]);
@@ -398,19 +399,19 @@ public class MenuItemTests
 
         childItem.InvokeCommand (Command.Activate);
 
-        // SubMenu is not a SubView of rootMenu — it can't bubble there.
-        Assert.Equal (0, rootActivatingCount);
+        // Bridge → parentMenuItem.InvokeCommand → TryBubbleUp → rootMenu.Activating fires.
+        Assert.Equal (1, rootActivatingCount);
 
         rootMenu.Dispose ();
     }
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     CommandBridge fires Activated (not Activating) on the parent MenuItem. Activating is a
-    ///     cancellable pre-notification; the bridge only relays completion events.
+    ///     CommandBridge uses InvokeCommand, which re-enters the full command pipeline on the parent
+    ///     MenuItem. This means Activating fires on parentMenuItem (as well as Activated).
     /// </summary>
     [Fact]
-    public void SubMenu_ChildActivate_Does_Not_Fire_Activating_On_ParentMenuItem ()
+    public void SubMenu_ChildActivate_Fires_Activating_On_ParentMenuItem ()
     {
         MenuItem childItem = new () { Title = "Child" };
         Menu subMenu = new ([childItem]);
@@ -423,8 +424,8 @@ public class MenuItemTests
 
         childItem.InvokeCommand (Command.Activate);
 
-        // Bridge fires Activated (completion), not Activating (cancellable).
-        Assert.Equal (0, parentActivatingCount);
+        // Bridge calls InvokeCommand → full pipeline → Activating fires on parentMenuItem.
+        Assert.Equal (1, parentActivatingCount);
 
         rootMenu.Dispose ();
     }

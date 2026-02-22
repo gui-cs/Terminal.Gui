@@ -98,7 +98,7 @@ Bound to `Key.Enter`.
 
 1. Resets `_lastDispatchOccurred`
 2. Calls `RaiseAccepting` (OnAccepting → Accepting event → TryDispatchToTarget → TryBubbleUp)
-3. If handled and dispatch occurred, calls `RaiseAccepted`
+3. If handled and (dispatch occurred OR routing is `Bridged`), calls `RaiseAccepted`
 4. If not handled, redirects to `DefaultAcceptView` via `DispatchDown` (unless Accept will also bubble to an ancestor — prevents double-path)
 5. For `BubblingUp` with a dispatch target, calls `RaiseAccepted`
 6. Calls `RaiseAccepted`
@@ -150,7 +150,8 @@ Controls whether dispatch consumes the command:
 
 Called by `RaiseActivating` and `RaiseAccepting` after the `OnActivating`/`Activating` (or `OnAccepting`/`Accepting`) have had a chance to cancel. Guards:
 
-- **Routing is `DispatchingDown`** → skip (prevents re-entry)
+- **Routing is `DispatchingDown`** → skip (prevents re-entry when command is already dispatching down)
+- **Routing is `Bridged`** → skip (bridge brings commands *up* from a non-containment boundary; dispatching down into the owner's CommandView would be incorrect)
 - **Relay + no binding** → skip (programmatic invocation — no user interaction to forward)
 - **Source is within target** → skip (prevents loops)
 
@@ -208,14 +209,18 @@ Creates a `CommandContext` with `Routing = CommandRouting.DispatchingDown` and i
 
 ## CommandBridge
 
-`CommandBridge` routes commands across non-containment boundaries (e.g., MenuBarItem ↔ PopoverMenu, which is registered with `Application.Popover` rather than the SuperView hierarchy).
+`CommandBridge` routes commands across non-containment boundaries (e.g., MenuItem.SubMenu ↔ parentMenuItem, MenuBarItem ↔ PopoverMenu). The bridge subscribes to the remote view's `Accepted`/`Activated` events and re-enters the full command pipeline on the owner via `InvokeCommand`:
 
 ```csharp
 CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept, Command.Activate);
-// remote.Accepted → owner.RaiseAccepted (Routing = Bridged)
-// remote.Activated → owner.RaiseActivated (Routing = Bridged)
+// remote.Accepted → owner.InvokeCommand (Accept, Routing = Bridged)
+// remote.Activated → owner.InvokeCommand (Activate, Routing = Bridged)
 bridge.Dispose (); // tears down subscriptions
 ```
+
+Because the bridge calls `InvokeCommand` (not `RaiseAccepted`/`RaiseActivated`), bridged commands flow through the full pipeline: `RaiseActivating`/`RaiseAccepting` → `TryDispatchToTarget` → `TryBubbleUp` → `RaiseActivated`/`RaiseAccepted`. This enables bridged commands to propagate through the owner's SuperView hierarchy.
+
+`TryDispatchToTarget` has a `Bridged` routing guard to prevent the bridged command from dispatching down into the owner's CommandView — the bridge brings commands *up*, not *down*.
 
 Both references are weak — the bridge does not prevent GC. The bridge is one-way; create two bridges for bidirectional routing.
 
@@ -287,7 +292,7 @@ When an inner CheckBox activates (via click/space), the command bubbles up to th
 | **ComboBox** | Handled by SubViews | Handled by SubViews | `Command.HotKey` | OnMouseEvent (toggle) | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **Shortcut** | `Command.Activate` (dispatch to CommandView) | `Command.Accept` (dispatch to CommandView) | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
 | **MenuItem** | Inherited from Shortcut | Inherited from Shortcut | `Command.HotKey` → `Command.Activate` | Not bound | `Command.Activate` | Not bound | Not bound |
-| **Menu** / **Bar** | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts |
+| **Menu** / **Bar** | `Command.Activate` (dispatches to focused MenuItem) | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts |
 | **MenuBar** | Handled by SubViews (ConsumeDispatch) | Handled by SubViews (ConsumeDispatch) | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **ScrollBar** | Not bound | Not bound | Not bound | OnMouseEvent | OnMouseEvent | OnMouseEvent | Not bound |
 | **ProgressBar** / **SpinnerView** | N/A | N/A | N/A | N/A | N/A | N/A | N/A |

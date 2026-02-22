@@ -259,7 +259,10 @@ public partial class View // Command APIs
         if (RaiseAccepting (ctx) is true)
         {
             // If dispatch consumed the command, the composite view needs completion.
-            if (_lastDispatchOccurred)
+            // Bridged commands also need completion: the bridge brings a command from a remote
+            // view (e.g., SubMenu), TryBubbleUp propagates it to the SuperView, but the owner
+            // still needs its Accepted event to fire for subscribers (e.g., parentMenuItem.Accepted).
+            if (_lastDispatchOccurred || ctx?.Routing == CommandRouting.Bridged)
             {
                 RaiseAccepted (ctx);
             }
@@ -810,6 +813,14 @@ public partial class View // Command APIs
 
         // Guard: don't dispatch if already dispatching down (prevents re-entry)
         if (ctx?.Routing == CommandRouting.DispatchingDown)
+        {
+            return false;
+        }
+
+        // Guard: don't dispatch when a command arrives via bridge. The bridge brings
+        // commands UP from a non-containment boundary (e.g., SubMenu → parentMenuItem);
+        // dispatching down into the owner's CommandView would be incorrect.
+        if (ctx?.Routing == CommandRouting.Bridged)
         {
             return false;
         }

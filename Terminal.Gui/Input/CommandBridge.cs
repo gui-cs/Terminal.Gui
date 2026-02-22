@@ -8,9 +8,12 @@ namespace Terminal.Gui.Input;
 /// <remarks>
 ///     <para>
 ///         The bridge subscribes to the remote view's <c>Accepted</c> and/or <c>Activated</c> events.
-///         When fired, it creates a new immutable <see cref="CommandContext"/> with
+///         When fired, it creates a new <see cref="CommandContext"/> with
 ///         <see cref="CommandRouting.Bridged"/> routing and invokes the command on the owner via
-///         <see cref="View.InvokeCommand(Command, ICommandContext?)"/>.
+///         <see cref="View.InvokeCommand(Command, ICommandContext?)"/>. This re-enters the full
+///         command pipeline (RaiseActivating/RaiseAccepting → TryDispatchToTarget → TryBubbleUp →
+///         RaiseActivated/RaiseAccepted), enabling bridged commands to propagate through the
+///         owner's SuperView hierarchy.
 ///     </para>
 ///     <para>
 ///         Both references are weak — the bridge does not prevent GC of either view.
@@ -94,7 +97,7 @@ public class CommandBridge : IDisposable
             Routing = CommandRouting.Bridged
         };
 
-        owner.RaiseAccepted (bridgedCtx);
+        owner.InvokeCommand (Command.Accept, bridgedCtx);
     }
 
     private void OnRemoteActivated (object? sender, EventArgs<ICommandContext?> e)
@@ -114,6 +117,6 @@ public class CommandBridge : IDisposable
             Routing = CommandRouting.Bridged
         };
 
-        owner.RaiseActivated (bridgedCtx);
+        owner.InvokeCommand (Command.Activate, bridgedCtx);
     }
 }

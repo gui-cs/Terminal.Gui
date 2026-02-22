@@ -1,8 +1,10 @@
 # Finalizing Command System - Bug Fixes
 
-## Status: Issues #1-3 COMPLETED
+## Status: Issues #1-3 COMPLETED, Gaps #2-3 COMPLETED
 
 Issues #1-3 have been implemented and verified. See [Implementation Results](#implementation-results) at the bottom.
+Architectural Gaps #2-3 (CommandBridge InvokeCommand, Menu.OnActivating dispatch) are completed.
+Gap #1 (FlagSelector value via DispatchDown) is deferred — see [Gap 1 Analysis](#gap-1-flagselector-value-via-dispatchdown).
 Issues #4-6 remain deferred.
 
 ---
@@ -539,3 +541,97 @@ Added `OnActivating` override to `Shortcut.cs` that resets `_activatedFiredThisC
 | `Terminal.Gui/Views/Shortcut.cs` | Issue #3: OnActivating override resets deferred flag |
 | `Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs` | 3 new tests |
 | `Tests/UnitTestsParallelizable/Views/ShortcutTests.Command.cs` | 2 new tests |
+
+---
+
+## Architectural Gaps (Menu/MenuItem Focus)
+
+Three architectural gaps were discovered while adding CommandView propagation tests for Menu→MenuItem:
+
+### Gap 1: FlagSelector Value Unchanged via DispatchDown — DEFERRED
+
+**Problem**: When Menu.OnActivating dispatches `Command.Activate` to a MenuItem that has a FlagSelector as its CommandView, the FlagSelector's value doesn't change. The `DispatchingDown` guard in `TryDispatchToTarget` prevents multi-level dispatch chains (Menu → MenuItem → FlagSelector → CheckBox).
+
+**Analysis**: The guard IS important for correctness. Removing it would cause FlagSelector.OnActivated to receive a command with the MenuItem as the source (not a CheckBox), leading to state desync between inner CheckBoxes and FlagSelector.Value. The FlagSelector is a consume-dispatch composite view that owns its internal state; its inner CheckBox activations are implementation details.
+
+**Test documenting this**: `Menu_InvokeActivate_With_Focus_FlagSelector_Value_Unchanged` in MenuTests.cs.
+
+**Resolution**: This is by design. Consume-dispatch views should not have their internal state manipulated from external dispatch chains. If users need to change FlagSelector state from a menu, they should use the FlagSelector's public API (e.g., set `Value` directly) rather than attempting to dispatch through the command pipeline.
+
+### Gap 2: CommandBridge → InvokeCommand — COMPLETED
+
+**Problem**: CommandBridge called `owner.RaiseAccepted()`/`owner.RaiseActivated()` directly, which are fire-and-forget events. Bridged commands stopped at the parentMenuItem and never bubbled further to rootMenu or its SuperView.
+
+**Fix** (`CommandBridge.cs`):
+- Changed `OnRemoteAccepted`: `owner.RaiseAccepted(ctx)` → `owner.InvokeCommand(Command.Accept, ctx)`
+- Changed `OnRemoteActivated`: `owner.RaiseActivated(ctx)` → `owner.InvokeCommand(Command.Activate, ctx)`
+- Both create a `CommandContext` with `Routing = CommandRouting.Bridged`
+
+**Fix** (`View.Command.cs`):
+- Added `Bridged` routing guard in `TryDispatchToTarget` — prevents dispatching down when a command arrives via bridge (bridge brings commands *up*, not *down*)
+- Added `ctx?.Routing == CommandRouting.Bridged` check in `DefaultAcceptHandler`'s early-exit path — ensures `RaiseAccepted` fires for bridged Accept commands (compensates for Accept/Activate asymmetry: Accept bubbling returns `true` while Activate returns `false`)
+
+**Tests updated**:
+- `SubMenu_ChildActivate_Fires_Activating_On_ParentMenuItem` (was "Does_Not_Fire", assert 0→1)
+- `SubMenu_ChildActivate_Bridges_Through_ParentMenuItem_To_RootMenu` (was "Does_Not_Reach", assert 0→1)
+- `SubMenu_Bridge_Propagates_Through_ParentMenuItem_To_RootMenu_And_SuperView` (was "Does_Not_Propagate", assert 0→1)
+
+### Gap 3: Menu.OnActivating Dispatches to Focused MenuItem — COMPLETED
+
+**Problem**: `menu.InvokeCommand(Command.Activate)` fired Menu's own Activating event but did NOT dispatch to any MenuItem or its CommandView. There was no `GetDispatchTarget` or equivalent dispatch mechanism.
+
+**Fix** (`Menu.cs`): Added `OnActivating` override that:
+1. Calls `base.OnActivating(args)` — lets the base class handle default behavior
+2. Checks for `BubblingUp` routing — if a MenuItem's activation is bubbling up, don't re-dispatch (prevents loops)
+3. If `Focused` is a `MenuItem`, creates a synthetic context and calls `menuItem.InvokeCommand(Command.Activate, ctx)`
+
+**Tests added**:
+- `Menu_InvokeActivate_With_Focus_Dispatches_To_MenuItem_CheckBox_RoundTrip` — Full round-trip: menu.InvokeCommand(Activate) → MenuItem → CheckBox value toggles
+- `Menu_InvokeActivate_With_Focus_FlagSelector_Value_Unchanged` — Documents DispatchingDown guard prevents FlagSelector inner dispatch
+
+### Gap Implementation Test Results
+
+| Metric | Before Gaps | After Gaps | Delta |
+|--------|-------------|------------|-------|
+| **UnitTestsParallelizable** | | | |
+| Total | 14027 | 14075 | +48 (new tests from multiple sessions) |
+| Passed | 13995 | 14041 | +46 |
+| Failed | 10 | 12 | +2 (pre-existing MenuBar/PopoverMenu) |
+| Skipped | 22 | 22 | 0 |
+
+### Files Modified (Gaps #2-3)
+
+| File | Change |
+|------|--------|
+| `Terminal.Gui/Input/CommandBridge.cs` | Gap 2: InvokeCommand instead of RaiseAccepted/RaiseActivated |
+| `Terminal.Gui/ViewBase/View.Command.cs` | Gap 2: Bridged guard in TryDispatchToTarget + DefaultAcceptHandler |
+| `Terminal.Gui/Views/Menu/Menu.cs` | Gap 3: OnActivating override dispatches to focused MenuItem |
+| `Tests/UnitTestsParallelizable/Views/MenuItemTests.cs` | 2 tests renamed/updated |
+| `Tests/UnitTestsParallelizable/Views/MenuTests.cs` | 2 tests renamed, 2 new tests added |
+| `docfx/docs/command.md` | Updated CommandBridge, TryDispatchToTarget, Menu behavior docs |
+
+---
+
+## Gap 1: FlagSelector Value via DispatchDown
+
+### Problem Statement
+
+When `Menu.OnActivating` dispatches `Command.Activate` to a `MenuItem` whose `CommandView` is a `FlagSelector`, the FlagSelector's `Value` property does not change. The command reaches the FlagSelector (via Shortcut's relay dispatch) but `TryDispatchToTarget` has a `DispatchingDown` guard that prevents the FlagSelector from dispatching down to its inner CheckBox.
+
+### Why the Guard Exists
+
+The `DispatchingDown` guard in `TryDispatchToTarget` prevents multi-level dispatch chains:
+
+```
+Menu.OnActivating → MenuItem.InvokeCommand(Activate)      [DispatchingDown]
+  → Shortcut (MenuItem) TryDispatchToTarget → FlagSelector [DispatchingDown relayed]
+    → FlagSelector TryDispatchToTarget → CheckBox          [BLOCKED: already DispatchingDown]
+```
+
+Without the guard, the dispatch chain would be: Menu → MenuItem → FlagSelector → CheckBox. The problem is that FlagSelector.OnActivated expects the source to be an inner CheckBox — it uses the source to determine WHICH flag to toggle. When the source is a MenuItem (from the menu dispatch), FlagSelector can't determine the correct flag and would either crash or toggle the wrong flag.
+
+### Conclusion
+
+This is **by design**. Consume-dispatch composite views (FlagSelector, OptionSelector) own their internal state. External dispatch chains should not manipulate that state. The `Menu_InvokeActivate_With_Focus_FlagSelector_Value_Unchanged` test documents this behavior.
+
+For simple `CommandView` types like `CheckBox`, the dispatch chain works correctly because CheckBox doesn't need to inspect the source — it simply toggles its state.
