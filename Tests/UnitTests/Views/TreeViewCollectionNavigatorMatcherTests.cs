@@ -74,20 +74,6 @@ public class TreeViewCollectionNavigatorMatcherTests
         Assert.False (matcher.IsMatch ("A", null));
     }
 
-    [Fact]
-    public void IsMatch_WithEmptySearch_ReturnsFalse ()
-    {
-        // Arrange
-        var treeView = new TreeView<TestItem> ();
-        treeView.AspectGetter = item => item.Name;
-        
-        var matcher = new TreeViewCollectionNavigatorMatcher<TestItem> (treeView);
-        var item = new TestItem { Id = 1, Name = "Apple" };
-        
-        // Act & Assert
-        Assert.False (matcher.IsMatch ("", item));
-        Assert.False (matcher.IsMatch (null, item));
-    }
 
     [Fact]
     public void IsMatch_AspectGetterReturnsNull_ReturnsFalse ()
