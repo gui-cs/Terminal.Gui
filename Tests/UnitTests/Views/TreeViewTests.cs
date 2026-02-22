@@ -1600,6 +1600,48 @@ oot two
         Assert.Equal (abb, tv.SelectedObject);
     }
 
+    [Fact]
+    [SetupFakeApplication]
+    public void AllowLetterBasedNavigation_CaseVariationsInParentAndChildren ()
+    {
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 10 };
+
+        // Tree structure mimicking file system:
+        // D:\
+        // SendTo
+        //   Desktop
+        //   desktop.ini
+        var dRoot = new TreeNode ("D:\\");
+        var sendTo = new TreeNode ("SendTo");
+        var desktop = new TreeNode ("Desktop");
+        var desktopIni = new TreeNode ("desktop.ini");
+        sendTo.Children.Add (desktop);
+        sendTo.Children.Add (desktopIni);
+
+        tv.AddObject (dRoot);
+        tv.AddObject (sendTo);
+        tv.Expand (sendTo);
+
+        tv.SetScheme (new Scheme ());
+        tv.LayoutSubViews ();
+
+        // Select Desktop
+        tv.SelectedObject = desktop;
+        Assert.Equal (desktop, tv.SelectedObject);
+
+        // Press 'd' - should navigate to next 'd' item which is desktop.ini, NOT back to D:\
+        tv.NewKeyDownEvent (Key.D);
+        Assert.Equal (desktopIni, tv.SelectedObject);
+
+        // Press 'd' again - should cycle to D:\
+        tv.NewKeyDownEvent (Key.D);
+        Assert.Equal (dRoot, tv.SelectedObject);
+
+        // Press 'd' again - should go to Desktop
+        tv.NewKeyDownEvent (Key.D);
+        Assert.Equal (desktop, tv.SelectedObject);
+    }
+
     #region Test Setup Methods
 
     private class Factory
