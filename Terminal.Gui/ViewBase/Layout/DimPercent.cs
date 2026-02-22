@@ -29,4 +29,10 @@ public record DimPercent (int Percentage, DimPercentMode Mode = DimPercentMode.C
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension) =>
         Mode == DimPercentMode.Position ? Math.Max (GetAnchor (superviewContentSize - location), 0) : GetAnchor (superviewContentSize);
+
+    /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => true;
+
+    /// <inheritdoc/>
+    internal override bool CanContributeToAutoSizing => false;
 }

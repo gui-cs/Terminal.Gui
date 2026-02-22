@@ -90,5 +90,39 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
     }
 
     /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => Left.DependsOnSuperViewContentSize || Right.DependsOnSuperViewContentSize;
+
+    /// <inheritdoc/>
+    internal override bool CanContributeToAutoSizing => Left.CanContributeToAutoSizing || Right.CanContributeToAutoSizing;
+
+    /// <inheritdoc/>
+    internal override int GetMinimumContribution (int location, int superviewContentSize, View us, Dimension dimension)
+    {
+        int newDimension;
+
+        if (Add == AddOrSubtract.Add)
+        {
+            newDimension = Left.GetMinimumContribution (location, superviewContentSize, us, dimension)
+                           + Right.GetMinimumContribution (location, superviewContentSize, us, dimension);
+        }
+        else
+        {
+            newDimension = Math.Max (
+                                     0,
+                                     Left.GetMinimumContribution (location, superviewContentSize, us, dimension)
+                                     - Right.GetMinimumContribution (location, superviewContentSize, us, dimension)
+                                    );
+        }
+
+        return newDimension;
+    }
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => Left.IsFixed && Right.IsFixed;
+
+    /// <inheritdoc/>
+    internal override bool RequiresTargetLayout => Left.RequiresTargetLayout || Right.RequiresTargetLayout;
+
+    /// <inheritdoc/>
     protected override bool HasInner<TDim> (out TDim dim) => Left.Has (out dim) || Right.Has (out dim);
 }

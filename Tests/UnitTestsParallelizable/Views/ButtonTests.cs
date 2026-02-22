@@ -61,8 +61,8 @@ public class ButtonTests
         btn1.Width = width;
         btn1.Height = height;
 
-        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Frame.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
 
         btn1.Dispose ();
@@ -90,9 +90,9 @@ public class ButtonTests
     {
         var btn1 = new Button { ShadowStyle = ShadowStyle.None, Text = text, Width = width, Height = height };
 
-        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Frame.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), btn1.Viewport.Size);
-        Assert.Equal (new (expectedWidth, expectedHeight), btn1.GetContentSize ());
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
+        Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.GetContentSize ());
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.TextFormatter.ConstrainToSize);
 
         btn1.Dispose ();
@@ -337,21 +337,21 @@ public class ButtonTests
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (2, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Disable Mouse Highlighting to test that it does not interfere with Accepting event
         button.MouseHighlightStates = MouseState.None;
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (3, activatingCount);
         Assert.Equal (3, acceptingCount);
 
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (4, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
@@ -395,18 +395,23 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // First click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         Assert.Equal (1, acceptingCount);
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, activatingCount);
 
         // Second click - more than 500ms later to avoid double-click detection
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) },
+                              options);
+
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) },
+                              options);
 
         Assert.Equal (2, acceptingCount);
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, activatingCount);
     }
 
     /// <summary>
@@ -458,43 +463,50 @@ public class ButtonTests
         // First click - when MouseHighlightStates = None:
         // - Pressed event fires Activating (Command.Activate)
         // - Clicked event fires both Activating and Accepting (Command.Accept)
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         // Activating: 1 from Pressed + 1 from Clicked = 2
         // Accepting: 1 from Clicked only = 1
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptingCount);
 
         // Second click - more than 500ms later to avoid double-click detection
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) },
+                              options);
+
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) },
+                              options);
 
         // Activating: previous 2 + 1 from Pressed + 1 from Clicked = 4
         // Accepting: previous 1 + 1 from Clicked = 2
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Third click - verify it continues to work
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1200) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1200) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
                               options);
 
         // Activating: previous 4 + 1 from Pressed + 1 from Clicked = 6
         // Accepting: previous 2 + 1 from Clicked = 3
-        Assert.Equal (6, activatingCount);
+        Assert.Equal (3, activatingCount);
         Assert.Equal (3, acceptingCount);
 
         // Fourth click - verify consistency
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1800) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1800) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1850) },
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1850) },
                               options);
 
         // Activating: previous 6 + 1 from Pressed + 1 from Clicked = 8
         // Accepting: previous 3 + 1 from Clicked = 4
-        Assert.Equal (8, activatingCount);
+        Assert.Equal (4, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
 
@@ -537,21 +549,24 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // Inject Press and Release to generate a Clicked event
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         // Assert - Button should receive Clicked event and fire both Activating and Accepting
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptingCount);
 
         // Act - Second click with timestamp spacing >500ms should be a new single click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) },
+                              options);
 
         // Assert - Should fire again (two independent single clicks, not a double-click)
-        Assert.Equal (4, activatingCount);
+        Assert.Equal (2, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Cleanup
@@ -596,14 +611,17 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // First click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         // Second click within 500ms threshold
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) },
+                              options);
 
         // Assert - Should receive a double-click event (timestamp spacing allows multi-click)
         // We don't assert exact count since View may emit additional events,
@@ -656,14 +674,17 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // First click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         // Second click within 500ms threshold (creates double-click, but we ignore Click events)
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) },
+                              options);
 
         // Assert - Should fire Accept twice (one per Press/Release cycle)
         // MouseHoldRepeat uses Press/Release events only, ignoring Click/DoubleClick synthesized events
@@ -712,8 +733,10 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // Quick single click - press and release within 50ms (too fast for timer to start)
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         // Should fire Accept once from the Clicked event
         Assert.Equal (1, acceptingCount);
@@ -757,19 +780,24 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // First click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         // Second click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (200) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (200) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (250) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (250) },
+                              options);
 
         // Third click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (400) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (400) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (450) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (450) },
+                              options);
 
         // Assert - Should fire Accept three times (one per Press/Release cycle)
         // MouseHoldRepeat uses Press/Release events only, ignoring Click/DoubleClick/TripleClick synthesized events
@@ -818,21 +846,27 @@ public class ButtonTests
         IInputInjector injector = app.GetInputInjector ();
 
         // First click
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
 
         Assert.Equal (1, acceptingCount);
 
         // Second click - more than 500ms later (not a double-click)
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) }, options);
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) },
+                              options);
+
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) },
+                              options);
 
         Assert.Equal (2, acceptingCount);
 
         // Third click - more than 500ms after second
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1200) }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (1200) },
+                              options);
 
-        injector.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
                               options);
 
         Assert.Equal (3, acceptingCount);

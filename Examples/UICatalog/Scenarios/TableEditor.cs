@@ -565,7 +565,8 @@ public class TableEditor : Scenario
         {
             DataColumn col = dt.Columns.Add (i.ToString (), typeof (uint));
             ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Ordinal);
-            style.RepresentationGetter = o => new Rune ((uint)o).ToString ();
+
+            style.RepresentationGetter = RuneToString;
         }
 
         // add cols called a to z
@@ -573,7 +574,7 @@ public class TableEditor : Scenario
         {
             DataColumn col = dt.Columns.Add (((char)i).ToString (), typeof (uint));
             ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Ordinal);
-            style.RepresentationGetter = o => new Rune ((uint)o).ToString ();
+            style.RepresentationGetter = RuneToString;
         }
 
         // now add table contents
@@ -600,6 +601,15 @@ public class TableEditor : Scenario
         }
 
         return dt;
+    }
+
+    private string RuneToString (object o)
+    {
+        if(Rune.TryCreate((uint)o, out var rune))
+        {
+            return rune.ToString();
+        }
+        return " ";
     }
 
     private void CheckOrUncheckFile (FileSystemInfo info, bool check)
@@ -799,13 +809,17 @@ public class TableEditor : Scenario
                                                           { "FileSize", GetHumanReadableFileSize }
                                                       });
 
-        HashSet<string> seen = new ();
-
+        bool isWindows = OperatingSystem.IsWindows ();
         try
         {
-            foreach (string path in Environment.GetLogicalDrives ())
+            foreach (DriveInfo di in DriveInfo.GetDrives ())
             {
-                tree.AddObject (new DirectoryInfo (path));
+                if (isWindows && di is { DriveType: DriveType.Network, IsReady: false })
+                {
+                    continue;
+                }
+
+                tree.AddObject (new DirectoryInfo (di.Name));
             }
         }
         catch (Exception e)

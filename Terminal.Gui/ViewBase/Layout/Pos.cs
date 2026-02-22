@@ -389,10 +389,70 @@ public abstract record Pos
     ///     Composite types like <see cref="PosCombine"/> should aggregate results from their children.
     /// </remarks>
     /// <returns>An enumerable of views that this Pos depends on.</returns>
-    internal virtual IEnumerable<View> GetReferencedViews ()
-    {
-        yield break;
-    }
+    internal virtual IEnumerable<View> GetReferencedViews () { yield break; }
+
+    /// <summary>
+    ///     Indicates whether this Pos depends on the SuperView's content size for its calculation.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to categorize subviews during auto-sizing calculations
+    ///         without needing to perform type checking.
+    ///     </para>
+    ///     <para>
+    ///         Types that depend on and actively contribute to SuperView content size determination include
+    ///         <see cref="PosAnchorEnd"/> and <see cref="PosAlign"/>. These types require special handling during
+    ///         auto-sizing because they affect the minimum content size needed.
+    ///     </para>
+    ///     <para>
+    ///         Types like <see cref="PosCenter"/> and <see cref="PosPercent"/> also use the SuperView's content size
+    ///         for positioning, but they do NOT actively contribute to determining that size, so this property
+    ///         returns <see langword="false"/> for them.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos actively contributes to determining the SuperView's content size;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool DependsOnSuperViewContentSize => false;
+
+    /// <summary>
+    ///     Indicates whether this Pos has a fixed value that doesn't depend on layout calculations.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to identify positions that can be
+    ///         determined without performing layout calculations on other views.
+    ///     </para>
+    ///     <para>
+    ///         Fixed positions include <see cref="PosAbsolute"/> and positions calculated by
+    ///         <see cref="PosFunc"/> that don't depend on other views' layouts.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos has a fixed value independent of layout;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool IsFixed => false;
+
+    /// <summary>
+    ///     Indicates whether this Pos requires the target view to be laid out before it can be calculated.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is used by <see cref="DimAuto"/> to identify positions that depend on
+    ///         another view's layout being completed first.
+    ///     </para>
+    ///     <para>
+    ///         Positions that require target layout include <see cref="PosView"/> which depends on
+    ///         the target view's calculated position.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if this Pos requires the target view's layout to be calculated first;
+    ///     otherwise, <see langword="false"/>.
+    /// </returns>
+    internal virtual bool RequiresTargetLayout => false;
 
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.

@@ -3,21 +3,20 @@ namespace UICatalog.Scenarios;
 
 public class AllViewsView : View
 {
-    private const int MAX_VIEW_FRAME_HEIGHT = 25;
+    private const int MAX_VIEW_FRAME_HEIGHT = 30;
 
     public AllViewsView ()
     {
         CanFocus = true;
         BorderStyle = LineStyle.Heavy;
         Arrangement = ViewArrangement.Resizable;
-        HorizontalScrollBar.AutoShow = false;
-        VerticalScrollBar.AutoShow = true;
+        ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
-        SubViewsLaidOut += (sender, _) =>
+        ViewportChanged += (sender, _) =>
                            {
                                if (sender is View sendingView)
                                {
-                                  sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
+                                   sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
                                }
                            };
 
@@ -26,8 +25,7 @@ public class AllViewsView : View
         AddCommand (Command.PageUp, () => ScrollVertical (-SubViews.OfType<FrameView> ().First ().Frame.Height));
         AddCommand (Command.PageDown, () => ScrollVertical (SubViews.OfType<FrameView> ().First ().Frame.Height));
 
-        AddCommand (
-                    Command.Start,
+        AddCommand (Command.Start,
                     () =>
                     {
                         Viewport = Viewport with { Y = 0 };
@@ -35,8 +33,7 @@ public class AllViewsView : View
                         return true;
                     });
 
-        AddCommand (
-                    Command.End,
+        AddCommand (Command.End,
                     () =>
                     {
                         Viewport = Viewport with { Y = GetContentSize ().Height };
@@ -81,20 +78,22 @@ public class AllViewsView : View
         {
             View? view = CreateView (type);
 
-            if (view is not null)
+            if (view is null)
             {
-                FrameView frame = new ()
-                {
-                    CanFocus = true,
-                    Title = type.Name,
-                    Y = previousView is not null ? Pos.Bottom (previousView) : 0,
-                    Width = Dim.Fill (),
-                    Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: MAX_VIEW_FRAME_HEIGHT)
-                };
-                frame.Add (view);
-                Add (frame);
-                previousView = frame;
+                continue;
             }
+
+            FrameView frame = new ()
+            {
+                CanFocus = true,
+                Title = type.Name,
+                Y = previousView is { } ? Pos.Bottom (previousView) : 0,
+                Width = Dim.Fill (),
+                Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: MAX_VIEW_FRAME_HEIGHT)
+            };
+            frame.Add (view);
+            Add (frame);
+            previousView = frame;
         }
     }
 
@@ -170,8 +169,7 @@ public class AllViewsView : View
     private static List<Type> GetAllViewClassesCollection ()
     {
         List<Type> types = typeof (View).Assembly.GetTypes ()
-                                        .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
-                                                          && myType.IsSubclassOf (typeof (View)))
+                                        .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true } && myType.IsSubclassOf (typeof (View)))
                                         .ToList ();
 
         types.Add (typeof (View));
@@ -198,12 +196,12 @@ public class AllViewsView : View
 
         if (!view.Width.Has<DimAuto> (out _))
         {
-            view.Width = Dim.Fill ();
+            view.Width = Dim.Fill (0, minimumContentDim: 100);
         }
 
         if (!view.Height.Has<DimAuto> (out _))
         {
-            view.Height = Dim.Auto (minimumContentDim: MAX_VIEW_FRAME_HEIGHT - 2, maximumContentDim: MAX_VIEW_FRAME_HEIGHT - 2);
+            view.Height = Dim.Auto (minimumContentDim: MAX_VIEW_FRAME_HEIGHT - 2, maximumContentDim: MAX_VIEW_FRAME_HEIGHT - view.GetAdornmentsThickness().Vertical);
         }
     }
 }

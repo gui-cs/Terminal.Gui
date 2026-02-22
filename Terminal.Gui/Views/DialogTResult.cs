@@ -148,8 +148,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
         // HACK: Ensure scrollbars are shown as needed before calculating sizes
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
         UpdateSizes ();
         base.OnSubViewLayout (args);
     }
@@ -190,12 +189,12 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (!Buttons.Contains (args.Context?.Source))
+        if (!args.Context.TryGetSource (out View? sourceView) || !Buttons.Contains (sourceView))
         {
             return false;
         }
 
-        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == args.Context?.Source)
+        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == sourceView)
         {
             // Default button pressed
             return false;
@@ -208,6 +207,16 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         }
 
         return true;
+    }
+
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        if (!IsInitialized)
+        {
+            SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
+        }
+        base.OnViewportChanged (e);
     }
 
     private void UpdateSizes ()

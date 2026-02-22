@@ -128,14 +128,14 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
 
         // Act - Press button
         view.NewMouseEvent (mouse);
-        Assert.Equal (1, activatingCount); // Should fire on press
+        Assert.Equal (0, activatingCount); // Default changed: should NOT fire on press (issue #4674)
 
         // Act - Release button
         mouse.Flags = MouseFlags.LeftButtonReleased;
         mouse.Handled = false;
         view.NewMouseEvent (mouse);
 
-        // Assert - Activating should be raised exactly once
+        // Assert - Activating should be raised exactly once (on release)
         Assert.Equal (1, activatingCount);
 
         view.Dispose ();
@@ -175,7 +175,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
 
         // Now press
         view.NewMouseEvent (mouse);
-        Assert.Equal (1, activatingCount); // Should fire on press
+        Assert.Equal (0, activatingCount); // Default changed: should NOT fire on press (issue #4674)
 
         // Act - Release button
         mouse.Flags = MouseFlags.LeftButtonReleased;
@@ -296,6 +296,34 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         _output.WriteLine ($"Expected >= 3 activations, got {activatingCount}");
 
         view.Dispose ();
+    }
+
+    [Fact]
+    public void MouseHoldRepeat_Changing_In_SubViews_Works_Correctly ()
+    {
+        // Arrange
+        View view = new ()
+        {
+            Width = 10,
+            Height = 10,
+            MouseHoldRepeat = MouseFlags.LeftButtonPressed
+        };
+
+        Exception? exception = Record.Exception (() => new View { MouseHoldRepeat = view.MouseHoldRepeat }); // Inherit from parent
+        Assert.Null (exception);
+    }
+
+    [Theory]
+    [InlineData (MouseFlags.None)]
+    [InlineData (MouseFlags.PositionReport)]
+    [InlineData (MouseFlags.Button4Pressed)]
+    public void MouseHoldRepeat_Throws_On_Invalid_Flags (MouseFlags mouseFlags)
+    {
+        // Arrange
+        View view = new ();
+
+        // Act & Assert - Setting invalid flags should throw
+        Assert.Throws<ArgumentException> (() => view.MouseHoldRepeat = mouseFlags);
     }
 
     #region Input Injection Tests (Application Level)
@@ -530,7 +558,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
                              ScreenPosition = new (0, 0)
                          });
 
-        Assert.Equal (1, activatingCount); // Should fire on press
+        Assert.Equal (0, activatingCount); // Default changed: should NOT fire on press (issue #4674)
 
         // Act - Release at (0, 0) - synthesizes Clicked event
         app.InjectMouse (
@@ -540,7 +568,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
                              ScreenPosition = new (0, 0)
                          });
 
-        // Assert - Activating should still be 1 (not fired again on Clicked)
+        // Assert - Activating should fire once on release
         Assert.Equal (1, activatingCount);
 
         (runnable as View)?.Dispose ();

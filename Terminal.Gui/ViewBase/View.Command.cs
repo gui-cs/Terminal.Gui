@@ -435,7 +435,7 @@ public partial class View // Command APIs
             {
                 if (!_commandImplementations.ContainsKey (command))
                 {
-                    Logging.Warning (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
+                    Logging.Trace (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
                 }
 
                 // each command has its own return value
@@ -473,7 +473,7 @@ public partial class View // Command APIs
                 _commandImplementations.TryGetValue (Command.NotBound, out implementation);
             }
 
-            return implementation! (new CommandContext { Command = command, Source = this, Binding = binding });
+            return implementation! (new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding });
         }
 
         /// <summary>
@@ -516,6 +516,6 @@ public partial class View // Command APIs
                 _commandImplementations.TryGetValue (Command.NotBound, out implementation);
             }
 
-            return implementation! (new CommandContext { Command = command, Source = this, Binding = null });
+            return implementation! (new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = null });
         }
     }

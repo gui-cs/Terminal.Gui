@@ -265,10 +265,12 @@ public sealed class UICatalogRunnable : Runnable
 
             _diagnosticFlagsSelector.Activating += (_, args) =>
                                                    {
-                                                       _diagnosticFlags =
-                                                           (ViewDiagnosticFlags)(int)args.Context!.Source!
-                                                                                         .Data!; // (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                                                       Diagnostics = _diagnosticFlags;
+                                                       if (args.Context?.TryGetSource (out View? sourceView) == true)
+                                                       {
+                                                           _diagnosticFlags =
+                                                               (ViewDiagnosticFlags)(int)sourceView.Data!; // (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                                           Diagnostics = _diagnosticFlags;
+                                                       }
                                                    };
 
             var diagFlagMenuItem = new MenuItem { CommandView = _diagnosticFlagsSelector, HelpText = "View Diagnostics" };
@@ -499,7 +501,7 @@ public sealed class UICatalogRunnable : Runnable
         categoryList.ValueChanged += CategoryView_SelectedChanged;
 
         // This enables the scrollbar by causing lazy instantiation to happen
-        categoryList.VerticalScrollBar.AutoShow = true;
+        categoryList.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
         return categoryList;
     }
@@ -722,8 +724,7 @@ public sealed class UICatalogRunnable : Runnable
             SelectedItem = 0,
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error)
         };
-        eventLog.HorizontalScrollBar.AutoShow = true;
-        eventLog.VerticalScrollBar.AutoShow = true;
+        eventLog.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         Button okButton = new () { Text = "OK" };
 
