@@ -1,304 +1,348 @@
 # Plan: Terminal Default Color Detection (Issue #2381)
 
-> **Note:** This plan should be saved to `./plans/terminal-color-detection.md` in the repo root as the first step of implementation.
-
 ## Context
 
-PR #4740 introduced `Color.None` — a sentinel (alpha=0) that tells the driver to emit `CSI 39m`/`CSI 49m` (reset fg/bg) instead of explicit RGB, letting the terminal's native colors show through. The Default theme's `Base` and `Runnable` schemes now use `Color.None` for background.
+PR #4740 introduced `Color.None` — a sentinel (alpha=0) that tells the driver to emit `CSI 39m`/`CSI 49m` (reset fg/bg) instead of explicit RGB, letting the terminal's native colors show through. The Default theme's `Base` and `Runnable` schemes now use `Color.None` for both fg and bg.
 
-**Problem:** TG doesn't know what those actual default colors *are*. This causes:
-- `ResolveNoneToBlack` (Scheme.cs:530) hardcodes Black when inverting for Focus
-- `Highlight` derivation calls `.GetBrighterColor()` on `Color.None`'s RGB (255,255,255) — producing wrong results
-- No color math (dim, brighten) can work correctly without real RGB values
+**Core Problem:** TG doesn't know what the terminal's actual default colors *are*. This causes:
+- Color math (`GetBrighterColor`, `GetDimColor`) to operate on `Color.None`'s sentinel RGB (255,255,255,alpha=0) producing wrong results
+- Scheme role derivation (Focus, Active, Highlight, etc.) to produce poor contrast on light-background terminals
+- No way to determine if the terminal has a dark or light background
 
-This plan adds two capabilities (PowerShell `$PSStyle.Formatting` deferred to a future PR):
-1. **OSC 10/11 queries** to discover the terminal's actual default fg/bg colors
-2. **`$TERM`/`$COLORTERM`** environment variable integration
+This plan has three phases:
+1. **Parts A & C (DONE):** OSC 10/11 queries + environment variable detection
+2. **Part D (NEW):** Revamp `GetBrighterColor`/`GetDimColor` for dark/light awareness
+3. **Part E (NEW):** Revamp built-in Themes to use `Color.None` smartly
 
 ---
 
-## Part A: OSC 10/11 Terminal Color Querying
+## Part A: OSC 10/11 Terminal Color Querying — DONE
 
-### A.1: Parser Challenge — OSC Response Termination
+All items implemented in commits `8a0cbb062..01bb8c940`.
 
-**The critical issue:** The ANSI response parser (`AnsiResponseParserBase.cs:147-154`) treats ESC as the start of a *new* sequence. But OSC responses can end with ST = `ESC\`, which would cause the parser to break the OSC response in two.
+### A.1: Parser — OSC Response Termination — DONE
+- Added `_inOscSequence` flag to `AnsiResponseParserBase.cs`
+- Handles both ST (`ESC\`) and BEL (`\a`) as OSC terminators
+- ESC inside OSC sequences is accumulated rather than treated as new sequence start
 
-**Solution:** Add an `_inOscSequence` flag to `AnsiResponseParserBase`. When the parser is in `ExpectingEscapeSequence` state and sees `]` (line 128-137), set `_inOscSequence = true`. Then in `InResponse` state (line 147), when `_inOscSequence` is true:
-- If ESC is seen, **do not release**. Instead, continue accumulating (ESC is part of ST).
-- On the next character: if it's `\`, the ST is complete — call `HandleHeldContent()` to match.
-- If the next char after ESC is anything else, it's malformed — release and reset.
-- Also handle BEL (`\a`, 0x07) as an alternative OSC terminator: when accumulated content starts with `ESC]` and ends with `\a`, treat as complete.
+### A.2: AnsiResponseExpectation.Matches() — DONE
+- Added OSC `]` regex matching alongside existing CSI `[` matching
+- Updated fallback `Contains` check
 
-**Files to modify:**
-- `Terminal.Gui/Drivers/AnsiHandling/AnsiResponseParserBase.cs`
-  - Add `private bool _inOscSequence;` field
-  - In `ExpectingEscapeSequence` case (line 128): when next char is `]`, set `_inOscSequence = true`
-  - In `InResponse` case (line 147): if `_inOscSequence && isEscape`, accumulate instead of releasing. Track "expecting ST backslash" state.
-  - In `ResetState()` (line 60): reset `_inOscSequence = false`
+### A.3: OSC 10/11 Definitions in EscSeqUtils — DONE
+- `OSC_QueryForegroundColor` and `OSC_QueryBackgroundColor` definitions
+- `TryParseOscColorResponse()` parser handling both 4-digit (16-bit) and 2-digit (8-bit) hex per channel
 
-### A.2: Update AnsiResponseExpectation.Matches() for OSC Format
+### A.4: `DefaultAttribute` on IDriver — DONE
+- `IDriver.DefaultAttribute` property (nullable)
+- `DriverImpl.SetDefaultAttribute()` internal setter
 
-**File:** `Terminal.Gui/Drivers/AnsiHandling/AnsiResponseExpectation.cs`
+### A.5: TerminalColorDetector — DONE
+- New file: `Terminal.Gui/Drivers/AnsiHandling/TerminalColorDetector.cs`
+- Chains OSC 10 → OSC 11 queries with abandoned fallback
+- Skips on `IsLegacyConsole`
 
-The current `Matches()` regex at line 39 only handles CSI: `@"^\[(\d+);"`. Add OSC matching:
+### A.6: Startup Wiring — DONE
+- `MainLoopCoordinator.BuildDriverIfPossible()` triggers `TerminalColorDetector`
+- Gated on `ColorCapabilities` (only for Colors256/TrueColor)
 
-```csharp
-// After stripping leading ESC:
-// Existing CSI: ^\[(\d+);
-// New OSC:      ^\](\d+);
-Match oscMatch = Regex.Match (s, @"^\](\d+);");
-if (oscMatch.Success)
-{
-    return string.Equals (oscMatch.Groups [1].Value, Value, StringComparison.Ordinal);
-}
-```
-
-Also update the fallback `Contains` check (line 47) to include `]`.
-
-### A.3: Add OSC 10/11 Definitions and Response Parser to EscSeqUtils
-
-**File:** `Terminal.Gui/Drivers/AnsiHandling/EscSeqUtils/EscSeqUtils.cs`
-
-Add after the existing `#region OSC` section (line 1057):
-
-```csharp
-public static readonly AnsiEscapeSequence OSC_QueryForegroundColor = new ()
-{
-    Request = $"{OSC}10;?{ST}",
-    Terminator = ST,  // ESC\
-    Value = "10"
-};
-
-public static readonly AnsiEscapeSequence OSC_QueryBackgroundColor = new ()
-{
-    Request = $"{OSC}11;?{ST}",
-    Terminator = ST,
-    Value = "11"
-};
-
-public static bool TryParseOscColorResponse (string? response, out Color? color)
-{
-    // Parses: ESC]10;rgb:RRRR/GGGG/BBBB ST  (or with \a terminator)
-    // Handles both 4-digit (16-bit) and 2-digit (8-bit) per-channel hex
-    // Takes high byte of 16-bit values
-}
-```
-
-### A.4: Add `DefaultAttribute` to IDriver
-
-**File:** `Terminal.Gui/Drivers/IDriver.cs` — in `#region Color Support` (after line 127):
-
-```csharp
-/// <summary>
-///     Gets the terminal's actual default foreground and background colors,
-///     queried via OSC 10/11 at driver startup.
-///     <see langword="null"/> if the terminal did not respond.
-/// </summary>
-Attribute? DefaultAttribute { get; }
-```
-
-**File:** `Terminal.Gui/Drivers/DriverImpl.cs` — implement with backing field + internal setter:
-
-```csharp
-private Attribute? _defaultAttribute;
-public Attribute? DefaultAttribute => _defaultAttribute;
-internal void SetDefaultAttribute (Attribute attr) => _defaultAttribute = attr;
-```
-
-### A.5: Create TerminalColorDetector
-
-**New file:** `Terminal.Gui/Drivers/AnsiHandling/TerminalColorDetector.cs`
-
-Follows the `SixelSupportDetector` pattern — chains two async ANSI requests:
-1. Send OSC 10 query → parse fg color from response
-2. Send OSC 11 query → parse bg color from response
-3. Deliver result via callback: `Action<Color?, Color?>`
-4. Skip query if `IsLegacyConsole` is true
-5. Handle `Abandoned` callbacks gracefully (terminal doesn't support OSC)
-
-### A.6: Trigger Detection at Driver Startup
-
-**File:** `Terminal.Gui/App/MainLoop/MainLoopCoordinator.cs` — in `BuildDriverIfPossible()` (after line 151):
-
-```csharp
-// After: _loop.SizeMonitor.Initialize(_driver);
-TerminalColorDetector colorDetector = new (_driver);
-colorDetector.Detect ((fg, bg) =>
-{
-    if (fg is { } || bg is { })
-    {
-        _driver.SetDefaultAttribute (new Attribute (
-            fg ?? Color.White,
-            bg ?? Color.Black));
-
-        // Make queried colors available for scheme derivation
-        Scheme.TerminalDefaultAttribute = _driver.DefaultAttribute;
-    }
-});
-```
-
-### A.7: Use Queried Colors in Scheme Derivation
-
-**File:** `Terminal.Gui/Drawing/Scheme.cs`
-
-Add a static property:
-
-```csharp
-internal static Attribute? TerminalDefaultAttribute { get; set; }
-```
-
-Replace `ResolveNoneToBlack` (line 530) with `ResolveNone`:
-
-```csharp
-private static Color ResolveNone (Color color, bool isForeground = false)
-{
-    if (color != Color.None) return color;
-
-    if (TerminalDefaultAttribute is { } attr)
-        return isForeground ? attr.Foreground : attr.Background;
-
-    return isForeground ? new Color (255, 255, 255) : new Color (0, 0, 0);
-}
-```
-
-Update call sites:
-- Line 277: `ResolveNone(Normal.Background)` (was `ResolveNoneToBlack`)
-- Line 290: `ResolveNone(Normal.Background).GetBrighterColor()` — wrap Highlight derivation similarly
-- Line 298: `ResolveNone(Normal.Foreground, true).GetDimColor()` — Editable derivation
+### A.7: Scheme.ResolveNone — DONE
+- `ResolveNone(color, defaultTerminalColors, isForeground)` replaces old `ResolveNoneToBlack`
+- `GetAttributeForRole()` now accepts `Attribute? defaultTerminalColors` parameter
+- `View.GetAttributeForRole()` passes `App?.Driver?.DefaultAttribute` through
 
 ---
 
 ## Part B: PowerShell `$PSStyle.Formatting` Integration
 
-**DEFERRED** — Too complicated and narrow audience for this PR. Can be added in a future PR using `ClipboardProcessRunner.Process()` to spawn `pwsh`.
+**DEFERRED** — Too complicated and narrow audience for this PR.
 
 ---
 
-## Part C: `$TERM` / `$COLORTERM` Environment Variable Integration
+## Part C: `$TERM` / `$COLORTERM` Environment Variable Integration — DONE
 
-### C.1: Create TerminalEnvironmentDetector
+### C.1: TerminalEnvironmentDetector — DONE
+- New file: `Terminal.Gui/Drivers/TerminalEnvironment/TerminalEnvironmentDetector.cs`
+- Reads `TERM`, `COLORTERM`, `TERM_PROGRAM`, `WT_SESSION`, `NO_COLOR`
+- Maps to `ColorCapabilityLevel` enum
 
-**New file:** `Terminal.Gui/Drivers/TerminalEnvironment/TerminalEnvironmentDetector.cs`
+### C.2: TerminalColorCapabilities — DONE
+- New file: `Terminal.Gui/Drivers/TerminalEnvironment/TerminalColorCapabilities.cs`
+- New file: `Terminal.Gui/Drivers/TerminalEnvironment/ColorCapabilityLevel.cs`
+- `NoColor`, `Colors16`, `Colors256`, `TrueColor` levels
 
-```csharp
-public static class TerminalEnvironmentDetector
-{
-    public static TerminalColorCapabilities DetectColorCapabilities ()
-    {
-        // Read: TERM, COLORTERM, TERM_PROGRAM, WT_SESSION
-        // Map to capability level:
-        //   TERM=dumb           → NoColor
-        //   TERM=linux          → Colors16
-        //   COLORTERM=truecolor → TrueColor
-        //   COLORTERM=24bit     → TrueColor
-        //   WT_SESSION present  → TrueColor (Windows Terminal)
-        //   *-256color          → Colors256
-        //   Default             → TrueColor
-    }
-}
-```
+### C.3: Integration in ApplicationImpl.Driver.cs — DONE
+- Runs after driver creation, before OSC queries
+- Sets `Force16Colors = true` for `NoColor`/`Colors16`
 
-### C.2: TerminalColorCapabilities Record
-
-```csharp
-public record TerminalColorCapabilities
-{
-    public string? Term { get; init; }
-    public string? ColorTerm { get; init; }
-    public string? TermProgram { get; init; }
-    public bool IsWindowsTerminal { get; init; }
-    public ColorCapabilityLevel Capability { get; internal set; }
-}
-
-public enum ColorCapabilityLevel { NoColor, Colors16, Colors256, TrueColor }
-```
-
-### C.3: Integrate into Driver Creation — Run BEFORE OSC Queries
-
-**File:** `Terminal.Gui/App/ApplicationImpl.Driver.cs` — after `Driver.Force16Colors = ...` (line 108):
-
-```csharp
-TerminalColorCapabilities caps = TerminalEnvironmentDetector.DetectColorCapabilities ();
-Driver.ColorCapabilities = caps;
-
-if (caps.Capability is ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16)
-{
-    Driver.Force16Colors = true;
-}
-```
-
-**Important:** Environment detection must run before the OSC 10/11 queries in `MainLoopCoordinator.BuildDriverIfPossible()`. The `TerminalColorDetector` should check `ColorCapabilities` and skip the query if `Capability` is `NoColor` or `Colors16` (these terminals typically don't support OSC).
-
-### C.4: Add to IDriver
-
-```csharp
-// In IDriver.cs, Color Support region:
-TerminalColorCapabilities? ColorCapabilities { get; }
-```
+### C.4: ColorCapabilities on IDriver — DONE
+- `IDriver.ColorCapabilities` property
+- `DriverImpl.SetColorCapabilities()` internal setter
 
 ---
 
-## Implementation Sequence
+## Part D: Revamp `GetBrighterColor` / `GetDimColor` for Dark/Light Awareness — NEW
 
-| Phase | Work | Dependencies |
-|-------|------|-------------|
-| **1** | Parser: OSC support in `AnsiResponseParserBase` + `AnsiResponseExpectation` | None |
-| **2** | `EscSeqUtils`: OSC 10/11 definitions + `TryParseOscColorResponse` | None (parallel with 1) |
-| **3** | `TerminalEnvironmentDetector` + `ColorCapabilities` | None (parallel with 1, 2) |
-| **4** | `TerminalColorDetector` class (gates on `ColorCapabilities`) | Phase 1, 2, 3 |
-| **5** | `IDriver.DefaultAttribute` + `DriverImpl` + startup wiring | Phase 4 |
-| **6** | `Scheme.ResolveNone` — use queried colors in derivation | Phase 5 |
-| **7** | Tests for all of the above | All phases |
+### Problem Statement
 
-## Key Files to Modify
+`GetBrighterColor` and `GetDimColor` (in `Color.cs:297` and `Color.cs:344`) operate purely on the input color's own lightness, with no awareness of the surrounding context (dark vs light background). This produces visually broken results in the `Scheme` derivation algorithm when `Color.None` resolves to a light background color.
+
+**Specific issues:**
+
+1. **`GetDimColor` always darkens.** On a light background (e.g., resolved `Color.None` → white), "dimming" should make colors *lighter* (closer to the background), not darker. Currently it unconditionally reduces lightness, which on a light bg produces dark colors that are *more* prominent, the opposite of "dim."
+
+2. **`GetBrighterColor` is context-unaware for contrast.** It does adjust direction based on the color's own lightness (brightens dark, darkens light), but when used for Focus/Active/Highlight derivation, it doesn't know whether the *result* needs to contrast against a dark or light background.
+
+3. **`GetDimColor` returns `DarkGray` for very dark inputs (L ≤ 0.1).** This hardcoded fallback is wrong on light backgrounds where the dim color should be a light gray.
+
+4. **The Scheme derivation algorithm** (`Scheme.cs:277-312`) applies `GetBrighterColor`/`GetDimColor` after `ResolveNone`, but the resolved color values don't carry enough context about whether we're operating in a "dark mode" or "light mode" environment.
+
+### Proposed Solution
+
+Add an overload (or optional parameter) to `GetBrighterColor` and `GetDimColor` that accepts the terminal's background color, enabling direction-aware adjustments.
+
+#### D.1: Add `isDarkBackground` context to `GetDimColor`
+
+**File:** `Terminal.Gui/Drawing/Color/Color.cs`
+
+```csharp
+/// <summary>
+///     Returns a "dimmed" version of this color appropriate for the given background context.
+///     On dark backgrounds, dims by reducing lightness (darker). On light backgrounds, dims by
+///     increasing lightness (lighter/washed out), moving the color toward the background.
+/// </summary>
+/// <param name="dimAmount">The percent amount to dim. Default is 20%.</param>
+/// <param name="isDarkBackground">
+///     If <see langword="true"/>, dims by darkening. If <see langword="false"/>, dims by lightening.
+///     If <see langword="null"/>, auto-detects based on this color's own lightness (current behavior).
+/// </param>
+public Color GetDimColor (double dimAmount = 0.2, bool? isDarkBackground = null)
+```
+
+**Algorithm change:**
+- When `isDarkBackground == true` (or `null` and color is light): reduce lightness (current behavior)
+- When `isDarkBackground == false`: *increase* lightness toward 1.0 (washes out toward white)
+- Replace the hardcoded `DarkGray` fallback: when already at the extreme for the given direction, return a context-appropriate gray (`DarkGray` for dark bg, `LightGray` for light bg)
+
+#### D.2: Add `isDarkBackground` context to `GetBrighterColor`
+
+**File:** `Terminal.Gui/Drawing/Color/Color.cs`
+
+```csharp
+/// <summary>
+///     Returns a "highlighted" version of this color — visually more prominent against
+///     the given background context.
+/// </summary>
+/// <param name="brightenAmount">The percent amount to adjust. Default is 20%.</param>
+/// <param name="isDarkBackground">
+///     If <see langword="true"/>, brightens (increases lightness). If <see langword="false"/>,
+///     darkens (decreases lightness). If <see langword="null"/>, auto-detects (current behavior).
+/// </param>
+public Color GetBrighterColor (double brightenAmount = 0.2, bool? isDarkBackground = null)
+```
+
+**Algorithm change:**
+- When `isDarkBackground == true`: always increase lightness (brighter = more visible on dark bg)
+- When `isDarkBackground == false`: always decrease lightness (darker = more visible on light bg)
+- When `isDarkBackground == null`: current heuristic (based on color's own L value, for backward compat)
+
+#### D.3: Add `IsDarkColor()` helper to `Color`
+
+**File:** `Terminal.Gui/Drawing/Color/Color.cs`
+
+```csharp
+/// <summary>
+///     Returns <see langword="true"/> if this color is "dark" (HSL lightness < 0.5).
+/// </summary>
+public bool IsDarkColor ()
+{
+    HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
+    return hsl.L / 255.0 < 0.5;
+}
+```
+
+This is used by `Scheme.ResolveNone` to determine the `isDarkBackground` parameter.
+
+#### D.4: Update `Scheme.GetAttributeForRoleCore` to pass background context
+
+**File:** `Terminal.Gui/Drawing/Scheme.cs`
+
+In the derivation algorithm, determine whether the resolved background is dark or light, and pass that context to `GetBrighterColor`/`GetDimColor`:
+
+```csharp
+// In the derivation switch:
+VisualRole.Active => ... with
+{
+    // Determine if the focus background is dark
+    Color focusBg = ResolveNone (...Focus bg...);
+    bool isDark = focusBg.IsDarkColor ();
+
+    Foreground = ResolveNone (...Focus fg...).GetBrighterColor (0.2, isDark),
+    Background = focusBg.GetDimColor (0.2, isDark),
+    Style = ... | TextStyle.Bold
+},
+```
+
+Apply the same pattern to:
+- **Active**: `Focus.fg.GetBrighterColor(isDark)`, `Focus.bg.GetDimColor(isDark)`
+- **Highlight**: `Normal.bg.GetBrighterColor(isDark)` where `isDark` is based on `Normal.bg`
+- **Editable**: `Normal.fg.GetDimColor(0.5, isDark)` where `isDark` is based on resolved `Normal.bg`
+- **ReadOnly**: `Editable.fg.GetDimColor(0.05, isDark)`
+- **Disabled**: `Normal.fg.GetDimColor(0.05, isDark)`
+
+#### D.5: Backward Compatibility
+
+- The default parameter `isDarkBackground = null` preserves existing behavior for all direct callers
+- Only the Scheme derivation code passes explicit `isDarkBackground` values
+- Existing tests that don't use `Color.None` see identical results
+
+### Files to Modify
 
 | File | Change |
 |------|--------|
-| `Terminal.Gui/Drivers/AnsiHandling/AnsiResponseParserBase.cs` | Add `_inOscSequence` flag, OSC accumulation logic |
-| `Terminal.Gui/Drivers/AnsiHandling/AnsiResponseExpectation.cs` | Add `]` regex for OSC matching |
-| `Terminal.Gui/Drivers/AnsiHandling/EscSeqUtils/EscSeqUtils.cs` | OSC 10/11 definitions, `TryParseOscColorResponse` |
-| `Terminal.Gui/Drivers/IDriver.cs` | `DefaultAttribute`, `ColorCapabilities` properties |
-| `Terminal.Gui/Drivers/DriverImpl.cs` | Implement new properties |
-| `Terminal.Gui/Drawing/Scheme.cs` | `TerminalDefaultAttribute`, rename/expand `ResolveNoneToBlack` |
-| `Terminal.Gui/App/MainLoop/MainLoopCoordinator.cs` | Trigger `TerminalColorDetector` |
-| `Terminal.Gui/App/ApplicationImpl.Driver.cs` | Trigger `TerminalEnvironmentDetector` |
+| `Terminal.Gui/Drawing/Color/Color.cs` | Add `isDarkBackground` param to `GetBrighterColor`/`GetDimColor`; add `IsDarkColor()` |
+| `Terminal.Gui/Drawing/Scheme.cs` | Pass background context to color math calls in derivation |
 
-## Existing Utilities to Reuse
+### Tests
 
-| File | Utility |
-|------|---------|
-| `Terminal.Gui/Drivers/AnsiHandling/AnsiRequestScheduler.cs` | Request throttling + abandoned timeout (1s) |
-| `Terminal.Gui/Drivers/Sixel/SixelSupportDetector.cs` | Pattern for chained async ANSI queries with callbacks |
+Add to `Tests/UnitTestsParallelizable`:
+- `GetBrighterColor_WithDarkBackground_IncreasesLightness`
+- `GetBrighterColor_WithLightBackground_DecreasesLightness`
+- `GetDimColor_WithDarkBackground_DecreasesLightness`
+- `GetDimColor_WithLightBackground_IncreasesLightness`
+- `GetDimColor_VeryDarkInput_LightBackground_ReturnsLightGray`
+- `IsDarkColor_DarkColors_ReturnsTrue`
+- `IsDarkColor_LightColors_ReturnsFalse`
+- `SchemeDerivation_WithLightTerminalBackground_ProducesReadableColors`
+- `SchemeDerivation_WithDarkTerminalBackground_ProducesReadableColors`
 
-## New Files
+---
 
-| File | Purpose |
-|------|---------|
-| `Terminal.Gui/Drivers/AnsiHandling/TerminalColorDetector.cs` | OSC 10/11 async query |
-| `Terminal.Gui/Drivers/TerminalEnvironment/TerminalEnvironmentDetector.cs` | `$TERM`/`$COLORTERM` parsing |
-| `Terminal.Gui/Drivers/TerminalEnvironment/TerminalColorCapabilities.cs` | Capability data record |
+## Part E: Revamp Themes to Use `Color.None` Smartly — NEW
+
+### Problem Statement
+
+The Default (hardcoded) theme uses `Color.None` for both fg and bg in `Base` and `Runnable`, letting the terminal's native colors show through. However, none of the config.json themes take advantage of `Color.None`. Some themes are natural candidates for transparency, while others are not.
+
+### Design Principles
+
+1. **`Color.None` for background** means the terminal's own background shows through. Good for themes that want to blend with the user's terminal setup.
+2. **`Color.None` for foreground** means the terminal's default text color shows through. Good for themes that don't enforce a specific text color.
+3. **Monochrome themes** (Green Phosphor, Amber Phosphor) should use `Color.None` for background but **NOT** for foreground — their identity *is* the specific fg color.
+4. **Fully styled themes** (TurboPascal 5, Anders, 8-Bit, Hot Dog Stand) should NOT use `Color.None` — their specific color choices are the whole point.
+5. **Dark/Light themes** should use `Color.None` only for the Runnable and Base scheme backgrounds, since they are designed to float over the terminal bg. Dialog, Menu, Error need explicit bg for visual separation.
+
+### Theme-by-Theme Plan
+
+#### E.1: `Terminal.Gui/Resources/config.json`
+
+| Theme | Change | Rationale |
+|-------|--------|-----------|
+| **Dark** | `Runnable.Normal.Background` → `"None"`, `Base.Normal.Background` → `"None"` | Dark theme should blend with dark terminal bg. Dialog/Menu/Error keep explicit dark colors for layering. |
+| **Light** | `Runnable.Normal.Background` → `"None"`, `Base.Normal.Background` → `"None"` | Light theme should blend with light terminal bg. Dialog/Menu/Error keep explicit light colors. |
+| **Green Phosphor** | `Runnable.Normal.Background` → `"None"`, `Base.Normal.Background` → `"None"` | Green fg on terminal bg. Fg stays `GreenPhosphor`. |
+| **Amber Phosphor** | `Runnable.Normal.Background` → `"None"`, `Base.Normal.Background` → `"None"` | Amber fg on terminal bg. Fg stays `AmberPhosphor`. |
+| **TurboPascal 5** | No change | Retro theme with intentional Blue bg — `Color.None` would break the aesthetic. |
+| **Anders** | No change | Dark-blue base bg is part of the identity. |
+| **8-Bit** | No change | B&W theme with fully explicit colors; `Color.None` adds no value since it already uses Black/White. |
+
+**Detail for Dark theme:**
+```json
+"Base": {
+  "Normal": {
+    "Foreground": "LightGray",
+    "Background": "None",      // was "Black"
+    "Style": "None"
+  },
+  // Focus, HotNormal, etc. keep explicit colors for contrast
+  ...
+}
+```
+
+For roles that derive from `Normal.Background` (Focus swaps fg/bg, Active dims bg, etc.), the derivation algorithm will use `ResolveNone` → `DefaultAttribute` → terminal's actual bg. With Part D's dark/light awareness, the derived colors will be correct.
+
+**Detail for Green Phosphor:**
+```json
+"Runnable": {
+  "Normal": {
+    "Foreground": "GreenPhosphor",   // KEEP - this IS the theme
+    "Background": "None",            // was "Black" — let terminal bg shine through
+    "Style": "None"
+  }
+},
+"Base": {
+  "Normal": {
+    "Foreground": "GreenPhosphor",   // KEEP
+    "Background": "None",            // was "Black"
+    "Style": "None"
+  },
+  // Active, Highlight, Editable keep their explicit overrides
+  ...
+}
+```
+
+Note: Green/Amber Phosphor's `Dialog` and `Menu` schemes use *inverted* colors (Black on GreenPhosphor) — these should NOT use `Color.None` since the inversion is intentional.
+
+#### E.2: `Examples/UICatalog/Resources/config.json`
+
+| Theme | Change | Rationale |
+|-------|--------|-----------|
+| **Hot Dog Stand** | No change | Fully explicit novelty theme. |
+| **UI Catalog** | No change | Fully explicit demo theme. |
+
+### Cascade Effects
+
+When `Normal.Background` is `Color.None` in a config theme, the derivation algorithm produces:
+- **Focus**: fg = ResolveNone(bg) → terminal bg color; bg = ResolveNone(fg) → terminal fg color (or explicit fg)
+- **Active**: derived from Focus with `GetBrighterColor`/`GetDimColor` — Part D ensures correct direction
+- **Highlight**: fg = ResolveNone(Normal.bg).GetBrighterColor() — correct with Part D
+- **Editable**: bg = ResolveNone(Normal.fg).GetDimColor() — correct with Part D
+
+For roles that have explicit overrides in the config (e.g., Dark theme defines explicit Focus, Active, Highlight, etc.), the `Color.None` in `Normal` only affects roles that are NOT explicitly overridden. Since the Dark and Light themes already override most roles explicitly, the immediate visual impact is limited to the main background area — which is exactly what we want.
+
+For Green/Amber Phosphor, the roles that are NOT explicitly overridden (Focus, HotNormal, HotFocus, Disabled, HotActive) will derive from the `Color.None` bg. This should work well because:
+- Focus: terminal bg on GreenPhosphor (readable on both dark and light terminals)
+- Disabled: GreenPhosphor dimmed (via Part D, direction-aware)
+
+### Files to Modify
+
+| File | Change |
+|------|--------|
+| `Terminal.Gui/Resources/config.json` | Update Dark, Light, Green Phosphor, Amber Phosphor schemes |
+
+### Verification
+
+1. **Manual testing** — Run UICatalog with each modified theme on:
+   - Dark terminal background (e.g., Windows Terminal dark theme)
+   - Light terminal background (e.g., Windows Terminal light theme)
+   - Verify readable text, proper focus/highlight contrast, correct Dialog/Menu layering
+2. **Unit tests** — Existing `SchemeTests.ColorNoneDerivationTests` cover derivation correctness
+
+---
+
+## Implementation Sequence (Updated)
+
+| Phase | Work | Status |
+|-------|------|--------|
+| **1** | Parser: OSC support in `AnsiResponseParserBase` + `AnsiResponseExpectation` | **DONE** |
+| **2** | `EscSeqUtils`: OSC 10/11 definitions + `TryParseOscColorResponse` | **DONE** |
+| **3** | `TerminalEnvironmentDetector` + `ColorCapabilities` | **DONE** |
+| **4** | `TerminalColorDetector` class (gates on `ColorCapabilities`) | **DONE** |
+| **5** | `IDriver.DefaultAttribute` + `DriverImpl` + startup wiring | **DONE** |
+| **6** | `Scheme.ResolveNone` — use queried colors in derivation | **DONE** |
+| **7** | Tests for A.1–A.7 and C.1–C.4 | **DONE** |
+| **8** | `GetBrighterColor`/`GetDimColor` dark/light awareness (Part D) | TODO |
+| **9** | Theme config.json revamp with `Color.None` (Part E) | TODO — depends on Phase 8 |
+| **10** | Tests for Parts D and E | TODO |
 
 ## Edge Cases
 
-1. **Terminal doesn't respond to OSC** — `Abandoned` callback fires (1s timeout from `AnsiRequestScheduler`). `DefaultAttribute` stays null. `ResolveNone` falls back to White/Black.
-2. **Terminal responds with BEL instead of ST** — Parser handles both: BEL is a single char (doesn't trigger ESC release), ST is handled via the new `_inOscSequence` flag.
-3. **Legacy console (conhost)** — `TerminalColorDetector.Detect()` checks `IsLegacyConsole` and skips query entirely.
-4. **tmux/screen** — May intercept OSC queries. Handled by the same `Abandoned` timeout.
-5. **Race condition (async response)** — First frame renders with fallback colors. When OSC response arrives, `Scheme.TerminalDefaultAttribute` is updated. Next natural `Draw` cycle picks up the correct colors (no forced redraw).
-6. **Color.None in GetBrighterColor/GetDimColor** — The `ResolveNone` call wraps these so they never operate on `Color.None`'s sentinel RGB.
-7. **`TERM=dumb`** — `Force16Colors` is set. OSC queries are **skipped** (gated on `ColorCapabilities`).
-
-## Verification
-
-1. **Unit tests** (in `Tests/UnitTestsParallelizable`):
-   - `TryParseOscColorResponse` with valid 16-bit, 8-bit, and malformed inputs
-   - `AnsiResponseExpectation.Matches()` with OSC response strings
-   - Parser integration: feed OSC response bytes through `AnsiResponseParser.ProcessInput()` and verify callback fires
-   - `ResolveNone` with and without `TerminalDefaultAttribute` set
-   - `TerminalEnvironmentDetector` with mocked env vars
-
-2. **Manual testing**:
-   - Run UICatalog in Windows Terminal → verify `DefaultAttribute` is populated
-   - Run UICatalog in VS Code terminal → verify OSC works
-   - Run with `TERM=dumb` → verify `Force16Colors` is set
-   - Check Focus/Highlight roles look correct with transparent backgrounds
+1. **Terminal doesn't respond to OSC** — `Abandoned` callback fires (1s timeout). `DefaultAttribute` stays null. `ResolveNone` falls back to White fg / Black bg. Part D's `isDarkBackground` defaults to `null` (auto-detect from color's own lightness).
+2. **Terminal responds with BEL instead of ST** — Parser handles both terminators. ✅
+3. **Legacy console (conhost)** — `TerminalColorDetector` skips query. Falls back to White/Black. ✅
+4. **tmux/screen** — May intercept OSC queries. Handled by `Abandoned` timeout. ✅
+5. **Race condition (async response)** — First frame uses fallback colors; next draw cycle picks up queried colors. ✅
+6. **Light terminal background** — Part D ensures `GetDimColor` washes out (increases L) instead of darkening. Part E's `Color.None` bg resolves to the light color, and derivation adjusts accordingly.
+7. **Green/Amber Phosphor on light bg** — fg stays the specific phosphor color. bg is `Color.None` → light terminal bg. Focus becomes terminal-bg-on-phosphor-fg. `GetDimColor` with `isDarkBackground=false` produces appropriately washed-out variants.
+8. **`TERM=dumb`** — `Force16Colors` is set. OSC queries are skipped. Themes with `Color.None` still resolve via fallback (White/Black). ✅
+9. **Config themes with explicit overrides** — When Dark/Light themes define explicit Focus/Active/etc. colors, `Color.None` in Normal only affects the base background. Explicit overrides are preserved as-is by the derivation algorithm.
