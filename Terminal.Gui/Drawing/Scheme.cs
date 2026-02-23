@@ -62,7 +62,7 @@ namespace Terminal.Gui.Drawing;
 ///                         <item>
 ///                             <description>
 ///                                 Setting <c>Background</c> to <see cref="Focus"/>'s background with
-///                                 <see cref="Color.GetDimColor(double, bool?)"/>, passing the same dark/light context.
+///                                 <see cref="Color.GetDimmerColor(double, bool?)"/>, passing the same dark/light context.
 ///                             </description>
 ///                         </item>
 ///                         <item>
@@ -106,7 +106,7 @@ namespace Terminal.Gui.Drawing;
 ///                         <item>
 ///                             <description>
 ///                                 Setting <c>Background</c> to <see cref="Normal"/>'s foreground with
-///                                 <see cref="Color.GetDimColor(double, bool?)"/> at 50%, using the
+///                                 <see cref="Color.GetDimmerColor(double, bool?)"/> at 50%, using the
 ///                                 <see cref="Normal"/> background's dark/light context.
 ///                             </description>
 ///                         </item>
@@ -116,14 +116,14 @@ namespace Terminal.Gui.Drawing;
 ///             <item>
 ///                 <description>
 ///                     <b>ReadOnly:</b> If not set, derived from <see cref="Editable"/> by dimming
-///                     the foreground with <see cref="Color.GetDimColor(double, bool?)"/> at 5%,
+///                     the foreground with <see cref="Color.GetDimmerColor(double, bool?)"/> at 5%,
 ///                     using the <see cref="Editable"/> background's dark/light context.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
 ///                     <b>Disabled:</b> If not set, derived from <see cref="Normal"/> by dimming
-///                     the foreground with <see cref="Color.GetDimColor(double, bool?)"/> at 5%,
+///                     the foreground with <see cref="Color.GetDimmerColor(double, bool?)"/> at 5%,
 ///                     using the <see cref="Normal"/> background's dark/light context.
 ///                 </description>
 ///             </item>
@@ -153,7 +153,7 @@ namespace Terminal.Gui.Drawing;
 ///         <b>Dark/Light Background Awareness:</b>
 ///         <br/>
 ///         When deriving roles that use color math (<see cref="Color.GetBrighterColor(double, bool?)"/> and
-///         <see cref="Color.GetDimColor(double, bool?)"/>), the algorithm determines whether the relevant background
+///         <see cref="Color.GetDimmerColor(double, bool?)"/>), the algorithm determines whether the relevant background
 ///         is dark or light via <see cref="Color.IsDarkColor"/>. This ensures correct visual results regardless
 ///         of whether the terminal has a dark or light background. For example, "dimming" a color on a light background
 ///         increases lightness (washing out toward white) rather than decreasing it.
@@ -323,7 +323,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 result = focus with
                 {
                     Foreground = ResolveNone (focus.Foreground, defaultTerminalColors, true).GetBrighterColor (0.2, isDark),
-                    Background = focusBg.GetDimColor (0.2, isDark),
+                    Background = focusBg.GetDimmerColor (0.2, isDark),
                     Style = focus.Style | TextStyle.Bold
                 };
 
@@ -356,7 +356,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 result = normal with
                 {
                     Foreground = resolvedFg,
-                    Background = resolvedFg.GetDimColor (0.5, isDark)
+                    Background = resolvedFg.GetDimmerColor (0.5, isDark)
                 };
 
                 break;
@@ -369,7 +369,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
                 result = editable with
                 {
-                    Foreground = editable.Foreground.GetDimColor (0.05, isDark)
+                    Foreground = editable.Foreground.GetDimmerColor (0.05, isDark)
                 };
 
                 break;
@@ -383,7 +383,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
                 result = normal with
                 {
-                    Foreground = ResolveNone (normal.Foreground, defaultTerminalColors, true).GetDimColor (0.05, isDark)
+                    Foreground = ResolveNone (normal.Foreground, defaultTerminalColors, true).GetDimmerColor (0.05, isDark)
                 };
 
                 break;

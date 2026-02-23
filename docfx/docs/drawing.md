@@ -173,10 +173,10 @@ When `Color.None` is used in a `Scheme`, the derivation algorithm resolves it to
 
 ### Dark/Light Background Awareness
 
-The `Color.IsDarkColor()` method returns `true` if a color's HSL lightness is below 50%. This is used by the `Scheme` derivation algorithm to determine the direction for `GetBrighterColor` and `GetDimColor`:
+The `Color.IsDarkColor()` method returns `true` if a color's HSL lightness is below 50%. This is used by the `Scheme` derivation algorithm to determine the direction for `GetBrighterColor` and `GetDimmerColor`:
 
 - `Color.GetBrighterColor(double, bool?)` — Makes a color more visually prominent. On dark backgrounds (or when auto-detecting), increases lightness. On light backgrounds, decreases lightness.
-- `Color.GetDimColor(double, bool?)` — Makes a color less visually prominent. On dark backgrounds, decreases lightness. On light backgrounds, increases lightness (washes out toward white).
+- `Color.GetDimmerColor(double, bool?)` — Makes a color less visually prominent. On dark backgrounds, decreases lightness. On light backgrounds, increases lightness (washes out toward white).
 
 Both methods accept an optional `isDarkBackground` parameter. When `null` (the default), they auto-detect from the color's own lightness for backward compatibility. The `Scheme` derivation algorithm passes explicit values based on the resolved background color.
 

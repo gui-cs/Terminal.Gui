@@ -5,13 +5,13 @@
 PR #4740 introduced `Color.None` — a sentinel (alpha=0) that tells the driver to emit `CSI 39m`/`CSI 49m` (reset fg/bg) instead of explicit RGB, letting the terminal's native colors show through. The Default theme's `Base` and `Runnable` schemes now use `Color.None` for both fg and bg.
 
 **Core Problem:** TG doesn't know what the terminal's actual default colors *are*. This causes:
-- Color math (`GetBrighterColor`, `GetDimColor`) to operate on `Color.None`'s sentinel RGB (255,255,255,alpha=0) producing wrong results
+- Color math (`GetBrighterColor`, `GetDimmerColor`) to operate on `Color.None`'s sentinel RGB (255,255,255,alpha=0) producing wrong results
 - Scheme role derivation (Focus, Active, Highlight, etc.) to produce poor contrast on light-background terminals
 - No way to determine if the terminal has a dark or light background
 
 This plan has three phases:
 1. **Parts A & C (DONE):** OSC 10/11 queries + environment variable detection
-2. **Part D (NEW):** Revamp `GetBrighterColor`/`GetDimColor` for dark/light awareness
+2. **Part D (NEW):** Revamp `GetBrighterColor`/`GetDimmerColor` for dark/light awareness
 3. **Part E (NEW):** Revamp built-in Themes to use `Color.None` smartly
 
 ---
@@ -81,27 +81,27 @@ All items implemented in commits `8a0cbb062..01bb8c940`.
 
 ---
 
-## Part D: Revamp `GetBrighterColor` / `GetDimColor` for Dark/Light Awareness — DONE
+## Part D: Revamp `GetBrighterColor` / `GetDimmerColor` for Dark/Light Awareness — DONE
 
 ### Problem Statement
 
-`GetBrighterColor` and `GetDimColor` (in `Color.cs:297` and `Color.cs:344`) operate purely on the input color's own lightness, with no awareness of the surrounding context (dark vs light background). This produces visually broken results in the `Scheme` derivation algorithm when `Color.None` resolves to a light background color.
+`GetBrighterColor` and `GetDimmerColor` (in `Color.cs:297` and `Color.cs:344`) operate purely on the input color's own lightness, with no awareness of the surrounding context (dark vs light background). This produces visually broken results in the `Scheme` derivation algorithm when `Color.None` resolves to a light background color.
 
 **Specific issues:**
 
-1. **`GetDimColor` always darkens.** On a light background (e.g., resolved `Color.None` → white), "dimming" should make colors *lighter* (closer to the background), not darker. Currently it unconditionally reduces lightness, which on a light bg produces dark colors that are *more* prominent, the opposite of "dim."
+1. **`GetDimmerColor` always darkens.** On a light background (e.g., resolved `Color.None` → white), "dimming" should make colors *lighter* (closer to the background), not darker. Currently it unconditionally reduces lightness, which on a light bg produces dark colors that are *more* prominent, the opposite of "dim."
 
 2. **`GetBrighterColor` is context-unaware for contrast.** It does adjust direction based on the color's own lightness (brightens dark, darkens light), but when used for Focus/Active/Highlight derivation, it doesn't know whether the *result* needs to contrast against a dark or light background.
 
-3. **`GetDimColor` returns `DarkGray` for very dark inputs (L ≤ 0.1).** This hardcoded fallback is wrong on light backgrounds where the dim color should be a light gray.
+3. **`GetDimmerColor` returns `DarkGray` for very dark inputs (L ≤ 0.1).** This hardcoded fallback is wrong on light backgrounds where the dim color should be a light gray.
 
-4. **The Scheme derivation algorithm** (`Scheme.cs:277-312`) applies `GetBrighterColor`/`GetDimColor` after `ResolveNone`, but the resolved color values don't carry enough context about whether we're operating in a "dark mode" or "light mode" environment.
+4. **The Scheme derivation algorithm** (`Scheme.cs:277-312`) applies `GetBrighterColor`/`GetDimmerColor` after `ResolveNone`, but the resolved color values don't carry enough context about whether we're operating in a "dark mode" or "light mode" environment.
 
 ### Proposed Solution
 
-Add an overload (or optional parameter) to `GetBrighterColor` and `GetDimColor` that accepts the terminal's background color, enabling direction-aware adjustments.
+Add an overload (or optional parameter) to `GetBrighterColor` and `GetDimmerColor` that accepts the terminal's background color, enabling direction-aware adjustments.
 
-### D.1: Add `isDarkBackground` context to `GetDimColor` — DONE
+### D.1: Add `isDarkBackground` context to `GetDimmerColor` — DONE
 
 Added optional `bool? isDarkBackground` parameter. When `true` (or `null`/default), reduces lightness. When `false`, increases lightness (washes out toward light bg). Extreme-value fallback now returns `Gray` for light backgrounds instead of always `DarkGray`. Thresholds use `hsl.L` directly (ColorHelper's 0-100 HSL scale).
 
@@ -118,7 +118,7 @@ Returns `true` if `hsl.L < 50` (using ColorHelper's 0-100 HSL L scale). Used by 
 Refactored from switch expression to switch statement to enable local variables. Each role that uses color math (Active, Highlight, Editable, ReadOnly, Disabled) now:
 1. Resolves the background color via `ResolveNone`
 2. Determines `isDark` via `IsDarkColor()`
-3. Passes `isDark` to `GetBrighterColor`/`GetDimColor`
+3. Passes `isDark` to `GetBrighterColor`/`GetDimmerColor`
 
 **Bug fix:** Fixed a stack cleanup bug in `GetAttributeForRoleCore` where explicitly-set roles were not removed from the recursion-guard `HashSet` on early return (line 271). This caused the old switch expression's redundant calls to `GetAttributeForRoleCore` for the same role to incorrectly return `Normal` instead of the explicit value. The refactoring to local variables also avoids triggering this bug.
 
@@ -132,9 +132,9 @@ Refactored from switch expression to switch statement to enable local variables.
 
 | File | Change |
 |------|--------|
-| `Terminal.Gui/Drawing/Color/Color.cs` | Added `isDarkBackground` param to `GetBrighterColor`/`GetDimColor`; added `IsDarkColor()` |
+| `Terminal.Gui/Drawing/Color/Color.cs` | Added `isDarkBackground` param to `GetBrighterColor`/`GetDimmerColor`; added `IsDarkColor()` |
 | `Terminal.Gui/Drawing/Scheme.cs` | Refactored derivation to switch statement; pass background context; fixed stack cleanup bug |
-| `Tests/UnitTestsParallelizable/Drawing/Color/ColorClassTests.DarkLightAwareness.cs` | **NEW** — 16 tests for `IsDarkColor`, `GetBrighterColor`, `GetDimColor` with background context |
+| `Tests/UnitTestsParallelizable/Drawing/Color/ColorClassTests.DarkLightAwareness.cs` | **NEW** — 16 tests for `IsDarkColor`, `GetBrighterColor`, `GetDimmerColor` with background context |
 | `Tests/UnitTestsParallelizable/Drawing/SchemeTests.ColorNoneDerivationTests.cs` | Added 5 dark/light awareness derivation tests |
 | `Tests/UnitTestsParallelizable/Configuration/DeepClonerTests.cs` | Fixed HotActive test value to account for corrected derivation |
 
@@ -216,9 +216,9 @@ Note: Green/Amber Phosphor's `Dialog` and `Menu` schemes use *inverted* colors (
 
 When `Normal.Background` is `Color.None` in a config theme, the derivation algorithm produces:
 - **Focus**: fg = ResolveNone(bg) → terminal bg color; bg = ResolveNone(fg) → terminal fg color (or explicit fg)
-- **Active**: derived from Focus with `GetBrighterColor`/`GetDimColor` — Part D ensures correct direction
+- **Active**: derived from Focus with `GetBrighterColor`/`GetDimmerColor` — Part D ensures correct direction
 - **Highlight**: fg = ResolveNone(Normal.bg).GetBrighterColor() — correct with Part D
-- **Editable**: bg = ResolveNone(Normal.fg).GetDimColor() — correct with Part D
+- **Editable**: bg = ResolveNone(Normal.fg).GetDimmerColor() — correct with Part D
 
 For roles that have explicit overrides in the config (e.g., Dark theme defines explicit Focus, Active, Highlight, etc.), the `Color.None` in `Normal` only affects roles that are NOT explicitly overridden. Since the Dark and Light themes already override most roles explicitly, the immediate visual impact is limited to the main background area — which is exactly what we want.
 
@@ -253,7 +253,7 @@ For Green/Amber Phosphor, the roles that are NOT explicitly overridden (Focus, H
 | **5** | `IDriver.DefaultAttribute` + `DriverImpl` + startup wiring | **DONE** |
 | **6** | `Scheme.ResolveNone` — use queried colors in derivation | **DONE** |
 | **7** | Tests for A.1–A.7 and C.1–C.4 | **DONE** |
-| **8** | `GetBrighterColor`/`GetDimColor` dark/light awareness (Part D) | **DONE** |
+| **8** | `GetBrighterColor`/`GetDimmerColor` dark/light awareness (Part D) | **DONE** |
 | **9** | Theme config.json revamp with `Color.None` (Part E) | TODO — depends on Phase 8 |
 | **10** | Tests for Part E | TODO |
 
@@ -264,7 +264,7 @@ For Green/Amber Phosphor, the roles that are NOT explicitly overridden (Focus, H
 3. **Legacy console (conhost)** — `TerminalColorDetector` skips query. Falls back to White/Black. ✅
 4. **tmux/screen** — May intercept OSC queries. Handled by `Abandoned` timeout. ✅
 5. **Race condition (async response)** — First frame uses fallback colors; next draw cycle picks up queried colors. ✅
-6. **Light terminal background** — Part D ensures `GetDimColor` washes out (increases L) instead of darkening. Part E's `Color.None` bg resolves to the light color, and derivation adjusts accordingly.
-7. **Green/Amber Phosphor on light bg** — fg stays the specific phosphor color. bg is `Color.None` → light terminal bg. Focus becomes terminal-bg-on-phosphor-fg. `GetDimColor` with `isDarkBackground=false` produces appropriately washed-out variants.
+6. **Light terminal background** — Part D ensures `GetDimmerColor` washes out (increases L) instead of darkening. Part E's `Color.None` bg resolves to the light color, and derivation adjusts accordingly.
+7. **Green/Amber Phosphor on light bg** — fg stays the specific phosphor color. bg is `Color.None` → light terminal bg. Focus becomes terminal-bg-on-phosphor-fg. `GetDimmerColor` with `isDarkBackground=false` produces appropriately washed-out variants.
 8. **`TERM=dumb`** — `Force16Colors` is set. OSC queries are skipped. Themes with `Color.None` still resolve via fallback (White/Black). ✅
 9. **Config themes with explicit overrides** — When Dark/Light themes define explicit Focus/Active/etc. colors, `Color.None` in Normal only affects the base background. Explicit overrides are preserved as-is by the derivation algorithm.

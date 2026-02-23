@@ -85,7 +85,7 @@ public class SchemeColorNoneDerivationTests (ITestOutputHelper output) : TestDri
         Scheme baseScheme = schemes ["Base"];
 
         // Editable.Foreground = ResolveNone(Normal.Foreground=Color.None, fg=true)
-        // Editable.Background = ResolveNone(Normal.Foreground=Color.None, fg=true).GetDimColor(0.5)
+        // Editable.Background = ResolveNone(Normal.Foreground=Color.None, fg=true).GetDimmerColor(0.5)
         // Both use the same resolved color, so bg is a dimmed version of fg.
         Attribute lightDefault = new (new Color (40, 40, 40), new Color (240, 240, 240));
         Attribute editableWithLight = baseScheme.GetAttributeForRole (VisualRole.Editable, lightDefault);
@@ -123,7 +123,7 @@ public class SchemeColorNoneDerivationTests (ITestOutputHelper output) : TestDri
         ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
         Scheme baseScheme = schemes ["Base"];
 
-        // Disabled.Foreground = ResolveNone(Normal.Foreground=Color.None, fg=true).GetDimColor(0.05)
+        // Disabled.Foreground = ResolveNone(Normal.Foreground=Color.None, fg=true).GetDimmerColor(0.05)
         // Without ResolveNone, this would dim Color.None's sentinel RGB (255,255,255) = wrong
         Attribute darkDefault = new (new Color (200, 200, 200), new Color (20, 20, 20));
         Attribute disabled = baseScheme.GetAttributeForRole (VisualRole.Disabled, darkDefault);
@@ -151,7 +151,7 @@ public class SchemeColorNoneDerivationTests (ITestOutputHelper output) : TestDri
 
         // Focus for dark terminal: fg=(20,20,20), bg=(200,200,200)
         // Active.Foreground = Focus.fg.GetBrighterColor(isDark=false because Focus.bg=(200,200,200) is light)
-        // Active.Background = Focus.bg.GetDimColor(isDark=false)
+        // Active.Background = Focus.bg.GetDimmerColor(isDark=false)
         // The Focus bg (200,200,200) is light, so isDark=false: brighter=darker, dim=lighter
         Assert.True (active.Style.HasFlag (TextStyle.Bold), "Active should have Bold style");
     }
@@ -238,7 +238,7 @@ public class SchemeColorNoneDerivationTests (ITestOutputHelper output) : TestDri
         Attribute lightDefault = new (new Color (40, 40, 40), new Color (240, 240, 240));
         Attribute disabled = baseScheme.GetAttributeForRole (VisualRole.Disabled, lightDefault);
 
-        // Disabled.Foreground = terminal_fg(40,40,40).GetDimColor(0.05, isDark=false)
+        // Disabled.Foreground = terminal_fg(40,40,40).GetDimmerColor(0.05, isDark=false)
         // isDark=false means "dim by increasing lightness (wash out)"
         // So disabled fg should be lighter than the original fg
         Assert.True (disabled.Foreground.R > 40 || disabled.Foreground.G > 40 || disabled.Foreground.B > 40,

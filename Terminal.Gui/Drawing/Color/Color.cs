@@ -341,7 +341,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     If <see langword="false"/>, dims by increasing lightness (washed out, toward the light background).
     ///     If <see langword="null"/>, always reduces lightness (default/backward-compatible behavior).
     /// </param>
-    public Color GetDimColor (double dimAmount = 0.2, bool? isDarkBackground = null)
+    public Color GetDimmerColor (double dimAmount = 0.2, bool? isDarkBackground = null)
     {
         HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
 

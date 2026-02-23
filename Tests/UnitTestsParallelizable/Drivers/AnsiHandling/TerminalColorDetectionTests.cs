@@ -339,7 +339,7 @@ public class TerminalColorDetectionTests
     {
         Scheme scheme = new () { Normal = new Attribute (Color.None, new Color (30, 30, 30)) };
 
-        // Editable calls GetDimColor on foreground — should not fail with Color.None
+        // Editable calls GetDimmerColor on foreground — should not fail with Color.None
         Attribute editable = scheme.GetAttributeForRole (VisualRole.Editable);
 
         Assert.NotEqual (default, editable);

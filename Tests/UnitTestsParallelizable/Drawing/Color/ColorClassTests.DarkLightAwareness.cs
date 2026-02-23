@@ -97,33 +97,33 @@ public partial class ColorClassTests
 
     #endregion
 
-    #region GetDimColor with isDarkBackground Tests
+    #region GetDimmerColor with isDarkBackground Tests
 
     [Fact]
-    public void GetDimColor_WithDarkBackground_DecreasesLightness ()
+    public void GetDimmerColor_WithDarkBackground_DecreasesLightness ()
     {
         Color color = new (150, 150, 150);
-        Color dimmed = color.GetDimColor (0.2, true);
+        Color dimmed = color.GetDimmerColor (0.2, true);
 
         // On dark background, dim should reduce lightness
         Assert.True (dimmed.R < color.R || dimmed.G < color.G || dimmed.B < color.B, "Dimming on dark background should decrease lightness");
     }
 
     [Fact]
-    public void GetDimColor_WithLightBackground_IncreasesLightness ()
+    public void GetDimmerColor_WithLightBackground_IncreasesLightness ()
     {
         Color color = new (100, 100, 100);
-        Color dimmed = color.GetDimColor (0.2, false);
+        Color dimmed = color.GetDimmerColor (0.2, false);
 
         // On light background, dim should increase lightness (wash out toward white)
         Assert.True (dimmed.R > color.R || dimmed.G > color.G || dimmed.B > color.B, "Dimming on light background should increase lightness");
     }
 
     [Fact]
-    public void GetDimColor_VeryDarkInput_DarkBackground_ReturnsDarkGray ()
+    public void GetDimmerColor_VeryDarkInput_DarkBackground_ReturnsDarkGray ()
     {
         Color veryDark = new (10, 10, 10);
-        Color dimmed = veryDark.GetDimColor (0.2, true);
+        Color dimmed = veryDark.GetDimmerColor (0.2, true);
 
         // Very dark color on dark bg should fall back to DarkGray
         Color darkGray = new (ColorName16.DarkGray);
@@ -131,10 +131,10 @@ public partial class ColorClassTests
     }
 
     [Fact]
-    public void GetDimColor_VeryLightInput_LightBackground_ReturnsGray ()
+    public void GetDimmerColor_VeryLightInput_LightBackground_ReturnsGray ()
     {
         Color veryLight = new (240, 240, 240);
-        Color dimmed = veryLight.GetDimColor (0.2, false);
+        Color dimmed = veryLight.GetDimmerColor (0.2, false);
 
         // Very light color on light bg should fall back to Gray
         Color gray = new (ColorName16.Gray);
@@ -142,23 +142,23 @@ public partial class ColorClassTests
     }
 
     [Fact]
-    public void GetDimColor_WithNullBackground_ReducesLightness ()
+    public void GetDimmerColor_WithNullBackground_ReducesLightness ()
     {
         // null isDarkBackground defaults to reducing lightness (backward compat)
         Color color = new (150, 150, 150);
-        Color dimmedNull = color.GetDimColor ();
-        Color dimmedTrue = color.GetDimColor (0.2, true);
+        Color dimmedNull = color.GetDimmerColor ();
+        Color dimmedTrue = color.GetDimmerColor (0.2, true);
 
         Assert.Equal (dimmedTrue, dimmedNull);
     }
 
     [Fact]
-    public void GetDimColor_NoArgs_BackwardCompatible ()
+    public void GetDimmerColor_NoArgs_BackwardCompatible ()
     {
         // No-argument call should behave identically to isDarkBackground=null (which defaults to true)
         Color color = new (150, 150, 150);
-        Color dimmedNoArgs = color.GetDimColor ();
-        Color dimmedNull = color.GetDimColor ();
+        Color dimmedNoArgs = color.GetDimmerColor ();
+        Color dimmedNull = color.GetDimmerColor ();
 
         Assert.Equal (dimmedNull, dimmedNoArgs);
     }
