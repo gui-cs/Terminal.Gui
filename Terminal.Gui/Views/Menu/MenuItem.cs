@@ -11,7 +11,7 @@ public class MenuItem : Shortcut
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>.
     /// </summary>
-    public MenuItem () : base (Key.Empty, null, null) => RebindEnterToActivate ();
+    public MenuItem () : base (Key.Empty, null, null) { }
 
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>, binding it to <paramref name="targetView"/> and
@@ -41,37 +41,46 @@ public class MenuItem : Shortcut
         TargetView = targetView;
         Command = command;
         SubMenu = subMenu;
-        RebindEnterToActivate ();
     }
 
     /// <inheritdoc/>
     public MenuItem (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null) : base (key ?? Key.Empty,
         commandText,
         action,
-        helpText) =>
-        RebindEnterToActivate ();
+        helpText)
+    { }
 
     /// <inheritdoc/>
-    public MenuItem (string commandText, Key key, Action? action = null) : base (key ?? Key.Empty, commandText, action) => RebindEnterToActivate ();
+    public MenuItem (string commandText, Key key, Action? action = null) : base (key ?? Key.Empty, commandText, action) { }
 
     /// <inheritdoc/>
-    public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText)
-    {
+    public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText) =>
         SubMenu = subMenu;
-        RebindEnterToActivate ();
-    }
 
-    /// <summary>
-    ///     In menu context, Enter means "select/activate this item" — not "accept/submit".
-    ///     Replaces the inherited <see cref="Key.Enter"/> → <see cref="Command.Accept"/> binding
-    ///     with <see cref="Key.Enter"/> → <see cref="Command.Activate"/> so the activation flows
-    ///     through the bridge architecture (closing the menu) instead of raising Accept which
-    ///     bubbles up to the host view.
-    /// </summary>
-    private void RebindEnterToActivate ()
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     In menu context, Enter means "activate this item and dismiss the menu" — not
+    ///     "accept/submit". When Accept arrives from a key binding (e.g. Enter), translates it
+    ///     into <see cref="Command.Activate"/> so it flows through the bridge architecture
+    ///     (MenuItem → Menu → CommandBridge → PopoverMenu), dismissing the menu.
+    ///     Without this, Accept would bubble past the menu hierarchy to the host view,
+    ///     triggering unintended exit behavior.
+    /// </remarks>
+    protected override bool OnAccepting (CommandEventArgs args)
     {
-        KeyBindings.Remove (Key.Enter);
-        KeyBindings.Add (Key.Enter, Command.Activate);
+        // Only convert key-binding-initiated Accept (e.g. Enter key).
+        // Programmatic InvokeCommand(Accept) without a binding should flow normally.
+        if (args.Context?.Binding is not KeyBinding)
+        {
+            return base.OnAccepting (args);
+        }
+
+        // Convert Accept → Activate. The binding is preserved so TryDispatchToTarget's
+        // relay-dispatch guard (ConsumeDispatch=false && binding is null) passes and
+        // the CommandView still receives Activate (e.g. CheckBox toggles).
+        InvokeCommand (Command.Activate, args.Context.Binding);
+
+        return true;
     }
 
     private CommandBridge? _subMenuBridge;
