@@ -13,7 +13,7 @@ public class SchemeManagerTests
     {
         Disable (true);
 
-        Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemesForCurrentTheme ();
+        Dictionary<string, Scheme?> schemes = SchemeManager.GetSchemesForCurrentTheme ();
         Assert.NotNull (schemes);
         Assert.NotNull (schemes ["Base"]);
         Assert.True (schemes!.ContainsKey ("Base"));
@@ -29,10 +29,10 @@ public class SchemeManagerTests
         {
             Enable (ConfigLocations.HardCoded);
 
-            Dictionary<string, Scheme?>? schemes = SchemeManager.GetSchemesForCurrentTheme ();
+            Dictionary<string, Scheme?> schemes = SchemeManager.GetSchemesForCurrentTheme ();
             Assert.NotNull (schemes);
             Assert.NotNull (schemes ["Base"]);
-            Assert.True (schemes!.ContainsKey ("Base"));
+            Assert.True (schemes.ContainsKey ("Base"));
             Assert.True (schemes.ContainsKey ("base"));
 
             Assert.Equal (SchemeManager.GetSchemes (), schemes);
@@ -75,29 +75,29 @@ public class SchemeManagerTests
         Assert.NotNull (schemes);
 
         // Base
-        Scheme? baseScheme = schemes! ["Base"];
+        Scheme? baseScheme = schemes ["Base"];
         Assert.NotNull (baseScheme);
-        Assert.Equal (new Attribute (StandardColor.LightBlue, Color.None), baseScheme.Normal);
+        Assert.Equal (new Attribute (Color.None, Color.None), baseScheme.Normal);
 
         // Dialog
         Scheme? dialogScheme = schemes ["Dialog"];
         Assert.NotNull (dialogScheme);
-        Assert.Equal (new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace), dialogScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace), dialogScheme.Normal);
 
         // Error
         Scheme? errorScheme = schemes ["Error"];
         Assert.NotNull (errorScheme);
-        Assert.Equal (new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack), errorScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack), errorScheme.Normal);
 
         // Menu (Bold style)
         Scheme? menuScheme = schemes ["Menu"];
         Assert.NotNull (menuScheme);
-        Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme.Normal);
 
         // Runnable (uses Color.None for transparent background)
         Scheme? runnableScheme = schemes ["Runnable"];
         Assert.NotNull (runnableScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, Color.None), runnableScheme!.Normal);
+        Assert.Equal (new Attribute (Color.None, Color.None), runnableScheme.Normal);
     }
 
     [Fact]
@@ -109,39 +109,39 @@ public class SchemeManagerTests
         Assert.NotNull (schemes);
 
         // Base
-        Scheme? baseScheme = schemes! ["Base"];
+        Scheme? baseScheme = schemes ["Base"];
         Assert.NotNull (baseScheme);
-        Assert.Equal (new Attribute (StandardColor.LightBlue, Color.None), baseScheme!.Normal);
+        Assert.Equal (new Attribute (Color.None, Color.None), baseScheme.Normal);
 
         // Dialog
         Scheme? dialogScheme = schemes ["Dialog"];
         Assert.NotNull (dialogScheme);
-        Assert.Equal (new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace), dialogScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace), dialogScheme.Normal);
 
         // Error
         Scheme? errorScheme = schemes ["Error"];
         Assert.NotNull (errorScheme);
-        Assert.Equal (new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack), errorScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack), errorScheme.Normal);
 
         // Menu (Bold style)
         Scheme? menuScheme = schemes ["Menu"];
         Assert.NotNull (menuScheme);
-        Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme.Normal);
 
         // Runnable (uses Color.None for transparent background)
         Scheme? runnableScheme = schemes ["Runnable"];
         Assert.NotNull (runnableScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, Color.None), runnableScheme!.Normal);
+        Assert.Equal (new Attribute (Color.None, Color.None), runnableScheme.Normal);
     }
 
     [Fact]
     public void Not_Case_Sensitive_Disabled ()
     {
         Assert.False (IsEnabled);
-        Dictionary<string, Scheme?>? current = SchemeManager.GetSchemesForCurrentTheme ();
+        Dictionary<string, Scheme?> current = SchemeManager.GetSchemesForCurrentTheme ();
         Assert.NotNull (current);
 
-        Assert.True (current!.ContainsKey ("Base"));
+        Assert.True (current.ContainsKey ("Base"));
         Assert.True (current.ContainsKey ("base"));
     }
 
@@ -154,14 +154,14 @@ public class SchemeManagerTests
         {
             Enable (ConfigLocations.HardCoded);
 
-            Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("Base"));
-            Assert.True (SchemeManager.GetSchemesForCurrentTheme ()!.ContainsKey ("base"));
+            Assert.True (SchemeManager.GetSchemesForCurrentTheme ().ContainsKey ("Base"));
+            Assert.True (SchemeManager.GetSchemesForCurrentTheme ().ContainsKey ("base"));
 
             ResetToHardCodedDefaults ();
-            Dictionary<string, Scheme?>? current = SchemeManager.GetSchemesForCurrentTheme ();
+            Dictionary<string, Scheme?> current = SchemeManager.GetSchemesForCurrentTheme ();
             Assert.NotNull (current);
 
-            Assert.True (current!.ContainsKey ("Base"));
+            Assert.True (current.ContainsKey ("Base"));
             Assert.True (current.ContainsKey ("base"));
         }
         finally
@@ -242,9 +242,9 @@ public class SchemeManagerTests
         };
         theme ["Schemes"].PropertyValue = SchemeManager.GetSchemesForCurrentTheme ();
 
-        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!)! ["Test"] = scheme;
+        ((Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!) ["Test"] = scheme;
 
-        Dictionary<string, Scheme>? schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!;
+        Dictionary<string, Scheme> schemes = (Dictionary<string, Scheme>)theme ["Schemes"].PropertyValue!;
         Assert.Equal (scheme.Normal, schemes ["Test"].Normal);
         Assert.Equal (scheme.Focus, schemes ["Test"].Focus);
 
@@ -261,7 +261,7 @@ public class SchemeManagerTests
             Disabled = scheme.Disabled
         };
         newTheme ["Schemes"].PropertyValue = SchemeManager.GetSchemesForCurrentTheme ();
-        ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue!)! ["Test"] = newScheme;
+        ((Dictionary<string, Scheme>)newTheme ["Schemes"].PropertyValue!) ["Test"] = newScheme;
 
         // Act
         theme.UpdateFrom (newTheme);
@@ -503,7 +503,7 @@ public class SchemeManagerTests
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
 
             Color hardCodedRunnableNormalFg = hardCodedSchemes ["Runnable"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedRunnableNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedRunnableNormalFg.ToString ());
 
             Assert.Equal (hardCodedSchemes ["Menu"].Normal.Style, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
 
@@ -512,7 +512,7 @@ public class SchemeManagerTests
 
             Color currentRunnableNormalFg = currentSchemes ["Runnable"].Normal.Foreground;
 
-            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), currentRunnableNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), currentRunnableNormalFg.ToString ());
 
             // Load the test theme
             Load (ConfigLocations.Runtime);
@@ -693,7 +693,7 @@ public class SchemeManagerTests
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
 
             Color hardCodedRunnableNormalFg = hardCodedSchemes ["Runnable"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedRunnableNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedRunnableNormalFg.ToString ());
 
             Assert.Equal (hardCodedSchemes ["Menu"].Normal.Style, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
 
@@ -702,7 +702,7 @@ public class SchemeManagerTests
 
             Color currentRunnableNormalFg = currentSchemes ["Runnable"].Normal.Foreground;
 
-            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), currentRunnableNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), currentRunnableNormalFg.ToString ());
 
             // Load the test theme
             Load (ConfigLocations.Runtime);
@@ -886,12 +886,12 @@ public class SchemeManagerTests
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
 
             Color hardCodedRunnableNormalFg = hardCodedSchemes ["Runnable"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), hardCodedRunnableNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedRunnableNormalFg.ToString ());
 
             // Capture current scheme colors
             Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
             Color currentRunnableNormalFg = currentSchemes ["Runnable"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.CadetBlue).ToString (), currentRunnableNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), currentRunnableNormalFg.ToString ());
 
             // Load the test theme
             ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
@@ -900,7 +900,7 @@ public class SchemeManagerTests
             Assert.Equal (TextStyle.Reverse, SchemeManager.GetSchemesForCurrentTheme () ["Menu"]!.Normal.Style);
 
             Dictionary<string, Scheme>? hardCodedSchemesViaScope =
-                GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
+                GetHardCodedConfigPropertiesByScope ("ThemeScope").ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
             Assert.Equal (hardCodedRunnableNormalFg.ToString (), hardCodedSchemesViaScope! ["Runnable"].Normal.Foreground.ToString ());
         }
         finally
@@ -914,7 +914,7 @@ public class SchemeManagerTests
     {
         Enable (ConfigLocations.HardCoded);
 
-        Assert.False (SchemeManager.GetSchemes ()!.ContainsKey ("test"));
+        Assert.False (SchemeManager.GetSchemes ().ContainsKey ("test"));
         Assert.Equal (5, SchemeManager.GetSchemes ().Count); // base, runnable, menu, error, dialog
 
         var theme = new ThemeScope ();

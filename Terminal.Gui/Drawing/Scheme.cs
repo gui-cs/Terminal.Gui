@@ -168,7 +168,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                                                                             CreateRunnable ())
                                                       ]);
 
-        Scheme CreateBase () => new () { Normal = new Attribute (StandardColor.LightBlue, Color.None) };
+        Scheme CreateBase () => new () { Normal = new Attribute (Color.None, Color.None) };
 
         Scheme CreateError () => new () { Normal = new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack) };
 
@@ -176,7 +176,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
         Scheme CreateMenu () => new () { Normal = new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold) };
 
-        Scheme CreateRunnable () => new () { Normal = new Attribute (StandardColor.CadetBlue, Color.None) };
+        Scheme CreateRunnable () => new () { Normal = new Attribute (Color.None, Color.None) };
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
@@ -279,7 +279,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Focus => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
                                    Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Background, defaultTerminalColors),
-                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground
+                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true)
                                },
 
                                VisualRole.Active => GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors) with
@@ -298,7 +298,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
                                VisualRole.Editable => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground,
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true),
                                    Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true).GetDimColor (0.5)
                                },
 
@@ -309,7 +309,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
                                VisualRole.Disabled => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground.GetDimColor (0.05)
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true).GetDimColor (0.05)
                                },
 
                                VisualRole.HotNormal => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with

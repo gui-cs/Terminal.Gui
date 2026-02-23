@@ -48,7 +48,7 @@ public class SchemeTests
         // Base (uses Color.None for transparent background)
         Scheme baseScheme = schemes ["Base"];
         Assert.NotNull (baseScheme);
-        Assert.Equal (new Attribute (StandardColor.LightBlue, Color.None), baseScheme.Normal);
+        Assert.Equal (new Attribute (Color.None, Color.None), baseScheme.Normal);
 
         // Dialog
         Scheme dialogScheme = schemes ["Dialog"];
@@ -68,7 +68,7 @@ public class SchemeTests
         // Runnable (uses Color.None for transparent background)
         Scheme runnableScheme = schemes ["Runnable"];
         Assert.NotNull (runnableScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, Color.None), runnableScheme.Normal);
+        Assert.Equal (new Attribute (Color.None, Color.None), runnableScheme.Normal);
     }
 
     [Fact]
