@@ -36,8 +36,6 @@ public class MenuBar : Menu, IDesignable
         AddCommand (Command.Quit,
                     ctx =>
                     {
-                        // Logging.Debug ($"{this.ToIdentifyingString ()} - Command.Quit");
-
                         _popoverBrowsingMode = false;
 
                         if (HideActiveItem ())
@@ -47,7 +45,7 @@ public class MenuBar : Menu, IDesignable
 
                         if (!CanFocus)
                         {
-                            return false; // RaiseAccepted (ctx);
+                            return false;
                         }
                         CanFocus = false;
                         Active = false;
@@ -105,8 +103,6 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
-
         if (!Visible || !Enabled)
         {
             return true; // Block activation when invisible or disabled
@@ -164,7 +160,6 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} {ctx}");
         base.OnActivated (ctx);
 
         if (ctx is { Routing: CommandRouting.Direct })
@@ -191,13 +186,9 @@ public class MenuBar : Menu, IDesignable
 
             field = value;
 
-            // Logging.Debug ($"Active set to {field} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
-
             // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
             // it won't be to the MenuBar
             CanFocus = value;
-
-            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
             if (field)
             {
@@ -270,12 +261,8 @@ public class MenuBar : Menu, IDesignable
     /// <returns><see langword="true"/> if the popover was hidden</returns>
     public bool HideItem (MenuBarItem? activeItem)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} {activeItem?.ToIdentifyingString ()}");
-
         if (activeItem is null || !activeItem.PopoverMenuOpen)
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} No active item.");
-
             return false;
         }
 
@@ -387,8 +374,6 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
-
         if (!newHasFocus)
         {
             Active = false;
@@ -400,8 +385,6 @@ public class MenuBar : Menu, IDesignable
     {
         // If the MenuBar does not have focus and the mouse enters: Enable CanFocus
         // But do NOT show a Popover unless the user clicks or presses a hotkey
-        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
-
         if (!HasFocus)
         {
             Active = true;
@@ -413,8 +396,6 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnMouseLeave ()
     {
-        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
-
         if (!IsOpen ())
         {
             Active = false;
@@ -426,8 +407,6 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnSelectedMenuItemChanged (MenuItem? selected)
     {
-        // Logging.Debug ($"{this.ToIdentifyingString ()} ({selected?.Title}) - IsOpen: {IsOpen ()}");
-
         if (_popoverBrowsingMode && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
         {
             ShowItem (selectedMenuBarItem);
@@ -512,12 +491,8 @@ public class MenuBar : Menu, IDesignable
     /// <param name="menuBarItem"></param>
     private void ShowItem (MenuBarItem? menuBarItem)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} {menuBarItem?.ToIdentifyingString ()}");
-
         if (!Active || !Visible)
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - {menuBarItem?.Id} - Not Active, not showing.");
-
             return;
         }
 

@@ -97,8 +97,6 @@ public class MenuBarItem : MenuItem, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
-
         if (base.OnActivating (args))
         {
             return true;
@@ -261,8 +259,6 @@ public class MenuBarItem : MenuItem, IDesignable
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({key})");
-
         if (PopoverMenu is not { Visible: true } || !HotKeyBindings.TryGet (key, out _))
         {
             return false;
