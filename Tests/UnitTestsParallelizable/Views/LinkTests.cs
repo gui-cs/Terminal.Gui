@@ -1,6 +1,7 @@
 #nullable enable
 using JetBrains.Annotations;
 using UnitTests;
+using Xunit.Abstractions;
 
 namespace ViewsTests;
 
@@ -9,8 +10,10 @@ namespace ViewsTests;
 ///     These tests can run in parallel without interference.
 /// </summary>
 [TestSubject (typeof (Link))]
-public class LinkTests : TestDriverBase
+public class LinkTests (ITestOutputHelper output) : TestDriverBase
 {
+    private readonly ITestOutputHelper _output = output;
+
     [Fact]
     public void Constructor_Defaults ()
     {
@@ -384,5 +387,44 @@ public class LinkTests : TestDriverBase
         Assert.Equal ("https://github.com", contents [0, 2].Url);
 
         link.Dispose ();
+    }
+
+    [Fact]
+    public void Link_Osc8_Emits_StartTextEnd_And_Outputs_Correctly ()
+    {
+        string text = "GitHub";
+        string url = "https://github.com";
+
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver?.SetScreenSize (40, 1);
+        app.Driver!.Force16Colors = true;
+
+        using Runnable window = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
+
+        Link link = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 60,
+            Height = 1,
+            Text = text,
+            Url = url,
+        };
+        window.Add (link);
+
+        app.Begin(window);
+        app.LayoutAndDraw ();
+        app.Driver.Refresh ();
+
+        DriverAssert.AssertDriverOutputIs ("""
+            \x1b]8;;https://github.com\x1b\\\x1b[90m\x1b[47mGitHub\x1b]8;;\x1b\\\x1b[37m\x1b[100m
+            """, _output, app.Driver);
     }
 }
