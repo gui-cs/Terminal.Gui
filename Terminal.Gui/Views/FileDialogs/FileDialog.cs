@@ -624,13 +624,6 @@ public class FileDialog : Dialog, IDesignable
         ApplySort ();
     }
 
-    /// <inheritdoc />
-    protected override void OnAccepted (ICommandContext? ctx)
-    {
-        base.OnAccepted (ctx);
-       // Accept (true);
-    }
-
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
