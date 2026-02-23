@@ -317,7 +317,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             {
                 IEnumerable<Menu> oldMenus = GetAllSubMenus ();
 
-
                 foreach (Menu menu in oldMenus)
                 {
                     //menu.Accepting -= MenuOnAccepting;

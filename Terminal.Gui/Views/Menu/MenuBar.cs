@@ -96,7 +96,7 @@ public class MenuBar : Menu, IDesignable
 
         bool? MoveLeft (ICommandContext? ctx)
         {
-            _isNavigating = true;
+            _isSwitchingItem = true;
 
             try
             {
@@ -104,13 +104,13 @@ public class MenuBar : Menu, IDesignable
             }
             finally
             {
-                _isNavigating = false;
+                _isSwitchingItem = false;
             }
         }
 
         bool? MoveRight (ICommandContext? ctx)
         {
-            _isNavigating = true;
+            _isSwitchingItem = true;
 
             try
             {
@@ -118,7 +118,7 @@ public class MenuBar : Menu, IDesignable
             }
             finally
             {
-                _isNavigating = false;
+                _isSwitchingItem = false;
             }
         }
     }
@@ -358,12 +358,12 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Guards against deactivation during arrow-key navigation between MenuBarItems.
-    ///     When navigating (MoveLeft/MoveRight), the old popover closes before the new one opens,
-    ///     which would trigger deactivation via <see cref="OnMenuBarItemPopoverMenuOpenChanged"/>.
-    ///     This flag prevents that.
+    ///     Guards against deactivation during MenuBarItem switching (arrow keys, mouse hover, ShowItem).
+    ///     When switching items, the old popover may close before the new one opens, which would
+    ///     trigger deactivation via <see cref="OnMenuBarItemPopoverMenuOpenChanged"/>.
+    ///     This flag prevents that false deactivation.
     /// </summary>
-    private bool _isNavigating;
+    private bool _isSwitchingItem;
 
     /// <summary>
     ///     Tracks "popover browsing mode" — set when any popover opens, stays true during
@@ -483,7 +483,7 @@ public class MenuBar : Menu, IDesignable
 
         if (!IsOpen ())
         {
-            // Active = false;
+            Active = false;
         }
 
         base.OnMouseLeave ();
@@ -559,7 +559,7 @@ public class MenuBar : Menu, IDesignable
         // arrow-key navigation (where the old popover closes before the new one opens),
         // deactivate the MenuBar entirely. HotKey switching (Alt+E while File is open)
         // is safe because the new popover opens BEFORE the old one closes.
-        if (!_isNavigating && !SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen))
+        if (!_isSwitchingItem && !SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen))
         {
             Active = false;
         }
@@ -580,37 +580,39 @@ public class MenuBar : Menu, IDesignable
             return;
         }
 
-        // TODO: We should init the PopoverMenu in a smarter way
-        if (menuBarItem?.PopoverMenu is { IsInitialized: false })
+        // Guard: when switching items, SetFocus() closes the old popover before the new one opens.
+        // Without this guard, OnMenuBarItemPopoverMenuOpenChanged would deactivate the MenuBar.
+        _isSwitchingItem = true;
+
+        try
         {
-            menuBarItem.PopoverMenu.BeginInit ();
-            menuBarItem.PopoverMenu.EndInit ();
+            // TODO: We should init the PopoverMenu in a smarter way
+            if (menuBarItem?.PopoverMenu is { IsInitialized: false })
+            {
+                menuBarItem.PopoverMenu.BeginInit ();
+                menuBarItem.PopoverMenu.EndInit ();
+            }
+
+            if (menuBarItem is null)
+            {
+                return;
+            }
+
+            Active = true;
+            menuBarItem.SetFocus ();
+
+            if (menuBarItem.PopoverMenu?.Root is { })
+            {
+                menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
+                menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
+            }
+
+            menuBarItem.PopoverMenuOpen = true;
         }
-
-        //// If the active Application Popover is part of this MenuBar, hide it.
-        //if (App?.Popovers?.GetActivePopover () is PopoverMenu popoverMenu && popoverMenu.Root?.SuperMenuItem?.SuperView == this)
-        //{
-        //    Logging.Debug ($"{this.ToIdentifyingString ()} {menuBarItem?.ToIdentifyingString ()} - Calling App?.Popover?.Hide");
-
-        //    App?.Popovers.Hide (popoverMenu);
-        //}
-
-        if (menuBarItem is null)
+        finally
         {
-            // Logging.Debug ($"{this.ToIdentifyingString ()} - menuBarItem is null.");
-
-            return;
+            _isSwitchingItem = false;
         }
-
-        Active = true;
-        menuBarItem.SetFocus ();
-
-        if (menuBarItem.PopoverMenu?.Root is { })
-        {
-            menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
-            menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
-        }
-        menuBarItem?.PopoverMenuOpen = true;
     }
 
     /// <inheritdoc/>

@@ -578,6 +578,15 @@ public class Shortcut : View, IOrientation, IDesignable
         if (!_activatedFiredThisCycle)
         {
             RaiseActivated (e.Value);
+
+            // When CommandView received a BubblingUp command and consumed it (ConsumeDispatch=true,
+            // e.g., OptionSelector/FlagSelector), Activating was blocked from propagating further
+            // up the hierarchy. Propagate Activated (not Activating) to SuperView so it is notified
+            // that the composite completed its state change (e.g., Menu.Activated → PopoverMenu closes).
+            if (e.Value?.Routing == CommandRouting.BubblingUp && SuperView is { })
+            {
+                SuperView.RaiseActivated (e.Value);
+            }
         }
 
         _activatedFiredThisCycle = false;

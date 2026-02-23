@@ -1286,5 +1286,96 @@ public class MenuBarTests
         Assert.False (menuBar.CanFocus);
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void MouseLeave_Without_Open_Popover_Deactivates_MenuBar ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        MenuItem menuItem = new () { Id = "menuItem", Title = "Menu_Item" };
+        Menu menu = new ([menuItem]) { Id = "menu" };
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_MenuBarItem" };
+        PopoverMenu menuBarItemPopover = new ();
+        menuBarItem.PopoverMenu = menuBarItemPopover;
+        menuBarItemPopover.Root = menu;
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.Add (menuBarItem);
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Mouse enters MenuBar — should activate
+        Point menuBarPos = menuBar.FrameToScreen ().Location;
+        app.InjectMouse (new Mouse { ScreenPosition = menuBarPos, Flags = MouseFlags.PositionReport });
+
+        Assert.True (menuBar.Active);
+        Assert.False (menuBar.IsOpen (), "Hovering should not open a popover");
+
+        // Mouse leaves MenuBar — should deactivate (no popover is open)
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (0, menuBar.FrameToScreen ().Bottom + 2), Flags = MouseFlags.PositionReport });
+
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.CanFocus);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void OptionSelector_Click_In_SubMenu_Deactivates_MenuBar ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Open File menu
+        MenuBarItem fileItem = menuBar.SubViews.OfType<MenuBarItem> ().First ();
+        Point fileScreenPos = fileItem.FrameToScreen ().Location;
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (fileScreenPos));
+        Assert.True (menuBar.IsOpen (), "File menu should be open");
+
+        // Navigate to Preferences SubMenu
+        Menu? rootMenu = fileItem.PopoverMenu!.Root;
+        MenuItem? prefsItem = rootMenu!.SubViews.OfType<MenuItem> ().FirstOrDefault (mi => mi.Title == "_Preferences");
+        Assert.NotNull (prefsItem);
+        prefsItem.SetFocus ();
+
+        // Find the OptionSelector
+        MenuItem? optionMenuItem = prefsItem.SubMenu!.SubViews.OfType<MenuItem> ().FirstOrDefault (mi => mi.Id == "mutuallyExclusiveOptions");
+        Assert.NotNull (optionMenuItem);
+        OptionSelector<Schemes>? optionSelector = optionMenuItem.CommandView as OptionSelector<Schemes>;
+        Assert.NotNull (optionSelector);
+
+        // Click on the Error checkbox
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        Assert.NotNull (errorCheckBox);
+        errorCheckBox.SetFocus ();
+        Point errorScreenPos = errorCheckBox.FrameToScreen ().Location;
+        app.InjectMouse (new Mouse { ScreenPosition = errorScreenPos, Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = errorScreenPos, Flags = MouseFlags.LeftButtonReleased });
+
+        // Assert — value changed AND menu is fully deactivated
+        Assert.Equal (Schemes.Error, optionSelector.Value);
+        Assert.False (menuBar.IsOpen ());
+        Assert.False (menuBar.Active);
+
+        menuBar.Dispose ();
+    }
+
     #endregion
 }
