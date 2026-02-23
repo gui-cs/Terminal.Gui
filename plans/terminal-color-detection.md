@@ -81,7 +81,7 @@ All items implemented in commits `8a0cbb062..01bb8c940`.
 
 ---
 
-## Part D: Revamp `GetBrighterColor` / `GetDimColor` for Dark/Light Awareness — NEW
+## Part D: Revamp `GetBrighterColor` / `GetDimColor` for Dark/Light Awareness — DONE
 
 ### Problem Statement
 
@@ -101,120 +101,42 @@ All items implemented in commits `8a0cbb062..01bb8c940`.
 
 Add an overload (or optional parameter) to `GetBrighterColor` and `GetDimColor` that accepts the terminal's background color, enabling direction-aware adjustments.
 
-#### D.1: Add `isDarkBackground` context to `GetDimColor`
+### D.1: Add `isDarkBackground` context to `GetDimColor` — DONE
 
-**File:** `Terminal.Gui/Drawing/Color/Color.cs`
+Added optional `bool? isDarkBackground` parameter. When `true` (or `null`/default), reduces lightness. When `false`, increases lightness (washes out toward light bg). Extreme-value fallback now returns `Gray` for light backgrounds instead of always `DarkGray`. Thresholds use `hsl.L` directly (ColorHelper's 0-100 HSL scale).
 
-```csharp
-/// <summary>
-///     Returns a "dimmed" version of this color appropriate for the given background context.
-///     On dark backgrounds, dims by reducing lightness (darker). On light backgrounds, dims by
-///     increasing lightness (lighter/washed out), moving the color toward the background.
-/// </summary>
-/// <param name="dimAmount">The percent amount to dim. Default is 20%.</param>
-/// <param name="isDarkBackground">
-///     If <see langword="true"/>, dims by darkening. If <see langword="false"/>, dims by lightening.
-///     If <see langword="null"/>, auto-detects based on this color's own lightness (current behavior).
-/// </param>
-public Color GetDimColor (double dimAmount = 0.2, bool? isDarkBackground = null)
-```
+### D.2: Add `isDarkBackground` context to `GetBrighterColor` — DONE
 
-**Algorithm change:**
-- When `isDarkBackground == true` (or `null` and color is light): reduce lightness (current behavior)
-- When `isDarkBackground == false`: *increase* lightness toward 1.0 (washes out toward white)
-- Replace the hardcoded `DarkGray` fallback: when already at the extreme for the given direction, return a context-appropriate gray (`DarkGray` for dark bg, `LightGray` for light bg)
+Added optional `bool? isDarkBackground` parameter. When `true`, increases lightness (brighter on dark bg). When `false`, decreases lightness (darker/more visible on light bg). When `null`, auto-detects from color's own lightness (backward compatible).
 
-#### D.2: Add `isDarkBackground` context to `GetBrighterColor`
+### D.3: Add `IsDarkColor()` helper to `Color` — DONE
 
-**File:** `Terminal.Gui/Drawing/Color/Color.cs`
+Returns `true` if `hsl.L < 50` (using ColorHelper's 0-100 HSL L scale). Used by `Scheme.GetAttributeForRoleCore` to determine the `isDarkBackground` parameter.
 
-```csharp
-/// <summary>
-///     Returns a "highlighted" version of this color — visually more prominent against
-///     the given background context.
-/// </summary>
-/// <param name="brightenAmount">The percent amount to adjust. Default is 20%.</param>
-/// <param name="isDarkBackground">
-///     If <see langword="true"/>, brightens (increases lightness). If <see langword="false"/>,
-///     darkens (decreases lightness). If <see langword="null"/>, auto-detects (current behavior).
-/// </param>
-public Color GetBrighterColor (double brightenAmount = 0.2, bool? isDarkBackground = null)
-```
+### D.4: Update `Scheme.GetAttributeForRoleCore` to pass background context — DONE
 
-**Algorithm change:**
-- When `isDarkBackground == true`: always increase lightness (brighter = more visible on dark bg)
-- When `isDarkBackground == false`: always decrease lightness (darker = more visible on light bg)
-- When `isDarkBackground == null`: current heuristic (based on color's own L value, for backward compat)
+Refactored from switch expression to switch statement to enable local variables. Each role that uses color math (Active, Highlight, Editable, ReadOnly, Disabled) now:
+1. Resolves the background color via `ResolveNone`
+2. Determines `isDark` via `IsDarkColor()`
+3. Passes `isDark` to `GetBrighterColor`/`GetDimColor`
 
-#### D.3: Add `IsDarkColor()` helper to `Color`
+**Bug fix:** Fixed a stack cleanup bug in `GetAttributeForRoleCore` where explicitly-set roles were not removed from the recursion-guard `HashSet` on early return (line 271). This caused the old switch expression's redundant calls to `GetAttributeForRoleCore` for the same role to incorrectly return `Normal` instead of the explicit value. The refactoring to local variables also avoids triggering this bug.
 
-**File:** `Terminal.Gui/Drawing/Color/Color.cs`
+### D.5: Backward Compatibility — DONE
 
-```csharp
-/// <summary>
-///     Returns <see langword="true"/> if this color is "dark" (HSL lightness < 0.5).
-/// </summary>
-public bool IsDarkColor ()
-{
-    HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
-    return hsl.L / 255.0 < 0.5;
-}
-```
-
-This is used by `Scheme.ResolveNone` to determine the `isDarkBackground` parameter.
-
-#### D.4: Update `Scheme.GetAttributeForRoleCore` to pass background context
-
-**File:** `Terminal.Gui/Drawing/Scheme.cs`
-
-In the derivation algorithm, determine whether the resolved background is dark or light, and pass that context to `GetBrighterColor`/`GetDimColor`:
-
-```csharp
-// In the derivation switch:
-VisualRole.Active => ... with
-{
-    // Determine if the focus background is dark
-    Color focusBg = ResolveNone (...Focus bg...);
-    bool isDark = focusBg.IsDarkColor ();
-
-    Foreground = ResolveNone (...Focus fg...).GetBrighterColor (0.2, isDark),
-    Background = focusBg.GetDimColor (0.2, isDark),
-    Style = ... | TextStyle.Bold
-},
-```
-
-Apply the same pattern to:
-- **Active**: `Focus.fg.GetBrighterColor(isDark)`, `Focus.bg.GetDimColor(isDark)`
-- **Highlight**: `Normal.bg.GetBrighterColor(isDark)` where `isDark` is based on `Normal.bg`
-- **Editable**: `Normal.fg.GetDimColor(0.5, isDark)` where `isDark` is based on resolved `Normal.bg`
-- **ReadOnly**: `Editable.fg.GetDimColor(0.05, isDark)`
-- **Disabled**: `Normal.fg.GetDimColor(0.05, isDark)`
-
-#### D.5: Backward Compatibility
-
-- The default parameter `isDarkBackground = null` preserves existing behavior for all direct callers
+- Default parameter `isDarkBackground = null` preserves behavior for all external callers (ShadowView, ColorPicker, TextField, UICatalog scenarios)
 - Only the Scheme derivation code passes explicit `isDarkBackground` values
-- Existing tests that don't use `Color.None` see identical results
+- Updated `DeepClonerTests.Scheme_All_Set_ReturnsEqualValue` to account for corrected derivation behavior
 
-### Files to Modify
+### Files Modified
 
 | File | Change |
 |------|--------|
-| `Terminal.Gui/Drawing/Color/Color.cs` | Add `isDarkBackground` param to `GetBrighterColor`/`GetDimColor`; add `IsDarkColor()` |
-| `Terminal.Gui/Drawing/Scheme.cs` | Pass background context to color math calls in derivation |
-
-### Tests
-
-Add to `Tests/UnitTestsParallelizable`:
-- `GetBrighterColor_WithDarkBackground_IncreasesLightness`
-- `GetBrighterColor_WithLightBackground_DecreasesLightness`
-- `GetDimColor_WithDarkBackground_DecreasesLightness`
-- `GetDimColor_WithLightBackground_IncreasesLightness`
-- `GetDimColor_VeryDarkInput_LightBackground_ReturnsLightGray`
-- `IsDarkColor_DarkColors_ReturnsTrue`
-- `IsDarkColor_LightColors_ReturnsFalse`
-- `SchemeDerivation_WithLightTerminalBackground_ProducesReadableColors`
-- `SchemeDerivation_WithDarkTerminalBackground_ProducesReadableColors`
+| `Terminal.Gui/Drawing/Color/Color.cs` | Added `isDarkBackground` param to `GetBrighterColor`/`GetDimColor`; added `IsDarkColor()` |
+| `Terminal.Gui/Drawing/Scheme.cs` | Refactored derivation to switch statement; pass background context; fixed stack cleanup bug |
+| `Tests/UnitTestsParallelizable/Drawing/Color/ColorClassTests.DarkLightAwareness.cs` | **NEW** — 16 tests for `IsDarkColor`, `GetBrighterColor`, `GetDimColor` with background context |
+| `Tests/UnitTestsParallelizable/Drawing/SchemeTests.ColorNoneDerivationTests.cs` | Added 5 dark/light awareness derivation tests |
+| `Tests/UnitTestsParallelizable/Configuration/DeepClonerTests.cs` | Fixed HotActive test value to account for corrected derivation |
 
 ---
 
@@ -331,9 +253,9 @@ For Green/Amber Phosphor, the roles that are NOT explicitly overridden (Focus, H
 | **5** | `IDriver.DefaultAttribute` + `DriverImpl` + startup wiring | **DONE** |
 | **6** | `Scheme.ResolveNone` — use queried colors in derivation | **DONE** |
 | **7** | Tests for A.1–A.7 and C.1–C.4 | **DONE** |
-| **8** | `GetBrighterColor`/`GetDimColor` dark/light awareness (Part D) | TODO |
+| **8** | `GetBrighterColor`/`GetDimColor` dark/light awareness (Part D) | **DONE** |
 | **9** | Theme config.json revamp with `Color.None` (Part E) | TODO — depends on Phase 8 |
-| **10** | Tests for Parts D and E | TODO |
+| **10** | Tests for Part E | TODO |
 
 ## Edge Cases
 

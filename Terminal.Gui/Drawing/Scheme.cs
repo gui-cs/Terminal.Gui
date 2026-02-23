@@ -44,7 +44,8 @@ namespace Terminal.Gui.Drawing;
 ///             <item>
 ///                 <description>
 ///                     <b>Focus:</b> If not set, derived from <see cref="Normal"/> by swapping foreground and background
-///                     colors.
+///                     colors. Any <see cref="Color.None"/> values are resolved to the terminal's actual default colors
+///                     (queried via OSC 10/11) before swapping.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -54,13 +55,14 @@ namespace Terminal.Gui.Drawing;
 ///                         <item>
 ///                             <description>
 ///                                 Setting <c>Foreground</c> to <see cref="Focus"/>'s foreground with
-///                                 <c>GetHighlightColor()</c>.
+///                                 <see cref="Color.GetBrighterColor(double, bool?)"/>, passing whether the
+///                                 <see cref="Focus"/> background is dark or light.
 ///                             </description>
 ///                         </item>
 ///                         <item>
 ///                             <description>
 ///                                 Setting <c>Background</c> to <see cref="Focus"/>'s background with
-///                                 <c>GetDimColor()</c>.
+///                                 <see cref="Color.GetDimColor(double, bool?)"/>, passing the same dark/light context.
 ///                             </description>
 ///                         </item>
 ///                         <item>
@@ -76,7 +78,8 @@ namespace Terminal.Gui.Drawing;
 ///                         <item>
 ///                             <description>
 ///                                 Setting <c>Foreground</c> to <see cref="Normal"/>'s background with
-///                                 <c>GetHighlightColor()</c>.
+///                                 <see cref="Color.GetBrighterColor(double, bool?)"/>, using the
+///                                 <see cref="Normal"/> background's dark/light context.
 ///                             </description>
 ///                         </item>
 ///                         <item>
@@ -97,14 +100,14 @@ namespace Terminal.Gui.Drawing;
 ///                     <list type="bullet">
 ///                         <item>
 ///                             <description>
-///                                 Setting <c>Foreground</c> to <see cref="Normal"/>'s background with
-///                                 <c>GetHighlightColor()</c>.
+///                                 Setting <c>Foreground</c> to <see cref="Normal"/>'s foreground (resolved).
 ///                             </description>
 ///                         </item>
 ///                         <item>
 ///                             <description>
-///                                 Setting <c>Background</c> to <see cref="Normal"/>'s background with
-///                                 <c>GetDimColor()</c>.
+///                                 Setting <c>Background</c> to <see cref="Normal"/>'s foreground with
+///                                 <see cref="Color.GetDimColor(double, bool?)"/> at 50%, using the
+///                                 <see cref="Normal"/> background's dark/light context.
 ///                             </description>
 ///                         </item>
 ///                     </list>
@@ -112,14 +115,16 @@ namespace Terminal.Gui.Drawing;
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     <b>ReadOnly:</b> If not set, derived from <see cref="Editable"/> by adding
-///                     <see cref="TextStyle.Faint"/> to the style.
+///                     <b>ReadOnly:</b> If not set, derived from <see cref="Editable"/> by dimming
+///                     the foreground with <see cref="Color.GetDimColor(double, bool?)"/> at 5%,
+///                     using the <see cref="Editable"/> background's dark/light context.
 ///                 </description>
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     <b>Disabled:</b> If not set, derived from <see cref="Normal"/> by adding
-///                     <see cref="TextStyle.Faint"/> to the style.
+///                     <b>Disabled:</b> If not set, derived from <see cref="Normal"/> by dimming
+///                     the foreground with <see cref="Color.GetDimColor(double, bool?)"/> at 5%,
+///                     using the <see cref="Normal"/> background's dark/light context.
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -143,6 +148,22 @@ namespace Terminal.Gui.Drawing;
 ///         </list>
 ///         This algorithm ensures that every <see cref="VisualRole"/> always resolves to a valid <see cref="Attribute"/>,
 ///         either explicitly set or derived.
+///     </para>
+///     <para>
+///         <b>Dark/Light Background Awareness:</b>
+///         <br/>
+///         When deriving roles that use color math (<see cref="Color.GetBrighterColor(double, bool?)"/> and
+///         <see cref="Color.GetDimColor(double, bool?)"/>), the algorithm determines whether the relevant background
+///         is dark or light via <see cref="Color.IsDarkColor"/>. This ensures correct visual results regardless
+///         of whether the terminal has a dark or light background. For example, "dimming" a color on a light background
+///         increases lightness (washing out toward white) rather than decreasing it.
+///     </para>
+///     <para>
+///         <b><see cref="Color.None"/> Resolution:</b>
+///         <br/>
+///         Before performing color math, any <see cref="Color.None"/> values are resolved to the terminal's actual
+///         default colors (detected via OSC 10/11 queries at startup). If the terminal's colors are not available,
+///         the fallback is White for foreground and Black for background.
 ///     </para>
 /// </remarks>
 #pragma warning disable IL2026 // SchemeJsonConverter is AOT-compatible
@@ -268,67 +289,147 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
         if (role == VisualRole.Normal || TryGetExplicitlySetAttributeForRole (role, out attr))
         {
+            stack.Remove (role);
+
             return attr!.Value;
         }
 
         // TODO: Provide an API that lets devs override this algo?
 
         // Derivation algorithm as documented
-        Attribute result = role switch
-                           {
-                               VisualRole.Focus => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
-                               {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Background, defaultTerminalColors),
-                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true)
-                               },
+        Attribute result;
 
-                               VisualRole.Active => GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors) with
-                               {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true).GetBrighterColor (),
-                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Background, defaultTerminalColors).GetDimColor (),
-                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Style | TextStyle.Bold
-                               },
+        switch (role)
+        {
+            case VisualRole.Focus:
+            {
+                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
 
-                               VisualRole.Highlight => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
-                               {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Background, defaultTerminalColors).GetBrighterColor (),
-                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Background,
-                                   Style = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors).Style | TextStyle.Italic
-                               },
+                result = normal with
+                {
+                    Foreground = ResolveNone (normal.Background, defaultTerminalColors),
+                    Background = ResolveNone (normal.Foreground, defaultTerminalColors, true)
+                };
 
-                               VisualRole.Editable => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
-                               {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true),
-                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true).GetDimColor (0.5)
-                               },
+                break;
+            }
 
-                               VisualRole.ReadOnly => GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors) with
-                               {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors).Foreground.GetDimColor (0.05)
-                               },
+            case VisualRole.Active:
+            {
+                Attribute focus = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors);
+                Color focusBg = ResolveNone (focus.Background, defaultTerminalColors);
+                bool isDark = focusBg.IsDarkColor ();
 
-                               VisualRole.Disabled => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
-                               {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true).GetDimColor (0.05)
-                               },
+                result = focus with
+                {
+                    Foreground = ResolveNone (focus.Foreground, defaultTerminalColors, true).GetBrighterColor (0.2, isDark),
+                    Background = focusBg.GetDimColor (0.2, isDark),
+                    Style = focus.Style | TextStyle.Bold
+                };
 
-                               VisualRole.HotNormal => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
-                               {
-                                   Style = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Style | TextStyle.Underline
-                               },
+                break;
+            }
 
-                               VisualRole.HotFocus => GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors) with
-                               {
-                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Style | TextStyle.Underline
-                               },
+            case VisualRole.Highlight:
+            {
+                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+                Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
+                bool isDark = normalBg.IsDarkColor ();
 
-                               VisualRole.HotActive => GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors) with
-                               {
-                                   Style = GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors).Style | TextStyle.Underline
-                               },
+                result = normal with
+                {
+                    Foreground = normalBg.GetBrighterColor (0.2, isDark),
+                    Background = normal.Background,
+                    Style = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors).Style | TextStyle.Italic
+                };
 
-                               _ => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors)
-                           };
+                break;
+            }
+
+            case VisualRole.Editable:
+            {
+                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+                Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
+                bool isDark = normalBg.IsDarkColor ();
+                Color resolvedFg = ResolveNone (normal.Foreground, defaultTerminalColors, true);
+
+                result = normal with
+                {
+                    Foreground = resolvedFg,
+                    Background = resolvedFg.GetDimColor (0.5, isDark)
+                };
+
+                break;
+            }
+
+            case VisualRole.ReadOnly:
+            {
+                Attribute editable = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors);
+                bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
+
+                result = editable with
+                {
+                    Foreground = editable.Foreground.GetDimColor (0.05, isDark)
+                };
+
+                break;
+            }
+
+            case VisualRole.Disabled:
+            {
+                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+                Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
+                bool isDark = normalBg.IsDarkColor ();
+
+                result = normal with
+                {
+                    Foreground = ResolveNone (normal.Foreground, defaultTerminalColors, true).GetDimColor (0.05, isDark)
+                };
+
+                break;
+            }
+
+            case VisualRole.HotNormal:
+            {
+                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+
+                result = normal with
+                {
+                    Style = normal.Style | TextStyle.Underline
+                };
+
+                break;
+            }
+
+            case VisualRole.HotFocus:
+            {
+                Attribute focus = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors);
+
+                result = focus with
+                {
+                    Style = focus.Style | TextStyle.Underline
+                };
+
+                break;
+            }
+
+            case VisualRole.HotActive:
+            {
+                Attribute active = GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors);
+
+                result = active with
+                {
+                    Style = active.Style | TextStyle.Underline
+                };
+
+                break;
+            }
+
+            default:
+                result = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+
+                break;
+        }
 
         stack.Remove (role);
 
@@ -340,27 +441,10 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// </summary>
     /// <param name="roleName">The name of the <see cref="VisualRole"/> describing the element being rendered.</param>
     /// <returns>The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>.</returns>
-    public Attribute GetAttributeForRole (string roleName)
-    {
-        if (Enum.TryParse (roleName, true, out VisualRole role))
-        {
-            return GetAttributeForRole (role);
-        }
-
-        // If the string does not match any VisualRole, return the default Normal attribute
-        return Normal;
-    }
+    public Attribute GetAttributeForRole (string roleName) => Enum.TryParse (roleName, true, out VisualRole role) ? GetAttributeForRole (role) : Normal;
 
     // Helper method for property _get implementation
-    private Attribute GetAttributeForRoleProperty (Attribute? explicitValue, VisualRole role)
-    {
-        if (explicitValue is { })
-        {
-            return explicitValue.Value;
-        }
-
-        return GetAttributeForRoleCore (role, [], null);
-    }
+    private Attribute GetAttributeForRoleProperty (Attribute? explicitValue, VisualRole role) => explicitValue ?? GetAttributeForRoleCore (role, [], null);
 
     // Helper method for property _set implementation
     private Attribute? SetAttributeForRoleProperty (Attribute value, VisualRole role)

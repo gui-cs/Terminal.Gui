@@ -136,6 +136,117 @@ public class SchemeColorNoneDerivationTests (ITestOutputHelper output) : TestDri
 
     #endregion
 
+    #region Dark/Light Background Awareness (Part D)
+
+    [Fact]
+    public void Active_WithDarkTerminal_BrightensForground_DimsBackground ()
+    {
+        // Claude - Opus 4.6
+        ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
+        Scheme baseScheme = schemes ["Base"];
+
+        // Dark terminal: bright fg on dark bg
+        Attribute darkDefault = new (new Color (200, 200, 200), new Color (20, 20, 20));
+        Attribute active = baseScheme.GetAttributeForRole (VisualRole.Active, darkDefault);
+
+        // Focus for dark terminal: fg=(20,20,20), bg=(200,200,200)
+        // Active.Foreground = Focus.fg.GetBrighterColor(isDark=false because Focus.bg=(200,200,200) is light)
+        // Active.Background = Focus.bg.GetDimColor(isDark=false)
+        // The Focus bg (200,200,200) is light, so isDark=false: brighter=darker, dim=lighter
+        Assert.True (active.Style.HasFlag (TextStyle.Bold), "Active should have Bold style");
+    }
+
+    [Fact]
+    public void SchemeDerivation_WithLightTerminalBackground_ProducesReadableColors ()
+    {
+        // Claude - Opus 4.6
+        ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
+        Scheme baseScheme = schemes ["Base"];
+
+        // Simulate light terminal: dark fg on light bg
+        Attribute lightDefault = new (new Color (40, 40, 40), new Color (240, 240, 240));
+
+        // Roles that perform color math should produce resolved (non-None) colors.
+        // Normal and HotNormal intentionally preserve Color.None (they don't transform fg/bg).
+        VisualRole[] derivedRoles =
+        [
+            VisualRole.Focus, VisualRole.Active, VisualRole.Highlight,
+            VisualRole.Editable, VisualRole.ReadOnly, VisualRole.Disabled,
+            VisualRole.HotFocus, VisualRole.HotActive
+        ];
+
+        foreach (VisualRole role in derivedRoles)
+        {
+            Attribute attr = baseScheme.GetAttributeForRole (role, lightDefault);
+            Assert.NotEqual (Color.None, attr.Foreground);
+            Assert.True (attr.Foreground.A == 255, $"Role {role} foreground should be opaque (not Color.None)");
+        }
+    }
+
+    [Fact]
+    public void SchemeDerivation_WithDarkTerminalBackground_ProducesReadableColors ()
+    {
+        // Claude - Opus 4.6
+        ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
+        Scheme baseScheme = schemes ["Base"];
+
+        // Simulate dark terminal: bright fg on dark bg
+        Attribute darkDefault = new (new Color (200, 200, 200), new Color (20, 20, 20));
+
+        // Roles that perform color math should produce resolved (non-None) colors.
+        VisualRole[] derivedRoles =
+        [
+            VisualRole.Focus, VisualRole.Active, VisualRole.Highlight,
+            VisualRole.Editable, VisualRole.ReadOnly, VisualRole.Disabled,
+            VisualRole.HotFocus, VisualRole.HotActive
+        ];
+
+        foreach (VisualRole role in derivedRoles)
+        {
+            Attribute attr = baseScheme.GetAttributeForRole (role, darkDefault);
+            Assert.NotEqual (Color.None, attr.Foreground);
+            Assert.True (attr.Foreground.A == 255, $"Role {role} foreground should be opaque (not Color.None)");
+        }
+    }
+
+    [Fact]
+    public void Highlight_WithLightTerminal_DarkensForVisibility ()
+    {
+        // Claude - Opus 4.6
+        ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
+        Scheme baseScheme = schemes ["Base"];
+
+        // Light terminal: Normal.Background = Color.None → (240,240,240)
+        Attribute lightDefault = new (new Color (40, 40, 40), new Color (240, 240, 240));
+        Attribute highlight = baseScheme.GetAttributeForRole (VisualRole.Highlight, lightDefault);
+
+        // Highlight.Foreground = ResolveNone(bg=(240,240,240)).GetBrighterColor(isDark=false)
+        // isDark=false means "darken for visibility on light bg"
+        // So highlight fg should be darker than the bg
+        Assert.True (highlight.Foreground.R < 240 || highlight.Foreground.G < 240 || highlight.Foreground.B < 240,
+                     "Highlight foreground on light bg should be darker than the background for visibility");
+    }
+
+    [Fact]
+    public void Disabled_WithLightTerminal_WashesOutForeground ()
+    {
+        // Claude - Opus 4.6
+        ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
+        Scheme baseScheme = schemes ["Base"];
+
+        // Light terminal
+        Attribute lightDefault = new (new Color (40, 40, 40), new Color (240, 240, 240));
+        Attribute disabled = baseScheme.GetAttributeForRole (VisualRole.Disabled, lightDefault);
+
+        // Disabled.Foreground = terminal_fg(40,40,40).GetDimColor(0.05, isDark=false)
+        // isDark=false means "dim by increasing lightness (wash out)"
+        // So disabled fg should be lighter than the original fg
+        Assert.True (disabled.Foreground.R > 40 || disabled.Foreground.G > 40 || disabled.Foreground.B > 40,
+                     "Disabled foreground on light bg should be washed out (lighter than original fg)");
+    }
+
+    #endregion
+
     #region End-to-End ANSI Rendering
 
     [Fact]

@@ -165,6 +165,21 @@ ColorStrings.GetColorName(opaqueRed);      // Returns "Red"
 ColorStrings.GetColorName(transparentRed); // Returns "Red"
 ```
 
+### Color.None (Terminal Default Colors)
+
+`Color.None` is a special sentinel value (alpha=0) that tells the driver to emit ANSI reset codes (`CSI 39m` / `CSI 49m`) instead of explicit RGB values. This allows the terminal's native foreground/background colors — including any transparency or acrylic effects — to show through.
+
+When `Color.None` is used in a `Scheme`, the derivation algorithm resolves it to the terminal's actual default colors (detected via OSC 10/11 queries at startup) before performing color math. See [Scheme Deep Dive](scheme.md) for details.
+
+### Dark/Light Background Awareness
+
+The `Color.IsDarkColor()` method returns `true` if a color's HSL lightness is below 50%. This is used by the `Scheme` derivation algorithm to determine the direction for `GetBrighterColor` and `GetDimColor`:
+
+- `Color.GetBrighterColor(double, bool?)` — Makes a color more visually prominent. On dark backgrounds (or when auto-detecting), increases lightness. On light backgrounds, decreases lightness.
+- `Color.GetDimColor(double, bool?)` — Makes a color less visually prominent. On dark backgrounds, decreases lightness. On light backgrounds, increases lightness (washes out toward white).
+
+Both methods accept an optional `isDarkBackground` parameter. When `null` (the default), they auto-detect from the color's own lightness for backward compatibility. The `Scheme` derivation algorithm passes explicit values based on the resolved background color.
+
 ### Legacy 16-Color Support
 
 For backwards compatibility and terminals with limited color support, Terminal.Gui maintains the legacy 16-color system via @Terminal.Gui.ColorName16. When true color is not available or when `Application.Force16Colors` is set, Terminal.Gui will map true colors to the nearest 16-color equivalent.
