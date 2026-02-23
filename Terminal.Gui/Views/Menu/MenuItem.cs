@@ -11,7 +11,7 @@ public class MenuItem : Shortcut
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>.
     /// </summary>
-    public MenuItem () : base (Key.Empty, null, null) { }
+    public MenuItem () : base (Key.Empty, null, null) { RebindEnterToActivate (); }
 
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>, binding it to <paramref name="targetView"/> and
@@ -41,6 +41,7 @@ public class MenuItem : Shortcut
         TargetView = targetView;
         Command = command;
         SubMenu = subMenu;
+        RebindEnterToActivate ();
     }
 
     /// <inheritdoc/>
@@ -48,14 +49,30 @@ public class MenuItem : Shortcut
         commandText,
         action,
         helpText)
-    { }
+    { RebindEnterToActivate (); }
 
     /// <inheritdoc/>
-    public MenuItem (string commandText, Key key, Action? action = null) : base (key ?? Key.Empty, commandText, action) { }
+    public MenuItem (string commandText, Key key, Action? action = null) : base (key ?? Key.Empty, commandText, action) { RebindEnterToActivate (); }
 
     /// <inheritdoc/>
-    public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText) =>
+    public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText)
+    {
         SubMenu = subMenu;
+        RebindEnterToActivate ();
+    }
+
+    /// <summary>
+    ///     In menu context, Enter means "select/activate this item" — not "accept/submit".
+    ///     Replaces the inherited <see cref="Key.Enter"/> → <see cref="Command.Accept"/> binding
+    ///     with <see cref="Key.Enter"/> → <see cref="Command.Activate"/> so the activation flows
+    ///     through the bridge architecture (closing the menu) instead of raising Accept which
+    ///     bubbles up to the host view.
+    /// </summary>
+    private void RebindEnterToActivate ()
+    {
+        KeyBindings.Remove (Key.Enter);
+        KeyBindings.Add (Key.Enter, Command.Activate);
+    }
 
     private CommandBridge? _subMenuBridge;
 

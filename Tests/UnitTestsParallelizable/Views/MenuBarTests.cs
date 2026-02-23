@@ -1777,6 +1777,100 @@ public class MenuBarTests
         Assert.False (subMenu.Visible, "SubMenu should NOT reappear when returning to File");
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void AltE_Opens_Edit_When_Another_View_Has_Focus ()
+    {
+        // Arrange — closer to UICatalog: MenuBar + separate focusable view with focus
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        // A separate focusable view that has focus (simulates scenarios TableView)
+        View contentView = new () { Id = "content", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), Y = 1 };
+        hostView.Add (contentView);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Ensure the content view has focus, not the MenuBar
+        contentView.SetFocus ();
+        Assert.True (contentView.HasFocus, "Content view should have focus");
+        Assert.False (menuBar.HasFocus, "MenuBar should NOT have focus");
+
+        MenuBarItem fileItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0);
+        MenuBarItem editItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (1);
+
+        var filePopoverOpened = false;
+
+        fileItem.PopoverMenu!.VisibleChanged += (_, _) =>
+                                                {
+                                                    if (fileItem.PopoverMenu.Visible)
+                                                    {
+                                                        filePopoverOpened = true;
+                                                    }
+                                                };
+
+        // Act — press Alt+E
+        app.InjectKey (Key.E.WithAlt);
+
+        // Assert
+        Assert.True (menuBar.Active, "MenuBar should be active");
+        Assert.True (editItem.PopoverMenu is { Visible: true }, "Edit's popover should be visible");
+        Assert.False (filePopoverOpened, "File's popover should NEVER have opened");
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Enter_On_MenuItem_Does_Not_Raise_Accepting_On_MenuBar_SuperView ()
+    {
+        // Arrange — Enter on a MenuItem should activate it (fire its action), not raise
+        // Accepting which would bubble up to the MenuBar's SuperView.
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        var menuItemActivated = false;
+        MenuItem menuItem = new () { Id = "menuItem", Title = "_New" };
+        menuItem.Activated += (_, _) => menuItemActivated = true;
+        Menu rootMenu = new ([menuItem]) { Id = "rootMenu" };
+
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_File" };
+        PopoverMenu popover = new ();
+        menuBarItem.PopoverMenu = popover;
+        popover.Root = rootMenu;
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.Add (menuBarItem);
+
+        var hostAccepted = false;
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        hostView.Accepting += (_, _) => hostAccepted = true;
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Open the menu
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBar.IsOpen (), "MenuBar should be open");
+
+        // Act — press Enter on the focused MenuItem
+        app.InjectKey (Key.Enter);
+
+        // Assert — the MenuItem should have been activated, but Accepting should NOT bubble
+        Assert.True (menuItemActivated, "MenuItem should have been activated");
+        Assert.False (hostAccepted, "Accepting should NOT have bubbled up to the host view");
+    }
+
     #endregion
 
     #region Diagnostic and fix tests

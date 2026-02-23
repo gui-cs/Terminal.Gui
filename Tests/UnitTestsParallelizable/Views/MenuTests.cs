@@ -812,9 +812,9 @@ public class MenuTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void Enter_Accept_DefaultCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    public void Enter_Activate_DefaultCommandView_Does_Not_Raise_Accepting ()
     {
-        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept, Command.Activate] };
         Menu menu = new () { Id = "menu" };
         superView.Add (menu);
 
@@ -829,17 +829,18 @@ public class MenuTests
 
         menuItem.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, menuAcceptingCount);
-        Assert.Equal (1, superViewAcceptingCount);
+        // Enter now triggers Activate, not Accept — Accepting should NOT fire
+        Assert.Equal (0, menuAcceptingCount);
+        Assert.Equal (0, superViewAcceptingCount);
 
         superView.Dispose ();
     }
 
     // Claude - Opus 4.6
     [Fact]
-    public void Enter_Accept_CheckBoxCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    public void Enter_Activate_CheckBoxCommandView_Does_Not_Raise_Accepting ()
     {
-        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept, Command.Activate] };
         Menu menu = new () { Id = "menu" };
         superView.Add (menu);
 
@@ -855,17 +856,18 @@ public class MenuTests
 
         menuItem.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, menuAcceptingCount);
-        Assert.Equal (1, superViewAcceptingCount);
+        // Enter now triggers Activate, not Accept — Accepting should NOT fire
+        Assert.Equal (0, menuAcceptingCount);
+        Assert.Equal (0, superViewAcceptingCount);
 
         superView.Dispose ();
     }
 
     // Claude - Opus 4.6
     [Fact]
-    public void Enter_Accept_OptionSelectorCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    public void Enter_Activate_OptionSelectorCommandView_Does_Not_Raise_Accepting ()
     {
-        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept, Command.Activate] };
         Menu menu = new () { Id = "menu" };
         superView.Add (menu);
 
@@ -881,17 +883,18 @@ public class MenuTests
 
         menuItem.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, menuAcceptingCount);
-        Assert.Equal (1, superViewAcceptingCount);
+        // Enter now triggers Activate, not Accept — Accepting should NOT fire
+        Assert.Equal (0, menuAcceptingCount);
+        Assert.Equal (0, superViewAcceptingCount);
 
         superView.Dispose ();
     }
 
     // Claude - Opus 4.6
     [Fact]
-    public void Enter_Accept_FlagSelectorCommandView_Raises_Accepting_On_Menu_And_SuperView ()
+    public void Enter_Activate_FlagSelectorCommandView_Does_Not_Raise_Accepting ()
     {
-        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept, Command.Activate] };
         Menu menu = new () { Id = "menu" };
         superView.Add (menu);
 
@@ -907,8 +910,9 @@ public class MenuTests
 
         menuItem.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, menuAcceptingCount);
-        Assert.Equal (1, superViewAcceptingCount);
+        // Enter now triggers Activate, not Accept — Accepting should NOT fire
+        Assert.Equal (0, menuAcceptingCount);
+        Assert.Equal (0, superViewAcceptingCount);
 
         superView.Dispose ();
     }
@@ -1088,9 +1092,9 @@ public class MenuTests
     ///     Menu and SuperView via CommandsToBubbleUp=[Accept].
     /// </summary>
     [Fact]
-    public void Enter_Accept_ButtonCommandView_Propagates_Accept_To_SuperView ()
+    public void Enter_Activate_ButtonCommandView_Does_Not_Raise_Accepting_On_SuperView ()
     {
-        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept] };
+        View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Accept, Command.Activate] };
         Menu menu = new () { Id = "menu" };
         superView.Add (menu);
 
@@ -1101,10 +1105,10 @@ public class MenuTests
         var superViewAcceptingCount = 0;
         superView.Accepting += (_, _) => superViewAcceptingCount++;
 
-        // Enter triggers Command.Accept → bubbles through Menu to SuperView
+        // Enter now triggers Activate, not Accept — Accepting should NOT bubble
         menuItem.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, superViewAcceptingCount);
+        Assert.Equal (0, superViewAcceptingCount);
 
         superView.Dispose ();
     }
@@ -1165,11 +1169,11 @@ public class MenuTests
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Enter on a childMenuItem with Button CommandView in a SubMenu raises Accept,
-    ///     which bubbles to subMenu and bridges Accepted to parentMenuItem.
+    ///     Enter on a childMenuItem with Button CommandView in a SubMenu raises Activate
+    ///     (not Accept), which does not bubble Accepting to the subMenu or bridge Accepted.
     /// </summary>
     [Fact]
-    public void SubMenu_Enter_Accept_ButtonCommandView_Bridges_Accepted_To_ParentMenuItem ()
+    public void SubMenu_Enter_Activate_ButtonCommandView_Does_Not_Raise_Accepting ()
     {
         Button button = new () { Title = "_Click", CanFocus = false };
         MenuItem childItem = new () { Title = "Child", CommandView = button };
@@ -1178,17 +1182,14 @@ public class MenuTests
         MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
         Menu rootMenu = new ([parentItem]);
 
-        var parentAcceptedCount = 0;
-        parentItem.Accepted += (_, _) => parentAcceptedCount++;
-
         var subMenuAcceptingCount = 0;
         subMenu.Accepting += (_, _) => subMenuAcceptingCount++;
 
-        // Enter triggers Command.Accept → bubbles to subMenu → bridges to parentMenuItem
+        // Enter now triggers Activate, not Accept
         childItem.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, subMenuAcceptingCount);
-        Assert.Equal (1, parentAcceptedCount);
+        // Accepting should NOT fire on the subMenu
+        Assert.Equal (0, subMenuAcceptingCount);
 
         rootMenu.Dispose ();
     }
