@@ -70,17 +70,16 @@ public class Menu : Bar
 
         // Dispatch Activate to the focused MenuItem. This enables callers to invoke
         // menu.InvokeCommand(Activate) and have it reach the selected MenuItem and its CommandView.
-        if (Focused is MenuItem menuItem)
+        if (Focused is not MenuItem menuItem)
         {
-            KeyBinding binding = new ([Command.Activate]);
-            WeakReference<View> source = new (this);
-            CommandContext ctx = new (Command.Activate, source, binding);
-            menuItem.InvokeCommand (Command.Activate, ctx);
-
-            return true;
+            return false;
         }
+        KeyBinding binding = new ([Command.Activate]);
+        WeakReference<View> source = new (this);
+        CommandContext ctx = new (Command.Activate, source, binding);
+        menuItem.InvokeCommand (Command.Activate, ctx);
 
-        return false;
+        return true;
     }
 
     /// <inheritdoc/>

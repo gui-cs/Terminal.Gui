@@ -34,25 +34,7 @@ public class MenuBar : Menu, IDesignable
         KeyBindings.Add (Key, Command.Quit);
         KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
 
-        AddCommand (Command.Quit,
-                    ctx =>
-                    {
-                        _popoverBrowsingMode = false;
-
-                        if (HideActiveItem ())
-                        {
-                            return true;
-                        }
-
-                        if (!CanFocus)
-                        {
-                            return false;
-                        }
-                        CanFocus = false;
-                        Active = false;
-
-                        return true;
-                    });
+        AddCommand (Command.Quit, Quit);
 
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -60,11 +42,56 @@ public class MenuBar : Menu, IDesignable
         AddCommand (Command.Left, MoveLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
 
+        // Override the default HotKey handler to correctly route bubbled-up HotKeys
+        // from MenuBarItems. Without this, DefaultHotKeyHandler invokes Activate on the
+        // MenuBar with Direct routing, causing FallbackToFirst to always open the first
+        // item instead of the one whose HotKey was pressed.
+        AddCommand (Command.HotKey, HotKeyHandler);
+
         BorderStyle = DefaultBorderStyle;
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
 
         return;
+
+        bool? HotKeyHandler (ICommandContext? ctx)
+        {
+            Trace.Command (this, ctx, "Entry");
+
+            // When a MenuBarItem's HotKey bubbles up to the MenuBar, invoke Activate
+            // on the source MenuBarItem directly. This toggles its PopoverMenuOpen and
+            // then bubbles Activate to OnActivating with BubblingUp routing, which
+            // correctly identifies the source and shows the right popover.
+            if (ctx?.Routing != CommandRouting.BubblingUp || !ctx.TryGetSource (out View? source) || FindMenuBarItemForSource (source) is not { } sourceMbi)
+            {
+                return DefaultHotKeyHandler (ctx);
+            }
+            Trace.Command (this, ctx, "BubblingUp", $"Activating {sourceMbi.ToIdentifyingString ()}");
+            sourceMbi.InvokeCommand (Command.Activate, ctx.Binding);
+
+            return true;
+
+            // Non-bubbled HotKey (e.g. F9 pressed on MenuBar directly) — use default behavior.
+        }
+
+        bool? Quit (ICommandContext? ctx)
+        {
+            _popoverBrowsingMode = false;
+
+            if (HideActiveItem ())
+            {
+                return true;
+            }
+
+            if (!CanFocus)
+            {
+                return false;
+            }
+            CanFocus = false;
+            Active = false;
+
+            return true;
+        }
 
         bool? MoveLeft (ICommandContext? ctx)
         {
@@ -586,7 +613,7 @@ public class MenuBar : Menu, IDesignable
 
         Id = "DemoBar";
 
-        var bordersCb = new CheckBox
+        CheckBox bordersCb = new ()
         {
             Title = "_Borders",
 
@@ -597,7 +624,7 @@ public class MenuBar : Menu, IDesignable
             Value = DefaultBorderStyle == LineStyle.None ? CheckState.UnChecked : CheckState.Checked
         };
 
-        var autoSaveCb = new CheckBox
+        CheckBox autoSaveCb = new ()
         {
             Title = "_Auto Save",
 
@@ -607,7 +634,7 @@ public class MenuBar : Menu, IDesignable
             CanFocus = false
         };
 
-        var enableOverwriteCb = new CheckBox
+        CheckBox enableOverwriteCb = new ()
         {
             Title = "Enable _Overwrite",
 
@@ -619,7 +646,7 @@ public class MenuBar : Menu, IDesignable
 
         OptionSelector<Schemes> mutuallyExclusiveOptionsSelector = new () { Title = "Scheme", CanFocus = true, MouseHighlightStates = MouseState.None };
 
-        var menuBgColorCp = new ColorPicker { Width = 30 };
+        ColorPicker menuBgColorCp = new () { Width = 30 };
 
         menuBgColorCp.ValueChanged += (_, args) =>
                                       {
@@ -734,9 +761,9 @@ public class MenuBar : Menu, IDesignable
 
         MenuItem [] ConfigureDetailsSubMenu ()
         {
-            var detail = new MenuItem { Title = "_Detail 1", Text = "Some detail #1" };
+            MenuItem detail = new () { Title = "_Detail 1", Text = "Some detail #1" };
 
-            var nestedSubMenu = new MenuItem { Title = "_Moar Details", SubMenu = new Menu (ConfigureMoreDetailsSubMenu ()) };
+            MenuItem nestedSubMenu = new () { Title = "_Moar Details", SubMenu = new Menu (ConfigureMoreDetailsSubMenu ()) };
 
             // This menu item is used to test Application Key binding. See the Menus Scenario.
             // F5 will toggle the Edit Mode checkbox, and the menu item text will update to show the Command it's bound to.
@@ -754,14 +781,14 @@ public class MenuBar : Menu, IDesignable
 
             View [] ConfigureMoreDetailsSubMenu ()
             {
-                var deeperDetail = new MenuItem
+                MenuItem deeperDetail = new ()
                 {
                     Title = "_Deeper Detail",
                     Text = "Deeper Detail",
                     Action = () => { MessageBox.Query (App!, "Deeper Detail", "Lots of details", Strings.btnOk); }
                 };
 
-                var belowLineDetail = new MenuItem { Title = "_Even more detail", Text = "Below the line" };
+                MenuItem belowLineDetail = new () { Title = "_Even more detail", Text = "Below the line" };
 
                 // This ensures the checkbox state toggles when the hotkey of Title is pressed.
                 // shortcut4.Accepting += (sender, args) => args.Cancel = true;

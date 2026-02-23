@@ -11,7 +11,7 @@ public class MenuItem : Shortcut
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>.
     /// </summary>
-    public MenuItem () : base (Key.Empty, null, null) { RebindEnterToActivate (); }
+    public MenuItem () : base (Key.Empty, null, null) => RebindEnterToActivate ();
 
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>, binding it to <paramref name="targetView"/> and
@@ -48,11 +48,11 @@ public class MenuItem : Shortcut
     public MenuItem (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null) : base (key ?? Key.Empty,
         commandText,
         action,
-        helpText)
-    { RebindEnterToActivate (); }
+        helpText) =>
+        RebindEnterToActivate ();
 
     /// <inheritdoc/>
-    public MenuItem (string commandText, Key key, Action? action = null) : base (key ?? Key.Empty, commandText, action) { RebindEnterToActivate (); }
+    public MenuItem (string commandText, Key key, Action? action = null) : base (key ?? Key.Empty, commandText, action) => RebindEnterToActivate ();
 
     /// <inheritdoc/>
     public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText)
