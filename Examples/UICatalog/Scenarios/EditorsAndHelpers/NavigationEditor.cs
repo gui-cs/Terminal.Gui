@@ -1,59 +1,48 @@
-﻿#nullable enable
+#nullable enable
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     Provides an editor UI for the Margin, Border, and Padding of a View.
+///     Provides an editor UI for TabStop and related Navigation settings.
 /// </summary>
-public sealed class ArrangementEditor : EditorBase
+public sealed class NavigationEditor : EditorBase
 {
-    public ArrangementEditor ()
+    public NavigationEditor ()
     {
-        Title = "ArrangementEditor";
+        Title = "NavigationEditor";
         TabStop = TabBehavior.TabGroup;
 
-        Initialized += ArrangementEditor_Initialized;
-
-        Add (_arrangementSelector);
+        Add (_tabBehaviorSelector);
     }
 
-    private readonly FlagSelector<ViewArrangement> _arrangementSelector = new () { Orientation = Orientation.Vertical };
+    private readonly OptionSelector<TabBehavior> _tabBehaviorSelector = new () { Orientation = Orientation.Vertical };
 
     protected override void OnViewToEditChanged ()
     {
-        _arrangementSelector.Enabled = ViewToEdit is { } and not Adornment;
+        _tabBehaviorSelector.Enabled = ViewToEdit is { } and not Adornment;
 
-        _arrangementSelector.ValueChanged -= ArrangementFlagsOnValueChanged;
+        _tabBehaviorSelector.ValueChanged -= TabStopOnValueChanged;
 
-        // Set the appropriate options in the slider based on _viewToEdit.Arrangement
         if (ViewToEdit is { })
         {
-            _arrangementSelector.Value = ViewToEdit.Arrangement;
+            _tabBehaviorSelector.Value = ViewToEdit.TabStop;
         }
 
-        _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
+        _tabBehaviorSelector.ValueChanged += TabStopOnValueChanged;
     }
 
-    private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<ViewArrangement?> e)
+    private void TabStopOnValueChanged (object? sender, EventArgs<TabBehavior?> e)
     {
         if (ViewToEdit is null || e.Value is null)
         {
             return;
         }
-        ViewToEdit.Arrangement = (ViewArrangement)e.Value;
-
-        if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
-        {
-            ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
-            ViewToEdit.SchemeName = "Runnable";
-        }
-        else
-        {
-            ViewToEdit.ShadowStyle = ShadowStyle.None;
-            ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
-        }
-
-        ViewToEdit.BorderStyle = ViewToEdit.Arrangement.HasFlag (ViewArrangement.Movable) ? LineStyle.Double : LineStyle.Single;
+        ViewToEdit.TabStop = (TabBehavior)e.Value;
     }
 
-    private void ArrangementEditor_Initialized (object? sender, EventArgs e) => _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        base.EndInit ();
+        _tabBehaviorSelector.ValueChanged += TabStopOnValueChanged;
+    }
 }

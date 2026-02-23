@@ -464,7 +464,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator != (Key? a, Key? b) { return a is { } && !a.Equals (b); }
+    public static bool operator != (Key? a, Key? b) { return a is null ? b is not null : !a.Equals (b); }
 
     /// <summary>Compares two <see cref="Key"/>s for less-than.</summary>
     /// <param name="a"></param>

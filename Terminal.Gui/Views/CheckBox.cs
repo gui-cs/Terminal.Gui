@@ -45,7 +45,6 @@ public class CheckBox : View, IValue<CheckState>
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? commandContext)
     {
-        Logging.Debug ($"{this.ToIdentifyingString ()} ({commandContext})");
         base.OnActivated (commandContext);
         AdvanceCheckState ();
     }

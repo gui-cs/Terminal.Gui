@@ -21,6 +21,8 @@ namespace Terminal.Gui.Drawing;
 /// </remarks>
 public class Glyphs
 {
+    private static string _null;
+
     // IMPORTANT: If you change these, make sure to update the ./Resources/config.json file as
     // IMPORTANT: it is the source of truth for the default glyphs at runtime.
     // IMPORTANT: Configuration Manager test SaveDefaults uses this class to generate the default config file
@@ -48,6 +50,10 @@ public class Glyphs
     public static Rune VerticalFourDots { get; set; } = (Rune)'⁞';
 
     #region ----------------- Single Glyphs -----------------
+
+    /// <summary>Null symbol ('␀')</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Rune Null { get; set; } = (Rune)'␀';
 
     /// <summary>Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
@@ -206,330 +212,330 @@ public class Glyphs
     public static Rune HLineDbl { get; set; } = (Rune)'═';
 
     /// <summary>Box Drawings Double Vertical (U+2551) - ║</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune VLineDbl { get; set; } = (Rune)'║';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune VLineDbl { get; set; } = (Rune)'║';
 
     /// <summary>Box Drawings Heavy Double Dash Horizontal (U+254D) - ╍</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HLineHvDa2 { get; set; } = (Rune)'╍';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HLineHvDa2 { get; set; } = (Rune)'╍';
 
     /// <summary>Box Drawings Heavy Triple Dash Vertical (U+2507) - ┇</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineHvDa3 { get; set; } = (Rune)'┇';
 
     /// <summary>Box Drawings Heavy Triple Dash Horizontal (U+2505) - ┅</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HLineHvDa3 { get; set; } = (Rune)'┅';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HLineHvDa3 { get; set; } = (Rune)'┅';
 
     /// <summary>Box Drawings Heavy Quadruple Dash Horizontal (U+2509) - ┉</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HLineHvDa4 { get; set; } = (Rune)'┉';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HLineHvDa4 { get; set; } = (Rune)'┉';
 
     /// <summary>Box Drawings Heavy Double Dash Vertical (U+254F) - ╏</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune VLineHvDa2 { get; set; } = (Rune)'╏';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune VLineHvDa2 { get; set; } = (Rune)'╏';
 
     /// <summary>Box Drawings Heavy Quadruple Dash Vertical (U+250B) - ┋</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune VLineHvDa4 { get; set; } = (Rune)'┋';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune VLineHvDa4 { get; set; } = (Rune)'┋';
 
     /// <summary>Box Drawings Light Double Dash Horizontal (U+254C) - ╌</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HLineDa2 { get; set; } = (Rune)'╌';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HLineDa2 { get; set; } = (Rune)'╌';
 
     /// <summary>Box Drawings Light Triple Dash Vertical (U+2506) - ┆</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune VLineDa3 { get; set; } = (Rune)'┆';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune VLineDa3 { get; set; } = (Rune)'┆';
 
     /// <summary>Box Drawings Light Triple Dash Horizontal (U+2504) - ┄</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HLineDa3 { get; set; } = (Rune)'┄';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HLineDa3 { get; set; } = (Rune)'┄';
 
     /// <summary>Box Drawings Light Quadruple Dash Horizontal (U+2508) - ┈</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HLineDa4 { get; set; } = (Rune)'┈';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HLineDa4 { get; set; } = (Rune)'┈';
 
     /// <summary>Box Drawings Light Double Dash Vertical (U+254E) - ╎</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune VLineDa2 { get; set; } = (Rune)'╎';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune VLineDa2 { get; set; } = (Rune)'╎';
 
     /// <summary>Box Drawings Light Quadruple Dash Vertical (U+250A) - ┊</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune VLineDa4 { get; set; } = (Rune)'┊';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune VLineDa4 { get; set; } = (Rune)'┊';
 
     /// <summary>Box Drawings Heavy Horizontal (U+2501) - ━</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HLineHv { get; set; } = (Rune)'━';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HLineHv { get; set; } = (Rune)'━';
 
     /// <summary>Box Drawings Heavy Vertical (U+2503) - ┃</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune VLineHv { get; set; } = (Rune)'┃';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune VLineHv { get; set; } = (Rune)'┃';
 
     /// <summary>Box Drawings Light Left (U+2574) - ╴</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfLeftLine { get; set; } = (Rune)'╴';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfLeftLine { get; set; } = (Rune)'╴';
 
     /// <summary>Box Drawings Light Vertical (U+2575) - ╵</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfTopLine { get; set; } = (Rune)'╵';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfTopLine { get; set; } = (Rune)'╵';
 
     /// <summary>Box Drawings Light Horizontal (U+2576) - ╶</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfRightLine { get; set; } = (Rune)'╶';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfRightLine { get; set; } = (Rune)'╶';
 
     /// <summary>Box Drawings Light Down (U+2577) - ╷</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfBottomLine { get; set; } = (Rune)'╷';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfBottomLine { get; set; } = (Rune)'╷';
 
     /// <summary>Box Drawings Heavy Left (U+2578) - ╸</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfLeftLineHv { get; set; } = (Rune)'╸';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfLeftLineHv { get; set; } = (Rune)'╸';
 
     /// <summary>Box Drawings Heavy Vertical (U+2579) - ╹</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfTopLineHv { get; set; } = (Rune)'╹';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfTopLineHv { get; set; } = (Rune)'╹';
 
     /// <summary>Box Drawings Heavy Horizontal (U+257A) - ╺</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfRightLineHv { get; set; } = (Rune)'╺';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfRightLineHv { get; set; } = (Rune)'╺';
 
     /// <summary>Box Drawings Light Vertical and Horizontal (U+257B) - ╻</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune HalfBottomLineLt { get; set; } = (Rune)'╻';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune HalfBottomLineLt { get; set; } = (Rune)'╻';
 
     /// <summary>Box Drawings Light Horizontal and Heavy Horizontal (U+257C) - ╼</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightSideLineLtHv { get; set; } = (Rune)'╼';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightSideLineLtHv { get; set; } = (Rune)'╼';
 
     /// <summary>Box Drawings Light Vertical and Heavy Horizontal (U+257D) - ╽</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomSideLineLtHv { get; set; } = (Rune)'╽';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomSideLineLtHv { get; set; } = (Rune)'╽';
 
     /// <summary>Box Drawings Heavy Left and Light Horizontal (U+257E) - ╾</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftSideLineHvLt { get; set; } = (Rune)'╾';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftSideLineHvLt { get; set; } = (Rune)'╾';
 
     /// <summary>Box Drawings Heavy Vertical and Light Horizontal (U+257F) - ╿</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopSideLineHvLt { get; set; } = (Rune)'╿';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopSideLineHvLt { get; set; } = (Rune)'╿';
 
     #endregion
 
     #region ----------------- Upper Left Corners -----------------
 
     /// <summary>Box Drawings Upper Left Corner - Light Vertical and Light Horizontal (U+250C) - ┌</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCorner { get; set; } = (Rune)'┌';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCorner { get; set; } = (Rune)'┌';
 
     /// <summary>Box Drawings Upper Left Corner -  Double (U+2554) - ╔</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCornerDbl { get; set; } = (Rune)'╔';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCornerDbl { get; set; } = (Rune)'╔';
 
     /// <summary>Box Drawings Upper Left Corner - Light Arc Down and Horizontal (U+256D) - ╭</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCornerR { get; set; } = (Rune)'╭';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCornerR { get; set; } = (Rune)'╭';
 
     /// <summary>Box Drawings Heavy Down and Horizontal (U+250F) - ┏</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCornerHv { get; set; } = (Rune)'┏';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCornerHv { get; set; } = (Rune)'┏';
 
     /// <summary>Box Drawings Down Heavy and Horizontal Light (U+251E) - ┎</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCornerHvLt { get; set; } = (Rune)'┎';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCornerHvLt { get; set; } = (Rune)'┎';
 
     /// <summary>Box Drawings Down Light and Horizontal Heavy (U+250D) - ┎</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCornerLtHv { get; set; } = (Rune)'┍';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCornerLtHv { get; set; } = (Rune)'┍';
 
     /// <summary>Box Drawings Double Down and Single Horizontal (U+2553) - ╓</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCornerDblSingle { get; set; } = (Rune)'╓';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCornerDblSingle { get; set; } = (Rune)'╓';
 
     /// <summary>Box Drawings Single Down and Double Horizontal (U+2552) - ╒</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ULCornerSingleDbl { get; set; } = (Rune)'╒';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ULCornerSingleDbl { get; set; } = (Rune)'╒';
 
     #endregion
 
     #region ----------------- Lower Left Corners -----------------
 
     /// <summary>Box Drawings Lower Left Corner - Light Vertical and Light Horizontal (U+2514) - └</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCorner { get; set; } = (Rune)'└';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCorner { get; set; } = (Rune)'└';
 
     /// <summary>Box Drawings Heavy Vertical and Horizontal (U+2517) - ┗</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCornerHv { get; set; } = (Rune)'┗';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCornerHv { get; set; } = (Rune)'┗';
 
     /// <summary>Box Drawings Heavy Vertical and Horizontal Light (U+2516) - ┖</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCornerHvLt { get; set; } = (Rune)'┖';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCornerHvLt { get; set; } = (Rune)'┖';
 
     /// <summary>Box Drawings Vertical Light and Horizontal Heavy (U+2511) - ┕</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCornerLtHv { get; set; } = (Rune)'┕';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCornerLtHv { get; set; } = (Rune)'┕';
 
     /// <summary>Box Drawings Double Vertical and Double Left (U+255A) - ╚</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCornerDbl { get; set; } = (Rune)'╚';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCornerDbl { get; set; } = (Rune)'╚';
 
     /// <summary>Box Drawings Single Vertical and Double Left (U+2558) - ╘</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCornerSingleDbl { get; set; } = (Rune)'╘';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCornerSingleDbl { get; set; } = (Rune)'╘';
 
     /// <summary>Box Drawings Double Down and Single Left (U+2559) - ╙</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCornerDblSingle { get; set; } = (Rune)'╙';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCornerDblSingle { get; set; } = (Rune)'╙';
 
     /// <summary>Box Drawings Upper Left Corner - Light Arc Down and Left (U+2570) - ╰</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LLCornerR { get; set; } = (Rune)'╰';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LLCornerR { get; set; } = (Rune)'╰';
 
     #endregion
 
     #region ----------------- Upper Right Corners -----------------
 
     /// <summary>Box Drawings Upper Horizontal Corner - Light Vertical and Light Horizontal (U+2510) - ┐</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCorner { get; set; } = (Rune)'┐';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCorner { get; set; } = (Rune)'┐';
 
     /// <summary>Box Drawings Upper Horizontal Corner - Double Vertical and Double Horizontal (U+2557) - ╗</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCornerDbl { get; set; } = (Rune)'╗';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCornerDbl { get; set; } = (Rune)'╗';
 
     /// <summary>Box Drawings Upper Horizontal Corner - Light Arc Vertical and Horizontal (U+256E) - ╮</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCornerR { get; set; } = (Rune)'╮';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCornerR { get; set; } = (Rune)'╮';
 
     /// <summary>Box Drawings Heavy Down and Left (U+2513) - ┓</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCornerHv { get; set; } = (Rune)'┓';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCornerHv { get; set; } = (Rune)'┓';
 
     /// <summary>Box Drawings Heavy Vertical and Left Down Light (U+2511) - ┑</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCornerHvLt { get; set; } = (Rune)'┑';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCornerHvLt { get; set; } = (Rune)'┑';
 
     /// <summary>Box Drawings Down Light and Horizontal Heavy (U+2514) - ┒</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCornerLtHv { get; set; } = (Rune)'┒';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCornerLtHv { get; set; } = (Rune)'┒';
 
     /// <summary>Box Drawings Double Vertical and Single Left (U+2556) - ╖</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCornerDblSingle { get; set; } = (Rune)'╖';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCornerDblSingle { get; set; } = (Rune)'╖';
 
     /// <summary>Box Drawings Single Vertical and Double Left (U+2555) - ╕</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune URCornerSingleDbl { get; set; } = (Rune)'╕';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune URCornerSingleDbl { get; set; } = (Rune)'╕';
 
     #endregion
 
     #region ----------------- Lower Right Corners -----------------
 
     /// <summary>Box Drawings Lower Right Corner - Light (U+2518) - ┘</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCorner { get; set; } = (Rune)'┘';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCorner { get; set; } = (Rune)'┘';
 
     /// <summary>Box Drawings Lower Right Corner - Double (U+255D) - ╝</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCornerDbl { get; set; } = (Rune)'╝';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCornerDbl { get; set; } = (Rune)'╝';
 
     /// <summary>Box Drawings Lower Right Corner - Rounded (U+256F) - ╯</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCornerR { get; set; } = (Rune)'╯';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCornerR { get; set; } = (Rune)'╯';
 
     /// <summary>Box Drawings Lower Right Corner - Heavy (U+251B) - ┛</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCornerHv { get; set; } = (Rune)'┛';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCornerHv { get; set; } = (Rune)'┛';
 
     /// <summary>Box Drawings Lower Right Corner - Double Vertical and Single Horizontal (U+255C) - ╜</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCornerDblSingle { get; set; } = (Rune)'╜';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCornerDblSingle { get; set; } = (Rune)'╜';
 
     /// <summary>Box Drawings Lower Right Corner - Single Vertical and Double Horizontal (U+255B) - ╛</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCornerSingleDbl { get; set; } = (Rune)'╛';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCornerSingleDbl { get; set; } = (Rune)'╛';
 
     /// <summary>Box Drawings Lower Right Corner - Light Vertical and Heavy Horizontal (U+2519) - ┙</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCornerLtHv { get; set; } = (Rune)'┙';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCornerLtHv { get; set; } = (Rune)'┙';
 
     /// <summary>Box Drawings Lower Right Corner - Heavy Vertical and Light Horizontal (U+251A) - ┚</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LRCornerHvLt { get; set; } = (Rune)'┚';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LRCornerHvLt { get; set; } = (Rune)'┚';
 
     #endregion
 
     #region ----------------- Tees -----------------
 
     /// <summary>Box Drawings Left Tee - Single Vertical and Single Horizontal (U+251C) - ├</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftTee { get; set; } = (Rune)'├';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftTee { get; set; } = (Rune)'├';
 
     /// <summary>Box Drawings Left Tee - Single Vertical and Double Horizontal (U+255E) - ╞</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftTeeDblH { get; set; } = (Rune)'╞';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftTeeDblH { get; set; } = (Rune)'╞';
 
     /// <summary>Box Drawings Left Tee - Double Vertical and Single Horizontal (U+255F) - ╟</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftTeeDblV { get; set; } = (Rune)'╟';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftTeeDblV { get; set; } = (Rune)'╟';
 
     /// <summary>Box Drawings Left Tee - Double Vertical and Double Horizontal (U+2560) - ╠</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftTeeDbl { get; set; } = (Rune)'╠';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftTeeDbl { get; set; } = (Rune)'╠';
 
     /// <summary>Box Drawings Left Tee - Heavy Horizontal and Light Vertical (U+2523) - ┝</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftTeeHvH { get; set; } = (Rune)'┝';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftTeeHvH { get; set; } = (Rune)'┝';
 
     /// <summary>Box Drawings Left Tee - Light Horizontal and Heavy Vertical (U+252B) - ┠</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftTeeHvV { get; set; } = (Rune)'┠';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftTeeHvV { get; set; } = (Rune)'┠';
 
     /// <summary>Box Drawings Left Tee - Heavy Vertical and Heavy Horizontal (U+2527) - ┣</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune LeftTeeHvDblH { get; set; } = (Rune)'┣';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune LeftTeeHvDblH { get; set; } = (Rune)'┣';
 
     /// <summary>Box Drawings Right Tee - Single Vertical and Single Horizontal (U+2524) - ┤</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightTee { get; set; } = (Rune)'┤';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightTee { get; set; } = (Rune)'┤';
 
     /// <summary>Box Drawings Right Tee - Single Vertical and Double Horizontal (U+2561) - ╡</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightTeeDblH { get; set; } = (Rune)'╡';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightTeeDblH { get; set; } = (Rune)'╡';
 
     /// <summary>Box Drawings Right Tee - Double Vertical and Single Horizontal (U+2562) - ╢</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightTeeDblV { get; set; } = (Rune)'╢';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightTeeDblV { get; set; } = (Rune)'╢';
 
     /// <summary>Box Drawings Right Tee - Double Vertical and Double Horizontal (U+2563) - ╣</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightTeeDbl { get; set; } = (Rune)'╣';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightTeeDbl { get; set; } = (Rune)'╣';
 
     /// <summary>Box Drawings Right Tee - Heavy Horizontal and Light Vertical (U+2528) - ┥</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightTeeHvH { get; set; } = (Rune)'┥';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightTeeHvH { get; set; } = (Rune)'┥';
 
     /// <summary>Box Drawings Right Tee - Light Horizontal and Heavy Vertical (U+2530) - ┨</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightTeeHvV { get; set; } = (Rune)'┨';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightTeeHvV { get; set; } = (Rune)'┨';
 
     /// <summary>Box Drawings Right Tee - Heavy Vertical and Heavy Horizontal (U+252C) - ┫</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune RightTeeHvDblH { get; set; } = (Rune)'┫';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune RightTeeHvDblH { get; set; } = (Rune)'┫';
 
     /// <summary>Box Drawings Top Tee - Single Vertical and Single Horizontal (U+252C) - ┬</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopTee { get; set; } = (Rune)'┬';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopTee { get; set; } = (Rune)'┬';
 
     /// <summary>Box Drawings Top Tee - Single Vertical and Double Horizontal (U+2564) - ╤</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopTeeDblH { get; set; } = (Rune)'╤';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopTeeDblH { get; set; } = (Rune)'╤';
 
     /// <summary>Box Drawings Top Tee - Double Vertical and Single Horizontal  (U+2565) - ╥</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopTeeDblV { get; set; } = (Rune)'╥';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopTeeDblV { get; set; } = (Rune)'╥';
 
     /// <summary>Box Drawings Top Tee - Double Vertical and Double Horizontal (U+2566) - ╦</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopTeeDbl { get; set; } = (Rune)'╦';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopTeeDbl { get; set; } = (Rune)'╦';
 
     /// <summary>Box Drawings Top Tee - Heavy Horizontal and Light Vertical (U+252F) - ┯</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopTeeHvH { get; set; } = (Rune)'┯';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopTeeHvH { get; set; } = (Rune)'┯';
 
     /// <summary>Box Drawings Top Tee - Light Horizontal and Heavy Vertical (U+2537) - ┰</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopTeeHvV { get; set; } = (Rune)'┰';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopTeeHvV { get; set; } = (Rune)'┰';
 
     /// <summary>Box Drawings Top Tee - Heavy Vertical and Heavy Horizontal (U+2533) - ┳</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune TopTeeHvDblH { get; set; } = (Rune)'┳';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune TopTeeHvDblH { get; set; } = (Rune)'┳';
 
     /// <summary>Box Drawings Bottom Tee - Single Vertical and Single Horizontal (U+2534) - ┴</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomTee { get; set; } = (Rune)'┴';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomTee { get; set; } = (Rune)'┴';
 
     /// <summary>Box Drawings Bottom Tee - Single Vertical and Double Horizontal (U+2567) - ╧</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomTeeDblH { get; set; } = (Rune)'╧';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomTeeDblH { get; set; } = (Rune)'╧';
 
     /// <summary>Box Drawings Bottom Tee - Double Vertical and Single Horizontal (U+2568) - ╨</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomTeeDblV { get; set; } = (Rune)'╨';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomTeeDblV { get; set; } = (Rune)'╨';
 
     /// <summary>Box Drawings Bottom Tee - Double Vertical and Double Horizontal (U+2569) - ╩</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomTeeDbl { get; set; } = (Rune)'╩';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomTeeDbl { get; set; } = (Rune)'╩';
 
     /// <summary>Box Drawings Bottom Tee - Heavy Horizontal and Light Vertical (U+2535) - ┷</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomTeeHvH { get; set; } = (Rune)'┷';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomTeeHvH { get; set; } = (Rune)'┷';
 
     /// <summary>Box Drawings Bottom Tee - Light Horizontal and Heavy Vertical (U+253D) - ┸</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomTeeHvV { get; set; } = (Rune)'┸';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomTeeHvV { get; set; } = (Rune)'┸';
 
     /// <summary>Box Drawings Bottom Tee - Heavy Vertical and Heavy Horizontal (U+2539) - ┻</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune BottomTeeHvDblH { get; set; } = (Rune)'┻';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune BottomTeeHvDblH { get; set; } = (Rune)'┻';
 
     #endregion
 
     #region ----------------- Crosses -----------------
 
     /// <summary>Box Drawings Cross - Single Vertical and Single Horizontal (U+253C) - ┼</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune Cross { get; set; } = (Rune)'┼';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune Cross { get; set; } = (Rune)'┼';
 
     /// <summary>Box Drawings Cross - Single Vertical and Double Horizontal (U+256A) - ╪</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune CrossDblH { get; set; } = (Rune)'╪';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune CrossDblH { get; set; } = (Rune)'╪';
 
     /// <summary>Box Drawings Cross - Double Vertical and Single Horizontal (U+256B) - ╫</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune CrossDblV { get; set; } = (Rune)'╫';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune CrossDblV { get; set; } = (Rune)'╫';
 
     /// <summary>Box Drawings Cross - Double Vertical and Double Horizontal (U+256C) - ╬</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune CrossDbl { get; set; } = (Rune)'╬';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune CrossDbl { get; set; } = (Rune)'╬';
 
     /// <summary>Box Drawings Cross - Heavy Horizontal and Light Vertical (U+253F) - ┿</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune CrossHvH { get; set; } = (Rune)'┿';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune CrossHvH { get; set; } = (Rune)'┿';
 
     /// <summary>Box Drawings Cross - Light Horizontal and Heavy Vertical (U+2541) - ╂</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune CrossHvV { get; set; } = (Rune)'╂';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune CrossHvV { get; set; } = (Rune)'╂';
 
     /// <summary>Box Drawings Cross - Heavy Vertical and Heavy Horizontal (U+254B) - ╋</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune CrossHv { get; set; } = (Rune)'╋';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune CrossHv { get; set; } = (Rune)'╋';
 
     #endregion
 
     #region ----------------- ShadowStyle -----------------
 
     /// <summary>Shadow - Vertical Start - Left Half Block - ▌ U+0258c</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ShadowVerticalStart { get; set; } = (Rune)'▖'; // Half: '\u2596'  ▖;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ShadowVerticalStart { get; set; } = (Rune)'▖'; // Half: '\u2596'  ▖;
 
     /// <summary>Shadow - Vertical - Left Half Block - ▌ U+0258c</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ShadowVertical { get; set; } = (Rune)'▌';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ShadowVertical { get; set; } = (Rune)'▌';
 
     /// <summary>Shadow - Horizontal Start - Upper Half Block - ▀ U+02580</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ShadowHorizontalStart { get; set; } = (Rune)'▝'; // Half: ▝ U+0259d;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ShadowHorizontalStart { get; set; } = (Rune)'▝'; // Half: ▝ U+0259d;
 
     /// <summary>Shadow - Horizontal - Upper Half Block - ▀ U+02580</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ShadowHorizontal { get; set; } = (Rune)'▀';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ShadowHorizontal { get; set; } = (Rune)'▀';
 
     /// <summary>Shadow - Horizontal End - Quadrant Upper Left - ▘ U+02598</summary>
-    [ConfigurationProperty(Scope = typeof(ThemeScope))] public static Rune ShadowHorizontalEnd { get; set; } = (Rune)'▘';
+    [ConfigurationProperty (Scope = typeof (ThemeScope))] public static Rune ShadowHorizontalEnd { get; set; } = (Rune)'▘';
 
     #endregion
 }

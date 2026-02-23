@@ -96,6 +96,6 @@ public record struct KeyBinding : ICommandBinding
             targetStr = $", Target={Target.ToIdentifyingString ()}";
         }
 
-        return $"[{string.Join (", ", Commands)}], Key={Key}{sourceStr}{targetStr}{(Data is { } ? ", Data=" : "")}";
+        return $"[{string.Join (", ", Commands)}], Key={Key}{sourceStr}{targetStr}{(Data is { } ? $", Data={Data}" : "")}";
     }
 }

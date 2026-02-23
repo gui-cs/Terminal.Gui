@@ -86,7 +86,7 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Tracing.Trace.Command (owner, e.Context, "Bridge", $"{_remote.ToIdentifyingString ()}->({_owner.ToIdentifyingString ()}");
+        Tracing.Trace.Command (owner, e.Context, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {
@@ -106,7 +106,7 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Tracing.Trace.Command (owner, e.Value, "Bridge", $"{_remote.ToIdentifyingString ()}->({_owner.ToIdentifyingString ()}");
+        Tracing.Trace.Command (owner, e.Value, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {

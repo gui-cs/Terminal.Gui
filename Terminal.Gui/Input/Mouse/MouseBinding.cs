@@ -53,6 +53,6 @@ public record struct MouseBinding : ICommandBinding
             sourceStr = $", Source={sv.ToIdentifyingString ()}";
         }
 
-        return $"[{string.Join (", ", Commands)}] (MouseEvent={MouseEvent}{sourceStr}{(Data is { } ? ", Data=" : "")})";
+        return $"[{string.Join (", ", Commands)}] (MouseEvent={MouseEvent}{sourceStr}{(Data is { } data ? $", Data={data}" : "")})";
     }
 }
