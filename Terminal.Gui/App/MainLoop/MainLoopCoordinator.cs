@@ -147,7 +147,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         // Detect the terminal's actual default colors via OSC 10/11 queries.
         // Skip if color capabilities indicate a terminal that won't support OSC.
-        if (_driver.ColorCapabilities is not { Capability: ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16 })
+        if (_driver.ColorCapabilities is { Capability: ColorCapabilityLevel.Colors256 or ColorCapabilityLevel.TrueColor })
         {
             TerminalColorDetector colorDetector = new (_driver);
 

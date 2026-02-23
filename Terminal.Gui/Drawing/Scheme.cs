@@ -213,14 +213,18 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     ///     applying inheritance rules for attributes not explicitly set.
     /// </summary>
     /// <param name="role">The semantic <see cref="VisualRole"/> describing the element being rendered.</param>
+    /// <param name="defaultTerminalColors">
+    ///     The terminal's actual default foreground/background colors (queried via OSC 10/11), used to resolve
+    ///     <see cref="Color.None"/> during color derivation. If <see langword="null"/>, falls back to White/Black.
+    /// </param>
     /// <returns>
     ///     The corresponding <see cref="Attribute"/> from the <see cref="Scheme"/>, possibly derived if not explicitly
     ///     set.
     /// </returns>
-    public Attribute GetAttributeForRole (VisualRole role) =>
+    public Attribute GetAttributeForRole (VisualRole role, Attribute? defaultTerminalColors = null) =>
 
         // Use a HashSet to guard against recursion cycles
-        GetAttributeForRoleCore (role, []);
+        GetAttributeForRoleCore (role, [], defaultTerminalColors);
 
     /// <summary>
     ///     Attempts to get the <see cref="Attribute"/> associated with a specified <see cref="VisualRole"/>. If the
@@ -252,7 +256,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
     // TODO: Provide a CWP-based API that lets devs override this algo?
 
-    private Attribute GetAttributeForRoleCore (VisualRole role, HashSet<VisualRole> stack)
+    private Attribute GetAttributeForRoleCore (VisualRole role, HashSet<VisualRole> stack, Attribute? defaultTerminalColors)
     {
         // Prevent infinite recursion
         if (!stack.Add (role))
@@ -272,58 +276,58 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         // Derivation algorithm as documented
         Attribute result = role switch
                            {
-                               VisualRole.Focus => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               VisualRole.Focus => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
-                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Background, defaultTerminalColors),
+                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground
                                },
 
-                               VisualRole.Active => GetAttributeForRoleCore (VisualRole.Focus, stack) with
+                               VisualRole.Active => GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors) with
                                {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground, true).GetBrighterColor (),
-                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack).Background).GetDimColor (),
-                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true).GetBrighterColor (),
+                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Background, defaultTerminalColors).GetDimColor (),
+                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Style | TextStyle.Bold
                                },
 
-                               VisualRole.Highlight => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               VisualRole.Highlight => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
-                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack).Background).GetBrighterColor (),
-                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
-                                   Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Italic
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Background, defaultTerminalColors).GetBrighterColor (),
+                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Background,
+                                   Style = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors).Style | TextStyle.Italic
                                },
 
-                               VisualRole.Editable => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               VisualRole.Editable => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
-                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground, true).GetDimColor (0.5)
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground,
+                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground, defaultTerminalColors, true).GetDimColor (0.5)
                                },
 
-                               VisualRole.ReadOnly => GetAttributeForRoleCore (VisualRole.Editable, stack) with
+                               VisualRole.ReadOnly => GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors) with
                                {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Editable, stack).Foreground.GetDimColor (0.05)
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors).Foreground.GetDimColor (0.05)
                                },
 
-                               VisualRole.Disabled => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               VisualRole.Disabled => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.05)
+                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Foreground.GetDimColor (0.05)
                                },
 
-                               VisualRole.HotNormal => GetAttributeForRoleCore (VisualRole.Normal, stack) with
+                               VisualRole.HotNormal => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors) with
                                {
-                                   Style = GetAttributeForRoleCore (VisualRole.Normal, stack).Style | TextStyle.Underline
+                                   Style = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors).Style | TextStyle.Underline
                                },
 
-                               VisualRole.HotFocus => GetAttributeForRoleCore (VisualRole.Focus, stack) with
+                               VisualRole.HotFocus => GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors) with
                                {
-                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Underline
+                                   Style = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors).Style | TextStyle.Underline
                                },
 
-                               VisualRole.HotActive => GetAttributeForRoleCore (VisualRole.Active, stack) with
+                               VisualRole.HotActive => GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors) with
                                {
-                                   Style = GetAttributeForRoleCore (VisualRole.Active, stack).Style | TextStyle.Underline
+                                   Style = GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors).Style | TextStyle.Underline
                                },
 
-                               _ => GetAttributeForRoleCore (VisualRole.Normal, stack)
+                               _ => GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors)
                            };
 
         stack.Remove (role);
@@ -355,14 +359,14 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             return explicitValue.Value;
         }
 
-        return GetAttributeForRoleCore (role, []);
+        return GetAttributeForRoleCore (role, [], null);
     }
 
     // Helper method for property _set implementation
     private Attribute? SetAttributeForRoleProperty (Attribute value, VisualRole role)
     {
         // If value is the same as the algorithm value, use null
-        if (GetAttributeForRoleCore (role, []) == value)
+        if (GetAttributeForRoleCore (role, [], null) == value)
         {
             return null;
         }
@@ -525,29 +529,30 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
     /// <summary>
     ///     Resolves <see cref="Color.None"/> to a concrete color for use in color math (brighten, dim, invert).
-    ///     Queries the current driver's <see cref="IDriver.DefaultAttribute"/> (detected via OSC 10/11)
-    ///     if available, otherwise falls back to White (foreground) or Black (background).
+    ///     Uses the provided terminal default colors (detected via OSC 10/11) if available,
+    ///     otherwise falls back to White (foreground) or Black (background).
     /// </summary>
     /// <param name="color">The color to resolve.</param>
+    /// <param name="defaultTerminalColors">
+    ///     The terminal's actual default foreground/background colors, or <see langword="null"/> to use fallback.
+    /// </param>
     /// <param name="isForeground">
     ///     <see langword="true"/> to resolve as a foreground color (falls back to White);
     ///     <see langword="false"/> to resolve as a background color (falls back to Black).
     /// </param>
     /// <returns>The resolved color, guaranteed to not be <see cref="Color.None"/>.</returns>
-    private static Color ResolveNone (Color color, bool isForeground = false)
+    private static Color ResolveNone (Color color, Attribute? defaultTerminalColors, bool isForeground = false)
     {
         if (color != Color.None)
         {
             return color;
         }
 
-        Attribute? defaultAttr = ApplicationImpl.Instance.Driver?.DefaultAttribute;
-
-        if (defaultAttr is { } attr)
+        if (defaultTerminalColors is { } attr)
         {
             return isForeground ? attr.Foreground : attr.Background;
         }
 
-        return isForeground ? new Color (255, 255, 255) : new Color (0, 0, 0);
+        return isForeground ? new Color (255, 255, 255) : new Color (0, 0);
     }
 }

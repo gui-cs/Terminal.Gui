@@ -1105,12 +1105,12 @@ public static class EscSeqUtils
         // Extract the color portion between "rgb:" and the terminator (ST or BEL)
         string colorPart = response [(rgbIndex + 4)..];
 
-        // Strip trailing terminators: ESC\ or BEL
-        if (colorPart.EndsWith (@"\x1b\\", StringComparison.Ordinal))
+        // Strip trailing terminators: ST (ESC\) or BEL (\a)
+        if (colorPart.EndsWith (ST, StringComparison.Ordinal))
         {
-            colorPart = colorPart [..^2];
+            colorPart = colorPart [..^ST.Length];
         }
-        else if (colorPart.EndsWith ("\a", StringComparison.Ordinal))
+        else if (colorPart.Length > 0 && colorPart [^1] == '\a')
         {
             colorPart = colorPart [..^1];
         }
