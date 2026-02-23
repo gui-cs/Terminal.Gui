@@ -1639,6 +1639,144 @@ public class MenuBarTests
         Assert.False (fileItem.PopoverMenu is { Visible: true }, "File's popover should be hidden");
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void After_Deactivation_Keys_Are_Not_Eaten_By_PopoverMenu_With_SubMenu ()
+    {
+        // Arrange — a MenuBar with a menu item that has a submenu containing HotKey items
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        // Create a submenu with HotKey items
+        MenuItem subItem1 = new () { Id = "subItem1", Title = "_Bold" };
+        MenuItem subItem2 = new () { Id = "subItem2", Title = "_Dark" };
+        Menu subMenu = new ([subItem1, subItem2]) { Id = "subMenu" };
+
+        // Create root menu with an item that has the submenu
+        MenuItem rootItemWithSub = new () { Id = "rootItemWithSub", Title = "_Themes", SubMenu = subMenu };
+        MenuItem rootItemPlain = new () { Id = "rootItemPlain", Title = "_New" };
+        Menu rootMenu = new ([rootItemPlain, rootItemWithSub]) { Id = "rootMenu" };
+
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_File" };
+        PopoverMenu popover = new ();
+        menuBarItem.PopoverMenu = popover;
+        popover.Root = rootMenu;
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.Add (menuBarItem);
+
+        // Create a focusable view that should receive keys after deactivation
+        var keyReceived = false;
+        View focusableView = new () { Id = "focusableView", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        focusableView.KeyDown += (_, k) =>
+                                 {
+                                     if (k == Key.B)
+                                     {
+                                         keyReceived = true;
+                                     }
+                                 };
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        hostView.Add (menuBar);
+        hostView.Add (focusableView);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Act — open the menu, open the submenu, then close the menu
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBar.Active, "MenuBar should be active");
+        Assert.True (menuBar.IsOpen (), "MenuBar should be open");
+
+        // Navigate to the Themes item and open its submenu
+        app.InjectKey (Key.CursorDown);  // Focus on _Themes
+        app.InjectKey (Key.CursorRight); // Open submenu
+
+        // Close the menu entirely
+        app.InjectKey (Application.QuitKey);
+
+        Assert.False (menuBar.Active, "MenuBar should be deactivated");
+        Assert.False (menuBar.IsOpen (), "No popover should be open");
+
+        // Verify focus is on the focusable view
+        focusableView.SetFocus ();
+        Assert.True (focusableView.HasFocus, "focusableView should have focus");
+
+        // Act — press 'B' which was a HotKey in the submenu
+        app.InjectKey (Key.B);
+
+        // Assert — the key should reach the focusable view, not be eaten by the PopoverMenu
+        Assert.True (keyReceived, "Key 'B' should reach focusableView, not be eaten by inactive PopoverMenu");
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void CursorRight_From_SubMenu_Switches_MenuBarItem_And_Closes_SubMenu ()
+    {
+        // Arrange — MenuBar with two items, first item has a submenu
+        // Reproduces: "if the submenu is open and I press right arrow to cause the next menu
+        // to open, and then go left, the submenu is still open"
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        // First MenuBarItem: has a submenu
+        MenuItem subItem = new () { Id = "subItem", Title = "_Bold" };
+        Menu subMenu = new ([subItem]) { Id = "subMenu" };
+        MenuItem rootItemWithSub = new () { Id = "rootItemWithSub", Title = "_Themes", SubMenu = subMenu };
+        MenuItem rootItemPlain = new () { Id = "rootItemPlain", Title = "_New" };
+        Menu rootMenu1 = new ([rootItemPlain, rootItemWithSub]) { Id = "rootMenu1" };
+        MenuBarItem menuBarItem1 = new () { Id = "menuBarItem1", Title = "_File" };
+        PopoverMenu popover1 = new ();
+        menuBarItem1.PopoverMenu = popover1;
+        popover1.Root = rootMenu1;
+
+        // Second MenuBarItem: simple
+        MenuItem editItem = new () { Id = "editItem", Title = "Cu_t" };
+        Menu rootMenu2 = new ([editItem]) { Id = "rootMenu2" };
+        MenuBarItem menuBarItem2 = new () { Id = "menuBarItem2", Title = "_Edit" };
+        PopoverMenu popover2 = new ();
+        menuBarItem2.PopoverMenu = popover2;
+        popover2.Root = rootMenu2;
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.Add (menuBarItem1);
+        menuBar.Add (menuBarItem2);
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Open File menu, navigate to Themes, open its submenu
+        app.InjectKey (MenuBar.DefaultKey);
+        Assert.True (menuBarItem1.PopoverMenu is { Visible: true }, "File's popover should be visible");
+        app.InjectKey (Key.CursorDown);  // Focus on _Themes
+        app.InjectKey (Key.CursorRight); // Open submenu, focus on _Bold
+        Assert.True (subMenu.Visible, "SubMenu should be visible after CursorRight");
+
+        // Act — from the submenu, CursorRight again. _Bold has no sub-submenu,
+        // so PopoverMenu.MoveRight returns false, key propagates to MenuBar, which
+        // switches to Edit.
+        app.InjectKey (Key.CursorRight);
+
+        // Assert — File's popover (and its submenu) should be fully closed
+        Assert.False (menuBarItem1.PopoverMenu is { Visible: true }, "File's popover should be hidden");
+        Assert.False (subMenu.Visible, "SubMenu should be closed after switching MenuBarItem");
+        Assert.True (menuBarItem2.PopoverMenu is { Visible: true }, "Edit's popover should be visible");
+
+        // Act — go back to File with CursorLeft
+        app.InjectKey (Key.CursorLeft);
+
+        // Assert — File reopens WITHOUT the submenu still showing
+        Assert.True (menuBarItem1.PopoverMenu is { Visible: true }, "File's popover should be visible again");
+        Assert.False (subMenu.Visible, "SubMenu should NOT reappear when returning to File");
+    }
+
     #endregion
 
     #region Diagnostic and fix tests

@@ -636,7 +636,15 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private void HideAndRemoveSubMenu (Menu? menu)
     {
-        if (_isHiding || menu is not { Visible: true })
+        if (menu is not { Visible: true })
+        {
+            return;
+        }
+
+        // Use _isHiding to prevent re-entrant calls from event handlers triggered by
+        // setting Visible = false or Remove(). But allow the recursive call for submenus
+        // by temporarily resetting the flag.
+        if (_isHiding)
         {
             return;
         }
@@ -645,10 +653,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         try
         {
-            // If there's a visible submenu, remove / hide it
+            // If there's a visible submenu, remove / hide it first (deepest first)
             if (menu.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
             {
+                // Temporarily allow recursion for the nested submenu
+                _isHiding = false;
                 HideAndRemoveSubMenu (visiblePeer.SubMenu);
+                _isHiding = true;
                 visiblePeer.ForceFocusColors = false;
             }
 
