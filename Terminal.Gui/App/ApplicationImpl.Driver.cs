@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.App;
 
@@ -106,6 +107,19 @@ internal partial class ApplicationImpl
         }
 
         Driver.Force16Colors = Drivers.Driver.Force16Colors;
+
+        // Detect terminal color capabilities from environment variables
+        TerminalColorCapabilities caps = TerminalEnvironmentDetector.DetectColorCapabilities ();
+
+        if (Driver is DriverImpl driverImpl)
+        {
+            driverImpl.SetColorCapabilities (caps);
+        }
+
+        if (caps.Capability is ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16)
+        {
+            Driver.Force16Colors = true;
+        }
     }
 
     private readonly IComponentFactory? _componentFactory;

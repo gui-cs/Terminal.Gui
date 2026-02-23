@@ -274,20 +274,20 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                            {
                                VisualRole.Focus => GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                {
-                                   Foreground = ResolveNoneToBlack (GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack).Background),
                                    Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground
                                },
 
                                VisualRole.Active => GetAttributeForRoleCore (VisualRole.Focus, stack) with
                                {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground.GetBrighterColor (),
-                                   Background = GetAttributeForRoleCore (VisualRole.Focus, stack).Background.GetDimColor (),
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack).Foreground, true).GetBrighterColor (),
+                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Focus, stack).Background).GetDimColor (),
                                    Style = GetAttributeForRoleCore (VisualRole.Focus, stack).Style | TextStyle.Bold
                                },
 
                                VisualRole.Highlight => GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                {
-                                   Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Background.GetBrighterColor (),
+                                   Foreground = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack).Background).GetBrighterColor (),
                                    Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Background,
                                    Style = GetAttributeForRoleCore (VisualRole.Editable, stack).Style | TextStyle.Italic
                                },
@@ -295,7 +295,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                VisualRole.Editable => GetAttributeForRoleCore (VisualRole.Normal, stack) with
                                {
                                    Foreground = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground,
-                                   Background = GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground.GetDimColor (0.5)
+                                   Background = ResolveNone (GetAttributeForRoleCore (VisualRole.Normal, stack).Foreground, true).GetDimColor (0.5)
                                },
 
                                VisualRole.ReadOnly => GetAttributeForRoleCore (VisualRole.Editable, stack) with
@@ -524,8 +524,30 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}";
 
     /// <summary>
-    ///     When inverting colors for derived roles (e.g., Focus = inverted Normal), a None background
-    ///     would become a None foreground, making text invisible. This method substitutes Black instead.
+    ///     Resolves <see cref="Color.None"/> to a concrete color for use in color math (brighten, dim, invert).
+    ///     Queries the current driver's <see cref="IDriver.DefaultAttribute"/> (detected via OSC 10/11)
+    ///     if available, otherwise falls back to White (foreground) or Black (background).
     /// </summary>
-    private static Color ResolveNoneToBlack (Color color) => color == Color.None ? new Color (0, 0) : color;
+    /// <param name="color">The color to resolve.</param>
+    /// <param name="isForeground">
+    ///     <see langword="true"/> to resolve as a foreground color (falls back to White);
+    ///     <see langword="false"/> to resolve as a background color (falls back to Black).
+    /// </param>
+    /// <returns>The resolved color, guaranteed to not be <see cref="Color.None"/>.</returns>
+    private static Color ResolveNone (Color color, bool isForeground = false)
+    {
+        if (color != Color.None)
+        {
+            return color;
+        }
+
+        Attribute? defaultAttr = ApplicationImpl.Instance.Driver?.DefaultAttribute;
+
+        if (defaultAttr is { } attr)
+        {
+            return isForeground ? attr.Foreground : attr.Background;
+        }
+
+        return isForeground ? new Color (255, 255, 255) : new Color (0, 0, 0);
+    }
 }

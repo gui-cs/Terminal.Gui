@@ -24,13 +24,11 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="loop">The main application loop instance</param>
     /// <param name="componentFactory">Factory for creating driver-specific components (input, output, etc.)</param>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    public MainLoopCoordinator (
-        ITimedEvents timedEvents,
-        ConcurrentQueue<TInputRecord> inputQueue,
-        IApplicationMainLoop<TInputRecord> loop,
-        IComponentFactory<TInputRecord> componentFactory,
-        ITimeProvider? timeProvider = null
-    )
+    public MainLoopCoordinator (ITimedEvents timedEvents,
+                                ConcurrentQueue<TInputRecord> inputQueue,
+                                IApplicationMainLoop<TInputRecord> loop,
+                                IComponentFactory<TInputRecord> componentFactory,
+                                ITimeProvider? timeProvider = null)
     {
         _timedEvents = timedEvents;
         _inputQueue = inputQueue;
@@ -44,7 +42,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
     private readonly ConcurrentQueue<TInputRecord> _inputQueue;
     private readonly IInputProcessor _inputProcessor;
-    private readonly object _oLockInitialization = new ();
+    private readonly Lock _oLockInitialization = new ();
     private readonly ITimedEvents _timedEvents;
 
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
@@ -132,29 +130,38 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void BuildDriverIfPossible (IApplication? app)
     {
-
-        if (_input != null && _output != null)
+        if (_input == null || _output == null)
         {
-            _driver = new (
-                           _componentFactory,
-                           _inputProcessor,
-                           _loop.OutputBuffer,
-                           _output,
-                           _loop.AnsiRequestScheduler,
-                           _loop.SizeMonitor);
-
-            // Initialize the size monitor now that the driver is fully constructed
-            // This allows size monitors to set up platform-specific mechanisms:
-            // - ANSI queries (ANSIDriver)
-            // - Signal handlers (UnixDriver)
-            // - Console events (WindowsDriver)
-            _loop.SizeMonitor.Initialize(_driver);
-
-            app!.Driver = _driver;
-
-            _startupSemaphore.Release ();
-            Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
+            return;
         }
+        _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor);
+
+        // Initialize the size monitor now that the driver is fully constructed
+        // This allows size monitors to set up platform-specific mechanisms:
+        // - ANSI queries (ANSIDriver)
+        // - Signal handlers (UnixDriver)
+        // - Console events (WindowsDriver)
+        _loop.SizeMonitor.Initialize (_driver);
+
+        app!.Driver = _driver;
+
+        // Detect the terminal's actual default colors via OSC 10/11 queries.
+        // Skip if color capabilities indicate a terminal that won't support OSC.
+        if (_driver.ColorCapabilities is not { Capability: ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16 })
+        {
+            TerminalColorDetector colorDetector = new (_driver);
+
+            colorDetector.Detect ((fg, bg) =>
+                                  {
+                                      if (fg is { } || bg is { })
+                                      {
+                                          _driver.SetDefaultAttribute (new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0)));
+                                      }
+                                  });
+        }
+
+        _startupSemaphore.Release ();
+        Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
     }
 
     /// <summary>

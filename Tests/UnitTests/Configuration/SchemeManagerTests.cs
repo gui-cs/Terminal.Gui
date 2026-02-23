@@ -80,7 +80,7 @@ public class SchemeManagerTests
         // Base
         var baseScheme = schemes! ["Base"];
         Assert.NotNull (baseScheme);
-        Assert.Equal (new Attribute (StandardColor.LightBlue, StandardColor.RaisinBlack), baseScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.LightBlue, Color.None), baseScheme!.Normal);
 
         // Dialog
         var dialogScheme = schemes ["Dialog"];
@@ -97,10 +97,10 @@ public class SchemeManagerTests
         Assert.NotNull (menuScheme);
         Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme!.Normal);
 
-        // Runnable
+        // Runnable (uses Color.None for transparent background)
         var runnableScheme = schemes ["Runnable"];
         Assert.NotNull (runnableScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString (), runnableScheme!.Normal.ToString ());
+        Assert.Equal (new Attribute (StandardColor.CadetBlue, Color.None), runnableScheme!.Normal);
     }
 
 
@@ -115,7 +115,7 @@ public class SchemeManagerTests
         // Base
         var baseScheme = schemes! ["Base"];
         Assert.NotNull (baseScheme);
-        Assert.Equal (new Attribute (StandardColor.LightBlue, StandardColor.RaisinBlack), baseScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.LightBlue, Color.None), baseScheme!.Normal);
 
         // Dialog
         var dialogScheme = schemes ["Dialog"];
@@ -132,10 +132,10 @@ public class SchemeManagerTests
         Assert.NotNull (menuScheme);
         Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme!.Normal);
 
-        // Runnable
+        // Runnable (uses Color.None for transparent background)
         var runnableScheme = schemes ["Runnable"];
         Assert.NotNull (runnableScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString (), runnableScheme!.Normal.ToString ());
+        Assert.Equal (new Attribute (StandardColor.CadetBlue, Color.None), runnableScheme!.Normal);
     }
     [Fact]
     public void Not_Case_Sensitive_Disabled ()
