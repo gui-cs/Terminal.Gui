@@ -72,7 +72,9 @@ public class ApplicationImplTests
 
         Mock<IComponentFactory<ConsoleKeyInfo>> m = new ();
         m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
-        m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> (), It.IsAny<ITimeProvider?> ())).Returns (Mock.Of<IInputProcessor> ());
+        Mock<IInputProcessor> inputProcessor = new ();
+        inputProcessor.Setup (p => p.GetParser ()).Returns (Mock.Of<IAnsiResponseParser> ());
+        m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> (), It.IsAny<ITimeProvider?> ())).Returns (inputProcessor.Object);
 
         Mock<IOutput> consoleOutput = new ();
         var size = new Size (80, 25);

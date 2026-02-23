@@ -145,19 +145,40 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         app!.Driver = _driver;
 
+        // Detect terminal color capabilities from environment variables
+        TerminalColorCapabilities caps = TerminalEnvironmentDetector.DetectColorCapabilities ();
+
+        _driver.SetColorCapabilities (caps);
+
+        if (caps.Capability is ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16)
+        {
+            Driver.Force16Colors = true;
+        }
+
         // Detect the terminal's actual default colors via OSC 10/11 queries.
         // Skip if color capabilities indicate a terminal that won't support OSC.
         if (_driver.ColorCapabilities is { Capability: ColorCapabilityLevel.Colors256 or ColorCapabilityLevel.TrueColor })
         {
-            TerminalColorDetector colorDetector = new (_driver);
+            try
+            {
+                TerminalColorDetector colorDetector = new (_driver);
 
-            colorDetector.Detect ((fg, bg) =>
-                                  {
-                                      if (fg is { } || bg is { })
+                colorDetector.Detect ((fg, bg) =>
                                       {
+                                          if (fg is null && bg is null)
+                                          {
+                                              return;
+                                          }
+
+                                          Logging.Trace ($"app: SetDefaultAttribute ({new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0))})");
+
                                           _driver.SetDefaultAttribute (new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0)));
-                                      }
-                                  });
+                                      });
+            }
+            catch (Exception ex)
+            {
+                Logging.Warning ($"Terminal color detection failed: {ex.Message}");
+            }
         }
 
         _startupSemaphore.Release ();
