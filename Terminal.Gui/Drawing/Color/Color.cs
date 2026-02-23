@@ -289,7 +289,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     {
         HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
-        double lNorm = hsl.L / 255.0;
+        double lNorm = hsl.L / 100.0;
 
         // Determine direction: on dark bg, brighten (increase L); on light bg, darken (decrease L)
         bool shouldIncrease = isDarkBackground ?? (lNorm < 0.5);
@@ -301,7 +301,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
             newL = shouldIncrease ? Math.Min (1.0, lNorm + 2 * brightenAmount) : Math.Max (0.0, lNorm - 2 * brightenAmount);
         }
 
-        HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 255));
+        HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
         RGB rgb = ColorConverter.HslToRgb (newHsl);
 
         return new (rgb.R, rgb.G, rgb.B);
@@ -345,7 +345,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     {
         HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
-        double lNorm = hsl.L / 255.0;
+        double lNorm = hsl.L / 100.0;
 
         // Determine direction: on dark bg (or null/default), reduce L; on light bg, increase L
         bool shouldDecrease = isDarkBackground ?? true;
@@ -370,7 +370,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
             newL = shouldDecrease ? Math.Max (0.0, lNorm - 2 * dimAmount) : Math.Min (1.0, lNorm + 2 * dimAmount);
         }
 
-        HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 255));
+        HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
         RGB rgb = ColorConverter.HslToRgb (newHsl);
 
         return new (rgb.R, rgb.G, rgb.B);

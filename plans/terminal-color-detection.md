@@ -254,8 +254,101 @@ For Green/Amber Phosphor, the roles that are NOT explicitly overridden (Focus, H
 | **6** | `Scheme.ResolveNone` — use queried colors in derivation | **DONE** |
 | **7** | Tests for A.1–A.7 and C.1–C.4 | **DONE** |
 | **8** | `GetBrighterColor`/`GetDimmerColor` dark/light awareness (Part D) | **DONE** |
-| **9** | Theme config.json revamp with `Color.None` (Part E) | TODO — depends on Phase 8 |
-| **10** | Tests for Part E | TODO |
+| **9** | Fix HSL scale mismatch in `GetBrighterColor`/`GetDimmerColor` (Part F) | TODO — from Copilot PR review |
+| **10** | Theme config.json revamp with `Color.None` (Part E) | TODO — depends on Phase 8 |
+| **11** | Tests for Part E | TODO |
+
+## Part F: Fix HSL Scale Mismatch in `GetBrighterColor` / `GetDimmerColor`
+
+### Source
+
+Copilot PR review on [PR #4745](https://github.com/gui-cs/Terminal.Gui/pull/4745#pullrequestreview-3841716656) — 2 comments identifying the same root cause.
+
+### Problem Statement
+
+`GetBrighterColor` and `GetDimmerColor` in `Color.cs` normalize `hsl.L` by dividing by **255.0**, but ColorHelper's `HSL` struct uses an L range of **0–100**, not 0–255. This is confirmed by:
+
+1. The comment at line 354: `// Note: ColorHelper's HSL uses L in range 0-100.`
+2. `IsDarkColor()` at line 390: `return hsl.L < 50;` (midpoint of 0-100, not 127.5)
+3. The extreme-value checks in `GetDimmerColor` comparing `hsl.L` against 10 and 90 (0-100 scale)
+
+**Impact:** The normalization `hsl.L / 255.0` compresses the lightness range to ~0–0.39 instead of 0–1.0. This means:
+
+- A color with L=50 (mid-gray) gets `lNorm = 0.196` instead of `0.5`
+- The `shouldIncrease` auto-detect (`lNorm < 0.5`) in `GetBrighterColor` is biased — nearly all colors appear "dark"
+- Brightening/dimming adjustments (±0.2 on a compressed scale) produce different magnitudes than intended
+- The `newL * 255` reconstruction further distorts the output, amplifying the lightness change when converted back to HSL
+
+The bug is partially masked because the distortions in normalization and denormalization partially cancel, but the directional logic and threshold comparisons are still wrong.
+
+### Proposed Fix
+
+#### F.1: Fix normalization — divide by 100.0 instead of 255.0
+
+**`GetBrighterColor` (line 292):**
+```csharp
+// Before:
+double lNorm = hsl.L / 255.0;
+// After:
+double lNorm = hsl.L / 100.0;
+```
+
+**`GetDimmerColor` (line 348):**
+```csharp
+// Before:
+double lNorm = hsl.L / 255.0;
+// After:
+double lNorm = hsl.L / 100.0;
+```
+
+#### F.2: Fix denormalization — multiply by 100 instead of 255
+
+**`GetBrighterColor` (line 304):**
+```csharp
+// Before:
+HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 255));
+// After:
+HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
+```
+
+**`GetDimmerColor` (line 373):**
+```csharp
+// Before:
+HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 255));
+// After:
+HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
+```
+
+#### F.3: `IsDarkColor()` — No change needed
+
+Line 390 already correctly uses `hsl.L < 50` (0-100 scale). No fix required.
+
+#### F.4: Update existing tests
+
+Tests in `ColorClassTests.DarkLightAwareness.cs` may have expected values calibrated to the broken 255 scale. These need to be re-verified and updated to match correct 100-scale behavior.
+
+### Files to Modify
+
+| File | Change |
+|------|--------|
+| `Terminal.Gui/Drawing/Color/Color.cs:292` | `hsl.L / 255.0` → `hsl.L / 100.0` |
+| `Terminal.Gui/Drawing/Color/Color.cs:304` | `newL * 255` → `newL * 100` |
+| `Terminal.Gui/Drawing/Color/Color.cs:348` | `hsl.L / 255.0` → `hsl.L / 100.0` |
+| `Terminal.Gui/Drawing/Color/Color.cs:373` | `newL * 255` → `newL * 100` |
+| `Tests/UnitTestsParallelizable/Drawing/Color/ColorClassTests.DarkLightAwareness.cs` | Verify/update expected values |
+
+### Verification
+
+1. Run existing `ColorClassTests.DarkLightAwareness` tests — fix any that fail due to corrected scale
+2. Validate that `GetBrighterColor` on mid-gray (128,128,128) with `isDarkBackground=true` produces a visibly lighter color
+3. Validate that `GetDimmerColor` on mid-gray with `isDarkBackground=false` produces a visibly lighter (washed-out) color
+4. Manual testing in UICatalog — verify Focus/Active/Highlight contrast on both dark and light terminal backgrounds
+
+### Risk Assessment
+
+**Low-Medium.** The 255-scale bug partially self-cancels (compress then expand), so existing visual output may not change dramatically. However, the directional logic fix (correct `shouldIncrease` threshold) will improve auto-detection accuracy for `isDarkBackground=null` callers.
+
+---
 
 ## Edge Cases
 
