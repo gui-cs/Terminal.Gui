@@ -1377,5 +1377,51 @@ public class MenuBarTests
         menuBar.Dispose ();
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When a MenuBarItem's popover is open and the mouse moves over another MenuBarItem,
+    ///     the MenuBar should switch to the new item's popover. This test verifies that mouse
+    ///     hover switching works without throwing a focus-related exception in View.Navigation.
+    /// </summary>
+    [Fact]
+    public void Mouse_Hover_Over_Second_MenuBarItem_While_First_Is_Open_Switches ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        MenuBarItem firstItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0);
+        MenuBarItem secondItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (1);
+
+        // Act — click on first MBI to open its popover
+        Point firstScreenPos = firstItem.FrameToScreen ().Location;
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (firstScreenPos));
+
+        Assert.True (menuBar.Active);
+        Assert.True (firstItem.PopoverMenuOpen, "First item's popover should be open after click");
+
+        // Act — move the mouse over the second MBI (hover, no click)
+        Point secondScreenPos = secondItem.FrameToScreen ().Location;
+        app.InjectMouse (new Mouse { ScreenPosition = secondScreenPos, Flags = MouseFlags.PositionReport });
+
+        // Assert — second item should be open, first should be closed
+        Assert.True (menuBar.Active, "MenuBar should remain active during hover switch");
+        Assert.True (secondItem.PopoverMenuOpen, "Second item's popover should open on hover");
+        Assert.False (firstItem.PopoverMenuOpen, "First item's popover should close when second opens");
+
+        menuBar.Dispose ();
+    }
+
     #endregion
 }
