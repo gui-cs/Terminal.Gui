@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -81,12 +83,18 @@ public class MenuBarItem : MenuItem, IDesignable
         AddCommand (Command.HotKey,
                     ctx =>
                     {
+                        Trace.Command (this, ctx, "Entry", "HotKey handler");
+
                         if (RaiseHandlingHotKey (ctx) is true)
                         {
+                            Trace.Command (this, ctx, "Handled", "RaiseHandlingHotKey returned true");
+
                             return false;
                         }
 
                         RaiseHotKeyCommand (ctx);
+
+                        Trace.Command (this, ctx, "InvokeActivate", "Before InvokeCommand(Activate)");
 
                         // ShowItem/HideItem in MenuBar.OnActivating handles focus.
                         InvokeCommand (Command.Activate, ctx?.Binding);
@@ -97,8 +105,12 @@ public class MenuBarItem : MenuItem, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
+        Trace.Command (this, args.Context, "Entry", $"PopoverMenuOpen={PopoverMenuOpen} Routing={args.Context?.Routing}");
+
         if (base.OnActivating (args))
         {
+            Trace.Command (this, args.Context, "BaseHandled", "base.OnActivating returned true");
+
             return true;
         }
 
@@ -106,15 +118,19 @@ public class MenuBarItem : MenuItem, IDesignable
         // This is a notification — do not toggle the PopoverMenu open/closed.
         if (args.Context?.Routing == CommandRouting.Bridged)
         {
+            Trace.Command (this, args.Context, "Bridged", "Ignoring bridged command — no toggle");
+
             return false;
         }
 
         if (PopoverMenuOpen)
         {
+            Trace.Command (this, args.Context, "Closing", "PopoverMenuOpen -> false");
             PopoverMenuOpen = false;
         }
         else
         {
+            Trace.Command (this, args.Context, "Opening", "PopoverMenuOpen -> true");
             RegisterPopover ();
 
             PopoverMenuOpen = true;
@@ -184,6 +200,7 @@ public class MenuBarItem : MenuItem, IDesignable
             Id = $"{Id}.{field.Id}";
 #endif
 
+            Trace.Command (this, "PopoverMenuSet", $"PopoverMenu={field.ToIdentifyingString ()}");
             RegisterPopover ();
             PopoverMenuOpen = field.Visible;
             field.VisibleChanged += OnPopoverVisibleChanged;
@@ -259,10 +276,14 @@ public class MenuBarItem : MenuItem, IDesignable
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)
     {
+        Trace.Keyboard (this, key, "Entry", $"PopoverMenuVisible={PopoverMenu is { Visible: true }}");
+
         if (PopoverMenu is not { Visible: true } || !HotKeyBindings.TryGet (key, out _))
         {
             return false;
         }
+
+        Trace.Keyboard (this, key, "HotKeyMatch", "Popover visible + HotKey match — hiding");
 
         // If the user presses the hotkey for a menu item that is already open,
         // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
@@ -277,6 +298,8 @@ public class MenuBarItem : MenuItem, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
+        Trace.Command (this, "Entry", $"newHasFocus={newHasFocus}");
+
         if (newHasFocus)
         {
             return;

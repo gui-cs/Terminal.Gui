@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -261,16 +263,92 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     protected override void OnVisibleChanged ()
     {
+        Trace.Command (this, "Entry", $"Visible={Visible}");
         base.OnVisibleChanged ();
 
         if (Visible)
         {
+            Trace.Command (this, "Showing", "AddAndShowSubMenu");
             AddAndShowSubMenu (_root);
         }
         else
         {
+            Trace.Command (this, "Hiding", "HideAndRemoveSubMenu");
             HideAndRemoveSubMenu (_root);
             App?.Popovers?.Hide (this);
+        }
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Handles bridged Activate commands from the Root menu hierarchy. When a MenuItem
+    ///     is activated inside the menu, the command propagates through SubMenu bridges up to Root,
+    ///     then via the Root CommandBridge to PopoverMenu with <see cref="CommandRouting.Bridged"/> routing.
+    /// </remarks>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        Trace.Command (this, args.Context, "Entry", $"Routing={args.Context?.Routing} Cmd={args.Context?.Command}");
+
+        if (base.OnActivating (args))
+        {
+            return true;
+        }
+
+        // Only process bridged commands from the menu hierarchy
+        if (args.Context?.Routing != CommandRouting.Bridged)
+        {
+            return false;
+        }
+
+        // For non-HotKey activations, hide the popover (the menu item was selected)
+        if (args.Context?.Command != Command.HotKey)
+        {
+            Trace.Command (this, args.Context, "HideOnNonHotKey", "Setting Visible=false");
+            Visible = false;
+        }
+
+        // QuitKey handling
+        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey && SuperView is { Visible: true })
+        {
+            args.Handled = true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     When a MenuItem activation completes (arrives via bridge as <see cref="CommandRouting.Bridged"/>),
+    ///     this determines whether to hide or show submenus based on the source MenuItem.
+    /// </remarks>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        Trace.Command (this, ctx, "Entry", $"Routing={ctx?.Routing}");
+
+        base.OnActivated (ctx);
+
+        // Only process bridged commands from the menu hierarchy
+        if (ctx?.Routing != CommandRouting.Bridged)
+        {
+            return;
+        }
+
+        if (ctx.Source?.TryGetTarget (out View? sourceView) != true)
+        {
+            return;
+        }
+
+        Trace.Command (this, ctx, "SourceFound", $"Source={sourceView.ToIdentifyingString ()} HasSubMenu={sourceView is MenuItem { SubMenu: { } }}");
+
+        if (sourceView is MenuItem { SubMenu: null })
+        {
+            // Leaf MenuItem — hide the entire menu
+            HideAndRemoveSubMenu (_root);
+        }
+        else if (sourceView is MenuItem { SubMenu: { } } menuItemWithSubMenu)
+        {
+            // MenuItem with SubMenu — show the submenu
+            ShowSubMenu (menuItemWithSubMenu);
         }
     }
 
@@ -300,6 +378,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 return;
             }
 
+            Trace.Command (this, "RootSetter", $"OldRoot={_root?.ToIdentifyingString ()} NewRoot={value?.ToIdentifyingString ()}");
+
 #if DEBUG
             Id = $"{Root?.Id}.PopoverMenu";
 #endif
@@ -311,10 +391,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
                 foreach (Menu menu in oldMenus)
                 {
-                    //menu.Accepting -= MenuOnAccepting;
-                    //menu.Accepted -= MenuAccepted;
-                    //menu.Activating -= MenuOnActivating;
-                    //menu.Activated -= MenuOnActivated;
                     menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
                 }
 
@@ -339,16 +415,18 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 menu.App = App;
                 menu.Visible = false;
 
-                menu.Activating += MenuOnActivating;
-                menu.Activated += MenuOnActivated;
+                // Activate/Activated are handled via CommandBridge (Root → PopoverMenu).
+                // SubMenu activations propagate up through MenuItem SubMenu bridges to Root.
                 menu.SelectedMenuItemChanged += MenuOnSelectedMenuItemChanged;
             }
 
             // Bridge Activate from Root → PopoverMenu across the non-containment boundary.
-            if (_root is { })
+            if (_root is null)
             {
-                _rootCommandBridge = CommandBridge.Connect (this, _root, Command.Activate);
+                return;
             }
+            Trace.Command (this, "BridgeCreate", $"Bridging Activate from {_root.ToIdentifyingString ()}");
+            _rootCommandBridge = CommandBridge.Connect (this, _root, Command.Activate);
         }
     }
 
@@ -592,74 +670,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    private void MenuOnAccepting (object? sender, CommandEventArgs e)
-    {
-        if (e.Context?.Command != Command.HotKey)
-        {
-            Visible = false;
-        }
-
-        if (e.Context?.Binding is not KeyBinding { Key: { } key })
-        {
-            return;
-        }
-
-        if (key == Application.QuitKey && SuperView is { Visible: true })
-        {
-            e.Handled = true;
-        }
-    }
-
-    private void MenuAccepted (object? sender, CommandEventArgs e)
-    {
-        if (e.Context?.Source?.TryGetTarget (out View? sourceView) == true)
-        {
-            switch (sourceView)
-            {
-                case MenuItem { SubMenu: null }: HideAndRemoveSubMenu (_root); break;
-
-                case MenuItem { SubMenu: { } } menuItemWithSubMenu: ShowSubMenu (menuItemWithSubMenu); break;
-            }
-        }
-        RaiseAccepted (e.Context);
-    }
-
-    private void MenuOnActivating (object? sender, CommandEventArgs e)
-    {
-        if (e.Context?.Command != Command.HotKey)
-        {
-            Visible = false;
-        }
-
-        if (e.Context?.Binding is not KeyBinding { Key: { } key })
-        {
-            return;
-        }
-
-        if (key == Application.QuitKey && SuperView is { Visible: true })
-        {
-            e.Handled = true;
-        }
-    }
-
-    private void MenuOnActivated (object? sender, EventArgs<ICommandContext?> e)
-    {
-        if (e.Value?.Source?.TryGetTarget (out View? sourceView) == true)
-        {
-            Visible = false;
-
-            if (sourceView is MenuItem { SubMenu: null })
-            {
-                HideAndRemoveSubMenu (_root);
-            }
-            else if (sourceView is MenuItem { SubMenu: { } } menuItemWithSubMenu)
-            {
-                ShowSubMenu (menuItemWithSubMenu);
-            }
-        }
-        RaiseActivated (e.Value);
-    }
-
     /// <inheritdoc/>
     /// <remarks>
     ///     <para>
@@ -671,12 +681,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     protected override bool OnAccepting (CommandEventArgs args)
     {
+        Trace.Command (this, args.Context, "Entry", $"Visible={Visible}");
+
         // If we're not visible, ignore any keys that are not hotkeys
 
         if (!Visible && args.Context?.Binding is KeyBinding { Key: { } key })
         {
             if (!GetMenuItemsOfAllSubMenus (i => i.Key == key).Any ())
             {
+                Trace.Command (this, args.Context, "NotVisible", "No matching MenuItem key — ignoring");
+
                 return false;
             }
         }
@@ -728,8 +742,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             foreach (Menu menu in allMenus)
             {
-                menu.Accepting -= MenuOnAccepting;
-                menu.Accepted -= MenuAccepted;
                 menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
             }
 

@@ -226,9 +226,13 @@ public sealed class ApplicationPopover : IDisposable
                 continue;
             }
 
+            Trace.Keyboard ("Popovers", key, "InactiveDispatch", $"Sending to {popoverView.ToIdentifyingString ()}");
+
             // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
             popoverView.App ??= App;
             hotKeyHandled = popoverView.NewKeyDownEvent (key);
+
+            Trace.Keyboard ("Popovers", key, "InactiveResult", $"{popoverView.ToIdentifyingString ()} returned {hotKeyHandled}");
 
             if (hotKeyHandled is true)
             {

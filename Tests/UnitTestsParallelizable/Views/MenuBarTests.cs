@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace ViewsTests;
 
 public class MenuBarTests
@@ -421,10 +423,7 @@ public class MenuBarTests
 
         var valueChangedCount = 0;
 
-        optionSelector.ValueChanged += (_, args) =>
-                                       {
-                                           valueChangedCount++;
-                                       };
+        optionSelector.ValueChanged += (_, _) => { valueChangedCount++; };
 
         // Act — focus Error checkbox and press Enter via the MenuItem context
         errorCheckBox!.SetFocus ();
@@ -1421,6 +1420,325 @@ public class MenuBarTests
         Assert.False (firstItem.PopoverMenuOpen, "First item's popover should close when second opens");
 
         menuBar.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void EnableForDesign_AltE_Activates_Edit_Menu ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        Assert.False (menuBar.Active);
+
+        // EnableForDesign creates: _File (0), _Edit (1), _Help (2)
+        MenuBarItem fileItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0);
+        MenuBarItem editItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (1);
+
+        // Verify PopoverMenus are registered with Popovers (as they are in a real app)
+        Assert.True (app.Popovers!.IsRegistered (fileItem.PopoverMenu));
+        Assert.True (app.Popovers!.IsRegistered (editItem.PopoverMenu));
+
+        // Track what actually opens — detect the real bug where _File opens instead of _Edit
+        var filePopoverOpened = false;
+
+        fileItem.PopoverMenu!.VisibleChanged += (_, _) =>
+                                                {
+                                                    if (fileItem.PopoverMenu.Visible)
+                                                    {
+                                                        filePopoverOpened = true;
+                                                    }
+                                                };
+
+        // Act — press Alt+E to activate the _Edit menu directly (MenuBar is inactive)
+        app.InjectKey (Key.E.WithAlt);
+
+        // Assert — MenuBar should be active with the _Edit menu open (not _File)
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (editItem.PopoverMenu is { Visible: true });
+
+        // The _File popover should NEVER have been opened (even transiently)
+        Assert.False (filePopoverOpened, "Bug: _File menu was opened instead of/before _Edit menu");
+        Assert.False (fileItem.PopoverMenu is { Visible: true });
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void EnableForDesign_AltH_Activates_Help_Menu ()
+    {
+        // Arrange — same bug as Alt+E: pressing Alt+H to open _Help instead opens _File
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        Assert.False (menuBar.Active);
+
+        // EnableForDesign creates: _File (0), _Edit (1), _Help (2)
+        MenuBarItem fileItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0);
+        MenuBarItem helpItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (2);
+
+        // Verify PopoverMenus are registered with Popovers (as they are in a real app)
+        Assert.True (app.Popovers!.IsRegistered (fileItem.PopoverMenu));
+        Assert.True (app.Popovers!.IsRegistered (helpItem.PopoverMenu));
+
+        // Track what actually opens — detect the real bug where _File opens instead of _Help
+        var filePopoverOpened = false;
+
+        fileItem.PopoverMenu!.VisibleChanged += (_, _) =>
+                                                {
+                                                    if (fileItem.PopoverMenu.Visible)
+                                                    {
+                                                        filePopoverOpened = true;
+                                                    }
+                                                };
+
+        // Act — press Alt+H to activate the _Help menu directly (MenuBar is inactive)
+        app.InjectKey (Key.H.WithAlt);
+
+        // Assert — MenuBar should be active with the _Help menu open (not _File)
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (helpItem.PopoverMenu is { Visible: true });
+
+        // The _File popover should NEVER have been opened (even transiently)
+        Assert.False (filePopoverOpened, "Bug: _File menu was opened instead of/before _Help menu");
+        Assert.False (fileItem.PopoverMenu is { Visible: true });
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Mouse_Over_Standalone_Menu_While_MenuBar_Active_Does_Not_Crash ()
+    {
+        // Arrange — replicate the Menus Scenario layout:
+        // A hostView containing a MenuBar (with EnableForDesign) and a standalone Menu (TestMenu).
+        // The bug: After the MenuBar is activated (which causes focus corruption via the
+        // Popovers HotKey dispatch bug), moving the mouse over the standalone Menu's MenuItems
+        // causes a Debug.Assert(_hasFocus) failure in View.SetHasFocusFalse because
+        // MenuItem.OnMouseEnter calls SetFocus() on a corrupted focus chain.
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        // Add a standalone Menu like the Menus Scenario's TestMenu
+        Menu testMenu = new () { Y = 10, Id = "TestMenu" };
+        // ReSharper disable once StringLiteralTypo
+        MenuItem testMenuItem1 = new () { Title = "Z_igzag", Text = "Gonna zig zag" };
+        MenuItem testMenuItem2 = new () { Title = "_Borders", Text = "Borders" };
+        testMenu.Add (testMenuItem1, testMenuItem2);
+        hostView.Add (testMenu);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Trigger the buggy activation path: press Alt+E which causes the Popovers dispatch
+        // to fire the _Edit PopoverMenu's HotKey, which bubbles to MenuBar and causes a generic
+        // Activate that opens _File first. This corrupts the focus state.
+        app.InjectKey (Key.E.WithAlt);
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+
+        // Act — move the mouse over the standalone Menu's MenuItems.
+        // MenuItem.OnMouseEnter calls SetFocus(), which traverses the focus chain. If the
+        // focus state was corrupted by the buggy activation above, this will trigger a
+        // Debug.Assert(_hasFocus) failure in View.SetHasFocusFalse (View.Navigation.cs:908).
+        Point menuItemScreenPos = testMenuItem1.FrameToScreen ().Location;
+        app.InjectMouse (new Mouse { ScreenPosition = menuItemScreenPos, Flags = MouseFlags.PositionReport });
+
+        // Assert — focus state should be consistent after mouse move
+        // If the bug is present, the assertion above will fire before we get here.
+        // Verify the standalone MenuItem got focus and the MenuBar closed cleanly.
+        Assert.True (testMenuItem1.HasFocus, "TestMenu's MenuItem should have focus after mouse enter");
+        Assert.False (menuBar.IsOpen (), "MenuBar popover should close when focus moves to standalone Menu");
+    }
+
+    #endregion
+
+    #region Diagnostic and fix tests
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Diagnostic_AltE_TraceCapture ()
+    {
+        ListBackend traceBackend = new ();
+        Trace.Backend = traceBackend;
+        Trace.CommandEnabled = true;
+        Trace.KeyboardEnabled = true;
+
+        try
+        {
+            VirtualTimeProvider time = new ();
+            using IApplication app = Application.Create (time);
+            app.Init (DriverRegistry.Names.ANSI);
+            IRunnable runnable = new Runnable ();
+
+            View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+            MenuBar menuBar = new () { Id = "menuBar" };
+            menuBar.EnableForDesign (ref hostView);
+            hostView.Add (menuBar);
+            ((View)runnable).Add (hostView);
+            app.Begin (runnable);
+
+            // Track File popover opening (detects the transient open bug)
+            MenuBarItem fileItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0);
+            MenuBarItem editItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (1);
+            var filePopoverOpened = false;
+
+            fileItem.PopoverMenu!.VisibleChanged += (_, _) =>
+                                                    {
+                                                        if (fileItem.PopoverMenu.Visible)
+                                                        {
+                                                            filePopoverOpened = true;
+                                                        }
+                                                    };
+
+            // Clear traces from setup
+            traceBackend.Clear ();
+
+            // Act — press Alt+E
+            app.InjectKey (Key.E.WithAlt);
+
+            // Build trace dump for assertion messages
+            string traceDump = string.Join ("\n",
+                                            traceBackend.Entries.Select (e =>
+                                                                         {
+                                                                             string dataStr = e.Data switch
+                                                                                              {
+                                                                                                  (Command cmd, CommandRouting routing) => $"Cmd={
+                                                                                                      cmd
+                                                                                                  } Routing={
+                                                                                                      routing
+                                                                                                  }",
+                                                                                                  Key key => $"Key={key}",
+                                                                                                  _ => e.Data?.ToString () ?? ""
+                                                                                              };
+
+                                                                             return $"  [{
+                                                                                 e.Category
+                                                                             }:{
+                                                                                 e.Phase
+                                                                             }] {
+                                                                                 e.ViewId
+                                                                             } ({
+                                                                                 e.Method
+                                                                             }) {
+                                                                                 e.Message
+                                                                             } [{
+                                                                                 dataStr
+                                                                             }]";
+                                                                         }));
+
+            // The real assertions — with trace dump in failure message
+            Assert.True (menuBar.Active, $"MenuBar should be active.\nTraces:\n{traceDump}");
+            Assert.True (editItem.PopoverMenu is { Visible: true }, $"Edit PopoverMenu should be visible.\nTraces:\n{traceDump}");
+            Assert.False (filePopoverOpened, $"File PopoverMenu should NEVER have opened.\nTraces:\n{traceDump}");
+        }
+        finally
+        {
+            Trace.CommandEnabled = false;
+            Trace.KeyboardEnabled = false;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Diagnostic_FocusChain_After_AltE ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        Menu testMenu = new () { Y = 10, Id = "TestMenu" };
+        // ReSharper disable once StringLiteralTypo
+        MenuItem testMenuItem1 = new () { Title = "Z_igzag", Text = "Gonna zig zag" };
+        testMenu.Add (testMenuItem1);
+        hostView.Add (testMenu);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Capture focus chain BEFORE Alt+E
+        string focusBefore = DumpFocusChain ((View)runnable, "Before Alt+E");
+
+        // Press Alt+E
+        app.InjectKey (Key.E.WithAlt);
+
+        // Capture focus chain AFTER Alt+E
+        string focusAfter = DumpFocusChain ((View)runnable, "After Alt+E");
+
+        // Verify the focus chain is consistent:
+        // Walk from MostFocused up to root, verifying _hasFocus is true at every level
+        View? current = app.Navigation?.GetFocused ();
+        List<string> focusProblems = [];
+
+        while (current is { })
+        {
+            if (!current.HasFocus)
+            {
+                focusProblems.Add ($"  BROKEN: {current.ToIdentifyingString ()} HasFocus=false but is in the focused chain");
+            }
+
+            current = current.SuperView;
+        }
+
+        Assert.True (focusProblems.Count == 0, $"Focus chain is corrupted:\n{string.Join ("\n", focusProblems)}\n\n{focusBefore}\n\n{focusAfter}");
+    }
+
+    private static string DumpFocusChain (View root, string label)
+    {
+        List<string> lines = [$"=== {label} ==="];
+        DumpView (root, 0, lines);
+
+        return string.Join ("\n", lines);
+    }
+
+    private static void DumpView (View view, int indent, List<string> lines)
+    {
+        string prefix = new (' ', indent * 2);
+        string focusMarker = view.HasFocus ? " [FOCUSED]" : "";
+        lines.Add ($"{prefix}{view.ToIdentifyingString ()}{focusMarker}");
+
+        foreach (View sub in view.SubViews)
+        {
+            DumpView (sub, indent + 1, lines);
+        }
     }
 
     #endregion

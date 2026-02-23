@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Views;
 
@@ -103,8 +104,12 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
+        Trace.Command (this, args.Context, "Entry", $"Visible={Visible} Enabled={Enabled} Active={Active}");
+
         if (!Visible || !Enabled)
         {
+            Trace.Command (this, args.Context, "Blocked", "Invisible or disabled");
+
             return true; // Block activation when invisible or disabled
         }
 
@@ -113,18 +118,35 @@ public class MenuBar : Menu, IDesignable
         {
             if (!args.Context.TryGetSource (out View? source) || FindMenuBarItemForSource (source) is not { } sourceMbi)
             {
+                Trace.Command (this, args.Context, "BubblingUp", "Source not found or not a MenuBarItem");
+
                 return false;
             }
 
+            Trace.Command (this, args.Context, "BubblingUp", $"Source={sourceMbi.ToIdentifyingString ()} PopoverMenuOpen={sourceMbi.PopoverMenuOpen}");
+
             if (sourceMbi.PopoverMenuOpen)
             {
-                // MenuBarItem just opened its popover — ensure MenuBar is active
-                if (!Active)
-                {
-                    Active = true;
-                }
+                // Guard against intermediate focus traversal: setting Active=true
+                // causes CanFocus=true which can focus the first MenuBarItem transiently.
+                // _isSwitchingItem prevents OnSelectedMenuItemChanged from auto-opening
+                // that intermediate item.
+                _isSwitchingItem = true;
 
-                ShowItem (sourceMbi);
+                try
+                {
+                    // MenuBarItem just opened its popover — ensure MenuBar is active
+                    if (!Active)
+                    {
+                        Active = true;
+                    }
+
+                    ShowItem (sourceMbi);
+                }
+                finally
+                {
+                    _isSwitchingItem = false;
+                }
             }
             else
             {
@@ -140,6 +162,7 @@ public class MenuBar : Menu, IDesignable
         if (Active)
         {
             // Already active — toggle off
+            Trace.Command (this, args.Context, "ToggleOff", "Already active — deactivating");
             Active = false;
 
             return true;
@@ -147,10 +170,13 @@ public class MenuBar : Menu, IDesignable
 
         if (SubViews.OfType<MenuBarItem> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is not { } first)
         {
+            Trace.Command (this, args.Context, "NoItems", "No MenuBarItem with PopoverMenu found");
+
             return false;
         }
 
         // Not yet active — activate and show the first MenuBarItem with a PopoverMenu.
+        Trace.Command (this, args.Context, "FallbackToFirst", $"Opening first={first.ToIdentifyingString ()}");
         Active = true;
         ShowItem (first);
 
@@ -160,6 +186,7 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
+        Trace.Command (this, ctx, "Entry", $"Active={Active} Routing={ctx?.Routing}");
         base.OnActivated (ctx);
 
         if (ctx is { Routing: CommandRouting.Direct })
@@ -184,6 +211,7 @@ public class MenuBar : Menu, IDesignable
                 return;
             }
 
+            Trace.Command (this, "ActiveChanged", $"{field} -> {value}");
             field = value;
 
             // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
@@ -252,7 +280,12 @@ public class MenuBar : Menu, IDesignable
     ///     Hides the popover menu associated with the active menu bar item and updates the focus state.
     /// </summary>
     /// <returns><see langword="true"/> if the popover was hidden</returns>
-    public bool HideActiveItem () => HideItem (GetActiveItem ());
+    public bool HideActiveItem ()
+    {
+        Trace.Command (this, "Entry");
+
+        return HideItem (GetActiveItem ());
+    }
 
     /// <summary>
     ///     Hides popover menu associated with the specified menu bar item and updates the focus state.
@@ -407,7 +440,13 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnSelectedMenuItemChanged (MenuItem? selected)
     {
-        if (_popoverBrowsingMode && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
+        Trace.Command (this, "Entry", $"Selected={selected?.ToIdentifyingString ()} BrowsingMode={_popoverBrowsingMode} IsSwitching={_isSwitchingItem}");
+
+        // When _isSwitchingItem is true, we're already inside a ShowItem call
+        // (e.g., from a HotKey activation that bubbled up). Focus traversal may
+        // transiently pass through intermediate MenuBarItems. We must NOT auto-open
+        // those items — only the target item should open.
+        if (!_isSwitchingItem && _popoverBrowsingMode && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
         {
             ShowItem (selectedMenuBarItem);
         }
@@ -478,10 +517,23 @@ public class MenuBar : Menu, IDesignable
             // via OnSelectedMenuItemChanged once the focus transfer completes.
             bool anotherMbiHasFocus = SubViews.OfType<MenuBarItem> ().Any (m => m != sender && m.HasFocus);
 
-            if (!anotherMbiHasFocus)
+            if (anotherMbiHasFocus)
             {
-                Active = false;
+                return;
             }
+
+            // If no MBI has focus at all, focus is leaving the MenuBar entirely. Don't call
+            // Active = false here — it would set CanFocus = false → HasFocus = false re-entrantly,
+            // violating SetHasFocusFalse's invariant (Debug.Assert(_hasFocus) at line 908).
+            // MenuBar.OnHasFocusChanged will deactivate once the focus traversal completes.
+            bool anyMbiHasFocus = SubViews.OfType<MenuBarItem> ().Any (m => m.HasFocus);
+
+            if (!anyMbiHasFocus)
+            {
+                return;
+            }
+
+            Active = false;
         }
     }
 
@@ -491,6 +543,8 @@ public class MenuBar : Menu, IDesignable
     /// <param name="menuBarItem"></param>
     private void ShowItem (MenuBarItem? menuBarItem)
     {
+        Trace.Command (this, "Entry", $"Item={menuBarItem?.ToIdentifyingString ()} Active={Active}");
+
         if (!Active || !Visible)
         {
             return;
