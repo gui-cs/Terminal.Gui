@@ -1581,6 +1581,64 @@ public class MenuBarTests
         Assert.False (menuBar.IsOpen (), "MenuBar popover should close when focus moves to standalone Menu");
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void CursorRight_While_PopoverOpen_Switches_To_Next_MenuBarItem ()
+    {
+        // Arrange — reproduces Integration test Navigation_Left_Right_Wraps
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MenuBar menuBar = new () { Id = "menuBar" };
+        menuBar.EnableForDesign (ref hostView);
+        hostView.Add (menuBar);
+
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        MenuBarItem fileItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (0);
+        MenuBarItem editItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (1);
+        MenuBarItem helpItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (2);
+
+        // Act — press F9 to open MenuBar (File menu opens)
+        app.InjectKey (MenuBar.DefaultKey);
+
+        Assert.True (menuBar.Active, "MenuBar should be active after F9");
+        Assert.True (menuBar.IsOpen (), "MenuBar should be open after F9");
+        Assert.True (fileItem.PopoverMenu is { Visible: true }, "File's popover should be visible");
+
+        // Act — press CursorRight to switch to Edit menu
+        app.InjectKey (Key.CursorRight);
+
+        // Assert — Edit's popover should now be open, File's should be closed
+        Assert.True (menuBar.Active, "MenuBar should still be active after CursorRight");
+        Assert.True (menuBar.IsOpen (), "MenuBar should still be open after CursorRight");
+        Assert.False (fileItem.PopoverMenu is { Visible: true }, "File's popover should be hidden");
+        Assert.True (editItem.PopoverMenu is { Visible: true }, "Edit's popover should be visible");
+
+        // Act — press CursorRight again to switch to Help menu
+        app.InjectKey (Key.CursorRight);
+
+        Assert.True (helpItem.PopoverMenu is { Visible: true }, "Help's popover should be visible");
+        Assert.False (editItem.PopoverMenu is { Visible: true }, "Edit's popover should be hidden");
+
+        // Act — press CursorRight again to wrap to File
+        app.InjectKey (Key.CursorRight);
+
+        Assert.True (fileItem.PopoverMenu is { Visible: true }, "File's popover should be visible after wrap");
+        Assert.False (helpItem.PopoverMenu is { Visible: true }, "Help's popover should be hidden");
+
+        // Act — press CursorLeft to go back to Help
+        app.InjectKey (Key.CursorLeft);
+
+        Assert.True (helpItem.PopoverMenu is { Visible: true }, "Help's popover should be visible after CursorLeft");
+        Assert.False (fileItem.PopoverMenu is { Visible: true }, "File's popover should be hidden");
+    }
+
     #endregion
 
     #region Diagnostic and fix tests

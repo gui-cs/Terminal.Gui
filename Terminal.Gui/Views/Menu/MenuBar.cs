@@ -68,30 +68,18 @@ public class MenuBar : Menu, IDesignable
 
         bool? MoveLeft (ICommandContext? ctx)
         {
-            _isSwitchingItem = true;
-
-            try
-            {
-                return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
-            }
-            finally
-            {
-                _isSwitchingItem = false;
-            }
+            // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
+            // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
+            // _isSwitchingItem guard for the focus transfer it does.
+            return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
         }
 
         bool? MoveRight (ICommandContext? ctx)
         {
-            _isSwitchingItem = true;
-
-            try
-            {
-                return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-            }
-            finally
-            {
-                _isSwitchingItem = false;
-            }
+            // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
+            // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
+            // _isSwitchingItem guard for the focus transfer it does.
+            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         }
     }
 

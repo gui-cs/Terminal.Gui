@@ -1619,10 +1619,6 @@ public class MenuTests
         View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
         hostView.Add (outerMenu);
 
-        // Track Activated on the outer menu (proves the bridge relayed the command)
-        var outerMenuActivatedCount = 0;
-        outerMenu.Activated += (_, _) => outerMenuActivatedCount++;
-
         // Track Activated on the outer item (proves the bridge relayed to the MenuItem)
         var outerItemActivatedCount = 0;
         outerItem.Activated += (_, _) => outerItemActivatedCount++;
