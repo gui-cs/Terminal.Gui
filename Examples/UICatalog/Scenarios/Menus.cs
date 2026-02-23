@@ -226,7 +226,7 @@ public class Menus : Scenario
             };
 
             // The source of truth is our status CB; any time it changes, update the menu item
-            var editModeMenuItemCb = MenuBar.GetMenuItemsWith (mi => mi.Id == "EditMode").FirstOrDefault ()?.CommandView as CheckBox;
+            var editModeMenuItemCb = MenuBar?.GetMenuItemsWith (mi => mi.Id == "EditMode").FirstOrDefault ()?.CommandView as CheckBox;
 
             editModeStatusCb.ValueChanged += (_, _) => { editModeMenuItemCb?.Value = editModeStatusCb.Value; };
 

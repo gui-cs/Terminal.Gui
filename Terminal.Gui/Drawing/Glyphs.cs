@@ -21,8 +21,6 @@ namespace Terminal.Gui.Drawing;
 /// </remarks>
 public class Glyphs
 {
-    private static string _null;
-
     // IMPORTANT: If you change these, make sure to update the ./Resources/config.json file as
     // IMPORTANT: it is the source of truth for the default glyphs at runtime.
     // IMPORTANT: Configuration Manager test SaveDefaults uses this class to generate the default config file
