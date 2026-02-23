@@ -308,7 +308,10 @@ public class MenuBar : Menu, IDesignable
     /// </summary>
     public bool IsOpen () => SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen);
 
-    /// <summary>Specifies the key that will activate the context menu.</summary>
+    /// <summary>
+    ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F9"/> and
+    ///     can be configured using the <see cref="DefaultKey"/> configuraiton property.
+    /// </summary>
     public Key Key
     {
         get;
@@ -318,7 +321,7 @@ public class MenuBar : Menu, IDesignable
             field = value;
             KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, field));
         }
-    } = DefaultKey;
+    }
 
     /// <summary>Raised when <see cref="Key"/> is changed.</summary>
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;

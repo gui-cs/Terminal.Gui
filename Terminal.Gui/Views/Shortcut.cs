@@ -272,7 +272,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///         <item>Deferred completion (Shortcut.Activated fires after CommandView.Activated)</item>
     ///     </list>
     /// </summary>
-    protected override View? GetDispatchTarget (ICommandContext? ctx) => CommandView;
+    protected override View GetDispatchTarget (ICommandContext? ctx) => CommandView;
 
     // ConsumeDispatch defaults to false — CommandView completes its own activation
     // (e.g., CheckBox.OnActivated calls AdvanceCheckState).
@@ -375,10 +375,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
     /// <summary>Called when <see cref="Orientation"/> has changed.</summary>
     /// <param name="newOrientation"></param>
-    public void OnOrientationChanged (Orientation newOrientation) =>
-
-        // TODO: Determine what, if anything, is opinionated about the orientation.
-        SetNeedsLayout ();
+    public void OnOrientationChanged (Orientation newOrientation) => SetNeedsLayout ();
 
     #endregion
 

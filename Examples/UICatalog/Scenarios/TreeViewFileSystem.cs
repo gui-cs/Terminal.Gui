@@ -524,7 +524,7 @@ public class TreeViewFileSystem : Scenario
                     }
 
                     sb = new StringBuilder ();
-                    sb.AppendLine ($"Path:\n {_fileInfo.FullName}\n");
+                    sb.AppendLine ($"Path:\n {_fileInfo?.FullName}\n");
                     sb.AppendLine ($"Exception:\n {ioe.Message}");
                 }
 

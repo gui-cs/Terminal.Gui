@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -96,7 +94,7 @@ public class MenuBarItem : MenuItem, IDesignable
                         return true;
                     });
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} {args}");
@@ -135,14 +133,7 @@ public class MenuBarItem : MenuItem, IDesignable
         }
     }
 
-    /// <inheritdoc />
-    protected override void OnAccepted (ICommandContext? ctx)
-    {
-        base.OnAccepted (ctx);
-
-    }
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();
@@ -187,26 +178,24 @@ public class MenuBarItem : MenuItem, IDesignable
 
             field = value;
 
-            if (field is { })
+            if (field is null)
             {
+                return;
+            }
 #if DEBUG
-                Id = $"{Id}.{field.Id}";
+            Id = $"{Id}.{field.Id}";
 #endif
 
-                RegisterPopover ();
-                PopoverMenuOpen = field.Visible;
-                field.VisibleChanged += OnPopoverVisibleChanged;
+            RegisterPopover ();
+            PopoverMenuOpen = field.Visible;
+            field.VisibleChanged += OnPopoverVisibleChanged;
 
-                // Bridge Activate from PopoverMenu → MenuBarItem across the non-containment boundary.
-                _popoverBridge = CommandBridge.Connect (this, field, Command.Activate);
-            }
+            // Bridge Activate from PopoverMenu → MenuBarItem across the non-containment boundary.
+            _popoverBridge = CommandBridge.Connect (this, field, Command.Activate);
 
             return;
 
-            void OnPopoverVisibleChanged (object? sender, EventArgs args) =>
-
-                // Logging.Debug ($"OnPopoverVisibleChanged - {this.ToIdentifyingString ()} - Visible = {_popoverMenu?.Visible} ");
-                PopoverMenuOpen = field?.Visible ?? false;
+            void OnPopoverVisibleChanged (object? sender, EventArgs args) => PopoverMenuOpen = field?.Visible ?? false;
         }
     }
 
@@ -215,7 +204,7 @@ public class MenuBarItem : MenuItem, IDesignable
     /// </summary>
     public bool PopoverMenuOpen
     {
-        get; 
+        get;
         set
         {
             if (field == value)
@@ -258,7 +247,6 @@ public class MenuBarItem : MenuItem, IDesignable
     protected virtual bool OnPopoverMenuOpenChanging (ValueChangingEventArgs<bool> args) => false;
 
     /// <summary>
-    /// 
     /// </summary>
     public event EventHandler<ValueChangingEventArgs<bool>>? PopoverMenuOpenChanging;
 
@@ -275,26 +263,24 @@ public class MenuBarItem : MenuItem, IDesignable
     {
         Logging.Debug ($"{this.ToIdentifyingString ()} ({key})");
 
-        if (PopoverMenu is { Visible: true } && HotKeyBindings.TryGet (key, out _))
+        if (PopoverMenu is not { Visible: true } || !HotKeyBindings.TryGet (key, out _))
         {
-            // If the user presses the hotkey for a menu item that is already open,
-            // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
-            if (SuperView is MenuBar { } menuBar)
-            {
-                menuBar.HideActiveItem ();
-            }
-
-            return true;
+            return false;
         }
 
-        return false;
+        // If the user presses the hotkey for a menu item that is already open,
+        // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
+        if (SuperView is MenuBar { } menuBar)
+        {
+            menuBar.HideActiveItem ();
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
-
         if (newHasFocus)
         {
             return;

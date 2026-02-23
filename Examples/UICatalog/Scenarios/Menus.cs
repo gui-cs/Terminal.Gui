@@ -194,7 +194,7 @@ public class Menus : Scenario
 
             enableOverwriteStatusCb.ValueChanged += (_, _) => { enableOverwriteMenuItemCb?.Value = enableOverwriteStatusCb.Value; };
 
-            MenuBar.Accepted += (_, args) =>
+            MenuBar?.Accepted += (_, args) =>
                                 {
                                     if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi)
                                     {
