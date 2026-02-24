@@ -284,7 +284,7 @@ public class MenuBar : Menu, IDesignable
         {
             if (mbi.PopoverMenu is { })
             {
-                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus (predicate));
+                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus (null, predicate));
             }
         }
 

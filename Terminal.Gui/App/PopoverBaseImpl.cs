@@ -88,7 +88,7 @@ public abstract class PopoverBaseImpl : View, IPopover
     }
 
     /// <inheritdoc/>
-    public IRunnable? Current
+    public IRunnable? Owner
     {
         get;
         set

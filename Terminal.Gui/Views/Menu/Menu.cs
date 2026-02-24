@@ -57,6 +57,8 @@ public class Menu : Bar
     /// <inheritdoc />
     protected override bool OnActivating (CommandEventArgs args)
     {
+        Tracing.Trace.Command (this, args.Context, "Entry", $"Routing={args.Context?.Routing} Cmd={args.Context?.Command}");
+
         if (base.OnActivating (args) || args.Handled)
         {
             return true;
@@ -125,6 +127,7 @@ public class Menu : Bar
     internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({selected?.Title})");
+        Tracing.Trace.Command (this, "Handler", $"{selected?.ToIdentifyingString ()}");
 
         OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);

@@ -81,6 +81,12 @@ public class Menus : Scenario
             BorderStyle = LineStyle.Dashed;
         }
 
+        /// <inheritdoc />
+        protected override void OnAccepted (ICommandContext? ctx) => base.OnAccepted (ctx);
+
+        /// <inheritdoc />
+        protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
+
         /// <inheritdoc/>
         public override void EndInit ()
         {

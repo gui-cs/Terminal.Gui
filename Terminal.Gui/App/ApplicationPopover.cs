@@ -122,7 +122,7 @@ public sealed class ApplicationPopover : IDisposable
         {
             return popover;
         }
-        popover.Current ??= App?.TopRunnableView as IRunnable;
+        popover.Owner ??= App?.TopRunnableView as IRunnable;
 
         if (popover is View popoverView)
         {
@@ -221,7 +221,7 @@ public sealed class ApplicationPopover : IDisposable
 
         foreach (IPopover popover in _popovers.ToList ())
         {
-            if (popover == activePopover || popover is not View popoverView || (popover.Current is { } && popover.Current != App?.TopRunnableView))
+            if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnableView))
             {
                 continue;
             }

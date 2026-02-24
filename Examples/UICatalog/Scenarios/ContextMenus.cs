@@ -124,7 +124,7 @@ public class ContextMenus : Scenario
     /// </summary>
     private class PopoverMenuHost : FrameView
     {
-        private PopoverMenu? _contextMenu;
+        private PopoverMenu? _popoverMenu;
 
         public PopoverMenuHost ()
         {
@@ -133,6 +133,20 @@ public class ContextMenus : Scenario
             base.Text = "Right-click or press the context menu key to open.";
             TextAlignment = Alignment.Center;
             VerticalTextAlignment = Alignment.Center;
+            CommandsToBubbleUp = [Command.Activate];
+        }
+
+        /// <inheritdoc/>
+        protected override void OnActivated (ICommandContext? ctx)
+        {
+            base.OnActivated (ctx);
+
+            MenuItem? menuItem = _popoverMenu?.GetMenuItemsOfAllSubMenus (null, item => item.Id == "menuItemBorders").FirstOrDefault ();
+
+            if (menuItem?.CommandView is CheckBox bordersCheckBox)
+            {
+                BorderStyle = bordersCheckBox.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+            }
         }
 
         /// <inheritdoc/>
@@ -140,22 +154,28 @@ public class ContextMenus : Scenario
         {
             base.EndInit ();
 
-            _contextMenu = new PopoverMenu { Title = "ContextMenu", Id = "PopoverMenuHostContextMenu" };
-            Menu testContextMenu = new () { Id = "TestContextMenu" };
-            _contextMenu.Root = testContextMenu;
-            ConfigureTestMenu (testContextMenu);
-            _contextMenu.Visible = false;
+            _popoverMenu = new PopoverMenu { Title = "ContextMenu", Id = "PopoverMenuHostContextMenu" };
 
-            _contextMenu.Accepted += (_, args) =>
-                                     {
-                                         string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-                                         Logging.Trace ($"PopoverMenuHost ContextMenu.Accepted: {sourceTitle}");
-                                     };
+            Menu testContextMenu = new () { Id = "TestContextMenu" };
+            _popoverMenu.Root = testContextMenu;
+            ConfigureTestMenu (testContextMenu);
+            _popoverMenu.Visible = false;
+
+            _popoverMenu.Activated += (_, args) =>
+                                      {
+                                          MenuItem? menuItem = _popoverMenu.GetMenuItemsOfAllSubMenus (null, item => item.Id == "menuItemScheme")
+                                                                           .FirstOrDefault ();
+
+                                          if (menuItem?.CommandView is OptionSelector<Schemes> schemeSelector)
+                                          {
+                                              SchemeName = schemeSelector.Value.ToString ();
+                                          }
+                                      };
 
             AddCommand (Command.Context,
                         _ =>
                         {
-                            _contextMenu?.MakeVisible ();
+                            _popoverMenu?.MakeVisible ();
 
                             return true;
                         });
@@ -163,7 +183,7 @@ public class ContextMenus : Scenario
             MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
             KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-            App?.Popovers?.Register (_contextMenu);
+            App?.Popovers?.Register (_popoverMenu);
         }
 
         private void ConfigureTestMenu (Menu menu)
@@ -173,7 +193,7 @@ public class ContextMenus : Scenario
 
             Line line = new ();
 
-            MenuItem menuItemBorders = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+            MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
             menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
 
             menuItemBorders.Action += () =>
@@ -189,15 +209,22 @@ public class ContextMenus : Scenario
 
             OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
 
-            MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+            MenuItem menuItemScheme = new ()
+            {
+                Id = "menuItemScheme",
+                Title = "_Scheme",
+                Text = "Scheme",
+                Key = Key.S.WithCtrl,
+                CommandView = schemeOptionSelector
+            };
 
             schemeOptionSelector.ValueChanged += (_, args) =>
-                                                  {
-                                                      if (args.Value is { } scheme)
-                                                      {
-                                                          menu.SchemeName = scheme.ToString ();
-                                                      }
-                                                  };
+                                                 {
+                                                     if (args.Value is { } scheme)
+                                                     {
+                                                         menu.SchemeName = scheme.ToString ();
+                                                     }
+                                                 };
 
             menu.Add (menuItem1, line, menuItemBorders, menuItemScheme);
         }
@@ -205,10 +232,10 @@ public class ContextMenus : Scenario
         /// <inheritdoc/>
         protected override void Dispose (bool disposing)
         {
-            if (_contextMenu is { })
+            if (_popoverMenu is { })
             {
-                _contextMenu.Dispose ();
-                _contextMenu = null;
+                _popoverMenu.Dispose ();
+                _popoverMenu = null;
             }
 
             base.Dispose (disposing);

@@ -159,8 +159,6 @@ public class Shortcut : View, IOrientation, IDesignable
     public override void EndInit ()
     {
         base.EndInit ();
-        App ??= SuperView?.App; // HACK: Remove once legacy static Application is gone
-        Debug.Assert (App is { });
         UpdateKeyBindings (Key.Empty);
     }
 

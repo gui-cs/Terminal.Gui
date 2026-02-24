@@ -131,7 +131,7 @@ public class PopoverMenuTests
         popoverManager.Show (popoverMenu);
 
         // Show the submenu — this sets parentItem.ForceFocusColors = true
-        popoverMenu.ShowSubMenu (parentItem);
+        popoverMenu.ShowMenuItemSubMenu (parentItem);
         Assert.True (parentItem.ForceFocusColors);
 
         // Act — hide the entire popover

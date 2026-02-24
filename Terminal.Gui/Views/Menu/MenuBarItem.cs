@@ -156,9 +156,10 @@ public class MenuBarItem : MenuItem, IDesignable
         {
             return;
         }
+
+        PopoverMenu?.App = App;
         PopoverMenu?.BeginInit ();
         PopoverMenu?.EndInit ();
-        PopoverMenu?.App = App;
         RegisterPopover ();
     }
 

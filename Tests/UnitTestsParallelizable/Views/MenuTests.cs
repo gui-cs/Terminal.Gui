@@ -1852,7 +1852,7 @@ public class MenuTests
         popoverMenu.Activated += (_, _) => popoverActivatedCount++;
 
         // Make the inner menu visible (simulating ShowSubMenu)
-        popoverMenu.ShowSubMenu (outerItem);
+        popoverMenu.ShowMenuItemSubMenu (outerItem);
 
         // Focus and activate the inner item
         innerItem.SetFocus ();
