@@ -6,7 +6,6 @@ namespace Terminal.Gui.ViewBase;
 [Serializable]
 public class LayoutException : Exception
 {
-
     /// <summary>
     ///     Creates a new instance of <see cref="LayoutException"/>.
     /// </summary>
@@ -23,7 +22,5 @@ public class LayoutException : Exception
     /// </summary>
     /// <param name="message"></param>
     /// <param name="innerException"></param>
-    public LayoutException (string? message, Exception? innerException)
-        : base (message, innerException)
-    { }
+    public LayoutException (string? message, Exception? innerException) : base (message, innerException) { }
 }

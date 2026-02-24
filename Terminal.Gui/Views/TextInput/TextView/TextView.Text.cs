@@ -60,31 +60,14 @@ public partial class TextView
     }
 
     /// <summary>
-    ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
-    ///     <see langword="false"/> otherwise.
+    ///     Gets whatever the text was changed or not. <see langword="true"/> if the text was changed
+    ///     <see langword="false"/> otherwise. Calling <see cref="ClearHistoryChanges"/> will reset this property to
+    ///     <see langword="false"/>.
     /// </summary>
-    public bool IsDirty { get => _historyText.IsDirty (_model.GetAllLines ()); set => _historyText.Clear (_model.GetAllLines ()); }
-
-    /// <summary>Gets or sets the left column.</summary>
-    public int LeftColumn
-    {
-        get => Viewport.X;
-        set
-        {
-            if (value > 0 && _wordWrap)
-            {
-                return;
-            }
-
-            Viewport = Viewport with { X = Math.Max (Math.Min (value, Maxlength - 1), 0) };
-        }
-    }
+    public bool IsDirty => _historyText.IsDirty (_model.GetAllLines ());
 
     /// <summary>Gets the number of lines.</summary>
     public int Lines => _model.Count;
-
-    /// <summary>Gets the maximum visible length line.</summary>
-    public int Maxlength => _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
 
     private bool _multiline = true;
 
@@ -113,11 +96,6 @@ public partial class TextView
                 WordWrap = false;
 
                 // Don't reset cursor position - this causes unwanted scrolling (issue #3988)
-                // CurrentColumn = 0;
-                // CurrentRow = 0;
-                //_savedHeight = Height;
-
-                //Height = Dim.Auto (DimAutoStyle.Text, 1);
 
                 if (!IsInitialized)
                 {
@@ -126,9 +104,8 @@ public partial class TextView
 
                 SetNeedsDraw ();
             }
-            else if (_multiline /*&& _savedHeight is { }*/)
+            else if (_multiline)
             {
-                //Height = _savedHeight;
                 SetNeedsDraw ();
             }
 
@@ -155,8 +132,6 @@ public partial class TextView
 
             SetNeedsDraw ();
 
-            // TODO: This call is probably not needed as Adjust also
-            // TODO: calls WrapTextModel
             WrapTextModel ();
             AdjustViewport ();
         }
@@ -217,9 +192,6 @@ public partial class TextView
             _historyText.Clear (_model.GetAllLines ());
         }
     }
-
-    /// <summary>Gets or sets the top row.</summary>
-    public int TopRow { get => Viewport.Y; set => Viewport = Viewport with { Y = Math.Max (Math.Min (value, Lines - 1), 0) }; }
 
     /// <summary>
     ///     Tracks whether the text view should be considered "used", that is, that the user has moved in the entry, so

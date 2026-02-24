@@ -13,42 +13,15 @@ namespace ViewsTests;
 public class DialogTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
-    public void Constructor_Initializes_DefaultValues ()
+    public void Add_SubView_Updates_Dialog ()
     {
         Dialog dialog = new ();
 
-        Assert.NotNull (dialog);
-        Assert.True (dialog.CanFocus);
-        Assert.Equal (Alignment.End, dialog.ButtonAlignment);
-        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, dialog.ButtonAlignmentModes);
-        Assert.Equal (LineStyle.Heavy, dialog.BorderStyle);
-        Assert.Equal (ShadowStyle.Transparent, dialog.ShadowStyle);
-        Assert.Empty (dialog.Buttons);
-        Assert.Null (dialog.Result);
-        Assert.True (dialog.Canceled); // Canceled is true when Result is null
-        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
+        Label label = new () { Text = "Hello World", X = 0, Y = 0 };
 
-        dialog.Dispose ();
-    }
+        dialog.Add (label);
 
-    [Fact]
-    public void Constructor_Sets_Position_Center ()
-    {
-        Dialog dialog = new ();
-
-        Assert.True (dialog.X.Has<PosCenter> (out _));
-        Assert.True (dialog.Y.Has<PosCenter> (out _));
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Constructor_Sets_AutoDimensions ()
-    {
-        Dialog dialog = new ();
-
-        Assert.True (dialog.Width.Has<DimAuto> (out _));
-        Assert.True (dialog.Height.Has<DimAuto> (out _));
+        Assert.Contains (label, dialog.SubViews);
 
         dialog.Dispose ();
     }
@@ -89,18 +62,15 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Buttons_Property_Set_Adds_Buttons ()
+    public void AddButton_Sets_Button_Position ()
     {
         Dialog dialog = new ();
+        Button button = new () { Title = "OK" };
 
-        Button [] buttons = [new () { Title = "Cancel" }, new () { Title = "OK" }];
+        dialog.AddButton (button);
 
-        dialog.Buttons = buttons;
-
-        Assert.Equal (2, dialog.Buttons.Length);
-        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
-        Assert.Equal ("OK", dialog.Buttons [1].Title);
-        Assert.True (dialog.Buttons [1].IsDefault);
+        Assert.True (button.X.Has<PosAlign> (out _));
+        Assert.Equal (1, button.Y);
 
         dialog.Dispose ();
     }
@@ -117,6 +87,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.ButtonAlignment = Alignment.Center;
         Assert.Equal (Alignment.Center, dialog.ButtonAlignment);
+
+        dialog.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (Alignment.Start)]
+    [InlineData (Alignment.Center)]
+    [InlineData (Alignment.End)]
+    [InlineData (Alignment.Fill)]
+    public void ButtonAlignment_Theory (Alignment alignment)
+    {
+        Dialog dialog = new () { ButtonAlignment = alignment };
+
+        Assert.Equal (alignment, dialog.ButtonAlignment);
 
         dialog.Dispose ();
     }
@@ -138,6 +122,23 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Buttons_Property_Set_Adds_Buttons ()
+    {
+        Dialog dialog = new ();
+
+        Button [] buttons = [new () { Title = "Cancel" }, new () { Title = "OK" }];
+
+        dialog.Buttons = buttons;
+
+        Assert.Equal (2, dialog.Buttons.Length);
+        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
+        Assert.Equal ("OK", dialog.Buttons [1].Title);
+        Assert.True (dialog.Buttons [1].IsDefault);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
     public void Canceled_False_When_Result_Null ()
     {
         Dialog dialog = new ();
@@ -149,52 +150,42 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Title_Get_Set ()
+    public void Constructor_Initializes_DefaultValues ()
     {
         Dialog dialog = new ();
 
-        Assert.Equal (string.Empty, dialog.Title);
-
-        dialog.Title = "Test Dialog";
-        Assert.Equal ("Test Dialog", dialog.Title);
-
-        dialog.Title = "你好";
-        Assert.Equal ("你好", dialog.Title);
+        Assert.NotNull (dialog);
+        Assert.True (dialog.CanFocus);
+        Assert.Equal (Alignment.End, dialog.ButtonAlignment);
+        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, dialog.ButtonAlignmentModes);
+        Assert.Equal (LineStyle.Heavy, dialog.BorderStyle);
+        Assert.Equal (ShadowStyle.Transparent, dialog.ShadowStyle);
+        Assert.Empty (dialog.Buttons);
+        Assert.Null (dialog.Result);
+        Assert.True (dialog.Canceled); // Canceled is true when Result is null
+        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
 
         dialog.Dispose ();
     }
 
     [Fact]
-    public void Add_SubView_Updates_Dialog ()
+    public void Constructor_Sets_AutoDimensions ()
     {
         Dialog dialog = new ();
 
-        Label label = new () { Text = "Hello World", X = 0, Y = 0 };
-
-        dialog.Add (label);
-
-        Assert.Contains (label, dialog.SubViews);
+        Assert.True (dialog.Width.Has<DimAuto> (out _));
+        Assert.True (dialog.Height.Has<DimAuto> (out _));
 
         dialog.Dispose ();
     }
 
     [Fact]
-    public void Dialog_With_Title_And_Buttons ()
+    public void Constructor_Sets_Position_Center ()
     {
-        Dialog dialog = new () { Title = "Confirm" };
+        Dialog dialog = new ();
 
-        Button cancelButton = new () { Title = "Cancel" };
-        Button okButton = new () { Title = "OK" };
-
-        dialog.AddButton (cancelButton);
-        dialog.AddButton (okButton);
-
-        Assert.Equal ("Confirm", dialog.Title);
-        Assert.Equal (2, dialog.Buttons.Length);
-        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
-        Assert.Equal ("OK", dialog.Buttons [1].Title);
-        Assert.False (cancelButton.IsDefault);
-        Assert.True (okButton.IsDefault);
+        Assert.True (dialog.X.Has<PosCenter> (out _));
+        Assert.True (dialog.Y.Has<PosCenter> (out _));
 
         dialog.Dispose ();
     }
@@ -210,11 +201,128 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Dialog_Border_Style_Can_Be_Changed ()
+    {
+        Dialog dialog = new () { BorderStyle = LineStyle.Single };
+
+        Assert.Equal (LineStyle.Single, dialog.BorderStyle);
+
+        dialog.BorderStyle = LineStyle.Double;
+        Assert.Equal (LineStyle.Double, dialog.BorderStyle);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
     public void Dialog_CanFocus_Default_True ()
     {
         Dialog dialog = new ();
 
         Assert.True (dialog.CanFocus);
+
+        dialog.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Dialog_Command_Accept_SetsResultAndStops ()
+    {
+        Dialog dialog = new () { Title = "Test" };
+        Button button = new () { Text = "OK", IsDefault = true };
+        dialog.AddButton (button);
+
+        var acceptingFired = false;
+
+        dialog.Accepting += (_, e) =>
+                            {
+                                acceptingFired = true;
+                                e.Handled = true;
+                            };
+
+        // Accept command on dialog should propagate through default button
+        bool? result = dialog.InvokeCommand (Command.Accept);
+
+        // The accepting event on dialog fires
+        Assert.True (acceptingFired);
+        Assert.True (result);
+
+        dialog.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void Dialog_ContainedButton_Accept_PropagatesUp ()
+    {
+        Dialog dialog = new () { Title = "Test" };
+        Button button = new () { Text = "OK" };
+        dialog.AddButton (button);
+
+        var buttonAcceptingFired = false;
+
+        button.Accepting += (_, e) =>
+                            {
+                                buttonAcceptingFired = true;
+                                e.Handled = true;
+                            };
+
+        // Button's Accept should fire
+        bool? result = button.InvokeCommand (Command.HotKey);
+
+        Assert.True (buttonAcceptingFired);
+        Assert.True (result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Disposes_Buttons ()
+    {
+        Dialog dialog = new ();
+        Button button1 = new () { Title = "OK" };
+        Button button2 = new () { Title = "Cancel" };
+
+        dialog.AddButton (button1);
+        dialog.AddButton (button2);
+
+        Assert.Equal (2, dialog.Buttons.Length);
+
+        dialog.Dispose ();
+
+#if DEBUG_IDISPOSABLE
+
+        // After disposal, buttons should be disposed through the dialog's disposal chain
+        Assert.True (dialog.WasDisposed);
+        Assert.True (button1.WasDisposed);
+        Assert.True (button2.WasDisposed);
+#endif
+    }
+
+    [Fact]
+    public void Dialog_ShadowStyle_Can_Be_Changed ()
+    {
+        Dialog dialog = new () { ShadowStyle = ShadowStyle.None };
+
+        Assert.Equal (ShadowStyle.None, dialog.ShadowStyle);
+
+        dialog.ShadowStyle = ShadowStyle.Opaque;
+        Assert.Equal (ShadowStyle.Opaque, dialog.ShadowStyle);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Text_Property ()
+    {
+        Dialog dialog = new () { Text = "This is a message" };
+
+        Assert.Equal ("This is a message", dialog.Text);
+
+        dialog.Text = "Updated message";
+        Assert.Equal ("Updated message", dialog.Text);
 
         dialog.Dispose ();
     }
@@ -248,15 +356,46 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void AddButton_Sets_Button_Position ()
+    public void Dialog_With_Title_And_Buttons ()
+    {
+        Dialog dialog = new () { Title = "Confirm" };
+
+        Button cancelButton = new () { Title = "Cancel" };
+        Button okButton = new () { Title = "OK" };
+
+        dialog.AddButton (cancelButton);
+        dialog.AddButton (okButton);
+
+        Assert.Equal ("Confirm", dialog.Title);
+        Assert.Equal (2, dialog.Buttons.Length);
+        Assert.Equal ("Cancel", dialog.Buttons [0].Title);
+        Assert.Equal ("OK", dialog.Buttons [1].Title);
+        Assert.False (cancelButton.IsDefault);
+        Assert.True (okButton.IsDefault);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_With_Wide_Character_Button_Text ()
     {
         Dialog dialog = new ();
-        Button button = new () { Title = "OK" };
+        Button button = new () { Title = "确定" };
 
         dialog.AddButton (button);
 
-        Assert.True (button.X.Has<PosAlign> (out _));
-        Assert.Equal (1, button.Y);
+        Assert.Single (dialog.Buttons);
+        Assert.Equal ("确定", dialog.Buttons [0].Title);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_With_Wide_Character_Title ()
+    {
+        Dialog dialog = new () { Title = "你好世界" };
+
+        Assert.Equal ("你好世界", dialog.Title);
 
         dialog.Dispose ();
     }
@@ -270,69 +409,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.Null (dialog.Result);
 
         dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_Border_Style_Can_Be_Changed ()
-    {
-        Dialog dialog = new () { BorderStyle = LineStyle.Single };
-
-        Assert.Equal (LineStyle.Single, dialog.BorderStyle);
-
-        dialog.BorderStyle = LineStyle.Double;
-        Assert.Equal (LineStyle.Double, dialog.BorderStyle);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_ShadowStyle_Can_Be_Changed ()
-    {
-        Dialog dialog = new () { ShadowStyle = ShadowStyle.None };
-
-        Assert.Equal (ShadowStyle.None, dialog.ShadowStyle);
-
-        dialog.ShadowStyle = ShadowStyle.Opaque;
-        Assert.Equal (ShadowStyle.Opaque, dialog.ShadowStyle);
-
-        dialog.Dispose ();
-    }
-
-    [Theory]
-    [InlineData (Alignment.Start)]
-    [InlineData (Alignment.Center)]
-    [InlineData (Alignment.End)]
-    [InlineData (Alignment.Fill)]
-    public void ButtonAlignment_Theory (Alignment alignment)
-    {
-        Dialog dialog = new () { ButtonAlignment = alignment };
-
-        Assert.Equal (alignment, dialog.ButtonAlignment);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_Disposes_Buttons ()
-    {
-        Dialog dialog = new ();
-        Button button1 = new () { Title = "OK" };
-        Button button2 = new () { Title = "Cancel" };
-
-        dialog.AddButton (button1);
-        dialog.AddButton (button2);
-
-        Assert.Equal (2, dialog.Buttons.Length);
-
-        dialog.Dispose ();
-
-#if DEBUG_IDISPOSABLE
-
-        // After disposal, buttons should be disposed through the dialog's disposal chain
-        Assert.True (dialog.WasDisposed);
-        Assert.True (button1.WasDisposed);
-        Assert.True (button2.WasDisposed);
-#endif
     }
 
     [Fact]
@@ -357,38 +433,17 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Dialog_With_Wide_Character_Title ()
-    {
-        Dialog dialog = new () { Title = "你好世界" };
-
-        Assert.Equal ("你好世界", dialog.Title);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_With_Wide_Character_Button_Text ()
+    public void Title_Get_Set ()
     {
         Dialog dialog = new ();
-        Button button = new () { Title = "确定" };
 
-        dialog.AddButton (button);
+        Assert.Equal (string.Empty, dialog.Title);
 
-        Assert.Single (dialog.Buttons);
-        Assert.Equal ("确定", dialog.Buttons [0].Title);
+        dialog.Title = "Test Dialog";
+        Assert.Equal ("Test Dialog", dialog.Title);
 
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Dialog_Text_Property ()
-    {
-        Dialog dialog = new () { Text = "This is a message" };
-
-        Assert.Equal ("This is a message", dialog.Text);
-
-        dialog.Text = "Updated message";
-        Assert.Equal ("Updated message", dialog.Text);
+        dialog.Title = "你好";
+        Assert.Equal ("你好", dialog.Title);
 
         dialog.Dispose ();
     }
@@ -1121,6 +1176,313 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
     }
 
+    [Theory]
+    [MemberData (nameof (PosData))]
+    public void Dialog_Draws_SubView_With_SubViews_WithDifferentPosTypes (Pos pos, string expected)
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (22, 9);
+
+        using Dialog dialog = new ();
+
+        dialog.Driver = driver;
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.Title = "Dialog";
+
+        var container = new View
+        {
+            X = pos,
+            Id = "container",
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Title = "container",
+            BorderStyle = LineStyle.Single
+        };
+        var view1 = new View { Width = Dim.Auto (), Height = Dim.Auto (), Text = "view1" };
+        var view2 = new View { Y = 1, Width = Dim.Auto (), Height = Dim.Auto (), Text = "view2" };
+        container.Add (view1, view2);
+
+        dialog.Add (container);
+
+        dialog.Layout ();
+        dialog.Draw ();
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    public static TheoryData<Pos, string> PosData () =>
+        new ()
+        {
+            {
+                Pos.Absolute (0), """
+                                  ┌┤Dialog├──┐
+                                  │┌┤con├┐   │
+                                  ││view1│   │
+                                  ││view2│   │
+                                  │└─────┘   │
+                                  └──────────┘
+                                  """
+            },
+            {
+                Pos.Absolute (2), """
+                                  ┌┤Dialog├──┐
+                                  │  ┌┤con├┐ │
+                                  │  │view1│ │
+                                  │  │view2│ │
+                                  │  └─────┘ │
+                                  └──────────┘
+                                  """
+            },
+            {
+                Pos.Center (), """
+                               ┌┤Dialog├──┐
+                               │ ┌┤con├┐  │
+                               │ │view1│  │
+                               │ │view2│  │
+                               │ └─────┘  │
+                               └──────────┘
+                               """
+            },
+            {
+                Pos.AnchorEnd (), """
+                                  ┌┤Dialog├──┐
+                                  │   ┌┤con├┐│
+                                  │   │view1││
+                                  │   │view2││
+                                  │   └─────┘│
+                                  └──────────┘
+                                  """
+            },
+            {
+                Pos.Align (Alignment.Start), """
+                                             ┌┤Dialog├──┐
+                                             │┌┤con├┐   │
+                                             ││view1│   │
+                                             ││view2│   │
+                                             │└─────┘   │
+                                             └──────────┘
+                                             """
+            },
+            {
+                Pos.Align (Alignment.Center), """
+                                              ┌┤Dialog├──┐
+                                              │ ┌┤con├┐  │
+                                              │ │view1│  │
+                                              │ │view2│  │
+                                              │ └─────┘  │
+                                              └──────────┘
+                                              """
+            },
+            {
+                Pos.Align (Alignment.End), """
+                                           ┌┤Dialog├──┐
+                                           │   ┌┤con├┐│
+                                           │   │view1││
+                                           │   │view2││
+                                           │   └─────┘│
+                                           └──────────┘
+                                           """
+            },
+            {
+                Pos.Align (Alignment.Fill), """
+                                            ┌┤Dialog├──┐
+                                            │┌┤con├┐   │
+                                            ││view1│   │
+                                            ││view2│   │
+                                            │└─────┘   │
+                                            └──────────┘
+                                            """
+            },
+            {
+                Pos.Percent (50), """
+                                  ┌┤Dialog├──┐
+                                  │     ┌┤con│
+                                  │     │view│
+                                  │     │view│
+                                  │     └────│
+                                  └──────────┘
+                                  """
+            },
+            {
+                Pos.Func (_ => 3), """
+                                   ┌┤Dialog├──┐
+                                   │   ┌┤con├┐│
+                                   │   │view1││
+                                   │   │view2││
+                                   │   └─────┘│
+                                   └──────────┘
+                                   """
+            }
+        };
+
+    [Theory]
+    [MemberData (nameof (PosViewData))]
+    public void Dialog_Draws_SubView_With_SubViews_WithDifferentPosViewTypes (Func<View, Pos> posFactory, Func<View> viewFactory, string expected)
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (23, 11);
+
+        using Dialog dialog = new ();
+
+        dialog.Driver = driver;
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.Title = "Dialog";
+
+        View view = viewFactory (); // Create fresh instance
+        Pos pos = posFactory (view);
+
+        var container = new View
+        {
+            X = pos,
+            Y = pos,
+            Id = "container",
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Title = "container",
+            BorderStyle = LineStyle.Single
+        };
+        var view1 = new View { Width = Dim.Auto (), Height = Dim.Auto (), Text = "v" };
+        container.Add (view1);
+
+        dialog.Add (container, view);
+
+        dialog.Layout ();
+        dialog.Draw ();
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    public static TheoryData<Func<View, Pos>, Func<View>, string> PosViewData () =>
+        new ()
+        {
+            {
+                Pos.Bottom, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │   ┌─┐    │
+                │   │v│    │
+                │   └─┘    │
+                └──────────┘
+                """
+            },
+            {
+                Pos.Left, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
+                """
+            },
+            {
+                Pos.Right, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │          │
+                │          │
+                │          │
+                │      ┌─┐ │
+                │      │v│ │
+                │      └─┘ │
+                └──────────┘
+                """
+            },
+            {
+                Pos.Top, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
+                
+                """
+            },
+            {
+                Pos.X, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
+                """
+            },
+            {
+                Pos.Y, () => new View
+                {
+                    X = 2,
+                    Y = 2,
+                    Width = Dim.Auto (),
+                    Height = Dim.Auto (),
+                    Text = "view"
+                },
+                """
+                ┌┤Dialog├──┐
+                │          │
+                │          │
+                │  view    │
+                │  │v│     │
+                │  └─┘     │
+                └──────────┘
+                """
+            }
+        };
+
     #endregion Drawing Tests
 
     #region Dialog<TResult> Generic Tests
@@ -1132,14 +1494,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestColorDialog : Dialog<Color>
     {
-        public Color SelectedColor { get; init; } = Color.Blue;
-
         public TestColorDialog ()
         {
             Title = "Select Color";
             AddButton (new Button { Title = "Cancel" });
             AddButton (new Button { Title = "OK" });
         }
+
+        public Color SelectedColor { get; init; } = Color.Blue;
     }
 
     /// <summary>
@@ -1147,14 +1509,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestStringDialog : Dialog<string>
     {
-        public string InputText { get; init; } = "";
-
         public TestStringDialog ()
         {
             Title = "Enter Text";
             AddButton (new Button { Title = "Cancel" });
             AddButton (new Button { Title = "OK" });
         }
+
+        public string InputText { get; init; } = "";
 
         /// <inheritdoc/>
         protected override bool OnAccepting (CommandEventArgs args)
@@ -1174,8 +1536,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestDateDialog : Dialog<DateTime>
     {
-        private DateTime SelectedDate { get; } = DateTime.Now;
-
         public TestDateDialog ()
         {
             Title = "Select Date";
@@ -1193,6 +1553,8 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
             return false;
         }
+
+        private DateTime SelectedDate { get; } = DateTime.Now;
     }
 
     [Fact]

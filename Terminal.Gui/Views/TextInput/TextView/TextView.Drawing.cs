@@ -144,7 +144,7 @@ public partial class TextView
         }
         else
         {
-            SetAttribute (GetAttributeForRole (VisualRole.Normal));
+            SetAttribute (GetAttributeForRole (VisualRole.Editable));
         }
     }
 
@@ -246,14 +246,12 @@ public partial class TextView
     /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        if (role == VisualRole.Normal)
+        if (role != VisualRole.Normal)
         {
-            currentAttribute = GetAttributeForRole (VisualRole.Editable);
-
-            return true;
+            return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
 
-        return base.OnGettingAttributeForRole (role, ref currentAttribute);
+        return base.OnGettingAttributeForRole (VisualRole.Editable, ref currentAttribute);
     }
 
     private void ClearRegion (int left, int top, int right, int bottom)
@@ -363,12 +361,13 @@ public partial class TextView
 
                     colWithColor = l.FindLastIndex (colWithColor > -1 ? colWithColor : l.Count - 1, c => c.Attribute != null);
 
-                    if (colWithColor > -1 && l [colWithColor].Attribute is { })
+                    if (colWithColor <= -1 || l [colWithColor].Attribute is null)
                     {
-                        cell = l [colWithColor];
-
-                        break;
+                        continue;
                     }
+                    cell = l [colWithColor];
+
+                    break;
                 }
 
                 break;
@@ -407,11 +406,12 @@ public partial class TextView
             lineToSet [colWithoutColor] = lineTo;
             colWithoutColor--;
 
-            if (colWithoutColor == -1 && row > 0)
+            if (colWithoutColor != -1 || row <= 0)
             {
-                lineToSet = GetLine (--row);
-                colWithoutColor = lineToSet.Count - 1;
+                continue;
             }
+            lineToSet = GetLine (--row);
+            colWithoutColor = lineToSet.Count - 1;
         }
     }
 

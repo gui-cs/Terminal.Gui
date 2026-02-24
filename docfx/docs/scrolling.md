@@ -25,9 +25,46 @@ Scrolling with the mouse and keyboard are enabled by:
 1) Making the @Terminal.Gui.View.Viewport size smaller than the size returned by @Terminal.Gui.View.GetContentSize. 
 2) Creating key bindings for the appropriate directional keys, and calling @Terminal.Gui.View.ScrollHorizontal(System.Int32) / @Terminal.Gui.View.ScrollVertical(System.Int32) as needed.
 3) Subscribing to @Terminal.Gui.View.MouseEvent and calling calling @Terminal.Gui.View.ScrollHorizontal(System.Int32) / @Terminal.Gui.View.ScrollVertical(System.Int32) as needed.
-4) Enabling the ScrollBars built into View by making @Terminal.Gui.View.HorizontalScrollBar or @Terminal.Gui.View.VerticalScrollBar visible or by enabling automatic show/hide behavior (seethe @Terminal.Gui.ScrollBar.AutoShow property).
+4) Enabling the ScrollBars built into View by setting the @Terminal.Gui.ViewportSettingsFlags.HasVerticalScrollBar or @Terminal.Gui.ViewportSettingsFlags.HasHorizontalScrollBar flags on the @Terminal.Gui.View.ViewportSettings property. Alternatively, the @Terminal.Gui.ScrollBar.VisibilityMode property can be set to control scrollbar visibility manually.
 
 While @Terminal.Gui.ScrollBar can be used in a standalone manner to provide proportional scrolling, it is typically enabled automatically via the @Terminal.Gui.View.HorizontalScrollBar and @Terminal.Gui.View.VerticalScrollBar properties.
+
+## ScrollBar Visibility
+
+The @Terminal.Gui.ScrollBar.VisibilityMode property controls how a ScrollBar manages its @Terminal.Gui.View.Visible state. The @Terminal.Gui.ScrollBarVisibilityMode enum provides these options:
+
+* `Manual` (default) - The scrollbar does not manage its own visibility. The developer controls @Terminal.Gui.View.Visible directly to show or hide the scrollbar.
+* `Auto` - The scrollbar is automatically shown when the scrollable content size exceeds the visible content size, and hidden otherwise.
+* `Always` - The scrollbar is always visible regardless of content size.
+* `None` - The scrollbar is always hidden regardless of content size or @Terminal.Gui.ViewportSettingsFlags.
+
+### Enabling Built-in Scrollbars
+
+The recommended way to enable the built-in scrollbars (@Terminal.Gui.View.VerticalScrollBar and @Terminal.Gui.View.HorizontalScrollBar) is to use the @Terminal.Gui.ViewportSettingsFlags.HasVerticalScrollBar and @Terminal.Gui.ViewportSettingsFlags.HasHorizontalScrollBar flags:
+
+```csharp
+// Enable vertical scrollbar with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+
+// Enable both scrollbars
+view.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+
+// Disable horizontal scrollbar
+view.ViewportSettings &= ~ViewportSettingsFlags.HasHorizontalScrollBar;
+```
+
+Setting these flags automatically:
+1. Creates the scrollbar (they are lazy-loaded)
+2. Sets the scrollbar's `VisibilityMode` to `Auto`
+3. Makes the scrollbar visible when content exceeds viewport size
+
+Alternatively, you can manually control scrollbar visibility:
+
+```csharp
+// Manual control
+view.VerticalScrollBar.Visible = true;
+view.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Always;
+```
 
 ## Examples
 
@@ -41,15 +78,42 @@ These `UI Catalog` Scenarios illustrate Terminal.Gui scrolling:
 
 ## ViewportSettings
 
-Use @Terminal.Gui.ViewportSettings to adjust the behavior of scrolling. 
+The @Terminal.Gui.View.ViewportSettings property (of type @Terminal.Gui.ViewportSettingsFlags) controls the behavior of scrolling. 
 
-* `AllowNegativeX/Y` - If set, Viewport.Size can be set to negative coordinates enabling scrolling beyond the top-left of the content area.
+**Negative Location Flags** - Allow scrolling before the content origin (0,0):
 
-* `AllowX/YGreaterThanContentWidth` - If set, @Terminal.Gui.View.Viewport `.Size` can be set to values greater than @Terminal.Gui.View.GetContentSize enabling scrolling beyond the bottom-right of the Content Area. When not set, @Terminal.Gui.View.Viewport `.Location` is constrained to the dimension of the content area - 1. 
+* `AllowNegativeX` - If set, `Viewport.X` can be set to negative coordinates enabling scrolling beyond the left of the content area.
+* `AllowNegativeY` - If set, `Viewport.Y` can be set to negative coordinates enabling scrolling beyond the top of the content area.
+* `AllowNegativeLocation` - Combines both X and Y.
 
-  This means the last column of the content will remain visible even if there is an attempt to scroll the Viewport past the last column. The practical effect of this is that the last column/row of the content will always be visible.
+**Greater Than Content Flags** - Allow scrolling past the last row/column:
+
+* `AllowXGreaterThanContentWidth` - If set, @Terminal.Gui.View.Viewport `.X` can be set to values greater than or equal to the content width, enabling scrolling beyond the right of the Content Area. When not set, `Viewport.X` is constrained so the last column remains visible.
+* `AllowYGreaterThanContentHeight` - If set, @Terminal.Gui.View.Viewport `.Y` can be set to values greater than or equal to the content height, enabling scrolling beyond the bottom of the Content Area. When not set, `Viewport.Y` is constrained so the last row remains visible.
+* `AllowLocationGreaterThanContentSize` - Combines both X and Y.
+
+**Blank Space Flags** - Allow blank space to appear when scrolling:
+
+* `AllowXPlusWidthGreaterThanContentWidth` - If set, `Viewport.X + Viewport.Width` can exceed `GetContentSize().Width`, allowing blank space on the right when scrolling.
+* `AllowYPlusHeightGreaterThanContentHeight` - If set, `Viewport.Y + Viewport.Height` can exceed `GetContentSize().Height`, allowing blank space at the bottom when scrolling.
+* `AllowLocationPlusSizeGreaterThanContentSize` - Combines both X and Y.
+
+**Conditional Negative Flags** - Allow negative scrolling only when viewport is larger than content:
+
+* `AllowNegativeXWhenWidthGreaterThanContentWidth` - Useful for centering content smaller than the view.
+* `AllowNegativeYWhenHeightGreaterThanContentHeight` - Useful for centering content smaller than the view.
+* `AllowNegativeLocationWhenSizeGreaterThanContentSize` - Combines both X and Y.
+
+**Drawing Flags** - Control clipping and clearing behavior:
 
 * `ClipContentOnly` - By default, clipping is applied to @Terminal.Gui.View.Viewport. Setting this flag will cause clipping to be applied to the visible content area.
+* `ClearContentOnly` - If set, @Terminal.Gui.View.ClearViewport will clear only the portion of the content area that is visible within the Viewport. This is useful for views that have a content area larger than the Viewport and want the area outside the content to be visually distinct. `ClipContentOnly` must be set for this to work.
+* `Transparent` - The view does not clear its background when drawing.
+* `TransparentMouse` - Mouse events pass through areas not occupied by SubViews.
 
-* `ClearContentOnly`- If set @Terminal.Gui.View.ClearViewport will clear only the portion of the content area that is visible within the Viewport. This is useful for views that have a content area larger than the Viewport and want the area outside the content to be visually distinct.
+**ScrollBar Flags** - Enable built-in scrollbars:
+
+* `HasVerticalScrollBar` - If set, the built-in @Terminal.Gui.View.VerticalScrollBar is enabled with @Terminal.Gui.ScrollBarVisibilityMode.Auto behavior. Clearing this flag disables the scrollbar.
+* `HasHorizontalScrollBar` - If set, the built-in @Terminal.Gui.View.HorizontalScrollBar is enabled with @Terminal.Gui.ScrollBarVisibilityMode.Auto behavior. Clearing this flag disables the scrollbar.
+* `HasScrollBars` - Combines both vertical and horizontal scrollbar flags.
 

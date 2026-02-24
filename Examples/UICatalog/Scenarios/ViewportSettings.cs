@@ -30,9 +30,7 @@ public class ViewportSettings : Scenario
 
         ViewportSettingsDemoView view = new ()
         {
-            Title = "ViewportSettings Demo View",
-            Width = Dim.Fill (Dim.Func (_ => mainWindow.IsInitialized ? adornmentsEditor.Frame.Width + 1 : 1)),
-            Height = Dim.Fill (Dim.Func (_ => mainWindow.IsInitialized ? viewportSettingsEditor.Frame.Height : 1))
+            Title = "ViewportSettings Demo View", Width = Dim.Fill (adornmentsEditor), Height = Dim.Fill (viewportSettingsEditor)
         };
 
         mainWindow.Add (view);
@@ -52,11 +50,12 @@ public class ViewportSettings : Scenario
 
         colorPicker.ValueChanged += (_, e) =>
                                     {
-                                        colorPicker.SuperView!.SetScheme (new (colorPicker.SuperView.GetScheme ())
+                                        colorPicker.SuperView!.SetScheme (new Scheme (colorPicker.SuperView.GetScheme ())
                                         {
-                                            Normal = new (colorPicker.SuperView.GetAttributeForRole (VisualRole.Normal)
-                                                                     .Foreground,
-                                                          e.NewValue)
+                                            Normal = new Attribute (colorPicker.SuperView
+                                                                               .GetAttributeForRole (VisualRole.Normal)
+                                                                               .Foreground,
+                                                                    e.NewValue)
                                         });
                                     };
 
@@ -74,10 +73,10 @@ public class ViewportSettings : Scenario
         buttonAnchored.Accepting += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", Strings.btnOk);
 
         view.Margin!.Data = "Margin";
-        view.Margin!.Thickness = new (0);
+        view.Margin!.Thickness = new Thickness (0);
 
         view.Border!.Data = "Border";
-        view.Border!.Thickness = new (3);
+        view.Border!.Thickness = new Thickness (3);
 
         view.Padding!.Data = "Padding";
 
@@ -166,10 +165,10 @@ internal class ViewportSettingsDemoView : FrameView
         BorderStyle = LineStyle.Rounded;
         Arrangement = ViewArrangement.Resizable;
 
-        SetContentSize (new (60, 40));
+        SetContentSize (new Size (60, 40));
         ViewportSettings |= ViewportSettingsFlags.ClearContentOnly;
         ViewportSettings |= ViewportSettingsFlags.ClipContentOnly;
-        VerticalScrollBar.Visible = true;
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         // Things this view knows how to do
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));

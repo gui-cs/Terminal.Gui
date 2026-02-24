@@ -89,7 +89,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // Check if we have a real console first
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
             {
-                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
                 return;
             }

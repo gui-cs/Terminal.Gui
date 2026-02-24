@@ -448,8 +448,8 @@ view.ScrollVertical(5);
 view.ScrollHorizontal(3);
 
 // Enable scrollbars
-view.VerticalScrollBar.Visible = true;
-view.HorizontalScrollBar.Visible = true;
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 ```
 
 ---
@@ -543,9 +543,9 @@ var view = new View
 // Set content larger than viewport
 view.SetContentSize(new Size(100, 100));
 
-// Enable scrollbars with auto-show
-view.VerticalScrollBar.AutoShow = true;
-view.HorizontalScrollBar.AutoShow = true;
+// Enable scrollbars with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
 // Add key bindings for scrolling
 view.KeyBindings.Add(Key.CursorUp, Command.ScrollUp);

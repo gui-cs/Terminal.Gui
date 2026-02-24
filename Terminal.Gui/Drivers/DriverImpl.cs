@@ -234,6 +234,22 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public bool Force16Colors { get => _output.Force16Colors; set => _output.Force16Colors = value; }
 
+    /// <inheritdoc/>
+    public Attribute? DefaultAttribute { get; private set; }
+
+    /// <summary>
+    ///     Sets the terminal's default attribute (queried via OSC 10/11).
+    /// </summary>
+    internal void SetDefaultAttribute (Attribute attr) => DefaultAttribute = attr;
+
+    /// <inheritdoc/>
+    public TerminalColorCapabilities? ColorCapabilities { get; private set; }
+
+    /// <summary>
+    ///     Sets the terminal's color capabilities (detected from environment variables).
+    /// </summary>
+    internal void SetColorCapabilities (TerminalColorCapabilities caps) => ColorCapabilities = caps;
+
     private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) => Force16Colors = e.NewValue;
 
     #endregion Color Support

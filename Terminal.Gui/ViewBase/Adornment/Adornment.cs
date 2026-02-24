@@ -1,7 +1,4 @@
-
-
 namespace Terminal.Gui.ViewBase;
-
 
 /// <summary>
 ///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:
@@ -34,7 +31,6 @@ public class Adornment : View, IDesignable
 
         // By default, Adornments have no key bindings.
         KeyBindings.Clear ();
-
     }
 
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
@@ -82,28 +78,25 @@ public class Adornment : View, IDesignable
     public event EventHandler? ThicknessChanged;
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public void OnThicknessChanged () { ThicknessChanged?.Invoke (this, EventArgs.Empty); }
+    public void OnThicknessChanged () => ThicknessChanged?.Invoke (this, EventArgs.Empty);
 
     #endregion Thickness
 
     #region View Overrides
 
-    /// <inheritdoc />
-    public override string ToDebugString ()
-    {
-        return $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
-    }
+    /// <inheritdoc/>
+    public override string ToDebugString () => $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override IApplication? GetApp () => Parent?.App;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver ();
 
     // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
     private Scheme? _scheme;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnGettingScheme (out Scheme? scheme)
     {
         scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
@@ -111,12 +104,13 @@ public class Adornment : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
     {
         Parent?.SetNeedsDraw ();
 
         _scheme = args.NewValue;
+
         return false;
     }
 
@@ -141,14 +135,14 @@ public class Adornment : View, IDesignable
         {
             // While there are no real use cases for an Adornment being a subview, we support it for
             // testing. E.g. in AllViewsTester.
-            if (SuperView is { })
+            if (SuperView is null)
             {
-                Point super = SuperView.ViewportToScreen (Frame.Location);
-
-                return new (super, Frame.Size);
+                return Frame;
             }
+            Point super = SuperView.ViewportToScreen (Frame.Location);
 
-            return Frame;
+            return new (super, Frame.Size);
+
         }
 
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
@@ -165,16 +159,18 @@ public class Adornment : View, IDesignable
     {
         View? parentOrSuperView = Parent;
 
+        if (parentOrSuperView is { })
+        {
+            return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+        }
+
+        // While there are no real use cases for an Adornment being a subview, we support it for
+        // testing. E.g. in AllViewsTester.
+        parentOrSuperView = SuperView;
+
         if (parentOrSuperView is null)
         {
-            // While there are no real use cases for an Adornment being a subview, we support it for
-            // testing. E.g. in AllViewsTester.
-            parentOrSuperView = SuperView;
-
-            if (parentOrSuperView is null)
-            {
-                return Point.Empty;
-            }
+            return Point.Empty;
         }
 
         return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
@@ -203,15 +199,14 @@ public class Adornment : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingText () { return Thickness == Thickness.Empty; }
+    protected override bool OnDrawingText () => Thickness == Thickness.Empty;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingSubViews () { return Thickness == Thickness.Empty; }
-
+    protected override bool OnDrawingSubViews () => Thickness == Thickness.Empty;
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    protected override bool OnRenderingLineCanvas () { return true; }
+    protected override bool OnRenderingLineCanvas () => true;
 
     /// <summary>
     ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this

@@ -38,13 +38,12 @@ public class Menus : Scenario
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource)
         };
-        eventLog.Border!.Thickness = new (0, 1, 0, 0);
+        eventLog.Border!.Thickness = new Thickness (0, 1, 0, 0);
 
         MenuHost menuHostView = new ()
         {
             Id = "menuHostView",
             Title = $"Menu Host - Use {PopoverMenu.DefaultKey} for Popover Menu",
-
             X = 0,
             Y = 0,
             Width = Dim.Fill ()! - Dim.Width (eventLog),
@@ -72,8 +71,9 @@ public class Menus : Scenario
                                           return;
                                       }
 
-                                      Logging.Debug ($"{sender.Id} Accepting: {args.Context?.Source?.Title}");
-                                      eventSource.Add ($"{sender.Id} Accepting: {args.Context?.Source?.Title}: ");
+                                      string sourceTitle = args.Context?.Source.ToIdentifyingString () ?? "(null)";
+                                      Logging.Debug ($"{sender.Id} Accepting: {sourceTitle}");
+                                      eventSource.Add ($"{sender.Id} Accepting: {sourceTitle}: ");
                                       eventLog.MoveDown ();
                                   };
 
@@ -84,8 +84,14 @@ public class Menus : Scenario
                                                       return;
                                                   }
 
-                                                  Logging.Debug ($"{sender.Id} Accepted: {args.Context?.Source?.Text}");
-                                                  eventSource.Add ($"{sender.Id} Accepted: {args.Context?.Source?.Text}: ");
+                                                  var sourceText = "(null)";
+
+                                                  if (args.Context?.TryGetSource (out View? sourceView) == true)
+                                                  {
+                                                      sourceText = sourceView.Text;
+                                                  }
+                                                  Logging.Debug ($"{sender.Id} Accepted: {sourceText}");
+                                                  eventSource.Add ($"{sender.Id} Accepted: {sourceText}: ");
                                                   eventLog.MoveDown ();
                                               };
 
@@ -106,8 +112,7 @@ public class Menus : Scenario
             CanFocus = true;
             BorderStyle = LineStyle.Dashed;
 
-            AddCommand (
-                        Command.Context,
+            AddCommand (Command.Context,
                         _ =>
                         {
                             ContextMenu?.MakeVisible ();
@@ -132,20 +137,9 @@ public class Menus : Scenario
 
             //MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Cancel);
 
-            Label lastCommandLabel = new ()
-            {
-                Title = "_Last Command:",
-                X = 15,
-                Y = 10
-            };
+            Label lastCommandLabel = new () { Title = "_Last Command:", X = 15, Y = 10 };
 
-            View lastCommandText = new ()
-            {
-                X = Pos.Right (lastCommandLabel) + 1,
-                Y = Pos.Top (lastCommandLabel),
-                Height = Dim.Auto (),
-                Width = Dim.Auto ()
-            };
+            View lastCommandText = new () { X = Pos.Right (lastCommandLabel) + 1, Y = Pos.Top (lastCommandLabel), Height = Dim.Auto (), Width = Dim.Auto () };
 
             Add (lastCommandLabel, lastCommandText);
 
@@ -161,8 +155,7 @@ public class Menus : Scenario
             AddCommand (Command.SaveAs, HandleCommand);
             HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
 
-            AddCommand (
-                        Command.Quit,
+            AddCommand (Command.Quit,
                         _ =>
                         {
                             Logging.Debug ("MenuHost Command.Quit - RequestStop");
@@ -190,28 +183,17 @@ public class Menus : Scenario
             App?.Keyboard.KeyBindings.Remove (Key.F5);
             App?.Keyboard.KeyBindings.Add (Key.F5, this, Command.Edit);
 
-            var menuBar = new MenuBar
-            {
-                Title = "MenuHost MenuBar"
-            };
+            var menuBar = new MenuBar { Title = "MenuHost MenuBar" };
             MenuHost host = this;
             menuBar.EnableForDesign (ref host);
 
             Add (menuBar);
 
-            Label lastAcceptedLabel = new ()
-            {
-                Title = "Last Accepted:",
-                X = Pos.Left (lastCommandLabel),
-                Y = Pos.Bottom (lastCommandLabel)
-            };
+            Label lastAcceptedLabel = new () { Title = "Last Accepted:", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastCommandLabel) };
 
             View lastAcceptedText = new ()
             {
-                X = Pos.Right (lastAcceptedLabel) + 1,
-                Y = Pos.Top (lastAcceptedLabel),
-                Height = Dim.Auto (),
-                Width = Dim.Auto ()
+                X = Pos.Right (lastAcceptedLabel) + 1, Y = Pos.Top (lastAcceptedLabel), Height = Dim.Auto (), Width = Dim.Auto ()
             };
 
             Add (lastAcceptedLabel, lastAcceptedText);
@@ -222,13 +204,11 @@ public class Menus : Scenario
             // CB.
             // So that is needed is to mirror the two check boxes.
             var autoSaveMenuItemCb = menuBar.GetMenuItemsWithTitle ("_Auto Save").FirstOrDefault ()?.CommandView as CheckBox;
-            Debug.Assert (autoSaveMenuItemCb is not null);
+            Debug.Assert (autoSaveMenuItemCb is { });
 
             CheckBox autoSaveStatusCb = new ()
             {
-                Title = "AutoSave Status (MenuItem Binding to F10)",
-                X = Pos.Left (lastAcceptedLabel),
-                Y = Pos.Bottom (lastAcceptedLabel)
+                Title = "AutoSave Status (MenuItem Binding to F10)", X = Pos.Left (lastAcceptedLabel), Y = Pos.Bottom (lastAcceptedLabel)
             };
 
             autoSaveStatusCb.ValueChanged += (_, _) => { autoSaveMenuItemCb!.Value = autoSaveStatusCb.Value; };
@@ -243,43 +223,42 @@ public class Menus : Scenario
             // If the user clicks on the MenuItem, Accept will be raised.
             CheckBox enableOverwriteStatusCb = new ()
             {
-                Title = "Enable Overwrite (View Binding to Ctrl+W)",
-                X = Pos.Left (autoSaveStatusCb),
-                Y = Pos.Bottom (autoSaveStatusCb)
+                Title = "Enable Overwrite (View Binding to Ctrl+W)", X = Pos.Left (autoSaveStatusCb), Y = Pos.Bottom (autoSaveStatusCb)
             };
 
             // The source of truth is our status CB; any time it changes, update the menu item
             var enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithTitle ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
 
             enableOverwriteStatusCb.ValueChanged += (_, _) =>
-                                                           {
-                                                               if (enableOverwriteMenuItemCb is not null)
-                                                               {
-                                                                   enableOverwriteMenuItemCb.Value = enableOverwriteStatusCb.Value;
-                                                               }
-                                                           };
+                                                    {
+                                                        if (enableOverwriteMenuItemCb is { })
+                                                        {
+                                                            enableOverwriteMenuItemCb.Value = enableOverwriteStatusCb.Value;
+                                                        }
+                                                    };
 
             menuBar.Accepted += (_, args) =>
                                 {
-                                    if (args.Context?.Source is not MenuItem mi || mi.CommandView != enableOverwriteMenuItemCb)
+                                    if (!(args.Context?.TryGetSource (out View? sourceView) == true)
+                                        || sourceView is not MenuItem mi
+                                        || mi.CommandView != enableOverwriteMenuItemCb)
                                     {
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
+                                    Logging.Debug ($"menuBar.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;
 
                                     // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
                                     enableOverwriteStatusCb.Value = ((CheckBox)mi.CommandView).Value;
-                                    lastAcceptedText.Text = args.Context?.Source?.Title!;
+                                    lastAcceptedText.Text = sourceView.Title;
                                 };
 
             HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
 
-            AddCommand (
-                        Command.EnableOverwrite,
+            AddCommand (Command.EnableOverwrite,
                         ctx =>
                         {
                             // The command was invoked. Toggle the status Cb.
@@ -297,41 +276,40 @@ public class Menus : Scenario
             // If the user clicks on the MenuItem, Accept will be raised.
             CheckBox editModeStatusCb = new ()
             {
-                Title = "EditMode (App Binding to F5)",
-                X = Pos.Left (enableOverwriteStatusCb),
-                Y = Pos.Bottom (enableOverwriteStatusCb)
+                Title = "EditMode (App Binding to F5)", X = Pos.Left (enableOverwriteStatusCb), Y = Pos.Bottom (enableOverwriteStatusCb)
             };
 
             // The source of truth is our status CB; any time it changes, update the menu item
             var editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
 
             editModeStatusCb.ValueChanged += (_, _) =>
-                                                    {
-                                                        if (editModeMenuItemCb is not null)
-                                                        {
-                                                            editModeMenuItemCb.Value = editModeStatusCb.Value;
-                                                        }
-                                                    };
+                                             {
+                                                 if (editModeMenuItemCb is { })
+                                                 {
+                                                     editModeMenuItemCb.Value = editModeStatusCb.Value;
+                                                 }
+                                             };
 
             menuBar.Accepted += (_, args) =>
                                 {
-                                    if (args.Context?.Source is not MenuItem mi || mi.CommandView != editModeMenuItemCb)
+                                    if (!(args.Context?.TryGetSource (out View? sourceView) == true)
+                                        || sourceView is not MenuItem mi
+                                        || mi.CommandView != editModeMenuItemCb)
                                     {
                                         return;
                                     }
 
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
+                                    Logging.Debug ($"menuBar.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
 
                                     // Set Cancel to true to stop propagation of Accepting to superview
                                     args.Handled = true;
 
                                     // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
                                     editModeMenuItemCb.Value = ((CheckBox)mi.CommandView).Value;
-                                    lastAcceptedText.Text = args.Context?.Source?.Title!;
+                                    lastAcceptedText.Text = sourceView.Title;
                                 };
 
-            AddCommand (
-                        Command.Edit,
+            AddCommand (Command.Edit,
                         ctx =>
                         {
                             // The command was invoked. Toggle the status Cb.
@@ -343,11 +321,7 @@ public class Menus : Scenario
             Add (editModeStatusCb);
 
             // Set up the Context Menu
-            ContextMenu = new ()
-            {
-                Title = "ContextMenu",
-                Id = "ContextMenu"
-            };
+            ContextMenu = new PopoverMenu { Title = "ContextMenu", Id = "ContextMenu" };
 
             ContextMenu.EnableForDesign (ref host);
             App?.Popover?.Register (ContextMenu);
@@ -359,25 +333,22 @@ public class Menus : Scenario
             // we need to subscribe to the ContextMenu's Accepted event.
             ContextMenu!.Accepted += (_, args) =>
                                      {
-                                         Logging.Debug ($"ContextMenu.Accepted: {args.Context?.Source?.Title}");
+                                         Logging.Debug ($"ContextMenu.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
 
                                          // Forward the event to the MenuHost
-                                         if (args.Context is not null)
+                                         if (args.Context is { })
                                          {
                                              //InvokeCommand (args.Context.Command);
                                          }
                                      };
 
             // Add a button to open the contextmenu
-            var openBtn = new Button
-            {
-                X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true
-            };
+            var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
 
             openBtn.Accepting += (_, e) =>
                                  {
                                      e.Handled = true;
-                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {e.Context?.Source?.Title}");
+                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {e.Context?.Source.ToIdentifyingString ()}");
                                      NewKeyDownEvent (menuBar.Key);
                                  };
 
@@ -409,7 +380,7 @@ public class Menus : Scenario
         /// <inheritdoc/>
         protected override void Dispose (bool disposing)
         {
-            if (ContextMenu is not null)
+            if (ContextMenu is { })
             {
                 ContextMenu.Dispose ();
                 ContextMenu = null;
@@ -428,22 +399,20 @@ public class Menus : Scenario
         // Configure Serilog to write logs to a file
         _logLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
 
-        Log.Logger = new LoggerConfiguration ()
-                     .MinimumLevel.ControlledBy (_logLevelSwitch)
-                     .Enrich.FromLogContext () // Enables dynamic enrichment
-                     .WriteTo.Debug ()
-                     .WriteTo.File (
-                                    _logFilePath,
-                                    rollingInterval: RollingInterval.Day,
-                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                     .CreateLogger ();
+        Log.Logger = new LoggerConfiguration ().MinimumLevel.ControlledBy (_logLevelSwitch)
+                                               .Enrich.FromLogContext () // Enables dynamic enrichment
+                                               .WriteTo.Debug ()
+                                               .WriteTo.File (_logFilePath,
+                                                              rollingInterval: RollingInterval.Day,
+                                                              outputTemplate:
+                                                              "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                                               .CreateLogger ();
 
         // Create a logger factory compatible with Microsoft.Extensions.Logging
         using ILoggerFactory loggerFactory = LoggerFactory.Create (builder =>
                                                                    {
-                                                                       builder
-                                                                           .AddSerilog (dispose: true) // Integrate Serilog with ILogger
-                                                                           .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
+                                                                       builder.AddSerilog (dispose: true) // Integrate Serilog with ILogger
+                                                                              .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
                                                                    });
 
         // Get an ILogger instance
