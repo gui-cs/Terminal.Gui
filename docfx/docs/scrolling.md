@@ -78,7 +78,7 @@ These `UI Catalog` Scenarios illustrate Terminal.Gui scrolling:
 
 ## ViewportSettings
 
-Use @Terminal.Gui.ViewportSettingsFlags to adjust the behavior of scrolling. 
+The @Terminal.Gui.View.ViewportSettings property (of type @Terminal.Gui.ViewportSettingsFlags) controls the behavior of scrolling. 
 
 **Negative Location Flags** - Allow scrolling before the content origin (0,0):
 
@@ -94,8 +94,8 @@ Use @Terminal.Gui.ViewportSettingsFlags to adjust the behavior of scrolling.
 
 **Blank Space Flags** - Allow blank space to appear when scrolling:
 
-* `AllowXPlusWidthGreaterThanContentWidth` - If set, `Viewport.X + Viewport.Width` can exceed `ContentSize.Width`, allowing blank space on the right when scrolling.
-* `AllowYPlusHeightGreaterThanContentHeight` - If set, `Viewport.Y + Viewport.Height` can exceed `ContentSize.Height`, allowing blank space at the bottom when scrolling.
+* `AllowXPlusWidthGreaterThanContentWidth` - If set, `Viewport.X + Viewport.Width` can exceed `GetContentSize().Width`, allowing blank space on the right when scrolling.
+* `AllowYPlusHeightGreaterThanContentHeight` - If set, `Viewport.Y + Viewport.Height` can exceed `GetContentSize().Height`, allowing blank space at the bottom when scrolling.
 * `AllowLocationPlusSizeGreaterThanContentSize` - Combines both X and Y.
 
 **Conditional Negative Flags** - Allow negative scrolling only when viewport is larger than content:
