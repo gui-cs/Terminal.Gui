@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -108,6 +109,8 @@ internal partial class ApplicationImpl
         // Create session token
         SessionToken token = new (runnable);
 
+        Trace.Lifecycle (MainThreadId.ToString (), "Begin", "(token.Runnable as Runnable)?.ToIdentifyingString ()");
+
         // Get old IsRunning value BEFORE any stack changes (safe - cached value)
         bool oldIsRunning = runnable.IsRunning;
 
@@ -214,15 +217,8 @@ internal partial class ApplicationImpl
         // Begin the session (adds to stack, raises IsRunningChanging/IsRunningChanged)
         SessionToken? token;
 
-        if (runnable.IsRunning)
-        {
-            // Find it on the stack
-            token = SessionStack?.FirstOrDefault (st => st.Runnable == runnable);
-        }
-        else
-        {
-            token = Begin (runnable);
-        }
+        // Find it on the stack
+        token = runnable.IsRunning ? SessionStack?.FirstOrDefault (st => st.Runnable == runnable) : Begin (runnable);
 
         if (token is null)
         {
@@ -253,6 +249,8 @@ internal partial class ApplicationImpl
         // Note: IsRunning is now a cached property, safe to check each iteration
         var firstIteration = true;
 
+        Trace.Lifecycle (MainThreadId.ToString (), "Run", $"{(runnable as Runnable)?.ToIdentifyingString ()}");
+
         while (runnable is { StopRequested: false, IsRunning: true })
         {
             if (Coordinator is null)
@@ -275,12 +273,16 @@ internal partial class ApplicationImpl
 
             if (StopAfterFirstIteration && firstIteration)
             {
-                Logging.Information ("Run - Stopping after first iteration as requested");
+                Trace.Lifecycle (MainThreadId.ToString (),
+                                 "Run",
+                                 $"{(runnable as Runnable)?.ToIdentifyingString ()} Stopping after first iteration as requested");
                 RequestStop (runnable);
             }
 
             firstIteration = false;
         }
+
+        Trace.Lifecycle (MainThreadId.ToString (), "Run", $"{(runnable as Runnable)?.ToIdentifyingString ()} Stopped");
     }
 
     #endregion Session Lifecycle - Run
@@ -296,6 +298,8 @@ internal partial class ApplicationImpl
         {
             return; // Already ended
         }
+
+        Trace.Lifecycle (MainThreadId.ToString (), "End", $"{(token.Runnable as Runnable)?.ToIdentifyingString ()}");
 
         // TODO: Move Poppover to utilize IRunnable arch; Get all refs to anyting
         // TODO: View-related out of ApplicationImpl.
@@ -365,6 +369,8 @@ internal partial class ApplicationImpl
 
         _result = token.Result;
 
+        Trace.Lifecycle (MainThreadId.ToString (), "End", $"{(token.Runnable as Runnable)?.ToIdentifyingString ()} - Result: {_result ?? Glyphs.Null}");
+
         // Clear the Runnable from the token
         token.Runnable = null;
         SessionEnded?.Invoke (this, new SessionTokenEventArgs (token));
@@ -393,6 +399,8 @@ internal partial class ApplicationImpl
                 return;
             }
         }
+
+        Trace.Lifecycle (MainThreadId.ToString (), "Run", $"{(runnable as Runnable)?.ToIdentifyingString ()}");
 
         runnable.StopRequested = true;
 

@@ -57,7 +57,7 @@ public class TraceTests
 
             Assert.Single (backend.Entries);
             Assert.Equal (TraceCategory.Command, backend.Entries [0].Category);
-            Assert.Contains ("test", backend.Entries [0].ViewId);
+            Assert.Contains ("test", backend.Entries [0].Id);
             Assert.Equal ("TestPhase", backend.Entries [0].Phase);
         }
         finally
@@ -81,7 +81,7 @@ public class TraceTests
 
             Assert.Single (backend.Entries);
             Assert.Equal (TraceCategory.Mouse, backend.Entries [0].Category);
-            Assert.Contains ("mouseTest", backend.Entries [0].ViewId);
+            Assert.Contains ("mouseTest", backend.Entries [0].Id);
             Assert.Equal ("Click", backend.Entries [0].Phase);
         }
         finally
@@ -105,7 +105,7 @@ public class TraceTests
 
             Assert.Single (backend.Entries);
             Assert.Equal (TraceCategory.Keyboard, backend.Entries [0].Category);
-            Assert.Contains ("keyTest", backend.Entries [0].ViewId);
+            Assert.Contains ("keyTest", backend.Entries [0].Id);
             Assert.Equal ("KeyDown", backend.Entries [0].Phase);
         }
         finally

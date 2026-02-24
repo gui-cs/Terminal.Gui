@@ -1937,7 +1937,7 @@ public class MenuBarTests
                                                                              }:{
                                                                                  e.Phase
                                                                              }] {
-                                                                                 e.ViewId
+                                                                                 e.Id
                                                                              } ({
                                                                                  e.Method
                                                                              }) {

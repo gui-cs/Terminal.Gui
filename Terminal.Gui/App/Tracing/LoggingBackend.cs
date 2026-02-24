@@ -10,21 +10,28 @@ public sealed class LoggingBackend : ITraceBackend
     {
         string prefix = entry.Category switch
                         {
+                            TraceCategory.Lifecycle => FormatLifecycle (entry),
                             TraceCategory.Command => FormatCommand (entry),
                             TraceCategory.Mouse => FormatMouse (entry),
                             TraceCategory.Keyboard => FormatKeyboard (entry),
+                            TraceCategory.Navigation => FormatNavigation (entry),
                             _ => $"[{entry.Category}]"
                         };
 
-        var message = $"{prefix} @ {entry.ViewId} ({entry.Method})";
+        var message = $"{prefix}@\"{entry.Id}\"";
 
         if (!string.IsNullOrEmpty (entry.Message))
         {
             message += $" - {entry.Message}";
         }
 
-        Logging.Trace (message);
+        // ReSharper disable once ExplicitCallerInfoArgument
+        Logging.Trace (message, entry.Method, $"{entry.Category}:{entry.Phase}");
     }
+
+    private string FormatNavigation (TraceEntry entry) => string.Empty;
+
+    private string FormatLifecycle (TraceEntry entry) => string.Empty;
 
     private static string FormatCommand (TraceEntry entry)
     {
@@ -38,37 +45,37 @@ public sealed class LoggingBackend : ITraceBackend
                                _ => "•"
                            };
 
-            return $"[{entry.Phase}] {arrow} {cmd}";
+            return $"{arrow} {cmd}";
         }
 
-        return $"[Command:{entry.Phase}]";
+        return string.Empty;
     }
 
     private static string FormatMouse (TraceEntry entry)
     {
         if (entry.Data is (MouseFlags flags, Point pos))
         {
-            return $"[Mouse:{entry.Phase}] {flags} @({pos.X},{pos.Y})";
+            return $"{flags} @({pos.X},{pos.Y})";
         }
 
         if (entry.Data is Mouse mouse)
         {
             Point mousePos = mouse.Position ?? Point.Empty;
 
-            return $"[Mouse:{entry.Phase}] {mouse.Flags} @({mousePos.X},{mousePos.Y})";
+            return $"{mouse.Flags} @({mousePos.X},{mousePos.Y})";
         }
 
-        return $"[Mouse:{entry.Phase}]";
+        return string.Empty;
     }
 
     private static string FormatKeyboard (TraceEntry entry)
     {
         if (entry.Data is Key key)
         {
-            return $"[Key:{entry.Phase}] {key}";
+            return $"{key}";
         }
 
-        return $"[Key:{entry.Phase}]";
+        return string.Empty;
     }
 
     /// <inheritdoc/>

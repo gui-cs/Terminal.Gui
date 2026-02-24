@@ -12,9 +12,11 @@ namespace Terminal.Gui.Tracing;
 ///         By default, all tracing is disabled. Enable individual categories via properties:
 ///     </para>
 ///     <list type="bullet">
+///         <item><see cref="LifecycleEnabled"/> - command routing traces</item>
 ///         <item><see cref="CommandEnabled"/> - command routing traces</item>
 ///         <item><see cref="MouseEnabled"/> - mouse event traces</item>
 ///         <item><see cref="KeyboardEnabled"/> - keyboard event traces</item>
+///         <item><see cref="NavigationEnabled"/> - keyboard event traces</item>
 ///     </list>
 ///     <para>
 ///         All trace methods are marked with <c>[Conditional("DEBUG")]</c>,
@@ -31,9 +33,20 @@ public static class Trace
     private static readonly NullBackend _nullBackend = new ();
     private static readonly LoggingBackend _loggingBackend = new ();
 
-    private static bool _commandEnabled;
-    private static bool _mouseEnabled;
-    private static bool _keyboardEnabled;
+    /// <summary>
+    ///     Gets or sets whether Application and Driver lifecycle tracing is enabled.
+    ///     When enabled, automatically uses <see cref="LoggingBackend"/> if no backend is set.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static bool LifecycleEnabled
+    {
+        get;
+        set
+        {
+            field = value;
+            EnsureBackendIfEnabled ();
+        }
+    }
 
     /// <summary>
     ///     Gets or sets whether command tracing is enabled.
@@ -42,10 +55,10 @@ public static class Trace
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool CommandEnabled
     {
-        get => _commandEnabled;
+        get;
         set
         {
-            _commandEnabled = value;
+            field = value;
             EnsureBackendIfEnabled ();
         }
     }
@@ -57,10 +70,10 @@ public static class Trace
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool MouseEnabled
     {
-        get => _mouseEnabled;
+        get;
         set
         {
-            _mouseEnabled = value;
+            field = value;
             EnsureBackendIfEnabled ();
         }
     }
@@ -72,10 +85,27 @@ public static class Trace
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool KeyboardEnabled
     {
-        get => _keyboardEnabled;
+        get;
         set
         {
-            _keyboardEnabled = value;
+            field = value;
+            EnsureBackendIfEnabled ();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets whether Navigation (Focus and TabBehavior) tracing is enabled.
+    /// When enabled, automatically uses
+    /// <see cref="LoggingBackend"/>
+    /// if no backend is set.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static bool NavigationEnabled
+    {
+        get;
+        set
+        {
+            field = value;
             EnsureBackendIfEnabled ();
         }
     }
@@ -95,11 +125,33 @@ public static class Trace
         // Auto-switch to LoggingBackend if:
         // 1. Any category is enabled, AND
         // 2. No backend has been set (null) OR the backend is NullBackend
-        if ((_commandEnabled || _mouseEnabled || _keyboardEnabled) && (_asyncLocalBackend.Value is null || _asyncLocalBackend.Value is NullBackend))
+        if ((LifecycleEnabled || CommandEnabled || MouseEnabled || KeyboardEnabled || NavigationEnabled) && (_asyncLocalBackend.Value is null || _asyncLocalBackend.Value is NullBackend))
         {
             _asyncLocalBackend.Value = _loggingBackend;
         }
     }
+
+    #region Lifecycle Tracing
+
+    /// <summary>
+    ///     Traces a command routing step.
+    /// </summary>
+    /// <param name="id">An identifying string for the trace. E.g. <c></c></param>
+    /// <param name="phase">The phase of routing (e.g., "Init", "Run", "Iteration").</param>
+    /// <param name="message">Optional additional context.</param>
+    /// <param name="method">Automatically captured caller method name.</param>
+    [Conditional ("DEBUG")]
+    public static void Lifecycle (string? id, string phase, string? message = null, [CallerMemberName] string method = "")
+    {
+        if (!LifecycleEnabled)
+        {
+            return;
+        }
+
+        Backend.Log (new TraceEntry (TraceCategory.Lifecycle, id ?? string.Empty, phase, method, message, DateTime.UtcNow, null));
+    }
+
+    #endregion
 
     #region Command Tracing
 

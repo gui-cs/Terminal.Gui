@@ -196,7 +196,7 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
-        Trace.Mouse ("app", MouseFlags.None, screenPosition, "Enter/Leave");
+        Trace.Mouse ("app", MouseFlags.None, screenPosition, "EnterLeave");
 
         // Tell any views that are no longer under the mouse that the mouse has left
         List<View?> viewsToLeave = CachedViewsUnderMouse.Where (v => v is { } && !currentViewsUnderMouse.Contains (v)).ToList ();

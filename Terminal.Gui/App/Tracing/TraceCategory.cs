@@ -9,21 +9,23 @@ public enum TraceCategory
     /// <summary>No tracing enabled.</summary>
     None = 0,
 
+    /// <summary>
+    ///     Application and Driver lifecycle tracing.
+    /// </summary>
+    Lifecycle = 1,
+
     /// <summary>Command routing traces (InvokeCommand, bubbling, dispatch).</summary>
-    Command = 1,
+    Command = 2,
 
     /// <summary>Mouse event traces (clicks, drags, wheel).</summary>
-    Mouse = 2,
+    Mouse = 4,
 
     /// <summary>Keyboard event traces (key down, key up).</summary>
-    Keyboard = 4,
+    Keyboard = 8,
 
-    /// <summary>Menu interaction traces.</summary>
-    Menu = 8,
-
-    /// <summary>Collection navigation traces (ListView, TreeView search).</summary>
+    /// <summary>Navigation traces (Focus, TabBehavior, etc...).</summary>
     Navigation = 16,
 
     /// <summary>All trace categories enabled.</summary>
-    All = Command | Mouse | Keyboard | Menu | Navigation
+    All = Lifecycle | Command | Mouse | Keyboard | Navigation
 }

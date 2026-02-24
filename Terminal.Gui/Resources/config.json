@@ -13,8 +13,11 @@
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
 
   // Set this to true in a .config file to be loaded to cause JSON parsing errors
-  // to throw exceptions. 
+  // to throw exceptions.
   "ConfigurationManager.ThrowOnJsonErrors": false,
+
+  // --------------- Tracing ----------------------------
+  "Trace.LifecycleEnabled" :  true,
 
   // --------------- Application Settings ---------------
   "Key.Separator": "+",

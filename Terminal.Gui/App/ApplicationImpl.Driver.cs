@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
@@ -20,7 +21,7 @@ internal partial class ApplicationImpl
         if (_componentFactory != null)
         {
             _driverName = _componentFactory.GetDriverName ();
-            Logging.Information ($"Using provided component factory: {_driverName}");
+            Tracing.Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"Using provided component factory: {_driverName}");
 
             // Determine the input type and create subcomponents
             if (_componentFactory is IComponentFactory<WindowsConsole.InputRecord> windowsFactory)
@@ -52,20 +53,20 @@ internal partial class ApplicationImpl
             {
                 // Use explicitly specified driver name
                 _driverName = descriptor!.Name;
-                Logging.Information ($"Using driver specified by parameter: {descriptor.Name} ({descriptor.DisplayName})");
+                Tracing.Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"Using driver specified by parameter: {descriptor.Name} ({descriptor.DisplayName})");
             }
             else if (!string.IsNullOrEmpty (ForceDriver) && DriverRegistry.TryGetDriver (ForceDriver, out descriptor))
             {
                 // Use ForceDriver configuration property
                 _driverName = descriptor!.Name;
-                Logging.Information ($"Using driver from ForceDriver configuration: {descriptor.Name} ({descriptor.DisplayName})");
+                Tracing.Trace.Lifecycle(MainThreadId?.ToString(), "Init", $"Using driver from ForceDriver configuration: {descriptor.Name} ({descriptor.DisplayName})");
             }
             else
             {
                 // Use platform default
                 descriptor = DriverRegistry.GetDefaultDriver ();
                 _driverName = descriptor.Name;
-                Logging.Information ($"Using platform default driver: {descriptor.Name} ({descriptor.DisplayName})");
+                Tracing.Trace.Lifecycle(MainThreadId?.ToString(), "Init", $"Using platform default driver: {descriptor.Name} ({descriptor.DisplayName})");
             }
 
             // Create coordinator based on driver name
@@ -95,8 +96,6 @@ internal partial class ApplicationImpl
                     throw new InvalidOperationException ($"Unknown driver name: {_driverName}");
             }
         }
-
-        //Logging.Trace ($"Created Subcomponents: {Coordinator}");
 
         Coordinator.StartInputTaskAsync (this).Wait ();
 

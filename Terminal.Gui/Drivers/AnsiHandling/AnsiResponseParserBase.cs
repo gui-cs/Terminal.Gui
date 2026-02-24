@@ -232,7 +232,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
             }
             _heldContent.ClearHeld ();
 
-            Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
+            Tracing.Trace.Lifecycle (string.Empty, "Ansi", $"AnsiResponseParser last minute swallowed '{cur}'");
         }
     }
 
@@ -312,7 +312,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                 case true:
                     ResetState ();
 
-                    Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
+                    Tracing.Trace.Lifecycle (string.Empty, "Ansi", $"AnsiResponseParser swallowed '{cur}'");
 
                     // Do not send back to input stream
                     return false;

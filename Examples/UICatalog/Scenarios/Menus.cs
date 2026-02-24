@@ -285,7 +285,7 @@ public class Menus : Scenario
                                      e.Handled = true;
                                      string sourceTitle = e.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
                                      Logging.Trace ($"openBtn.Accepting - Sending F9. {sourceTitle}");
-                                     NewKeyDownEvent (MenuBar.Key);
+                                     NewKeyDownEvent (MenuBar!.Key);
                                  };
 
             Add (openBtn);
