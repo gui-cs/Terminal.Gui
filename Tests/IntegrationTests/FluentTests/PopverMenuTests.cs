@@ -40,7 +40,7 @@ public class PopoverMenuTests : TestsAllDrivers
                                              Assert.Equal (7, popoverMenu.Root.SubViews.Count);
 
                                              // Should have Cut menu item
-                                             View? cutMenuItem = popoverMenu.GetMenuItemsOfAllSubMenus ().FirstOrDefault (v => v?.Title == "Cu_t");
+                                             View? cutMenuItem = popoverMenu.Root?.GetMenuItemsOfAllSubMenus ().FirstOrDefault (v => v?.Title == "Cu_t");
 
                                              Assert.NotNull (cutMenuItem);
                                          });

@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -54,10 +56,10 @@ public class Menu : Bar
     /// </summary>
     public MenuItem? SuperMenuItem { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        Tracing.Trace.Command (this, args.Context, "Entry", $"Routing={args.Context?.Routing} Cmd={args.Context?.Command}");
+        Trace.Command (this, args.Context, "Entry", $"Routing={args.Context?.Routing} Cmd={args.Context?.Command}");
 
         if (base.OnActivating (args) || args.Handled)
         {
@@ -92,14 +94,14 @@ public class Menu : Bar
         switch (view)
         {
             case MenuItem menuItem:
-                {
-                    menuItem.CanFocus = true;
+            {
+                menuItem.CanFocus = true;
 
-                    // Accept propagation is handled by CommandsToBubbleUp=[Accept] (line 36).
-                    // An explicit Accepting subscription here caused double-fire of Accepted.
+                // Accept propagation is handled by CommandsToBubbleUp=[Accept] (line 36).
+                // An explicit Accepting subscription here caused double-fire of Accepted.
 
-                    break;
-                }
+                break;
+            }
 
             case Line line:
                 // Grow line so we get auto-join line
@@ -127,22 +129,177 @@ public class Menu : Bar
     internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {
         // Logging.Debug ($"{this.ToIdentifyingString ()} ({selected?.Title})");
-        Tracing.Trace.Command (this, "Handler", $"{selected?.ToIdentifyingString ()}");
+        Trace.Command (this, "Handler", $"{selected?.ToIdentifyingString ()}");
 
         OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);
     }
 
     /// <summary>
-    ///     Called when the selected menu item has changed.
+    ///     Called when the selected menu item has changed. Handles hiding peer SubMenus
+    ///     and showing the selected item's SubMenu.
     /// </summary>
-    /// <param name="selected"></param>
-    protected virtual void OnSelectedMenuItemChanged (MenuItem? selected) { }
+    /// <param name="selected">The newly selected <see cref="MenuItem"/>, or <see langword="null"/> if none.</param>
+    protected virtual void OnSelectedMenuItemChanged (MenuItem? selected)
+    {
+        // Hide any visible peer SubMenus
+        foreach (MenuItem mi in SubViews.OfType<MenuItem> ().Where (mi => mi != selected && mi.SubMenu is { Visible: true }))
+        {
+            mi.SubMenu!.HideMenu ();
+        }
+
+        if (selected?.SubMenu is not { Visible: false })
+        {
+            return;
+        }
+
+        // If SubMenu has no SuperView yet, add it to our SuperView
+        if (selected.SubMenu.SuperView is null && SuperView is { })
+        {
+            SuperView.Add (selected.SubMenu);
+        }
+
+        selected.SubMenu.ShowMenu ();
+
+        // Generic positioning: right of this Menu, at the MenuItem's Y
+        if (selected.SubMenu.SuperView is null)
+        {
+            return;
+        }
+        Point screenPos = new (selected.FrameToScreen ().Right, selected.FrameToScreen ().Top);
+        Point localPos = selected.SubMenu.SuperView.ScreenToViewport (screenPos);
+        selected.SubMenu.X = localPos.X;
+        selected.SubMenu.Y = localPos.Y;
+    }
 
     /// <summary>
     ///     Raised when the selected menu item has changed.
     /// </summary>
     public event EventHandler<MenuItem?>? SelectedMenuItemChanged;
+
+    /// <summary>
+    ///     Gets all the submenus in this menu's hierarchy, including this menu.
+    /// </summary>
+    /// <returns>An enumerable collection of all <see cref="Menu"/> instances in the hierarchy.</returns>
+    /// <remarks>
+    ///     This method performs a depth-first traversal of the menu tree starting from <see langword="this"/>.
+    /// </remarks>
+    public IEnumerable<Menu> GetAllSubMenus ()
+    {
+        List<Menu> result = [];
+        Stack<Menu> stack = new ();
+        stack.Push (this);
+
+        while (stack.Count > 0)
+        {
+            Menu currentMenu = stack.Pop ();
+            result.Add (currentMenu);
+
+            foreach (View subView in currentMenu.SubViews)
+            {
+                if (subView is MenuItem { SubMenu: { } } menuItem)
+                {
+                    stack.Push (menuItem.SubMenu);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    ///     Gets menu items in this menu's hierarchy, optionally filtered by <paramref name="predicate"/>.
+    /// </summary>
+    /// <param name="predicate">
+    ///     If provided, only <see cref="MenuItem"/>s matching the predicate are returned.
+    ///     If <see langword="null"/>, all menu items are returned.
+    /// </param>
+    /// <returns>The matching <see cref="MenuItem"/> instances across all menus in the hierarchy.</returns>
+    /// <remarks>
+    ///     This method traverses all menus returned by <see cref="GetAllSubMenus"/> and collects their menu items.
+    /// </remarks>
+    public IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus (Func<MenuItem, bool>? predicate = null)
+    {
+        List<MenuItem> result = [];
+
+        foreach (Menu menu in GetAllSubMenus ())
+        {
+            foreach (View subView in menu.SubViews)
+            {
+                if (subView is MenuItem menuItem && (predicate is null || predicate (menuItem)))
+                {
+                    result.Add (menuItem);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    #region ShowMenu / HideMenu
+
+    /// <summary>
+    ///     Shows this menu by setting <see cref="View.Visible"/> and <see cref="View.Enabled"/> to <see langword="true"/>.
+    ///     If the menu has not been initialized, initialization is performed first.
+    /// </summary>
+    internal void ShowMenu ()
+    {
+        if (Visible)
+        {
+            return;
+        }
+
+        if (!IsInitialized)
+        {
+            BeginInit ();
+            EndInit ();
+        }
+
+        ClearFocus ();
+
+        // IMPORTANT: This must be done after adding the menu to the SuperView or Add will try
+        // to set focus to it.
+        Visible = true;
+        Enabled = true;
+    }
+
+    private bool _isHiding;
+
+    /// <summary>
+    ///     Hides this menu and any visible SubMenus by setting <see cref="View.Visible"/> and
+    ///     <see cref="View.Enabled"/> to <see langword="false"/>.
+    /// </summary>
+    internal void HideMenu ()
+    {
+        if (!Visible || _isHiding)
+        {
+            return;
+        }
+
+        _isHiding = true;
+
+        try
+        {
+            // If there's a visible SubMenu, hide it first (deepest first)
+            if (SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
+            {
+                _isHiding = false;
+                visiblePeer.SubMenu!.HideMenu ();
+                _isHiding = true;
+            }
+
+            Visible = false;
+            Enabled = false;
+
+            ClearFocus ();
+        }
+        finally
+        {
+            _isHiding = false;
+        }
+    }
+
+    #endregion ShowMenu / HideMenu
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

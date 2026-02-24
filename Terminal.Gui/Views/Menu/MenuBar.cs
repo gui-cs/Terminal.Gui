@@ -282,7 +282,7 @@ public class MenuBar : Menu, IDesignable
         {
             if (mbi.PopoverMenu is { })
             {
-                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus (null, predicate));
+                menuItems.AddRange (mbi.PopoverMenu.Root?.GetMenuItemsOfAllSubMenus (predicate) ?? []);
             }
         }
 
@@ -750,7 +750,7 @@ public class MenuBar : Menu, IDesignable
                     continue;
                 }
 
-                foreach (Menu subMenu in mbi.PopoverMenu.GetAllSubMenus ())
+                foreach (Menu subMenu in mbi.PopoverMenu.Root?.GetAllSubMenus () ?? [])
                 {
                     subMenu.Border?.Thickness = bordersCb.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
                     subMenu.Border?.LineStyle = bordersCb.Value == CheckState.Checked ? LineStyle.Rounded : LineStyle.None;

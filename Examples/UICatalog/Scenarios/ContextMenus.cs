@@ -141,7 +141,7 @@ public class ContextMenus : Scenario
         {
             base.OnActivated (ctx);
 
-            MenuItem? menuItem = _popoverMenu?.GetMenuItemsOfAllSubMenus (null, item => item.Id == "menuItemBorders").FirstOrDefault ();
+            MenuItem? menuItem = _popoverMenu?.Root?.GetMenuItemsOfAllSubMenus (item => item.Id == "menuItemBorders").FirstOrDefault ();
 
             if (menuItem?.CommandView is CheckBox bordersCheckBox)
             {
@@ -161,9 +161,9 @@ public class ContextMenus : Scenario
             ConfigureTestMenu (testContextMenu);
             _popoverMenu.Visible = false;
 
-            _popoverMenu.Activated += (_, args) =>
+            _popoverMenu.Activated += (_, _) =>
                                       {
-                                          MenuItem? menuItem = _popoverMenu.GetMenuItemsOfAllSubMenus (null, item => item.Id == "menuItemScheme")
+                                          MenuItem? menuItem = _popoverMenu.Root?.GetMenuItemsOfAllSubMenus (item => item.Id == "menuItemScheme")
                                                                            .FirstOrDefault ();
 
                                           if (menuItem?.CommandView is OptionSelector<Schemes> schemeSelector)

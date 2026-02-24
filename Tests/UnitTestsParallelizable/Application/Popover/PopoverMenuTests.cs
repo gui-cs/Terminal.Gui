@@ -80,7 +80,7 @@ public class PopoverMenuTests
         PopoverMenu popoverMenu = new () { Root = root };
 
         // Act
-        IEnumerable<MenuItem> allItems = popoverMenu.GetMenuItemsOfAllSubMenus ();
+        IEnumerable<MenuItem> allItems = popoverMenu.Root?.GetMenuItemsOfAllSubMenus () ?? [];
 
         // Assert — all menu items should be found
         Assert.Contains (parentItem, allItems);
@@ -103,7 +103,7 @@ public class PopoverMenuTests
         PopoverMenu popoverMenu = new () { Root = root };
 
         // Act - get all menu items
-        IEnumerable<MenuItem> allMenuItems = popoverMenu.GetMenuItemsOfAllSubMenus ();
+        IEnumerable<MenuItem> allMenuItems = popoverMenu.Root?.GetMenuItemsOfAllSubMenus () ?? [];
 
         // Assert - the filter mechanism should identify our MenuItem
         Assert.Contains (menuItem, allMenuItems);

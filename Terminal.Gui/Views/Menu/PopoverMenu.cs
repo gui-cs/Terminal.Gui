@@ -202,7 +202,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         if (sourceView is MenuItem { SubMenu: null })
         {
             // Leaf MenuItem — hide the entire menu
-            HideMenu (Root);
+            Root?.HideMenu ();
         }
         else if (sourceView is MenuItem { SubMenu: { } } menuItemWithSubMenu)
         {
@@ -228,7 +228,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (!Visible && args.Context?.Binding is KeyBinding { Key: { } key })
         {
-            if (!GetMenuItemsOfAllSubMenus (Root, i => i.Key == key).Any ())
+            if (Root?.GetMenuItemsOfAllSubMenus (i => i.Key == key).Any () != true)
             {
                 Trace.Command (this, args.Context, "NotVisible", "No matching MenuItem key — ignoring");
 
@@ -376,11 +376,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (Visible)
         {
-            ShowMenu (Root);
+            Root?.ShowMenu ();
         }
         else
         {
-            HideMenu (Root);
+            Root?.HideMenu ();
 
             // Specific to PopoverMenu
             App?.Popovers?.Hide (this);
@@ -417,12 +417,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 #endif
             Trace.Command (this, "RootSetter", $"OldRoot={Root?.ToIdentifyingString ()} NewRoot={value?.ToIdentifyingString ()}");
 
-            HideMenu (Root);
-
-            // Undo old hierarchy
-            if (Root is { })
+            // Unsubscribe from old Root's VisibleChanged
+            if (Root is { } oldRoot)
             {
-                IEnumerable<Menu> oldMenus = GetAllSubMenus ();
+                oldRoot.HideMenu ();
+                oldRoot.VisibleChanged -= RootOnVisibleChanged;
+
+                IEnumerable<Menu> oldMenus = oldRoot.GetAllSubMenus ();
 
                 foreach (Menu menu in oldMenus)
                 {
@@ -440,6 +441,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             {
                 return;
             }
+
+            // When Root is hidden (e.g. via HideMenu), hide the PopoverMenu too
+            Root.VisibleChanged += RootOnVisibleChanged;
+
             Trace.Command (this, "BridgeCreate", $"Bridging Activate from {Root.ToIdentifyingString ()}");
             _rootCommandBridge = CommandBridge.Connect (this, Root, Command.Activate);
         }
@@ -466,7 +471,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         UpdateKeyBindings (addedMenu);
 
-        IEnumerable<Menu> allMenus = GetAllSubMenus (addedMenu);
+        IEnumerable<Menu> allMenus = addedMenu.GetAllSubMenus ();
 
         foreach (Menu menu in allMenus)
         {
@@ -487,7 +492,33 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e) => ShowMenuItemSubMenu (e);
+    private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e)
+    {
+        // Menu.OnSelectedMenuItemChanged already handled show/hide.
+        // PopoverMenu only adjusts positioning for screen boundaries.
+        if (e?.SubMenu is not { Visible: true })
+        {
+            return;
+        }
+
+        Point idealLocation = ScreenToViewport (new Point (e.FrameToScreen ().Right - e.SubMenu.GetAdornmentsThickness ().Left,
+                                                           e.FrameToScreen ().Top - e.SubMenu.GetAdornmentsThickness ().Top));
+
+        Point pos = GetMostVisibleLocationForSubMenu (e.SubMenu, idealLocation);
+        e.SubMenu.X = pos.X;
+        e.SubMenu.Y = pos.Y;
+    }
+
+    /// <summary>
+    ///     When Root becomes invisible, hide the PopoverMenu too.
+    /// </summary>
+    private void RootOnVisibleChanged (object? sender, EventArgs e)
+    {
+        if (sender is Menu { Visible: false } menu && menu == Root && Visible)
+        {
+            Visible = false;
+        }
+    }
 
     /// <summary>
     ///     Updates the key bindings for all menu items with associated commands, assigning the appropriate key based on the
@@ -505,7 +536,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </param>
     private void UpdateKeyBindings (Menu? start = null)
     {
-        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus (start, mi => mi.Command != Command.NotBound);
+        IEnumerable<MenuItem> all = (start ?? Root)?.GetMenuItemsOfAllSubMenus (mi => mi.Command != Command.NotBound) ?? [];
 
         foreach (MenuItem menuItem in all)
         {
@@ -544,7 +575,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     protected override bool OnKeyDownNotHandled (Key key)
     {
         // See if any of our MenuItems have this key as Key
-        IEnumerable<MenuItem> all = GetMenuItemsOfAllSubMenus (Root, mi => key != Application.QuitKey && mi.Key == key);
+        IEnumerable<MenuItem> all = Root?.GetMenuItemsOfAllSubMenus (mi => key != Application.QuitKey && mi.Key == key) ?? [];
 
         foreach (MenuItem menuItem in all)
         {
@@ -552,81 +583,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
 
         return base.OnKeyDownNotHandled (key);
-    }
-
-    /// <summary>
-    ///     Gets all the submenus in the popover menu hierarchy, including the root menu.
-    /// </summary>
-    /// <returns>An enumerable collection of all <see cref="Menu"/> instances in the hierarchy.</returns>
-    /// <remarks>
-    ///     This method performs a depth-first traversal of the menu tree.
-    /// </remarks>
-    /// <param name="start">
-    ///     The root menu from which to begin updating key bindings. If <see langword="null"/>, <see cref="Root"/> will be
-    ///     used.
-    /// </param>
-    public IEnumerable<Menu> GetAllSubMenus (Menu? start = null)
-    {
-        List<Menu> result = [];
-
-        if (start == null)
-        {
-            start = Root;
-        }
-
-        if (Root == null)
-        {
-            return result;
-        }
-
-        Stack<Menu> stack = new ();
-        stack.Push (start!);
-
-        while (stack.Count > 0)
-        {
-            Menu currentMenu = stack.Pop ();
-            result.Add (currentMenu);
-
-            foreach (View subView in currentMenu.SubViews)
-            {
-                if (subView is MenuItem { SubMenu: { } } menuItem)
-                {
-                    stack.Push (menuItem.SubMenu);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    ///     Gets menu items in the popover menu hierarchy, optionally filtered by <paramref name="predicate"/>.
-    /// </summary>
-    /// <param name="start">The menu to start the search from. If <see langword="null"/>, <see cref="Root"/> will be used.</param>
-    /// <param name="predicate">
-    ///     If provided, only <see cref="MenuItem"/>s matching the predicate are returned.
-    ///     If <see langword="null"/>, all menu items are returned.
-    /// </param>
-    /// <returns>THe matching <see cref="MenuItem"/> instances across all menus in the hierarchy.</returns>
-    /// <remarks>
-    ///     This method traverses all menus returned by <see cref="GetAllSubMenus"/> and collects their menu items.
-    /// </remarks>
-    public IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus (Menu? start = null, Func<MenuItem, bool>? predicate = null)
-    {
-        List<MenuItem> result = [];
-
-        foreach (Menu menu in GetAllSubMenus (start))
-        {
-            foreach (View subView in menu.SubViews)
-            {
-                if (subView is MenuItem menuItem && (predicate is null || predicate (menuItem)))
-                {
-                    result.Add (menuItem);
-                }
-            }
-        }
-
-        return result;
     }
 
     /// <summary>
@@ -646,17 +602,18 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         var menu = menuItem?.SuperView as Menu;
 
-        // If there's a visible peer, remove / hide it
+        // If there's a visible peer, hide it
         if (menu?.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
         {
-            HideMenu (visiblePeer.SubMenu);
+            visiblePeer.SubMenu!.HideMenu ();
         }
 
         if (menuItem is not { SubMenu.Visible: false })
         {
             return;
         }
-        ShowMenu (menuItem.SubMenu);
+
+        menuItem.SubMenu.ShowMenu ();
 
         Point idealLocation = ScreenToViewport (new Point (menuItem.FrameToScreen ().Right - menuItem.SubMenu.GetAdornmentsThickness ().Left,
                                                            menuItem.FrameToScreen ().Top - menuItem.SubMenu.GetAdornmentsThickness ().Top));
@@ -681,80 +638,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         GetLocationEnsuringFullVisibility (menu, idealLocation.X, idealLocation.Y, out int nx, out int ny);
 
         return new Point (nx, ny);
-    }
-
-    private void ShowMenu (Menu? menu)
-    {
-        if (menu is not { Visible: false })
-        {
-            return;
-        }
-
-        Trace.Command (this, "Showing");
-
-        // TODO: Find the menu item below the mouse, if any, and select it
-
-        if (!menu.IsInitialized)
-        {
-            menu.App ??= App;
-            menu.BeginInit ();
-            menu.EndInit ();
-        }
-
-        menu.ClearFocus ();
-
-        // IMPORTANT: This must be done after adding the menu to the super view or Add will try
-        // to set focus to it.
-        menu.Visible = true;
-        menu.Enabled = true;
-    }
-
-    private bool _isHiding;
-
-    private void HideMenu (Menu? menu)
-    {
-        if (menu is not { Visible: true })
-        {
-            return;
-        }
-
-        Trace.Command (this, "Hiding");
-
-        // Use _isHiding to prevent re-entrant calls from event handlers triggered by
-        // setting Visible = false. But allow the recursive call for submenus
-        // by temporarily resetting the flag.
-        if (_isHiding)
-        {
-            return;
-        }
-
-        _isHiding = true;
-
-        try
-        {
-            // If there's a visible submenu, remove / hide it first (deepest first)
-            if (menu.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
-            {
-                // Temporarily allow recursion for the nested submenu
-                _isHiding = false;
-                HideMenu (visiblePeer.SubMenu);
-                _isHiding = true;
-            }
-
-            menu.Visible = false;
-            menu.Enabled = false;
-
-            menu.ClearFocus ();
-
-            if (menu == Root)
-            {
-                Visible = false;
-            }
-        }
-        finally
-        {
-            _isHiding = false;
-        }
     }
 
     #endregion
@@ -801,7 +684,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     {
         if (disposing)
         {
-            IEnumerable<Menu> allMenus = GetAllSubMenus ();
+            if (Root is { } root)
+            {
+                root.VisibleChanged -= RootOnVisibleChanged;
+            }
+
+            IEnumerable<Menu> allMenus = Root?.GetAllSubMenus () ?? [];
 
             foreach (Menu menu in allMenus)
             {

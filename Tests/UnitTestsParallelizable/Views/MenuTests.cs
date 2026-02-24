@@ -1870,4 +1870,255 @@ public class MenuTests
     }
 
     #endregion PopoverMenu Bridging (next layer up)
+
+    #region Menu Enumeration Helpers
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_GetAllSubMenus_ReturnsFullHierarchy ()
+    {
+        // Arrange: Root -> parentItem (SubMenu) -> subItem (SubMenu) -> deepItem
+        MenuItem deepItem = new () { Title = "Deep" };
+        Menu deepMenu = new ([deepItem]) { Title = "DeepMenu" };
+        MenuItem subItem = new () { Title = "Sub", SubMenu = deepMenu };
+        Menu subMenu = new ([subItem]) { Title = "SubMenu" };
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        MenuItem siblingItem = new () { Title = "Sibling" };
+        Menu root = new ([parentItem, siblingItem]) { Title = "Root" };
+
+        // Act
+        IEnumerable<Menu> allMenus = root.GetAllSubMenus ();
+
+        // Assert — should include root, subMenu, and deepMenu
+        List<Menu> menuList = allMenus.ToList ();
+        Assert.Equal (3, menuList.Count);
+        Assert.Contains (root, menuList);
+        Assert.Contains (subMenu, menuList);
+        Assert.Contains (deepMenu, menuList);
+
+        root.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_GetMenuItemsOfAllSubMenus_WithPredicate ()
+    {
+        // Arrange
+        MenuItem subItem = new () { Title = "SubItem" };
+        Menu subMenu = new ([subItem]) { Title = "SubMenu" };
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        MenuItem siblingItem = new () { Title = "Sibling" };
+        Menu root = new ([parentItem, siblingItem]) { Title = "Root" };
+
+        // Act — no predicate (all items)
+        IEnumerable<MenuItem> allItems = root.GetMenuItemsOfAllSubMenus ();
+        Assert.Equal (3, allItems.Count ());
+        Assert.Contains (parentItem, allItems);
+        Assert.Contains (siblingItem, allItems);
+        Assert.Contains (subItem, allItems);
+
+        // Act — with predicate (only items titled "Sibling")
+        IEnumerable<MenuItem> filtered = root.GetMenuItemsOfAllSubMenus (mi => mi.Title == "Sibling");
+        Assert.Single (filtered);
+        Assert.Contains (siblingItem, filtered);
+
+        root.Dispose ();
+    }
+
+    #endregion Menu Enumeration Helpers
+
+    #region Menu ShowMenu / HideMenu
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_ShowMenu_InitializesAndMakesVisible ()
+    {
+        // Arrange
+        Menu menu = new ([new MenuItem { Title = "Item1" }]) { Title = "TestMenu" };
+        menu.Visible = false;
+        menu.Enabled = false;
+
+        // Act
+        menu.ShowMenu ();
+
+        // Assert
+        Assert.True (menu.Visible);
+        Assert.True (menu.Enabled);
+        Assert.True (menu.IsInitialized);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_ShowMenu_NoOp_WhenAlreadyVisible ()
+    {
+        // Arrange
+        Menu menu = new ([new MenuItem { Title = "Item1" }]) { Title = "TestMenu" };
+        menu.ShowMenu ();
+
+        var visibleChangedCount = 0;
+        menu.VisibleChanged += (_, _) => visibleChangedCount++;
+
+        // Act — show again
+        menu.ShowMenu ();
+
+        // Assert — should not fire VisibleChanged again
+        Assert.Equal (0, visibleChangedCount);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_HideMenu_CascadesSubMenus ()
+    {
+        // Arrange: root has a SubMenu that is visible
+        Menu subMenu = new ([new MenuItem { Title = "SubItem" }]) { Title = "SubMenu" };
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        Menu root = new ([parentItem]) { Title = "Root" };
+
+        // Make both menus visible
+        root.ShowMenu ();
+        subMenu.ShowMenu ();
+        Assert.True (root.Visible);
+        Assert.True (subMenu.Visible);
+
+        // Act — hide root
+        root.HideMenu ();
+
+        // Assert — both should be hidden
+        Assert.False (root.Visible);
+        Assert.False (root.Enabled);
+        Assert.False (subMenu.Visible);
+        Assert.False (subMenu.Enabled);
+
+        root.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_HideMenu_NoOp_WhenAlreadyHidden ()
+    {
+        // Arrange
+        Menu menu = new ([new MenuItem { Title = "Item1" }]) { Title = "TestMenu" };
+
+        // Menu starts with Visible = true by default, so hide it first
+        menu.HideMenu ();
+        Assert.False (menu.Visible);
+
+        var visibleChangedCount = 0;
+        menu.VisibleChanged += (_, _) => visibleChangedCount++;
+
+        // Act — hide again
+        menu.HideMenu ();
+
+        // Assert — should not fire VisibleChanged again
+        Assert.Equal (0, visibleChangedCount);
+
+        menu.Dispose ();
+    }
+
+    #endregion Menu ShowMenu / HideMenu
+
+    #region Menu OnSelectedMenuItemChanged SubMenu Display
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnSelectedMenuItemChanged_ShowsSubMenu ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Menu subMenu = new ([new MenuItem { Title = "SubItem" }]) { Title = "SubMenu" };
+        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
+        MenuItem siblingItem = new () { Title = "Sibling" };
+        Menu root = new ([parentItem, siblingItem]) { Title = "Root" };
+
+        IRunnable runnable = new Runnable ();
+        (runnable as View)?.Add (root);
+        app.Begin (runnable);
+
+        root.ShowMenu ();
+
+        // Act — focus parentItem (which has a SubMenu)
+        parentItem.SetFocus ();
+
+        // Assert — SubMenu should become visible
+        Assert.True (subMenu.Visible);
+
+        (runnable as View)?.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnSelectedMenuItemChanged_HidesPeerSubMenu ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Menu subMenu1 = new ([new MenuItem { Title = "Sub1Item" }]) { Title = "SubMenu1" };
+        Menu subMenu2 = new ([new MenuItem { Title = "Sub2Item" }]) { Title = "SubMenu2" };
+        MenuItem item1 = new () { Title = "Item1", SubMenu = subMenu1 };
+        MenuItem item2 = new () { Title = "Item2", SubMenu = subMenu2 };
+        Menu root = new ([item1, item2]) { Title = "Root" };
+
+        IRunnable runnable = new Runnable ();
+        (runnable as View)?.Add (root);
+        app.Begin (runnable);
+
+        root.ShowMenu ();
+
+        // Show first SubMenu
+        item1.SetFocus ();
+        Assert.True (subMenu1.Visible);
+
+        // Act — focus second item
+        item2.SetFocus ();
+
+        // Assert — first SubMenu should be hidden, second shown
+        Assert.False (subMenu1.Visible);
+        Assert.True (subMenu2.Visible);
+
+        (runnable as View)?.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnSelectedMenuItemChanged_LeafItem_HidesPeerSubMenu ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Menu subMenu = new ([new MenuItem { Title = "SubItem" }]) { Title = "SubMenu" };
+        MenuItem itemWithSub = new () { Title = "WithSub", SubMenu = subMenu };
+        MenuItem leafItem = new () { Title = "Leaf" };
+        Menu root = new ([itemWithSub, leafItem]) { Title = "Root" };
+
+        IRunnable runnable = new Runnable ();
+        (runnable as View)?.Add (root);
+        app.Begin (runnable);
+
+        root.ShowMenu ();
+
+        // Show SubMenu
+        itemWithSub.SetFocus ();
+        Assert.True (subMenu.Visible);
+
+        // Act — focus leaf item (no SubMenu)
+        leafItem.SetFocus ();
+
+        // Assert — SubMenu should be hidden
+        Assert.False (subMenu.Visible);
+
+        (runnable as View)?.Dispose ();
+    }
+
+    #endregion Menu OnSelectedMenuItemChanged SubMenu Display
 }
