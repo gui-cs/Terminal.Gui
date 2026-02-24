@@ -658,7 +658,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         if (menu?.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
         {
             HideMenu (visiblePeer.SubMenu);
-            visiblePeer.ForceFocusColors = false;
         }
 
         if (menuItem is not { SubMenu: { Visible: false } })
@@ -673,8 +672,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         Point pos = GetMostVisibleLocationForSubMenu (menuItem.SubMenu, idealLocation);
         menuItem.SubMenu.X = pos.X;
         menuItem.SubMenu.Y = pos.Y;
-
-        menuItem.ForceFocusColors = true;
     }
 
     /// <summary>
@@ -748,11 +745,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 _isHiding = false;
                 HideMenu (visiblePeer.SubMenu);
                 _isHiding = true;
-                visiblePeer.ForceFocusColors = false;
             }
-
-            // Reset ForceFocusColors on the SuperMenuItem that owns this menu
-            menu.SuperMenuItem?.ForceFocusColors = false;
 
             menu.Visible = false;
             menu.Enabled = false;

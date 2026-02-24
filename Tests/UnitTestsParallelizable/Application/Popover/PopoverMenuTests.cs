@@ -108,36 +108,4 @@ public class PopoverMenuTests
         // Assert - the filter mechanism should identify our MenuItem
         Assert.Contains (menuItem, allMenuItems);
     }
-
-    /// <summary>
-    ///     Issue 8: ForceFocusColors not reset when popover is hidden.
-    ///     When the popover is hidden, ForceFocusColors should be reset on parent items.
-    /// </summary>
-    [Fact]
-    public void ForceFocusColors_ResetWhenPopoverHidden ()
-    {
-        // Arrange
-        ApplicationImpl app = new ();
-        ApplicationPopover popoverManager = new () { App = app };
-        app.Popovers = popoverManager;
-
-        MenuItem subItem = new () { Title = "SubItem" };
-        Menu subMenu = new ([subItem]) { Title = "SubMenu" };
-        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
-        Menu root = new ([parentItem]) { Title = "Root" };
-
-        PopoverMenu popoverMenu = new () { Root = root, App = app };
-        popoverManager.Register (popoverMenu);
-        popoverManager.Show (popoverMenu);
-
-        // Show the submenu — this sets parentItem.ForceFocusColors = true
-        popoverMenu.ShowMenuItemSubMenu (parentItem);
-        Assert.True (parentItem.ForceFocusColors);
-
-        // Act — hide the entire popover
-        popoverMenu.Visible = false;
-
-        // Assert — ForceFocusColors should be reset
-        Assert.False (parentItem.ForceFocusColors);
-    }
 }

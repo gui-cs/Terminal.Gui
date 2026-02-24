@@ -845,19 +845,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Focus
 
-    /// <summary>
-    ///     TODO: IS this needed?
-    /// </summary>
-    public bool ForceFocusColors
-    {
-        get;
-        set
-        {
-            field = value;
-            SetNeedsDraw ();
-        }
-    }
-
     /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {

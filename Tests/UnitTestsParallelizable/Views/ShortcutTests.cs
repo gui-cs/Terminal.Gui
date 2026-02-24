@@ -96,9 +96,6 @@ public partial class ShortcutTests
         // Mouse highlight defaults
         Assert.Equal (MouseState.In, shortcut.MouseHighlightStates);
 
-        // Focus defaults
-        Assert.False (shortcut.ForceFocusColors);
-
         // SubViews - CommandView added, HelpView and KeyView not added (empty)
         Assert.Contains (shortcut.CommandView, shortcut.SubViews);
         Assert.DoesNotContain (shortcut.HelpView, shortcut.SubViews);
