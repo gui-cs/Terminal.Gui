@@ -10,6 +10,19 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     #region Fields and State Management
 
     private const char ESCAPE = '\x1B';
+    private const char BEL = '\a';
+
+    /// <summary>
+    ///     Tracks whether the parser is currently inside an OSC (Operating System Command) sequence.
+    ///     OSC responses can be terminated by ST (ESC \) which requires special handling because
+    ///     ESC normally starts a new sequence in the parser.
+    /// </summary>
+    private bool _inOscSequence;
+
+    /// <summary>
+    ///     Tracks whether we've seen ESC within an OSC sequence, indicating a potential ST (ESC \) terminator.
+    /// </summary>
+    private bool _oscExpectingBackslash;
 
     protected object _lockExpectedResponses = new ();
     protected object _lockState = new ();
@@ -60,6 +73,8 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     protected void ResetState ()
     {
         State = AnsiResponseParserState.Normal;
+        _inOscSequence = false;
+        _oscExpectingBackslash = false;
 
         lock (_lockState)
         {
@@ -131,7 +146,10 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                         //We need any letter or digit for Alt+Letter (see EscAsAltPattern)
                         //In fact lets just always see what comes after esc
 
-                        // Detected '[' or 'O', transition to InResponse state
+                        // Track whether this is an OSC sequence (ESC ])
+                        _inOscSequence = currentChar == ']';
+
+                        // Detected '[', ']', 'O', etc., transition to InResponse state
                         State = AnsiResponseParserState.InResponse;
                         _heldContent.AddToHeld (currentObj); // Hold the letter
                     }
@@ -146,9 +164,58 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
                 case AnsiResponseParserState.InResponse:
 
-                    // if seeing another esc, we must resolve the current one first
-                    if (isEscape)
+                    if (_inOscSequence)
                     {
+                        if (_oscExpectingBackslash)
+                        {
+                            // We previously saw ESC inside an OSC sequence
+                            if (currentChar == '\\')
+                            {
+                                // ST complete (ESC \) — add backslash and try to match
+                                _heldContent.AddToHeld (currentObj);
+                                _oscExpectingBackslash = false;
+
+                                if (!HandleHeldContent ())
+                                {
+                                    // No match — release as normal output
+                                    ReleaseHeld (appendOutput);
+                                }
+                            }
+                            else
+                            {
+                                // Malformed: ESC followed by non-backslash inside OSC — release everything
+                                _oscExpectingBackslash = false;
+                                _inOscSequence = false;
+                                ReleaseHeld (appendOutput);
+                                appendOutput (currentObj);
+                            }
+                        }
+                        else if (isEscape)
+                        {
+                            // Possible start of ST (ESC \) — accumulate ESC and wait for next char
+                            _heldContent.AddToHeld (currentObj);
+                            _oscExpectingBackslash = true;
+                        }
+                        else if (currentChar == BEL)
+                        {
+                            // BEL terminates OSC sequences in many terminals
+                            _heldContent.AddToHeld (currentObj);
+
+                            if (!HandleHeldContent ())
+                            {
+                                // No match — release as normal output
+                                ReleaseHeld (appendOutput);
+                            }
+                        }
+                        else
+                        {
+                            // Continue accumulating OSC content
+                            _heldContent.AddToHeld (currentObj);
+                        }
+                    }
+                    else if (isEscape)
+                    {
+                        // if seeing another esc, we must resolve the current one first
                         ReleaseHeld (appendOutput);
                         State = AnsiResponseParserState.ExpectingEscapeSequence;
                         _heldContent.AddToHeld (currentObj);
@@ -186,6 +253,8 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         }
 
         State = newState;
+        _inOscSequence = false;
+        _oscExpectingBackslash = false;
         _heldContent.ClearHeld ();
     }
 
@@ -299,7 +368,13 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             // Finally if it is a valid ansi response but not one we are expect (e.g. its mouse activity)
             // then we can release it back to input processing stream
-            if (!_knownTerminators.Contains (cur.Last ()) || !cur.StartsWith (EscSeqUtils.CSI, StringComparison.Ordinal))
+            bool isCompleteCsi = cur.StartsWith (EscSeqUtils.CSI, StringComparison.Ordinal) && _knownTerminators.Contains (cur.Last ());
+
+            bool isCompleteOsc = _inOscSequence
+                                 && cur.StartsWith (EscSeqUtils.OSC, StringComparison.Ordinal)
+                                 && (cur.EndsWith (EscSeqUtils.ST, StringComparison.Ordinal) || cur [^1] == BEL);
+
+            if (!isCompleteCsi && !isCompleteOsc)
             {
                 return false; // Continue accumulating
             }
