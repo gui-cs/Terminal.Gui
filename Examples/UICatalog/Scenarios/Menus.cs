@@ -222,7 +222,7 @@ public class Menus : Scenario
 
             editModeStatusCb.ValueChanged += (_, _) => { editModeMenuItemCb?.Value = editModeStatusCb.Value; };
 
-            MenuBar.Accepted += (_, args) =>
+            MenuBar?.Accepted += (_, args) =>
                                 {
                                     if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi)
                                     {
@@ -244,13 +244,13 @@ public class Menus : Scenario
             Add (editModeStatusCb);
 
             OptionSelector<Schemes>? schemeOptionSelector =
-                MenuBar.GetMenuItemsWith (mi => mi.Id == "mutuallyExclusiveOptions").FirstOrDefault ()?.CommandView as OptionSelector<Schemes>;
+                MenuBar?.GetMenuItemsWith (mi => mi.Id == "mutuallyExclusiveOptions").FirstOrDefault ()?.CommandView as OptionSelector<Schemes>;
 
             schemeOptionSelector!.ValueChanged += (_, args) =>
                                                   {
                                                       if (args.Value is { } scheme)
                                                       {
-                                                          MenuBar.SchemeName = scheme.ToString ();
+                                                          MenuBar?.SchemeName = scheme.ToString ();
                                                       }
                                                   };
 

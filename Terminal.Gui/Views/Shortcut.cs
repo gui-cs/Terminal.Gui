@@ -85,10 +85,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
         CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
-        // NOTE: No AddCommand (Command.Activate, HandleActivate).
-        // The framework calls GetDispatchTarget and handles dispatch/deferred-completion
-        // automatically via the default handlers.
-
         TitleChanged += Shortcut_TitleChanged; // This needs to be set before CommandView is set
 
         CommandView = new View
@@ -189,22 +185,18 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             Thickness t = GetMarginThickness ();
 
-            switch (_maxHelpWidth)
-            {
-                case 0:
-                case 1:
-                    // Scrunch it by removing both margins
-                    HelpView.Margin!.Thickness = new Thickness (t.Right - 1, t.Top, t.Left - 1, t.Bottom);
+            HelpView.Margin!.Thickness = _maxHelpWidth switch
+                                         {
+                                             0 or 1 =>
 
-                    break;
+                                                 // Scrunch it by removing both margins
+                                                 new Thickness (t.Right - 1, t.Top, t.Left - 1, t.Bottom),
+                                             2 =>
 
-                case 2:
-
-                    // Scrunch just the right margin
-                    HelpView.Margin!.Thickness = new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom);
-
-                    break;
-            }
+                                                 // Scrunch just the right margin
+                                                 new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom),
+                                             _ => HelpView.Margin!.Thickness
+                                         };
         }
         else
         {
@@ -224,25 +216,57 @@ public class Shortcut : View, IOrientation, IDesignable
     // so Pos.Align works correctly.
     internal void ShowHide ()
     {
-        RemoveAll ();
-
         if (CommandView.Visible)
         {
-            Add (CommandView);
-            SetCommandViewDefaultLayout ();
+            if (CommandView.SuperView is null)
+            {
+                Add (CommandView);
+                SetCommandViewDefaultLayout ();
+            }
+        }
+        else
+        {
+            if (CommandView.SuperView is { })
+            {
+                Remove (CommandView);
+            }
         }
 
         if (HelpView.Visible && !string.IsNullOrEmpty (HelpView.Text))
         {
-            Add (HelpView);
-            SetHelpViewDefaultLayout ();
+            if (HelpView.SuperView is null)
+            {
+                Add (HelpView);
+                SetHelpViewDefaultLayout ();
+            }
+        }
+        else
+        {
+            if (HelpView.SuperView is { })
+            {
+                Remove (HelpView);
+            }
         }
 
         if (KeyView.Visible && (Key != Key.Empty || KeyView.Text != string.Empty))
         {
-            Add (KeyView);
-            SetKeyViewDefaultLayout ();
+            if (KeyView.SuperView is null)
+            {
+                Add (KeyView);
+                SetKeyViewDefaultLayout ();
+            }
         }
+        else
+        {
+            if (KeyView.SuperView is { })
+            {
+                Remove (KeyView);
+            }
+        }
+
+        MoveSubViewToStart (KeyView);
+        MoveSubViewToStart (HelpView);
+        MoveSubViewToStart (CommandView);
     }
 
     // Force Width to DimAuto to calculate natural width and then set it back

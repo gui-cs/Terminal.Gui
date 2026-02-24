@@ -164,8 +164,6 @@ public sealed class UICatalogRunnable : Runnable
                                                     ])
                                ]) { Title = "menuBar", Id = "menuBar" };
 
-        menuBar.CommandsToBubbleUp = [Command.Accept, Command.Activate, Command.HotKey];
-
         return menuBar;
 
         View [] CreateThemeMenuItems ()
@@ -205,7 +203,7 @@ public sealed class UICatalogRunnable : Runnable
                 menuItem = new MenuItem
                 {
                     Title = "Scheme for Runnable",
-                    SubMenu = new Menu ([new MenuItem { CommandView = _topSchemesSelector, HelpText = "Cycle Through schemes", Key = Key.S.WithCtrl }])
+                    SubMenu = new Menu ([new MenuItem { CommandView = _topSchemesSelector, HelpText = "Cycle Through Schemes", Key = Key.S.WithCtrl }])
                 };
                 menuItems.Add (menuItem);
 

@@ -347,17 +347,16 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (view.SuperView is null)
         {
-            Logging.Warning ($"{view} cannot be Removed. SuperView is null.");
+            Logging.Warning ($"{view.ToIdentifyingString()} cannot be Removed. SuperView is null.");
         }
-
-        if (view.SuperView != this)
+        else if (view.SuperView != this)
         {
-            Logging.Warning ($"{view} cannot be Removed. SuperView is not this ({view.SuperView}.");
+            Logging.Warning ($"{view.ToIdentifyingString ()} cannot be Removed. SuperView is not this ({view.SuperView.ToIdentifyingString ()}).");
         }
 
         if (!InternalSubViews.Contains (view))
         {
-            Logging.Warning ($"{view} cannot be Removed. It has not been added to {this}.");
+            Logging.Warning ($"{view.ToIdentifyingString ()} cannot be Removed. It has not been added to {this.ToIdentifyingString ()}.");
         }
 
         if (App is { } && App.Mouse.IsGrabbed (view))
