@@ -663,7 +663,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <summary>
     ///     The subview that displays the help text for the command. Internal for unit testing.
     /// </summary>
-    public View HelpView { get; } = new () { ViewportSettings = ViewportSettingsFlags.TransparentMouse };
+    public View HelpView { get; } = new () { /*ViewportSettings = ViewportSettingsFlags.TransparentMouse*/ };
 
     private void SetHelpViewDefaultLayout ()
     {
@@ -769,7 +769,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public View KeyView { get; } = new () { ViewportSettings = ViewportSettingsFlags.TransparentMouse };
+    public View KeyView { get; } = new () { /*ViewportSettings = ViewportSettingsFlags.TransparentMouse*/ };
 
     /// <summary>
     ///     Gets or sets the minimum size of the key text. Useful for aligning the key text with other <see cref="Shortcut"/>s.

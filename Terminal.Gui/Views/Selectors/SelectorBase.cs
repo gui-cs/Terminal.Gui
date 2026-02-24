@@ -30,7 +30,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
         // Clear all mouse bindings; the selector's SubViews will handle all
         // mouse events.
-        //MouseBindings.Clear ();
+        MouseBindings.Clear ();
 
         CommandsToBubbleUp = [Command.Activate, Command.Accept];
 

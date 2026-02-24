@@ -93,9 +93,12 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
 
-        if (ctx?.Binding is KeyBinding keyBinding && (int)checkBox.Data! == Value && keyBinding.Key is { } && keyBinding.Key == Key.Space)
+        if ((int)checkBox.Data! == Value
+            && (ctx?.Routing == CommandRouting.DispatchingDown
+                || (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)))
         {
-            // Caused by space. If the checkbox is already checked, we cycle to the next one.
+            // Caused by Key.Space or a SuperView...
+            // If the checkbox is already checked, we cycle to the next one.
             Cycle ();
         }
         else

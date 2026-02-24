@@ -327,7 +327,7 @@ public class Menus : Scenario
             // This ensures the checkbox state toggles when the hotkey of Title is pressed.
             menuItemBorders.Accepting += (_, args) => args.Handled = true;
 
-            OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = false };
+            OptionSelector<Schemes>? schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
 
             MenuItem menuItemScheme = new ()
             {

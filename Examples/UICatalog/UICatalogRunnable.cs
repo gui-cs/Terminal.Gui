@@ -291,15 +291,15 @@ public sealed class UICatalogRunnable : Runnable
             // Trace toggles
             CheckBox commandTraceCheckBox = new () { Text = "Command _Trace", Value = Trace.CommandEnabled ? CheckState.Checked : CheckState.UnChecked };
             commandTraceCheckBox.ValueChanging += (_, e) => { Trace.CommandEnabled = e.NewValue == CheckState.Checked; };
-            menuItems.Add (new MenuItem { CommandView = commandTraceCheckBox, HelpText = "Toggle command route tracing" });
+            menuItems.Add (new MenuItem { CommandView = commandTraceCheckBox, HelpText = "Toggle Command route tracing", Key = Key.C.WithCtrl });
 
             CheckBox mouseTraceCheckBox = new () { Text = "_Mouse Trace", Value = Trace.MouseEnabled ? CheckState.Checked : CheckState.UnChecked };
             mouseTraceCheckBox.ValueChanging += (_, e) => { Trace.MouseEnabled = e.NewValue == CheckState.Checked; };
-            menuItems.Add (new MenuItem { CommandView = mouseTraceCheckBox, HelpText = "Toggle mouse event tracing" });
+            menuItems.Add (new MenuItem { CommandView = mouseTraceCheckBox, HelpText = "Toggle Mouse event tracing", Key = Key.U.WithCtrl });
 
             CheckBox keyboardTraceCheckBox = new () { Text = "_Keyboard Trace", Value = Trace.KeyboardEnabled ? CheckState.Checked : CheckState.UnChecked };
             keyboardTraceCheckBox.ValueChanging += (_, e) => { Trace.KeyboardEnabled = e.NewValue == CheckState.Checked; };
-            menuItems.Add (new MenuItem { CommandView = keyboardTraceCheckBox, HelpText = "Toggle keyboard event tracing" });
+            menuItems.Add (new MenuItem { CommandView = keyboardTraceCheckBox, HelpText = "Toggle Keyboard event tracing", Key = Key.K.WithCtrl });
 
             // add a separator
             menuItems.Add (new Line ());

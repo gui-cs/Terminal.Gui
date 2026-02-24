@@ -57,32 +57,6 @@ public class MenuItem : Shortcut
     public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText) =>
         SubMenu = subMenu;
 
-    ///// <inheritdoc/>
-    ///// <remarks>
-    /////     In menu context, Enter means "activate this item and dismiss the menu" — not
-    /////     "accept/submit". When Accept arrives from a key binding (e.g. Enter), translates it
-    /////     into <see cref="Command.Activate"/> so it flows through the bridge architecture
-    /////     (MenuItem → Menu → CommandBridge → PopoverMenu), dismissing the menu.
-    /////     Without this, Accept would bubble past the menu hierarchy to the host view,
-    /////     triggering unintended exit behavior.
-    ///// </remarks>
-    //protected override bool OnAccepting (CommandEventArgs args)
-    //{
-    //    // Only convert key-binding-initiated Accept (e.g. Enter key).
-    //    // Programmatic InvokeCommand(Accept) without a binding should flow normally.
-    //    if (args.Context?.Binding is not KeyBinding)
-    //    {
-    //        return base.OnAccepting (args);
-    //    }
-
-    //    // Convert Accept → Activate. The binding is preserved so TryDispatchToTarget's
-    //    // relay-dispatch guard (ConsumeDispatch=false && binding is null) passes and
-    //    // the CommandView still receives Activate (e.g. CheckBox toggles).
-    //    InvokeCommand (Command.Activate, args.Context.Binding);
-
-    //    return true;
-    //}
-
     private CommandBridge? _subMenuBridge;
 
     /// <summary>
