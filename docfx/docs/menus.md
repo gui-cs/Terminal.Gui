@@ -1,6 +1,6 @@
 # Menus Deep Dive
 
-Terminal.Gui provides a comprehensive, hierarchical menu system built on top of the @Terminal.Gui.Shortcut and @Terminal.Gui.Bar classes. This deep dive covers the architecture, class relationships, and interactions between the menu components.
+Terminal.Gui provides a comprehensive, hierarchical menu system built on top of the @Terminal.Gui.Shortcut and @Terminal.Gui.Bar classes. This deep dive covers the architecture, class relationships, command routing, and interactions between the menu components.
 
 ## Table of Contents
 
@@ -8,6 +8,7 @@ Terminal.Gui provides a comprehensive, hierarchical menu system built on top of 
 - [Class Hierarchy](#class-hierarchy)
 - [Component Descriptions](#component-descriptions)
 - [Architecture](#architecture)
+- [Command Routing](#command-routing)
 - [Interactions](#interactions)
 - [Usage Examples](#usage-examples)
 - [Keyboard Navigation](#keyboard-navigation)
@@ -95,6 +96,8 @@ Key features:
 - `BindKeyToApplication` enables application-wide key bindings
 - `AlignmentModes` controls element ordering (start-to-end or end-to-start)
 - `CommandView` can be replaced with custom views (e.g., `CheckBox`)
+- Uses relay dispatch (`ConsumeDispatch=false`): commands dispatched to `CommandView` complete normally, then `Shortcut` is notified via a deferred callback
+- Sets `CommandsToBubbleUp = [Command.Activate, Command.Accept]`
 
 ### Bar
 
@@ -135,10 +138,11 @@ MenuItem boundItem = new (myView, Command.Save);
 ```
 
 Key features:
-- `SubMenu` property holds nested @Terminal.Gui.Menu
-- `TargetView` and `Command` enable command binding
+- `SubMenu` property holds nested @Terminal.Gui.Menu for cascading menus
+- `TargetView` and `Command` enable command binding to other views
 - Automatically gets focus on mouse enter
 - Displays right-arrow glyph when it has a submenu
+- When `SubMenu` is set, a @Terminal.Gui.Input.CommandBridge connects the SubMenu back to this MenuItem (bridging `Activate` and `Accept` commands across the non-containment boundary)
 
 ### Menu
 
@@ -160,6 +164,8 @@ Key features:
 - `SelectedMenuItem` tracks current selection
 - Supports `Line` separators between items
 - Uses `Schemes.Menu` color scheme by default
+- Sets `CommandsToBubbleUp = [Command.Accept, Command.Activate]` — enables command propagation up through the PopoverMenu hierarchy
+- Overrides `OnActivating` to dispatch `Activate` to the focused `MenuItem` (manual dispatch, not the `GetDispatchTarget` pattern)
 
 ### MenuBarItem
 
@@ -178,8 +184,10 @@ MenuBarItem fileMenuBarItem = new ("_File", [
 
 Key features:
 - `PopoverMenu` property holds the dropdown menu
-- `PopoverMenuOpen` tracks whether the popover is visible
-- `PopoverMenuOpenChanged` event fires when visibility changes
+- `PopoverMenuOpen` tracks whether the popover is visible (CWP property with `PopoverMenuOpenChanging`/`PopoverMenuOpenChanged` events)
+- When `PopoverMenu` is set, a @Terminal.Gui.Input.CommandBridge connects the PopoverMenu back to this MenuBarItem, bridging `Activate` commands across the non-containment boundary
+- Overrides `OnActivating` to toggle `PopoverMenuOpen`, with a guard that ignores `Bridged` commands (which are notifications from PopoverMenu internals, not toggle requests)
+- Has a custom `HotKey` handler that skips `SetFocus` before invoking `Activate`, preventing premature popover opening during MenuBarItem switching
 
 ### MenuBar
 
@@ -209,10 +217,13 @@ window.Add (menuBar);
 
 Key features:
 - `Key` property defines the activation key (default: `F9`)
-- `Active` property indicates whether the menu bar is active
+- `Active` property controls whether the MenuBar is active — when `Active` changes, it drives `CanFocus` and hides any open PopoverMenus on deactivation
 - `IsOpen()` returns whether any popover menu is visible
 - `DefaultBorderStyle` configurable via themes
 - Automatically positions at top with `Width = Dim.Fill ()`
+- Uses consume dispatch (`ConsumeDispatch=true`, `GetDispatchTarget => Focused`) — the MenuBar owns activation state for its MenuBarItems
+- Blocks activation when `!Visible || !Enabled`
+- Registers custom command handlers for `Command.HotKey`, `Command.Quit`, `Command.Right`, and `Command.Left`
 
 ### PopoverMenu
 
@@ -242,8 +253,10 @@ Key features:
 - `Root` property holds the top-level @Terminal.Gui.Menu
 - `Key` property for activation (default: `Shift+F10`)
 - `MouseFlags` property defines mouse button to show menu (default: right-click)
+- **Must be registered** with `Application.Popover` before calling `MakeVisible`
 - Auto-positions to ensure visibility on screen
 - Cascading submenus shown automatically on selection
+- Registers custom command handlers for `Command.Right` (enter submenu), `Command.Left` (leave submenu), and `Command.Quit` (close menu)
 
 **Important:** See the [Popovers Deep Dive](Popovers.md) for complete details on popover lifecycle and requirements.
 
@@ -264,7 +277,7 @@ Key features:
 │  │  └──────┬──────┘  └─────────────┘  └─────────────┘            │  │
 │  └─────────│─────────────────────────────────────────────────────┘  │
 │            │                                                         │
-│            │ owns                                                    │
+│            │ owns (+ CommandBridge)                                   │
 │            ▼                                                         │
 │  ┌──────────────────┐                                               │
 │  │   PopoverMenu    │ ◄─── Registered with Application.Popover      │
@@ -273,10 +286,10 @@ Key features:
 │  │  │ (Root)     │  │                                               │
 │  │  │ ┌────────┐ │  │                                               │
 │  │  │ │MenuItem│─┼──┼──► SubMenu ──► Menu ──► MenuItem ──► SubMenu  │
-│  │  │ │MenuItem│ │  │                    ▲                          │
-│  │  │ │  Line  │ │  │     Cascading      │                          │
-│  │  │ │MenuItem│ │  │     Hierarchy ─────┘                          │
-│  │  │ └────────┘ │  │                                               │
+│  │  │ │MenuItem│ │  │         ▲  (CommandBridge)                    │
+│  │  │ │  Line  │ │  │         │                                     │
+│  │  │ │MenuItem│ │  │     Cascading                                 │
+│  │  │ └────────┘ │  │     Hierarchy                                 │
 │  │  └────────────┘  │                                               │
 │  └──────────────────┘                                               │
 └─────────────────────────────────────────────────────────────────────┘
@@ -288,9 +301,10 @@ Key features:
    - `MenuBar` is a horizontal `Menu` containing `MenuBarItem` subviews
    - Each `MenuBarItem` owns a `PopoverMenu`
 
-2. **MenuBarItem owns PopoverMenu:**
+2. **MenuBarItem owns PopoverMenu (cross-boundary):**
    - `MenuBarItem.PopoverMenu` property holds the dropdown
-   - Events are wired up automatically for visibility and acceptance
+   - A `CommandBridge` connects PopoverMenu back to MenuBarItem, bridging `Activate` commands
+   - `PopoverMenuOpenChanged` event fires when visibility changes
 
 3. **PopoverMenu contains Root Menu:**
    - `PopoverMenu.Root` is the top-level `Menu`
@@ -299,10 +313,54 @@ Key features:
 4. **Menu contains MenuItems:**
    - `Menu.SubViews` contains `MenuItem` instances
    - `Menu.SelectedMenuItem` tracks the focused item
+   - `Menu.CommandsToBubbleUp = [Command.Accept, Command.Activate]` enables propagation
 
-5. **MenuItem may contain SubMenu:**
+5. **MenuItem may contain SubMenu (cross-boundary):**
    - `MenuItem.SubMenu` holds a nested `Menu` for cascading
    - `Menu.SuperMenuItem` links back to the parent `MenuItem`
+   - A `CommandBridge` connects SubMenu back to its MenuItem, bridging `Activate` and `Accept`
+
+---
+
+## Command Routing
+
+The menu system uses the [Command Deep Dive](command.md) infrastructure extensively. Understanding command routing is essential for working with menus.
+
+### Dispatch Patterns
+
+Each menu component uses a specific command dispatch pattern:
+
+| Component | `GetDispatchTarget` | `ConsumeDispatch` | Pattern |
+|-----------|--------------------|--------------------|---------|
+| **MenuBar** | `Focused` (the focused MenuBarItem) | `true` | Consume: MenuBar owns activation state |
+| **Menu** | Not overridden (manual dispatch in `OnActivating`) | Not overridden | Dispatches `Activate` to focused MenuItem directly |
+| **MenuItem** | Inherited from Shortcut (`CommandView`) | `false` | Relay: CommandView completes normally, then MenuItem is notified |
+| **MenuBarItem** | Inherited from MenuItem/Shortcut | `false` | Relay (inherited), plus custom `OnActivating` for PopoverMenu toggle |
+
+### CommandBridge (Cross-Boundary Routing)
+
+The menu system has two non-containment boundaries that require @Terminal.Gui.Input.CommandBridge:
+
+1. **MenuBarItem ↔ PopoverMenu:** `PopoverMenu` is not a SubView of `MenuBarItem` — it is registered with `Application.Popover` and lives outside the view hierarchy. The bridge brings `Activate` events from the PopoverMenu back to the MenuBarItem so they can bubble up through the MenuBar.
+
+2. **MenuItem ↔ SubMenu:** `SubMenu` is not a SubView of `MenuItem` — it is managed by the PopoverMenu's cascading infrastructure. The bridge brings `Activate` and `Accept` events from the SubMenu back to the MenuItem so they can bubble up through the Menu.
+
+### Routing Modes in Menu Context
+
+| Mode | When It Occurs | Effect |
+|------|---------------|--------|
+| **Direct** | User presses `F9`, or programmatic `InvokeCommand` | MenuBar toggles `Active` on/off |
+| **BubblingUp** | MenuBarItem activation bubbles to MenuBar | MenuBar identifies the source MenuBarItem and shows/hides its PopoverMenu |
+| **Bridged** | MenuItem activation inside PopoverMenu bridges to MenuBarItem | MenuBarItem ignores the command (notification only — no PopoverMenu toggle) |
+
+### Command Bubbling
+
+`Menu` sets `CommandsToBubbleUp = [Command.Accept, Command.Activate]`. This means:
+
+1. When a `MenuItem` fires `Accept` or `Activate`, the command bubbles up through the Menu to its SuperView
+2. For Root Menus inside a `PopoverMenu`, the command reaches the PopoverMenu
+3. The `CommandBridge` on MenuBarItem detects the `Activate` event on PopoverMenu and relays it to MenuBarItem
+4. The MenuBarItem's activation then bubbles to the MenuBar via normal SuperView bubbling
 
 ---
 
@@ -311,18 +369,46 @@ Key features:
 ### MenuBar Activation Flow
 
 1. User presses `F9` (default) or clicks on `MenuBar`
-2. `MenuBar.Active` is set to `true`
-3. `MenuBar.CanFocus` becomes `true`
-4. First `MenuBarItem` with a `PopoverMenu` is selected
-5. `PopoverMenu.MakeVisible()` is called
+2. MenuBar's HotKey handler fires — for direct activation, this calls `InvokeCommand (Command.Activate)`
+3. `MenuBar.OnActivating` runs:
+   - If `!Visible || !Enabled`: activation is blocked
+   - If already `Active`: toggles off (`Active = false`)
+   - Otherwise: sets `Active = true` and calls `ShowItem` on the first MenuBarItem with a PopoverMenu
+4. `Active = true` sets `CanFocus = true`
+5. `ShowItem` focuses the MenuBarItem and sets `PopoverMenuOpen = true`
+6. `PopoverMenuOpen` setter calls `PopoverMenu.MakeVisible` with the calculated screen position
+
+### MenuBarItem HotKey Activation
+
+When a MenuBarItem's HotKey (e.g., `Alt+F` for "\_File") is pressed:
+
+1. The HotKey is processed on the MenuBarItem, which has a custom HotKey handler
+2. The handler skips `SetFocus` (to prevent premature popover opening) and directly invokes `Command.Activate`
+3. `MenuBarItem.OnActivating` toggles `PopoverMenuOpen`
+4. The activation bubbles up to `MenuBar.OnActivating` with `BubblingUp` routing
+5. MenuBar identifies the source MenuBarItem and either:
+   - Activates the MenuBar and shows the source item's PopoverMenu (if opening)
+   - Deactivates the MenuBar (if the PopoverMenu is closing)
+
+### Switching Between MenuBarItems
+
+When the MenuBar is active and a PopoverMenu is open:
+
+- **Arrow keys:** `Command.Right`/`Command.Left` advance focus to the next/previous MenuBarItem. The `OnSelectedMenuItemChanged` callback detects the focus change and, while in _popover browsing mode_, calls `ShowItem` on the newly focused item.
+- **Mouse hover:** Moving the mouse over a different MenuBarItem triggers `OnMouseEnter`, which sets focus. If in browsing mode, the new item's PopoverMenu opens automatically.
+- **HotKey:** Pressing another MenuBarItem's HotKey directly invokes `Activate` on that item, causing a switch.
+
+The `_isSwitchingItem` guard prevents premature deactivation during the brief interval when the old popover closes before the new one opens. The `_popoverBrowsingMode` flag tracks whether any popover is open, enabling auto-open behavior during navigation.
 
 ### PopoverMenu Display Flow
 
-1. `MakeVisible()` is called (optionally with position)
-2. `SetPosition()` calculates visible location
+1. `MakeVisible()` is called (optionally with a position)
+2. `SetPosition()` calculates a visible location on screen
 3. `Application.Popover.Show()` is invoked
-4. `OnVisibleChanged()` adds and shows the `Root` menu
+4. `OnVisibleChanged()` adds and lays out the `Root` menu
 5. First `MenuItem` receives focus
+
+**Prerequisite:** The `PopoverMenu` must be registered with `Application.Popover` before `MakeVisible` is called. For `MenuBarItem`, registration happens automatically in `EndInit`. For standalone context menus, call `Application.Popover?.Register (contextMenu)` explicitly.
 
 ### Menu Selection Flow
 
@@ -334,12 +420,19 @@ Key features:
 
 ### MenuItem Acceptance Flow
 
-1. User presses Enter or clicks on `MenuItem`
-2. `MenuItem.DispatchCommand()` is called
-3. If `TargetView` exists, command is invoked on target
-4. Otherwise, `Action` is invoked
-5. `Accepting` and `Accepted` events propagate up
-6. `PopoverMenu` hides (unless item has submenu)
+When a user presses Enter or clicks a `MenuItem`:
+
+1. `Command.Accept` is invoked on the focused `MenuItem`
+2. `MenuItem.RaiseAccepting` fires the cancellable `Accepting` event
+3. If not cancelled, `Shortcut.OnAccepted` runs:
+   - If `TargetView` and `Command` are set: invokes the command on the target view
+   - If `Action` is set: invokes the action
+4. `Accepted` fires on the MenuItem
+5. Because `Menu.CommandsToBubbleUp` includes `Accept`, the command bubbles up:
+   - MenuItem → Menu → PopoverMenu
+6. PopoverMenu hides (closes) in response to the accepted command
+7. The `CommandBridge` on MenuBarItem brings the event into the containment hierarchy
+8. MenuBar deactivates
 
 ### Keyboard Navigation
 
@@ -350,8 +443,10 @@ Key features:
 | `↑` / `↓` | Navigate within Menu |
 | `←` / `→` | Navigate MenuBar items / Expand-collapse submenus |
 | `Enter` | Accept selected MenuItem |
-| `Escape` | Close menu / Deactivate MenuBar |
-| Hotkey | Jump to MenuItem with matching hotkey |
+| `Space` | Activate selected MenuItem (e.g., toggle a CheckBox CommandView) |
+| `Escape` / `QuitKey` | Close menu / Deactivate MenuBar |
+| Hotkey (e.g., `Alt+F`) | Activate/toggle specific MenuBarItem |
+| Hotkey in Menu | Jump to MenuItem with matching hotkey |
 
 ---
 
@@ -434,7 +529,7 @@ MenuBar menuBar = new ([
 
 ```csharp
 CheckBox wordWrapCheckBox = new () { Title = "_Word Wrap" };
-wordWrapCheckBox.CheckedStateChanging += (s, e) =>
+wordWrapCheckBox.CheckedStateChanging += (_, e) =>
 {
     editor.WordWrap = e.NewValue == CheckState.Checked;
 };
@@ -463,7 +558,7 @@ PopoverMenu contextMenu = new ([
 Application.Popover?.Register (contextMenu);
 
 // Show on right-click
-editor.MouseClick += (s, e) =>
+editor.MouseClick += (_, e) =>
 {
     if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
     {
@@ -477,20 +572,48 @@ editor.MouseClick += (s, e) =>
 
 ## Event Flow
 
-### Acceptance Event Propagation
+### Command Propagation Through the Menu Hierarchy
 
-When a `MenuItem` is accepted, events propagate through the hierarchy:
+When a `MenuItem` is activated or accepted, commands propagate through the hierarchy using two mechanisms: **command bubbling** (within the containment hierarchy) and **CommandBridge** (across non-containment boundaries).
+
+#### Accept Flow (e.g., user presses Enter on a MenuItem)
 
 ```
-MenuItem.Accepting → MenuItem.Accepted
-        ↓                    ↓
-Menu.Accepting    →    Menu.Accepted
-        ↓                    ↓
-PopoverMenu.Accepting → PopoverMenu.Accepted
-        ↓                    ↓
-MenuBarItem.Accepting → MenuBarItem.Accepted
-        ↓                    ↓
-MenuBar.Accepting  →  MenuBar.Accepted
+MenuItem
+  ├─ Accepting event (cancellable)
+  ├─ Accepted event
+  ↓ (bubbles via CommandsToBubbleUp)
+Menu (Root)
+  ├─ Accepting event
+  ├─ Accepted event
+  ↓ (PopoverMenu receives via containment)
+PopoverMenu
+  ├─ Closes (Visible = false)
+  ↓ (CommandBridge bridges to MenuBarItem)
+MenuBarItem
+  ├─ PopoverMenuOpen = false (via VisibleChanged)
+  ↓ (bubbles to SuperView)
+MenuBar
+  ├─ Active = false
+  └─ Deactivates
+```
+
+#### Activate Flow (e.g., user presses Space to toggle a CheckBox in a MenuItem)
+
+```
+MenuItem's CommandView (e.g., CheckBox)
+  ├─ Activating / Activated events
+  ↓ (relay dispatch from Shortcut)
+MenuItem
+  ├─ Activating / Activated events
+  ↓ (bubbles via CommandsToBubbleUp)
+Menu (Root)
+  ↓ (CommandBridge bridges to MenuBarItem)
+MenuBarItem
+  ├─ OnActivating sees Bridged routing → ignores (no toggle)
+  ↓ (bubbles to SuperView)
+MenuBar
+  ├─ OnActivating sees BubblingUp routing → notification only
 ```
 
 ### Selection Change Events
@@ -507,13 +630,25 @@ User navigates → Menu.Focused changes
               PopoverMenu shows/hides submenus
 ```
 
-### Key Binding Resolution
+### Key Event Processing
 
-1. Check `KeyBindings` on focused `MenuItem`
-2. Check `HotKeyBindings` on `Menu`
-3. Check `KeyBindings` on `PopoverMenu`
-4. Check `KeyBindings` on `MenuBar`
-5. Check `Application.Keyboard.KeyBindings`
+Key events are processed depth-first through the view hierarchy:
+
+```
+NewKeyDownEvent (key)
+  ├─ If has Focused SubView → recurse into Focused
+  ├─ RaiseKeyDown (key) — OnKeyDown + KeyDown event
+  ├─ InvokeCommandsBoundToKey (key) — KeyBindings lookup
+  ├─ InvokeCommandsBoundToHotKey (key) — HotKeyBindings (this + SubViews)
+  └─ RaiseKeyDownNotHandled (key) — OnKeyDownNotHandled + event
+```
+
+For menus specifically:
+- `MenuBar` binds `F9` to `Command.HotKey` (via `HotKeyBindings`)
+- `MenuBar` binds `F9` and `Application.QuitKey` to `Command.Quit` (via `KeyBindings`)
+- `MenuBar` binds arrow keys to `Command.Right`/`Command.Left`
+- `PopoverMenu` binds arrow keys to `Command.Right`/`Command.Left` for submenu navigation
+- `PopoverMenu` binds `Escape`/`QuitKey` to `Command.Quit`
 
 ---
 
@@ -557,7 +692,7 @@ These can also be configured in `config.json`:
 ## See Also
 
 - [Popovers Deep Dive](Popovers.md) - Complete details on popover lifecycle
-- [Command Deep Dive](command.md) - Command binding and dispatch
+- [Command Deep Dive](command.md) - Command binding, dispatch, and routing
 - [Keyboard Deep Dive](keyboard.md) - Key binding system
 - [Events Deep Dive](events.md) - Event handling patterns
 - @Terminal.Gui.MenuBar API Reference
