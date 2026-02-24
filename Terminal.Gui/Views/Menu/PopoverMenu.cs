@@ -3,7 +3,7 @@ using Terminal.Gui.Tracing;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="PopoverBaseImpl"/>-derived view that provides a cascading menu.
+///     A <see cref="IPopover"/>-derived view that provides a cascading menu.
 ///     Can be used as a context menu or a drop-down menu as part of <see cref="MenuBar"/>.
 /// </summary>
 /// <remarks>
@@ -25,8 +25,7 @@ namespace Terminal.Gui.Views;
 ///         menu.MakeVisible (); // or Application.Popover?.Show (menu);
 ///     </code>
 ///     <para>
-///         See <see cref="PopoverBaseImpl"/> and <see cref="IPopover"/> for lifecycle, focus, and keyboard handling
-///         details.
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
 ///     </para>
 /// </remarks>
 public class PopoverMenu : PopoverBaseImpl, IDesignable
@@ -322,9 +321,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Ensure the Popover is sized correctly in case this is the first time we are being made visible
         Layout ();
 
-        // TODO: This should not be needed:
-        UpdateKeyBindings ();
-
         SetPosition (idealScreenPosition);
         App!.Popovers?.Show (this);
     }
@@ -358,10 +354,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Root.App ??= App;
             Root.BeginInit ();
             Root.EndInit ();
-
-            // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-            // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-            Root.Layout ();
         }
 
         pos = GetMostVisibleLocationForSubMenu (Root, pos);
@@ -648,11 +640,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     internal void ShowMenuItemSubMenu (MenuItem? menuItem)
     {
-        var menu = menuItem?.SuperView as Menu;
-
-        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-        menu?.Layout ();
+        Menu? menu = menuItem?.SuperView as Menu;
 
         // If there's a visible peer, remove / hide it
         if (menu?.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
@@ -660,7 +648,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             HideMenu (visiblePeer.SubMenu);
         }
 
-        if (menuItem is not { SubMenu: { Visible: false } })
+        if (menuItem is not { SubMenu.Visible: false })
         {
             return;
         }
@@ -713,10 +701,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // to set focus to it.
         menu.Visible = true;
         menu.Enabled = true;
-
-        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-        menu.Layout ();
     }
 
     private void HideMenu (Menu? menu)

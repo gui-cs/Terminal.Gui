@@ -93,21 +93,19 @@ public class MenuBar : Menu, IDesignable
             return true;
         }
 
-        bool? MoveLeft (ICommandContext? ctx)
-        {
-            // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
-            // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
-            // _isSwitchingItem guard for the focus transfer it does.
-            return AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
-        }
+        bool? MoveLeft (ICommandContext? ctx) =>
 
-        bool? MoveRight (ICommandContext? ctx)
-        {
             // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
             // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
             // _isSwitchingItem guard for the focus transfer it does.
-            return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-        }
+            AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+
+        bool? MoveRight (ICommandContext? ctx) =>
+
+            // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
+            // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
+            // _isSwitchingItem guard for the focus transfer it does.
+            AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
     }
 
     /// <inheritdoc/>
@@ -538,7 +536,7 @@ public class MenuBar : Menu, IDesignable
             }
 
             // If no MBI has focus at all, focus is leaving the MenuBar entirely. Don't call
-            // Active = false here — it would set CanFocus = false → HasFocus = false re-entrantly,
+            // Active = false here — it would set CanFocus = false → HasFocus = false reentrantly,
             // violating SetHasFocusFalse's invariant (Debug.Assert(_hasFocus) at line 908).
             // MenuBar.OnHasFocusChanged will deactivate once the focus traversal completes.
             bool anyMbiHasFocus = SubViews.OfType<MenuBarItem> ().Any (m => m.HasFocus);
@@ -730,10 +728,7 @@ public class MenuBar : Menu, IDesignable
                                   new MenuItem { Title = "_Details", SubMenu = new Menu (ConfigureDetailsSubMenu ()) }
                               ]));
 
-        MenuItem onlineHelpMi = new ()
-        {
-            Title = "_Online Help..."
-        };
+        MenuItem onlineHelpMi = new () { Title = "_Online Help..." };
 
         // Demonstrate using Activating
         onlineHelpMi.Activated += (_, _) => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk);
