@@ -445,10 +445,9 @@ view.SetContentSize (new (100, 100));
 view.ScrollVertical (5);
 view.ScrollHorizontal (3);
 
-// Built-in scrollbars
-view.VerticalScrollBar.Visible = true;
-view.HorizontalScrollBar.Visible = true;
-view.VerticalScrollBar.AutoShow = true;
+// Built-in scrollbars with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 ```
 
 ### Enhanced ScrollBar
@@ -456,10 +455,11 @@ view.VerticalScrollBar.AutoShow = true;
 v2 replaces `ScrollBarView` with [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml):
 
 - Cleaner implementation
-- Automatic show/hide
+- Automatic show/hide via [ScrollBarVisibilityMode](~/api/Terminal.Gui.Views.ScrollBarVisibilityMode.yml)
 - Proportional sizing with `ScrollSlider`
 - Integrated with View's scrolling system
-- Simple to add via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.yml) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.yml)
+- Simple to enable via [ViewportSettingsFlags](~/api/Terminal.Gui.ViewBase.ViewportSettingsFlags.yml)
+- Accessible via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.yml) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.yml)
 
 ### Advanced Layout Features
 
