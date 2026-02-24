@@ -46,12 +46,15 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Url_Set_Validates_Uri ()
     {
-        Link link = new();
+        Link link = new() { Url = "https://github.com" };
 
-        Assert.Throws<UriFormatException> (() => link.Url = "not a valid url");
-        // link.Url = ""; is now has no effect and is ok
+        link.Url = "not a valid url";
+        Assert.Equal ("https://github.com", link.Url); // Url should not change on invalid
+
+        link.Url = "";
+        Assert.Equal ("https://github.com", link.Url); // Url should not change on invalid
     }
-
+    
     [Fact]
     public void Url_Set_Fires_UrlChanged_Event ()
     {
