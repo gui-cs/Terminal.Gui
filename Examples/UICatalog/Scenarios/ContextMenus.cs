@@ -5,7 +5,8 @@ using System.Globalization;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ContextMenus", "Context Menu Sample.")]
+[ScenarioMetadata ("ContextMenus", "Illustrates PopoverMenu as a context menu")]
+[ScenarioCategory ("Controls")]
 [ScenarioCategory ("Menus")]
 public class ContextMenus : Scenario
 {
@@ -102,6 +103,115 @@ public class ContextMenus : Scenario
                                                    Thread.CurrentThread.CurrentUICulture = originalCulture;
                                                }
                                            };
+
+            // PopoverMenu-with-Menu-Root demo: a FrameView with its own context menu
+            PopoverMenuHost popoverMenuHost = new ()
+            {
+                X = Pos.Center (),
+                Y = Pos.Bottom (_tfMiddle!) + 1,
+                Width = 50,
+                Height = 10,
+                Title = $"PopoverMenu Host - Right-click or {PopoverMenu.DefaultKey}",
+                BorderStyle = LineStyle.Dashed
+            };
+            _appWindow.Add (popoverMenuHost);
+        }
+    }
+
+    /// <summary>
+    ///     A demo view that owns a PopoverMenu with a Menu as Root, demonstrating
+    ///     the PopoverMenu-as-context-menu pattern.
+    /// </summary>
+    private class PopoverMenuHost : FrameView
+    {
+        private PopoverMenu? _contextMenu;
+
+        public PopoverMenuHost ()
+        {
+            CanFocus = true;
+
+            base.Text = "Right-click or press the context menu key to open.";
+            TextAlignment = Alignment.Center;
+            VerticalTextAlignment = Alignment.Center;
+        }
+
+        /// <inheritdoc/>
+        public override void EndInit ()
+        {
+            base.EndInit ();
+
+            _contextMenu = new PopoverMenu { Title = "ContextMenu", Id = "PopoverMenuHostContextMenu" };
+            Menu testContextMenu = new () { Id = "TestContextMenu" };
+            _contextMenu.Root = testContextMenu;
+            ConfigureTestMenu (testContextMenu);
+            _contextMenu.Visible = false;
+
+            _contextMenu.Accepted += (_, args) =>
+                                     {
+                                         string sourceTitle = args.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
+                                         Logging.Trace ($"PopoverMenuHost ContextMenu.Accepted: {sourceTitle}");
+                                     };
+
+            AddCommand (Command.Context,
+                        _ =>
+                        {
+                            _contextMenu?.MakeVisible ();
+
+                            return true;
+                        });
+
+            MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+            KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
+
+            App?.Popovers?.Register (_contextMenu);
+        }
+
+        private void ConfigureTestMenu (Menu menu)
+        {
+            MenuItem menuItem1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
+            menuItem1.Activated += (_, _) => MessageBox.Query (App!, "This is a MessageBox", "This is a message box message", Strings.btnOk);
+
+            Line line = new ();
+
+            MenuItem menuItemBorders = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+            menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
+
+            menuItemBorders.Action += () =>
+                                      {
+                                          if (menuItemBorders.CommandView is CheckBox cb)
+                                          {
+                                              menu.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                          }
+                                      };
+
+            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+            menuItemBorders.Accepting += (_, args) => args.Handled = true;
+
+            OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+
+            MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+
+            schemeOptionSelector.ValueChanged += (_, args) =>
+                                                  {
+                                                      if (args.Value is { } scheme)
+                                                      {
+                                                          menu.SchemeName = scheme.ToString ();
+                                                      }
+                                                  };
+
+            menu.Add (menuItem1, line, menuItemBorders, menuItemScheme);
+        }
+
+        /// <inheritdoc/>
+        protected override void Dispose (bool disposing)
+        {
+            if (_contextMenu is { })
+            {
+                _contextMenu.Dispose ();
+                _contextMenu = null;
+            }
+
+            base.Dispose (disposing);
         }
     }
 
@@ -192,8 +302,7 @@ public class ContextMenus : Scenario
                 culture.Title = "_English";
                 culture.HelpText = "en-US";
 
-                ((CheckBox)culture.CommandView).Value =
-                    Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
+                ((CheckBox)culture.CommandView).Value = Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
                 CreateAction (supportedCultures, culture);
                 supportedCultures.Add (culture);
 
@@ -206,8 +315,7 @@ public class ContextMenus : Scenario
             culture.Title = $"_{c.Parent.EnglishName}";
             culture.HelpText = c.Name;
 
-            ((CheckBox)culture.CommandView).Value =
-                Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
+            ((CheckBox)culture.CommandView).Value = Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
             CreateAction (supportedCultures, culture);
             supportedCultures.Add (culture);
         }
