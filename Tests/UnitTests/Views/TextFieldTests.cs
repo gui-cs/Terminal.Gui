@@ -169,7 +169,7 @@ public class TextFieldTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre ("Enter text", output);
 
         // Verify the caption uses dimmed color attribute
-        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
                                          tf.GetAttributeForRole (VisualRole.Editable).Background);
 
         // All characters in "Enter text" should have the caption attribute
@@ -198,10 +198,10 @@ public class TextFieldTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre ("Find", output);
 
         // Verify the hotkey character 'F' has underline style
-        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
                                          tf.GetAttributeForRole (VisualRole.Editable).Background);
 
-        var hotkeyAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+        var hotkeyAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
                                         tf.GetAttributeForRole (VisualRole.Editable).Background,
                                         tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
@@ -231,10 +231,10 @@ public class TextFieldTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre ("Enter Text", output);
 
         // Verify the hotkey character 'T' has underline style
-        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
                                          tf.GetAttributeForRole (VisualRole.Editable).Background);
 
-        var hotkeyAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+        var hotkeyAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
                                         tf.GetAttributeForRole (VisualRole.Editable).Background,
                                         tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 

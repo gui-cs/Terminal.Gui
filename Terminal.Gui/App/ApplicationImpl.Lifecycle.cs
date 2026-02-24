@@ -88,10 +88,10 @@ internal partial class ApplicationImpl
 
         Initialized = true;
 
-        RaiseInitializedChanged (this, new (true));
+        RaiseInitializedChanged (this, new EventArgs<bool> (true));
         SubscribeDriverEvents ();
 
-        SynchronizationContext.SetSynchronizationContext (new ());
+        SynchronizationContext.SetSynchronizationContext (new SynchronizationContext ());
 
         _result = null;
 
@@ -201,7 +201,7 @@ internal partial class ApplicationImpl
         if (wasInitialized)
         {
             bool init = Initialized; // Will be false after ResetState
-            RaiseInitializedChanged (this, new (in init));
+            RaiseInitializedChanged (this, new EventArgs<bool> (in init));
         }
 
         // Clear the event to prevent memory leaks
@@ -234,7 +234,7 @@ internal partial class ApplicationImpl
         // e.g. see Issue #537
 
         // === 0. Stop all timers ===
-        TimedEvents?.StopAll ();
+        TimedEvents.StopAll ();
 
         // === 1. Stop all running runnables ===
         foreach (SessionToken token in SessionStack!.Reverse ())
@@ -322,7 +322,7 @@ internal partial class ApplicationImpl
     /// <summary>
     ///     Raises the <see cref="InitializedChanged"/> event.
     /// </summary>
-    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
+    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) => InitializedChanged?.Invoke (sender, e);
 
 #if DEBUG
     /// <summary>
@@ -339,28 +339,20 @@ internal partial class ApplicationImpl
 
         Delegate [] subscribers = eventDelegate.GetInvocationList ();
 
-        if (subscribers.Length > 0)
+        if (subscribers.Length <= 0)
         {
-            string subscriberInfo = string.Join (
-                                                 ", ",
-                                                 subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
-                                                                    )
-                                                );
-
-            Debug.Fail (
-                        $"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}"
-                       );
+            return;
         }
+        string subscriberInfo = string.Join (", ", subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"));
+
+        Debug.Fail ($"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}");
     }
 #endif
 
-    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
+    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) => ForceDriver = e.NewValue;
 
     /// <summary>
     ///     Unsubscribes from Application static property change events.
     /// </summary>
-    private void UnsubscribeApplicationEvents ()
-    {
-        Application.ForceDriverChanged -= OnForceDriverChanged;
-    }
+    private void UnsubscribeApplicationEvents () => Application.ForceDriverChanged -= OnForceDriverChanged;
 }
