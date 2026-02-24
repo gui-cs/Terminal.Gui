@@ -322,6 +322,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         Layout ();
 
         SetPosition (idealScreenPosition);
+
+        // Specific to PopoverMenu
         App!.Popovers?.Show (this);
     }
 
@@ -364,7 +366,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     When becoming visible, the root menu is added and shown. When becoming hidden, the root menu is removed
+    ///     When becoming visible, the root menu is shown. When becoming hidden, the root menu is hidden
     ///     and the popover is hidden via <see cref="ApplicationPopover.Hide"/>.
     /// </remarks>
     protected override void OnVisibleChanged ()
@@ -374,18 +376,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
         if (Visible)
         {
-            Trace.Command (this, "Showing", "AddAndShowSubMenu");
             ShowMenu (Root);
         }
         else
         {
-            Trace.Command (this, "Hiding", "HideAndRemoveSubMenu");
             HideMenu (Root);
+
+            // Specific to PopoverMenu
             App?.Popovers?.Hide (this);
         }
     }
 
-    private bool _isHiding;
     private CommandBridge? _rootCommandBridge;
 
     /// <summary>
@@ -411,11 +412,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 return;
             }
 
-            Trace.Command (this, "RootSetter", $"OldRoot={Root?.ToIdentifyingString ()} NewRoot={value?.ToIdentifyingString ()}");
-
 #if DEBUG
-            Id = $"{Root?.Id}.PopoverMenu";
+            Id = $"{value?.Id}PopoverMenu";
 #endif
+            Trace.Command (this, "RootSetter", $"OldRoot={Root?.ToIdentifyingString ()} NewRoot={value?.ToIdentifyingString ()}");
 
             HideMenu (Root);
 
@@ -444,6 +444,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             _rootCommandBridge = CommandBridge.Connect (this, Root, Command.Activate);
         }
     }
+
+    #region MenuItem & SubMenu Helpers
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
@@ -484,6 +486,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             }
         }
     }
+
+    private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e) => ShowMenuItemSubMenu (e);
 
     /// <summary>
     ///     Updates the key bindings for all menu items with associated commands, assigning the appropriate key based on the
@@ -534,7 +538,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     This method checks all menu items in the hierarchy for a matching key binding and invokes the
+    ///     Checks all menu items in the hierarchy for a matching key binding and invokes the
     ///     appropriate menu item if found.
     /// </remarks>
     protected override bool OnKeyDownNotHandled (Key key)
@@ -640,7 +644,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     internal void ShowMenuItemSubMenu (MenuItem? menuItem)
     {
-        Menu? menu = menuItem?.SuperView as Menu;
+        var menu = menuItem?.SuperView as Menu;
 
         // If there's a visible peer, remove / hide it
         if (menu?.SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
@@ -686,6 +690,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             return;
         }
 
+        Trace.Command (this, "Showing");
+
         // TODO: Find the menu item below the mouse, if any, and select it
 
         if (!menu.IsInitialized)
@@ -703,12 +709,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         menu.Enabled = true;
     }
 
+    private bool _isHiding;
+
     private void HideMenu (Menu? menu)
     {
         if (menu is not { Visible: true })
         {
             return;
         }
+
+        Trace.Command (this, "Hiding");
 
         // Use _isHiding to prevent re-entrant calls from event handlers triggered by
         // setting Visible = false. But allow the recursive call for submenus
@@ -747,7 +757,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e) => ShowMenuItemSubMenu (e);
+    #endregion
 
     /// <summary>
     ///     Enables the popover menu for use in design-time scenarios.
