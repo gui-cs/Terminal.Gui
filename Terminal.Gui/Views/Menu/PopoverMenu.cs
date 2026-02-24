@@ -82,6 +82,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         KeyBindings.Add (Key.CursorLeft, Command.Left);
 
         KeyBindings.Remove (Key.Space);
+        KeyBindings.Remove (Key.Enter);
 
         // PopoverBaseImpl sets a key binding for Quit, so we
         // don't need to do it here.

@@ -21,7 +21,7 @@ public class MenuItemTests
     }
 
     [Fact]
-    public void Command_Accept_Executes_Action ()
+    public void Command_Accept_Does_Not_Execute_Action ()
     {
         MenuItem menuItem = new () { Title = "Test" };
         var actionFired = false;
@@ -30,7 +30,7 @@ public class MenuItemTests
         // Accept executes Action
         menuItem.InvokeCommand (Command.Accept);
 
-        Assert.True (actionFired);
+        Assert.False (actionFired);
 
         menuItem.Dispose ();
     }
@@ -139,7 +139,7 @@ public class MenuItemTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void MenuItem_Accept_Invokes_Command_On_TargetView ()
+    public void MenuItem_Accept_Does_Not_Invoke_Command_On_TargetView ()
     {
         TestTargetView targetView = new () { Title = "Target" };
         var commandInvoked = false;
@@ -157,10 +157,9 @@ public class MenuItemTests
 
         MenuItem menuItem = new (targetView, Command.Save);
 
-        // Invoke Accept on the MenuItem - this should call OnAccepted which invokes Command on TargetView
         menuItem.InvokeCommand (Command.Accept);
 
-        Assert.True (commandInvoked);
+        Assert.False (commandInvoked);
 
         menuItem.Dispose ();
         targetView.Dispose ();

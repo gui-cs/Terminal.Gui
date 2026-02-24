@@ -730,13 +730,17 @@ public class MenuBar : Menu, IDesignable
                                   new MenuItem { Title = "_Details", SubMenu = new Menu (ConfigureDetailsSubMenu ()) }
                               ]));
 
+        MenuItem onlineHelpMi = new ()
+        {
+            Title = "_Online Help..."
+        };
+
+        // Demonstrate using Activating
+        onlineHelpMi.Activated += (_, _) => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk);
+
         Add (new MenuBarItem (Strings.menuHelp,
                               [
-                                  new MenuItem
-                                  {
-                                      Title = "_Online Help...",
-                                      Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk)
-                                  },
+                                  onlineHelpMi,
                                   new MenuItem { Title = "About...", Action = () => MessageBox.Query (App!, "About", "Something About Mary.", Strings.btnOk) }
                               ]));
 

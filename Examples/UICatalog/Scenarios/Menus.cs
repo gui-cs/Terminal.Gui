@@ -194,14 +194,6 @@ public class Menus : Scenario
 
             enableOverwriteStatusCb.ValueChanged += (_, _) => { enableOverwriteMenuItemCb?.Value = enableOverwriteStatusCb.Value; };
 
-            MenuBar?.Accepted += (_, args) =>
-                                {
-                                    if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi)
-                                    {
-                                        lastCommandText.Text = args.Context?.Command!.ToString ()!;
-                                    }
-                                };
-
             HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
 
             AddCommand (Command.EnableOverwrite,
@@ -317,6 +309,7 @@ public class Menus : Scenario
         private void ConfigureTestMenu (Menu menu)
         {
             MenuItem menuItem1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
+            menuItem1.Activated += (sender, args) => MessageBox.Query (App!, "This is a MessageBox", "This is a message box message", buttons: Strings.btnOk);
 
             Line line = new ();
 

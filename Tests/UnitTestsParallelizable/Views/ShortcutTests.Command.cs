@@ -449,13 +449,8 @@ public partial class ShortcutTests
         Assert.Equal (CheckState.Checked, checkBox.Value);
     }
 
-    // Claude - Opus 4.6
-    /// <summary>
-    ///     Verifies that Action is invoked from both OnActivated and OnAccepted paths,
-    ///     as documented in shortcut.md.
-    /// </summary>
     [Fact]
-    public void Action_Invoked_From_Both_Activate_And_Accept ()
+    public void Action_Invoked_From_Just_Activate_And_Not_Accept ()
     {
         // Arrange
         var actionCount = 0;
@@ -468,7 +463,7 @@ public partial class ShortcutTests
 
         // Act 2 - Accept
         shortcut.InvokeCommand (Command.Accept);
-        Assert.Equal (2, actionCount);
+        Assert.Equal (1, actionCount);
     }
 
     // Claude - Opus 4.6
@@ -522,43 +517,6 @@ public partial class ShortcutTests
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Verifies that <see cref="Shortcut.OnAccepted"/> invokes the Command on TargetView
-    ///     when both TargetView and Command are set.
-    /// </summary>
-    [Fact]
-    public void Accept_Invokes_Command_On_TargetView ()
-    {
-        // Arrange
-        var commandInvoked = false;
-        TestTargetView target = new () { Title = "Target" };
-
-        target.RegisterCommand (Command.Save,
-                                () =>
-                                {
-                                    commandInvoked = true;
-
-                                    return true;
-                                });
-
-        target.HotKeyBindings.Add (Key.S.WithCtrl, Command.Save);
-
-        using Shortcut shortcut = new ();
-        shortcut.Key = Key.S.WithCtrl;
-        shortcut.Title = "Save";
-        shortcut.TargetView = target;
-        shortcut.Command = Command.Save;
-
-        // Act
-        shortcut.InvokeCommand (Command.Accept);
-
-        // Assert
-        Assert.True (commandInvoked);
-
-        target.Dispose ();
-    }
-
-    // Claude - Opus 4.6
-    /// <summary>
     ///     Verifies that Accept does NOT invoke TargetView when Command is NotBound.
     /// </summary>
     [Fact]
@@ -590,13 +548,8 @@ public partial class ShortcutTests
         target.Dispose ();
     }
 
-    // Claude - Opus 4.6
-    /// <summary>
-    ///     Verifies that Accept invokes both Action and TargetView.Command when both are set.
-    ///     Action fires first (in OnAccepted), then TargetView.InvokeCommand.
-    /// </summary>
     [Fact]
-    public void Accept_Invokes_Both_Action_And_TargetView ()
+    public void Accept_Does_Not_Invoke_Action_Or_TargetView ()
     {
         // Arrange
         var actionFired = 0;
@@ -623,9 +576,9 @@ public partial class ShortcutTests
         // Act
         shortcut.InvokeCommand (Command.Accept);
 
-        // Assert — both fire
-        Assert.Equal (1, actionFired);
-        Assert.Equal (1, commandInvoked);
+        // Assert
+        Assert.Equal (0, actionFired);
+        Assert.Equal (0, commandInvoked);
 
         target.Dispose ();
     }
@@ -693,13 +646,8 @@ public partial class ShortcutTests
         Assert.Null (ex);
     }
 
-    // Claude - Opus 4.6
-    /// <summary>
-    ///     Verifies that when neither TargetView nor Command is set,
-    ///     OnAccepted does not try to invoke app-level key bindings.
-    /// </summary>
     [Fact]
-    public void Accept_Without_TargetView_Or_Command_Only_Fires_Action ()
+    public void Accept_Without_TargetView_Or_Command_Does_Not_Fire_Action ()
     {
         // Arrange
         var actionFired = false;
@@ -713,7 +661,7 @@ public partial class ShortcutTests
         shortcut.InvokeCommand (Command.Accept);
 
         // Assert — only Action fires, no TargetView or app-level invocation
-        Assert.True (actionFired);
+        Assert.False (actionFired);
     }
 
     // Claude - Opus 4.6

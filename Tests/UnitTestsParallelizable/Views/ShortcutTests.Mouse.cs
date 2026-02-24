@@ -267,13 +267,8 @@ public partial class ShortcutTests
         Assert.Equal (1, checkBoxActivatingCount);
     }
 
-    // Claude - Opus 4.6
-    /// <summary>
-    ///     Verifies that Enter key invokes Accept (not Activate) on the Shortcut.
-    ///     Accept should NOT change CheckBox state - it's for confirmation, not state change.
-    /// </summary>
     [Fact]
-    public void Enter_Key_Invokes_Accept_Not_Activate ()
+    public void CheckBox_Enter_Key_Invokes_Activate ()
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -302,10 +297,10 @@ public partial class ShortcutTests
         // Act - Press Enter while Shortcut has focus
         app.Keyboard.RaiseKeyDownEvent (Key.Enter);
 
-        // Assert - Accept fires, Activate does NOT fire, CheckBox state unchanged
-        Assert.Equal (1, shortcutAcceptingCount);
-        Assert.Equal (0, shortcutActivatingCount);
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
+        // Assert - Accept fires, Activate does NOT fire, CheckBox state changed
+        Assert.Equal (0, shortcutAcceptingCount);
+        Assert.Equal (1, shortcutActivatingCount);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
         Assert.Equal (1, actionInvoked);
     }
 }

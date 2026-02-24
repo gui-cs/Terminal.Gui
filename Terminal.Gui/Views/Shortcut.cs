@@ -129,6 +129,7 @@ public class Shortcut : View, IOrientation, IDesignable
                                     };
         Key = key;
         Action = action;
+
         ShowHide ();
     }
 
@@ -327,30 +328,34 @@ public class Shortcut : View, IOrientation, IDesignable
         App?.Keyboard.InvokeCommandsBoundToKey (Key);
     }
 
-    /// <inheritdoc/>
-    protected override void OnAccepted (ICommandContext? ctx)
+    /// <remarks>
+    ///     Enter means "activate this item" — not
+    ///     "accept/submit". When Accept arrives from a key binding (e.g. Enter), translates it
+    ///     into <see cref="Command.Activate"/> so it flows through the bridge architecture
+    ///     (MenuItem → Menu → CommandBridge → PopoverMenu), dismissing the menu.
+    ///     Without this, Accept would bubble past the menu hierarchy to the host view,
+    ///     triggering unintended exit behavior.
+    /// </remarks>
+    protected override bool OnAccepting (CommandEventArgs args)
     {
-        base.OnAccepted (ctx);
-
-        Action?.Invoke ();
-
-        // Translate the incoming command to Command via immutable context
-        ICommandContext? targetCtx = ctx;
-
-        if (Command != Command.NotBound && ctx is CommandContext cc)
+        // Only convert key-binding-initiated Accept (e.g. Enter key).
+        // Programmatic InvokeCommand(Accept) without a binding should flow normally.
+        if (args.Context?.Binding is not KeyBinding)
         {
-            targetCtx = cc.WithCommand (Command);
+            return base.OnAccepting (args);
         }
 
-        InvokeOnTargetOrApp (targetCtx);
+        // Convert Accept → Activate. The binding is preserved so TryDispatchToTarget's
+        // relay-dispatch guard (ConsumeDispatch=false && binding is null) passes and
+        // the CommandView still receives Activate (e.g. CheckBox toggles).
+        InvokeCommand (Command.Activate, args.Context.Binding);
+
+        return true;
     }
 
     /// <summary>
-    ///     Gets or sets the action to be invoked when the Shortcut is Activated or Accepted.
+    ///     Gets or sets the action to be invoked when the Shortcut is Activated.
     /// </summary>
-    /// <remarks>
-    ///     Note, the <see cref="View.Accepting"/> event is fired first, and if cancelled, the event will not be invoked.
-    /// </remarks>
     public Action? Action { get; set; }
 
     #endregion Accept/Activate/HotKey Command Handling

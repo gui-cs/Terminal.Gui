@@ -164,7 +164,7 @@ public partial class ShortcutTests
     [InlineData (true, KeyCode.A, 0, 1)]
     [InlineData (true, KeyCode.C, 0, 1)]
     [InlineData (true, KeyCode.C | KeyCode.AltMask, 0, 1)]
-    [InlineData (true, KeyCode.Enter, 1, 0)]
+    [InlineData (true, KeyCode.Enter, 0, 1)]
     [InlineData (true, KeyCode.Space, 0, 1)]
     [InlineData (true, KeyCode.F1, 0, 0)]
     [InlineData (false, KeyCode.A, 0, 1)]

@@ -63,16 +63,15 @@ public class MenuBarItemTests
     }
 
     [Fact]
-    public void Command_Accept_Executes_Action ()
+    public void Command_Accept_Does_Not_Execute_Action ()
     {
         MenuBarItem menuBarItem = new () { Title = "Test" };
         var actionFired = 0;
         menuBarItem.Action = () => actionFired++;
 
-        // Accept executes Action
         menuBarItem.InvokeCommand (Command.Accept);
 
-        Assert.Equal (1, actionFired);
+        Assert.Equal (0, actionFired);
 
         menuBarItem.Dispose ();
     }
