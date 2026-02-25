@@ -32,7 +32,7 @@ public record PosCombine (AddOrSubtract Add, Pos Left, Pos Right) : Pos
     public new Pos Right { get; } = Right;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }
+    public override string ToString () => $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})";
 
     internal override int GetAnchor (int size)
     {
@@ -68,4 +68,30 @@ public record PosCombine (AddOrSubtract Add, Pos Left, Pos Right) : Pos
 
         return false;
     }
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        foreach (View view in Left.GetReferencedViews ())
+        {
+            yield return view;
+        }
+
+        foreach (View view in Right.GetReferencedViews ())
+        {
+            yield return view;
+        }
+    }
+
+    /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => Left.DependsOnSuperViewContentSize || Right.DependsOnSuperViewContentSize;
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => Left.IsFixed && Right.IsFixed;
+
+    /// <inheritdoc/>
+    internal override bool RequiresTargetLayout => Left.RequiresTargetLayout || Right.RequiresTargetLayout;
+
+    /// <inheritdoc/>
+    protected override bool HasInner<TPos> (out TPos pos) => Left.Has (out pos) || Right.Has (out pos);
 }

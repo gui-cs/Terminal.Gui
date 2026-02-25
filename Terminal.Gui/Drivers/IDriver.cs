@@ -3,9 +3,6 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
-/// <remarks>
-///     There are currently four implementations: UnixDriver, WindowsDriver, DotNetDriver, and FakeDriver
-/// </remarks>
 public interface IDriver : IDisposable
 {
     #region Driver Lifecycle
@@ -74,8 +71,8 @@ public interface IDriver : IDisposable
     /// </summary>
     IOutput GetOutput ();
 
-    /// <summary>Get the operating system clipboard.</summary>
-    IClipboard? Clipboard { get; }
+    /// <summary>Gets or sets the clipboard.</summary>
+    IClipboard? Clipboard { get; set; }
 
     #endregion Driver Components
 
@@ -127,6 +124,19 @@ public interface IDriver : IDisposable
     /// </remarks>
     /// <seealso cref="Driver.Force16Colors"/>
     bool Force16Colors { get; set; }
+
+    /// <summary>
+    ///     Gets the terminal's actual default foreground and background colors,
+    ///     queried via OSC 10/11 at driver startup.
+    ///     <see langword="null"/> if the terminal did not respond.
+    /// </summary>
+    Attribute? DefaultAttribute { get; }
+
+    /// <summary>
+    ///     Gets the terminal's color capabilities as detected from environment variables.
+    ///     <see langword="null"/> if detection has not been performed.
+    /// </summary>
+    TerminalColorCapabilities? ColorCapabilities { get; }
 
     #endregion Color Support
 
@@ -218,7 +228,7 @@ public interface IDriver : IDisposable
     /// <remarks>
     ///     <para>
     ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="rune"/> required, even if the new column value is outside of the
+    ///         <paramref name="rune"/> required, even if the new column value is outside the
     ///         <see cref="IDriver.Clip"/> or screen
     ///         dimensions defined by <see cref="IDriver.Cols"/>.
     ///     </para>
@@ -245,7 +255,7 @@ public interface IDriver : IDisposable
     /// <remarks>
     ///     <para>
     ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="IDriver.Clip"/>
+    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="IDriver.Clip"/>
     ///         or screen
     ///         dimensions defined by <see cref="IDriver.Cols"/>.
     ///     </para>
@@ -302,44 +312,48 @@ public interface IDriver : IDisposable
     #region Cursor
 
     /// <summary>
-    ///     Sets the position of the terminal cursor to <see cref="IDriver.Col"/> and
-    ///     <see cref="IDriver.Row"/>.
+    ///     Sets the cursor for this driver.
     /// </summary>
-    void UpdateCursor ();
+    /// <param name="cursor">
+    ///     The cursor to set. Position must be in screen-absolute coordinates.
+    ///     Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     Set Position to null to hide the cursor.
+    /// </param>
+    public void SetCursor (Cursor cursor);
 
-    /// <summary>Gets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool GetCursorVisibility (out CursorVisibility visibility);
+    /// <summary>
+    ///     Gets the current cursor for this driver.
+    /// </summary>
+    /// <returns></returns>
+    public Cursor GetCursor ();
 
-    /// <summary>Sets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool SetCursorVisibility (CursorVisibility visibility);
+    /// <summary>
+    ///     Gets whether the terminal cursor needs to be updated.
+    /// </summary>
+    /// <returns></returns>
+    bool GetCursorNeedsUpdate ();
+
+    /// <summary>
+    ///     Signals that the cursor needs to be updated without requiring a full redraw.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
+    ///         or shape changes but the view content does not need to be redrawn.
+    ///     </para>
+    /// </remarks>
+    /// <param name="needsUpdate">Indicates whether the cursor needs to be updated.</param>
+    public void SetCursorNeedsUpdate (bool needsUpdate);
 
     #endregion Cursor
 
     #region Input Events
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    event EventHandler<MouseEventArgs>? MouseEvent;
-
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
+    /// <summary>Event fired when a key is pressed down.</summary>
     event EventHandler<Key>? KeyDown;
 
-    /// <summary>Event fired when a key is released.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="IDriver.KeyDown"/>
-    ///     processing is
-    ///     complete.
-    /// </remarks>
-    event EventHandler<Key>? KeyUp;
-
-    /// <summary>
-    ///     Enqueues a key input event to the driver. For unit tests.
-    /// </summary>
-    /// <param name="key"></param>
-    void EnqueueKeyEvent (Key key);
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    event EventHandler<Mouse>? MouseEvent;
 
     #endregion Input Events
 

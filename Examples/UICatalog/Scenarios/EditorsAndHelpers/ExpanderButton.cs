@@ -36,13 +36,14 @@ public class ExpanderButton : Button
         NoDecorations = true;
         NoPadding = true;
 
+        AddCommand (Command.Accept, Toggle);
         AddCommand (Command.HotKey, Toggle);
         AddCommand (Command.Toggle, Toggle);
         KeyBindings.Add (Key.F4, Command.Toggle);
 
         Orientation = Orientation.Vertical;
 
-        HighlightStates = MouseState.In;
+        MouseHighlightStates = MouseState.In;
 
         Initialized += ExpanderButton_Initialized;
 
@@ -96,11 +97,7 @@ public class ExpanderButton : Button
     ///         bottom/left.
     ///     </para>
     /// </remarks>
-    public Orientation Orientation
-    {
-        get => _orientation;
-        set => OnOrientationChanging (value);
-    }
+    public Orientation Orientation { get => _orientation; set => OnOrientationChanging (value); }
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
     /// <param name="newOrientation"></param>
@@ -118,15 +115,15 @@ public class ExpanderButton : Button
             {
                 X = Pos.AnchorEnd () - 1;
                 Y = 0;
-                CollapseGlyph = new ('\u21d1'); // ⇑
-                ExpandGlyph = new ('\u21d3'); // ⇓
+                CollapseGlyph = new Rune ('\u21d1'); // ⇑
+                ExpandGlyph = new Rune ('\u21d3'); // ⇓
             }
             else
             {
                 X = 0;
                 Y = Pos.AnchorEnd () - 1;
-                CollapseGlyph = new ('\u21d0'); // ⇐
-                ExpandGlyph = new ('\u21d2'); // ⇒
+                CollapseGlyph = new Rune ('\u21d0'); // ⇐
+                ExpandGlyph = new Rune ('\u21d2'); // ⇒
             }
 
             ExpandOrCollapse (Collapsed);
@@ -155,11 +152,7 @@ public class ExpanderButton : Button
     /// <summary>
     ///     Gets or sets a value indicating whether the view is collapsed.
     /// </summary>
-    public bool Collapsed
-    {
-        get => _collapsed;
-        set => OnCollapsedChanging (value);
-    }
+    public bool Collapsed { get => _collapsed; set => OnCollapsedChanging (value); }
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
     /// <param name="newValue"></param>

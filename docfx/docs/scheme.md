@@ -8,9 +8,23 @@ See [Drawing](drawing.md) for an overview of the drawing system and [Configurati
 
 ### Scheme Inheritance
 
- A `Scheme` enables consistent, semantic theming of UI elements by associating each visual state with a specific style. Each property (e.g., `Normal`  or `Focus`) is an @Terminal.Gui.Drawing.Attribute. 
+ A `Scheme` enables consistent, semantic theming of UI elements by associating each visual state with a specific style. Each property (e.g., `Normal`  or `Focus`) is an @Terminal.Gui.Attribute. 
 
  Only `Normal` is required. If other properties are not explicitly set, its value is derived from other roles (typically `Normal`) using well-defined inheritance rules. See the source code for the `Scheme` class for more details. 
+
+### Color.None Resolution and Dark/Light Awareness
+
+When a `Scheme` uses `Color.None` for foreground or background (e.g., the default Base and Runnable schemes), the derivation algorithm resolves these to concrete colors before performing any color math. The resolution uses:
+
+1. **Terminal default colors** — Detected at startup via OSC 10/11 ANSI queries. The driver stores the terminal's actual default foreground and background colors in `IDriver.DefaultAttribute`.
+2. **Fallback** — If the terminal doesn't respond to OSC queries (e.g., legacy consoles), falls back to White (foreground) and Black (background).
+
+The derivation algorithm is also **dark/light background aware**. Roles that use `Color.GetBrighterColor` or `Color.GetDimmerColor` (Active, Highlight, Editable, ReadOnly, Disabled) determine whether the relevant background is dark or light via `Color.IsDarkColor()` and pass this context to the color math methods:
+
+- **On dark backgrounds:** "brighter" increases lightness; "dim" decreases lightness (moves toward the dark background).
+- **On light backgrounds:** "brighter" decreases lightness (darker = more visible); "dim" increases lightness (washes out toward the light background).
+
+This ensures the built-in themes produce readable, visually correct results on both dark and light terminal backgrounds.
 
 ### Flexible Scheme Management in `Terminal.Gui.View`
 

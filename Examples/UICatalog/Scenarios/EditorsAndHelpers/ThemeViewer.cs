@@ -2,7 +2,7 @@
 
 namespace UICatalog.Scenarios;
 
-public class ThemeViewer : FrameView
+public sealed class ThemeViewer : FrameView
 {
     public ThemeViewer ()
     {
@@ -15,8 +15,7 @@ public class ThemeViewer : FrameView
         Width = Dim.Auto ();
         Title = $"{ThemeManager.Theme}";
 
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         SubViewsLaidOut += (sender, _) =>
                            {
@@ -32,8 +31,7 @@ public class ThemeViewer : FrameView
         AddCommand (Command.PageUp, () => ScrollVertical (-SubViews.OfType<SchemeViewer> ().First ().Frame.Height));
         AddCommand (Command.PageDown, () => ScrollVertical (SubViews.OfType<SchemeViewer> ().First ().Frame.Height));
 
-        AddCommand (
-                    Command.Start,
+        AddCommand (Command.Start,
                     () =>
                     {
                         Viewport = Viewport with { Y = 0 };
@@ -41,8 +39,7 @@ public class ThemeViewer : FrameView
                         return true;
                     });
 
-        AddCommand (
-                    Command.End,
+        AddCommand (Command.End,
                     () =>
                     {
                         Viewport = Viewport with { Y = GetContentSize ().Height };
@@ -65,9 +62,9 @@ public class ThemeViewer : FrameView
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Context);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
@@ -77,11 +74,7 @@ public class ThemeViewer : FrameView
 
         foreach (KeyValuePair<string, Scheme?> kvp in SchemeManager.GetSchemesForCurrentTheme ())
         {
-            var schemeViewer = new SchemeViewer
-            {
-                Id = $"schemeViewer for {kvp.Key}",
-                SchemeName = kvp.Key
-            };
+            var schemeViewer = new SchemeViewer { Id = $"schemeViewer for {kvp.Key}", SchemeName = kvp.Key };
 
             if (prevSchemeViewer is { })
             {
@@ -89,7 +82,7 @@ public class ThemeViewer : FrameView
             }
 
             prevSchemeViewer = schemeViewer;
-            base.Add (schemeViewer);
+            Add (schemeViewer);
         }
 
         ThemeManager.ThemeChanged += OnThemeManagerOnThemeChanged;
@@ -106,7 +99,7 @@ public class ThemeViewer : FrameView
         }
     }
 
-    private void OnThemeManagerOnThemeChanged (object? _, EventArgs<string> args) { Title = args.Value!; }
+    private void OnThemeManagerOnThemeChanged (object? _, EventArgs<string> args) => Title = args.Value;
 
     protected override void Dispose (bool disposing)
     {

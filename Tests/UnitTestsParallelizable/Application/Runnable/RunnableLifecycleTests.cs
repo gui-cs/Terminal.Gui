@@ -6,6 +6,7 @@ namespace ViewsTests;
 /// <summary>
 ///     Tests for IRunnable lifecycle behavior.
 /// </summary>
+[Collection("Application Tests")]
 public class RunnableLifecycleTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
@@ -102,7 +101,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public WindowsOutput ()
     {
-        Logging.Information ($"Creating {nameof (WindowsOutput)}");
+        //Logging.Information ($"Creating {nameof (WindowsOutput)}");
 
         if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
@@ -147,6 +146,94 @@ internal partial class WindowsOutput : OutputBase, IOutput
         }
 
         GetSize ();
+    }
+
+    private Cursor _currentCursor = new ();
+
+    /// <inheritdoc />
+    public Cursor GetCursor ()
+    {
+        return _currentCursor;
+    }
+
+    // <inheritdoc />
+    public void SetCursor (Cursor cursor)
+    {
+        try
+        {
+            if (IsLegacyConsole)
+            {
+                WindowsConsole.ConsoleCursorInfo cursorInfo = new ();
+
+                if (!cursor.IsVisible)
+                {
+                    cursorInfo.bVisible = false;
+                    cursorInfo.dwSize = 0;
+                }
+                else
+                {
+                    cursorInfo.bVisible = true;
+
+                    cursorInfo.dwSize = cursor.Style switch
+                    {
+                        CursorStyle.BlinkingBlock => 100,
+                        CursorStyle.SteadyBlock => 100,
+                        CursorStyle.BlinkingUnderline => 15,
+                        CursorStyle.SteadyUnderline => 15,
+                        CursorStyle.BlinkingBar => 15,
+                        CursorStyle.SteadyBar => 15,
+                        _ => 100
+                    };
+                }
+
+                SetConsoleCursorInfo (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref cursorInfo);
+            }
+            else
+            {
+                if (!cursor.IsVisible)
+                {
+                    Write (EscSeqUtils.CSI_HideCursor);
+                }
+                else
+                {
+                    if (_currentCursor!.Style != cursor.Style)
+                    {
+                        Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
+                    }
+
+                    Write (EscSeqUtils.CSI_ShowCursor);
+                }
+            }
+        }
+        catch
+        {
+            // Ignore any exceptions
+        }
+        finally
+        {
+            SetCursorPositionImpl (
+                                   cursor.Position?.X ?? 0,
+                                   cursor.Position?.Y ?? 0
+                                  );
+            _currentCursor = cursor;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
+    {
+        if (Force16Colors && IsLegacyConsole)
+        {
+            SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
+        }
+        else
+        {
+            var sb = new StringBuilder ();
+            EscSeqUtils.CSI_AppendCursorPosition (sb, screenPositionY + 1, screenPositionX + 1);
+            Write (sb.ToString ());
+        }
+
+        return true;
     }
 
     private void CreateScreenBuffer ()
@@ -201,6 +288,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
         {
             // Do nothing; unit tests
         }
+
         return newSize;
     }
 
@@ -219,9 +307,11 @@ internal partial class WindowsOutput : OutputBase, IOutput
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
 
-        WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (!IsLegacyConsole ? _outputHandle : _screenBuffer);
-        short newCols = Math.Min (cols, maxWinSize.X);
-        short newRows = Math.Min (rows, maxWinSize.Y);
+        // Use the requested size directly. GetLargestConsoleWindowSize can underreport
+        // in modern terminals with non-default font sizes, causing the buffer to be
+        // clamped smaller than the actual window (visible as a gap at the bottom/right).
+        short newCols = cols;
+        short newRows = rows;
         csbi.dwSize = new (newCols, Math.Max (newRows, (short)1));
         csbi.srWindow = new (0, 0, newCols, newRows);
         csbi.dwMaximumWindowSize = new (newCols, newRows);
@@ -319,6 +409,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
         {
             return;
         }
+
         base.Write (output);
 
         var str = output.ToString ();
@@ -330,34 +421,59 @@ internal partial class WindowsOutput : OutputBase, IOutput
         }
         else
         {
-            _everythingStringBuilder.Append (str);
+            try
+            {
+                ReadOnlySpan<char> span = str.AsSpan (); // still allocates the string
+
+                bool result = WriteConsole (_outputHandle, span, (uint)span.Length, out _, nint.Zero);
+
+                if (!result)
+                {
+                    int err = Marshal.GetLastWin32Error ();
+
+                    if (err == 1)
+                    {
+                        Logging.Error ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
+
+                        return;
+                    }
+
+                    if (err != 0)
+                    {
+                        throw new Win32Exception (err);
+                    }
+                }
+            }
+            catch (DllNotFoundException)
+            {
+                // Running unit tests or in an environment where writing is not possible.
+            }
+            catch (Exception e)
+            {
+                Logging.Error ($"Error: {e.Message} in {nameof (WindowsOutput)}");
+
+                if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+                {
+                    throw;
+                }
+            }
         }
     }
 
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        if (Force16Colors)
+        if (Force16Colors && IsLegacyConsole)
         {
-            if (IsLegacyConsole)
-            {
-                Write (output);
-                output.Clear ();
-                var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
-                SetConsoleTextAttribute (_screenBuffer, as16ColorInt);
-            }
-            else
-            {
-                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
-                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-            }
+            // Legacy Windows console doesn't support ANSI — use Win32 API directly
+            Write (output);
+            output.Clear ();
+            var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
+            SetConsoleTextAttribute (_screenBuffer, as16ColorInt);
         }
         else
         {
-            EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-            EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
-            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            base.AppendOrWriteAttribute (output, attr, redrawTextStyle);
         }
     }
 
@@ -396,11 +512,13 @@ internal partial class WindowsOutput : OutputBase, IOutput
             // buffer will be wrong size, recreate it to ensure it doesn't result in
             // differing active and back buffer sizes (which causes flickering of window size)
             Size? bufSize = null;
+            int retries = 0;
 
-            while (bufSize != newSize)
+            while (bufSize != newSize && retries < 5)
             {
                 _lockResize = true;
                 bufSize = ResizeBuffer (newSize);
+                retries++;
             }
 
             _lockResize = false;
@@ -457,78 +575,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
         return new (maxWinSize.X, maxWinSize.Y);
     }
 
-    /// <inheritdoc/>
-    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
-    {
-        if (Force16Colors && IsLegacyConsole)
-        {
-            SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
-        }
-        else
-        {
-            // CSI codes are 1 indexed
-            _everythingStringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            EscSeqUtils.CSI_AppendCursorPosition (_everythingStringBuilder, screenPositionY + 1, screenPositionX + 1);
-        }
-
-        _lastCursorPosition = new (screenPositionX, screenPositionY);
-
-        return true;
-    }
-
-    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
-    public override void SetCursorVisibility (CursorVisibility visibility)
-    {
-        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            return;
-        }
-
-        if (IsLegacyConsole)
-        {
-            var info = new WindowsConsole.ConsoleCursorInfo
-            {
-                dwSize = (uint)visibility & 0x00FF,
-                bVisible = ((uint)visibility & 0xFF00) != 0
-            };
-
-            SetConsoleCursorInfo (_screenBuffer, ref info);
-        }
-        else
-        {
-            string cursorVisibilitySequence = visibility != CursorVisibility.Invisible
-                                                  ? EscSeqUtils.CSI_ShowCursor
-                                                  : EscSeqUtils.CSI_HideCursor;
-            Write (cursorVisibilitySequence);
-        }
-    }
-
-    /// <inheritdoc/>
-    public Point GetCursorPosition () { return _lastCursorPosition ?? Point.Empty; }
-
-    private Point? _lastCursorPosition;
-
-    /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row)
-    {
-        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == col && _lastCursorPosition.Value.Y == row)
-        {
-            return;
-        }
-
-        _lastCursorPosition = new (col, row);
-
-        if (IsLegacyConsole)
-        {
-            SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
-        }
-        else
-        {
-            var sb = new StringBuilder ();
-            EscSeqUtils.CSI_AppendCursorPosition (sb, row + 1, col + 1);
-            Write (sb.ToString ());
-        }
-    }
 
     /// <inheritdoc/>
     public void SetSize (int width, int height)

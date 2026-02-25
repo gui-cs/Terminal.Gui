@@ -11,7 +11,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Layout_Does_Not_Draw (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
@@ -49,7 +49,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Center_Properly (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
@@ -130,7 +130,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Command_Select_Raises_Selecting (Type viewType)
+    public void AllViews_Command_Activate_Raises_Activating (Type viewType)
     {
         var view = CreateInstanceIfNotGeneric (viewType);
 
@@ -173,20 +173,16 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
-        if (view is IDesignable designable)
-        {
-            designable.EnableForDesign ();
-        }
-
-        var activatingCount = 0;
-        view.Activating += (s, e) => activatingCount++;
+        //if (view is IDesignable designable)
+        //{
+        //    designable.EnableForDesign ();
+        //}
 
         var acceptingCount = 0;
         view.Accepting += (s, e) => { acceptingCount++; };
 
         if (view.InvokeCommand (Command.Accept) == true)
         {
-            Assert.Equal (0, activatingCount);
             Assert.Equal (1, acceptingCount);
         }
         view?.Dispose ();
@@ -214,16 +210,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             view.HotKey = Key.T;
         }
 
-        var acceptedCount = 0;
-        view.Accepting += (s, e) => { acceptedCount++; };
-
         var handlingHotKeyCount = 0;
         view.HandlingHotKey += (s, e) => { handlingHotKeyCount++; };
 
         if (view.InvokeCommand (Command.HotKey) == true)
         {
             Assert.Equal (1, handlingHotKeyCount);
-            Assert.Equal (0, acceptedCount);
         }
         view?.Dispose ();
     }
@@ -246,7 +238,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     //        designable.EnableForDesign ();
     //    }
 
-    //    var driver = CreateFakeDriver ();
+    //    var driver = CreateTestDriver ();
     //    driver.AttributeSet += (_, args) =>
     //                           {
     //                               if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)

@@ -22,7 +22,7 @@ namespace Terminal.Gui.App;
 ///         This base class provides:
 ///     </para>
 ///     <list type="bullet">
-///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill"/>, <see cref="View.Height"/> = <see cref="Dim.Fill"/>).</item>
+///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
 ///         <item>Transparent viewport settings for proper mouse event handling.</item>
 ///         <item>Automatic layout when becoming visible.</item>
 ///         <item>Focus restoration when hidden.</item>
@@ -44,7 +44,7 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///         Sets up default popover behavior:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill"/>, <see cref="View.Height"/> = <see cref="Dim.Fill"/>).</item>
+    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
     ///         <item>Sets <see cref="View.CanFocus"/> to <see langword="true"/>.</item>
     ///         <item>Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
     ///         <item>Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when invoked.</item>
@@ -52,7 +52,9 @@ public abstract class PopoverBaseImpl : View, IPopover
     /// </remarks>
     protected PopoverBaseImpl ()
     {
+#if DEBUG
         Id = "popoverBaseImpl";
+#endif
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
@@ -65,6 +67,10 @@ public abstract class PopoverBaseImpl : View, IPopover
 
         AddCommand (Command.Quit, Quit);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
+        KeyBindings.Remove (Key.Enter);
+
+        // Clear all mouse bindings so there's no conflict with subviews
+        MouseBindings.Clear ();
 
         return;
 
@@ -81,16 +87,14 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
     }
 
-    private IRunnable? _current;
-
     /// <inheritdoc/>
-    public IRunnable? Current
+    public IRunnable? Owner
     {
-        get => _current;
+        get;
         set
         {
-            _current = value;
-            App ??= (_current as View)?.App;
+            field = value;
+            App ??= (field as View)?.App;
         }
     }
 

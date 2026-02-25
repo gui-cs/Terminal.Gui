@@ -1,10 +1,8 @@
-
-using System.Diagnostics;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Helper class for <see cref="Application"/> navigation. Held by <see cref="Application.Navigation"/>
+///     Helper class for <see cref="Application"/> navigation and cursor handling. Held by
+///     <see cref="Application.Navigation"/>
 /// </summary>
 public class ApplicationNavigation
 {
@@ -31,12 +29,10 @@ public class ApplicationNavigation
     /// <summary>
     ///     Gets the most focused <see cref="View"/> in the application, if there is one.
     /// </summary>
-    public View? GetFocused ()
-    {
-        return _focused;
-    }
+    public View? GetFocused () => _focused;
 
-    // BUGBUG: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
+    // QUESTION: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
+    // QUESTION: Related, see View.GetSubViews(), which does support Adornments.
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the SubView hierarchy of <paramref name="start"/>.
     /// </summary>
@@ -85,9 +81,18 @@ public class ApplicationNavigation
         {
             return;
         }
-        Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
+
+        if (_focused is { } && App?.Mouse.IsGrabbed (_focused) == true)
+        {
+            App.Mouse.UngrabMouse ();
+        }
+
+        //Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
+
+        // Cursor needs update when focus changes
+        App?.Driver?.SetCursorNeedsUpdate (true);
 
         FocusedChanged?.Invoke (this, EventArgs.Empty);
     }
@@ -109,10 +114,73 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (App?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        if (App?.Popovers?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             return visiblePopover.AdvanceFocus (direction, behavior);
         }
+
         return App?.TopRunnableView is { } && App.TopRunnableView.AdvanceFocus (direction, behavior);
+    }
+
+    /// <summary>
+    ///     Updates the terminal cursor based on the currently focused view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
+    ///     </para>
+    /// </remarks>
+    public void UpdateCursor ()
+    {
+        if (App?.Driver?.GetCursorNeedsUpdate () == false)
+        {
+            return;
+        }
+
+        View? mostFocused = App?.TopRunnableView?.MostFocused;
+
+        if (mostFocused is null || !mostFocused.Cursor.IsVisible)
+        {
+            App?.Driver?.SetCursor (new Cursor ()); // Hide cursor
+
+            return;
+        }
+
+        // Get cursor in content area coordinates
+        Cursor mostFocusedCursor = mostFocused.Cursor;
+
+        if (mostFocusedCursor.Position.HasValue)
+        {
+            // Check if position is within all ancestor viewports
+            var withinViewports = true;
+            View? current = mostFocused;
+
+            while (current is { })
+            {
+                Rectangle viewportBounds = current.ViewportToScreen (new Rectangle (Point.Empty, current.Viewport.Size));
+
+                if (!viewportBounds.Contains (mostFocusedCursor.Position.Value))
+                {
+                    withinViewports = false;
+
+                    break;
+                }
+
+                current = current.SuperView;
+            }
+
+            if (withinViewports)
+            {
+                App?.Driver?.SetCursor (mostFocusedCursor);
+            }
+            else
+            {
+                App?.Driver?.SetCursor (new Cursor ()); // Hide cursor
+            }
+        }
+        else
+        {
+            App?.Driver?.SetCursor (new Cursor ()); // Hide cursor
+        }
     }
 }

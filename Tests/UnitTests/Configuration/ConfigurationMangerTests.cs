@@ -7,6 +7,7 @@ using System.Text.Json;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using File = System.IO.File;
+using SourcesManager = Terminal.Gui.Configuration.SourcesManager;
 
 #pragma warning disable IDE1006
 
@@ -239,7 +240,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
 
             Color hardCodedBaseNormalFg = hardCodedSchemes ["Base"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedBaseNormalFg.ToString ());
 
             Load (ConfigLocations.Runtime);
             Apply ();
@@ -529,7 +530,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Color hardCodedBaseNormalFg = hardCodedSchemesViaSchemeManager ["Base"].Normal.Foreground;
 
-            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedBaseNormalFg.ToString ());
 
             // Capture current scheme colors
             Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
@@ -676,7 +677,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 }					
 			";
 
-           // ResetToCurrentValues ();
+            // ResetToCurrentValues ();
 
             ThrowOnJsonErrors = true;
             ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
@@ -708,7 +709,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             hardCodedSchemes =
                 GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
             hardCodedBaseNormalFg = hardCodedSchemes! ["Base"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedBaseNormalFg.ToString ());
 
             FrozenDictionary<string, ConfigProperty> hardCodedCache = GetHardCodedConfigPropertyCache ()!;
 
@@ -1404,15 +1405,238 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     public static bool? TestProperty { get; set; }
 
     private class CMTestsScope : Scope<CMTestsScope>
-    {
-    }
+    { }
 
     [Fact]
     public void GetConfigPropertiesByScope_Gets ()
     {
-        var props = GetUninitializedConfigPropertiesByScope ("CMTestsScope");
+        IEnumerable<KeyValuePair<string, ConfigProperty>> props = GetUninitializedConfigPropertiesByScope ("CMTestsScope");
 
         Assert.NotNull (props);
         Assert.NotEmpty (props);
+    }
+
+    [Fact]
+    public void ConfigLocations_LoadOrder_IsCorrect ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Arrange
+            Enable (ConfigLocations.HardCoded);
+            ThrowOnJsonErrors = true;
+
+            // Test that each location overrides the previous ones
+            // Priority order (lowest to highest): HardCoded → LibraryResources → AppResources → GlobalHome → GlobalCurrent → AppHome → AppCurrent → Env → Runtime
+
+            // Start with HardCoded
+            Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load LibraryResources (should override HardCoded)
+            var libraryConfig = """
+                                {
+                                     "Application.QuitKey": "Ctrl+L"
+                                }
+                                """;
+            ConfigurationManager.SourcesManager?.Load (Settings, libraryConfig, "library-test", ConfigLocations.LibraryResources);
+            Assert.Equal (Key.L.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load AppResources (should override LibraryResources)
+            var appResourcesConfig = """
+                                     {
+                                          "Application.QuitKey": "Ctrl+A"
+                                     }
+                                     """;
+            ConfigurationManager.SourcesManager?.Load (Settings, appResourcesConfig, "appresources-test", ConfigLocations.AppResources);
+            Assert.Equal (Key.A.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load GlobalHome (should override AppResources)
+            var globalHomeConfig = """
+                                   {
+                                        "Application.QuitKey": "Ctrl+G"
+                                   }
+                                   """;
+            ConfigurationManager.SourcesManager?.Load (Settings, globalHomeConfig, "globalhome-test", ConfigLocations.GlobalHome);
+            Assert.Equal (Key.G.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load GlobalCurrent (should override GlobalHome)
+            var globalCurrentConfig = """
+                                      {
+                                           "Application.QuitKey": "Ctrl+C"
+                                      }
+                                      """;
+            ConfigurationManager.SourcesManager?.Load (Settings, globalCurrentConfig, "globalcurrent-test", ConfigLocations.GlobalCurrent);
+            Assert.Equal (Key.C.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load AppHome (should override GlobalCurrent)
+            var appHomeConfig = """
+                                {
+                                     "Application.QuitKey": "Ctrl+H"
+                                }
+                                """;
+            ConfigurationManager.SourcesManager?.Load (Settings, appHomeConfig, "apphome-test", ConfigLocations.AppHome);
+            Assert.Equal (Key.H.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load AppCurrent (should override AppHome)
+            var appCurrentConfig = """
+                                   {
+                                        "Application.QuitKey": "Ctrl+U"
+                                   }
+                                   """;
+            ConfigurationManager.SourcesManager?.Load (Settings, appCurrentConfig, "appcurrent-test", ConfigLocations.AppCurrent);
+            Assert.Equal (Key.U.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load Env (should override AppCurrent)
+            var envConfig = """
+                            {
+                                 "Application.QuitKey": "Ctrl+E"
+                            }
+                            """;
+            ConfigurationManager.SourcesManager?.Load (Settings, envConfig, "env-test", ConfigLocations.Env);
+            Assert.Equal (Key.E.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Load Runtime (should override Env - highest priority)
+            RuntimeConfig = """
+                            {
+                                 "Application.QuitKey": "Ctrl+R"
+                            }
+                            """;
+            Load (ConfigLocations.Runtime);
+            Assert.Equal (Key.R.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    [Fact]
+    public void ConfigLocations_Env_LoadsFromEnvironmentVariable ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Arrange
+            Enable (ConfigLocations.HardCoded);
+            ThrowOnJsonErrors = true;
+
+            // Set environment variable
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+Z"
+                                                }
+                                                """);
+
+            // Act
+            Load (ConfigLocations.Env);
+
+            // Assert
+            Assert.Equal (Key.Z.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable (SourcesManager.TUI_CONFIG_ENV_S, null);
+            Disable (true);
+        }
+    }
+
+    [Fact]
+    public void ConfigLocations_Runtime_HasHighestPriority ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Arrange
+            Enable (ConfigLocations.HardCoded);
+            ThrowOnJsonErrors = true;
+
+            // Set Env config
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+E"
+                                                }
+                                                """);
+
+            // Set Runtime config
+            RuntimeConfig = """
+                            {
+                                 "Application.QuitKey": "Ctrl+R"
+                            }
+                            """;
+
+            // Act - Load both Env and Runtime
+            Load (ConfigLocations.Env | ConfigLocations.Runtime);
+
+            // Assert - Runtime should win (highest priority)
+            Assert.Equal (Key.R.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable (SourcesManager.TUI_CONFIG_ENV_S, null);
+            Disable (true);
+        }
+    }
+
+    [Fact]
+    public void ConfigLocations_All_LoadsInCorrectOrder ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Arrange - Set up all possible configuration sources
+            Enable (ConfigLocations.HardCoded);
+            ThrowOnJsonErrors = true;
+
+            // Set environment variable (second-highest priority)
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+E"
+                                                }
+                                                """);
+
+            // Set runtime config (highest priority)
+            RuntimeConfig = """
+                            {
+                                 "Application.QuitKey": "Ctrl+R"
+                            }
+                            """;
+
+            // Act - Load all locations
+            Load (ConfigLocations.All);
+
+            // Assert - Runtime should win (highest priority)
+            Assert.Equal (Key.R.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Now test without Runtime
+            RuntimeConfig = null;
+            LoadHardCodedDefaults ();
+
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+E"
+                                                }
+                                                """);
+            Load (ConfigLocations.Env);
+
+            // Assert - Env should be used when Runtime is not set
+            Assert.Equal (Key.E.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable (SourcesManager.TUI_CONFIG_ENV_S, null);
+            Disable (true);
+        }
     }
 }

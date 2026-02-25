@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using System.Text;
 
-namespace ViewsTests;
+namespace ViewsTests.TextViewTests;
 
 public class TextViewTests
 {
@@ -23,10 +23,8 @@ public class TextViewTests
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
 
         var expectedEventCount = 1; // for ENTER key
@@ -48,10 +46,7 @@ public class TextViewTests
         var text = "This is the first line.\r\nThis is the second line.\r\n";
         tv.Load (new MemoryStream (Encoding.ASCII.GetBytes (text)));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
 
         Assert.Equal (1, eventcount);
     }
@@ -73,10 +68,7 @@ public class TextViewTests
         tv.Load (fileName);
         Assert.Equal (1, eventcount);
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
     }
 
     [Fact]
@@ -100,23 +92,19 @@ public class TextViewTests
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         tv.ClearHistoryChanges ();
 
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
     }
@@ -130,17 +118,11 @@ public class TextViewTests
         {
             if ((TextEditingLineStatus)ls != TextEditingLineStatus.Original)
             {
-                Assert.Throws<ArgumentException> (
-                                                  () => ht.Add (
-                                                                new List<List<Cell>> (),
-                                                                Point.Empty,
-                                                                (TextEditingLineStatus)ls
-                                                               )
-                                                 );
+                Assert.Throws<ArgumentException> (() => ht.Add (new List<List<Cell>> (), Point.Empty, (TextEditingLineStatus)ls));
             }
         }
 
-        Assert.Null (Record.Exception (() => ht.Add (new () { new () }, Point.Empty)));
+        Assert.Null (Record.Exception (() => ht.Add (new List<List<Cell>> { new () }, Point.Empty)));
     }
 
     [Fact]
@@ -150,49 +132,49 @@ public class TextViewTests
 
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.D1));
         Assert.Equal ("1", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (1, 0), tv.CursorPosition);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"1{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.D2));
         Assert.Equal ($"1{Environment.NewLine}2", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ($"1{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("1", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (1, 0), tv.CursorPosition);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // IsDirty cannot be based on HasHistoryChanges because HasHistoryChanges is greater than 0
         // The only way is comparing from the original text
@@ -210,34 +192,34 @@ public class TextViewTests
         Assert.True (tv.NewKeyDownEvent (Key.D1));
         Assert.Equal ("1", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (1, 0), tv.CursorPosition);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.D2));
         Assert.Equal ("12", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (2, 0), tv.CursorPosition);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.D3));
         Assert.Equal ("123", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (3, 0), tv.CursorPosition);
+        Assert.Equal (new Point (3, 0), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("12", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (2, 0), tv.CursorPosition);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.D4));
         Assert.Equal ("124", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (3, 0), tv.CursorPosition);
+        Assert.Equal (new Point (3, 0), tv.InsertionPoint);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("124", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (3, 0), tv.CursorPosition);
+        Assert.Equal (new Point (3, 0), tv.InsertionPoint);
     }
 
     [Fact]
@@ -250,28 +232,28 @@ public class TextViewTests
         tv.WordWrap = true;
 
         tv.SelectionStartColumn = 12;
-        tv.CursorPosition = new (12, 2);
+        tv.InsertionPoint = new Point (12, 2);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.A));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
     }
 
     [Fact]
@@ -281,73 +263,69 @@ public class TextViewTests
         var tv = new TextView { Text = text };
 
         tv.SelectionStartColumn = 12;
-        tv.CursorPosition = new (12, 2);
+        tv.InsertionPoint = new Point (12, 2);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.A));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (12, 2), tv.CursorPosition);
+        Assert.Equal (new Point (12, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (12, 2), tv.CursorPosition);
+        Assert.Equal (new Point (12, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
     }
 
     [Fact]
@@ -357,105 +335,83 @@ public class TextViewTests
         var tv = new TextView { Text = text };
 
         tv.SelectionStartColumn = 12;
-        tv.CursorPosition = new (17, 0);
+        tv.InsertionPoint = new Point (17, 0);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.A));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (17, 0), tv.CursorPosition);
+        Assert.Equal (new Point (17, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (17, 0), tv.CursorPosition);
+        Assert.Equal (new Point (17, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
     }
 
     [Fact]
@@ -468,121 +424,121 @@ public class TextViewTests
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (12, 1), tv.CursorPosition);
+        Assert.Equal (new Point (12, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (11, 1), tv.CursorPosition);
+        Assert.Equal (new Point (11, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (7, 1), tv.CursorPosition);
+        Assert.Equal (new Point (7, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (11, 0), tv.CursorPosition);
+        Assert.Equal (new Point (11, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("First line", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (10, 0), tv.CursorPosition);
+        Assert.Equal (new Point (10, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("First ", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (6, 0), tv.CursorPosition);
+        Assert.Equal (new Point (6, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First ", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (6, 0), tv.CursorPosition);
+        Assert.Equal (new Point (6, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First line", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (10, 0), tv.CursorPosition);
+        Assert.Equal (new Point (10, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (11, 0), tv.CursorPosition);
+        Assert.Equal (new Point (11, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (7, 1), tv.CursorPosition);
+        Assert.Equal (new Point (7, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (11, 1), tv.CursorPosition);
+        Assert.Equal (new Point (11, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (12, 1), tv.CursorPosition);
+        Assert.Equal (new Point (12, 1), tv.InsertionPoint);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (11, 1), tv.CursorPosition);
+        Assert.Equal (new Point (11, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (7, 1), tv.CursorPosition);
+        Assert.Equal (new Point (7, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (11, 0), tv.CursorPosition);
+        Assert.Equal (new Point (11, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First line", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (10, 0), tv.CursorPosition);
+        Assert.Equal (new Point (10, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First ", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (6, 0), tv.CursorPosition);
+        Assert.Equal (new Point (6, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
     }
 
     [Fact]
@@ -595,109 +551,109 @@ public class TextViewTests
         Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ($".{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal (".", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal (".", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($".{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($".{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("Second line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("line.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal (".", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
     }
 
     [Fact]
@@ -708,78 +664,69 @@ public class TextViewTests
 
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.A));
         Assert.Equal ($"{Environment.NewLine}a", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}a", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}a", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (1, 1), tv.CursorPosition);
+        Assert.Equal (new Point (1, 1), tv.InsertionPoint);
     }
 
     [Fact]
@@ -788,28 +735,19 @@ public class TextViewTests
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Text = text };
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.SelectedText
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.SelectedText);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.Equal (70 + Environment.NewLine.Length * 2, tv.SelectedLength);
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
@@ -818,7 +756,7 @@ public class TextViewTests
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
@@ -826,13 +764,10 @@ public class TextViewTests
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.False (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
@@ -842,7 +777,7 @@ public class TextViewTests
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
@@ -854,28 +789,19 @@ public class TextViewTests
         var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
         var tv = new TextView { Text = text };
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
 
         Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl.WithShift));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.SelectedText
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.SelectedText);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.Equal (70 + Environment.NewLine.Length * 2, tv.SelectedLength);
         Assert.False (tv.IsDirty);
         Assert.False (tv.HasHistoryChanges);
@@ -884,7 +810,7 @@ public class TextViewTests
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
@@ -892,13 +818,10 @@ public class TextViewTests
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (23, 2), tv.CursorPosition);
+        Assert.Equal (new Point (23, 2), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.False (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
@@ -908,107 +831,38 @@ public class TextViewTests
         Assert.Equal ("", tv.Text);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.True (tv.IsDirty);
         Assert.True (tv.HasHistoryChanges);
     }
 
     [Fact]
-    public void HistoryText_Undo_Redo_Multiline_Selected_Tab_BackTab ()
+    public void HistoryText_Undo_Redo_Multiline_Selected_Tab ()
     {
-        var text = "First line.\nSecond line.\nThird line.";
+        var text = $"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.";
         var tv = new TextView { Width = 80, Height = 5, Text = text };
 
         tv.SelectionStartColumn = 6;
-        tv.CursorPosition = new (6, 2);
+        tv.InsertionPoint = new Point (6, 2);
 
         Assert.True (tv.NewKeyDownEvent (Key.Tab));
         Assert.Equal ("First \tline.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (7, 0), tv.CursorPosition);
-
-        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
-        Assert.Equal ("First line.", tv.Text);
-        Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (6, 0), tv.CursorPosition);
+        Assert.Equal (new Point (7, 0), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-        Assert.Equal ("First \tline.", tv.Text);
-        Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (7, 0), tv.CursorPosition);
-        Assert.True (tv.IsDirty);
-
-        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
+        Assert.Equal (text, tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (6, 2), tv.CursorPosition);
+        Assert.Equal (new Point (6, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ("First \tline.", tv.Text);
         Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (7, 0), tv.CursorPosition);
-
-        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
-        Assert.Equal ("First line.", tv.Text);
-        Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (6, 0), tv.CursorPosition);
-    }
-
-    [Fact]
-    public void HistoryText_Undo_Redo_Multiline_Simples_Tab_BackTab ()
-    {
-        var text = "First line.\nSecond line.\nThird line.";
-        var tv = new TextView { Width = 80, Height = 5, Text = text };
-
-        Assert.True (tv.NewKeyDownEvent (Key.Tab));
-
-        Assert.Equal (
-                      $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
-                      tv.Text
-                     );
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 0), tv.CursorPosition);
-
-        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
-
-        // Undo
-        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-
-        Assert.Equal (
-                      $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
-                      tv.Text
-                     );
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 0), tv.CursorPosition);
-        Assert.True (tv.IsDirty);
-
-        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
-        Assert.False (tv.IsDirty);
-
-        // Redo
-        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
-
-        Assert.Equal (
-                      $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
-                      tv.Text
-                     );
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 0), tv.CursorPosition);
-
-        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.CursorPosition);
+        Assert.Equal (new Point (7, 0), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1018,58 +872,46 @@ public class TextViewTests
         var tv = new TextView { Text = text };
 
         tv.SelectionStartColumn = 12;
-        tv.CursorPosition = new (17, 0);
+        tv.InsertionPoint = new Point (17, 0);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (17, 0), tv.CursorPosition);
+        Assert.Equal (new Point (17, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (17, 0), tv.CursorPosition);
+        Assert.Equal (new Point (17, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1080,58 +922,46 @@ public class TextViewTests
 
         tv.SelectionStartColumn = 12;
         tv.SelectionStartRow = 1;
-        tv.CursorPosition = new (18, 1);
+        tv.InsertionPoint = new Point (18, 1);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1142,105 +972,83 @@ public class TextViewTests
 
         tv.SelectionStartColumn = 12;
         tv.SelectionStartRow = 1;
-        tv.CursorPosition = new (18, 1);
+        tv.InsertionPoint = new Point (18, 1);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.A));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (1, 2), tv.CursorPosition);
+        Assert.Equal (new Point (1, 2), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (1, 2), tv.CursorPosition);
+        Assert.Equal (new Point (1, 2), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (0, 2), tv.CursorPosition);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.",
+                      tv.Text);
         Assert.Equal (4, tv.Lines);
-        Assert.Equal (new (1, 2), tv.CursorPosition);
+        Assert.Equal (new Point (1, 2), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1250,46 +1058,40 @@ public class TextViewTests
         var tv = new TextView { Text = text };
 
         tv.SelectionStartColumn = 12;
-        tv.CursorPosition = new (17, 2);
+        tv.InsertionPoint = new Point (17, 2);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (17, 2), tv.CursorPosition);
+        Assert.Equal (new Point (17, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (17, 2), tv.CursorPosition);
+        Assert.Equal (new Point (17, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
         Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
         Assert.Equal (2, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1299,58 +1101,43 @@ public class TextViewTests
         var tv = new TextView { Text = text };
 
         tv.SelectionStartColumn = 12;
-        tv.CursorPosition = new (18, 1);
+        tv.InsertionPoint = new Point (18, 1);
 
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
 
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
         Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
 
-        Assert.Equal (
-                      $"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
         Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (0, 1), tv.CursorPosition);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
     }
 
     [Fact]
@@ -1360,7 +1147,7 @@ public class TextViewTests
         var tv = new TextView { Text = text };
 
         tv.SelectionStartColumn = 12;
-        tv.CursorPosition = new (18, 1);
+        tv.InsertionPoint = new Point (18, 1);
 
         if (Environment.NewLine.Length == 2)
         {
@@ -1373,19 +1160,19 @@ public class TextViewTests
 
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", Cell.ToString (tv.SelectedCellsList));
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         AssertNullAttribute ();
 
-        tv.ApplyCellsAttribute (new (Color.Red, Color.Green));
+        tv.ApplyCellsAttribute (new Attribute (Color.Red, Color.Green));
 
         AssertRedGreenAttribute ();
 
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.Equal ($"first line.{Environment.NewLine}This is the second", Cell.ToString (tv.SelectedCellsList));
-        Assert.Equal (new (18, 1), tv.CursorPosition);
+        Assert.Equal (new Point (18, 1), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         // Undo
@@ -1398,7 +1185,7 @@ public class TextViewTests
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.Empty (tv.SelectedCellsList);
-        Assert.Equal (new (12, 0), tv.CursorPosition);
+        Assert.Equal (new Point (12, 0), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
 
         // Redo
@@ -1411,7 +1198,7 @@ public class TextViewTests
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.Empty (tv.SelectedCellsList);
-        Assert.Equal (new (12, 0), tv.CursorPosition);
+        Assert.Equal (new Point (12, 0), tv.InsertionPoint);
         Assert.True (tv.IsDirty);
 
         void AssertNullAttribute ()
@@ -1512,7 +1299,7 @@ public class TextViewTests
         Assert.Equal ((new Point (9, 1), true), tm.ReplaceAllText ("is", false, false, "really"));
         Assert.Equal (Cell.StringToCells ("Threally really first line."), tm.GetLine (0));
         Assert.Equal (Cell.StringToCells ("Threally really last line."), tm.GetLine (1));
-        tm = new ();
+        tm = new TextModel ();
         tm.AddLine (0, Cell.StringToCells ("This is first line."));
         tm.AddLine (1, Cell.StringToCells ("This is last line."));
         Assert.Equal ((new Point (5, 1), true), tm.ReplaceAllText ("is", false, true, "really"));
@@ -1521,21 +1308,21 @@ public class TextViewTests
     }
 
     [Fact]
-    public void LeftColumn_Add_One_If_Text_Length_Is_Equal_To_Width ()
+    public void Viewport_X_Add_One_If_Text_Length_Is_Equal_To_Width ()
     {
         var tv = new TextView { Width = 10, Text = "1234567890" };
 
-        Assert.Equal (Point.Empty, tv.CursorPosition);
-        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
+        Assert.Equal (0, tv.Viewport.X);
 
-        tv.CursorPosition = new (9, 0);
-        Assert.Equal (new (9, 0), tv.CursorPosition);
-        Assert.Equal (0, tv.LeftColumn);
+        tv.InsertionPoint = new Point (9, 0);
+        Assert.Equal (new Point (9, 0), tv.InsertionPoint);
+        Assert.Equal (0, tv.Viewport.X);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-        tv.CursorPosition = new (10, 0);
-        Assert.Equal (new (10, 0), tv.CursorPosition);
-        Assert.Equal (1, tv.LeftColumn);
+        tv.InsertionPoint = new Point (10, 0);
+        Assert.Equal (new Point (10, 0), tv.InsertionPoint);
+        Assert.Equal (1, tv.Viewport.X);
     }
 
     [Fact]
@@ -1572,10 +1359,7 @@ public class TextViewTests
         var tv = new TextView ();
         tv.Load (new MemoryStream (Encoding.ASCII.GetBytes (text)));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
     }
 
     [Fact]
@@ -1632,10 +1416,7 @@ public class TextViewTests
         var tv = new TextView ();
         tv.Load (new MemoryStream (Encoding.ASCII.GetBytes (text)));
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
     }
 
     [Fact]
@@ -1672,10 +1453,7 @@ public class TextViewTests
         var tv = new TextView ();
         tv.Text = text;
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
     }
 
     [Fact]
@@ -1685,22 +1463,19 @@ public class TextViewTests
         var tv = new TextView ();
         tv.Text = text;
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
     }
 
     [Fact]
-    public void TextView_MultiLine_But_Without_Tabs ()
+    public void MultiLine_But_Without_Tabs ()
     {
         var view = new TextView ();
 
         // the default for TextView
         Assert.True (view.Multiline);
 
-        view.AllowsTab = false;
-        Assert.False (view.AllowsTab);
+        view.TabKeyAddsTab = false;
+        Assert.False (view.TabKeyAddsTab);
 
         Assert.True (view.Multiline);
     }
@@ -1732,16 +1507,10 @@ public class TextViewTests
         var tv = new TextView { Width = 10 };
         tv.Text = text;
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
         tv.WordWrap = true;
 
-        Assert.Equal (
-                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}",
-                      tv.Text
-                     );
+        Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}", tv.Text);
     }
 
     [Fact]
@@ -1767,18 +1536,15 @@ public class TextViewTests
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) => accepted = true;
     }
 
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 1)]
-    public void Accepted_Command_Raises_Accepted_Regardles_Of_AllowsReturn (bool allowsReturn, int expectedAcceptEvents)
+    public void Accepted_Command_Raises_Accepted_Regardless_Of_EnterKeyAddsLine (bool allowsReturn, int expectedAcceptEvents)
     {
-        var view = new TextView
-        {
-            AllowsReturn = allowsReturn
-        };
+        var view = new TextView { EnterKeyAddsLine = allowsReturn };
 
         var acceptedEvents = 0;
         view.Accepting += Accept;
@@ -1787,7 +1553,7 @@ public class TextViewTests
 
         return;
 
-        void Accept (object sender, CommandEventArgs e) { acceptedEvents++; }
+        void Accept (object sender, CommandEventArgs e) => acceptedEvents++;
     }
 
     [Theory]
@@ -1795,10 +1561,7 @@ public class TextViewTests
     [InlineData (true, 0)]
     public void Enter_Key_Fires_Accepted_BasedOn_AllowsReturn (bool allowsReturn, int expectedAccepts)
     {
-        var view = new TextView
-        {
-            Multiline = allowsReturn
-        };
+        var view = new TextView { Multiline = allowsReturn };
 
         var accepted = 0;
         view.Accepting += Accept;
@@ -1807,7 +1570,7 @@ public class TextViewTests
 
         return;
 
-        void Accept (object sender, CommandEventArgs e) { accepted++; }
+        void Accept (object sender, CommandEventArgs e) => accepted++;
     }
 
     [Theory]
@@ -1815,10 +1578,7 @@ public class TextViewTests
     [InlineData (true, 0)]
     public void Enter_Key_Fires_Accepted_BasedOn_Multiline (bool multiline, int expectedAccepts)
     {
-        var view = new TextView
-        {
-            Multiline = multiline
-        };
+        var view = new TextView { Multiline = multiline };
 
         var accepted = 0;
         view.Accepting += Accept;
@@ -1827,13 +1587,13 @@ public class TextViewTests
 
         return;
 
-        void Accept (object sender, CommandEventArgs e) { accepted++; }
+        void Accept (object sender, CommandEventArgs e) => accepted++;
     }
 
     [Fact]
     public void Space_Key_Types_Space ()
     {
-        var view = new TextView ();
+        TextView view = new ();
 
         view.NewKeyDownEvent (Key.Space);
 
@@ -1849,15 +1609,9 @@ public class TextViewTests
     {
         var superView = new Window ();
 
-        var tv = new TextView
-        {
-            Multiline = multiline
-        };
+        var tv = new TextView { Multiline = multiline };
 
-        var button = new Button
-        {
-            IsDefault = true
-        };
+        var button = new Button { IsDefault = true };
 
         superView.Add (tv, button);
 
@@ -1887,7 +1641,7 @@ public class TextViewTests
             e.Handled = handleAccept;
         }
 
-        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object sender, CommandEventArgs e) => buttonAccept++;
     }
 
     [Theory]
@@ -1897,15 +1651,9 @@ public class TextViewTests
     {
         var superView = new Window ();
 
-        var tv = new TextView
-        {
-            Multiline = multiline
-        };
+        var tv = new TextView { Multiline = multiline };
 
-        var button = new Button
-        {
-            IsDefault = true
-        };
+        var button = new Button { IsDefault = true };
 
         superView.Add (tv, button);
 
@@ -1924,16 +1672,13 @@ public class TextViewTests
 
         return;
 
-        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object sender, CommandEventArgs e) => buttonAccept++;
     }
 
     [Fact]
     public void Autocomplete_Popup_Added_To_SuperView_On_Init ()
     {
-        View superView = new ()
-        {
-            CanFocus = true
-        };
+        View superView = new () { CanFocus = true };
 
         TextView t = new ();
 
@@ -1949,20 +1694,13 @@ public class TextViewTests
     [Fact]
     public void Autocomplete__Added_To_SuperView_On_Add ()
     {
-        View superView = new ()
-        {
-            CanFocus = true,
-            Id = "superView"
-        };
+        View superView = new () { CanFocus = true, Id = "superView" };
 
         superView.BeginInit ();
         superView.EndInit ();
         Assert.Empty (superView.SubViews);
 
-        TextView t = new ()
-        {
-            Id = "t"
-        };
+        TextView t = new () { Id = "t" };
 
         superView.Add (t);
 
@@ -1972,10 +1710,7 @@ public class TextViewTests
     [Fact]
     public void Autocomplete_Visible_False_By_Default ()
     {
-        View superView = new ()
-        {
-            CanFocus = true
-        };
+        View superView = new () { CanFocus = true };
 
         TextView t = new ();
 
@@ -1992,14 +1727,11 @@ public class TextViewTests
     [Fact]
     public void Right_CursorAtEnd_WithSelection_ShouldClearSelection ()
     {
-        var tv = new TextView
-        {
-            Text = "Hello"
-        };
+        var tv = new TextView { Text = "Hello" };
         tv.SetFocus ();
 
         tv.NewKeyDownEvent (Key.End.WithShift);
-        Assert.Equal (5, tv.CursorPosition.X);
+        Assert.Equal (5, tv.InsertionPoint.X);
 
         // When there is selected text and the cursor is at the end of the text field
         Assert.Equal ("Hello", tv.SelectedText);
@@ -2015,16 +1747,13 @@ public class TextViewTests
     [Fact]
     public void Left_CursorAtStart_WithSelection_ShouldClearSelection ()
     {
-        var tv = new TextView
-        {
-            Text = "Hello"
-        };
+        var tv = new TextView { Text = "Hello" };
         tv.SetFocus ();
 
         tv.NewKeyDownEvent (Key.CursorRight);
         tv.NewKeyDownEvent (Key.CursorRight);
 
-        Assert.Equal (2, tv.CursorPosition.X);
+        Assert.Equal (2, tv.InsertionPoint.X);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift));
@@ -2037,7 +1766,7 @@ public class TextViewTests
         Assert.Empty (tv.SelectedText);
 
         // When clearing selected text with left the cursor should be at the start of the selection
-        Assert.Equal (0, tv.CursorPosition.X);
+        Assert.Equal (0, tv.InsertionPoint.X);
 
         // Now that the selection is cleared another left keypress should move focus
         Assert.False (tv.NewKeyDownEvent (Key.CursorLeft));
@@ -2051,10 +1780,10 @@ public class TextViewTests
         Assert.True (c1.Equals (c2));
         Assert.True (c2.Equals (c1));
 
-        c1.Grapheme = new ("a");
-        c1.Attribute = new ();
-        c2.Grapheme = new ("a");
-        c2.Attribute = new ();
+        c1.Grapheme = new string ("a");
+        c1.Attribute = new Attribute ();
+        c2.Grapheme = new string ("a");
+        c2.Attribute = new Attribute ();
         Assert.True (c1.Equals (c2));
         Assert.True (c2.Equals (c1));
     }
@@ -2064,10 +1793,10 @@ public class TextViewTests
     {
         List<Cell> cells = new ()
         {
-            new () { Grapheme = new ("T") },
-            new () { Grapheme = new ("e") },
-            new () { Grapheme = new ("s") },
-            new () { Grapheme = new ("t") }
+            new Cell { Grapheme = new string ("T") },
+            new Cell { Grapheme = new string ("e") },
+            new Cell { Grapheme = new string ("s") },
+            new Cell { Grapheme = new string ("t") }
         };
         TextView tv = CreateTextView ();
         var top = new Runnable ();
@@ -2114,90 +1843,79 @@ public class TextViewTests
     [InlineData ("\"$schema\": \"", true, "$schema\": \"", "schema\": \"", "\": \"", "\"", "")]
     [InlineData ("1ºªA", false, "")]
     [InlineData ("1ºªA", true, "")]
-    [InlineData (
-                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
-                    false,
-                    "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
-                    "")]
-    [InlineData (
-                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
-                    true,
-                    "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
-                    "|$=+´`~^<>£€¨",
-                    "")]
-    [InlineData (
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    false,
-                    "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "\"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "\"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    ".github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    ".io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    ".Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "/schemas/tui-config-schema.json\"\r\n}",
-                    "schemas/tui-config-schema.json\"\r\n}",
-                    "/tui-config-schema.json\"\r\n}",
-                    "tui-config-schema.json\"\r\n}",
-                    "-config-schema.json\"\r\n}",
-                    "config-schema.json\"\r\n}",
-                    "-schema.json\"\r\n}",
-                    "schema.json\"\r\n}",
-                    ".json\"\r\n}",
-                    "json\"\r\n}",
-                    "\"\r\n}",
-                    "\r\n}",
-                    "}",
-                    "")]
-    [InlineData (
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    true,
-                    "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "\"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "\"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    ".github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    ".io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    ".Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "Gui/schemas/tui-config-schema.json\"\r\n}",
-                    "/schemas/tui-config-schema.json\"\r\n}",
-                    "schemas/tui-config-schema.json\"\r\n}",
-                    "/tui-config-schema.json\"\r\n}",
-                    "tui-config-schema.json\"\r\n}",
-                    "-config-schema.json\"\r\n}",
-                    "config-schema.json\"\r\n}",
-                    "-schema.json\"\r\n}",
-                    "schema.json\"\r\n}",
-                    ".json\"\r\n}",
-                    "json\"\r\n}",
-                    "\"\r\n}",
-                    "\r\n}",
-                    "}",
-                    "")]
+    [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", false, "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", "")]
+    [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", true, "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", "|$=+´`~^<>£€¨", "")]
+    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 false,
+                 "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 ".github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 ".io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 ".Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "/schemas/tui-config-schema.json\"\r\n}",
+                 "schemas/tui-config-schema.json\"\r\n}",
+                 "/tui-config-schema.json\"\r\n}",
+                 "tui-config-schema.json\"\r\n}",
+                 "-config-schema.json\"\r\n}",
+                 "config-schema.json\"\r\n}",
+                 "-schema.json\"\r\n}",
+                 "schema.json\"\r\n}",
+                 ".json\"\r\n}",
+                 "json\"\r\n}",
+                 "\"\r\n}",
+                 "\r\n}",
+                 "}",
+                 "")]
+    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 true,
+                 "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 ".github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 ".io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 ".Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "/schemas/tui-config-schema.json\"\r\n}",
+                 "schemas/tui-config-schema.json\"\r\n}",
+                 "/tui-config-schema.json\"\r\n}",
+                 "tui-config-schema.json\"\r\n}",
+                 "-config-schema.json\"\r\n}",
+                 "config-schema.json\"\r\n}",
+                 "-schema.json\"\r\n}",
+                 "schema.json\"\r\n}",
+                 ".json\"\r\n}",
+                 "json\"\r\n}",
+                 "\"\r\n}",
+                 "\r\n}",
+                 "}",
+                 "")]
     public void WordForward_WordWrap_False_True (string text, bool useSameRuneType, params string [] expectedText)
     {
         TextView tv = CreateTextView ();
@@ -2249,90 +1967,79 @@ public class TextViewTests
     [InlineData ("\"$schema\": \"", true, "\"$schema\": ", "\"$schema", "\"$", "\"", "")]
     [InlineData ("1ºªA", false, "")]
     [InlineData ("1ºªA", true, "")]
-    [InlineData (
-                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
-                    false,
-                    "ºª",
-                    "")]
-    [InlineData (
-                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨",
-                    true,
-                    "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]",
-                    "ºª",
-                    "")]
-    [InlineData (
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    false,
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github",
-                    "{\r\n  \"$schema\": \"https://gui-cs.",
-                    "{\r\n  \"$schema\": \"https://gui-cs",
-                    "{\r\n  \"$schema\": \"https://gui-",
-                    "{\r\n  \"$schema\": \"https://gui",
-                    "{\r\n  \"$schema\": \"https://",
-                    "{\r\n  \"$schema\": \"https",
-                    "{\r\n  \"$schema\": \"",
-                    "{\r\n  \"$schema\": ",
-                    "{\r\n  \"$schema",
-                    "{\r\n  \"$",
-                    "{\r\n  ",
-                    "{\r\n",
-                    "{",
-                    "")]
-    [InlineData (
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                    true,
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.io",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github.",
-                    "{\r\n  \"$schema\": \"https://gui-cs.github",
-                    "{\r\n  \"$schema\": \"https://gui-cs.",
-                    "{\r\n  \"$schema\": \"https://gui-cs",
-                    "{\r\n  \"$schema\": \"https://gui-",
-                    "{\r\n  \"$schema\": \"https://gui",
-                    "{\r\n  \"$schema\": \"https://",
-                    "{\r\n  \"$schema\": \"https",
-                    "{\r\n  \"$schema\": \"",
-                    "{\r\n  \"$schema\": ",
-                    "{\r\n  \"$schema",
-                    "{\r\n  \"$",
-                    "{\r\n  \"",
-                    "{\r\n  ",
-                    "{\r\n",
-                    "{",
-                    "")]
+    [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", false, "ºª", "")]
+    [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", true, "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]", "ºª", "")]
+    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 false,
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github",
+                 "{\r\n  \"$schema\": \"https://gui-cs.",
+                 "{\r\n  \"$schema\": \"https://gui-cs",
+                 "{\r\n  \"$schema\": \"https://gui-",
+                 "{\r\n  \"$schema\": \"https://gui",
+                 "{\r\n  \"$schema\": \"https://",
+                 "{\r\n  \"$schema\": \"https",
+                 "{\r\n  \"$schema\": \"",
+                 "{\r\n  \"$schema\": ",
+                 "{\r\n  \"$schema",
+                 "{\r\n  \"$",
+                 "{\r\n  ",
+                 "{\r\n",
+                 "{",
+                 "")]
+    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 true,
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.io",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github.",
+                 "{\r\n  \"$schema\": \"https://gui-cs.github",
+                 "{\r\n  \"$schema\": \"https://gui-cs.",
+                 "{\r\n  \"$schema\": \"https://gui-cs",
+                 "{\r\n  \"$schema\": \"https://gui-",
+                 "{\r\n  \"$schema\": \"https://gui",
+                 "{\r\n  \"$schema\": \"https://",
+                 "{\r\n  \"$schema\": \"https",
+                 "{\r\n  \"$schema\": \"",
+                 "{\r\n  \"$schema\": ",
+                 "{\r\n  \"$schema",
+                 "{\r\n  \"$",
+                 "{\r\n  \"",
+                 "{\r\n  ",
+                 "{\r\n",
+                 "{",
+                 "")]
     public void WordBackward_WordWrap_False_True (string text, bool useSameRuneType, params string [] expectedText)
     {
         TextView tv = CreateTextView ();
@@ -2401,7 +2108,7 @@ public class TextViewTests
         tv.Text = text;
         tv.SelectWordOnlyOnDoubleClick = selectWordOnly;
 
-        Assert.True (tv.NewMouseEvent (new () { Position = new (col, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.True (tv.NewMouseEvent (new Mouse { Position = new Point (col, 0), Flags = MouseFlags.LeftButtonDoubleClicked }));
         Assert.Equal (expectedText, tv.SelectedText);
     }
 
@@ -2424,25 +2131,300 @@ public class TextViewTests
     }
 
     [Fact]
-    public void LeftColumn_Treat_Negative_Width_As_One_Column ()
+    public void Viewport_X_Treat_Negative_Width_As_One_Column ()
     {
         TextView tv = new () { Width = 2, Height = 1, Text = "\u001B[" };
 
-        Assert.Equal (0, tv.LeftColumn);
-        Assert.Equal (new (0, 0), tv.CursorPosition);
+        Assert.Equal (0, tv.Viewport.X);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (0, tv.LeftColumn);
-        Assert.Equal (new (1, 0), tv.CursorPosition);
+        Assert.Equal (0, tv.Viewport.X);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (1, tv.LeftColumn);
-        Assert.Equal (new (2, 0), tv.CursorPosition);
+        Assert.Equal (1, tv.Viewport.X);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
 
         Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (1, tv.LeftColumn);
-        Assert.Equal (new (2, 0), tv.CursorPosition);
+        Assert.Equal (1, tv.Viewport.X);
+        Assert.Equal (new Point (2, 0), tv.InsertionPoint);
     }
 
-    private TextView CreateTextView () { return new () { Width = 30, Height = 10 }; }
+    // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
+    /// <summary>
+    ///     Tests that ContentSize is updated when text is edited, allowing scrollbars to appear.
+    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    /// </summary>
+    [Fact]
+    public void ContentSize_Updates_When_Text_Is_Edited ()
+    {
+        // Arrange: Create a small TextView with ScrollBars enabled
+        TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.SetRelativeLayout (new Size (100, 100));
+
+        Size initialContentSize = tv.GetContentSize ();
+        Assert.Equal (1, initialContentSize.Height); // Initially 1 line
+
+        // Act: Type text that exceeds viewport height (add multiple lines)
+        tv.NewKeyDownEvent (Key.A);
+        tv.NewKeyDownEvent (Key.Enter);
+        tv.NewKeyDownEvent (Key.B);
+        tv.NewKeyDownEvent (Key.Enter);
+        tv.NewKeyDownEvent (Key.C);
+        tv.NewKeyDownEvent (Key.Enter);
+        tv.NewKeyDownEvent (Key.D);
+
+        // Assert: ContentSize height should reflect the number of lines (4 lines)
+        Size newContentSize = tv.GetContentSize ();
+        Assert.Equal (4, newContentSize.Height);
+
+        // With height=3 and 4 lines of content, vertical scrollbar should be visible
+        Assert.True (tv.VerticalScrollBar.Visible, "Vertical scrollbar should be visible when content exceeds viewport height");
+    }
+
+    // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
+    /// <summary>
+    ///     Tests that horizontal scrollbar appears when text width exceeds viewport width.
+    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    /// </summary>
+    [Fact]
+    public void HorizontalScrollBar_Appears_When_Text_Width_Exceeds_Viewport ()
+    {
+        // Arrange: Create a small TextView with ScrollBars enabled, WordWrap disabled
+        TextView tv = new () { Width = Dim.Fill (), Height = Dim.Fill (), ScrollBars = true, WordWrap = false };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.SetRelativeLayout (new Size (10, 5));
+
+        // Assert initial state
+        Assert.False (tv.HorizontalScrollBar.Visible, "Horizontal scrollbar should not be visible initially");
+
+        // Act: Type text that exceeds viewport width
+        for (var i = 0; i < 20; i++)
+        {
+            tv.NewKeyDownEvent (Key.A);
+        }
+
+        // Assert: ContentSize width should reflect the text width
+        Size newContentSize = tv.GetContentSize ();
+        Assert.True (newContentSize.Width >= 20, "Content width should reflect the typed text length");
+
+        // With width=10 and 20 characters, horizontal scrollbar should be visible
+        Assert.True (tv.HorizontalScrollBar.Visible, "Horizontal scrollbar should be visible when content exceeds viewport width");
+    }
+
+    // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
+    /// <summary>
+    ///     Tests that ContentSize is updated when Text property is set programmatically.
+    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    /// </summary>
+    [Fact]
+    public void ContentSize_Updates_When_Text_Property_Is_Set ()
+    {
+        // Arrange: Create a small TextView with ScrollBars enabled
+        TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.SetRelativeLayout (new Size (100, 100));
+
+        Size initialContentSize = tv.GetContentSize ();
+        Assert.Equal (1, initialContentSize.Height);
+
+        // Act: Set Text property programmatically with multiple lines
+        tv.Text = "Line1\nLine2\nLine3\nLine4";
+
+        // Assert: After setting Text programmatically with multiple lines,
+        // the content size should reflect the new number of lines
+        Size contentSizeAfterTextSet = tv.GetContentSize ();
+        Assert.Equal (4, contentSizeAfterTextSet.Height);
+
+        // And scrollbar should be visible since content (4 lines) > viewport (3 lines)
+        Assert.True (tv.VerticalScrollBar.Visible, "Vertical scrollbar should be visible after setting multi-line text");
+    }
+
+    // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
+    /// <summary>
+    ///     Tests that ContentsChanged event is fired and content size is updated appropriately.
+    ///     This test verifies the behavior described in issue #4660.
+    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    /// </summary>
+    [Fact]
+    public void ContentsChanged_Fires_And_ContentSize_Is_Correct_After_Typing ()
+    {
+        // Arrange: Create a small TextView with ScrollBars enabled
+        TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.SetRelativeLayout (new Size (100, 100));
+
+        // Track ContentsChanged events and content size at each event
+        var contentsChangedCount = 0;
+        var contentSizeAtLastContentsChanged = Size.Empty;
+
+        tv.ContentsChanged += (_, _) =>
+                              {
+                                  contentsChangedCount++;
+                                  contentSizeAtLastContentsChanged = tv.GetContentSize ();
+                              };
+
+        // Act: Type text that exceeds viewport height
+        tv.NewKeyDownEvent (Key.A);
+        Assert.Equal (1, contentsChangedCount);
+
+        tv.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (2, contentsChangedCount);
+
+        // After pressing Enter, we have 2 lines
+        Assert.Equal (2, contentSizeAtLastContentsChanged.Height);
+
+        tv.NewKeyDownEvent (Key.B);
+        Assert.Equal (3, contentsChangedCount);
+
+        tv.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (4, contentsChangedCount);
+
+        // After 2nd Enter, we have 3 lines
+        Assert.Equal (3, contentSizeAtLastContentsChanged.Height);
+
+        tv.NewKeyDownEvent (Key.C);
+        Assert.Equal (5, contentsChangedCount);
+
+        tv.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (6, contentsChangedCount);
+
+        // After 3rd Enter, we have 4 lines
+        Assert.Equal (4, contentSizeAtLastContentsChanged.Height);
+
+        tv.NewKeyDownEvent (Key.D);
+        Assert.Equal (7, contentsChangedCount);
+
+        // Final content size should be 4 lines
+        Assert.Equal (4, contentSizeAtLastContentsChanged.Height);
+
+        // Assert: Vertical scrollbar should be visible since content (4 lines) > viewport (3 lines)
+        Assert.True (tv.VerticalScrollBar.Visible, "Vertical scrollbar should be visible when content exceeds viewport height");
+    }
+
+    // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
+    /// <summary>
+    ///     Tests that ContentSize is updated *during* the ContentsChanged event, not just after.
+    ///     This test specifically verifies the bug where UpdateContentSize() needs to be called
+    ///     in OnContentsChanged() so that the content size is correct at the time the event fires.
+    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    /// </summary>
+    [Fact]
+    public void ContentSize_Is_Updated_During_ContentsChanged_Event ()
+    {
+        // Arrange: Create a small TextView with ScrollBars enabled
+        TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.SetRelativeLayout (new Size (100, 100));
+
+        // Track whether content size is correct INSIDE the ContentsChanged handler
+        // The bug is that UpdateContentSize() isn't called in OnContentsChanged(),
+        // so the content size may be stale when the event fires.
+        var contentSizeWasCorrectInHandler = true;
+
+        tv.ContentsChanged += (_, _) =>
+                              {
+                                  Size contentSize = tv.GetContentSize ();
+                                  int expectedHeight = tv.Lines;
+
+                                  if (contentSize.Height != expectedHeight)
+                                  {
+                                      contentSizeWasCorrectInHandler = false;
+                                  }
+                              };
+
+        // Act: Type text that creates multiple lines
+        tv.NewKeyDownEvent (Key.A); // Line 1
+        tv.NewKeyDownEvent (Key.Enter); // Creates line 2
+        tv.NewKeyDownEvent (Key.B); // Line 2 content
+        tv.NewKeyDownEvent (Key.Enter); // Creates line 3
+        tv.NewKeyDownEvent (Key.C); // Line 3 content
+        tv.NewKeyDownEvent (Key.Enter); // Creates line 4
+        tv.NewKeyDownEvent (Key.D); // Line 4 content
+
+        // Assert: Content size should have been correct at each ContentsChanged event
+        Assert.True (contentSizeWasCorrectInHandler, "Content size should be updated during ContentsChanged event, not just after");
+    }
+
+    // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
+    /// <summary>
+    ///     Tests that scrollbar visibility is correct *during* the ContentsChanged event.
+    ///     The bug in issue #4660 is that scrollbar visibility isn't updated until after
+    ///     OnContentsChanged returns, which can cause issues for event handlers.
+    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    /// </summary>
+    [Fact]
+    public void ScrollBar_Visibility_Is_Correct_During_ContentsChanged_Event ()
+    {
+        // Arrange: Create a small TextView with ScrollBars enabled
+        TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.SetRelativeLayout (new Size (100, 100));
+
+        // Track whether scrollbar visibility was correct when ContentsChanged fired
+        // and content exceeded viewport
+        var scrollbarWasVisibleWhenContentExceededViewport = false;
+
+        tv.ContentsChanged += (_, _) =>
+                              {
+                                  // When we have 4 lines (height=3 viewport), scrollbar should be visible
+                                  if (tv.Lines > tv.Viewport.Height)
+                                  {
+                                      scrollbarWasVisibleWhenContentExceededViewport = tv.VerticalScrollBar.Visible;
+                                  }
+                              };
+
+        // Act: Type text that creates 4 lines (exceeds viewport height of 3)
+        tv.NewKeyDownEvent (Key.A); // Line 1
+        tv.NewKeyDownEvent (Key.Enter); // Creates line 2
+        tv.NewKeyDownEvent (Key.B); // Line 2 content
+        tv.NewKeyDownEvent (Key.Enter); // Creates line 3
+        tv.NewKeyDownEvent (Key.C); // Line 3 content
+        tv.NewKeyDownEvent (Key.Enter); // Creates line 4 - now content > viewport
+        tv.NewKeyDownEvent (Key.D); // Line 4 content
+
+        // Assert: Scrollbar should have been visible DURING ContentsChanged when content exceeded viewport
+        Assert.True (scrollbarWasVisibleWhenContentExceededViewport,
+                     "Vertical scrollbar should be visible during ContentsChanged event when content exceeds viewport height");
+    }
+
+    [Fact]
+    public void Command_Activate_SetsFocus ()
+    {
+        TextView textView  = new () { Text = "Test", Width = 10 };
+        textView.BeginInit ();
+        textView.EndInit ();
+        Assert.False (textView.HasFocus);
+
+        textView.InvokeCommand (Command.Activate);
+
+        Assert.True (textView.HasFocus);
+
+        textView.Dispose ();
+    }
+
+    [Fact]
+    public void Command_HotKey_SetsFocus ()
+    {
+        TextView textView = new () { Text = "Test" };
+        textView.BeginInit ();
+        textView.EndInit ();
+        Assert.False (textView.HasFocus);
+
+        textView.InvokeCommand (Command.HotKey);
+
+        Assert.True (textView.HasFocus);
+
+        textView.Dispose ();
+    }
+
+    private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 }

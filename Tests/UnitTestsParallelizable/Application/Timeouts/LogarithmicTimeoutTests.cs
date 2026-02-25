@@ -1,5 +1,6 @@
 ﻿namespace ApplicationTests.Timeout;
 
+[Collection ("Application Timer Tests")]
 public class LogarithmicTimeoutTests
 {
     [Fact]

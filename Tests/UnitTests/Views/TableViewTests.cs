@@ -475,7 +475,7 @@ public class TableViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (expected, output);
 
         // revert the style change
-        style.MaxWidth = TableView.DefaultMaxCellWidth;
+        style.MaxWidth = TableView.DEFAULT_MAX_CELL_WIDTH;
 
         // another way API user can fix problem is to implement
         // RepresentationGetter and apply max length there
@@ -556,7 +556,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Viewport = new (0, 0, 25, 5);
 
         // revert style change
-        style.MinAcceptableWidth = TableView.DefaultMinAcceptableWidth;
+        style.MinAcceptableWidth = TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH;
 
         // Now let's test the global MaxCellWidth and MinCellWidth
         tableView.Style.ExpandLastColumn = false;
@@ -2197,7 +2197,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2205,7 +2205,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
+                          new () { Position = new (1, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl }
                          );
 
         // should extend the selection
@@ -2215,8 +2215,8 @@ public class TableViewTests (ITestOutputHelper output)
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.DoesNotContain (new (0, 1), selected);
-        Assert.Contains (new (0, 2), selected);
+        Assert.DoesNotContain (new Point (0, 1), selected);
+        Assert.Contains (new Point (0, 2), selected);
     }
 
     [Fact]
@@ -2273,7 +2273,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2328,7 +2328,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2381,7 +2381,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2565,7 +2565,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 3), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2573,7 +2573,7 @@ A B C
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
+                          new () { Position = new (1, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift }
                          );
 
         // should extend the selection
@@ -2582,7 +2582,7 @@ A B C
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.Contains (new (0, 1), selected);
+        Assert.Contains (new Point (0, 1), selected);
     }
 
     [Fact]
@@ -3048,7 +3048,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
 
         Point selectedCell = tableView.GetAllSelectedCells ().Single ();
         Assert.Equal (0, selectedCell.X);
@@ -3062,7 +3062,7 @@ A B C
         Assert.Equal (0, selectedCell.Y);
 
         // Toggle Select
-        tableView.NewKeyDownEvent (Key.Space);
+        Assert.True (tableView.NewKeyDownEvent (Key.Space));
         TableSelection m = tableView.MultiSelectedRegions.Single ();
         Assert.True (m.IsToggled);
         Assert.Equal (1, m.Origin.X);
@@ -3111,6 +3111,38 @@ A B C
         Assert.Equal (0, selectedCell.Y);
     }
 
+    /// <summary>
+    /// Tests that when multi select is off the user cannot toggle
+    /// and importantly that the Space key does not get consumed.
+    /// </summary>
+    [Fact]
+    public void TestToggleCells_MultiSelect_Off_ToggleDoesNothing ()
+    {
+        // 2 row table
+        TableView tableView = GetABCDEFTableView (out DataTable dt);
+        tableView.LayoutSubViews ();
+        dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+        tableView.MultiSelect = false;
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
+
+        Point selectedCell = tableView.GetAllSelectedCells ().Single ();
+        Assert.Equal (0, selectedCell.X);
+        Assert.Equal (0, selectedCell.Y);
+
+        // Go Right
+        tableView.NewKeyDownEvent (Key.CursorRight);
+
+        selectedCell = tableView.GetAllSelectedCells ().Single ();
+        Assert.Equal (1, selectedCell.X);
+        Assert.Equal (0, selectedCell.Y);
+
+        // Toggle Select Should do nothing because MultiSelect is off
+        Assert.False(tableView.NewKeyDownEvent (Key.Space));
+
+        Assert.Empty(tableView.MultiSelectedRegions);
+    }
+
     [Fact]
     public void TestToggleCells_MultiSelectOn_FullRowSelect ()
     {
@@ -3120,7 +3152,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.FullRowSelect = true;
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
 
         // Toggle Select Cell 0,0
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });
@@ -3160,7 +3192,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
 
         // Make a square selection
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });
@@ -3201,7 +3233,7 @@ A B C
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         dt.Rows.Add (1, 2, 3, 4, 5, 6);
         tableView.MultiSelect = true;
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
 
         // Make first square selection (0,0 to 1,1)
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.ShiftMask | KeyCode.CursorDown });

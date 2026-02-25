@@ -10,7 +10,7 @@ public abstract class EditorBase : View
 
         CanFocus = true;
 
-        ExpanderButton = new ()
+        ExpanderButton = new ExpanderButton
         {
             Orientation = Orientation.Vertical
         };
@@ -19,6 +19,12 @@ public abstract class EditorBase : View
 
         Initialized += OnInitialized;
 
+        AddCommand (Command.Accept, () => true);
+
+        SchemeName = "Dialog";
+
+        return;
+
         void OnInitialized (object? sender, EventArgs e)
         {
             Border?.Add (ExpanderButton);
@@ -26,10 +32,6 @@ public abstract class EditorBase : View
             App!.Mouse.MouseEvent += ApplicationOnMouseEvent;
             App!.Navigation!.FocusedChanged += NavigationOnFocusedChanged;
         }
-
-        AddCommand (Command.Accept, () => true);
-
-        SchemeName = "Dialog";
     }
 
     private readonly ExpanderButton? _expanderButton;
@@ -71,14 +73,14 @@ public abstract class EditorBase : View
                 return;
             }
 
-            if (value is null && _viewToEdit is { })
+            if (value is null && _viewToEdit is not null)
             {
                 _viewToEdit.SubViewsLaidOut -= View_LayoutComplete;
             }
 
             _viewToEdit = value;
 
-            if (_viewToEdit is { })
+            if (_viewToEdit is not null)
             {
                 _viewToEdit.SubViewsLaidOut += View_LayoutComplete;
             }
@@ -127,20 +129,20 @@ public abstract class EditorBase : View
         ViewToEdit = App!.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
+    private void ApplicationOnMouseEvent (object? sender, Mouse mouse)
     {
-        if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
+        if (mouse.Flags != MouseFlags.LeftButtonClicked || !AutoSelectViewToEdit)
         {
             return;
         }
 
-        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (e.Position))
-            || FrameToScreen ().Contains (e.Position))
+        if ((AutoSelectSuperView is not null && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position!.Value))
+            || FrameToScreen ().Contains (mouse.Position!.Value))
         {
             return;
         }
 
-        View? view = e.View;
+        View? view = mouse.View;
 
         if (view is null)
         {
@@ -158,14 +160,23 @@ public abstract class EditorBase : View
     }
 
     /// <inheritdoc />
-    protected override void Dispose (bool disposing)
+    protected override bool OnSuperViewChanging (ValueChangingEventArgs<View?> args)
     {
-        if (disposing && App is {})
+        // Clean up event handlers before SuperView is set to null
+        // This ensures App is still accessible for proper cleanup
+        if (App is {})
         {
             App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
             App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
         }
 
+        return base.OnSuperViewChanging (args);
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        // Event handlers are now cleaned up in OnSuperViewChanging
         base.Dispose (disposing);
     }
 }

@@ -1,45 +1,58 @@
-
-
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Provides a collection of <see cref="MouseFlags"/> bound to <see cref="Command"/>s.
+///     Provides a collection of <see cref="Command"/> objects stored in <see cref="MouseBindings"/>. Carried
+///     as context in command invocations (see <see cref="CommandContext"/>).
 /// </summary>
 /// <seealso cref="MouseBindings"/>
-/// <seealso cref="Command"/>
-public record struct MouseBinding : IInputBinding
+/// <seealso cref="KeyBinding"/>
+/// <seealso cref="CommandContext"/>
+public record struct MouseBinding : ICommandBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
     /// <param name="mouseFlags">The mouse flags that triggered this binding.</param>
-    public MouseBinding (Command [] commands, MouseFlags mouseFlags)
+    /// <param name="source"></param>
+    public MouseBinding (Command [] commands, MouseFlags mouseFlags, View? source = null)
     {
         Commands = commands;
-
-        MouseEventArgs = new MouseEventArgs()
-        {
-            Flags = mouseFlags
-        };
+        MouseEvent = new Mouse { Timestamp = DateTime.Now, Flags = mouseFlags };
+        Source = source is { } ? new WeakReference<View> (source) : null;
     }
-
 
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
     /// <param name="args">The mouse event that triggered this binding.</param>
-    public MouseBinding (Command [] commands, MouseEventArgs args)
+    public MouseBinding (Command [] commands, Mouse args)
     {
         Commands = commands;
-        MouseEventArgs = args;
+        MouseEvent = args;
     }
 
-    /// <summary>The commands this binding will invoke.</summary>
-    public Command [] Commands { get; set; }
+    /// <inheritdoc/>
+    public Command [] Commands { get; init; }
 
-    /// <inheritdoc />
-    public object? Data { get; set; }
+    /// <inheritdoc/>
+    public object? Data { get; init; }
+
+    /// <inheritdoc/>
+    public WeakReference<View>? Source { get; init; }
 
     /// <summary>
-    ///     The mouse event arguments.
+    ///     The mouse event data associated with this binding.
     /// </summary>
-    public MouseEventArgs? MouseEventArgs { get; set; }
+    public Mouse? MouseEvent { get; set; }
+
+    /// <inheritdoc/>
+    public override string ToString ()
+    {
+        string sourceStr = "";
+
+        if (Source?.TryGetTarget (out View? sv) == true)
+        {
+            sourceStr = $", Source={sv.ToIdentifyingString ()}";
+        }
+
+        return $"[{string.Join (", ", Commands)}] (MouseEvent={MouseEvent}{sourceStr}{(Data is { } data ? $", Data={data}" : "")})";
+    }
 }

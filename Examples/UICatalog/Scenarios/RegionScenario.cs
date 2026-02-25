@@ -1,7 +1,8 @@
 ﻿#nullable enable
 using System.Text;
-using UICatalog;
-using UICatalog.Scenarios;
+namespace UICatalog.Scenarios;
+
+// ReSharper disable AccessToDisposedClosure
 
 /// <summary>
 ///     Demonstrates creating and drawing regions through mouse dragging.
@@ -22,16 +23,17 @@ public class RegionScenario : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            TabStop = TabBehavior.TabGroup
-        };
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.TabStop = TabBehavior.TabGroup;
         appWindow.Padding!.Thickness = new (1);
 
-        var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
+        RegionToolsView tools = new () { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
         tools.CurrentAttribute = appWindow.GetAttributeForRole (VisualRole.HotNormal);
 
@@ -41,100 +43,101 @@ public class RegionScenario : Scenario
                               appWindow.SetNeedsDraw ();
                           };
 
-        tools.RegionOpChanged += (s, e) => { _regionOp = e; };
+        tools.RegionOpChanged += (_, e) => { _regionOp = e; };
 
         //tools.AddLayer += () => canvas.AddLayer ();
 
         appWindow.Add (tools);
 
         // Add drag handling to window
-        appWindow.MouseEvent += (s, e) =>
-                          {
-                              if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
-                              {
-                                  if (!e.Flags.HasFlag (MouseFlags.ReportMousePosition))
-                                  { // Start drag
-                                      _dragStart = e.ScreenPosition;
-                                      _isDragging = true;
-                                  }
-                                  else
-                                  {
-                                      // Drag
-                                      if (_isDragging && _dragStart.HasValue)
-                                      {
-                                          appWindow.SetNeedsDraw ();
-                                      }
-                                  }
-                              }
+        appWindow.MouseEvent += (_, e) =>
+                                {
+                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+                                    {
+                                        if (!e.Flags.HasFlag (MouseFlags.PositionReport))
+                                        { // Start drag
+                                            _dragStart = e.ScreenPosition;
+                                            _isDragging = true;
+                                        }
+                                        else
+                                        {
+                                            // Drag
+                                            if (_isDragging && _dragStart.HasValue)
+                                            {
+                                                appWindow.SetNeedsDraw ();
+                                            }
+                                        }
+                                    }
 
-                              if (e.Flags.HasFlag (MouseFlags.Button1Released))
-                              {
-                                  if (_isDragging && _dragStart.HasValue)
-                                  {
-                                      // Add the new region
-                                      AddRectangleFromPoints (_dragStart.Value, e.ScreenPosition, _regionOp);
-                                      _isDragging = false;
-                                      _dragStart = null;
-                                  }
+                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+                                    {
+                                        if (_isDragging && _dragStart.HasValue)
+                                        {
+                                            // Add the new region
+                                            AddRectangleFromPoints (_dragStart.Value, e.ScreenPosition, _regionOp);
+                                            _isDragging = false;
+                                            _dragStart = null;
+                                        }
 
-                                  appWindow.SetNeedsDraw ();
-                              }
-                          };
+                                        appWindow.SetNeedsDraw ();
+                                    }
+                                };
 
         // Draw the regions
-        appWindow.DrawingContent += (s, e) =>
-                              {
-                                  // Draw all regions with single line style
-                                  //_region.FillRectangles (_attribute.Value, _fillRune);
-                                  switch (_drawStyle)
-                                  {
-                                      case RegionDrawStyles.FillOnly:
-                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, _previewFillRune);
+        appWindow.DrawingContent += (s, _) =>
+                                    {
+                                        if (s is not View sendingView)
+                                        {
+                                            return;
+                                        }
 
-                                          break;
+                                        // Draw all regions with single line style
+                                        //_region.FillRectangles (_attribute.Value, _fillRune);
+                                        switch (_drawStyle)
+                                        {
+                                            case RegionDrawStyles.FillOnly:
+                                                _region.FillRectangles (sendingView.App?.Driver, tools.CurrentAttribute!.Value, _previewFillRune);
 
-                                      case RegionDrawStyles.InnerBoundaries:
-                                          _region.DrawBoundaries (appWindow.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
+                                                break;
 
-                                          break;
+                                            case RegionDrawStyles.InnerBoundaries:
+                                                _region.DrawBoundaries (sendingView.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
+                                                _region.FillRectangles (sendingView.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
-                                      case RegionDrawStyles.OuterBoundary:
-                                          _region.DrawOuterBoundary (appWindow.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
+                                                break;
 
-                                          break;
-                                  }
+                                            case RegionDrawStyles.OuterBoundary:
+                                                _region.DrawOuterBoundary (sendingView.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
+                                                _region.FillRectangles (sendingView.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
-                                  // If currently dragging, draw preview rectangle
-                                  if (_isDragging && _dragStart.HasValue)
-                                  {
-                                      Point currentMousePos = appWindow.App!.Mouse.LastMousePosition!.Value;
-                                      Rectangle previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
-                                      var previewRegion = new Region (previewRect);
+                                                break;
+                                        }
 
-                                      previewRegion.FillRectangles (appWindow.App.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
+                                        // If currently dragging, draw preview rectangle
+                                        if (_isDragging && _dragStart.HasValue)
+                                        {
+                                            Point currentMousePos = sendingView.App!.Mouse.LastMousePosition!.Value;
+                                            Rectangle previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
+                                            Region previewRegion = new (previewRect);
 
-                                      previewRegion.DrawBoundaries (
-                                                                    appWindow.LineCanvas,
-                                                                    LineStyle.Dashed,
-                                                                    new (
-                                                                         tools.CurrentAttribute!.Value.Foreground.GetBrighterColor (),
-                                                                         tools.CurrentAttribute!.Value.Background));
-                                  }
-                              };
+                                            previewRegion.FillRectangles (sendingView.App.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
-        Application.Run (appWindow);
+                                            previewRegion.DrawBoundaries (
+                                                                          sendingView.LineCanvas,
+                                                                          LineStyle.Dashed,
+                                                                          new (
+                                                                               tools.CurrentAttribute!.Value.Foreground.GetBrighterColor (),
+                                                                               tools.CurrentAttribute!.Value.Background));
+                                        }
+                                    };
 
-        // Clean up
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private void AddRectangleFromPoints (Point start, Point end, RegionOp op)
     {
         Rectangle rect = GetRectFromPoints (start, end);
-        var region = new Region (rect);
+        Region region = new (rect);
         _region.Combine (region, op); // Or RegionOp.MinimalUnion if you want minimal rectangles
     }
 
@@ -153,7 +156,7 @@ public class RegionScenario : Scenario
     }
 }
 
-public enum RegionDrawStyles
+internal enum RegionDrawStyles
 {
     FillOnly = 0,
 
@@ -162,10 +165,10 @@ public enum RegionDrawStyles
     OuterBoundary = 2
 }
 
-public class ToolsView : Window
+internal class RegionToolsView : Window
 {
     //private Button _addLayerBtn;
-    private readonly AttributeView _attributeView = new ();
+    private readonly RegionAttributeView _attributeView = new ();
     private OptionSelector<RegionDrawStyles>? _stylePicker;
     private OptionSelector<RegionOp>? _regionOpSelector;
 
@@ -175,7 +178,7 @@ public class ToolsView : Window
         set => _attributeView.Value = value;
     }
 
-    public ToolsView ()
+    public RegionToolsView ()
     {
         BorderStyle = LineStyle.Dotted;
         Border!.Thickness = new (1, 2, 1, 1);
@@ -183,13 +186,11 @@ public class ToolsView : Window
         Width = Dim.Auto ();
     }
 
-    //public event Action AddLayer;
-
     public override void BeginInit ()
     {
         base.BeginInit ();
 
-        _attributeView.ValueChanged += (s, e) => AttributeChanged?.Invoke (this, e);
+        _attributeView.ValueChanged += (_, e) => AttributeChanged?.Invoke (this, e);
 
         _stylePicker = new ()
         {
@@ -201,7 +202,7 @@ public class ToolsView : Window
         _stylePicker.Border!.Thickness = new (0, 1, 0, 0);
         _stylePicker.Title = "Draw Style";
 
-        _stylePicker.ValueChanged += (s, a) => { SetStyle?.Invoke ((RegionDrawStyles)a.Value!); };
+        _stylePicker.ValueChanged += (_, a) => { SetStyle?.Invoke ((RegionDrawStyles)a.Value!); };
         _stylePicker.Value = RegionDrawStyles.FillOnly;
 
         _regionOpSelector = new ()
@@ -210,18 +211,16 @@ public class ToolsView : Window
             Y = Pos.Bottom (_stylePicker) + 1,
             AssignHotKeys = true
         };
-        _regionOpSelector.ValueChanged += (s, a) =>
+
+        _regionOpSelector.ValueChanged += (_, a) =>
                                           {
-                                              if (a.Value is { })
+                                              if (a.Value is not null)
                                               {
                                                   RegionOpChanged?.Invoke (this, (RegionOp)a.Value);
                                               }
                                           };
         _regionOpSelector.Value = RegionOp.MinimalUnion;
 
-        //_addLayerBtn = new () { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
-
-        //_addLayerBtn.Accepting += (s, a) => AddLayer?.Invoke ();
         Add (_attributeView, _stylePicker, _regionOpSelector); //, _addLayerBtn);
     }
 
@@ -230,7 +229,7 @@ public class ToolsView : Window
     public event Action<RegionDrawStyles>? SetStyle;
 }
 
-public class AttributeView : View
+internal class RegionAttributeView : View
 {
     public event EventHandler<Attribute?>? ValueChanged;
     private Attribute? _value;
@@ -257,7 +256,7 @@ public class AttributeView : View
         (1, 2), (2, 2), (3, 2)
     ];
 
-    public AttributeView ()
+    public RegionAttributeView ()
     {
         Width = Dim.Fill ();
         Height = 4;
@@ -303,9 +302,6 @@ public class AttributeView : View
         // Square of background color
         foreach ((int, int) point in _backgroundPoints)
         {
-            // Make pattern like this when it is same color as background of control
-            /*▓▒
-              ▒▓*/
             Rune rune;
 
             if (isTransparentBg)
@@ -324,43 +320,57 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            if (IsForegroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            else if (IsBackgroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }
         }
 
-        mouseEvent.Handled = true;
+        mouse.Handled = true;
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
-    private bool IsForegroundPoint (int x, int y) { return _foregroundPoints.Contains ((x, y)); }
+    private bool IsForegroundPoint (int x, int y) => _foregroundPoints.Contains ((x, y));
 
-    private bool IsBackgroundPoint (int x, int y) { return _backgroundPoints.Contains ((x, y)); }
+    private bool IsBackgroundPoint (int x, int y) => _backgroundPoints.Contains ((x, y));
 
     private void ClickedInBackground ()
     {
-        if (LineDrawing.PromptForColor ("Background", Value!.Value.Background, out Color newColor))
+        Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
+                                                                       beginInitHandler: prompt =>
+                                                                                         {
+                                                                                             prompt.Title = "Background Color";
+                                                                                             prompt.GetWrappedView ().SelectedColor = Value!.Value.Background;
+                                                                                         });
+
+        if (result is { } selectedColor)
         {
-            Value = new (Value!.Value.Foreground, newColor);
+            Value = new Attribute (Value!.Value.Foreground, selectedColor, Value!.Value.Style);
             SetNeedsDraw ();
         }
     }
 
     private void ClickedInForeground ()
     {
-        if (LineDrawing.PromptForColor ("Foreground", Value!.Value.Foreground, out Color newColor))
+        Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
+                                                                       beginInitHandler: prompt =>
+                                                                                         {
+                                                                                             prompt.Title = "Foreground Color";
+                                                                                             prompt.GetWrappedView ().SelectedColor = Value!.Value.Foreground;
+                                                                                         });
+
+        if (result is { } selectedColor)
         {
-            Value = new (newColor, Value!.Value.Background);
+            Value = new Attribute (selectedColor, Value!.Value.Background);
             SetNeedsDraw ();
         }
     }

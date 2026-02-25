@@ -2,7 +2,7 @@
 
 namespace ViewBaseTests;
 
-[Collection ("Global Test Setup")]
+
 public class EnabledTests : TestsAllViews
 {
     [Fact]

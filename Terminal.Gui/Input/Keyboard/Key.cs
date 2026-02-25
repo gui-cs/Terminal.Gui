@@ -1,7 +1,11 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Terminal.Gui.Input;
+
+// NOTE: It may be tempting to think this should be a record struct.
+// NOTE: If this were a struct, it would be boxed when used in events, and the ability to
+// NOTE: modify properties like Handled would be lost on the boxed copy.
+// NOTE: Mouse is a class for the same reason.
 
 /// <summary>
 ///     Provides an abstraction for common keyboard operations and state. Used for processing keyboard input and
@@ -454,13 +458,13 @@ public class Key : EventArgs, IEquatable<Key>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator == (Key a, Key b) { return a!.Equals (b); }
+    public static bool operator == (Key a, Key b) { return a.Equals (b); }
 
     /// <summary>Compares two <see cref="Key"/>s for not equality.</summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator != (Key? a, Key? b) { return !a!.Equals (b); }
+    public static bool operator != (Key? a, Key? b) { return a is null ? b is not null : !a.Equals (b); }
 
     /// <summary>Compares two <see cref="Key"/>s for less-than.</summary>
     /// <param name="a"></param>

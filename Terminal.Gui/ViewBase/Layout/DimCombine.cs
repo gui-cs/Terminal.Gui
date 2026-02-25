@@ -30,16 +30,16 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
     public Dim Right { get; } = Right;
 
     /// <inheritdoc/>
-    public override string ToString () { return $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})"; }
+    public override string ToString () => $"Combine({Left}{(Add == AddOrSubtract.Add ? '+' : '-')}{Right})";
 
     internal override int GetAnchor (int size)
     {
         if (Add == AddOrSubtract.Add)
         {
-            return Left!.GetAnchor (size) + Right!.GetAnchor (size);
+            return Left.GetAnchor (size) + Right.GetAnchor (size);
         }
 
-        return Left!.GetAnchor (size) - Right!.GetAnchor (size);
+        return Left.GetAnchor (size) - Right.GetAnchor (size);
     }
 
     internal override int Calculate (int location, int superviewContentSize, View us, Dimension dimension)
@@ -48,16 +48,81 @@ public record DimCombine (AddOrSubtract Add, Dim Left, Dim Right) : Dim
 
         if (Add == AddOrSubtract.Add)
         {
-            newDimension = Left!.Calculate (location, superviewContentSize, us, dimension) + Right!.Calculate (location, superviewContentSize, us, dimension);
+            newDimension = Left.Calculate (location, superviewContentSize, us, dimension) + Right.Calculate (location, superviewContentSize, us, dimension);
+        }
+        else
+        {
+            newDimension = Math.Max (0,
+                                     Left.Calculate (location, superviewContentSize, us, dimension)
+                                     - Right.Calculate (location, superviewContentSize, us, dimension));
+        }
+
+        return newDimension;
+    }
+
+    internal override bool ReferencesOtherViews ()
+    {
+        if (Left.ReferencesOtherViews ())
+        {
+            return true;
+        }
+
+        if (Right.ReferencesOtherViews ())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    internal override IEnumerable<View> GetReferencedViews ()
+    {
+        foreach (View view in Left.GetReferencedViews ())
+        {
+            yield return view;
+        }
+
+        foreach (View view in Right.GetReferencedViews ())
+        {
+            yield return view;
+        }
+    }
+
+    /// <inheritdoc/>
+    internal override bool DependsOnSuperViewContentSize => Left.DependsOnSuperViewContentSize || Right.DependsOnSuperViewContentSize;
+
+    /// <inheritdoc/>
+    internal override bool CanContributeToAutoSizing => Left.CanContributeToAutoSizing || Right.CanContributeToAutoSizing;
+
+    /// <inheritdoc/>
+    internal override int GetMinimumContribution (int location, int superviewContentSize, View us, Dimension dimension)
+    {
+        int newDimension;
+
+        if (Add == AddOrSubtract.Add)
+        {
+            newDimension = Left.GetMinimumContribution (location, superviewContentSize, us, dimension)
+                           + Right.GetMinimumContribution (location, superviewContentSize, us, dimension);
         }
         else
         {
             newDimension = Math.Max (
                                      0,
-                                     Left!.Calculate (location, superviewContentSize, us, dimension)
-                                     - Right!.Calculate (location, superviewContentSize, us, dimension));
+                                     Left.GetMinimumContribution (location, superviewContentSize, us, dimension)
+                                     - Right.GetMinimumContribution (location, superviewContentSize, us, dimension)
+                                    );
         }
 
         return newDimension;
     }
+
+    /// <inheritdoc/>
+    internal override bool IsFixed => Left.IsFixed && Right.IsFixed;
+
+    /// <inheritdoc/>
+    internal override bool RequiresTargetLayout => Left.RequiresTargetLayout || Right.RequiresTargetLayout;
+
+    /// <inheritdoc/>
+    protected override bool HasInner<TDim> (out TDim dim) => Left.Has (out dim) || Right.Has (out dim);
 }

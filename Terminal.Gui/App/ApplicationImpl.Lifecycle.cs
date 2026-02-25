@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -25,6 +26,10 @@ internal partial class ApplicationImpl
 
             throw new InvalidOperationException ("Init called multiple times without Shutdown");
         }
+
+        MainThreadId = Thread.CurrentThread.ManagedThreadId;
+
+        Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"driverName: {driverName}");
 
         // Thread-safe fence check: Ensure we're not mixing application models
         // Use lock to make check-and-set atomic
@@ -59,13 +64,9 @@ internal partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        // Debug.Assert (Navigation is null);
-        // Navigation = new ();
-
-        //Debug.Assert (Popover is null);
-        //Popover = new ();
-
         // Preserve existing keyboard settings if they exist
+        // BUGBUG: These should not be needed; KeyboardImpl subscribes to Application static property changes
+        // BUGBUG: and should set these automatically.
         bool hasExistingKeyboard = _keyboard is { };
         Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
         Key existingArrangeKey = _keyboard?.ArrangeKey ?? Application.ArrangeKey;
@@ -90,13 +91,15 @@ internal partial class ApplicationImpl
 
         Initialized = true;
 
-        RaiseInitializedChanged (this, new (true));
+        RaiseInitializedChanged (this, new EventArgs<bool> (true));
         SubscribeDriverEvents ();
 
-        SynchronizationContext.SetSynchronizationContext (new ());
-        MainThreadId = Thread.CurrentThread.ManagedThreadId;
+        SynchronizationContext.SetSynchronizationContext (new SynchronizationContext ());
 
         _result = null;
+
+        // Raise static event for modern instance-based model
+        Application.RaiseInstanceInitialized (this);
 
         return this;
     }
@@ -171,6 +174,10 @@ internal partial class ApplicationImpl
         // Capture state before cleanup
         bool wasInitialized = Initialized;
 
+        // Raise static event for modern instance-based model BEFORE assertions
+        // This allows test code to unsubscribe from instance events before we check
+        Application.RaiseInstanceDisposed (this);
+
 #if DEBUG
 
         // Check that all Application events have no remaining subscribers BEFORE clearing them
@@ -197,7 +204,7 @@ internal partial class ApplicationImpl
         if (wasInitialized)
         {
             bool init = Initialized; // Will be false after ResetState
-            RaiseInitializedChanged (this, new (in init));
+            RaiseInitializedChanged (this, new EventArgs<bool> (in init));
         }
 
         // Clear the event to prevent memory leaks
@@ -229,8 +236,10 @@ internal partial class ApplicationImpl
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
 
+        Trace.Lifecycle (MainThreadId?.ToString (), "Shutdown");
+
         // === 0. Stop all timers ===
-        TimedEvents?.StopAll ();
+        TimedEvents.StopAll ();
 
         // === 1. Stop all running runnables ===
         foreach (SessionToken token in SessionStack!.Reverse ())
@@ -242,7 +251,7 @@ internal partial class ApplicationImpl
         }
 
         // === 2. Close and dispose popover ===
-        if (Popover?.GetActivePopover () is View popover)
+        if (Popovers?.GetActivePopover () is View popover)
         {
             // This forcefully closes the popover; invoking Command.Quit would be more graceful
             // but since this is shutdown, doing this is ok.
@@ -250,8 +259,8 @@ internal partial class ApplicationImpl
         }
 
         // Any popovers added to Popover have their lifetime controlled by Popover
-        Popover?.Dispose ();
-        Popover = null;
+        Popovers?.Dispose ();
+        Popovers = null;
 
         // === 3. Clean up runnables ===
         SessionStack?.Clear ();
@@ -261,7 +270,7 @@ internal partial class ApplicationImpl
         // Don't dispose the TopRunnable. It's up to caller dispose it
         if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnableView is { })
         {
-            Debug.Assert (TopRunnableView.WasDisposed, $"Title = {TopRunnableView.Title}, Id = {TopRunnableView.Id}");
+            Debug.Assert (TopRunnableView.WasDisposed, TopRunnableView.ToDebugString ());
         }
 #endif
 
@@ -282,20 +291,18 @@ internal partial class ApplicationImpl
 
         // === 6. Reset input systems ===
         // Dispose keyboard and mouse to unsubscribe from events
+        // Mouse and Keyboard will be lazy-initialized on next access
         if (_keyboard is IDisposable keyboardDisposable)
         {
             keyboardDisposable.Dispose ();
         }
+        _keyboard = null;
 
         if (_mouse is IDisposable mouseDisposable)
         {
             mouseDisposable.Dispose ();
         }
-
-        // Mouse and Keyboard will be lazy-initialized on next access
         _mouse = null;
-        _keyboard = null;
-        Mouse.ResetState ();
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
@@ -320,7 +327,7 @@ internal partial class ApplicationImpl
     /// <summary>
     ///     Raises the <see cref="InitializedChanged"/> event.
     /// </summary>
-    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
+    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) => InitializedChanged?.Invoke (sender, e);
 
 #if DEBUG
     /// <summary>
@@ -337,28 +344,20 @@ internal partial class ApplicationImpl
 
         Delegate [] subscribers = eventDelegate.GetInvocationList ();
 
-        if (subscribers.Length > 0)
+        if (subscribers.Length <= 0)
         {
-            string subscriberInfo = string.Join (
-                                                 ", ",
-                                                 subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
-                                                                    )
-                                                );
-
-            Debug.Fail (
-                        $"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}"
-                       );
+            return;
         }
+        string subscriberInfo = string.Join (", ", subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"));
+
+        Debug.Fail ($"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}");
     }
 #endif
 
-    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
+    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) => ForceDriver = e.NewValue;
 
     /// <summary>
     ///     Unsubscribes from Application static property change events.
     /// </summary>
-    private void UnsubscribeApplicationEvents ()
-    {
-        Application.ForceDriverChanged -= OnForceDriverChanged;
-    }
+    private void UnsubscribeApplicationEvents () => Application.ForceDriverChanged -= OnForceDriverChanged;
 }
