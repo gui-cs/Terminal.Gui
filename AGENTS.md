@@ -92,6 +92,14 @@ Process guides in `.claude/workflows/`:
 - [Build & Test Workflow](/.claude/workflows/build-test-workflow.md) - Build, test, and troubleshooting
 - [PR Workflow](/.claude/workflows/pr-workflow.md) - Submitting pull requests
 
+## Planning Mode
+
+When creating implementation plans:
+- **Create plan files in `./plans/`** (relative to repository root: `D:\s\gui-cs\Terminal.Gui\plans\`)
+- Use markdown format with clear sections
+- Include: problem statement, implementation steps, file changes, verification steps
+- Reference existing patterns and reuse opportunities from exploration
+
 ## Task-Specific Guides
 
 See `.claude/tasks/` for specialized checklists:
@@ -206,7 +214,7 @@ See `.claude/cookbook/` for common UI patterns:
 |Drivers/UnixDriver:{IUnixInput.cs,SuspendHelper.cs,UnixClipboard.cs,UnixComponentFactory.cs,UnixInput.cs,UnixInputProcessor.cs,UnixIOHelper.cs,UnixOutput.cs,UnixRawModeHelper.cs}
 |Drivers/WindowsDriver:{ClipboardImpl.cs,CursorVisibility.cs,IWindowsInput.cs,WindowsComponentFactory.cs,WindowsConsole.cs,WindowsInput.cs,WindowsInputProcessor.cs,WindowsKeyboardLayout.cs,WindowsKeyConverter.cs,WindowsKeyHelper.cs,WindowsOutput.cs,WindowsVTInputHelper.cs,WindowsVTOutputHelper.cs}
 |FileServices:{DefaultSearchMatcher.cs,FileSystemColorProvider.cs,FileSystemIconProvider.cs,FileSystemInfoStats.cs,FileSystemTreeBuilder.cs,IFileOperations.cs,ISearchMatcher.cs}
-|Input:{Command.cs,CommandContext.cs,CommandEventArgs.cs,ICommandContext.cs,IInputBinding.cs,InputBinding.cs,InputBindings.cs}
+|Input:{Command.cs,CommandContext.cs,CommandEventArgs.cs,ICommandContext.cs,ICommandBinding.cs,CommandBinding.cs,CommandBindings.cs}
 |Input/Keyboard:{Key.cs,KeyBinding.cs,KeyBindings.cs,KeyChangedEventArgs.cs,KeyEqualityComparer.cs,KeystrokeNavigatorEventArgs.cs}
 |Input/Mouse:{GrabMouseEventArgs.cs,Mouse.cs,MouseBinding.cs,MouseBindings.cs,MouseFlags.cs,MouseFlagsChangedEventArgs.cs}
 |Resources:{GlobalResources.cs,ResourceManagerWrapper.cs,Strings.Designer.cs}

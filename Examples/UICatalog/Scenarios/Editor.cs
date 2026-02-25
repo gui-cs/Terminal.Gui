@@ -84,7 +84,7 @@ public class Editor : Scenario
                                        new MenuItem { Title = "Replace Ne_xt", Key = Key.R.WithCtrl.WithShift, Action = ReplaceNext },
                                        new MenuItem { Title = "Replace Pre_vious", Key = Key.R.WithCtrl.WithShift.WithAlt, Action = ReplacePrevious },
                                        new MenuItem { Title = "Replace _All", Key = Key.A.WithCtrl.WithShift.WithAlt, Action = ReplaceAll },
-                                       new MenuItem { Title = Strings.ctxSelectAll, Key = Key.T.WithCtrl, Action = SelectAll }
+                                       new MenuItem { Title = Strings.cmdSelectAll, Key = Key.T.WithCtrl, Action = SelectAll }
                                    ]));
 
         menu.Add (new MenuBarItem ("_ScrollBars", CreateScrollBarsMenu ()));

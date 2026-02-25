@@ -240,7 +240,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ImmutableSortedDictionary<string, Scheme> hardCodedSchemes = SchemeManager.GetHardCodedSchemes ()!;
 
             Color hardCodedBaseNormalFg = hardCodedSchemes ["Base"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedBaseNormalFg.ToString ());
 
             Load (ConfigLocations.Runtime);
             Apply ();
@@ -530,7 +530,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Color hardCodedBaseNormalFg = hardCodedSchemesViaSchemeManager ["Base"].Normal.Foreground;
 
-            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedBaseNormalFg.ToString ());
 
             // Capture current scheme colors
             Dictionary<string, Scheme> currentSchemes = SchemeManager.GetSchemes ()!;
@@ -709,7 +709,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             hardCodedSchemes =
                 GetHardCodedConfigPropertiesByScope ("ThemeScope")!.ToFrozenDictionary () ["Schemes"].PropertyValue as Dictionary<string, Scheme>;
             hardCodedBaseNormalFg = hardCodedSchemes! ["Base"].Normal.Foreground;
-            Assert.Equal (new Color (StandardColor.LightBlue).ToString (), hardCodedBaseNormalFg.ToString ());
+            Assert.Equal (Color.None.ToString (), hardCodedBaseNormalFg.ToString ());
 
             FrozenDictionary<string, ConfigProperty> hardCodedCache = GetHardCodedConfigPropertyCache ()!;
 

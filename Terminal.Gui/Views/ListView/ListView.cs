@@ -285,7 +285,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
+        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item 3", "List Item Quattro", "Last List Item"]);
         Source = source;
 
         return true;

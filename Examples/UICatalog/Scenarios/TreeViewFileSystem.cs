@@ -355,7 +355,7 @@ public class TreeViewFileSystem : Scenario
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        _detailsFrame?.App?.Popover?.Register (contextMenu);
+        _detailsFrame?.App?.Popovers?.Register (contextMenu);
 
         _detailsFrame?.App?.Invoke (() => contextMenu.MakeVisible (screenPoint));
     }
@@ -524,7 +524,7 @@ public class TreeViewFileSystem : Scenario
                     }
 
                     sb = new StringBuilder ();
-                    sb.AppendLine ($"Path:\n {_fileInfo.FullName}\n");
+                    sb.AppendLine ($"Path:\n {_fileInfo?.FullName}\n");
                     sb.AppendLine ($"Exception:\n {ioe.Message}");
                 }
 

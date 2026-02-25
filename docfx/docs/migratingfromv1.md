@@ -760,10 +760,9 @@ var scrollView = new ScrollView
 var view = new View();
 view.SetContentSize(new Size(100, 100));
 
-// Built-in scrollbars
-view.VerticalScrollBar.Visible = true;
-view.HorizontalScrollBar.Visible = true;
-view.VerticalScrollBar.AutoShow = true;
+// Built-in scrollbars with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 ```
 
 ### Scrolling API

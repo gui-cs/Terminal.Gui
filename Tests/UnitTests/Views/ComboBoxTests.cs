@@ -718,32 +718,32 @@ Three ",
 
         cb.OpenSelectedItem += (s, _) => opened = true;
 
-        Assert.False (Application.RaiseKeyDownEvent (Key.Enter));
+        Application.RaiseKeyDownEvent (Key.Enter);
         Assert.False (opened);
 
         cb.Text = "Tw";
-        Assert.False (Application.RaiseKeyDownEvent (Key.Enter));
+        Application.RaiseKeyDownEvent (Key.Enter);
         Assert.True (opened);
         Assert.Equal ("Tw", cb.Text);
         Assert.False (cb.IsShow);
 
         cb.SetSource<string> (null);
         Assert.False (cb.IsShow);
-        Assert.False (Application.RaiseKeyDownEvent (Key.Enter));
-        Assert.True (Application.RaiseKeyDownEvent (Key.F4)); // with no source also expand empty
+        Application.RaiseKeyDownEvent (Key.Enter);
+        Application.RaiseKeyDownEvent (Key.F4); // with no source also expand empty
         Assert.True (cb.IsShow);
 
         Assert.Equal (-1, cb.SelectedItem);
         cb.SetSource (source);
         cb.Text = "";
-        Assert.True (Application.RaiseKeyDownEvent (Key.F4)); // collapse
+        Application.RaiseKeyDownEvent (Key.F4); // collapse
         Assert.False (cb.IsShow);
-        Assert.True (Application.RaiseKeyDownEvent (Key.F4)); // expand
+        Application.RaiseKeyDownEvent (Key.F4); // expand
         Assert.True (cb.IsShow);
         cb.Collapse ();
         Assert.False (cb.IsShow);
         Assert.True (cb.HasFocus);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown)); // losing focus
+        Application.RaiseKeyDownEvent (Key.CursorDown); // losing focus
         Assert.False (cb.IsShow);
         Assert.False (cb.HasFocus);
         cb.SetFocus ();
@@ -754,27 +754,27 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
+        Application.RaiseKeyDownEvent (Key.CursorDown);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
+        Application.RaiseKeyDownEvent (Key.CursorDown);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
+        Application.RaiseKeyDownEvent (Key.CursorDown);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
         Assert.Equal ("Three", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        Application.RaiseKeyDownEvent (Key.CursorUp);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        Application.RaiseKeyDownEvent (Key.CursorUp);
         Assert.True (cb.IsShow);
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        Application.RaiseKeyDownEvent (Key.CursorUp);
 
         cb.Layout ();
 

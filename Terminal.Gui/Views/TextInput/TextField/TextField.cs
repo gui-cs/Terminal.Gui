@@ -48,18 +48,12 @@ public partial class TextField : View, IDesignable, IValue<string>
             ScrollOffset = _insertionPoint > Viewport.Width + 1 ? _insertionPoint - Viewport.Width + 1 : 0;
         }
 
-        if (Autocomplete.HostControl is null)
+        if (Autocomplete.HostControl is { })
         {
-            Autocomplete.HostControl = this;
-            Autocomplete.PopupInsideContainer = false;
+            return;
         }
-
-        CreateContextMenu ();
-
-        if (ContextMenu?.Key is { })
-        {
-            KeyBindings.Add (ContextMenu.Key, Command.Context);
-        }
+        Autocomplete.HostControl = this;
+        Autocomplete.PopupInsideContainer = false;
     }
 
     /// <summary>Gets or sets whether the text field is read-only.</summary>
@@ -89,6 +83,24 @@ public partial class TextField : View, IDesignable, IValue<string>
         _focusSetByMouse = false;
 
         UpdateCursor ();
+
+        if (newHasFocus)
+        {
+            CreateContextMenu ();
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+            DisposeContextMenu ();
+        }
     }
 
     /// <inheritdoc/>
@@ -109,32 +121,39 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         PopoverMenu menu = new (new List<MenuItem>
         {
-            new (this, Command.SelectAll, Strings.ctxSelectAll),
-            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new (this, Command.Copy, Strings.ctxCopy),
-            new (this, Command.Cut, Strings.ctxCut),
-            new (this, Command.Paste, Strings.ctxPaste),
-            new (this, Command.Undo, Strings.ctxUndo),
-            new (this, Command.Redo, Strings.ctxRedo)
-        });
+            new (this, Command.SelectAll),
+            new (this, Command.DeleteAll),
+            new (this, Command.Copy),
+            new (this, Command.Cut),
+            new (this, Command.Paste),
+            new (this, Command.Undo),
+            new (this, Command.Redo)
+        })
+        {
+#if DEBUG
+            Id = "textFieldContextMenu"
+#endif
+        };
 
         HotKeyBindings.Remove (menu.Key);
         HotKeyBindings.Add (menu.Key, Command.Context);
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
-        App?.Popover?.Register (ContextMenu);
+        App?.Popovers?.Register (ContextMenu);
     }
 
     private void DisposeContextMenu ()
     {
-        if (ContextMenu is { })
+        if (ContextMenu is null)
         {
-            ContextMenu.Visible = false;
-            ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
-            ContextMenu.Dispose ();
-            ContextMenu = null;
+            return;
         }
+        ContextMenu.Visible = false;
+        App?.Popovers?.DeRegister (ContextMenu);
+        ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
+        ContextMenu.Dispose ();
+        ContextMenu = null;
     }
 
     /// <inheritdoc/>
@@ -163,6 +182,9 @@ public partial class TextField : View, IDesignable, IValue<string>
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
 
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     /// <summary>
     ///     Raises the <see cref="ValueChanging"/> event.
     /// </summary>
@@ -181,6 +203,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     {
         ValueChangedEventArgs<string?> args = new (oldValue, newValue);
         ValueChanged?.Invoke (this, args);
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, newValue));
     }
 
     #endregion

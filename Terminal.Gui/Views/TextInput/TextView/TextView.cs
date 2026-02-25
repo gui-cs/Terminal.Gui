@@ -113,8 +113,6 @@ public partial class TextView : View, IDesignable
         Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
-        App?.Popover?.Register (ContextMenu);
-        KeyBindings.Add (ContextMenu.Key, Command.Context);
 
         UpdateScrollBars ();
         UpdateContentSize ();
@@ -164,6 +162,20 @@ public partial class TextView : View, IDesignable
         if (newHasFocus)
         {
             PositionCursor ();
+            App?.Popovers?.Register (ContextMenu);
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+            App?.Popovers?.DeRegister (ContextMenu);
         }
     }
 
@@ -239,14 +251,19 @@ public partial class TextView : View, IDesignable
     {
         PopoverMenu menu = new (new List<View>
         {
-            new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
-            new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new MenuItem (this, Command.Copy, Strings.ctxCopy),
-            new MenuItem (this, Command.Cut, Strings.ctxCut),
-            new MenuItem (this, Command.Paste, Strings.ctxPaste),
-            new MenuItem (this, Command.Undo, Strings.ctxUndo),
-            new MenuItem (this, Command.Redo, Strings.ctxRedo)
-        });
+            new MenuItem (this, Command.SelectAll),
+            new MenuItem (this, Command.DeleteAll),
+            new MenuItem (this, Command.Copy),
+            new MenuItem (this, Command.Cut),
+            new MenuItem (this, Command.Paste),
+            new MenuItem (this, Command.Undo),
+            new MenuItem (this, Command.Redo)
+        })
+        {
+#if DEBUG
+            Id = "textViewContextMenu"
+#endif
+        }; ;
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 
