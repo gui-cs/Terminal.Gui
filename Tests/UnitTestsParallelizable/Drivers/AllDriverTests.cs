@@ -134,6 +134,17 @@ public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m", output, driver);
     }
+
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void All_Drivers_Handles_Suspend_Themselves (string driverName)
+    {
+        // Arrange
+        using IApplication? app = Application.Create ().Init (driverName);
+
+        // Act & Assert
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Z.WithCtrl));
+    }
 }
 
 public class TestTop : Runnable
