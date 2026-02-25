@@ -118,13 +118,13 @@ var label2 = new Label () {
 
 <xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y` and supports the following sub-types:
 
-* Absolute position, by passing an integer - <xref:Terminal.Gui.ViewBase.Pos.Absolute>.
-* Percentage of the parent's view size - <xref:Terminal.Gui.ViewBase.Pos.Percent>(System.Int32)
-* Anchored from the end of the dimension - <xref:Terminal.Gui.ViewBase.Pos.AnchorEnd>(System.Int32)
+* Absolute position, by passing an integer - <xref:Terminal.Gui.ViewBase.Pos.Absolute(System.Int32)>.
+* Percentage of the parent's view size - <xref:Terminal.Gui.ViewBase.Pos.Percent(System.Int32)>
+* Anchored from the end of the dimension - <xref:Terminal.Gui.ViewBase.Pos.AnchorEnd(System.Int32)>
 * Centered, using <xref:Terminal.Gui.ViewBase.Pos.Center>
-* The <xref:Terminal.Gui.ViewBase.Pos.Left>, <xref:Terminal.Gui.ViewBase.Pos.Right>, <xref:Terminal.Gui.ViewBase.Pos.Top>, and <xref:Terminal.Gui.ViewBase.Pos.Bottom> tracks the position of another view.
-* Aligned (left, right, center, etc...) with other views - <xref:Terminal.Gui.ViewBase.Pos.Align>
-* An arbitrary function - <xref:Terminal.Gui.ViewBase.Pos.Func>
+* The <xref:Terminal.Gui.ViewBase.Pos.Left(Terminal.Gui.ViewBase.View)>, <xref:Terminal.Gui.ViewBase.Pos.Right(Terminal.Gui.ViewBase.View)>, <xref:Terminal.Gui.ViewBase.Pos.Top(Terminal.Gui.ViewBase.View)>, and <xref:Terminal.Gui.ViewBase.Pos.Bottom(Terminal.Gui.ViewBase.View)> tracks the position of another view.
+* Aligned (left, right, center, etc...) with other views - <xref:Terminal.Gui.ViewBase.Pos.Align(Terminal.Gui.ViewBase.Alignment,Terminal.Gui.ViewBase.AlignmentModes,System.Int32)>
+* An arbitrary function - <xref:Terminal.Gui.ViewBase.Pos.Func(System.Func{Terminal.Gui.ViewBase.View,System.Int32},Terminal.Gui.ViewBase.View)>
 
 All `Pos` coordinates are relative to the SuperView's content area.
 
@@ -145,12 +145,12 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 
 <xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height` and supports the following sub-types:
 
-* Automatic size based on the View's content (either SubViews or Text) - <xref:Terminal.Gui.ViewBase.Dim.Auto> - See [Dim.Auto Deep Dive](dimauto.md).
-* Absolute size, by passing an integer - <xref:Terminal.Gui.ViewBase.Dim.Absolute>(System.Int32).
-* Percentage of the SuperView's Content Area  - <xref:Terminal.Gui.ViewBase.Dim.Percent>(System.Int32).
-* Fill to the end of the SuperView's Content Area - <xref:Terminal.Gui.ViewBase.Dim.Fill>. **Note:** `Dim.Fill` does not contribute to a SuperView's <xref:Terminal.Gui.ViewBase.Dim.Auto> sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
-* Reference the Width or Height of another view - <xref:Terminal.Gui.ViewBase.Dim.Width>(Terminal.Gui.View), <xref:Terminal.Gui.ViewBase.Dim.Height>(Terminal.Gui.View).
-* An arbitrary function - <xref:Terminal.Gui.ViewBase.Dim.Func>(System.Func{System.Int32}).
+* Automatic size based on the View's content (either SubViews or Text) - <xref:Terminal.Gui.ViewBase.Dim.Auto(Terminal.Gui.ViewBase.DimAutoStyle,Terminal.Gui.ViewBase.Dim,Terminal.Gui.ViewBase.Dim)> - See [Dim.Auto Deep Dive](dimauto.md).
+* Absolute size, by passing an integer - <xref:Terminal.Gui.ViewBase.Dim.Absolute(System.Int32)>.
+* Percentage of the SuperView's Content Area  - <xref:Terminal.Gui.ViewBase.Dim.Percent(System.Int32,Terminal.Gui.ViewBase.DimPercentMode)>.
+* Fill to the end of the SuperView's Content Area - <xref:Terminal.Gui.ViewBase.Dim.Fill>. **Note:** `Dim.Fill` does not contribute to a SuperView's <xref:Terminal.Gui.ViewBase.Dim.Auto(Terminal.Gui.ViewBase.DimAutoStyle,Terminal.Gui.ViewBase.Dim,Terminal.Gui.ViewBase.Dim)> sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
+* Reference the Width or Height of another view - <xref:Terminal.Gui.ViewBase.Dim.Width(Terminal.Gui.ViewBase.View)>, <xref:Terminal.Gui.ViewBase.Dim.Height(Terminal.Gui.ViewBase.View)>.
+* An arbitrary function - <xref:Terminal.Gui.ViewBase.Dim.Func(System.Func{Terminal.Gui.ViewBase.View,System.Int32},Terminal.Gui.ViewBase.View)>.
 
 All `Dim` dimensions are relative to the SuperView's content area.
 
@@ -213,7 +213,7 @@ superView.Add (label, textField, btn);
 
 ### Align Multiple Views (Like Dialog Buttons)
 
-**Scenario:** Align buttons horizontally using <xref:Terminal.Gui.ViewBase.Pos.Align>, as `Dialog` does:
+**Scenario:** Align buttons horizontally using <xref:Terminal.Gui.ViewBase.Pos.Align(Terminal.Gui.ViewBase.Alignment,Terminal.Gui.ViewBase.AlignmentModes,System.Int32)>, as `Dialog` does:
 
 ```cs
 Button cancelBtn = new ()

@@ -8,7 +8,7 @@ Terminal.Gui provides a set of APIs for formatting text, line drawing, and chara
 
 # View Drawing API
 
-Terminal.Gui apps draw using the <xref:Terminal.Gui.ViewBase.View.Move>(System.Int32,System.Int32) and <xref:Terminal.Gui.ViewBase.View.AddRune>(System.Text.Rune) APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the <xref:Terminal.Gui.Drawing.Attribute> that was most recently set via <xref:Terminal.Gui.ViewBase.View.SetAttribute>(Terminal.Gui.Attribute). The driver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
+Terminal.Gui apps draw using the <xref:Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32)> and <xref:Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune)> APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the <xref:Terminal.Gui.Drawing.Attribute> that was most recently set via <xref:Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute)>. The driver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
 
 ## Drawing Lifecycle
 
@@ -39,9 +39,9 @@ See [Layout](layout.md) for more details of the Terminal.Gui coordinate system.
 
 ## Outputting unformatted text
 
-1) Moving the draw cursor using <xref:Terminal.Gui.ViewBase.View.Move>(System.Int32,System.Int32).
-2) Setting the attributes using <xref:Terminal.Gui.ViewBase.View.SetAttribute>(Terminal.Gui.Attribute).
-3) Outputting glyphs by calling <xref:Terminal.Gui.ViewBase.View.AddRune>(System.Text.Rune) or <xref:Terminal.Gui.ViewBase.View.AddStr>(System.String) .
+1) Moving the draw cursor using <xref:Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32)>.
+2) Setting the attributes using <xref:Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute)>.
+3) Outputting glyphs by calling <xref:Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune)> or <xref:Terminal.Gui.ViewBase.View.AddStr(System.String)> .
 
 ## Outputting formatted text
 
@@ -94,13 +94,13 @@ The <xref:Terminal.Gui.Drawing.Cell> class represents a single cell on the scree
 
 `Cell` is not exposed directly to the developer. Instead, the driver classes manage the `Cell` array that represents the screen.
 
-To draw a `Cell` to the screen, use <xref:Terminal.Gui.ViewBase.View.Move>(System.Int32,System.Int32) to specify the row and column coordinates and then use the <xref:Terminal.Gui.ViewBase.View.AddRune>(System.Int32,System.Int32,System.Text.Rune) method to draw a single glyph.  
+To draw a `Cell` to the screen, use <xref:Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32)> to specify the row and column coordinates and then use the <xref:Terminal.Gui.ViewBase.View.AddRune(System.Int32,System.Int32,System.Text.Rune)> method to draw a single glyph.  
 
 ## Attribute 
 
 The <xref:Terminal.Gui.Drawing.Attribute> class represents the formatting attributes of a `Cell`. It exposes properties for the foreground and background colors as well as the text style. The foreground and background colors are of type <xref:Terminal.Gui.Drawing.Color>. Bold, underline, and other formatting attributes are supported via the <xref:Terminal.Gui.Drawing.Attribute.Style> property.
 
-Use <xref:Terminal.Gui.ViewBase.View.SetAttribute>(Terminal.Gui.Attribute) to indicate which Attribute subsequent <xref:Terminal.Gui.ViewBase.View.AddRune>(System.Text.Rune) and <xref:Terminal.Gui.ViewBase.View.AddStr>(System.String) calls will use:
+Use <xref:Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute)> to indicate which Attribute subsequent <xref:Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune)> and <xref:Terminal.Gui.ViewBase.View.AddStr(System.String)> calls will use:
 
 ```cs
 // This is for illustration only. Developers typically use SetAttributeForRole instead.
@@ -108,7 +108,7 @@ SetAttribute (new Attribute (Color.Red, Color.Black, Style.Underline));
 AddStr ("Red on Black Underlined.");
 ```
 
-In the above example a hard-coded Attribute is set. Normally, developers will use <xref:Terminal.Gui.ViewBase.View.SetAttributeForRole>(Terminal.Gui.VisualRole) to have the system use the Attributes associated with a `VisualRole` (see below).
+In the above example a hard-coded Attribute is set. Normally, developers will use <xref:Terminal.Gui.ViewBase.View.SetAttributeForRole(Terminal.Gui.Drawing.VisualRole)> to have the system use the Attributes associated with a `VisualRole` (see below).
 
 ```cs
 // Modify the View's Scheme such that Focus is Red on Black Underlined
