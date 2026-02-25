@@ -114,7 +114,7 @@ var label2 = new Label () {
 };
 ```
 
-### <xref:Terminal.Gui.ViewBase.Pos>
+### Pos
 
 <xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y` and supports the following sub-types:
 
@@ -141,7 +141,7 @@ anotherView.Width = 9;
 myView.X = Pos.X (view);
 myView.Y = Pos.Bottom (anotherView) + 5;
 ```
-### <xref:Terminal.Gui.ViewBase.Dim>
+### Dim
 
 <xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height` and supports the following sub-types:
 

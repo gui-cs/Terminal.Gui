@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Quick Reference](#quick-reference)
-- [Tenets for Mouse Handling](#tenets-for-terminal-gui-mouse-handling)
+- [Tenets for Mouse Handling](#tenets-for-mouse-handling)
 - [Mouse Behavior - End User's Perspective](#mouse-behavior---end-users-perspective)
 - [Mouse APIs](#mouse-apis)
 - [Mouse Bindings](#mouse-bindings)

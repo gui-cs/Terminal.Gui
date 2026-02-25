@@ -38,7 +38,7 @@ Use this decision tree to choose the right pattern:
 | Scenario | Pattern | Jump to |
 |----------|---------|---------|
 | Property change (cancellable) | `CWPPropertyHelper` | [Recipe 1](#recipe-1-cancellable-property-change) |
-| Action/workflow (cancellable) | Manual CWP or `CWPWorkflowHelper` | [Recipe 2](#recipe-2-cancellable-action-workflow) |
+| Action/workflow (cancellable) | Manual CWP or `CWPWorkflowHelper` | [Recipe 2](#recipe-2-cancellable-actionworkflow) |
 | Simple notification (no cancel) | `EventHandler` | [Recipe 3](#recipe-3-simple-notification) |
 | Property notification (MVVM) | `INotifyPropertyChanged` | [Recipe 4](#recipe-4-mvvm-property-notification) |
 

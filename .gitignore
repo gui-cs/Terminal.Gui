@@ -82,3 +82,4 @@ log.*
 .mcp.json
 .env
 tmpclaude-*-cwd
+local_packages/
