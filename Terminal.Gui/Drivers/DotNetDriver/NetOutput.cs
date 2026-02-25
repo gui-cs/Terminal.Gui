@@ -171,6 +171,14 @@ public class NetOutput : OutputBase, IOutput
             // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
             Write (EscSeqUtils.CSI_DisableMouseEvents);
 
+            // Check if we have a real console first
+            if (Console.IsInputRedirected || Console.IsOutputRedirected)
+            {
+                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+
+                return;
+            }
+
             Console.ResetColor ();
             Console.Clear ();
 

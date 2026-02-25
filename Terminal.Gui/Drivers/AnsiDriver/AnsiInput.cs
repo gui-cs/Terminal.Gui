@@ -86,9 +86,10 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
         try
         {
+            // Check if we have a real console first
             if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
             {
-                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                Logging.Information ($"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
 
                 return;
             }

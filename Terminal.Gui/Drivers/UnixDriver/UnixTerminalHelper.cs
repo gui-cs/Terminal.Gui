@@ -99,6 +99,14 @@ internal static class UnixTerminalHelper
             // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
             output.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
+            // Check if we have a real console first
+            if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            {
+                Logging.Information ($"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+
+                return;
+            }
+
             // Save terminal state before suspending
             SaveTerminalState ();
 
