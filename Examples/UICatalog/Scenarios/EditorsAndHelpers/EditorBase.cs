@@ -10,7 +10,7 @@ public abstract class EditorBase : View
 
         CanFocus = true;
 
-        ExpanderButton = new ()
+        ExpanderButton = new ExpanderButton
         {
             Orientation = Orientation.Vertical
         };
@@ -19,6 +19,12 @@ public abstract class EditorBase : View
 
         Initialized += OnInitialized;
 
+        AddCommand (Command.Accept, () => true);
+
+        SchemeName = "Dialog";
+
+        return;
+
         void OnInitialized (object? sender, EventArgs e)
         {
             Border?.Add (ExpanderButton);
@@ -26,10 +32,6 @@ public abstract class EditorBase : View
             App!.Mouse.MouseEvent += ApplicationOnMouseEvent;
             App!.Navigation!.FocusedChanged += NavigationOnFocusedChanged;
         }
-
-        AddCommand (Command.Accept, () => true);
-
-        SchemeName = "Dialog";
     }
 
     private readonly ExpanderButton? _expanderButton;

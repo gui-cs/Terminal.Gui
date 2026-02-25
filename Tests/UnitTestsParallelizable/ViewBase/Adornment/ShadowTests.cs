@@ -530,7 +530,7 @@ public class ShadowTests (ITestOutputHelper output)
 
         // Printed with bright black (dark gray) text on bright black (dark gray) background making it invisible
         DriverAssert.AssertDriverOutputIs ("""
-                                           \x1b[30m\x1b[107m*\x1b[90m\x1b[100mB
+                                           \x1b[30m\x1b[107m*\x1b[93m\x1b[100mB
                                            """, _output, app.Driver);
     }
 
@@ -577,7 +577,7 @@ public class ShadowTests (ITestOutputHelper output)
         _output.WriteLine (output);
 
         DriverAssert.AssertDriverOutputIs ("""
-                                           \x1b[30m\x1b[107m*\x1b[90m\x1b[103m \x1b[97m\x1b[40m \x1b[90m\x1b[100m \x1b[97m\x1b[40m🍎
+                                           \x1b[30m\x1b[107m*\x1b[90m\x1b[107m \x1b[97m\x1b[40m \x1b[93m\x1b[100m \x1b[97m\x1b[40m🍎
                                            """, _output, app.Driver);
     }
 }

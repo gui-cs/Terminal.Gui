@@ -48,12 +48,7 @@ internal class DriverImpl : IDriver
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
-
-        _inputProcessor.SyntheticMouseEvent += (s, e) =>
-                                               {
-                                                   //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
-                                                   MouseEvent?.Invoke (s, e);
-                                               };
+        _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
         _ansiRequestScheduler = ansiRequestScheduler;
@@ -233,6 +228,22 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public bool Force16Colors { get => _output.Force16Colors; set => _output.Force16Colors = value; }
+
+    /// <inheritdoc/>
+    public Attribute? DefaultAttribute { get; private set; }
+
+    /// <summary>
+    ///     Sets the terminal's default attribute (queried via OSC 10/11).
+    /// </summary>
+    internal void SetDefaultAttribute (Attribute attr) => DefaultAttribute = attr;
+
+    /// <inheritdoc/>
+    public TerminalColorCapabilities? ColorCapabilities { get; private set; }
+
+    /// <summary>
+    ///     Sets the terminal's color capabilities (detected from environment variables).
+    /// </summary>
+    internal void SetColorCapabilities (TerminalColorCapabilities caps) => ColorCapabilities = caps;
 
     private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) => Force16Colors = e.NewValue;
 

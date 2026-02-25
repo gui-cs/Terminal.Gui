@@ -211,9 +211,69 @@ using (Logging.PushLogger(new XUnitLogger(_output, LogLevel.Debug)))
 UICatalog includes built-in logging UI. Access via the **Logging** menu to:
 - View logs in real-time
 - Change log level at runtime
+- Toggle Command, Mouse, and Keyboard tracing
 - See scenario-specific logs
 
 ![UICatalog Logging](../images/UICatalog_Logging.png)
+
+## View Event Tracing
+
+Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` namespace) for debugging event flow through the view hierarchy. Three categories can be enabled independently:
+
+| Category | Property | What It Traces |
+|----------|----------|----------------|
+| Command | `Trace.CommandEnabled` | Command routing (InvokeCommand, bubbling, dispatch) |
+| Mouse | `Trace.MouseEnabled` | Mouse events (clicks, drags, wheel) |
+| Keyboard | `Trace.KeyboardEnabled` | Keyboard events (key down, key up) |
+
+### Enabling Tracing
+
+**Via code:**
+
+```csharp
+using Terminal.Gui.Tracing;
+
+Trace.CommandEnabled = true;   // Command routing
+Trace.MouseEnabled = true;     // Mouse events
+Trace.KeyboardEnabled = true;  // Keyboard events
+```
+
+When tracing is enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
+
+**Via configuration:**
+
+```json
+{
+  "Trace.CommandEnabled": true,
+  "Trace.MouseEnabled": false,
+  "Trace.KeyboardEnabled": true
+}
+```
+
+**Via UICatalog:** Toggle in **Logging** menu → **Command Trace** / **Mouse Trace** / **Keyboard Trace**
+
+### Custom Trace Backends
+
+For testing or custom logging, use `Trace.Backend`:
+
+```csharp
+using Terminal.Gui.Tracing;
+
+// Capture traces for assertions
+ListBackend backend = new ();
+Trace.Backend = backend;
+Trace.CommandEnabled = true;
+
+// ... run code ...
+
+// Inspect captured traces
+foreach (TraceEntry entry in backend.Entries)
+{
+    Console.WriteLine ($"{entry.Category}: {entry.ViewId} - {entry.Phase}");
+}
+```
+
+See [Command Deep Dive - Command Route Tracing](command.md#command-route-tracing) for detailed command tracing information.
 
 ## Metrics
 
