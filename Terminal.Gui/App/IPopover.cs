@@ -67,5 +67,7 @@ public interface IPopover
     ///         <see cref="IApplication.TopRunnableView"/> if not already set.
     ///     </para>
     /// </remarks>
-    IRunnable? Current { get; set; }
+    IRunnable? Owner { get; set; }
+
+    // TODO: Add WeakReference<View?>? Target {get; set;} - The view that commands will get bubbled up to
 }

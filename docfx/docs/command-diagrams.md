@@ -19,11 +19,11 @@ flowchart TD
 ```
 
 **Key Points:**
-- Commands follow the Cancellable Work Pattern: pre-event → virtual method → event → handler
-- `OnActivating`/`OnAccepting` or event handlers can cancel via `args.Cancel = true`
+- Commands follow the Cancellable Work Pattern: virtual method → event → handler
+- `OnActivating`/`OnAccepting` or event handlers can cancel via `args.Handled = true`
 - Command handlers return `bool?`: `null` (no handler), `false` (executed but unhandled), `true` (handled/canceled)
-- `Command.Activate` is handled locally (no propagation)
-- `Command.Accept` may propagate (see Level 2)
+- `Command.Activate` bubbling is opt-in via `SuperView.CommandsToBubbleUp`
+- `Command.Accept` may propagate via `DefaultAcceptView` or `CommandsToBubbleUp` (see Level 2)
 
 ### Level 2: Accept Propagation with Button.IsDefault
 
@@ -47,9 +47,9 @@ flowchart TD
 ```
 
 **Key Points:**
-- `Command.Accept` checks for a sibling `Button` with `IsDefault = true` in the `SuperView`
-- If found and not the source view, the default button handles the command first
-- If unhandled or no default button, command propagates to `SuperView`
+- `Command.Accept` checks `SuperView.DefaultAcceptView` for a SubView implementing `IAcceptTarget` with `IsDefault = true`
+- If found and not the source view, the default accept view handles the command first via `BubbleDown`
+- If unhandled or no default accept view, command bubbles to `SuperView` if `CommandsToBubbleUp` includes `Command.Accept`
 - `SuperView` (e.g., `Dialog`) can handle accept to close or trigger actions
 - This enables Enter key to activate default buttons from any focused view
 
@@ -96,6 +96,6 @@ flowchart TD
 - **Scenario 1 (HotKey)**: Shortcut activates menu bar item via `Command.HotKey`, which sets focus and triggers MenuBar to show the popover
 - **Scenario 2 (Activate)**: Arrow keys navigate menu items via `Command.Activate`, which is handled locally but raises `SelectedMenuItemChanged` for MenuBar coordination
 - **Scenario 3 (Accept)**: Enter key executes menu items via `Command.Accept`, followed by `Accepted` event propagating up (MenuItem → Menu → MenuBar) to close menus
-- `Command.Activate` doesn't propagate but uses view-specific event (`SelectedMenuItemChanged`) for hierarchical coordination
+- `Command.Activate` propagation is opt-in via `CommandsToBubbleUp`; Menu also uses view-specific event (`SelectedMenuItemChanged`) for hierarchical coordination
 - `Accepted` is a post-event (not part of Cancellable Work Pattern pre-event phase) that signals action completion
-- MenuBar uses `SelectedMenuItemChanged` to manage popover visibility, demonstrating current workaround for lack of generic `Activate` propagation
+- MenuBar uses `SelectedMenuItemChanged` to manage popover visibility

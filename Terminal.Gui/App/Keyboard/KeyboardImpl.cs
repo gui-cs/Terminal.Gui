@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -73,7 +74,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     public IApplication? App { get; set; }
 
     /// <inheritdoc/>
-    public KeyBindings KeyBindings { get; internal set; } = new (null);
+    public KeyBindings KeyBindings { get; internal set; } = new ();
 
     /// <inheritdoc/>
     public Key QuitKey
@@ -147,14 +148,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
-        // TODO: Add a way to ignore certain keys, esp for debugging.
-        //#if DEBUG
-        //        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
-        //        {
-        //            Logging.Debug ($"Ignoring {key}");
-        //            return false;
-        //        }
-        //#endif
+        Trace.Keyboard ("app", key, "Entry");
 
         // TODO: This should match standard event patterns
         KeyDown?.Invoke (this, key);
@@ -164,7 +158,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             return true;
         }
 
-        if (App?.Popover?.DispatchKeyDown (key) is true)
+        if (App?.Popovers?.DispatchKeyDown (key) is true)
         {
             return true;
         }
@@ -215,6 +209,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         // foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.GetBindings (key))
         if (KeyBindings.TryGet (key, out KeyBinding binding))
         {
+            Trace.Keyboard ("app", key, "Entry");
+
             if (binding.Target is { })
             {
                 if (!binding.Target.Enabled)
@@ -222,7 +218,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                     return null;
                 }
 
-                handled = binding.Target?.InvokeCommands (binding.Commands, binding);
+                handled = binding.Target?.InvokeCommands (binding.Commands, binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
             }
             else
             {
@@ -304,10 +300,10 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                         while (viewToArrange is { Arrangement: ViewArrangement.Fixed })
                         {
                             viewToArrange = viewToArrange switch
-                            {
-                                Adornment adornmentView => adornmentView.Parent,
-                                _ => viewToArrange.SuperView
-                            };
+                                            {
+                                                Adornment adornmentView => adornmentView.Parent,
+                                                _ => viewToArrange.SuperView
+                                            };
                         }
 
                         if (viewToArrange is { })

@@ -173,7 +173,6 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
                     newValue = DeepCloner.DeepClone (propWithValue.Value.PropertyValue);
                 }
 
-                // Logging.Debug($"{propWithValue.Key}: {currentValue} -> {newValue}");
                 Debug.Assert (!propWithValue.Value.Immutable);
                 propWithValue.Value.PropertyInfo.SetValue (null, newValue);
 

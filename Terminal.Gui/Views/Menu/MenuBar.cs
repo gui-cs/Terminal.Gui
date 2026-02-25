@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using System.Diagnostics;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Views;
 
@@ -28,58 +28,13 @@ public class MenuBar : Menu, IDesignable
 
         Key = DefaultKey;
 
-        AddCommand (Command.HotKey,
-                    ctx =>
-                    {
-                        // Logging.Debug ($"{Title} - Command.HotKey");
-
-                        if (RaiseHandlingHotKey (ctx) is true)
-                        {
-                            return true;
-                        }
-
-                        if (HideActiveItem ())
-                        {
-                            return true;
-                        }
-
-                        if (SubViews.OfType<MenuBarItem> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is { } first)
-                        {
-                            Active = true;
-                            ShowItem (first);
-
-                            return true;
-                        }
-
-                        return false;
-                    });
-
         // If we're not focused, Key activates/deactivates
         HotKeyBindings.Add (Key, Command.HotKey);
 
         KeyBindings.Add (Key, Command.Quit);
         KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
 
-        AddCommand (Command.Quit,
-                    ctx =>
-                    {
-                        // Logging.Debug ($"{Title} - Command.Quit");
-
-                        if (HideActiveItem ())
-                        {
-                            return true;
-                        }
-
-                        if (CanFocus)
-                        {
-                            CanFocus = false;
-                            Active = false;
-
-                            return true;
-                        }
-
-                        return false; // RaiseAccepted (ctx);
-                    });
+        AddCommand (Command.Quit, Quit);
 
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -87,20 +42,561 @@ public class MenuBar : Menu, IDesignable
         AddCommand (Command.Left, MoveLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
 
+        // Override the default HotKey handler to correctly route bubbled-up HotKeys
+        // from MenuBarItems. Without this, DefaultHotKeyHandler invokes Activate on the
+        // MenuBar with Direct routing, causing FallbackToFirst to always open the first
+        // item instead of the one whose HotKey was pressed.
+        AddCommand (Command.HotKey, HotKeyHandler);
+
         BorderStyle = DefaultBorderStyle;
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
 
         return;
 
-        bool? MoveLeft (ICommandContext? ctx) => AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        bool? HotKeyHandler (ICommandContext? ctx)
+        {
+            Trace.Command (this, ctx, "Entry");
 
-        bool? MoveRight (ICommandContext? ctx) => AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            // When a MenuBarItem's HotKey bubbles up to the MenuBar, invoke Activate
+            // on the source MenuBarItem directly. This toggles its PopoverMenuOpen and
+            // then bubbles Activate to OnActivating with BubblingUp routing, which
+            // correctly identifies the source and shows the right popover.
+            if (ctx?.Routing != CommandRouting.BubblingUp || !ctx.TryGetSource (out View? source) || FindMenuBarItemForSource (source) is not { } sourceMbi)
+            {
+                return DefaultHotKeyHandler (ctx);
+            }
+            Trace.Command (this, ctx, "BubblingUp", $"Activating {sourceMbi.ToIdentifyingString ()}");
+            sourceMbi.InvokeCommand (Command.Activate, ctx.Binding);
+
+            return true;
+
+            // Non-bubbled HotKey (e.g. F9 pressed on MenuBar directly) — use default behavior.
+        }
+
+        bool? Quit (ICommandContext? ctx)
+        {
+            _popoverBrowsingMode = false;
+
+            if (HideActiveItem ())
+            {
+                return true;
+            }
+
+            if (!CanFocus)
+            {
+                return false;
+            }
+            CanFocus = false;
+            Active = false;
+
+            return true;
+        }
+
+        bool? MoveLeft (ICommandContext? ctx) =>
+
+            // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
+            // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
+            // _isSwitchingItem guard for the focus transfer it does.
+            AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+
+        bool? MoveRight (ICommandContext? ctx) =>
+
+            // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
+            // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
+            // _isSwitchingItem guard for the focus transfer it does.
+            AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
     }
 
-    private Key _key = DefaultKey;
+    /// <inheritdoc/>
+    protected override View? GetDispatchTarget (ICommandContext? ctx) => Focused;
 
-    private bool _active;
+    /// <inheritdoc/>
+    protected override bool ConsumeDispatch => true;
+
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        Trace.Command (this, args.Context, "Entry", $"Visible={Visible} Enabled={Enabled} Active={Active}");
+
+        if (!Visible || !Enabled)
+        {
+            Trace.Command (this, args.Context, "Blocked", "Invisible or disabled");
+
+            return true; // Block activation when invisible or disabled
+        }
+
+        // When a MenuBarItem's activation bubbles up, activate the MenuBar and show that item.
+        if (args.Context?.Routing == CommandRouting.BubblingUp)
+        {
+            if (!args.Context.TryGetSource (out View? source) || FindMenuBarItemForSource (source) is not { } sourceMbi)
+            {
+                Trace.Command (this, args.Context, "BubblingUp", "Source not found or not a MenuBarItem");
+
+                return false;
+            }
+
+            Trace.Command (this, args.Context, "BubblingUp", $"Source={sourceMbi.ToIdentifyingString ()} PopoverMenuOpen={sourceMbi.PopoverMenuOpen}");
+
+            if (sourceMbi.PopoverMenuOpen)
+            {
+                // Guard against intermediate focus traversal: setting Active=true
+                // causes CanFocus=true which can focus the first MenuBarItem transiently.
+                // _isSwitchingItem prevents OnSelectedMenuItemChanged from auto-opening
+                // that intermediate item.
+                _isSwitchingItem = true;
+
+                try
+                {
+                    // MenuBarItem just opened its popover — ensure MenuBar is active
+                    if (!Active)
+                    {
+                        Active = true;
+                    }
+
+                    ShowItem (sourceMbi);
+                }
+                finally
+                {
+                    _isSwitchingItem = false;
+                }
+            }
+            else
+            {
+                // MenuBarItem just closed its popover — deactivate MenuBar
+                Active = false;
+            }
+
+            return true;
+
+            // Non-MenuBarItem SubView bubbling — let normal bubbling proceed.
+        }
+
+        if (Active)
+        {
+            // Already active — toggle off
+            Trace.Command (this, args.Context, "ToggleOff", "Already active — deactivating");
+            Active = false;
+
+            return true;
+        }
+
+        if (SubViews.OfType<MenuBarItem> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is not { } first)
+        {
+            Trace.Command (this, args.Context, "NoItems", "No MenuBarItem with PopoverMenu found");
+
+            return false;
+        }
+
+        // Not yet active — activate and show the first MenuBarItem with a PopoverMenu.
+        Trace.Command (this, args.Context, "FallbackToFirst", $"Opening first={first.ToIdentifyingString ()}");
+        Active = true;
+        ShowItem (first);
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        Trace.Command (this, ctx, "Entry", $"Active={Active} Routing={ctx?.Routing}");
+        base.OnActivated (ctx);
+
+        if (ctx is { Routing: CommandRouting.Direct })
+        {
+            CanFocus = !Active;
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets whether the menu bar is active or not. When active, the MenuBar can focus and moving the mouse
+    ///     over a MenuBarItem will switch focus to that item. Use <see cref="IsOpen"/> to determine if a PopoverMenu of
+    ///     a MenuBarItem is open.
+    /// </summary>
+    /// <returns></returns>
+    public bool Active
+    {
+        get;
+        internal set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            Trace.Command (this, "ActiveChanged", $"{field} -> {value}");
+            field = value;
+
+            // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
+            // it won't be to the MenuBar
+            CanFocus = value;
+
+            if (field)
+            {
+                return;
+            }
+            _popoverBrowsingMode = false;
+
+            HideActiveItem ();
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the default Border Style for the MenuBar. The default is <see cref="LineStyle.None"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+
+    /// <summary>The default key for activating menu bars.</summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Key DefaultKey { get; set; } = Key.F9;
+
+    /// <inheritdoc/>
+    public override void EndInit ()
+    {
+        base.EndInit ();
+
+        if (Border is { })
+        {
+            Border.Thickness = new Thickness (0);
+            Border.LineStyle = LineStyle.None;
+        }
+
+        // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
+        foreach (MenuBarItem? mbi in SubViews.Select (s => s as MenuBarItem))
+        {
+            App?.Popovers?.Register (mbi?.PopoverMenu);
+        }
+    }
+
+    /// <summary>
+    ///     Gets all <see cref="MenuItem"/>s in the menu hierarchy that match <paramref name="predicate"/>.
+    /// </summary>
+    /// <param name="predicate">A function to test each <see cref="MenuItem"/>.</param>
+    /// <returns>All matching <see cref="MenuItem"/>s across all <see cref="PopoverMenu"/>s.</returns>
+    public IEnumerable<MenuItem> GetMenuItemsWith (Func<MenuItem, bool> predicate)
+    {
+        List<MenuItem> menuItems = [];
+
+        foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
+        {
+            if (mbi.PopoverMenu is { })
+            {
+                menuItems.AddRange (mbi.PopoverMenu.Root?.GetMenuItemsOfAllSubMenus (predicate) ?? []);
+            }
+        }
+
+        return menuItems;
+    }
+
+    /// <summary>
+    ///     Hides the popover menu associated with the active menu bar item and updates the focus state.
+    /// </summary>
+    /// <returns><see langword="true"/> if the popover was hidden</returns>
+    public bool HideActiveItem ()
+    {
+        Trace.Command (this, "Entry");
+
+        return HideItem (GetActiveItem ());
+    }
+
+    /// <summary>
+    ///     Hides popover menu associated with the specified menu bar item and updates the focus state.
+    /// </summary>
+    /// <param name="activeItem"></param>
+    /// <returns><see langword="true"/> if the popover was hidden</returns>
+    public bool HideItem (MenuBarItem? activeItem)
+    {
+        if (activeItem is null || !activeItem.PopoverMenuOpen)
+        {
+            return false;
+        }
+
+        // IMPORTANT: Set Visible false before setting Active to false (Active changes Can/HasFocus)
+        activeItem.PopoverMenuOpen = false;
+
+        Active = false;
+        HasFocus = false;
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Guards against deactivation during MenuBarItem switching (arrow keys, mouse hover, ShowItem).
+    ///     When switching items, the old popover may close before the new one opens, which would
+    ///     trigger deactivation via <see cref="OnMenuBarItemPopoverMenuOpenChanged"/>.
+    ///     This flag prevents that false deactivation.
+    /// </summary>
+    private bool _isSwitchingItem;
+
+    /// <summary>
+    ///     Tracks "popover browsing mode" — set when any popover opens, stays true during
+    ///     item switching (bridging the brief gap when old popover closes before new one opens).
+    ///     Reset only when <see cref="Active"/> goes false or <see cref="Command.Quit"/> is handled.
+    /// </summary>
+    private bool _popoverBrowsingMode;
+
+    /// <summary>
+    ///     Gets whether any of the menu bar items have a visible <see cref="PopoverMenu"/>.
+    /// </summary>
+    public bool IsOpen () => SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen);
+
+    /// <summary>
+    ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F9"/> and
+    ///     can be configured using the <see cref="DefaultKey"/> configuraiton property.
+    /// </summary>
+    public Key Key
+    {
+        get;
+        set
+        {
+            Key oldKey = field;
+            field = value;
+            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, field));
+        }
+    }
+
+    /// <summary>Raised when <see cref="Key"/> is changed.</summary>
+    public event EventHandler<KeyChangedEventArgs>? KeyChanged;
+
+    /// <summary>
+    ///     Sets the Menu Bar Items for this Menu Bar. This will replace any existing Menu Bar Items.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a convenience property to help porting from the v1 MenuBar.
+    ///     </para>
+    /// </remarks>
+    public MenuBarItem []? Menus
+    {
+        set
+        {
+            RemoveAll ();
+
+            if (value is null)
+            {
+                return;
+            }
+
+            foreach (MenuBarItem mbi in value)
+            {
+                Add (mbi);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        if (disposing)
+        {
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+        }
+    }
+
+    /// <summary>
+    ///     Finds the MenuBarItem that is an ancestor (or is itself) the source view, and is a direct SubView of this
+    ///     MenuBar.
+    /// </summary>
+    private MenuBarItem? FindMenuBarItemForSource (View? source)
+    {
+        View? current = source;
+
+        while (current is { })
+        {
+            if (current is MenuBarItem mbi && mbi.SuperView == this)
+            {
+                return mbi;
+            }
+
+            current = current.SuperView;
+        }
+
+        return null;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
+    {
+        if (!newHasFocus)
+        {
+            Active = false;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnMouseEnter (CancelEventArgs eventArgs)
+    {
+        // If the MenuBar does not have focus and the mouse enters: Enable CanFocus
+        // But do NOT show a Popover unless the user clicks or presses a hotkey
+        if (!HasFocus)
+        {
+            Active = true;
+        }
+
+        return base.OnMouseEnter (eventArgs);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnMouseLeave ()
+    {
+        if (!IsOpen ())
+        {
+            Active = false;
+        }
+
+        base.OnMouseLeave ();
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSelectedMenuItemChanged (MenuItem? selected)
+    {
+        Trace.Command (this, "Entry", $"Selected={selected?.ToIdentifyingString ()} BrowsingMode={_popoverBrowsingMode} IsSwitching={_isSwitchingItem}");
+
+        // When _isSwitchingItem is true, we're already inside a ShowItem call
+        // (e.g., from a HotKey activation that bubbled up). Focus traversal may
+        // transiently pass through intermediate MenuBarItems. We must NOT auto-open
+        // those items — only the target item should open.
+        if (!_isSwitchingItem && _popoverBrowsingMode && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
+        {
+            ShowItem (selectedMenuBarItem);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSubViewAdded (View view)
+    {
+        base.OnSubViewAdded (view);
+
+        if (view is MenuBarItem mbi)
+        {
+            //mbi.Accepted += OnMenuBarItemAccepted;
+            mbi.PopoverMenuOpenChanged += OnMenuBarItemPopoverMenuOpenChanged;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSubViewRemoved (View view)
+    {
+        base.OnSubViewRemoved (view);
+
+        if (view is MenuBarItem mbi)
+        {
+            // mbi.Accepted -= OnMenuBarItemAccepted;
+            mbi.PopoverMenuOpenChanged -= OnMenuBarItemPopoverMenuOpenChanged;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> e)
+    {
+        if (SuperView is null)
+        {
+            // BUGBUG: This is a hack for avoiding a race condition in ConfigurationManager.Apply
+            // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
+            // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
+            // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+        }
+    }
+
+    private MenuBarItem? GetActiveItem () => SubViews.OfType<MenuBarItem> ().FirstOrDefault (sv => sv is { PopoverMenu.Visible: true });
+
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e) => BorderStyle = DefaultBorderStyle;
+
+    private void OnMenuBarItemPopoverMenuOpenChanged (object? sender, ValueChangedEventArgs<bool> e)
+    {
+        if (e.NewValue)
+        {
+            _popoverBrowsingMode = true;
+
+            return;
+        }
+
+        // A PopoverMenu just closed. If no others are open, and we're not in the middle of
+        // arrow-key navigation (where the old popover closes before the new one opens),
+        // deactivate the MenuBar entirely. HotKey switching (Alt+E while File is open)
+        // is safe because the new popover opens BEFORE the old one closes.
+        if (!_isSwitchingItem && !SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen))
+        {
+            // During mouse-hover switching, the old MBI's popover closes because
+            // MenuItem.OnMouseEnter → SetFocus() moved focus to the new MBI.  At this point
+            // the new MBI has _hasFocus=true but hasn't opened its popover yet (we're still
+            // inside SetHasFocusTrue).  Deactivating now would set CanFocus=false and cascade
+            // focus loss back to the new MBI, violating SetHasFocusTrue's post-condition.
+            // Skip deactivation when a *different* MBI already has focus — ShowItem will run
+            // via OnSelectedMenuItemChanged once the focus transfer completes.
+            bool anotherMbiHasFocus = SubViews.OfType<MenuBarItem> ().Any (m => m != sender && m.HasFocus);
+
+            if (anotherMbiHasFocus)
+            {
+                return;
+            }
+
+            // If no MBI has focus at all, focus is leaving the MenuBar entirely. Don't call
+            // Active = false here — it would set CanFocus = false → HasFocus = false reentrantly,
+            // violating SetHasFocusFalse's invariant (Debug.Assert(_hasFocus) at line 908).
+            // MenuBar.OnHasFocusChanged will deactivate once the focus traversal completes.
+            bool anyMbiHasFocus = SubViews.OfType<MenuBarItem> ().Any (m => m.HasFocus);
+
+            if (!anyMbiHasFocus)
+            {
+                return;
+            }
+
+            Active = false;
+        }
+    }
+
+    /// <summary>
+    ///     Shows the specified popover, but only if the menu bar is active.
+    /// </summary>
+    /// <param name="menuBarItem"></param>
+    private void ShowItem (MenuBarItem? menuBarItem)
+    {
+        Trace.Command (this, "Entry", $"Item={menuBarItem?.ToIdentifyingString ()} Active={Active}");
+
+        if (!Active || !Visible)
+        {
+            return;
+        }
+
+        // Guard: when switching items, SetFocus() closes the old popover before the new one opens.
+        // Without this guard, OnMenuBarItemPopoverMenuOpenChanged would deactivate the MenuBar.
+        _isSwitchingItem = true;
+
+        try
+        {
+            // TODO: We should init the PopoverMenu in a smarter way
+            if (menuBarItem?.PopoverMenu is { IsInitialized: false })
+            {
+                menuBarItem.PopoverMenu.BeginInit ();
+                menuBarItem.PopoverMenu.EndInit ();
+            }
+
+            if (menuBarItem is null)
+            {
+                return;
+            }
+
+            Active = true;
+            menuBarItem.SetFocus ();
+
+            if (menuBarItem.PopoverMenu?.Root is { })
+            {
+                menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
+                menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
+            }
+
+            menuBarItem.PopoverMenuOpen = true;
+        }
+        finally
+        {
+            _isSwitchingItem = false;
+        }
+    }
 
     /// <inheritdoc/>
     public bool EnableForDesign<TContext> (ref TContext targetView) where TContext : notnull
@@ -115,15 +611,40 @@ public class MenuBar : Menu, IDesignable
 
         Id = "DemoBar";
 
-        var bordersCb = new CheckBox { Title = "_Borders", Value = CheckState.Checked };
+        CheckBox bordersCb = new ()
+        {
+            Title = "_Borders",
 
-        var autoSaveCb = new CheckBox { Title = "_Auto Save" };
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false,
+            Value = DefaultBorderStyle == LineStyle.None ? CheckState.UnChecked : CheckState.Checked
+        };
 
-        var enableOverwriteCb = new CheckBox { Title = "Enable _Overwrite" };
+        CheckBox autoSaveCb = new ()
+        {
+            Title = "_Auto Save",
 
-        var mutuallyExclusiveOptionsSelector = new OptionSelector { Labels = ["G_ood", "_Bad", "U_gly"], Value = 0 };
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false
+        };
 
-        var menuBgColorCp = new ColorPicker { Width = 30 };
+        CheckBox enableOverwriteCb = new ()
+        {
+            Title = "Enable _Overwrite",
+
+            // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
+            // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox),
+            // we want it to look focused when selected, and unfocused when not, so set CanFocus false.
+            CanFocus = false
+        };
+
+        OptionSelector<Schemes> mutuallyExclusiveOptionsSelector = new () { Title = "Scheme", CanFocus = true, MouseHighlightStates = MouseState.None };
+
+        ColorPicker menuBgColorCp = new () { Width = 30 };
 
         menuBgColorCp.ValueChanged += (_, args) =>
                                       {
@@ -182,9 +703,11 @@ public class MenuBar : Menu, IDesignable
                                                               },
                                                               new MenuItem
                                                               {
-                                                                  HelpText = "3 Mutually Exclusive Options",
+                                                                  Id = "mutuallyExclusiveOptions",
+                                                                  HelpText = "Mutually Exclusive Options",
                                                                   CommandView = mutuallyExclusiveOptionsSelector,
-                                                                  Key = Key.F7
+                                                                  Key = Key.F7,
+                                                                  MouseHighlightStates = MouseState.None
                                                               },
                                                               new Line (),
                                                               new MenuItem { HelpText = "MenuBar BG Color", CommandView = menuBgColorCp, Key = Key.F8 }
@@ -205,13 +728,14 @@ public class MenuBar : Menu, IDesignable
                                   new MenuItem { Title = "_Details", SubMenu = new Menu (ConfigureDetailsSubMenu ()) }
                               ]));
 
+        MenuItem onlineHelpMi = new () { Title = "_Online Help..." };
+
+        // Demonstrate using Activating
+        onlineHelpMi.Activated += (_, _) => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk);
+
         Add (new MenuBarItem (Strings.menuHelp,
                               [
-                                  new MenuItem
-                                  {
-                                      Title = "_Online Help...",
-                                      Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk)
-                                  },
+                                  onlineHelpMi,
                                   new MenuItem { Title = "About...", Action = () => MessageBox.Query (App!, "About", "Something About Mary.", Strings.btnOk) }
                               ]));
 
@@ -226,462 +750,49 @@ public class MenuBar : Menu, IDesignable
                     continue;
                 }
 
-                foreach (Menu? subMenu in mbi.PopoverMenu.GetAllSubMenus ())
+                foreach (Menu subMenu in mbi.PopoverMenu.Root?.GetAllSubMenus () ?? [])
                 {
-                    if (bordersCb.Value == CheckState.Checked)
-                    {
-                        subMenu.Border!.Thickness = new Thickness (1);
-                    }
-                    else
-                    {
-                        subMenu.Border!.Thickness = new Thickness (0);
-                    }
+                    subMenu.Border?.Thickness = bordersCb.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
+                    subMenu.Border?.LineStyle = bordersCb.Value == CheckState.Checked ? LineStyle.Rounded : LineStyle.None;
                 }
             }
         }
 
         MenuItem [] ConfigureDetailsSubMenu ()
         {
-            var detail = new MenuItem { Title = "_Detail 1", Text = "Some detail #1" };
+            MenuItem detail = new () { Title = "_Detail 1", Text = "Some detail #1" };
 
-            var nestedSubMenu = new MenuItem { Title = "_Moar Details", SubMenu = new Menu (ConfigureMoreDetailsSubMenu ()) };
+            MenuItem nestedSubMenu = new () { Title = "_Moar Details", SubMenu = new Menu (ConfigureMoreDetailsSubMenu ()) };
 
-            var editMode = new MenuItem
+            // This menu item is used to test Application Key binding. See the Menus Scenario.
+            // F5 will toggle the Edit Mode checkbox, and the menu item text will update to show the Command it's bound to.
+            MenuItem editMode = new ()
             {
-                Text = "App Binding to Command.Edit", Id = "EditMode", Command = Command.Edit, CommandView = new CheckBox { Title = "E_dit Mode" }
+                Text = "App Binding to Command.Edit",
+                Id = "EditMode",
+                Command = Command.Edit,
+                CommandView = new CheckBox { Title = "E_dit Mode" },
+                Key = Key.F5,
+                BindKeyToApplication = true
             };
 
             return [detail, nestedSubMenu, null!, editMode];
 
             View [] ConfigureMoreDetailsSubMenu ()
             {
-                var deeperDetail = new MenuItem
+                MenuItem deeperDetail = new ()
                 {
                     Title = "_Deeper Detail",
                     Text = "Deeper Detail",
                     Action = () => { MessageBox.Query (App!, "Deeper Detail", "Lots of details", Strings.btnOk); }
                 };
 
-                var belowLineDetail = new MenuItem { Title = "_Even more detail", Text = "Below the line" };
+                MenuItem belowLineDetail = new () { Title = "_Even more detail", Text = "Below the line" };
 
                 // This ensures the checkbox state toggles when the hotkey of Title is pressed.
                 // shortcut4.Accepting += (sender, args) => args.Cancel = true;
 
                 return [deeperDetail, new Line (), belowLineDetail];
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets whether the menu bar is active or not. When active, the MenuBar can focus and moving the mouse
-    ///     over a MenuBarItem will switch focus to that item. Use <see cref="IsOpen"/> to determine if a PopoverMenu of
-    ///     a MenuBarItem is open.
-    /// </summary>
-    /// <returns></returns>
-    public bool Active
-    {
-        get => _active;
-        internal set
-        {
-            if (_active == value)
-            {
-                return;
-            }
-
-            _active = value;
-
-            // Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
-
-            // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
-            // it won't be to the MenuBar
-            CanFocus = value;
-
-            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
-
-            if (!_active)
-            {
-                // Hide open Popovers
-                HideActiveItem ();
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets the default Border Style for the MenuBar. The default is <see cref="LineStyle.None"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
-
-    /// <summary>The default key for activating menu bars.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F9;
-
-    /// <inheritdoc/>
-    public override void EndInit ()
-    {
-        base.EndInit ();
-
-        if (Border is { })
-        {
-            Border.Thickness = new Thickness (0);
-            Border.LineStyle = LineStyle.None;
-        }
-
-        // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
-        foreach (MenuBarItem? mbi in SubViews.Select (s => s as MenuBarItem))
-        {
-            App?.Popover?.Register (mbi?.PopoverMenu);
-        }
-    }
-
-    /// <summary>
-    ///     Gets all menu items with the specified Title, anywhere in the menu hierarchy.
-    /// </summary>
-    /// <param name="title"></param>
-    /// <returns></returns>
-    public IEnumerable<MenuItem> GetMenuItemsWithTitle (string title)
-    {
-        List<MenuItem> menuItems = [];
-
-        if (string.IsNullOrEmpty (title))
-        {
-            return menuItems;
-        }
-
-        foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
-        {
-            if (mbi.PopoverMenu is { })
-            {
-                menuItems.AddRange (mbi.PopoverMenu.GetMenuItemsOfAllSubMenus ());
-            }
-        }
-
-        return menuItems.Where (mi => mi.Title == title);
-    }
-
-    /// <summary>
-    ///     Hides the popover menu associated with the active menu bar item and updates the focus state.
-    /// </summary>
-    /// <returns><see langword="true"/> if the popover was hidden</returns>
-    public bool HideActiveItem () => HideItem (GetActiveItem ());
-
-    /// <summary>
-    ///     Hides popover menu associated with the specified menu bar item and updates the focus state.
-    /// </summary>
-    /// <param name="activeItem"></param>
-    /// <returns><see langword="true"/> if the popover was hidden</returns>
-    public bool HideItem (MenuBarItem? activeItem)
-    {
-        // Logging.Debug ($"{Title} ({activeItem?.Title}) - Active: {Active}, CanFocus: {CanFocus}, HasFocus: {HasFocus}");
-
-        if (activeItem is null || !activeItem.PopoverMenu!.Visible)
-        {
-            // Logging.Debug ($"{Title} No active item.");
-
-            return false;
-        }
-
-        // IMPORTANT: Set Visible false before setting Active to false (Active changes Can/HasFocus)
-        activeItem.PopoverMenu!.Visible = false;
-
-        Active = false;
-        HasFocus = false;
-
-        return true;
-    }
-
-    /// <summary>
-    ///     Gets whether any of the menu bar items have a visible <see cref="PopoverMenu"/>.
-    /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public bool IsOpen () => SubViews.OfType<MenuBarItem> ().Count (sv => sv is { PopoverMenuOpen: true }) > 0;
-
-    /// <summary>Specifies the key that will activate the context menu.</summary>
-    public Key Key
-    {
-        get => _key;
-        set
-        {
-            Key oldKey = _key;
-            _key = value;
-            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, _key));
-        }
-    }
-
-    /// <summary>Raised when <see cref="Key"/> is changed.</summary>
-    public event EventHandler<KeyChangedEventArgs>? KeyChanged;
-
-    /// <summary>
-    ///     Sets the Menu Bar Items for this Menu Bar. This will replace any existing Menu Bar Items.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This is a convenience property to help porting from the v1 MenuBar.
-    ///     </para>
-    /// </remarks>
-    public MenuBarItem []? Menus
-    {
-        set
-        {
-            RemoveAll ();
-
-            if (value is null)
-            {
-                return;
-            }
-
-            foreach (MenuBarItem mbi in value)
-            {
-                Add (mbi);
-            }
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        base.Dispose (disposing);
-
-        if (disposing)
-        {
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnAccepted (CommandEventArgs args)
-    {
-        // Logging.Debug ($"{Title} ({args.Context?.Source.ToIdentifyingString ()}) Command: {args.Context?.Command}");
-        base.OnAccepted (args);
-
-        if (args.Context.TryGetSource (out View? sourceView) && SubViews.OfType<MenuBarItem> ().Contains (sourceView))
-        {
-            return;
-        }
-
-        Active = false;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args)
-    {
-        // Logging.Debug ($"{Title} ({args.Context?.Source.ToIdentifyingString ()})");
-
-        // TODO: Ensure sourceMenuBar is actually one of our bar items
-        if (Visible && Enabled && args.Context.TryGetSource (out View? sourceView) && sourceView is MenuBarItem { PopoverMenuOpen: false } sourceMenuBarItem)
-        {
-            if (!CanFocus)
-            {
-                Debug.Assert (!Active);
-
-                // We are not Active; change that
-                Active = true;
-
-                ShowItem (sourceMenuBarItem);
-
-                if (!sourceMenuBarItem.HasFocus)
-                {
-                    sourceMenuBarItem.SetFocus ();
-                }
-            }
-            else
-            {
-                Debug.Assert (Active);
-                ShowItem (sourceMenuBarItem);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnBorderStyleChanged () =>
-
-        // HideActiveItem ();
-        base.OnBorderStyleChanged ();
-
-    /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
-    {
-        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
-
-        if (!newHasFocus)
-        {
-            Active = false;
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnMouseEnter (CancelEventArgs eventArgs)
-    {
-        // If the MenuBar does not have focus and the mouse enters: Enable CanFocus
-        // But do NOT show a Popover unless the user clicks or presses a hotkey
-        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
-
-        if (!HasFocus)
-        {
-            Active = true;
-        }
-
-        return base.OnMouseEnter (eventArgs);
-    }
-
-    /// <inheritdoc/>
-    protected override void OnMouseLeave ()
-    {
-        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
-
-        if (!IsOpen ())
-        {
-            Active = false;
-        }
-
-        base.OnMouseLeave ();
-    }
-
-    /// <inheritdoc/>
-    protected override void OnSelectedMenuItemChanged (MenuItem? selected)
-    {
-        // Logging.Debug ($"{Title} ({selected?.Title}) - IsOpen: {IsOpen ()}");
-
-        if (IsOpen () && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
-        {
-            ShowItem (selectedMenuBarItem);
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnSubViewAdded (View view)
-    {
-        base.OnSubViewAdded (view);
-
-        if (view is MenuBarItem mbi)
-        {
-            mbi.Accepted += OnMenuBarItemAccepted;
-            mbi.PopoverMenuOpenChanged += OnMenuBarItemPopoverMenuOpenChanged;
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnSubViewRemoved (View view)
-    {
-        base.OnSubViewRemoved (view);
-
-        if (view is MenuBarItem mbi)
-        {
-            mbi.Accepted -= OnMenuBarItemAccepted;
-            mbi.PopoverMenuOpenChanged -= OnMenuBarItemPopoverMenuOpenChanged;
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> e)
-    {
-        if (SuperView is null)
-        {
-            // BUGBUG: This is a hack for avoiding a race condition in ConfigurationManager.Apply
-            // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
-            // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
-            // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
-        }
-    }
-
-    private MenuBarItem? GetActiveItem () => SubViews.OfType<MenuBarItem> ().FirstOrDefault (sv => sv is { PopoverMenu: { Visible: true } });
-
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e) => BorderStyle = DefaultBorderStyle;
-
-    private void OnMenuBarItemAccepted (object? sender, CommandEventArgs e) =>
-
-        // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command}");
-        RaiseAccepted (e.Context);
-
-    private void OnMenuBarItemPopoverMenuOpenChanged (object? sender, EventArgs<bool> e)
-    {
-        if (sender is MenuBarItem mbi)
-        {
-            if (e.Value)
-            {
-                Active = true;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Shows the specified popover, but only if the menu bar is active.
-    /// </summary>
-    /// <param name="menuBarItem"></param>
-    private void ShowItem (MenuBarItem? menuBarItem)
-    {
-        // Logging.Debug ($"{Title} - {menuBarItem?.Id}");
-
-        if (!Active || !Visible)
-        {
-            // Logging.Debug ($"{Title} - {menuBarItem?.Id} - Not Active, not showing.");
-
-            return;
-        }
-
-        // TODO: We should init the PopoverMenu in a smarter way
-        if (menuBarItem?.PopoverMenu is { IsInitialized: false })
-        {
-            menuBarItem.PopoverMenu.BeginInit ();
-            menuBarItem.PopoverMenu.EndInit ();
-        }
-
-        // If the active Application Popover is part of this MenuBar, hide it.
-        if (App?.Popover?.GetActivePopover () is PopoverMenu popoverMenu && popoverMenu.Root?.SuperMenuItem?.SuperView == this)
-        {
-            // Logging.Debug ($"{Title} - Calling App?.Popover?.Hide ({popoverMenu.Title})");
-            App?.Popover.Hide (popoverMenu);
-        }
-
-        if (menuBarItem is null)
-        {
-            // Logging.Debug ($"{Title} - menuBarItem is null.");
-
-            return;
-        }
-
-        Active = true;
-        menuBarItem.SetFocus ();
-
-        if (menuBarItem.PopoverMenu?.Root is { })
-        {
-            menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
-            menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
-        }
-
-        // Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
-        if (menuBarItem.PopoverMenu is { })
-        {
-            menuBarItem.PopoverMenu.App ??= App;
-            menuBarItem.PopoverMenu.MakeVisible (new Point (menuBarItem.FrameToScreen ().X, menuBarItem.FrameToScreen ().Bottom));
-        }
-
-        // Subscribe to VisibleChanged to detect when the popover closes
-        if (menuBarItem.PopoverMenu is { })
-        {
-            menuBarItem.PopoverMenu.VisibleChanged += OnPopoverVisibleChanged;
-        }
-
-        return;
-
-        void OnPopoverVisibleChanged (object? sender, EventArgs args)
-        {
-            // Logging.Debug ($"{Title} - OnPopoverVisibleChanged");
-            // Unsubscribe from VisibleChanged (the event we subscribed to)
-            if (menuBarItem.PopoverMenu is { })
-            {
-                menuBarItem.PopoverMenu.VisibleChanged -= OnPopoverVisibleChanged;
-            }
-
-            if (Active && menuBarItem.PopoverMenu is { Visible: false })
-            {
-                Active = false;
-                HasFocus = false;
             }
         }
     }

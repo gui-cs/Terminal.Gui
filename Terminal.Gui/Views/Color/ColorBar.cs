@@ -1,5 +1,4 @@
 using ColorHelper;
-using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Views;
 
@@ -35,7 +34,6 @@ internal abstract class ColorBar : View, IColorBar
         KeyBindings.Add (Key.End, Command.RightEnd);
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
     }
-
 
     /// <summary>
     ///     X coordinate that the bar starts at excluding any label.
@@ -84,7 +82,7 @@ internal abstract class ColorBar : View, IColorBar
         SetNeedsDraw ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         base.OnSubViewsLaidOut (args);
@@ -126,7 +124,6 @@ internal abstract class ColorBar : View, IColorBar
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-
         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (mouse.Position!.Value.X >= _barStartsAt)
@@ -135,8 +132,10 @@ internal abstract class ColorBar : View, IColorBar
                 Value = Math.Clamp ((int)v, 0, MaxValue);
             }
             SetFocus ();
+
             // Do not mark as handled to allow Activating to be raised
         }
+
         return mouse.Handled;
     }
 
@@ -207,23 +206,23 @@ internal abstract class ColorBar : View, IColorBar
             if (isSelectedCell)
             {
                 // Draw the triangle at the closest position
-                SetAttribute (new (triangleColor, color, Enabled ? TextStyle.None : TextStyle.Faint));
-                AddRune (x + xOffset, yOffset, new ('▲'));
+                SetAttribute (new Attribute (triangleColor, color, Enabled ? TextStyle.None : TextStyle.Faint));
+                AddRune (x + xOffset, yOffset, new Rune ('▲'));
 
                 // Record for tests
                 TrianglePosition = x + xOffset;
             }
             else
             {
-                SetAttribute (new (color, color, Enabled ? TextStyle.None : TextStyle.Faint));
-                AddRune (x + xOffset, yOffset, new (' '));
+                SetAttribute (new Attribute (color, color, Enabled ? TextStyle.None : TextStyle.Faint));
+                AddRune (x + xOffset, yOffset, new Rune (' '));
             }
         }
     }
 
     private void OnValueChanged ()
     {
-       ValueChanged?.Invoke (this, new (in _value));
+        ValueChanged?.Invoke (this, new EventArgs<int> (in _value));
         SetNeedsDraw ();
     }
 

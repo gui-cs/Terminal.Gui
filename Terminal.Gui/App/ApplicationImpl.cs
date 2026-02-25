@@ -248,7 +248,7 @@ internal partial class ApplicationImpl : IApplication
     }
 
     /// <inheritdoc/>
-    public ApplicationPopover? Popover
+    public ApplicationPopover? Popovers
     {
         get
         {
