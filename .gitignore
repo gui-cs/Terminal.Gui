@@ -77,8 +77,8 @@ log.*
 *.cobertura.xml
 
 # Claude Code local settings
-.claude/settings.json
 .claude/settings.local.json
+.claude/worktrees/
 .mcp.json
 .env
 tmpclaude-*-cwd
