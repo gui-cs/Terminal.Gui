@@ -54,7 +54,9 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
     public TimeEditor ()
     {
         Provider = new TimeTextProvider ();
-        Width = Dim.Auto (minimumContentDim: 10);
+        
+        // Set initial width based on current format
+        Width = TimeProvider.DisplayText.Length + 2;
         
         // Subscribe to provider's text changed to raise our value events
         TimeProvider.TextChanged += (_, _) => RaiseValueChangedEvents ();
@@ -122,12 +124,16 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
                 return;
             }
 
+            // Update _lastKnownValue before setting to prevent double-firing from TextChanged handler
+            _lastKnownValue = value;
+            
             TimeProvider.TimeValue = value;
             Text = TimeProvider.Text;
 
             ValueChangedEventArgs<TimeSpan> changedArgs = new (oldValue, value);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
 
             SetNeedsDraw ();
         }
@@ -138,6 +144,9 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<TimeSpan>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <inheritdoc/>
     object? IValue.GetValue () => Value;
@@ -174,9 +183,35 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
             return;
         }
         
+        // Raise ValueChanging to allow cancellation
+        ValueChangingEventArgs<TimeSpan> changingArgs = new (_lastKnownValue, currentValue);
+        
+        if (OnValueChanging (changingArgs) || changingArgs.Handled)
+        {
+            // Revert the change if cancelled
+            TimeProvider.TimeValue = _lastKnownValue;
+            Text = TimeProvider.Text;
+            SetNeedsDraw ();
+            
+            return;
+        }
+        
+        ValueChanging?.Invoke (this, changingArgs);
+        
+        if (changingArgs.Handled)
+        {
+            // Revert the change if cancelled
+            TimeProvider.TimeValue = _lastKnownValue;
+            Text = TimeProvider.Text;
+            SetNeedsDraw ();
+            
+            return;
+        }
+        
         ValueChangedEventArgs<TimeSpan> changedArgs = new (_lastKnownValue, currentValue);
         _lastKnownValue = currentValue;
         OnValueChanged (changedArgs);
         ValueChanged?.Invoke (this, changedArgs);
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (_lastKnownValue, currentValue));
     }
 }

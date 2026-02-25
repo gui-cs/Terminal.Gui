@@ -3,6 +3,7 @@ using UnitTests;
 
 namespace ViewsTests;
 
+// Claude - Sonnet 4.6
 public class TimeEditorTests : TestDriverBase
 {
     [Fact]
@@ -40,13 +41,18 @@ public class TimeEditorTests : TestDriverBase
     public void Format_Property_Changes_Width ()
     {
         TimeEditor te = new ();
+        
+        // Set initial format explicitly to ensure deterministic test
+        DateTimeFormatInfo initialFormat = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        initialFormat.LongTimePattern = "HH:mm:ss";
+        te.Format = initialFormat;
         te.Layout ();
         
         int initialWidth = te.Frame.Width;
         Assert.True (initialWidth > 0);
         
-        // Change to a different culture with different pattern
-        DateTimeFormatInfo customFormat = (DateTimeFormatInfo)CultureInfo.CurrentCulture.DateTimeFormat.Clone ();
+        // Change to a different pattern
+        DateTimeFormatInfo customFormat = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
         customFormat.LongTimePattern = "HH:mm";
         te.Format = customFormat;
         te.Layout ();
@@ -54,6 +60,7 @@ public class TimeEditorTests : TestDriverBase
         // Width should change to accommodate shorter pattern
         int newWidth = te.Frame.Width;
         Assert.NotEqual (initialWidth, newWidth);
+        Assert.True (newWidth < initialWidth);
     }
 
     [Fact]

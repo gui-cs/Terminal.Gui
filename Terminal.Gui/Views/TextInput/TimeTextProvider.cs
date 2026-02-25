@@ -38,9 +38,8 @@ public class TimeTextProvider : ITextValidateProvider
     private bool _is12Hour;
     private bool _hasAmPm;
     private int _fieldLength;
-    private List<int> _separatorPositions = [];
+    private HashSet<int> _separatorPositions = [];
     private int _amPmPosition = -1;
-    private bool _isPm;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TimeTextProvider"/> class.
@@ -75,11 +74,7 @@ public class TimeTextProvider : ITextValidateProvider
     public TimeSpan TimeValue
     {
         get => _timeValue;
-        set
-        {
-            _timeValue = value;
-            _isPm = value.Hours >= 12;
-        }
+        set => _timeValue = value;
     }
 
     /// <inheritdoc/>
@@ -95,7 +90,6 @@ public class TimeTextProvider : ITextValidateProvider
             {
                 string oldValue = Text;
                 _timeValue = parsedValue;
-                _isPm = _timeValue.Hours >= 12;
                 
                 if (oldValue != Text)
                 {
@@ -257,14 +251,18 @@ public class TimeTextProvider : ITextValidateProvider
         {
             if (char.ToUpperInvariant (ch) == 'A' || char.ToUpperInvariant (ch) == 'P')
             {
-                _isPm = char.ToUpperInvariant (ch) == 'P';
+                bool isPm = char.ToUpperInvariant (ch) == 'P';
                 
                 // Update the time value hours to reflect AM/PM change
                 int hours = _timeValue.Hours % 12;
                 
-                if (_isPm && hours < 12)
+                if (isPm && hours < 12)
                 {
                     hours += 12;
+                }
+                else if (!isPm && hours >= 12)
+                {
+                    hours -= 12;
                 }
                 
                 _timeValue = new TimeSpan (hours, _timeValue.Minutes, _timeValue.Seconds);
@@ -293,7 +291,6 @@ public class TimeTextProvider : ITextValidateProvider
             if (TryParseTimeValue (sb.ToString (), out TimeSpan newValue))
             {
                 _timeValue = newValue;
-                _isPm = _timeValue.Hours >= 12;
                 OnTextChanged (new (in oldValue));
                 
                 return true;
@@ -354,38 +351,6 @@ public class TimeTextProvider : ITextValidateProvider
     private string FormatTimeValue ()
     {
         DateTime dt = DateTime.Today.Add (_timeValue);
-        
-        // For 12-hour format, adjust the hours if needed
-        if (_is12Hour && _hasAmPm)
-        {
-            int hours = _timeValue.Hours % 12;
-            
-            if (hours == 0)
-            {
-                hours = 12;
-            }
-            
-            // Convert to 24-hour format for DateTime construction
-            int hours24;
-            
-            if (_isPm)
-            {
-                hours24 = hours == 12 ? 12 : hours + 12;
-            }
-            else
-            {
-                hours24 = hours == 12 ? 0 : hours;
-            }
-            
-            dt = new DateTime (
-                BASE_YEAR,
-                BASE_MONTH,
-                BASE_DAY,
-                hours24,
-                _timeValue.Minutes,
-                _timeValue.Seconds
-            );
-        }
         
         return dt.ToString (_format.LongTimePattern, _format);
     }
@@ -506,12 +471,22 @@ public class TimeTextProvider : ITextValidateProvider
             seconds = Math.Max (0, Math.Min (59, seconds));
 
             result = new TimeSpan (hours, minutes, seconds);
-            _isPm = hours >= 12;
             
             return true;
         }
-        catch
+        catch (ArgumentException)
         {
+            // TimeSpan constructor can throw ArgumentOutOfRangeException
+            return false;
+        }
+        catch (FormatException)
+        {
+            // String parsing operations can throw FormatException
+            return false;
+        }
+        catch (OverflowException)
+        {
+            // Arithmetic operations can throw OverflowException
             return false;
         }
     }
