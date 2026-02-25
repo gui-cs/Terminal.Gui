@@ -61,7 +61,7 @@ Key Bindings can be added at the `Application` or `View` level.
 
 For **Application-scoped Key Bindings** there are two categories of Application-scoped Key Bindings:
 
-1) **Application Command Key Bindings** - Bindings for `Command`s supported by <xref:Terminal.Gui.App.Application>. For example, <xref:Terminal.Gui.App.Application.QuitKey>, which is bound to `Command.Quit` and results in <xref:Terminal.Gui.App.Application.RequestStop>(Terminal.Gui.Runnable) being called.
+1) **Application Command Key Bindings** - Bindings for `Command`s supported by <xref:Terminal.Gui.App.Application>. For example, <xref:Terminal.Gui.App.Application.QuitKey>, which is bound to `Command.Quit` and results in <xref:Terminal.Gui.App.Application.RequestStop(Terminal.Gui.App.IRunnable)> being called.
 2) **Application Key Bindings** - Bindings for `Command`s supported on arbitrary `Views` that are meant to be invoked regardless of which part of the application is visible/active. 
 
 Use <xref:Terminal.Gui.App.Application.Keyboard.KeyBindings> to add or modify Application-scoped Key Bindings. For backward compatibility, <xref:Terminal.Gui.App.Application.KeyBindings> also provides access to the same key bindings.
@@ -91,12 +91,12 @@ The Command can be invoked even if the `View` that defines them is not focused o
 
 ### **Key Events**
 
-Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises the <xref:Terminal.Gui.Drivers.IDriver.KeyDown> event which invokes <xref:Terminal.Gui.App.Application.RaiseKeyDownEvent> respectively.
+Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises the <xref:Terminal.Gui.Drivers.IDriver.KeyDown> event which invokes <xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> respectively.
 
 > [!NOTE]
 > Most drivers/platforms do not support sensing distinct KeyUp events, therefore Terminal.Gui does not support them.
 
-<xref:Terminal.Gui.App.Application.RaiseKeyDownEvent> raises <xref:Terminal.Gui.App.Application.KeyDown> and then calls <xref:Terminal.Gui.ViewBase.View.NewKeyDownEvent> on all runnable Views. If no View handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through <xref:Terminal.Gui.App.Application.Keyboard.KeyBindings>.
+<xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> raises <xref:Terminal.Gui.App.Application.KeyDown> and then calls <xref:Terminal.Gui.ViewBase.View.NewKeyDownEvent> on all runnable Views. If no View handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through <xref:Terminal.Gui.App.Application.Keyboard.KeyBindings>.
 
 If a view is enabled, the <xref:Terminal.Gui.ViewBase.View.NewKeyDownEvent> method will do the following: 
 

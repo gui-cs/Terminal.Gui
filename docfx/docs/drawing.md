@@ -26,7 +26,7 @@ Each iteration of the <xref:Terminal.Gui.App.Application> MainLoop (throttled to
 ### When Drawing Actually Occurs
 
 - **Normal Operation**: Drawing happens automatically during MainLoop iterations when <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or <xref:Terminal.Gui.ViewBase.View.SubViewNeedsDraw> is set
-- **Forced Update**: <xref:Terminal.Gui.App.Application.LayoutAndDraw> can be called to immediately trigger layout and drawing outside of the normal iteration cycle
+- **Forced Update**: <xref:Terminal.Gui.App.Application.LayoutAndDraw(System.Boolean)> can be called to immediately trigger layout and drawing outside of the normal iteration cycle
 - **Testing**: Tests can call <xref:Terminal.Gui.ViewBase.View.Draw> directly to update the back buffer, then call <xref:Terminal.Gui.Drivers.IDriver.Refresh> to output to the terminal
 
 **Important**: Calling `View.Draw()` does not immediately update the terminal screen. It only updates the driver's back buffer. The actual terminal output occurs when the driver's `Refresh()` method is called, which happens automatically during MainLoop iterations.
@@ -81,7 +81,7 @@ Then, after the above steps have completed, the Mainloop will iterate through al
 
 If a View need to redraw because something changed within it's Content Area it can call <xref:Terminal.Gui.ViewBase.View.SetNeedsDraw>. If a View needs to be redrawn because something has changed the size of the Viewport, it can call <xref:Terminal.Gui.ViewBase.View.SetNeedsLayout>.
 
-**Note**: Calling `SetNeedsDraw()` does not immediately cause drawing to occur. It marks the view as needing to be redrawn, which will happen in the next MainLoop iteration. To force immediate drawing (typically only needed in tests), call <xref:Terminal.Gui.App.Application.LayoutAndDraw>.
+**Note**: Calling `SetNeedsDraw()` does not immediately cause drawing to occur. It marks the view as needing to be redrawn, which will happen in the next MainLoop iteration. To force immediate drawing (typically only needed in tests), call <xref:Terminal.Gui.App.Application.LayoutAndDraw(System.Boolean)>.
 
 ## Clipping
 
