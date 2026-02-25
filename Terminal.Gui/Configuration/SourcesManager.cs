@@ -303,7 +303,6 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal string ToJson (SettingsScope? scope)
     {
-        //Logging.Debug  ("ConfigurationManager.ToJson()");
         return JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
     }
 

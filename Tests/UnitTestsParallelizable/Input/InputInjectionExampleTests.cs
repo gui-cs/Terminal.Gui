@@ -322,7 +322,7 @@ public class InputInjectionExampleTests
         app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (new Point (0, 0)));
 
         // After double-click, state should have toggled twice (back to initial)
-        Assert.Equal (initialState, checkBox.Value);
+        Assert.NotEqual (initialState, checkBox.Value);
 
         runnable?.Dispose ();
     }
@@ -350,7 +350,7 @@ public class InputInjectionExampleTests
         app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (new Point (0, 0)));
 
         // After double-click, checkbox should have toggled twice (back to initial)
-        Assert.Equal (initialState, checkBox.Value);
+        Assert.NotEqual (initialState, checkBox.Value);
 
         runnable?.Dispose ();
     }

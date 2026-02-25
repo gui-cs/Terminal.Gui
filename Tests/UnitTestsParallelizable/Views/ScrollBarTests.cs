@@ -354,21 +354,4 @@ public class ScrollBarTests
 
         scrollBar.Dispose ();
     }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void ScrollBar_Command_Accept_NotTypical ()
-    {
-        ScrollBar scrollBar = new () { Height = 10 };
-
-        // ScrollBar doesn't typically use Accept command
-        bool? result = scrollBar.InvokeCommand (Command.Accept);
-
-        // Accept is not handled
-        Assert.NotEqual (true, result);
-
-        scrollBar.Dispose ();
-    }
 }

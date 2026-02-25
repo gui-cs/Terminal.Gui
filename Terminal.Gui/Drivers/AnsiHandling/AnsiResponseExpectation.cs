@@ -43,7 +43,15 @@ internal record AnsiResponseExpectation (string? Terminator, string? Value, Acti
             return string.Equals (m.Groups [1].Value, Value, StringComparison.Ordinal);
         }
 
+        // Extract the first numeric token after ']' for OSC responses (e.g. "]10;..." -> "10", "]11;..." -> "11")
+        Match oscMatch = Regex.Match (s, @"^\](\d+);");
+
+        if (oscMatch.Success)
+        {
+            return string.Equals (oscMatch.Groups [1].Value, Value, StringComparison.Ordinal);
+        }
+
         // Fallback: conservative contains check (rare)
-        return s.Contains ($"[{Value};", StringComparison.Ordinal);
+        return s.Contains ($"[{Value};", StringComparison.Ordinal) || s.Contains ($"]{Value};", StringComparison.Ordinal);
     }
 }

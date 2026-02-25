@@ -21,7 +21,8 @@ public partial class TextField
             && !ev.Flags.HasFlag (MouseFlags.PositionReport)
             && !ev.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked)
-            && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
+            && ContextMenu is { }
+            && !ev.Flags.HasFlag (ContextMenu.MouseFlags))
         {
             return false;
         }
@@ -94,7 +95,7 @@ public partial class TextField
             ClearAllSelection ();
             PrepareSelection (0, _text.Count);
         }
-        else if (ev.Flags == ContextMenu!.MouseFlags)
+        else if (ev.Flags == ContextMenu?.MouseFlags)
         {
             ShowContextMenu (false);
         }

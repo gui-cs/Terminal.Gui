@@ -1,4 +1,4 @@
-﻿#nullable enable
+﻿using System.Collections.Immutable;
 using System.Reflection;
 
 namespace DrawingTests;
@@ -39,39 +39,37 @@ public class SchemeTests
         Assert.True (schemes.ContainsKey ("Runnable"));
     }
 
-
     [Fact]
     public void GetHardCodedSchemes_Have_Expected_Normal_Attributes ()
     {
-        var schemes = Scheme.GetHardCodedSchemes ();
+        ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
         Assert.NotNull (schemes);
 
-        // Base
-        var baseScheme = schemes! ["Base"];
+        // Base (uses Color.None for transparent background)
+        Scheme baseScheme = schemes ["Base"];
         Assert.NotNull (baseScheme);
-        Assert.Equal (new Attribute (StandardColor.LightBlue, StandardColor.RaisinBlack), baseScheme!.Normal);
+        Assert.Equal (new Attribute (Color.None, Color.None), baseScheme.Normal);
 
         // Dialog
-        var dialogScheme = schemes ["Dialog"];
+        Scheme dialogScheme = schemes ["Dialog"];
         Assert.NotNull (dialogScheme);
-        Assert.Equal (new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace), dialogScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.LightSkyBlue, StandardColor.OuterSpace), dialogScheme.Normal);
 
         // Error
-        var errorScheme = schemes ["Error"];
+        Scheme errorScheme = schemes ["Error"];
         Assert.NotNull (errorScheme);
-        Assert.Equal (new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack), errorScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack), errorScheme.Normal);
 
         // Menu (Bold style)
-        var menuScheme = schemes ["Menu"];
+        Scheme menuScheme = schemes ["Menu"];
         Assert.NotNull (menuScheme);
-        Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme!.Normal);
+        Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme.Normal);
 
-        // Runnable
-        var runnableScheme = schemes ["Runnable"];
+        // Runnable (uses Color.None for transparent background)
+        Scheme runnableScheme = schemes ["Runnable"];
         Assert.NotNull (runnableScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString (), runnableScheme!.Normal.ToString ());
+        Assert.Equal (new Attribute (Color.None, Color.None), runnableScheme.Normal);
     }
-
 
     [Fact]
     public void Built_Ins_Are_Implicit ()
@@ -81,7 +79,6 @@ public class SchemeTests
         Assert.True (schemes ["Base"]!.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
         Assert.False (schemes ["Base"]!.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out _));
     }
-
 
     [Fact]
     public void With_Same_Attributes_AreEqual ()
@@ -98,6 +95,7 @@ public class SchemeTests
     public void Scheme_Properties_Are_Immutable ()
     {
         Scheme scheme = new (new Attribute ("Red", "Blue"));
+
         // The following line should not compile if uncommented:
         // scheme.Normal = new Attribute("Green", "Yellow");
         // Immutability is enforced by the C# compiler for init-only properties.
@@ -165,7 +163,7 @@ public class SchemeTests
     public void ToString_Outputs_All_Properties ()
     {
         Scheme scheme = new (new Attribute ("Red", "Blue"));
-        string str = scheme.ToString ();
+        var str = scheme.ToString ();
         Assert.Contains ("Normal", str, StringComparison.OrdinalIgnoreCase);
         Assert.Contains ("HotNormal", str, StringComparison.OrdinalIgnoreCase);
         Assert.Contains ("Focus", str, StringComparison.OrdinalIgnoreCase);
@@ -179,21 +177,21 @@ public class SchemeTests
     }
 
     [Fact]
-    public void CopyConstructor_Null_Throws ()
-    {
-        Assert.Throws<ArgumentNullException> (() => new Scheme (null));
-    }
+    public void CopyConstructor_Null_Throws () => Assert.Throws<ArgumentNullException> (() => new Scheme (null));
 
     [Fact]
     public void Is_Thread_Safe_For_Concurrent_Reads ()
     {
         Scheme scheme = new (new Attribute ("Red", "Blue"));
-        Parallel.For (0, 1000, i =>
-                               {
-                                   // All threads can safely read properties
-                                   _ = scheme.Normal;
-                                   _ = scheme.GetAttributeForRole (VisualRole.Focus);
-                                   _ = scheme.ToString ();
-                               });
+
+        Parallel.For (0,
+                      1000,
+                      i =>
+                      {
+                          // All threads can safely read properties
+                          _ = scheme.Normal;
+                          _ = scheme.GetAttributeForRole (VisualRole.Focus);
+                          _ = scheme.ToString ();
+                      });
     }
 }

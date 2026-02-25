@@ -15,4 +15,7 @@ public class CommandEventArgs : HandledEventArgs
     ///     If <see langword="null"/> the command was invoked without context.
     /// </remarks>
     public required ICommandContext? Context { get; init; }
+
+    /// <inheritdoc />
+    public override string ToString () => $"{Context}";
 }

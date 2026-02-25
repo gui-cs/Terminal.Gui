@@ -1192,7 +1192,7 @@ public partial class View // Layout APIs
     public List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
     {
         // PopoverHost - If visible, start with it instead of Top
-        if (App?.Popover?.GetActivePopover () is View { Visible: true } visiblePopover)
+        if (App?.Popovers?.GetActivePopover () is View { Visible: true } visiblePopover)
         {
             // BUGBUG: We do not traverse all visible runnables if there's an active popover. This may be a bug.
             List<View?> result = [];
