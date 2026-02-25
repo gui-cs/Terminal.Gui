@@ -323,7 +323,7 @@ When an inner CheckBox activates (via click/space), the command bubbles up to th
 
 ## Command Route Tracing
 
-For debugging command routing issues, Terminal.Gui provides a tracing system via @Terminal.Gui.Tracing.Trace. Command tracing captures detailed information about command flow through the view hierarchy.
+For debugging command routing issues, Terminal.Gui provides a tracing system via <xref:Terminal.Gui.Tracing.Trace>. Command tracing captures detailed information about command flow through the view hierarchy.
 
 > [!TIP]
 > `Trace` also supports Mouse and Keyboard tracing. See [Logging - View Event Tracing](logging.md#view-event-tracing) for the full tracing API.

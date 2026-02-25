@@ -1,6 +1,6 @@
 # Menus Deep Dive
 
-Terminal.Gui provides a comprehensive, hierarchical menu system built on top of the @Terminal.Gui.Shortcut and @Terminal.Gui.Bar classes. This deep dive covers the architecture, class relationships, command routing, and interactions between the menu components.
+Terminal.Gui provides a comprehensive, hierarchical menu system built on top of the <xref:Terminal.Gui.Shortcut> and <xref:Terminal.Gui.Bar> classes. This deep dive covers the architecture, class relationships, command routing, and interactions between the menu components.
 
 ## Table of Contents
 
@@ -22,13 +22,13 @@ The menu system in Terminal.Gui consists of the following key components:
 
 | Component | Description |
 |-----------|-------------|
-| @Terminal.Gui.Shortcut | Base class for displaying a command, help text, and key binding |
-| @Terminal.Gui.Bar | Container for `Shortcut` items, supports horizontal/vertical orientation |
-| @Terminal.Gui.MenuItem | A `Shortcut`-derived item for use in menus, supports submenus |
-| @Terminal.Gui.Menu | A vertically-oriented `Bar` that contains `MenuItem` items |
-| @Terminal.Gui.MenuBarItem | A `MenuItem` that holds a `PopoverMenu` instead of a `SubMenu` |
-| @Terminal.Gui.MenuBar | A horizontal `Menu` that contains `MenuBarItem` items |
-| @Terminal.Gui.PopoverMenu | A `PopoverBaseImpl`-derived view that hosts cascading menus |
+| <xref:Terminal.Gui.Shortcut> | Base class for displaying a command, help text, and key binding |
+| <xref:Terminal.Gui.Bar> | Container for `Shortcut` items, supports horizontal/vertical orientation |
+| <xref:Terminal.Gui.MenuItem> | A `Shortcut`-derived item for use in menus, supports submenus |
+| <xref:Terminal.Gui.Menu> | A vertically-oriented `Bar` that contains `MenuItem` items |
+| <xref:Terminal.Gui.MenuBarItem> | A `MenuItem` that holds a `PopoverMenu` instead of a `SubMenu` |
+| <xref:Terminal.Gui.MenuBar> | A horizontal `Menu` that contains `MenuBarItem` items |
+| <xref:Terminal.Gui.PopoverMenu> | A `PopoverBaseImpl`-derived view that hosts cascading menus |
 
 ---
 
@@ -73,7 +73,7 @@ For completeness, here's how `StatusBar` fits in:
 
 ### Shortcut
 
-@Terminal.Gui.Shortcut is the foundational building block. It displays three elements:
+<xref:Terminal.Gui.Shortcut> is the foundational building block. It displays three elements:
 
 1. **CommandView** - The command text (left side by default)
 2. **HelpView** - Help text (middle)
@@ -101,7 +101,7 @@ Key features:
 
 ### Bar
 
-@Terminal.Gui.Bar is a container that arranges `Shortcut` items either horizontally or vertically:
+<xref:Terminal.Gui.Bar> is a container that arranges `Shortcut` items either horizontally or vertically:
 
 ```csharp
 Bar statusBar = new ()
@@ -122,7 +122,7 @@ Key features:
 
 ### MenuItem
 
-@Terminal.Gui.MenuItem extends `Shortcut` for use in menus:
+<xref:Terminal.Gui.MenuItem> extends `Shortcut` for use in menus:
 
 ```csharp
 MenuItem menuItem = new ()
@@ -138,15 +138,15 @@ MenuItem boundItem = new (myView, Command.Save);
 ```
 
 Key features:
-- `SubMenu` property holds nested @Terminal.Gui.Menu for cascading menus
+- `SubMenu` property holds nested <xref:Terminal.Gui.Menu> for cascading menus
 - `TargetView` and `Command` enable command binding to other views
 - Automatically gets focus on mouse enter
 - Displays right-arrow glyph when it has a submenu
-- When `SubMenu` is set, a @Terminal.Gui.Input.CommandBridge connects the SubMenu back to this MenuItem (bridging `Activate` and `Accept` commands across the non-containment boundary)
+- When `SubMenu` is set, a <xref:Terminal.Gui.Input.CommandBridge> connects the SubMenu back to this MenuItem (bridging `Activate` and `Accept` commands across the non-containment boundary)
 
 ### Menu
 
-@Terminal.Gui.Menu is a vertical `Bar` specialized for menu items:
+<xref:Terminal.Gui.Menu> is a vertical `Bar` specialized for menu items:
 
 ```csharp
 Menu fileMenu = new ([
@@ -173,7 +173,7 @@ Key features:
 
 ### MenuBarItem
 
-@Terminal.Gui.MenuBarItem extends `MenuItem` for use in @Terminal.Gui.MenuBar:
+<xref:Terminal.Gui.MenuBarItem> extends `MenuItem` for use in <xref:Terminal.Gui.MenuBar>:
 
 ```csharp
 MenuBarItem fileMenuBarItem = new ("_File", [
@@ -189,13 +189,13 @@ MenuBarItem fileMenuBarItem = new ("_File", [
 Key features:
 - `PopoverMenu` property holds the dropdown menu
 - `PopoverMenuOpen` tracks whether the popover is visible (CWP property with `PopoverMenuOpenChanging`/`PopoverMenuOpenChanged` events)
-- When `PopoverMenu` is set, a @Terminal.Gui.Input.CommandBridge connects the PopoverMenu back to this MenuBarItem, bridging `Activate` commands across the non-containment boundary
+- When `PopoverMenu` is set, a <xref:Terminal.Gui.Input.CommandBridge> connects the PopoverMenu back to this MenuBarItem, bridging `Activate` commands across the non-containment boundary
 - Overrides `OnActivating` to toggle `PopoverMenuOpen`, with a guard that ignores `Bridged` commands (which are notifications from PopoverMenu internals, not toggle requests)
 - Has a custom `HotKey` handler that skips `SetFocus` before invoking `Activate`, preventing premature popover opening during MenuBarItem switching
 
 ### MenuBar
 
-@Terminal.Gui.MenuBar is a horizontal menu bar typically placed at the top of a window:
+<xref:Terminal.Gui.MenuBar> is a horizontal menu bar typically placed at the top of a window:
 
 ```csharp
 MenuBar menuBar = new ([
@@ -231,7 +231,7 @@ Key features:
 
 ### PopoverMenu
 
-@Terminal.Gui.PopoverMenu is a popover that hosts cascading menus:
+<xref:Terminal.Gui.PopoverMenu> is a popover that hosts cascading menus:
 
 ```csharp
 // Create a context menu
@@ -254,7 +254,7 @@ contextMenu.MakeVisible (new Point (10, 5));
 ```
 
 Key features:
-- `Root` property holds the top-level @Terminal.Gui.Menu
+- `Root` property holds the top-level <xref:Terminal.Gui.Menu>
 - `Key` property for activation (default: `Shift+F10`)
 - `MouseFlags` property defines mouse button to show menu (default: right-click)
 - **Must be registered** with `Application.Popover` before calling `MakeVisible`
@@ -344,7 +344,7 @@ Each menu component uses a specific command dispatch pattern:
 
 ### CommandBridge (Cross-Boundary Routing)
 
-The menu system has two non-containment boundaries that require @Terminal.Gui.Input.CommandBridge:
+The menu system has two non-containment boundaries that require <xref:Terminal.Gui.Input.CommandBridge>:
 
 1. **MenuBarItem ↔ PopoverMenu:** `PopoverMenu` is not a SubView of `MenuBarItem` — it is registered with `Application.Popover` and lives outside the view hierarchy. The bridge brings `Activate` events from the PopoverMenu back to the MenuBarItem so they can bubble up through the MenuBar.
 
@@ -704,6 +704,6 @@ These can also be configured in `config.json`:
 - [Command Deep Dive](command.md) - Command binding, dispatch, and routing
 - [Keyboard Deep Dive](keyboard.md) - Key binding system
 - [Events Deep Dive](events.md) - Event handling patterns
-- @Terminal.Gui.MenuBar API Reference
-- @Terminal.Gui.PopoverMenu API Reference
-- @Terminal.Gui.MenuItem API Reference
+- <xref:Terminal.Gui.MenuBar> API Reference
+- <xref:Terminal.Gui.PopoverMenu> API Reference
+- <xref:Terminal.Gui.MenuItem> API Reference
