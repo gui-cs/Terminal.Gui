@@ -104,13 +104,19 @@ internal static class UnixTerminalHelper
 
             // Disable alternative screen buffer and show cursor
             output.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
             output.Write (EscSeqUtils.CSI_ShowCursor);
 
             if (!SuspendHelper.Suspend ())
             {
                 return;
             }
+
+            // Restore terminal state after resuming
             RestoreTerminalState ();
+
+            //Enable alternative screen buffer.
             output.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
         }
         catch (Exception ex)

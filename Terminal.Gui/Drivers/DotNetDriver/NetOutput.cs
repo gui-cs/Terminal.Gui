@@ -174,14 +174,18 @@ public class NetOutput : OutputBase, IOutput
             Console.ResetColor ();
             Console.Clear ();
 
+            //Disable alternative screen buffer.
             Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
             Write (EscSeqUtils.CSI_ShowCursor);
 
             if (!SuspendHelper.Suspend ())
             {
                 return;
             }
-            UnixTerminalHelper.RestoreTerminalState ();
+
+            //Enable alternative screen buffer.
             Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
         }
         catch (Exception ex)
