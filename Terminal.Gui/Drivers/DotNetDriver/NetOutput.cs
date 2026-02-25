@@ -156,4 +156,42 @@ public class NetOutput : OutputBase, IOutput
 
     /// <inheritdoc/>
     public void Dispose () { }
+
+    /// <inheritdoc/>
+    public void Suspend ()
+    {
+        if (PlatformDetection.IsWindows ())
+        {
+            return;
+        }
+
+        // Best-effort: mirror behavior of ANSI/Unix outputs for consoles that accept CSI sequences.
+        try
+        {
+            // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
+            Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            Console.ResetColor ();
+            Console.Clear ();
+
+            Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            Write (EscSeqUtils.CSI_ShowCursor);
+
+            if (!SuspendHelper.Suspend ())
+            {
+                return;
+            }
+            UnixTerminalHelper.RestoreTerminalState ();
+            Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+        }
+        catch (Exception ex)
+        {
+            Logging.Error ($"Error suspending terminal: {ex.Message}");
+        }
+        finally
+        {
+            // Enable mouse events to allow mouse events to be sent to the application when it is resumed.
+            Write (EscSeqUtils.CSI_EnableMouseEvents);
+        }
+    }
 }

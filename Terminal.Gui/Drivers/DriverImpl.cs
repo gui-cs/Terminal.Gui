@@ -96,42 +96,14 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public void Suspend ()
     {
-        if (PlatformDetection.IsWindows ())
-        {
-            return;
-        }
-
-        // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
-        _output.Write (EscSeqUtils.CSI_DisableMouseEvents);
-
         try
         {
-            // Save terminal state before suspending to ensure it can be restored correctly.
-            UnixTerminalHelper.SaveTerminalState ();
-
-            //Disable alternative screen buffer.
-            _output.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-
-            //Set cursor key to cursor.
-            _output.Write (EscSeqUtils.CSI_ShowCursor);
-
-            // BUGBUG: This is unix-specific and should not be implemented here.
-            if (SuspendHelper.Suspend ())
-            {
-                // Restore terminal state after resuming.
-                UnixTerminalHelper.RestoreTerminalState ();
-
-                //Enable alternative screen buffer.
-                _output.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-            }
+            _output.Suspend ();
         }
         catch (Exception ex)
         {
             Logging.Error ($"Error suspending terminal: {ex.Message}");
         }
-
-        // Enable mouse events to allow mouse events to be sent to the application when it is resumed.
-        _output.Write (EscSeqUtils.CSI_EnableMouseEvents);
     }
 
     /// <inheritdoc/>

@@ -11,6 +11,9 @@ namespace Terminal.Gui.Drivers;
 internal class UnixOutput : OutputBase, IOutput
 {
     /// <inheritdoc/>
+    public void Suspend () => UnixTerminalHelper.Suspend (this);
+
+    /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
         byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());

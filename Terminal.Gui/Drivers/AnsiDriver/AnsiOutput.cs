@@ -125,6 +125,9 @@ public class AnsiOutput : OutputBase, IOutput
         }
     }
 
+    /// <inheritdoc/>
+    public void Suspend () => UnixTerminalHelper.Suspend (this);
+
     /// <summary>
     ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
     ///     a reference to the buffer last written with <see cref="Write(IOutputBuffer)"/>.

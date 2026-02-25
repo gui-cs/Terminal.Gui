@@ -340,11 +340,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         // TODO: Refresh Key should be configurable
         KeyBindings.ReplaceCommands (Key.F5, Command.Refresh);
 
-        // TODO: Suspend Key should be configurable
-        if (Environment.OSVersion.Platform == PlatformID.Unix)
-        {
-            KeyBindings.ReplaceCommands (Key.Z.WithCtrl, Command.Suspend);
-        }
+        // Each driver handles Suspend themselves
+        KeyBindings.ReplaceCommands (Key.Z.WithCtrl, Command.Suspend);
     }
 
     /// <summary>
