@@ -35,15 +35,15 @@ See [Arrangement Deep Dive](arrangement.md) for more.
 
 ## The Content Area
 
-**Content Area** refers to the rectangle with a location of `0,0` with the size returned by <xref:Terminal.Gui.View.GetContentSize>. 
+**Content Area** refers to the rectangle with a location of `0,0` with the size returned by <xref:Terminal.Gui.ViewBase.View.GetContentSize>. 
 
-The content area is the area where the view's content is drawn. Content can be any combination of the <xref:Terminal.Gui.View.Text> property, `SubViews`, and other content drawn by the View. The <xref:Terminal.Gui.View.GetContentSize> method gets the size of the content area of the view. 
+The content area is the area where the view's content is drawn. Content can be any combination of the <xref:Terminal.Gui.ViewBase.View.Text> property, `SubViews`, and other content drawn by the View. The <xref:Terminal.Gui.ViewBase.View.GetContentSize> method gets the size of the content area of the view. 
 
- The Content Area size tracks the size of the <xref:Terminal.Gui.View.Viewport> by default. If the content size is set via <xref:Terminal.Gui.View.SetContentSize>, the content area is the provided size. If the content size is larger than the <xref:Terminal.Gui.View.Viewport>, scrolling is enabled. 
+ The Content Area size tracks the size of the <xref:Terminal.Gui.ViewBase.View.Viewport> by default. If the content size is set via <xref:Terminal.Gui.ViewBase.View.SetContentSize>, the content area is the provided size. If the content size is larger than the <xref:Terminal.Gui.ViewBase.View.Viewport>, scrolling is enabled. 
 
 ## The Viewport
 
-The <xref:Terminal.Gui.View.Viewport> is a rectangle describing the portion of the **Content Area** that is visible to the user. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.GetContentSize()`, `Viewport.Location` will be `0,0`. 
+The <xref:Terminal.Gui.ViewBase.View.Viewport> is a rectangle describing the portion of the **Content Area** that is visible to the user. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.GetContentSize()`, `Viewport.Location` will be `0,0`. 
 
 To enable scrolling call `View.SetContentSize()` and then set `Viewport.Location` to positive values. Making `Viewport.Location` positive moves the Viewport down and to the right in the content. 
 
@@ -51,7 +51,7 @@ See the [Scrolling Deep Dive](scrolling.md) for details on how to enable scrolli
 
 ### Viewport Settings
 
-The <xref:Terminal.Gui.View.ViewportSettings> property controls how the Viewport is constrained using <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>. By default, `ViewportSettings` is `None`, which provides sensible constraints for typical scrolling scenarios.
+The <xref:Terminal.Gui.ViewBase.View.ViewportSettings> property controls how the Viewport is constrained using <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>. By default, `ViewportSettings` is `None`, which provides sensible constraints for typical scrolling scenarios.
 
 #### Default Behavior (No Flags Set)
 
@@ -92,13 +92,13 @@ The flags are organized into categories:
 - `TransparentMouse` - Mouse events pass through areas not occupied by SubViews
 
 **ScrollBar Flags** - Enable built-in scrollbars:
-- `HasVerticalScrollBar` - Enables the built-in <xref:Terminal.Gui.View.VerticalScrollBar> with <xref:Terminal.Gui.ScrollBarVisibilityMode.Auto> behavior (automatically shown when content exceeds viewport)
-- `HasHorizontalScrollBar` - Enables the built-in <xref:Terminal.Gui.View.HorizontalScrollBar> with <xref:Terminal.Gui.ScrollBarVisibilityMode.Auto> behavior (automatically shown when content exceeds viewport)
+- `HasVerticalScrollBar` - Enables the built-in <xref:Terminal.Gui.ViewBase.View.VerticalScrollBar> with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode.Auto> behavior (automatically shown when content exceeds viewport)
+- `HasHorizontalScrollBar` - Enables the built-in <xref:Terminal.Gui.ViewBase.View.HorizontalScrollBar> with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode.Auto> behavior (automatically shown when content exceeds viewport)
 - `HasScrollBars` - Combines both vertical and horizontal scrollbar flags
 
 ## Layout Engine
 
-Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time <xref:Terminal.Gui.Pos>. The size is set via `Width` and `Height`, which are of type <xref:Terminal.Gui.Dim>.
+Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time <xref:Terminal.Gui.ViewBase.Pos>. The size is set via `Width` and `Height`, which are of type <xref:Terminal.Gui.ViewBase.Dim>.
 
 The layout system uses virtual properties for categorization without type checking: `ReferencesOtherViews()`, `DependsOnSuperViewContentSize`, `CanContributeToAutoSizing`, `GetMinimumContribution()`, `IsFixed`, and `RequiresTargetLayout`. This enables extensibility.
 
@@ -114,17 +114,17 @@ var label2 = new Label () {
 };
 ```
 
-### <xref:Terminal.Gui.Pos>
+### <xref:Terminal.Gui.ViewBase.Pos>
 
-<xref:Terminal.Gui.Pos> is the type of `View.X` and `View.Y` and supports the following sub-types:
+<xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y` and supports the following sub-types:
 
-* Absolute position, by passing an integer - <xref:Terminal.Gui.Pos.Absolute>.
-* Percentage of the parent's view size - <xref:Terminal.Gui.Pos.Percent>(System.Int32)
-* Anchored from the end of the dimension - <xref:Terminal.Gui.Pos.AnchorEnd>(System.Int32)
-* Centered, using <xref:Terminal.Gui.Pos.Center>
-* The <xref:Terminal.Gui.Pos.Left>, <xref:Terminal.Gui.Pos.Right>, <xref:Terminal.Gui.Pos.Top>, and <xref:Terminal.Gui.Pos.Bottom> tracks the position of another view.
-* Aligned (left, right, center, etc...) with other views - <xref:Terminal.Gui.Pos.Align>
-* An arbitrary function - <xref:Terminal.Gui.Pos.Func>
+* Absolute position, by passing an integer - <xref:Terminal.Gui.ViewBase.Pos.Absolute>.
+* Percentage of the parent's view size - <xref:Terminal.Gui.ViewBase.Pos.Percent>(System.Int32)
+* Anchored from the end of the dimension - <xref:Terminal.Gui.ViewBase.Pos.AnchorEnd>(System.Int32)
+* Centered, using <xref:Terminal.Gui.ViewBase.Pos.Center>
+* The <xref:Terminal.Gui.ViewBase.Pos.Left>, <xref:Terminal.Gui.ViewBase.Pos.Right>, <xref:Terminal.Gui.ViewBase.Pos.Top>, and <xref:Terminal.Gui.ViewBase.Pos.Bottom> tracks the position of another view.
+* Aligned (left, right, center, etc...) with other views - <xref:Terminal.Gui.ViewBase.Pos.Align>
+* An arbitrary function - <xref:Terminal.Gui.ViewBase.Pos.Func>
 
 All `Pos` coordinates are relative to the SuperView's content area.
 
@@ -141,16 +141,16 @@ anotherView.Width = 9;
 myView.X = Pos.X (view);
 myView.Y = Pos.Bottom (anotherView) + 5;
 ```
-### <xref:Terminal.Gui.Dim>
+### <xref:Terminal.Gui.ViewBase.Dim>
 
-<xref:Terminal.Gui.Dim> is the type of `View.Width` and `View.Height` and supports the following sub-types:
+<xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height` and supports the following sub-types:
 
-* Automatic size based on the View's content (either SubViews or Text) - <xref:Terminal.Gui.Dim.Auto> - See [Dim.Auto Deep Dive](dimauto.md).
-* Absolute size, by passing an integer - <xref:Terminal.Gui.Dim.Absolute>(System.Int32).
-* Percentage of the SuperView's Content Area  - <xref:Terminal.Gui.Dim.Percent>(System.Int32).
-* Fill to the end of the SuperView's Content Area - <xref:Terminal.Gui.Dim.Fill>. **Note:** `Dim.Fill` does not contribute to a SuperView's <xref:Terminal.Gui.Dim.Auto> sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
-* Reference the Width or Height of another view - <xref:Terminal.Gui.Dim.Width>(Terminal.Gui.View), <xref:Terminal.Gui.Dim.Height>(Terminal.Gui.View).
-* An arbitrary function - <xref:Terminal.Gui.Dim.Func>(System.Func{System.Int32}).
+* Automatic size based on the View's content (either SubViews or Text) - <xref:Terminal.Gui.ViewBase.Dim.Auto> - See [Dim.Auto Deep Dive](dimauto.md).
+* Absolute size, by passing an integer - <xref:Terminal.Gui.ViewBase.Dim.Absolute>(System.Int32).
+* Percentage of the SuperView's Content Area  - <xref:Terminal.Gui.ViewBase.Dim.Percent>(System.Int32).
+* Fill to the end of the SuperView's Content Area - <xref:Terminal.Gui.ViewBase.Dim.Fill>. **Note:** `Dim.Fill` does not contribute to a SuperView's <xref:Terminal.Gui.ViewBase.Dim.Auto> sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
+* Reference the Width or Height of another view - <xref:Terminal.Gui.ViewBase.Dim.Width>(Terminal.Gui.View), <xref:Terminal.Gui.ViewBase.Dim.Height>(Terminal.Gui.View).
+* An arbitrary function - <xref:Terminal.Gui.ViewBase.Dim.Func>(System.Func{System.Int32}).
 
 All `Dim` dimensions are relative to the SuperView's content area.
 
@@ -213,7 +213,7 @@ superView.Add (label, textField, btn);
 
 ### Align Multiple Views (Like Dialog Buttons)
 
-**Scenario:** Align buttons horizontally using <xref:Terminal.Gui.Pos.Align>, as `Dialog` does:
+**Scenario:** Align buttons horizontally using <xref:Terminal.Gui.ViewBase.Pos.Align>, as `Dialog` does:
 
 ```cs
 Button cancelBtn = new ()

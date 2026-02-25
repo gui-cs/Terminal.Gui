@@ -382,9 +382,9 @@ Drivers implement cursor control through `IDriver` which delegates to `IOutput`:
 - `QueueAnsiRequest()` - ANSI request handling
 
 **Note:** The driver is internal to Terminal.Gui. View classes should not access `Driver` directly. Instead:
-- Use <xref:Terminal.Gui.Application.Screen> to get screen dimensions
-- Use <xref:Terminal.Gui.View.Move> for positioning (with viewport-relative coordinates)
-- Use <xref:Terminal.Gui.View.AddRune> and <xref:Terminal.Gui.View.AddStr> for drawing
+- Use <xref:Terminal.Gui.App.Application.Screen> to get screen dimensions
+- Use <xref:Terminal.Gui.ViewBase.View.Move> for positioning (with viewport-relative coordinates)
+- Use <xref:Terminal.Gui.ViewBase.View.AddRune> and <xref:Terminal.Gui.ViewBase.View.AddStr> for drawing
 - ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can access Driver when needed for framework implementation
 
 ### Driver Creation and Selection

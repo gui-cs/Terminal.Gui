@@ -112,7 +112,7 @@ Terminal.Gui provides these APIs for handling mouse input:
 
 * **Mouse State** - `MouseState` property provides current interaction state for visual feedback.
 
-* **Mouse** class - Platform-independent abstraction (<xref:Terminal.Gui.Mouse>) for mouse events.
+* **Mouse** class - Platform-independent abstraction (<xref:Terminal.Gui.Input.Mouse>) for mouse events.
 
 ## Mouse Bindings
 
@@ -785,8 +785,8 @@ These events work with `MouseState` to enable hover effects and visual feedback.
 - [Input Injection](input-injection.md) - Complete testing documentation
 - [View Layout](layout.md) - Understanding coordinate systems and layout
 - [Cancellable Work Pattern](cancellable-work-pattern.md) - Event processing pattern
-- <xref:Terminal.Gui.IMouseGrabHandler> - API reference for mouse grab handling
-- <xref:Terminal.Gui.IMouse> - API reference for the mouse interface
+- <xref:Terminal.Gui.Input.IMouseGrabHandler> - API reference for mouse grab handling
+- <xref:Terminal.Gui.Input.IMouse> - API reference for the mouse interface
 
 ## Mouse Tracing
 
