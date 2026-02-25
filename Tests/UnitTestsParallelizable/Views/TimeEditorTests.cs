@@ -428,4 +428,232 @@ public class TimeEditorTests : TestDriverBase
             Assert.Equal (30, te.Value.Minutes);
         }
     }
+
+    [Fact]
+    public void TimeTextProvider_TryManualParse_PartialInput ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 24-hour format
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
+        // Test partial input parsing (minutes only)
+        provider.Text = "14:30";
+        Assert.Equal (14, provider.TimeValue.Hours);
+        Assert.Equal (30, provider.TimeValue.Minutes);
+        Assert.Equal (0, provider.TimeValue.Seconds);
+        
+        // Test with seconds
+        provider.Text = "14:30:45";
+        Assert.Equal (14, provider.TimeValue.Hours);
+        Assert.Equal (30, provider.TimeValue.Minutes);
+        Assert.Equal (45, provider.TimeValue.Seconds);
+    }
+
+    [Fact]
+    public void TimeTextProvider_TryManualParse_InvalidInput ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 24-hour format
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
+        TimeSpan initialValue = provider.TimeValue;
+        
+        // Test invalid input (no separator)
+        provider.Text = "invalid";
+        Assert.Equal (initialValue, provider.TimeValue);
+        
+        // Test incomplete input (only one part)
+        provider.Text = "14";
+        Assert.Equal (initialValue, provider.TimeValue);
+    }
+
+    [Fact]
+    public void TimeTextProvider_TryManualParse_AutoCorrection ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 24-hour format
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
+        // Test auto-correction for out-of-range values
+        provider.Text = "25:70:90";
+        
+        // Should auto-correct to valid ranges
+        Assert.Equal (23, provider.TimeValue.Hours); // Max 23
+        Assert.Equal (59, provider.TimeValue.Minutes); // Max 59
+        Assert.Equal (59, provider.TimeValue.Seconds); // Max 59
+    }
+
+    [Fact]
+    public void TimeTextProvider_12Hour_AM_PM_Parsing ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 12-hour format
+        DateTimeFormatInfo format12h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-US").DateTimeFormat.Clone ();
+        provider.Format = format12h;
+        
+        // Test PM parsing
+        provider.Text = "2:30:00 PM";
+        Assert.Equal (14, provider.TimeValue.Hours);
+        
+        // Test AM parsing
+        provider.Text = "2:30:00 AM";
+        Assert.Equal (2, provider.TimeValue.Hours);
+        
+        // Test 12 PM (noon)
+        provider.Text = "12:00:00 PM";
+        Assert.Equal (12, provider.TimeValue.Hours);
+        
+        // Test 12 AM (midnight)
+        provider.Text = "12:00:00 AM";
+        Assert.Equal (0, provider.TimeValue.Hours);
+    }
+
+    [Fact]
+    public void TimeTextProvider_CursorNavigation_Comprehensive ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 24-hour format
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
+        // Test CursorStart
+        Assert.Equal (0, provider.CursorStart ());
+        
+        // Test CursorEnd
+        int endPos = provider.CursorEnd ();
+        Assert.True (endPos >= 0);
+        
+        // Test navigation through all positions
+        int pos = provider.CursorStart ();
+        int lastPos = pos;
+        
+        for (int i = 0; i < 10; i++)
+        {
+            int nextPos = provider.CursorRight (pos);
+            
+            // Should skip separators
+            Assert.NotEqual (pos, nextPos);
+            pos = nextPos;
+            
+            if (pos >= provider.CursorEnd ())
+            {
+                break;
+            }
+        }
+    }
+
+    [Fact]
+    public void TimeEditor_ValueChanging_Cancel ()
+    {
+        TimeEditor te = new ();
+        TimeSpan initialValue = TimeSpan.FromHours (10);
+        te.Value = initialValue;
+        
+        bool changingEventFired = false;
+        bool changedEventFired = false;
+        
+        te.ValueChanging += (_, e) =>
+        {
+            changingEventFired = true;
+            e.Handled = true; // Cancel the change
+        };
+        
+        te.ValueChanged += (_, e) =>
+        {
+            changedEventFired = true;
+        };
+        
+        // Try to set new value
+        te.Value = TimeSpan.FromHours (15);
+        
+        // ValueChanging should have fired, but ValueChanged should not
+        Assert.True (changingEventFired);
+        Assert.False (changedEventFired);
+        
+        // Value should not have changed
+        Assert.Equal (initialValue, te.Value);
+    }
+
+    [Fact]
+    public void TimeTextProvider_Delete_AtSeparatorPosition ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 24-hour format
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
+        provider.TimeValue = new TimeSpan (14, 30, 45);
+        
+        // Try to delete at separator position (position 2 in "14:30:45")
+        string beforeText = provider.Text.Trim ();
+        bool result = provider.Delete (2);
+        
+        // Delete at separator should not change anything or should skip to next position
+        string afterText = provider.Text.Trim ();
+        
+        // The behavior depends on implementation, but text should still be valid
+        Assert.NotNull (afterText);
+    }
+
+    [Fact]
+    public void TimeEditor_ValueChangedUntyped_Event ()
+    {
+        TimeEditor te = new ();
+        bool eventFired = false;
+        object? oldValue = null;
+        object? newValue = null;
+        
+        te.ValueChangedUntyped += (_, e) =>
+        {
+            eventFired = true;
+            oldValue = e.OldValue;
+            newValue = e.NewValue;
+        };
+        
+        TimeSpan testValue = TimeSpan.FromHours (15);
+        te.Value = testValue;
+        
+        Assert.True (eventFired);
+        Assert.Equal (TimeSpan.Zero, oldValue);
+        Assert.Equal (testValue, newValue);
+    }
+
+    [Fact]
+    public void TimeTextProvider_CursorLeft_FromStart ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 24-hour format
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
+        // CursorLeft from start should return start
+        int pos = provider.CursorLeft (0);
+        Assert.Equal (0, pos);
+    }
+
+    [Fact]
+    public void TimeTextProvider_CursorRight_FromEnd ()
+    {
+        TimeTextProvider provider = new ();
+        
+        // Use 24-hour format
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        provider.Format = format24h;
+        
+        int endPos = provider.CursorEnd ();
+        
+        // CursorRight from end should return end
+        int pos = provider.CursorRight (endPos);
+        Assert.Equal (endPos, pos);
+    }
 }

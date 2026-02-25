@@ -25,7 +25,7 @@ public class TimeAndDate : Scenario
         app.Init ();
 
         using Window win = new () { Title = GetQuitKeyAndName () };
-        
+
         // TimeField examples (existing)
         Label tfLabel = new ()
         {
@@ -34,7 +34,7 @@ public class TimeAndDate : Scenario
             Text = "TimeField (Legacy):"
         };
         win.Add (tfLabel);
-        
+
         TimeField longTime = new ()
         {
             X = Pos.Center (),
@@ -56,7 +56,7 @@ public class TimeAndDate : Scenario
         };
         shortTime.ValueChanged += TimeChanged;
         win.Add (shortTime);
-        
+
         // TimeEditor examples (new)
         Label teLabel = new ()
         {
@@ -65,7 +65,7 @@ public class TimeAndDate : Scenario
             Text = "TimeEditor (New - based on TextValidateField):"
         };
         win.Add (teLabel);
-        
+
         // Default culture time editor
         TimeEditor defaultTimeEditor = new ()
         {
@@ -75,7 +75,7 @@ public class TimeAndDate : Scenario
         };
         defaultTimeEditor.ValueChanged += TimeEditorChanged;
         win.Add (defaultTimeEditor);
-        
+
         // 24-hour format time editor
         TimeEditor time24Editor = new ()
         {
@@ -86,7 +86,7 @@ public class TimeAndDate : Scenario
         };
         time24Editor.ValueChanged += TimeEditorChanged;
         win.Add (time24Editor);
-        
+
         // Short time format time editor
         DateTimeFormatInfo shortFormat = (DateTimeFormatInfo)System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Clone ();
         shortFormat.LongTimePattern = shortFormat.ShortTimePattern;
@@ -146,7 +146,7 @@ public class TimeAndDate : Scenario
             Text = "Time Format: "
         };
         win.Add (_lblTimeFmt);
-        
+
         _lblTimeEditorValue = new()
         {
             X = Pos.Center (),
@@ -221,7 +221,7 @@ public class TimeAndDate : Scenario
     {
         _lblNewTime!.Text = $"New Time: {e.NewValue}";
     }
-    
+
     private void TimeEditorChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
     {
         _lblTimeEditorValue!.Text = $"TimeEditor Value: {e.NewValue}";
