@@ -112,7 +112,7 @@ public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 **Examples:**
 - `Window.DefaultBorderStyle` - Default border style for windows
 - `Dialog.DefaultShadow` - Default shadow style for dialogs
-- `Schemes` - Color schemes for the theme
+- <xref:Terminal.Gui.Drawing.Schemes> - Color schemes for the theme
 
 ### 3. AppSettingsScope (Default)
 
@@ -124,7 +124,7 @@ public static string MyAppSetting { get; set; } = "default value";
 ```
 
 **Important:** 
-- App developers **cannot** define `SettingsScope` or `ThemeScope` properties
+- App developers **cannot** define <xref:Terminal.Gui.Configuration.SettingsScope> or <xref:Terminal.Gui.Configuration.ThemeScope> properties
 - AppSettings property names must be globally unique (automatically prefixed with class name)
 
 ---
@@ -166,7 +166,7 @@ Configuration is loaded from multiple locations with increasing precedence (high
    - Useful for container environments and CI/CD pipelines
 
 9. **[ConfigLocations.Runtime](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)** (Highest Precedence)
-   - Settings in `ConfigurationManager.RuntimeConfig` string property
+   - Settings in <xref:Terminal.Gui.Configuration.ConfigurationManager>'s `RuntimeConfig` string property
    - In-memory configuration without files
 
 ### Precedence Diagram
@@ -412,7 +412,7 @@ This:
 
 ### Granular Control
 
-For more control, use ConfigurationManager.Load and `ConfigurationManager.Apply()` separately:
+For more control, use <xref:Terminal.Gui.Configuration.ConfigurationManager>'s `Load` and `Apply()` separately:
 
 ```csharp
 // Enable without loading
@@ -776,8 +776,8 @@ ConfigurationManager.Applied += (sender, e) =>
 
 **1. Use Appropriate Scopes**
 
-- `SettingsScope` - For system-wide behavior
-- `ThemeScope` - For visual appearance that should be themeable
+- <xref:Terminal.Gui.Configuration.SettingsScope> - For system-wide behavior
+- <xref:Terminal.Gui.Configuration.ThemeScope> - For visual appearance that should be themeable
 - Don't use `AppSettingsScope` in library code
 
 **2. Provide Meaningful Defaults**

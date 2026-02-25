@@ -25,7 +25,7 @@ This document provides an in-depth overview of the new features, improvements, a
 
 Terminal.Gui v2 represents a fundamental redesign of the library's architecture, API, and capabilities. Key improvements include:
 
-- **Instance-Based Application Model** - Move from static singletons to `IApplication` instances
+- **Instance-Based Application Model** - Move from static singletons to <xref:Terminal.Gui.App.IApplication> instances
 - **IRunnable Architecture** - Interface-based pattern for type-safe, runnable views
 - **Proper Resource Management** - Full IDisposable pattern with automatic cleanup
 - **Built-in Scrolling** - Every view supports scrolling inherently
@@ -68,19 +68,19 @@ v2 introduces an instance-based architecture that eliminates global state and en
 ### Key Features
 
 **IApplication Interface:**
-- `Application.Create()` returns an `IApplication` instance
+- [Application.Create()](xref:Terminal.Gui.App.Application.Create*) returns an <xref:Terminal.Gui.App.IApplication> instance
 - Multiple applications can coexist (useful for testing)
 - Each instance manages its own driver, session stack, and resources
 
 **View.App Property:**
-- Every view has an `App` property referencing its `IApplication` context
-- Views access application services through `App` (driver, session management, etc.)
+- Every view has an <xref:Terminal.Gui.ViewBase.View.App> property referencing its <xref:Terminal.Gui.App.IApplication> context
+- Views access application services through <xref:Terminal.Gui.ViewBase.View.App> (driver, session management, etc.)
 - Eliminates static dependencies, improving testability
 
 **Session Management:**
-- `SessionStack` tracks all running sessions as a stack
-- `TopRunnable` property references the currently active session
-- `Begin()` and `End()` methods manage session lifecycle
+- <xref:Terminal.Gui.App.IApplication.SessionStack> tracks all running sessions as a stack
+- <xref:Terminal.Gui.App.IApplication.TopRunnable> property references the currently active session
+- [Begin()](xref:Terminal.Gui.App.IApplication.Begin*) and [End()](xref:Terminal.Gui.App.IApplication.End*) methods manage session lifecycle
 
 ### Example
 
@@ -113,7 +113,7 @@ public class MyView : View
 
 ### Benefits
 
-- **Testability** - Mock `IApplication` for unit tests
+- **Testability** - Mock <xref:Terminal.Gui.App.IApplication> for unit tests
 - **No Global State** - Multiple contexts can coexist
 - **Clear Ownership** - Views explicitly know their context
 - **Proper Cleanup** - IDisposable ensures resources are released
@@ -137,7 +137,7 @@ using (IApplication app = Application.Create ().Init ())
 ```
 
 **Important Changes:**
-- `Shutdown()` method is obsolete - use `Dispose()` instead
+- [Shutdown()](xref:Terminal.Gui.App.Application.Shutdown*) method is obsolete - use `Dispose()` instead
 - Always dispose applications (especially in tests)
 - Input thread runs at ~50 polls/second (20ms throttle) until disposed
 
@@ -147,12 +147,12 @@ using (IApplication app = Application.Create ().Init ())
 
 See the [Application Deep Dive](application.md) for complete details.
 
-v2 introduces `IRunnable<TResult>` - an interface-based pattern for runnable views with type-safe results.
+v2 introduces <xref:Terminal.Gui.App.IRunnable> - an interface-based pattern for runnable views with type-safe results.
 
 ### Key Features
 
 **Interface-Based:**
-- Implement `IRunnable<TResult>` without inheriting from `Runnable`
+- Implement <xref:Terminal.Gui.App.IRunnable> without inheriting from `Runnable`
 - Any view can be runnable
 - Decouples runnability from view hierarchy
 
@@ -232,9 +232,9 @@ using (IApplication app = Application.Create ().Init ())
 ```
 
 **Key Methods:**
-- `Init()` - Returns `IApplication` for chaining
-- `Run<TRunnable>()` - Creates and runs runnable, returns `IApplication`
-- `GetResult<T>()` - Extract typed result after run
+- [Init()](xref:Terminal.Gui.App.IApplication.Init*) - Returns <xref:Terminal.Gui.App.IApplication> for chaining
+- [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) - Creates and runs runnable, returns <xref:Terminal.Gui.App.IApplication>
+- [GetResult<T>()](xref:Terminal.Gui.App.IApplication.GetResult*) - Extract typed result after run
 - `Dispose()` - Release all resources
 
 ### Disposal Semantics
@@ -243,7 +243,7 @@ using (IApplication app = Application.Create ().Init ())
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|
-| `Run<TRunnable>()` | Framework | Framework | Automatic when returns |
+| [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) | Framework | Framework | Automatic when returns |
 | `Run(IRunnable)` | Caller | Caller | Manual by caller |
 
 ```csharp
@@ -404,7 +404,7 @@ view.AdvanceFocus ()
 
 v2 reduces overhead through:
 
-- Smarter `NeedsDraw` system (only draw what changed)
+- Smarter <xref:Terminal.Gui.ViewBase.View.NeedsDraw> system (only draw what changed)
 - Reduced allocations in hot paths (event handling, rendering)
 - Optimized layout calculations
 - Efficient input processing

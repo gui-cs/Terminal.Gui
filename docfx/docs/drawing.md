@@ -25,7 +25,7 @@ Each iteration of the <xref:Terminal.Gui.App.Application> MainLoop (throttled to
 
 ### When Drawing Actually Occurs
 
-- **Normal Operation**: Drawing happens automatically during MainLoop iterations when `NeedsDraw` or `SubViewNeedsDraw` is set
+- **Normal Operation**: Drawing happens automatically during MainLoop iterations when <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or `SubViewNeedsDraw` is set
 - **Forced Update**: <xref:Terminal.Gui.App.Application.LayoutAndDraw(System.Boolean)> can be called to immediately trigger layout and drawing outside of the normal iteration cycle
 - **Testing**: Tests can call `Draw()` directly to update the back buffer, then call `IDriver.Refresh()` to output to the terminal
 
@@ -58,24 +58,24 @@ See [Layout](layout.md) for more details of the Terminal.Gui coordinate system.
 
 The <xref:Terminal.Gui.App.Application> MainLoop will iterate over all Views in the view hierarchy performing the following steps:
 
-0) Determines if `NeedsDraw` or `SubViewNeedsDraw` are set. If neither is set, processing stops.
+0) Determines if <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or `SubViewNeedsDraw` are set. If neither is set, processing stops.
 1) Sets the clip to the view's Frame.
-2) Draws the `Border` and `Padding` (but NOT the Margin).
+2) Draws the <xref:Terminal.Gui.ViewBase.Border> and <xref:Terminal.Gui.ViewBase.Padding> (but NOT the Margin).
 3) Sets the clip to the view's Viewport.
 4) Sets the Normal color scheme.
 5) Calls Draw on any `SubViews`.
 6) Draws `Text`.
 7) Draws any non-text content (the base View does nothing.)
 8) Sets the clip back to the view's Frame.
-9) Draws `LineCanvas` (which may have been added to by any of the steps above).
-10) Draws the `Border` and `Padding` SubViews (just the subviews). (but NOT the Margin).
-11) The Clip at this point excludes all SubViews NOT INCLUDING their Margins. This clip is cached so `Margin` can be rendered later.
+9) Draws <xref:Terminal.Gui.Drawing.LineCanvas> (which may have been added to by any of the steps above).
+10) Draws the <xref:Terminal.Gui.ViewBase.Border> and <xref:Terminal.Gui.ViewBase.Padding> SubViews (just the subviews). (but NOT the Margin).
+11) The Clip at this point excludes all SubViews NOT INCLUDING their Margins. This clip is cached so <xref:Terminal.Gui.ViewBase.Margin> can be rendered later.
 12) DrawComplete is raised.
 13) The current View's Frame NOT INCLUDING the Margin is excluded from the current Clip region.
 
 Most of the steps above can be overridden by developers using the standard [Terminal.Gui Cancellable Work Pattern](cancellable-work-pattern.md). For example, the base <xref:Terminal.Gui.ViewBase.View> always clears the viewport. To override this, a subclass can override `OnClearingViewport()` to simply return `true`. Or, a user of `View` can subscribe to the `ClearingViewport` event and set the `Cancel` argument to `true`.
 
-Then, after the above steps have completed, the Mainloop will iterate through all views in the view hierarchy again, this time calling Draw on any `Margin` objects, using the cached Clip region mentioned above. This enables Margin to be transparent.
+Then, after the above steps have completed, the Mainloop will iterate through all views in the view hierarchy again, this time calling Draw on any <xref:Terminal.Gui.ViewBase.Margin> objects, using the cached Clip region mentioned above. This enables Margin to be transparent.
 
 ### Declaring that drawing is needed
 
@@ -169,16 +169,16 @@ ColorStrings.GetColorName(transparentRed); // Returns "Red"
 
 `Color.None` is a special sentinel value (alpha=0) that tells the driver to emit ANSI reset codes (`CSI 39m` / `CSI 49m`) instead of explicit RGB values. This allows the terminal's native foreground/background colors — including any transparency or acrylic effects — to show through.
 
-When `Color.None` is used in a `Scheme`, the derivation algorithm resolves it to the terminal's actual default colors (detected via OSC 10/11 queries at startup) before performing color math. See [Scheme Deep Dive](scheme.md) for details.
+When `Color.None` is used in a <xref:Terminal.Gui.Drawing.Scheme>, the derivation algorithm resolves it to the terminal's actual default colors (detected via OSC 10/11 queries at startup) before performing color math. See [Scheme Deep Dive](scheme.md) for details.
 
 ### Dark/Light Background Awareness
 
-The `Color.IsDarkColor()` method returns `true` if a color's HSL lightness is below 50%. This is used by the `Scheme` derivation algorithm to determine the direction for `GetBrighterColor` and `GetDimmerColor`:
+The `Color.IsDarkColor()` method returns `true` if a color's HSL lightness is below 50%. This is used by the <xref:Terminal.Gui.Drawing.Scheme> derivation algorithm to determine the direction for `GetBrighterColor` and `GetDimmerColor`:
 
 - `Color.GetBrighterColor(double, bool?)` — Makes a color more visually prominent. On dark backgrounds (or when auto-detecting), increases lightness. On light backgrounds, decreases lightness.
 - `Color.GetDimmerColor(double, bool?)` — Makes a color less visually prominent. On dark backgrounds, decreases lightness. On light backgrounds, increases lightness (washes out toward white).
 
-Both methods accept an optional `isDarkBackground` parameter. When `null` (the default), they auto-detect from the color's own lightness for backward compatibility. The `Scheme` derivation algorithm passes explicit values based on the resolved background color.
+Both methods accept an optional `isDarkBackground` parameter. When `null` (the default), they auto-detect from the color's own lightness for backward compatibility. The <xref:Terminal.Gui.Drawing.Scheme> derivation algorithm passes explicit values based on the resolved background color.
 
 ### Legacy 16-Color Support
 
@@ -223,7 +223,7 @@ See [View Deep Dive](View.md) for details.
 
 ## Diagnostics
 
-The `ViewDiagnosticFlags.DrawIndicator` flag can be set on `View.Diagnostics` to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either `NeedsDraw` or `SubViewNeedsDraw` is set.
+The `ViewDiagnosticFlags.DrawIndicator` flag can be set on `View.Diagnostics` to cause an animated glyph to appear in the <xref:Terminal.Gui.ViewBase.Border> of each View. The glyph will animate each time that View's `Draw` method is called where either <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or `SubViewNeedsDraw` is set.
 
 ## Accessing Application Drawing Context
 

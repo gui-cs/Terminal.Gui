@@ -25,7 +25,7 @@ Scrolling with the mouse and keyboard are enabled by:
 1) Making the `Viewport` size smaller than the size returned by `GetContentSize()`. 
 2) Creating key bindings for the appropriate directional keys, and calling `ScrollHorizontal()`(System.Int32) / `ScrollVertical()`(System.Int32) as needed.
 3) Subscribing to `MouseEvent` and calling calling `ScrollHorizontal()`(System.Int32) / `ScrollVertical()`(System.Int32) as needed.
-4) Enabling the ScrollBars built into View by setting the `ViewportSettingsFlags.HasVerticalScrollBar` or `ViewportSettingsFlags.HasHorizontalScrollBar` flags on the `ViewportSettings` property. Alternatively, the `ScrollBar.VisibilityMode` property can be set to control scrollbar visibility manually.
+4) Enabling the ScrollBars built into View by setting the <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>.HasVerticalScrollBar or <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>.HasHorizontalScrollBar flags on the `ViewportSettings` property. Alternatively, the `ScrollBar.VisibilityMode` property can be set to control scrollbar visibility manually.
 
 While <xref:Terminal.Gui.Views.ScrollBar> can be used in a standalone manner to provide proportional scrolling, it is typically enabled automatically via the `HorizontalScrollBar` and `VerticalScrollBar` properties.
 
@@ -40,7 +40,7 @@ The `ScrollBar.VisibilityMode` property controls how a ScrollBar manages its `Vi
 
 ### Enabling Built-in Scrollbars
 
-The recommended way to enable the built-in scrollbars (`VerticalScrollBar` and `HorizontalScrollBar`) is to use the `ViewportSettingsFlags.HasVerticalScrollBar` and `ViewportSettingsFlags.HasHorizontalScrollBar` flags:
+The recommended way to enable the built-in scrollbars (`VerticalScrollBar` and `HorizontalScrollBar`) is to use the <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>.HasVerticalScrollBar and <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>.HasHorizontalScrollBar flags:
 
 ```csharp
 // Enable vertical scrollbar with automatic visibility
@@ -113,7 +113,7 @@ The `ViewportSettings` property (of type <xref:Terminal.Gui.ViewBase.ViewportSet
 
 **ScrollBar Flags** - Enable built-in scrollbars:
 
-* `HasVerticalScrollBar` - If set, the built-in `VerticalScrollBar` is enabled with `ScrollBarVisibilityMode.Auto` behavior. Clearing this flag disables the scrollbar.
-* `HasHorizontalScrollBar` - If set, the built-in `HorizontalScrollBar` is enabled with `ScrollBarVisibilityMode.Auto` behavior. Clearing this flag disables the scrollbar.
+* `HasVerticalScrollBar` - If set, the built-in `VerticalScrollBar` is enabled with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode>.Auto behavior. Clearing this flag disables the scrollbar.
+* `HasHorizontalScrollBar` - If set, the built-in `HorizontalScrollBar` is enabled with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode>.Auto behavior. Clearing this flag disables the scrollbar.
 * `HasScrollBars` - Combines both vertical and horizontal scrollbar flags.
 

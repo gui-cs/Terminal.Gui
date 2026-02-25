@@ -22,14 +22,14 @@ See the [Views Overview](views.md) for a catalog of all built-in View subclasses
 
 - **[View](~/api/Terminal.Gui.ViewBase.View.yml)** - The base class for all visible UI elements
 - **SubView** - A View that is contained in another View and rendered as part of the containing View's content area. SubViews are added via `Add()`
-- **SuperView** - The View that contains SubViews. Each View has a `SuperView` property that references its container
+- **SuperView** - The <xref:Terminal.Gui.ViewBase.View> that contains SubViews. Each View has a `SuperView` property that references its container
 - **Child View** - A view that holds a reference to another view in a parent/child relationship (used sparingly; generally SubView/SuperView is preferred)
 - **Parent View** - A view that holds a reference to another view but is NOT a SuperView (used sparingly)
 
 ### Key Properties
 
 - `SubViews` - Read-only list of all SubViews added to this View
-- `SuperView` - The View's container (null if the View has no container)
+- `SuperView` - The <xref:Terminal.Gui.ViewBase.View>'s container (null if the View has no container)
 - `Id` - Unique identifier for the View (should be unique among siblings)
 - `Data` - Arbitrary data attached to the View
 - `App` - The application context this View belongs to
@@ -60,7 +60,7 @@ See the [Layout Deep Dive](layout.md) for complete details on View composition a
 
 ### Frame vs. Viewport
 
-- **Frame** - The View's location and size in SuperView-relative coordinates. Frame includes all adornments (Margin, Border, Padding)
+- **Frame** - The View's location and size in SuperView-relative coordinates. Frame includes all adornments (<xref:Terminal.Gui.ViewBase.Margin>, <xref:Terminal.Gui.ViewBase.Border>, <xref:Terminal.Gui.ViewBase.Padding>)
 - **Viewport** - The visible "window" into the View's content, located inside the adornments. Viewport coordinates are always relative to (0,0) of the content area
 
 ```csharp
@@ -130,7 +130,7 @@ See the [Command Deep Dive](command.md).
 - [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
 - `CommandsToBubbleUp` - Opt-in list of commands that bubble from SubViews to this View
 - [View.DispatchDown](~/api/Terminal.Gui.ViewBase.View.yml) - Dispatches a command downward to a SubView with bubbling suppressed (inverse of `TryBubbleToSuperView`)
-- `DefaultAcceptView` - The SubView that receives `Command.Accept` when no other SubView handles it
+- `DefaultAcceptView` - The SubView that receives <xref:Terminal.Gui.Input.Command.Accept> when no other SubView handles it
 
 ### Input Handling
 
@@ -138,8 +138,8 @@ See the [Command Deep Dive](command.md).
 
 See the [Keyboard Deep Dive](keyboard.md).
 
-- `KeyBindings` - Maps keys to Commands
-- `HotKey` - The hot key for the View
+- <xref:Terminal.Gui.Input.KeyBindings> - Maps keys to Commands
+- <xref:Terminal.Gui.ViewBase.View.HotKey> - The hot key for the View
 - `HotKeySpecifier` - Character used to denote hot keys in text (default: '_')
 - Events: `KeyDown`, `InvokingKeyBindings`
 
@@ -147,7 +147,7 @@ See the [Keyboard Deep Dive](keyboard.md).
 
 See the [Mouse Deep Dive](mouse.md).
 
-- `MouseBindings` - Maps mouse events to Commands
+- <xref:Terminal.Gui.Input.MouseBindings> - Maps mouse events to Commands
 - `MouseHoldRepeat` - Enables continuous button press events
 - View.Highlight event - Event for visual feedback on mouse hover/click
 - View.HighlightStyle - Visual style when highlighted
@@ -224,21 +224,21 @@ See the [Scheme Deep Dive](scheme.md) for details on color theming.
 
 See the [Navigation Deep Dive](navigation.md).
 
-- `CanFocus` - Whether the View can receive keyboard focus
-- `HasFocus` - Whether the View currently has focus
-- `TabStop` - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) for tab navigation
+- <xref:Terminal.Gui.ViewBase.View.CanFocus> - Whether the View can receive keyboard focus
+- <xref:Terminal.Gui.ViewBase.View.HasFocus> - Whether the View currently has focus
+- <xref:Terminal.Gui.ViewBase.View.TabStop> - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) for tab navigation
 - View.ZOrder - Order in tab navigation
 - [View.SetFocus](~/api/Terminal.Gui.ViewBase.View.yml) - Gives focus to the View
 
 Events:
 - `HasFocusChanging` - Before focus changes (cancellable)
 - `HasFocusChanged` - After focus changes
-- `Accepting` - When Command.Accept is invoked (typically Enter key) - cancellable
-- `Accepted` - After Command.Accept completes
-- `Activating` - When Command.Activate is invoked (typically Space or mouse click) - cancellable
-- `Activated` - After Command.Activate completes
-- `HandlingHotKey` - When Command.HotKey is invoked (the view's HotKey was pressed) - cancellable
-- `HotKeyCommand` - After Command.HotKey completes
+- <xref:Terminal.Gui.ViewBase.View.Accepting> - When <xref:Terminal.Gui.Input.Command.Accept> is invoked (typically Enter key) - cancellable
+- <xref:Terminal.Gui.ViewBase.View.Accepted> - After <xref:Terminal.Gui.Input.Command.Accept> completes
+- <xref:Terminal.Gui.ViewBase.View.Activating> - When <xref:Terminal.Gui.Input.Command.Activate> is invoked (typically Space or mouse click) - cancellable
+- <xref:Terminal.Gui.ViewBase.View.Activated> - After <xref:Terminal.Gui.Input.Command.Activate> completes
+- <xref:Terminal.Gui.ViewBase.View.HandlingHotKey> - When <xref:Terminal.Gui.Input.Command.HotKey> is invoked (the view's HotKey was pressed) - cancellable
+- <xref:Terminal.Gui.ViewBase.View.HotKeyCommand> - After <xref:Terminal.Gui.Input.Command.HotKey> completes
 
 ### Scrolling
 
@@ -280,7 +280,7 @@ View view = new ()
 
 ### 2. Initialization
 
-When a View is added to a SuperView or when Application.Run is called:
+When a <xref:Terminal.Gui.ViewBase.View> is added to a SuperView or when Application.Run is called:
 
 1. `BeginInit()` is called
 2. `EndInit()` is called
@@ -369,7 +369,7 @@ The keyboard subsystem processes key presses through:
 
 1. [View.KeyDown](~/api/Terminal.Gui.ViewBase.View.yml) event (cancellable)
 2. [View.OnKeyDown](~/api/Terminal.Gui.ViewBase.View.yml) virtual method
-3. `KeyBindings` - Converts keys to commands
+3. <xref:Terminal.Gui.Input.KeyBindings> - Converts keys to commands
 4. Command handlers (registered via [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml))
 
 #### Mouse
@@ -436,8 +436,8 @@ See the [Navigation Deep Dive](navigation.md) for complete details.
 
 Navigation controls keyboard focus movement:
 
-- `CanFocus` - Whether View can receive focus
-- `TabStop` - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) (NoStop, TabStop, TabGroup)
+- <xref:Terminal.Gui.ViewBase.View.CanFocus> - Whether View can receive focus
+- <xref:Terminal.Gui.ViewBase.View.TabStop> - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) (NoStop, TabStop, TabGroup)
 - View.TabIndex - Tab order within SuperView
 - [View.SetFocus](~/api/Terminal.Gui.ViewBase.View.yml) - Requests focus
 - [View.AdvanceFocus](~/api/Terminal.Gui.ViewBase.View.yml) - Moves focus to next/previous View
@@ -574,7 +574,7 @@ view.AddCommand (Command.ScrollDown, () => { view.ScrollVertical (1); return tru
 
 ## Runnable Views
 
-Views can implement [IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) to run as independent, blocking sessions with typed results. This decouples runnability from inheritance, allowing any View to participate in session management.
+Views can implement [IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) to run as independent, blocking sessions with typed results. This decouples runnability from inheritance, allowing any <xref:Terminal.Gui.ViewBase.View> to participate in session management.
 
 ### IRunnable Architecture
 
@@ -763,8 +763,8 @@ Application.Run (wizard);
 
 - `Enabled` - Whether the View is enabled
 - `Visible` - Whether the View is visible
-- `CanFocus` - Whether the View can receive focus
-- `HasFocus` - Whether the View currently has focus
+- <xref:Terminal.Gui.ViewBase.View.CanFocus> - Whether the View can receive focus
+- <xref:Terminal.Gui.ViewBase.View.HasFocus> - Whether the View currently has focus
 
 ### Shadow Effects
 

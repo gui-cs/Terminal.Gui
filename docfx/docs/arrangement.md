@@ -21,7 +21,7 @@ See the [Layout Deep Dive](layout.md) for the broader layout system context.
 
 ## Overview
 
-The `Arrangement` property controls how users can arrange views within their `SuperView`. The [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) enum provides flags that can be combined to specify arrangement behavior.
+The `Arrangement` property controls how users can arrange views within their `SuperView`. The <xref:Terminal.Gui.ViewBase.ViewArrangement> enum provides flags that can be combined to specify arrangement behavior.
 
 ### Arrangement Lexicon
 
@@ -99,7 +99,7 @@ var window = new Window
 };
 ```
 
-**Note:** When both `Movable` and `Resizable` are set, the top edge cannot be resized (Movable takes precedence).
+**Note:** When both <xref:Terminal.Gui.ViewBase.ViewArrangement.Movable> and <xref:Terminal.Gui.ViewBase.ViewArrangement.Resizable> are set, the top edge cannot be resized (Movable takes precedence).
 
 ### Individual Edge Resizing
 
@@ -163,7 +163,7 @@ For a View to be arrangeable:
 1. Must be part of a `SuperView`
 2. Position and dimensions must be independent of other SubViews
 3. Must have `Arrangement` flags set
-4. Typically needs a [Border](~/api/Terminal.Gui.ViewBase.Border.yml) for mouse interaction
+4. Typically needs a <xref:Terminal.Gui.ViewBase.Border> for mouse interaction
 
 ---
 
@@ -376,14 +376,14 @@ See the [Multitasking Deep Dive](multitasking.md) for complete details on modal 
 ### What Makes a View Modal
 
 A view is modal when:
-- Run via `IApplication.Run`
+- Run via <xref:Terminal.Gui.App.IApplication>`.Run`
 - Runnable.Modal == `true`
 
 ### Modal Characteristics
 
 - **Exclusive Input** - All keyboard and mouse input goes to the modal view
 - **Constrained Z-Order** - Modal view has Z-order of 1, everything else at 0
-- **Blocks Execution** - `IApplication.Run` blocks until `Application.RequestStop()` is called
+- **Blocks Execution** - <xref:Terminal.Gui.App.IApplication>`.Run` blocks until `Application.RequestStop()` is called
 - **Own SessionToken** - Each modal view has its own [SessionToken](~/api/Terminal.Gui.App.SessionToken.yml)
 
 ### Modal View Types
@@ -729,8 +729,8 @@ view.LayoutComplete += (s, e) =>
 ### API Reference
 
 - `Arrangement`
-- [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)
-- [Border](~/api/Terminal.Gui.ViewBase.Border.yml)
+- <xref:Terminal.Gui.ViewBase.ViewArrangement>
+- <xref:Terminal.Gui.ViewBase.Border>
 - `Application.ArrangeKey`
 - Runnable.Modal
 

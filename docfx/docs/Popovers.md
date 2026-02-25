@@ -4,7 +4,7 @@ Popovers are transient UI elements that appear above other content to display co
 
 ## Overview
 
-Normally, Views cannot draw outside of their `Viewport`. To display content that appears to "pop over" other views, Terminal.Gui provides the popover system via `Application.Popover`. Popovers differ from alternatives like modifying `Border` or `Margin` behavior because they:
+Normally, Views cannot draw outside of their `Viewport`. To display content that appears to "pop over" other views, Terminal.Gui provides the popover system via `Application.Popover`. Popovers differ from alternatives like modifying <xref:Terminal.Gui.ViewBase.Border> or <xref:Terminal.Gui.ViewBase.Margin> behavior because they:
 
 - Are managed centrally by the application
 - Support focus and keyboard event routing
@@ -263,7 +263,7 @@ myPopover.Current = myWindow; // Only active when myWindow is the top runnable
 
 ### Default Layout
 
-`PopoverBaseImpl` sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()`, making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
+`PopoverBaseImpl` sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()` (see <xref:Terminal.Gui.ViewBase.Dim>), making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
 
 ### Custom Sizing
 
@@ -309,7 +309,7 @@ The menu automatically adjusts position to ensure it remains fully visible on sc
 **Key Features:**
 - Cascading submenus with automatic positioning
 - Keyboard navigation (arrow keys, hotkeys)
-- Automatic key binding discovery from Commands — menu items that specify a `Command` automatically display the correct keyboard shortcut
+- Automatic key binding discovery from Commands — menu items that specify a <xref:Terminal.Gui.Input.Command> automatically display the correct keyboard shortcut
 - Mouse support
 - Separator lines via `new Line ()`
 

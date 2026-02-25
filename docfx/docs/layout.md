@@ -92,13 +92,13 @@ The flags are organized into categories:
 - `TransparentMouse` - Mouse events pass through areas not occupied by SubViews
 
 **ScrollBar Flags** - Enable built-in scrollbars:
-- `HasVerticalScrollBar` - Enables the built-in `VerticalScrollBar` with `ScrollBarVisibilityMode.Auto` behavior (automatically shown when content exceeds viewport)
-- `HasHorizontalScrollBar` - Enables the built-in `HorizontalScrollBar` with `ScrollBarVisibilityMode.Auto` behavior (automatically shown when content exceeds viewport)
+- `HasVerticalScrollBar` - Enables the built-in `VerticalScrollBar` with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode>.Auto behavior (automatically shown when content exceeds viewport)
+- `HasHorizontalScrollBar` - Enables the built-in `HorizontalScrollBar` with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode>.Auto behavior (automatically shown when content exceeds viewport)
 - `HasScrollBars` - Combines both vertical and horizontal scrollbar flags
 
 ## Layout Engine
 
-Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time `Pos`. The size is set via `Width` and `Height`, which are of type `Dim`.
+Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time <xref:Terminal.Gui.ViewBase.Pos>. The size is set via `Width` and `Height`, which are of type <xref:Terminal.Gui.ViewBase.Dim>.
 
 The layout system uses virtual properties for categorization without type checking: `ReferencesOtherViews()`, `DependsOnSuperViewContentSize`, `CanContributeToAutoSizing`, `GetMinimumContribution()`, `IsFixed`, and `RequiresTargetLayout`. This enables extensibility.
 
@@ -116,7 +116,7 @@ var label2 = new Label () {
 
 ### Pos
 
-`Pos` is the type of `View.X` and `View.Y` and supports the following sub-types:
+<xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y` and supports the following sub-types:
 
 * Absolute position, by passing an integer - `Pos.Absolute()`.
 * Percentage of the parent's view size - `Pos.Percent()`
@@ -126,9 +126,9 @@ var label2 = new Label () {
 * Aligned (left, right, center, etc...) with other views - `Pos.Align()`
 * An arbitrary function - `Pos.Func()`
 
-All `Pos` coordinates are relative to the SuperView's content area.
+All <xref:Terminal.Gui.ViewBase.Pos> coordinates are relative to the SuperView's content area.
 
-`Pos` values can be combined using addition or subtraction:
+<xref:Terminal.Gui.ViewBase.Pos> values can be combined using addition or subtraction:
 
 ```cs
 // Set the X coordinate to 10 characters left from the center
@@ -143,7 +143,7 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 ```
 ### Dim
 
-`Dim` is the type of `View.Width` and `View.Height` and supports the following sub-types:
+<xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height` and supports the following sub-types:
 
 * Automatic size based on the View's content (either SubViews or Text) - `Dim.Auto()` - See [Dim.Auto Deep Dive](dimauto.md).
 * Absolute size, by passing an integer - `Dim.Absolute()`.
@@ -152,9 +152,9 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 * Reference the Width or Height of another view - `Dim.Width()`, `Dim.Height()`.
 * An arbitrary function - `Dim.Func()`.
 
-All `Dim` dimensions are relative to the SuperView's content area.
+All <xref:Terminal.Gui.ViewBase.Dim> dimensions are relative to the SuperView's content area.
 
-Like, `Pos`, objects of type `Dim` can be combined using addition or subtraction, like this:
+Like, <xref:Terminal.Gui.ViewBase.Pos>, objects of type <xref:Terminal.Gui.ViewBase.Dim> can be combined using addition or subtraction, like this:
 
 ```cs
 // Set the Width to be 10 characters less than filling 
@@ -213,7 +213,7 @@ superView.Add (label, textField, btn);
 
 ### Align Multiple Views (Like Dialog Buttons)
 
-**Scenario:** Align buttons horizontally using `Pos.Align()`, as `Dialog` does:
+**Scenario:** Align buttons horizontally using `Pos.Align()`, as <xref:Terminal.Gui.Views.Dialog> does:
 
 ```cs
 Button cancelBtn = new ()
@@ -233,7 +233,7 @@ The `Pos.Align` method supports different alignments (`Start`, `Center`, `End`, 
 
 ### Center with Auto-Sizing and Constraints (Like Dialog)
 
-**Scenario:** A centered view that auto-sizes to its content, with minimum and maximum constraints that account for adornments (Border, Margin, Padding). This is how `Dialog` positions and sizes itself:
+**Scenario:** A centered view that auto-sizes to its content, with minimum and maximum constraints that account for adornments (<xref:Terminal.Gui.ViewBase.Border>, <xref:Terminal.Gui.ViewBase.Margin>, <xref:Terminal.Gui.ViewBase.Padding>). This is how <xref:Terminal.Gui.Views.Dialog> positions and sizes itself:
 
 ```cs
 Window popup = new ()
@@ -249,5 +249,5 @@ Window popup = new ()
 };
 ```
 
-The key insight is `maximumContentDim` subtracts the adornments thickness from 100% to ensure the view (including its Border, Margin, and Padding) never exceeds the SuperView's bounds.
+The key insight is `maximumContentDim` subtracts the adornments thickness from 100% to ensure the view (including its <xref:Terminal.Gui.ViewBase.Border>, <xref:Terminal.Gui.ViewBase.Margin>, and <xref:Terminal.Gui.ViewBase.Padding>) never exceeds the SuperView's bounds.
 

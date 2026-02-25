@@ -6,10 +6,10 @@ The driver model is the mechanism by which Terminal.Gui supports multiple platfo
 
 Terminal.Gui v2 uses a sophisticated driver architecture that separates concerns and enables platform-specific optimizations while maintaining a consistent API. The architecture is based on the **Component Factory** pattern and uses **multi-threading** to ensure responsive input handling.
 
-**Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
-- `View.Move(col, row)` for positioning
-- `View.AddRune()` and `View.AddStr()` for drawing
-- `View.App.Screen` for screen dimensions
+**Important:** <xref:Terminal.Gui.ViewBase.View> subclasses should not access <xref:Terminal.Gui.App.Application>'s `Driver`. Use the View APIs instead:
+- <xref:Terminal.Gui.ViewBase.View>'s `Move(col, row)` for positioning
+- <xref:Terminal.Gui.ViewBase.View>'s `AddRune()` and `AddStr()` for drawing
+- <xref:Terminal.Gui.ViewBase.View>'s `App.Screen` for screen dimensions
  
 ## Available Drivers
 
@@ -32,7 +32,7 @@ Terminal.Gui provides four console driver implementations optimized for differen
 
 ### Automatic Driver Selection
 
-The appropriate driver is automatically selected based on the platform when `Application.Init()` is called:
+The appropriate driver is automatically selected based on the platform when <xref:Terminal.Gui.App.Application>'s `Init()` is called:
 
 - **Windows** (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
 - **Unix/Linux/macOS** → `UnixDriver`
@@ -73,7 +73,7 @@ The `ForceDriver` property is a configuration property marked with `[Configurati
 
 - It can be set through the configuration system (e.g., `config.json`)
 - Changes raise the `ForceDriverChanged` event
-- It persists across application instances when using the static `Application` class
+- It persists across application instances when using the static <xref:Terminal.Gui.App.Application> class
 
 ```csharp
 // Subscribe to driver changes
@@ -244,11 +244,11 @@ Responsibilities include:
 
 #### IInputProcessor
 Translates raw console input into Terminal.Gui events:
-- Converts raw input to `Key` events (handles keyboard input)
+- Converts raw input to <xref:Terminal.Gui.Input.Key> events (handles keyboard input)
 - Parses ANSI escape sequences (mouse events, special keys)
 - Generates `MouseEventArgs` for mouse input
 - Handles platform-specific key mappings
-- Uses `IKeyConverter<T>` to translate `TInputRecord` to `Key`:
+- Uses `IKeyConverter<T>` to translate `TInputRecord` to <xref:Terminal.Gui.Input.Key>:
 - `AnsiKeyConverter` - For `char` input (UnixDriver, AnsiDriver)
 - `NetKeyConverter` - For `ConsoleKeyInfo` input (DotNetDriver)
 - `WindowsKeyConverter` - For `WindowsConsole.InputRecord` input (WindowsDriver)
@@ -264,7 +264,7 @@ Manages the screen buffer and drawing operations:
 Detects terminal size changes and raises `SizeChanged` events when the terminal is resized.
 
 #### DriverFacade&lt;T&gt;
-A unified facade that implements `IDriver` and coordinates all the components. This is what gets assigned to `Application.Driver`.
+A unified facade that implements `IDriver` and coordinates all the components. This is what gets assigned to <xref:Terminal.Gui.App.Application>'s `Driver`.
 
 ### Threading Model
 
@@ -301,20 +301,20 @@ This separation ensures that input is never lost and the UI remains responsive d
 
 ### Initialization Flow
 
-When `Application.Init()` is called:
+When <xref:Terminal.Gui.App.Application>'s `Init()` is called:
 
 1. **IApplication.Init()** is invoked
 2. Creates a `MainLoopCoordinator<T>` with the appropriate `ComponentFactory<T>`
 3. **MainLoopCoordinator.StartAsync()** begins:
    - Starts the input thread which creates `IInput<T>`
    - Initializes the main UI loop which creates `IOutput`
-   - Creates `DriverFacade<T>` and assigns to `IApplication.Driver`
+   - Creates `DriverFacade<T>` and assigns to <xref:Terminal.Gui.App.IApplication>'s `Driver`
    - Waits for both threads to be ready
 4. Returns control to the application
 
 ### Shutdown Flow
 
-When `IApplication.Shutdown()` is called:
+When <xref:Terminal.Gui.App.IApplication>'s `Shutdown()` is called:
 
 1. Cancellation token is triggered
 2. Input thread exits its read loop
@@ -346,7 +346,7 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 #### Color Support
 - `SupportsTrueColor` - 24-bit color capability
 - `Force16Colors` - Force 16-color mode
-- `DefaultAttribute` - The terminal's actual default foreground/background colors, detected at startup via OSC 10/11 queries. Used by `Scheme` to resolve `Color.None` during role derivation. `null` if the terminal didn't respond (e.g., legacy console).
+- `DefaultAttribute` - The terminal's actual default foreground/background colors, detected at startup via OSC 10/11 queries. Used by <xref:Terminal.Gui.Drawing.Scheme> to resolve <xref:Terminal.Gui.Drawing.Color>'s `None` during role derivation. `null` if the terminal didn't respond (e.g., legacy console).
 - `ColorCapabilities` - The terminal's color capability level (`NoColor`, `Colors16`, `Colors256`, `TrueColor`), detected from `$TERM`, `$COLORTERM`, and other environment variables
 
 #### Content Buffer
@@ -369,7 +369,7 @@ Drivers implement cursor control through `IDriver` which delegates to `IOutput`:
 - `SetCursorNeedsUpdate(bool)` / `GetCursorNeedsUpdate()` - Optimization flag for cursor updates
 
 > [!NOTE]
-> The cursor system is managed by `ApplicationNavigation`. Drivers implement the low-level cursor control; views use the `View.Cursor` property.
+> The cursor system is managed by `ApplicationNavigation`. Drivers implement the low-level cursor control; views use the <xref:Terminal.Gui.ViewBase.View>'s `Cursor` property.
 > See [Cursor Management](cursor.md) for complete details.
 
 #### Input Events
@@ -382,7 +382,7 @@ Drivers implement cursor control through `IDriver` which delegates to `IOutput`:
 - `QueueAnsiRequest()` - ANSI request handling
 
 **Note:** The driver is internal to Terminal.Gui. View classes should not access `Driver` directly. Instead:
-- Use `Application.Screen` to get screen dimensions
+- Use <xref:Terminal.Gui.App.Application>'s `Screen` to get screen dimensions
 - Use `Move()` for positioning (with viewport-relative coordinates)
 - Use `AddRune()` and `AddStr()` for drawing
 - ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can access Driver when needed for framework implementation
