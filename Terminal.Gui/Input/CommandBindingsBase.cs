@@ -8,17 +8,17 @@ namespace Terminal.Gui.Input;
 /// </summary>
 /// <typeparam name="TEvent">The type of the event (e.g. <see cref="Key"/> or <see cref="MouseFlags"/>).</typeparam>
 /// <typeparam name="TBinding">The binding type (e.g. <see cref="KeyBinding"/>).</typeparam>
-public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBinding, new() where TEvent : notnull
+public abstract class CommandBindingsBase<TEvent, TBinding> where TBinding : ICommandBinding, new () where TEvent : notnull
 {
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
     /// <param name="constructBinding"></param>
     /// <param name="equalityComparer"></param>
-    protected InputBindings (Func<Command [], TEvent, TBinding> constructBinding, IEqualityComparer<TEvent> equalityComparer)
+    protected CommandBindingsBase (Func<Command [], TEvent, View?, TBinding> constructBinding, IEqualityComparer<TEvent> equalityComparer)
     {
         _constructBinding = constructBinding;
-        _bindings = new (equalityComparer);
+        _bindings = new ConcurrentDictionary<TEvent, TBinding> (equalityComparer);
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// </summary>
     private readonly ConcurrentDictionary<TEvent, TBinding> _bindings;
 
-    private readonly Func<Command [], TEvent, TBinding> _constructBinding;
+    private readonly Func<Command [], TEvent, View?, TBinding> _constructBinding;
 
     /// <summary>Adds a <typeparamref name="TEvent"/> bound to <typeparamref name="TBinding"/> to the collection.</summary>
     /// <param name="eventArgs"></param>
@@ -75,7 +75,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (eventArgs));
         }
 
-        TBinding binding = _constructBinding (commands, eventArgs);
+        TBinding binding = _constructBinding (commands, eventArgs, null);
 
         if (!_bindings.TryAdd (eventArgs, binding))
         {
@@ -84,7 +84,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     }
 
     /// <summary>Removes all <typeparamref name="TEvent"/> objects from the collection.</summary>
-    public void Clear () { _bindings.Clear (); }
+    public void Clear () => _bindings.Clear ();
 
     /// <summary>
     ///     Removes all bindings that trigger the given command set. Views can have multiple different
@@ -96,9 +96,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     public void Clear (params Command [] command)
     {
         // ToArray() creates a snapshot to avoid modification during enumeration
-        KeyValuePair<TEvent, TBinding> [] kvps = _bindings
-                                                 .Where (kvp => kvp.Value.Commands.SequenceEqual (command))
-                                                 .ToArray ();
+        KeyValuePair<TEvent, TBinding> [] kvps = _bindings.Where (kvp => kvp.Value.Commands.SequenceEqual (command)).ToArray ();
 
         foreach (KeyValuePair<TEvent, TBinding> kvp in kvps)
         {
@@ -127,21 +125,19 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     ///     the
     ///     set of commands was not found.
     /// </returns>
-    public IEnumerable<TEvent> GetAllFromCommands (params Command [] commands)
-    {
+    public IEnumerable<TEvent> GetAllFromCommands (params Command [] commands) =>
+
         // ToList() creates a snapshot to ensure thread-safe enumeration
-        return _bindings.Where (a => a.Value.Commands.SequenceEqual (commands)).Select (a => a.Key).ToList ();
-    }
+        _bindings.Where (a => a.Value.Commands.SequenceEqual (commands)).Select (a => a.Key).ToList ();
 
     /// <summary>
     ///     Gets the bindings.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<KeyValuePair<TEvent, TBinding>> GetBindings ()
-    {
+    public IEnumerable<KeyValuePair<TEvent, TBinding>> GetBindings () =>
+
         // ConcurrentDictionary provides a snapshot enumeration that is safe for concurrent access
-        return _bindings;
-    }
+        _bindings;
 
     /// <summary>Gets the array of <see cref="Command"/>s bound to <paramref name="eventArgs"/> if it exists.</summary>
     /// <param name="eventArgs">The <typeparamref name="TEvent"/> to check.</param>
@@ -168,7 +164,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     ///     The first matching <typeparamref name="TEvent"/> bound to the set of commands specified by
     ///     <paramref name="commands"/>. <see langword="null"/> if the set of commands was not found.
     /// </returns>
-    public TEvent? GetFirstFromCommands (params Command [] commands) { return _bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key; }
+    public TEvent? GetFirstFromCommands (params Command [] commands) => _bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key;
 
     /// <summary>
     ///     Tests whether <paramref name="eventArgs"/> is valid or not.
@@ -179,7 +175,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
 
     /// <summary>Removes a <typeparamref name="TEvent"/> from the collection.</summary>
     /// <param name="eventArgs"></param>
-    public void Remove (TEvent eventArgs) { _bindings.TryRemove (eventArgs, out _); }
+    public void Remove (TEvent eventArgs) => _bindings.TryRemove (eventArgs, out _);
 
     /// <summary>Replaces a <typeparamref name="TEvent"/> combination already bound to a set of <see cref="Command"/>s.</summary>
     /// <remarks></remarks>
@@ -208,10 +204,9 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
         // Thread-safe: Atomically add/update newEventArgs with the binding from oldEventArgs
         // The updateValueFactory is only called if the key already exists, ensuring we don't
         // accidentally overwrite a binding that was added by another thread
-        _bindings.AddOrUpdate (
-            newEventArgs,
-            binding, // Add this binding if newEventArgs doesn't exist
-            (_, _) => binding);
+        _bindings.AddOrUpdate (newEventArgs,
+                               binding, // Add this binding if newEventArgs doesn't exist
+                               (_, _) => binding);
 
         // Thread-safe: Remove oldEventArgs only after newEventArgs has been set
         // This ensures we don't lose the binding if another thread is reading it
@@ -228,7 +223,7 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// <param name="newCommands">The set of commands to replace the old ones with.</param>
     public void ReplaceCommands (TEvent eventArgs, params Command [] newCommands)
     {
-        TBinding newBinding = _constructBinding (newCommands, eventArgs);
+        TBinding newBinding = _constructBinding (newCommands, eventArgs, null);
 
         // Thread-safe: Add or update atomically
         _bindings.AddOrUpdate (eventArgs, newBinding, (_, _) => newBinding);
@@ -244,5 +239,5 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     ///     found; otherwise, null. This parameter is passed uninitialized.
     /// </param>
     /// <returns><see langword="true"/> if the <typeparamref name="TEvent"/> is bound; otherwise <see langword="false"/>.</returns>
-    public bool TryGet (TEvent eventArgs, out TBinding? binding) { return _bindings.TryGetValue (eventArgs, out binding); }
+    public bool TryGet (TEvent eventArgs, out TBinding? binding) => _bindings.TryGetValue (eventArgs, out binding);
 }

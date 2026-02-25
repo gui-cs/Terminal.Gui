@@ -180,9 +180,9 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Copy to clipboard.
         /// </summary>
-        public static string cmdCopyHelp {
+        public static string cmdCopy_Help {
             get {
-                return ResourceManager.GetString("cmdCopyHelp", resourceCulture);
+                return ResourceManager.GetString("cmdCopy_Help", resourceCulture);
             }
         }
         
@@ -200,7 +200,7 @@ namespace Terminal.Gui.Resources {
         /// </summary>
         public static string cmdCut_Help {
             get {
-                return ResourceManager.GetString("cmdCut.Help", resourceCulture);
+                return ResourceManager.GetString("cmdCut_Help", resourceCulture);
             }
         }
         
@@ -214,7 +214,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _New file.
+        ///   Looks up a localized string similar to _New.
         /// </summary>
         public static string cmdNew {
             get {
@@ -225,9 +225,9 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to New file.
         /// </summary>
-        public static string cmdNewHelp {
+        public static string cmdNew_Help {
             get {
-                return ResourceManager.GetString("cmdNewHelp", resourceCulture);
+                return ResourceManager.GetString("cmdNew_Help", resourceCulture);
             }
         }
         
@@ -245,7 +245,7 @@ namespace Terminal.Gui.Resources {
         /// </summary>
         public static string cmdOpen_Help {
             get {
-                return ResourceManager.GetString("cmdOpen.Help", resourceCulture);
+                return ResourceManager.GetString("cmdOpen_Help", resourceCulture);
             }
         }
         
@@ -261,9 +261,9 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Paste from clipboard.
         /// </summary>
-        public static string cmdPasteHelp {
+        public static string cmdPaste_Help {
             get {
-                return ResourceManager.GetString("cmdPasteHelp", resourceCulture);
+                return ResourceManager.GetString("cmdPaste_Help", resourceCulture);
             }
         }
         
@@ -277,11 +277,11 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Exit the application.
         /// </summary>
-        public static string cmdQuitHelp {
+        public static string cmdQuit_Help {
             get {
-                return ResourceManager.GetString("cmdQuitHelp", resourceCulture);
+                return ResourceManager.GetString("cmdQuit_Help", resourceCulture);
             }
         }
         
@@ -291,6 +291,15 @@ namespace Terminal.Gui.Resources {
         public static string cmdSave {
             get {
                 return ResourceManager.GetString("cmdSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save file.
+        /// </summary>
+        public static string cmdSave_Help {
+            get {
+                return ResourceManager.GetString("cmdSave_Help", resourceCulture);
             }
         }
         
@@ -306,18 +315,9 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Save file as.
         /// </summary>
-        public static string cmdSaveAsHelp {
+        public static string cmdSaveAs_Help {
             get {
-                return ResourceManager.GetString("cmdSaveAsHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save.
-        /// </summary>
-        public static string cmdSaveHelp {
-            get {
-                return ResourceManager.GetString("cmdSaveHelp", resourceCulture);
+                return ResourceManager.GetString("cmdSaveAs_Help", resourceCulture);
             }
         }
         
@@ -333,84 +333,93 @@ namespace Terminal.Gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Select all.
         /// </summary>
-        public static string cmdSelectAllHelp {
+        public static string cmdSelectAll_Help {
             get {
-                return ResourceManager.GetString("cmdSelectAllHelp", resourceCulture);
+                return ResourceManager.GetString("cmdSelectAll_Help", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Co_lors.
+        ///   Looks up a localized string similar to Close.
         /// </summary>
-        public static string ctxColors {
+        public static string cmdClose_Help {
             get {
-                return ResourceManager.GetString("ctxColors", resourceCulture);
+                return ResourceManager.GetString("cmdClose_Help", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _Copy.
-        /// </summary>
-        public static string ctxCopy {
-            get {
-                return ResourceManager.GetString("ctxCopy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cu_t.
-        /// </summary>
-        public static string ctxCut {
-            get {
-                return ResourceManager.GetString("ctxCut", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to _Delete All.
         /// </summary>
-        public static string ctxDeleteAll {
+        public static string cmdDeleteAll {
             get {
-                return ResourceManager.GetString("ctxDeleteAll", resourceCulture);
+                return ResourceManager.GetString("cmdDeleteAll", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to _Paste.
+        ///   Looks up a localized string similar to Delete all.
         /// </summary>
-        public static string ctxPaste {
+        public static string cmdDeleteAll_Help {
             get {
-                return ResourceManager.GetString("ctxPaste", resourceCulture);
+                return ResourceManager.GetString("cmdDeleteAll_Help", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to _Edit.
+        /// </summary>
+        public static string cmdEdit {
+            get {
+                return ResourceManager.GetString("cmdEdit", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Edit.
+        /// </summary>
+        public static string cmdEdit_Help {
+            get {
+                return ResourceManager.GetString("cmdEdit_Help", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to _Redo.
         /// </summary>
-        public static string ctxRedo {
+        public static string cmdRedo {
             get {
-                return ResourceManager.GetString("ctxRedo", resourceCulture);
+                return ResourceManager.GetString("cmdRedo", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to _Select All.
+        ///   Looks up a localized string similar to Redo last action.
         /// </summary>
-        public static string ctxSelectAll {
+        public static string cmdRedo_Help {
             get {
-                return ResourceManager.GetString("ctxSelectAll", resourceCulture);
+                return ResourceManager.GetString("cmdRedo_Help", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to _Undo.
         /// </summary>
-        public static string ctxUndo {
+        public static string cmdUndo {
             get {
-                return ResourceManager.GetString("ctxUndo", resourceCulture);
+                return ResourceManager.GetString("cmdUndo", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Undo last action.
+        /// </summary>
+        public static string cmdUndo_Help {
+            get {
+                return ResourceManager.GetString("cmdUndo_Help", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Date Picker.
         /// </summary>

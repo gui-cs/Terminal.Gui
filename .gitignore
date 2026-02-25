@@ -17,7 +17,9 @@
 _ReSharper.**
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 .vs/
 
 # Visual Studio cache files

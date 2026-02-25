@@ -65,10 +65,10 @@ See the [Layout Deep Dive](layout.md) for complete details on View composition a
 
 ```csharp
 // Frame is SuperView-relative
-view.Frame = new Rectangle(10, 5, 50, 20);
+view.Frame = new Rectangle (10, 5, 50, 20);
 
 // Viewport is content-relative (the visible portal)
-view.Viewport = new Rectangle(0, 0, 45, 15); // Adjusted for adornments
+view.Viewport = new Rectangle (0, 0, 45, 15); // Adjusted for adornments
 ```
 
 ### Content Area and Scrolling
@@ -128,6 +128,9 @@ See the [Command Deep Dive](command.md).
 - [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Declares commands the View supports
 - [View.InvokeCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Invokes a command
 - [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
+- <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp> - Opt-in list of commands that bubble from SubViews to this View
+- [View.DispatchDown](~/api/Terminal.Gui.ViewBase.View.yml) - Dispatches a command downward to a SubView with bubbling suppressed (inverse of `TryBubbleToSuperView`)
+- <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> - The SubView that receives `Command.Accept` when no other SubView handles it
 
 ### Input Handling
 
@@ -230,10 +233,12 @@ See the [Navigation Deep Dive](navigation.md).
 Events:
 - `HasFocusChanging` - Before focus changes (cancellable)
 - `HasFocusChanged` - After focus changes
-- `Accepting` - When Command.Accept is invoked (typically Enter key)
+- `Accepting` - When Command.Accept is invoked (typically Enter key) - cancellable
 - `Accepted` - After Command.Accept completes
-- `Activating` - When Command.Activate is invoked (typically Space or mouse click)
+- `Activating` - When Command.Activate is invoked (typically Space or mouse click) - cancellable
 - `Activated` - After Command.Activate completes
+- `HandlingHotKey` - When Command.HotKey is invoked (the view's HotKey was pressed) - cancellable
+- `HotKeyCommand` - After Command.HotKey completes
 
 ### Scrolling
 
@@ -266,10 +271,10 @@ See the [Scrolling Deep Dive](scrolling.md).
 ```csharp
 View view = new ()
 {
-    X = Pos.Center(),
-    Y = Pos.Center(),
-    Width = Dim.Percent(50),
-    Height = Dim.Fill()
+    X = Pos.Center (),
+    Y = Pos.Center (),
+    Width = Dim.Percent (50),
+    Height = Dim.Fill ()
 };
 ```
 
@@ -315,7 +320,7 @@ Input is processed in this order:
 ### 6. Disposal
 
 ```csharp
-view.Dispose();
+view.Dispose ();
 ```
 
 - Raises [View.Disposing](~/api/Terminal.Gui.ViewBase.View.yml) event
@@ -334,7 +339,7 @@ Views use a command pattern for handling input:
 
 ```csharp
 // Add a command the view supports
-view.AddCommand (Command.Accept, () => 
+view.AddCommand (Command.Accept, () =>
 {
     // Handle the Accept command
     return true;
@@ -345,6 +350,13 @@ view.KeyBindings.Add (Key.Enter, Command.Accept);
 
 // Bind a mouse action to the command
 view.MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
+
+// Enable command bubbling from SubViews to this View
+view.CommandsToBubbleUp = [Command.Accept, Command.Activate];
+
+// Set the default view that receives Accept when no other SubView handles it
+// (typically a Button with IsDefault = true, found automatically via IAcceptTarget)
+view.DefaultAcceptView = okButton;
 ```
 
 ### Input
@@ -379,12 +391,12 @@ See the [Layout Deep Dive](layout.md) for complete details.
 Layout is declarative using [Pos](~/api/Terminal.Gui.ViewBase.Pos.yml) and [Dim](~/api/Terminal.Gui.ViewBase.Dim.yml):
 
 ```csharp
-var label = new Label { Text = "Name:" };
-var textField = new TextField 
-{ 
-    X = Pos.Right(label) + 1,
-    Y = Pos.Top(label),
-    Width = Dim.Fill()
+Label label = new () { Text = "Name:" };
+TextField textField = new ()
+{
+    X = Pos.Right (label) + 1,
+    Y = Pos.Top (label),
+    Width = Dim.Fill ()
 };
 ```
 
@@ -401,13 +413,13 @@ See the [Drawing Deep Dive](drawing.md) for complete details.
 Views draw themselves using viewport-relative coordinates:
 
 ```csharp
-protected override bool OnDrawingContent()
+protected override bool OnDrawingContent ()
 {
     // Draw at viewport coordinates (0,0)
-    Move(0, 0);
-    SetAttribute(new Attribute(Color.White, Color.Blue));
-    AddStr("Hello, Terminal.Gui!");
-    
+    Move (0, 0);
+    SetAttribute (new Attribute (Color.White, Color.Blue));
+    AddStr ("Hello, Terminal.Gui!");
+
     return true;
 }
 ```
@@ -461,33 +473,33 @@ view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 ```csharp
 public class MyCustomView : View
 {
-    public MyCustomView()
+    public MyCustomView ()
     {
         // Set up default size
-        Width = Dim.Auto();
-        Height = Dim.Auto();
-        
+        Width = Dim.Auto ();
+        Height = Dim.Auto ();
+
         // Can receive focus
         CanFocus = true;
-        
+
         // Add supported commands
-        AddCommand(Command.Accept, HandleAccept);
-        
+        AddCommand (Command.Accept, HandleAccept);
+
         // Configure key bindings
-        KeyBindings.Add(Key.Enter, Command.Accept);
+        KeyBindings.Add (Key.Enter, Command.Accept);
     }
-    
-    protected override bool OnDrawingContent()
+
+    protected override bool OnDrawingContent ()
     {
         // Draw custom content using viewport coordinates
-        Move(0, 0);
-        SetAttributeForRole(VisualRole.Normal);
-        AddStr("My custom content");
-        
+        Move (0, 0);
+        SetAttributeForRole (VisualRole.Normal);
+        AddStr ("My custom content");
+
         return true; // Handled
     }
-    
-    private bool HandleAccept()
+
+    private bool HandleAccept ()
     {
         // Handle the Accept command
         // Raise events, update state, etc.
@@ -499,63 +511,63 @@ public class MyCustomView : View
 ### Adding SubViews
 
 ```csharp
-var container = new View
+View container = new ()
 {
-    Width = Dim.Fill(),
-    Height = Dim.Fill()
+    Width = Dim.Fill (),
+    Height = Dim.Fill ()
 };
 
-var LeftButton = new Button { Text = "OK", X = 2, Y = 2 };
-var MiddleButton = new Button { Text = "Cancel", X = Pos.Right(LeftButton) + 2, Y = 2 };
+Button leftButton = new () { Text = "OK", X = 2, Y = 2 };
+Button middleButton = new () { Text = "Cancel", X = Pos.Right (leftButton) + 2, Y = 2 };
 
-container.Add(LeftButton, MiddleButton);
+container.Add (leftButton, middleButton);
 ```
 
 ### Using Adornments
 
 ```csharp
-var view = new View
+View view = new ()
 {
     BorderStyle = LineStyle.Double,
     Title = "My View"
 };
 
 // Configure border
-view.Border.Thickness = new Thickness(1);
+view.Border.Thickness = new Thickness (1);
 view.Border.Settings = BorderSettings.Title;
 
 // Add padding
-view.Padding.Thickness = new Thickness(1);
+view.Padding.Thickness = new Thickness (1);
 
 // Add margin
-view.Margin.Thickness = new Thickness(2);
+view.Margin.Thickness = new Thickness (2);
 ```
 
 ### Implementing Scrolling
 
 ```csharp
-var view = new View
+View view = new ()
 {
     Width = 40,
     Height = 20
 };
 
 // Set content larger than viewport
-view.SetContentSize(new Size(100, 100));
+view.SetContentSize (new Size (100, 100));
 
 // Enable scrollbars with automatic visibility
 view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
 // Add key bindings for scrolling
-view.KeyBindings.Add(Key.CursorUp, Command.ScrollUp);
-view.KeyBindings.Add(Key.CursorDown, Command.ScrollDown);
-view.KeyBindings.Add(Key.CursorLeft, Command.ScrollLeft);
-view.KeyBindings.Add(Key.CursorRight, Command.ScrollRight);
+view.KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+view.KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
+view.KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+view.KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
 
 // Add command handlers
-view.AddCommand(Command.ScrollUp, () => { view.ScrollVertical(-1); return true; });
-view.AddCommand(Command.ScrollDown, () => { view.ScrollVertical(1); return true; });
+view.AddCommand (Command.ScrollUp, () => { view.ScrollVertical (-1); return true; });
+view.AddCommand (Command.ScrollDown, () => { view.ScrollVertical (1); return true; });
 ```
 
 ---
@@ -582,20 +594,22 @@ Derive from [Runnable<TResult>](~/api/Terminal.Gui.Views.Runnable-1.yml) or impl
 public class ColorPickerDialog : Runnable<Color?>
 {
     private ColorPicker16 _colorPicker;
-    
-    public ColorPickerDialog()
+
+    public ColorPickerDialog ()
     {
         Title = "Select a Color";
-        
-        _colorPicker = new ColorPicker16 { X = Pos.Center(), Y = 2 };
-        
-        var okButton = new Button { Text = "OK", IsDefault = true };
-        okButton.Accepting += (s, e) => {
+
+        _colorPicker = new ColorPicker16 { X = Pos.Center (), Y = 2 };
+
+        Button okButton = new () { Text = "OK", IsDefault = true };
+
+        okButton.Accepting += (_, e) =>
+        {
             Result = _colorPicker.SelectedColor;
-            Application.RequestStop();
+            Application.RequestStop ();
         };
-        
-        Add(_colorPicker, okButton);
+
+        Add (_colorPicker, okButton);
     }
 }
 ```
@@ -606,10 +620,10 @@ The fluent API enables elegant, concise code with automatic disposal:
 
 ```csharp
 // Framework creates, runs, and disposes the runnable automatically
-Color? result = Application.Create()
-                           .Init()
-                           .Run<ColorPickerDialog>()
-                           .Shutdown() as Color?;
+Color? result = Application.Create ()
+                           .Init ()
+                           .Run<ColorPickerDialog> ()
+                           .Shutdown () as Color?;
 
 if (result is { })
 {
@@ -622,19 +636,19 @@ if (result is { })
 For more control over the lifecycle:
 
 ```csharp
-var app = Application.Create();
-app.Init();
+IApplication app = Application.Create ();
+app.Init ();
 
-var dialog = new ColorPickerDialog();
-app.Run(dialog);
+ColorPickerDialog dialog = new ();
+app.Run (dialog);
 
 // Extract result after Run returns
 Color? result = dialog.Result;
 
 // Caller is responsible for disposal
-dialog.Dispose();
+dialog.Dispose ();
 
-app.Shutdown();
+app.Shutdown ();
 ```
 
 ### Disposal Semantics
@@ -649,20 +663,20 @@ app.Shutdown();
 Extract the result in `OnIsRunningChanging` when stopping:
 
 ```csharp
-protected override bool OnIsRunningChanging(bool oldIsRunning, bool newIsRunning)
+protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
 {
     if (!newIsRunning)  // Stopping - extract result before disposal
     {
         Result = _colorPicker.SelectedColor;
-        
+
         // Optionally cancel stop (e.g., prompt to save)
-        if (HasUnsavedChanges())
+        if (HasUnsavedChanges ())
         {
             return true;  // Cancel stop
         }
     }
-    
-    return base.OnIsRunningChanging(oldIsRunning, newIsRunning);
+
+    return base.OnIsRunningChanging (oldIsRunning, newIsRunning);
 }
 ```
 
@@ -689,91 +703,48 @@ Views can run modally (exclusively capturing all input until closed). See [Runna
 ### Running a View Modally (Legacy)
 
 ```csharp
-var dialog = new Dialog
+Dialog dialog = new ()
 {
     Title = "Confirmation",
-    Width = Dim.Percent(50),
-    Height = Dim.Percent(50)
+    Width = Dim.Percent (50),
+    Height = Dim.Percent (50)
 };
 
 // Add content...
-var label = new Label { Text = "Are you sure?", X = Pos.Center(), Y = 1 };
-dialog.Add(label);
+Label label = new () { Text = "Are you sure?", X = Pos.Center (), Y = 1 };
+dialog.Add (label);
 
 // Run modally - blocks until closed
-Application.Run(dialog);
+Application.Run (dialog);
 
 // Dialog has been closed
-dialog.Dispose();
+dialog.Dispose ();
 ```
 
-### Modal View Types (Legacy)
+### Modal View Types
 
 - **[Runnable](~/api/Terminal.Gui.Views.Runnable.yml)** - Base class for modal views, can fill entire screen
 - **[Window](~/api/Terminal.Gui.Views.Window.yml)** - Overlapped container with border and title
 - **[Dialog](~/api/Terminal.Gui.Views.Dialog.yml)** - Modal Window, centered with button support
 - **[Wizard](~/api/Terminal.Gui.Views.Wizard.yml)** - Multi-step modal dialog
 
-### Dialog Example (Legacy)
-
-[Dialogs](~/api/Terminal.Gui.Views.Dialog.yml) are Modal [Windows](~/api/Terminal.Gui.Views.Window.yml) centered on screen:
-
-```csharp
-bool okPressed = false;
-var ok = new Button { Text = "Ok" };
-ok.Accepting += (s, e) => { okPressed = true; Application.RequestStop(); };
-
-var cancel = new Button { Text = "Cancel" };
-cancel.Accepting += (s, e) => Application.RequestStop();
-
-var dialog = new Dialog 
-{ 
-    Title = "Quit",
-    Width = 50,
-    Height = 10
-};
-dialog.Add(new Label { Text = "Are you sure you want to quit?", X = Pos.Center(), Y = 2 });
-dialog.AddButton(ok);
-dialog.AddButton(cancel);
-
-Application.Run(dialog);
-
-if (okPressed)
-{
-    // User clicked OK
-}
-```
-
-Which displays:
-
-```
-╔═ Quit ═══════════════════════════════════════════╗
-║                                                  ║
-║          Are you sure you want to quit?         ║
-║                                                  ║
-║                                                  ║
-║                                                  ║
-║                [ Ok ]  [ Cancel ]                ║
-╚══════════════════════════════════════════════════╝
-```
-
 ### Wizard Example
 
 [Wizards](~/api/Terminal.Gui.Views.Wizard.yml) let users step through multiple pages:
 
 ```csharp
-var wizard = new Wizard { Title = "Setup Wizard" };
+Wizard wizard = new () { Title = "Setup Wizard" };
 
-var step1 = new WizardStep { Title = "Welcome" };
-step1.Add(new Label { Text = "Welcome to the wizard!", X = 1, Y = 1 });
+WizardStep step1 = new () { Title = "Welcome" };
+step1.Add (new Label { Text = "Welcome to the wizard!", X = 1, Y = 1 });
 
-var step2 = new WizardStep { Title = "Configuration" };
-step2.Add(new TextField { X = 1, Y = 1, Width = 30 });
+WizardStep step2 = new () { Title = "Configuration" };
+step2.Add (new TextField { X = 1, Y = 1, Width = 30 });
 
-wizard.AddStep(step1);
-wizard.AddStep(step2);
+wizard.AddStep (step1);
+wizard.AddStep (step2);
 
-Application.Run(wizard);
+Application.Run (wizard);
 ```
 
 ---

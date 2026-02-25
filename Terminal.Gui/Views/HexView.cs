@@ -60,7 +60,6 @@ public class HexView : View, IDesignable
         _leftSideHasFocus = true;
         _firstNibble = true;
 
-        AddCommand (Command.Activate, HandleMouseClick);
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.Down, () => MoveDown (BytesPerLine));
@@ -225,12 +224,13 @@ public class HexView : View, IDesignable
             _source.WriteByte (kv.Value);
             _source.Flush ();
 
-            if (stream is { })
+            if (stream is null)
             {
-                stream.Position = kv.Key;
-                stream.WriteByte (kv.Value);
-                stream.Flush ();
+                continue;
             }
+            stream.Position = kv.Key;
+            stream.WriteByte (kv.Value);
+            stream.Flush ();
         }
 
         _edits = new SortedDictionary<long, byte> ();
@@ -257,7 +257,7 @@ public class HexView : View, IDesignable
         {
             ArgumentNullException.ThrowIfNull (value);
 
-            if (!value!.CanSeek)
+            if (!value.CanSeek)
             {
                 throw new ArgumentException (@"The source stream must be seekable (CanSeek property)");
             }
@@ -276,28 +276,24 @@ public class HexView : View, IDesignable
         }
     }
 
-    private int _bpl;
-
     /// <summary>The bytes length per line.</summary>
     public int BytesPerLine
     {
-        get => _bpl;
+        get;
         set
         {
-            _bpl = value;
+            field = value;
             RaisePositionChanged ();
         }
     }
 
-    private long _address;
-
     /// <summary>Gets or sets the current byte position in the <see cref="Stream"/>.</summary>
     public long Address
     {
-        get => _address;
+        get;
         set
         {
-            if (_address == value)
+            if (field == value)
             {
                 return;
             }
@@ -306,7 +302,7 @@ public class HexView : View, IDesignable
 
             Point offsetToNewCursor = GetCursor (newAddress);
 
-            _address = newAddress;
+            field = newAddress;
 
             // Ensure the new cursor position is visible
             ScrollToMakeCursorVisible (offsetToNewCursor);
@@ -314,39 +310,33 @@ public class HexView : View, IDesignable
         }
     }
 
-    private int _addressWidth = DEFAULT_ADDRESS_WIDTH;
-
     /// <summary>
     ///     Gets or sets the width of the Address column on the left. Set to 0 to hide. The default is 8.
     /// </summary>
     public int AddressWidth
     {
-        get => _addressWidth;
+        get;
         set
         {
-            if (_addressWidth == value)
+            if (field == value)
             {
                 return;
             }
 
-            _addressWidth = value;
+            field = value;
             SetNeedsDraw ();
             SetNeedsLayout ();
         }
-    }
+    } = DEFAULT_ADDRESS_WIDTH;
 
     private int GetLeftSideStartColumn () => AddressWidth == 0 ? 0 : AddressWidth + 1;
 
-    private bool? HandleMouseClick (ICommandContext? commandContext)
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        if (commandContext?.Binding is not MouseBinding { MouseEvent: { } mouse })
+        if (args.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
         {
-            return false;
-        }
-
-        if (RaiseActivating (commandContext) is true)
-        {
-            return true;
+            return base.OnActivating (args);
         }
 
         if (!HasFocus)
@@ -356,6 +346,8 @@ public class HexView : View, IDesignable
 
         if (mouse.Position!.Value.X < GetLeftSideStartColumn ())
         {
+            args.Handled = true;
+
             return true;
         }
 
@@ -365,6 +357,8 @@ public class HexView : View, IDesignable
 
         if (mouse.Position!.Value.X > blocksRightOffset + BytesPerLine - 1)
         {
+            args.Handled = true;
+
             return true;
         }
 
@@ -378,6 +372,8 @@ public class HexView : View, IDesignable
 
         if (!clickIsOnLeftSide && item > 0 && (empty == 0 || x == block * HEX_COLUMN_WIDTH + HEX_COLUMN_WIDTH - 1 - block * 2))
         {
+            args.Handled = true;
+
             return true;
         }
 
@@ -409,7 +405,9 @@ public class HexView : View, IDesignable
             UpdateCursor ();
         }
 
-        return false;
+        args.Handled = true;
+
+        return true;
     }
 
     ///<inheritdoc/>
@@ -451,7 +449,7 @@ public class HexView : View, IDesignable
             }
 
             var address = $"{addressOfLine:x8}";
-            AddStr ($"{address.Substring (8 - AddressWidth)}");
+            AddStr ($"{address [(8 - AddressWidth)..]}");
 
             SetAttribute (editingAttribute);
 
@@ -871,24 +869,23 @@ public class HexView : View, IDesignable
             return false;
         }
 
-        if ((direction == NavigationDirection.Forward && _leftSideHasFocus) || (direction == NavigationDirection.Backward && !_leftSideHasFocus))
+        if ((direction != NavigationDirection.Forward || !_leftSideHasFocus) && (direction != NavigationDirection.Backward || _leftSideHasFocus))
         {
-            _leftSideHasFocus = !_leftSideHasFocus;
-            _firstNibble = true;
-            SetNeedsDraw ();
-
-            UpdateCursor ();
-
-            return true;
+            return false;
         }
+        _leftSideHasFocus = !_leftSideHasFocus;
+        _firstNibble = true;
+        SetNeedsDraw ();
 
-        return false;
+        UpdateCursor ();
+
+        return true;
     }
 
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Source = new MemoryStream (Encoding.UTF8.GetBytes ("HexView data with wide codepoints: 𝔹Aℝ𝔽!"));
+        Source = new MemoryStream ("HexView data with wide codepoints: 𝔹Aℝ𝔽!"u8.ToArray ());
 
         return true;
     }

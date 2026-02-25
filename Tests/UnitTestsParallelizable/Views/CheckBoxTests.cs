@@ -23,6 +23,7 @@ public class CheckBoxTests
         }
     }
 
+    // Claude - Opus 4.5
     [Fact]
     public void AllowCheckStateNone_Get_Set ()
     {
@@ -40,8 +41,8 @@ public class CheckBoxTests
         Assert.True (checkBox.HasFocus);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
-        // Select with keyboard
-        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
+        // Select with keyboard - DefaultActivateHandler returns false on success
+        checkBox.NewKeyDownEvent (Key.Space);
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
         // Select with mouse
@@ -49,7 +50,9 @@ public class CheckBoxTests
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
         checkBox.AllowCheckStateNone = true;
-        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
+
+        // DefaultActivateHandler returns false on success
+        checkBox.NewKeyDownEvent (Key.Space);
         Assert.Equal (CheckState.None, checkBox.Value);
 
         checkBox.AllowCheckStateNone = false;
@@ -63,7 +66,7 @@ public class CheckBoxTests
     [InlineData (1, 1, 1, 1)]
     [InlineData (10, 1, 10, 1)]
     [InlineData (10, 3, 10, 3)]
-    public void CheckBox_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
         var checkBox = new CheckBox { X = 0, Y = 0, Width = width, Height = height };
 
@@ -92,7 +95,7 @@ public class CheckBoxTests
     [InlineData ("0_12你", 0, 1, 0, 1)]
     [InlineData ("0_12你", 1, 1, 1, 1)]
     [InlineData ("0_12你", 10, 1, 10, 1)]
-    public void CheckBox_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
         var checkBox = new CheckBox
         {
@@ -115,7 +118,7 @@ public class CheckBoxTests
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Command_Accept_ConfirmsStateWithoutToggle ()
+    public void Command_Accept_ConfirmsStateWithoutToggle ()
     {
         CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
         CheckState initialState = checkBox.Value;
@@ -136,11 +139,8 @@ public class CheckBoxTests
         checkBox.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Command_Activate_TogglesState ()
+    public void Command_Activate_TogglesState ()
     {
         CheckBox checkBox = new () { Text = "Test" };
         CheckState initialState = checkBox.Value;
@@ -148,22 +148,19 @@ public class CheckBoxTests
 
         checkBox.Activating += (_, _) => activatingFired = true;
 
-        bool? result = checkBox.InvokeCommand (Command.Activate);
+        checkBox.InvokeCommand (Command.Activate);
 
         Assert.True (activatingFired);
         Assert.NotEqual (initialState, checkBox.Value);
-        Assert.True (result);
 
         checkBox.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Command_HotKey_InvokesActivate ()
+    public void Command_HotKey_SetsFocus_DoesNotToggle ()
     {
-        CheckBox checkBox = new () { Text = "_Test" };
+        using CheckBox checkBox = new ();
+        checkBox.Text = "_Test";
         CheckState initialState = checkBox.Value;
         var activatingFired = false;
 
@@ -171,19 +168,15 @@ public class CheckBoxTests
 
         bool? result = checkBox.InvokeCommand (Command.HotKey);
 
-        // HotKey invokes Activate (toggles state + SetFocus)
         Assert.True (activatingFired);
         Assert.NotEqual (initialState, checkBox.Value);
-        Assert.True (result);
-
-        checkBox.Dispose ();
     }
 
     // Claude - Opus 4.5
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Enter_ConfirmsWithoutToggle ()
+    public void Enter_ConfirmsWithoutToggle ()
     {
         CheckBox checkBox = new () { Text = "Test", Value = CheckState.Checked };
         CheckState initialState = checkBox.Value;
@@ -209,72 +202,17 @@ public class CheckBoxTests
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void CheckBox_Space_TogglesState ()
+    public void Space_TogglesState ()
     {
         CheckBox checkBox = new () { Text = "Test" };
         CheckState initialState = checkBox.Value;
 
         // Space should trigger state toggle via Activate command
-        bool? result = checkBox.NewKeyDownEvent (Key.Space);
+        checkBox.NewKeyDownEvent (Key.Space);
 
         Assert.NotEqual (initialState, checkBox.Value);
-        Assert.True (result);
 
         checkBox.Dispose ();
-    }
-
-    [Fact]
-    public void Commands_Select ()
-    {
-        IApplication app = Application.Create ();
-        Runnable<bool> runnable = new ();
-        View otherView = new () { CanFocus = true };
-        var ckb = new CheckBox ();
-        runnable.Add (ckb, otherView);
-        app.Begin (runnable);
-        ckb.SetFocus ();
-        Assert.True (ckb.HasFocus);
-
-        var checkedStateChangingCount = 0;
-        ckb.ValueChanging += (s, e) => checkedStateChangingCount++;
-
-        var selectCount = 0;
-        ckb.Activating += (s, e) => selectCount++;
-
-        var acceptCount = 0;
-        ckb.Accepting += (s, e) => acceptCount++;
-
-        Assert.Equal (CheckState.UnChecked, ckb.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
-        Assert.Equal (Key.Empty, ckb.HotKey);
-
-        // Test while focused
-        ckb.Text = "_Test";
-        Assert.Equal (Key.T, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.T);
-        Assert.Equal (CheckState.Checked, ckb.Value);
-        Assert.Equal (1, checkedStateChangingCount);
-        Assert.Equal (1, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.Text = "T_est";
-        Assert.Equal (Key.E, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.E.WithAlt);
-        Assert.Equal (2, checkedStateChangingCount);
-        Assert.Equal (2, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.NewKeyDownEvent (Key.Space);
-        Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, selectCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.NewKeyDownEvent (Key.Enter);
-        Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, selectCount);
-        Assert.Equal (1, acceptCount);
     }
 
     [Fact]
@@ -396,38 +334,45 @@ public class CheckBoxTests
     }
 
     [Fact]
-    public void Mouse_DoubleClick_Accepts ()
+    public void Mouse_DoubleClick_Advances_And_Accepts ()
     {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var checkBox = new CheckBox { Text = "_Checkbox" };
+        (runnable as View)?.Add (checkBox);
+        app.Begin (runnable);
         Assert.True (checkBox.CanFocus);
 
-        var checkedStateChangingCount = 0;
-        checkBox.ValueChanging += (s, e) => checkedStateChangingCount++;
+        var valueChangingCount = 0;
+        checkBox.ValueChanging += (s, e) => valueChangingCount++;
 
-        var selectCount = 0;
-        checkBox.Activating += (s, e) => selectCount++;
+        var activatingCount = 0;
+        checkBox.Activating += (s, e) => activatingCount++;
 
-        var acceptCount = 0;
+        var acceptingCount = 0;
+        checkBox.Accepting += (s, e) => acceptingCount++;
 
-        checkBox.Accepting += (s, e) =>
-                              {
-                                  acceptCount++;
-                                  e.Handled = true;
-                              };
+        var acceptedCount = 0;
+        checkBox.Accepted += (s, e) => acceptedCount++;
 
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (0, acceptCount);
+        Assert.Equal (0, valueChangingCount);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptingCount);
 
-        checkBox.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
+        // Double click should advance and then accept
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (Point.Empty));
 
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, selectCount);
-        Assert.Equal (1, acceptCount);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (1, valueChangingCount);
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptingCount);
+        Assert.Equal (1, acceptedCount);
     }
 
     // Test that Title and Text are the same

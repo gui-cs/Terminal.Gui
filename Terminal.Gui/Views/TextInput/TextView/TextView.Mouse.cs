@@ -19,7 +19,8 @@ public partial class TextView
             && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
             && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Shift)
             && !mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Shift)
-            && !mouse.Flags.HasFlag (ContextMenu!.MouseFlags))
+            && ContextMenu is { }
+            && !mouse.Flags.HasFlag (ContextMenu.MouseFlags))
         {
             return false;
         }
@@ -236,7 +237,7 @@ public partial class TextView
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags == ContextMenu!.MouseFlags)
+        else if (ContextMenu is { } && mouse.Flags == ContextMenu.MouseFlags)
         {
             ShowContextMenu (mouse.ScreenPosition);
         }

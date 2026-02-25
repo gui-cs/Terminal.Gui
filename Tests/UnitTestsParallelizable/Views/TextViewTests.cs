@@ -1467,7 +1467,7 @@ public class TextViewTests
     }
 
     [Fact]
-    public void TextView_MultiLine_But_Without_Tabs ()
+    public void MultiLine_But_Without_Tabs ()
     {
         var view = new TextView ();
 
@@ -1542,7 +1542,7 @@ public class TextViewTests
     [Theory]
     [InlineData (false, 1)]
     [InlineData (true, 1)]
-    public void Accepted_Command_Raises_Accepted_Regardles_Of_AllowsReturn (bool allowsReturn, int expectedAcceptEvents)
+    public void Accepted_Command_Raises_Accepted_Regardless_Of_EnterKeyAddsLine (bool allowsReturn, int expectedAcceptEvents)
     {
         var view = new TextView { EnterKeyAddsLine = allowsReturn };
 
@@ -2396,55 +2396,32 @@ public class TextViewTests
                      "Vertical scrollbar should be visible during ContentsChanged event when content exceeds viewport height");
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextView_Command_Activate_PositionsCursor ()
+    public void Command_Activate_SetsFocus ()
     {
-        TextView textView = new () { Text = "Test", Width = 10, Height = 5 };
+        TextView textView  = new () { Text = "Test", Width = 10 };
         textView.BeginInit ();
         textView.EndInit ();
+        Assert.False (textView.HasFocus);
 
-        // Activate via Command.Activate for positioning cursor
-        bool? result = textView.InvokeCommand (Command.Activate);
+        textView.InvokeCommand (Command.Activate);
 
-        // Command should be handled (returns true)
-        Assert.True (result);
-
-        textView.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void TextView_Command_Accept_NotTypical ()
-    {
-        TextView textView = new () { Text = "Test" };
-
-        // TextView doesn't typically use Accept command (multiline input)
-        // Just verify the command doesn't crash
-        bool? result = textView.InvokeCommand (Command.Accept);
-
-        // Accept returns false for TextView (not handled)
-        Assert.False (result);
+        Assert.True (textView.HasFocus);
 
         textView.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextView_Command_HotKey_SetsFocus ()
+    public void Command_HotKey_SetsFocus ()
     {
         TextView textView = new () { Text = "Test" };
+        textView.BeginInit ();
+        textView.EndInit ();
+        Assert.False (textView.HasFocus);
 
-        bool? result = textView.InvokeCommand (Command.HotKey);
+        textView.InvokeCommand (Command.HotKey);
 
-        // HotKey should return true (handled)
-        Assert.True (result);
+        Assert.True (textView.HasFocus);
 
         textView.Dispose ();
     }

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Views;
 
@@ -48,8 +49,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
 
-        AddCommand (Command.Accept, HandleAcceptCommand);
-        AddCommand (Command.Activate, HandleSelectCommand);
         AddCommand (Command.Context, HandleContextCommand);
 
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -236,6 +235,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
             ValueChangedEventArgs<Rune> changedArgs = new (oldValue, new Rune (field));
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, new Rune (field)));
         }
     }
 
@@ -246,6 +246,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     /// <inheritdoc/>
     object IValue.GetValue () => new Rune (SelectedCodePoint);
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
     ///     Called when the <see cref="CharMap"/> <see cref="Value"/> is changing.
@@ -388,8 +391,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     #region Details Dialog
 
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     private void ShowDetails ()
     {
         if (App is not { Initialized: true })
@@ -446,7 +447,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
                 name = nameElement.GetString ();
             }
 
-            decResponse = JsonSerializer.Serialize (document.RootElement, new JsonSerializerOptions { WriteIndented = true });
+            decResponse = JsonSerializer.Serialize (document.RootElement, CharMapJsonContext.Default.JsonElement);
         }
         else
         {
@@ -873,10 +874,13 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     #endregion Drawing
 
-    #region Mouse Handling
+    #region Input Handling
 
-    private bool? HandleSelectCommand (ICommandContext? commandContext)
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? commandContext)
     {
+        base.OnActivated (commandContext);
+
         Point position = GetCursor (SelectedCodePoint);
 
         if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
@@ -895,19 +899,14 @@ public class CharMap : View, IDesignable, IValue<Rune>
             }
         }
 
-        if (RaiseActivating (commandContext) is true)
-        {
-            return true;
-        }
-
         if (!TryGetCodePointFromPosition (position, out int cp))
         {
-            return false;
+            return;
         }
 
         if (cp == SelectedCodePoint)
         {
-            return true;
+            return;
         }
 
         if (!HasFocus && CanFocus)
@@ -916,20 +915,14 @@ public class CharMap : View, IDesignable, IValue<Rune>
         }
 
         SelectedCodePoint = cp;
-
-        return true;
     }
 
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    private bool? HandleAcceptCommand (ICommandContext? commandContext)
+    /// <inheritdoc/>
+    protected override void OnAccepted (ICommandContext? ctx)
     {
-        if (RaiseAccepting (commandContext) is true)
-        {
-            return true;
-        }
+        base.OnAccepted (ctx);
 
-        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             if (!HasFocus && CanFocus)
             {
@@ -938,15 +931,13 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
             if (!TryGetCodePointFromPosition (mouse.Position!.Value, out int cp))
             {
-                return false;
+                return;
             }
 
             SelectedCodePoint = cp;
         }
 
         ShowDetails ();
-
-        return true;
     }
 
     private bool? HandleContextCommand (ICommandContext? commandContext)
@@ -978,7 +969,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        App!.Popover?.Register (contextMenu);
+        App!.Popovers?.Register (contextMenu);
 
         contextMenu.MakeVisible (ViewportToScreen (GetCursor (SelectedCodePoint)));
 
@@ -1022,3 +1013,10 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     #endregion Mouse Handling
 }
+
+/// <summary>
+///     Source generation context for AOT-compatible JSON serialization in CharMap.
+/// </summary>
+[JsonSerializable (typeof (JsonElement))]
+[JsonSourceGenerationOptions (WriteIndented = true)]
+internal partial class CharMapJsonContext : JsonSerializerContext;

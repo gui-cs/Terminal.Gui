@@ -98,7 +98,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_int ()
     {
         NumericUpDown<int> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (new (100, 100));
+        numericUpDown.SetRelativeLayout (new Size (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -108,7 +108,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_float ()
     {
         NumericUpDown<float> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (new (100, 100));
+        numericUpDown.SetRelativeLayout (new Size (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -118,7 +118,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_double ()
     {
         NumericUpDown<double> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (new (100, 100));
+        numericUpDown.SetRelativeLayout (new Size (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -128,7 +128,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_long ()
     {
         NumericUpDown<long> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (new (100, 100));
+        numericUpDown.SetRelativeLayout (new Size (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -138,7 +138,7 @@ public class NumericUpDownTests
     public void WhenCreated_ShouldHaveDefaultWidthAndHeight_decimal ()
     {
         NumericUpDown<decimal> numericUpDown = new ();
-        numericUpDown.SetRelativeLayout (new (100, 100));
+        numericUpDown.SetRelativeLayout (new Size (100, 100));
 
         Assert.Equal (3, numericUpDown.Frame.Width);
         Assert.Equal (1, numericUpDown.Frame.Height);
@@ -274,6 +274,375 @@ public class NumericUpDownTests
         // Internal buttons change value when accepting
         // Verify the control is set up correctly
         Assert.Equal (5, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests for ValueChanging event - should be cancellable
+    [Fact]
+    public void ValueChanging_Event_Is_Raised ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 0 };
+        var eventRaised = false;
+        int? currentValue = null;
+        int? newValue = null;
+
+        numericUpDown.ValueChanging += (_, e) =>
+                                       {
+                                           eventRaised = true;
+                                           currentValue = e.CurrentValue;
+                                           newValue = e.NewValue;
+                                       };
+
+        numericUpDown.Value = 10;
+
+        Assert.True (eventRaised);
+        Assert.Equal (0, currentValue);
+        Assert.Equal (10, newValue);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests that ValueChanging can cancel the value change
+    [Fact]
+    public void ValueChanging_Event_Can_Cancel_Change ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 5 };
+
+        numericUpDown.ValueChanging += (_, e) => e.Handled = true;
+
+        numericUpDown.Value = 10;
+
+        Assert.Equal (5, numericUpDown.Value); // Value should not change
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests for ValueChanged event
+    [Fact]
+    public void ValueChanged_Event_Is_Raised ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 0 };
+        var eventRaised = false;
+        int? oldValue = null;
+        int? newValue = null;
+
+        numericUpDown.ValueChanged += (_, e) =>
+                                      {
+                                          eventRaised = true;
+                                          oldValue = e.OldValue;
+                                          newValue = e.NewValue;
+                                      };
+
+        numericUpDown.Value = 10;
+
+        Assert.True (eventRaised);
+        Assert.Equal (0, oldValue);
+        Assert.Equal (10, newValue);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests for ValueChangedUntyped event
+    [Fact]
+    public void ValueChangedUntyped_Event_Is_Raised ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 0 };
+        var eventRaised = false;
+        object? oldValue = null;
+        object? newValue = null;
+
+        numericUpDown.ValueChangedUntyped += (_, e) =>
+                                             {
+                                                 eventRaised = true;
+                                                 oldValue = e.OldValue;
+                                                 newValue = e.NewValue;
+                                             };
+
+        numericUpDown.Value = 10;
+
+        Assert.True (eventRaised);
+        Assert.Equal (0, oldValue);
+        Assert.Equal (10, newValue);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests for FormatChanged event
+    [Fact]
+    public void FormatChanged_Event_Is_Raised ()
+    {
+        NumericUpDown<int> numericUpDown = new ();
+        var eventRaised = false;
+        string? newFormat = null;
+
+        numericUpDown.FormatChanged += (_, e) =>
+                                       {
+                                           eventRaised = true;
+                                           newFormat = e.Value;
+                                       };
+
+        numericUpDown.Format = "{0:X}";
+
+        Assert.True (eventRaised);
+        Assert.Equal ("{0:X}", newFormat);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests that Format same value does not raise event
+    [Fact]
+    public void Format_Same_Value_Does_Not_Raise_Event ()
+    {
+        NumericUpDown<int> numericUpDown = new ();
+        var eventCount = 0;
+
+        numericUpDown.FormatChanged += (_, _) => eventCount++;
+
+        numericUpDown.Format = "{0}"; // Same as default
+
+        Assert.Equal (0, eventCount);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests for IncrementChanged event
+    [Fact]
+    public void IncrementChanged_Event_Is_Raised ()
+    {
+        NumericUpDown<int> numericUpDown = new ();
+        var eventRaised = false;
+        int? newIncrement = null;
+
+        numericUpDown.IncrementChanged += (_, e) =>
+                                          {
+                                              eventRaised = true;
+                                              newIncrement = e.Value;
+                                          };
+
+        numericUpDown.Increment = 5;
+
+        Assert.True (eventRaised);
+        Assert.Equal (5, newIncrement);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests that Increment same value does not raise event
+    [Fact]
+    public void Increment_Same_Value_Does_Not_Raise_Event ()
+    {
+        NumericUpDown<int> numericUpDown = new ();
+        var eventCount = 0;
+
+        numericUpDown.IncrementChanged += (_, _) => eventCount++;
+
+        numericUpDown.Increment = 1; // Same as default
+
+        Assert.Equal (0, eventCount);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests that setting same Value does not raise events
+    [Fact]
+    public void Value_Same_Value_Does_Not_Raise_Events ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 5 };
+        var changingCount = 0;
+        var changedCount = 0;
+
+        numericUpDown.ValueChanging += (_, _) => changingCount++;
+        numericUpDown.ValueChanged += (_, _) => changedCount++;
+
+        numericUpDown.Value = 5; // Same value
+
+        Assert.Equal (0, changingCount);
+        Assert.Equal (0, changedCount);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests TryConvert with valid conversion
+    [Fact]
+    public void TryConvert_Valid_Conversion_Returns_True ()
+    {
+        bool result = NumericUpDown<int>.TryConvert (10, out int converted);
+
+        Assert.True (result);
+        Assert.Equal (10, converted);
+    }
+
+    // GitHub Copilot
+    // Tests TryConvert with invalid conversion
+    [Fact]
+    public void TryConvert_Invalid_Conversion_Returns_False ()
+    {
+        bool result = NumericUpDown<int>.TryConvert ("not a number", out int converted);
+
+        Assert.False (result);
+        Assert.Equal (default (int), converted);
+    }
+
+    // GitHub Copilot
+    // Tests TryConvert from double to int - uses banker's rounding
+    [Fact]
+    public void TryConvert_Double_To_Int_Rounds ()
+    {
+        bool result = NumericUpDown<int>.TryConvert (10.9, out int converted);
+
+        Assert.True (result);
+        Assert.Equal (11, converted); // Convert.ChangeType uses banker's rounding
+    }
+
+    // GitHub Copilot
+    // Tests InvokeCommand with Command.Up
+    [Fact]
+    public void InvokeCommand_Up_Increments_Value ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 5, Increment = 2 };
+
+        numericUpDown.InvokeCommand (Command.Up);
+
+        Assert.Equal (7, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests InvokeCommand with Command.Down
+    [Fact]
+    public void InvokeCommand_Down_Decrements_Value ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 5, Increment = 2 };
+
+        numericUpDown.InvokeCommand (Command.Down);
+
+        Assert.Equal (3, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests non-generic NumericUpDown defaults to int
+    [Fact]
+    public void NonGeneric_NumericUpDown_Uses_Int ()
+    {
+        NumericUpDown numericUpDown = new ();
+
+        Assert.Equal (0, numericUpDown.Value);
+        Assert.Equal (1, numericUpDown.Increment);
+
+        numericUpDown.Value = 100;
+        Assert.Equal (100, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests that Text is updated when Value changes
+    [Fact]
+    public void Text_Updates_When_Value_Changes ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 0 };
+
+        Assert.Equal ("0", numericUpDown.Text);
+
+        numericUpDown.Value = 42;
+
+        Assert.Equal ("42", numericUpDown.Text);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests that Text respects Format when Value changes
+    [Fact]
+    public void Text_Respects_Format_When_Value_Changes ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Format = "{0:X}", Value = 255 };
+
+        Assert.Equal ("FF", numericUpDown.Text);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests Command.Up with object type returns false
+    [Fact]
+    public void Command_Up_With_Object_Type_Returns_False ()
+    {
+        NumericUpDown<object> numericUpDown = new ();
+
+        bool? result = numericUpDown.InvokeCommand (Command.Up);
+
+        Assert.False (result);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests Command.Down with object type returns false
+    [Fact]
+    public void Command_Down_With_Object_Type_Returns_False ()
+    {
+        NumericUpDown<object> numericUpDown = new ();
+
+        bool? result = numericUpDown.InvokeCommand (Command.Down);
+
+        Assert.False (result);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests negative values work correctly
+    [Fact]
+    public void Negative_Values_Work_Correctly ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = -10 };
+
+        Assert.Equal ("-10", numericUpDown.Text);
+
+        numericUpDown.InvokeCommand (Command.Down);
+
+        Assert.Equal (-11, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests decimal precision is maintained
+    [Fact]
+    public void Decimal_Precision_Is_Maintained ()
+    {
+        NumericUpDown<decimal> numericUpDown = new () { Value = 1.234m, Increment = 0.001m };
+
+        numericUpDown.InvokeCommand (Command.Up);
+
+        Assert.Equal (1.235m, numericUpDown.Value);
+
+        numericUpDown.Dispose ();
+    }
+
+    // GitHub Copilot
+    // Tests that CanFocus is true by default
+    [Fact]
+    public void CanFocus_Is_True_By_Default ()
+    {
+        NumericUpDown<int> numericUpDown = new ();
+
+        Assert.True (numericUpDown.CanFocus);
 
         numericUpDown.Dispose ();
     }

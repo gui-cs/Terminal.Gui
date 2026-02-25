@@ -90,6 +90,19 @@ public partial class TextView
     public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
 
     /// <inheritdoc/>
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        // If we already have focus, cancel the hotkey so the key passes through
+        // to OnKeyDownNotHandled for text input (e.g. the 'E' in "_Enter Path").
+        return HasFocus;
+    }
+
+    /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)
     {
         if (!key.IsValid)
