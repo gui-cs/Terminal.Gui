@@ -2032,4 +2032,103 @@ public class MenuBarTests
     }
 
     #endregion
+
+    #region OpenMenu Tests
+
+    // Claude - Sonnet 4.6
+
+    [Fact]
+    public void OpenMenu_Opens_First_MenuBarItem ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        MenuItem menuItem1 = new () { Id = "menuItem1", Title = "Item _1" };
+        MenuItem menuItem2 = new () { Id = "menuItem2", Title = "Item _2" };
+        Menu menu = new ([menuItem1, menuItem2]) { Id = "menu" };
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_File" };
+        PopoverMenu popoverMenu = new ();
+        menuBarItem.PopoverMenu = popoverMenu;
+        popoverMenu.Root = menu;
+
+        MenuBar menuBar = new ([menuBarItem]) { Id = "menuBar" };
+        hostView.Add (menuBar);
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.IsOpen ());
+
+        // Act
+        bool result = menuBar.OpenMenu ();
+
+        // Assert
+        Assert.True (result);
+        Assert.True (menuBar.Active);
+        Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBarItem.PopoverMenu.Visible);
+    }
+
+    [Fact]
+    public void OpenMenu_Returns_False_When_No_MenuBarItem_Has_PopoverMenu ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_File" };
+
+        // No PopoverMenu set
+        MenuBar menuBar = new ([menuBarItem]) { Id = "menuBar" };
+        hostView.Add (menuBar);
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Act
+        bool result = menuBar.OpenMenu ();
+
+        // Assert
+        Assert.False (result);
+        Assert.False (menuBar.Active);
+        Assert.False (menuBar.IsOpen ());
+    }
+
+    [Fact]
+    public void OpenMenu_WithNullPosition_UsesDefaultPosition ()
+    {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        MenuItem menuItem = new () { Id = "menuItem1", Title = "Item _1" };
+        Menu menu = new ([menuItem]) { Id = "menu" };
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_File" };
+        PopoverMenu popoverMenu = new ();
+        menuBarItem.PopoverMenu = popoverMenu;
+        popoverMenu.Root = menu;
+
+        MenuBar menuBar = new ([menuBarItem]) { Id = "menuBar" };
+        hostView.Add (menuBar);
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Act - OpenMenu () overload delegates to OpenMenu (null)
+        bool result = menuBar.OpenMenu ();
+
+        // Assert
+        Assert.True (result);
+        Assert.True (menuBar.IsOpen ());
+    }
+
+    #endregion
 }
