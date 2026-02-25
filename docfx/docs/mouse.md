@@ -787,3 +787,21 @@ These events work with `MouseState` to enable hover effects and visual feedback.
 - [Cancellable Work Pattern](cancellable-work-pattern.md) - Event processing pattern
 - @Terminal.Gui.IMouseGrabHandler - API reference for mouse grab handling
 - @Terminal.Gui.IMouse - API reference for the mouse interface
+
+## Mouse Tracing
+
+For debugging mouse event flow, use the `Trace` class from the `Terminal.Gui.Tracing` namespace:
+
+```csharp
+using Terminal.Gui.Tracing;
+
+Trace.MouseEnabled = true;
+```
+
+When enabled, mouse events are logged via `Logging.Trace` showing the flow from Driver → Application → View. Enable via:
+
+- **Code**: `Trace.MouseEnabled = true;`
+- **Config**: `"Trace.MouseEnabled": true`
+- **UICatalog**: Logging menu → Mouse Trace
+
+See [Logging - View Event Tracing](logging.md#view-event-tracing) for more details.

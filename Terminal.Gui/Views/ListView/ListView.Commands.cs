@@ -26,15 +26,6 @@ public partial class ListView
         AddCommand (Command.StartExtend, () => MoveHome (true));
         AddCommand (Command.EndExtend, () => MoveEnd (true));
 
-        // Accept (Enter key or double-click) - Raise Accept event
-        AddCommand (Command.Accept, HandleAccept);
-
-        // Activate (Space key and single-click) - If ShowMarks, change mark and raise Activate event
-        AddCommand (Command.Activate, HandleActivate);
-
-        // Hotkey - If none set, activate and raise Activate event. SetFocus. - DO NOT raise Accept
-        AddCommand (Command.HotKey, HandleHotKey);
-
         AddCommand (Command.SelectAll, HandleSelectAll);
 
         // Default keybindings for all ListViews
@@ -62,7 +53,7 @@ public partial class ListView
         // Key.Space is already bound to Command.Activate; this gives us activate then move down
         KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);
 
-        // Use the form of Add that lets us pass context to the handler
+        // Use the form of Add that lets us pass data with the binding
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
 
@@ -82,39 +73,18 @@ public partial class ListView
         MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
     }
 
-    private bool? HandleHotKey (ICommandContext? ctx)
+    /// <inheritdoc />
+    protected override void OnHotKeyCommand (ICommandContext? ctx)
     {
-        if (SelectedItem is { })
-        {
-            return !SetFocus ();
-        }
+        base.OnHotKeyCommand (ctx);
 
-        SelectedItem = 0;
-
-        if (RaiseActivating (ctx) == true)
-        {
-            return true;
-        }
-
-        return !SetFocus ();
+        SelectedItem ??= 0;
     }
 
-    private bool? HandleAccept (ICommandContext? ctx)
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? ctx)
     {
-        return RaiseAccepting (ctx) == true;
-    }
-
-    private bool? HandleActivate (ICommandContext? ctx)
-    {
-        if (RaiseActivating (ctx) == true)
-        {
-            return true;
-        }
-
-        if (!HasFocus && CanFocus)
-        {
-            SetFocus ();
-        }
+        base.OnActivated (ctx);
 
         // Handle keyboard (Space key) - mark item when marking is enabled
         if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse })
@@ -126,7 +96,7 @@ public partial class ListView
                 MarkUnmarkSelectedItem ();
             }
 
-            return true;
+            return;
         }
 
         // Handle mouse clicks
@@ -135,7 +105,7 @@ public partial class ListView
 
         if (Source is null || index >= Source.Count)
         {
-            return true;
+            return;
         }
         bool shift = mouse.Flags.HasFlag (MouseFlags.Shift);
         bool ctrl = mouse.Flags.HasFlag (MouseFlags.Ctrl);
@@ -172,7 +142,5 @@ public partial class ListView
                 MarkUnmarkSelectedItem ();
             }
         }
-
-        return true;
     }
 }

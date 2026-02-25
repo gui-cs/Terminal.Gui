@@ -204,7 +204,7 @@ public class ApplicationPopoverTests
             Application.Popover?.Register (popover);
 
             // Assert
-            Assert.Equal (Application.TopRunnableView as IRunnable, popover.Current);
+            Assert.Equal (Application.TopRunnableView as IRunnable, popover.Owner);
         }
         finally
         {

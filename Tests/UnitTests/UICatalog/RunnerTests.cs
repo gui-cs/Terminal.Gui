@@ -13,13 +13,13 @@ namespace UnitTests.UICatalog;
 public class RunnerTests (ITestOutputHelper output) : TestsAllViews
 {
     [Fact]
-    public void Constructor_WithNoArgs_DoesNotSetRuntimeConfig ()
+    public void Constructor_DoesNotSetRuntimeConfig ()
     {
         // Arrange - clear any previous config
         ConfigurationManager.RuntimeConfig = null;
 
         // Act
-        Runner runner = new ();
+        Runner _ = new ();
 
         // Assert - RuntimeConfig should be null or empty when no args provided
         // This verifies the early return path in the constructor
@@ -27,14 +27,15 @@ public class RunnerTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void Constructor_WithForceDriver_SetsRuntimeConfig ()
+    public void SetRuntimeConfig_WithForceDriver_SetsRuntimeConfig ()
     {
         // Arrange
         ConfigurationManager.RuntimeConfig = null;
         var driverName = "TestDriver";
 
         // Act
-        Runner runner = new (driverName);
+        Runner runner = new ();
+        runner.SetRuntimeConfig (driverName);
 
         // Assert
         Assert.NotNull (ConfigurationManager.RuntimeConfig);
@@ -46,13 +47,14 @@ public class RunnerTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void Constructor_WithForce16Colors_SetsRuntimeConfig ()
+    public void SetRuntimeConfig_WithForce16Colors_SetsRuntimeConfig ()
     {
         // Arrange
         ConfigurationManager.RuntimeConfig = null;
 
         // Act
-        Runner runner = new (force16Colors: true);
+        Runner runner = new ();
+        runner.SetRuntimeConfig (force16Colors: true);
 
         // Assert
         Assert.NotNull (ConfigurationManager.RuntimeConfig);
@@ -64,13 +66,14 @@ public class RunnerTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void Constructor_WithBothOptions_SetsRuntimeConfig ()
+    public void SetRuntimeConfig_WithBothOptions_SetsRuntimeConfig ()
     {
         // Arrange
         ConfigurationManager.RuntimeConfig = null;
 
         // Act
-        Runner runner = new ("TestDriver", false);
+        Runner runner = new ();
+        runner.SetRuntimeConfig ("TestDriver", false);
 
         // Assert
         Assert.NotNull (ConfigurationManager.RuntimeConfig);
@@ -87,18 +90,8 @@ public class RunnerTests (ITestOutputHelper output) : TestsAllViews
         // Arrange
         List<BenchmarkResults> results =
         [
-            new ()
-            {
-                Scenario = "TestScenario1",
-                Duration = TimeSpan.FromSeconds (1),
-                IterationCount = 100
-            },
-            new ()
-            {
-                Scenario = "TestScenario2",
-                Duration = TimeSpan.FromSeconds (2),
-                IterationCount = 200
-            }
+            new () { Scenario = "TestScenario1", Duration = TimeSpan.FromSeconds (1), IterationCount = 100 },
+            new () { Scenario = "TestScenario2", Duration = TimeSpan.FromSeconds (2), IterationCount = 200 }
         ];
 
         string tempFile = Path.GetTempFileName ();
@@ -168,36 +161,17 @@ public class RunnerTests (ITestOutputHelper output) : TestsAllViews
         int preScenarioPosition = global::UICatalog.UICatalog.LogCapture.ScenarioStartPosition;
 
         ConfigurationManager.RuntimeConfig = null;
-        Runner runner = new (DriverRegistry.Names.ANSI);
+        Runner runner = new ();
+        runner.SetRuntimeConfig (DriverRegistry.Names.ANSI);
 
         // We need to run the scenario in a way that it exits quickly
         // The Generic scenario is a simple one that should work
 
         // Use a timer to force quit after a short time
         Timer? quitTimer = null;
-        IApplication? currentApp = null;
+        IApplication? currentApp;
 
         Application.InstanceInitialized += OnInstanceInitialized;
-
-        void OnInstanceInitialized (object? sender, EventArgs<IApplication> e)
-        {
-            currentApp = e.Value;
-
-            quitTimer = new (
-                             _ =>
-                             {
-                                 try
-                                 {
-                                     currentApp?.RequestStop ();
-                                 }
-                                 catch
-                                 { /* ignore */
-                                 }
-                             },
-                             null,
-                             500,
-                             Timeout.Infinite);
-        }
 
         try
         {
@@ -205,8 +179,7 @@ public class RunnerTests (ITestOutputHelper output) : TestsAllViews
             runner.RunScenario (scenarioName, false);
 
             // Assert - the scenario start position should have been updated
-            Assert.True (
-                         global::UICatalog.UICatalog.LogCapture.ScenarioStartPosition > preScenarioPosition,
+            Assert.True (global::UICatalog.UICatalog.LogCapture.ScenarioStartPosition > preScenarioPosition,
                          "MarkScenarioStart should have been called, updating the position");
 
             // Scenario logs should not contain the pre-scenario log
@@ -222,6 +195,27 @@ public class RunnerTests (ITestOutputHelper output) : TestsAllViews
 
             // Reset model tracking so other tests can use either model
             ApplicationImpl.ResetModelUsageTracking ();
+        }
+
+        return;
+
+        void OnInstanceInitialized (object? sender, EventArgs<IApplication> e)
+        {
+            currentApp = e.Value;
+
+            quitTimer = new Timer (_ =>
+                                   {
+                                       try
+                                       {
+                                           currentApp?.RequestStop ();
+                                       }
+                                       catch
+                                       { /* ignore */
+                                       }
+                                   },
+                                   null,
+                                   500,
+                                   Timeout.Infinite);
         }
     }
 

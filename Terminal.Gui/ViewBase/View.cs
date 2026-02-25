@@ -59,7 +59,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <returns></returns>
     public virtual string ToDebugString ()
     {
-        string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{Title}";
+        string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{this.ToIdentifyingString ()}";
 
         return $"{GetType ().Name}({identifyingText}) SuperView={(SuperView is { } ? SuperView.ToDebugString () : "null")}";
     }
@@ -375,6 +375,11 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
             if (!field)
             {
+                if (App?.Mouse.IsGrabbed (this) == true)
+                {
+                    App.Mouse.UngrabMouse ();
+                }
+
                 // BUGBUG: Ideally we'd reset _previouslyFocused to the first focusable subview
                 _previouslyFocused = SubViews.FirstOrDefault (v => v.CanFocus);
 

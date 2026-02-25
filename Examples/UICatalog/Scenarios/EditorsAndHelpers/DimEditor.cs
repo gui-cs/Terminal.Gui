@@ -91,7 +91,7 @@ public class DimEditor : EditorBase
         var label = new Label
         {
             X = 0, Y = 0,
-            Text = $"{Title}:"
+            Text = $"{this.ToIdentifyingString ()}:"
         };
         Add (label);
         _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };

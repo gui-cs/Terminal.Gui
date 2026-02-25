@@ -303,3 +303,21 @@ injector.InjectKey(Key.F1, options);
 - Testing patterns and best practices
 - Advanced scenarios (modifier keys, function keys, special keys)
 - Troubleshooting guide
+
+## Keyboard Tracing
+
+For debugging keyboard event flow, use the `Trace` class from the `Terminal.Gui.Tracing` namespace:
+
+```csharp
+using Terminal.Gui.Tracing;
+
+Trace.KeyboardEnabled = true;
+```
+
+When enabled, keyboard events are logged via `Logging.Trace` showing the flow from Driver → Application → View. Enable via:
+
+- **Code**: `Trace.KeyboardEnabled = true;`
+- **Config**: `"Trace.KeyboardEnabled": true`
+- **UICatalog**: Logging menu → Keyboard Trace
+
+See [Logging - View Event Tracing](logging.md#view-event-tracing) for more details.
