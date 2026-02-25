@@ -29,14 +29,15 @@ public class ColorPicker16 : View, IValue<ColorName16>
         get => _boxHeight;
         set
         {
-            if (_boxHeight != value)
+            if (_boxHeight == value)
             {
-                _boxHeight = value;
-                Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
-                Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-                SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
-                SetNeedsLayout ();
+                return;
             }
+            _boxHeight = value;
+            Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
+            Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
+            SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
+            SetNeedsLayout ();
         }
     }
 
@@ -48,14 +49,15 @@ public class ColorPicker16 : View, IValue<ColorName16>
         get => _boxWidth;
         set
         {
-            if (_boxWidth != value)
+            if (_boxWidth == value)
             {
-                _boxWidth = value;
-                Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
-                Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-                SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
-                SetNeedsLayout ();
+                return;
             }
+            _boxWidth = value;
+            Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
+            Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
+            SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
+            SetNeedsLayout ();
         }
     }
 
@@ -100,14 +102,13 @@ public class ColorPicker16 : View, IValue<ColorName16>
             return true;
         }
 
-        if (Caret.X > 0)
+        if (Caret.X <= 0)
         {
-            SelectedColor--;
-
-            return true;
+            return false;
         }
+        SelectedColor--;
 
-        return false;
+        return true;
     }
 
     /// <summary>Moves the selected item index to the next column.</summary>
@@ -119,14 +120,13 @@ public class ColorPicker16 : View, IValue<ColorName16>
             return true;
         }
 
-        if (Caret.X < COLS - 1)
+        if (Caret.X >= COLS - 1)
         {
-            SelectedColor++;
-
-            return true;
+            return false;
         }
+        SelectedColor++;
 
-        return false;
+        return true;
     }
 
     /// <summary>Moves the selected item index to the previous row.</summary>
@@ -138,14 +138,13 @@ public class ColorPicker16 : View, IValue<ColorName16>
             return true;
         }
 
-        if (Caret.Y > 0)
+        if (Caret.Y <= 0)
         {
-            SelectedColor -= COLS;
-
-            return true;
+            return false;
         }
+        SelectedColor -= COLS;
 
-        return false;
+        return true;
     }
 
     ///<inheritdoc/>
@@ -171,7 +170,7 @@ public class ColorPicker16 : View, IValue<ColorName16>
                 }
                 else
                 {
-                    SetAttribute (new Attribute ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimColor (), TextStyle.Faint));
+                    SetAttribute (new Attribute ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimmerColor (), TextStyle.Faint));
                 }
 
                 bool selected = x == Caret.X && y == Caret.Y;
@@ -232,7 +231,7 @@ public class ColorPicker16 : View, IValue<ColorName16>
     public ColorName16 Value { get => SelectedColor; set => SelectedColor = value; }
 
     /// <inheritdoc/>
-    object? IValue.GetValue () => SelectedColor;
+    object IValue.GetValue () => SelectedColor;
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;

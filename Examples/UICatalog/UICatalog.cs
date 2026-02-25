@@ -245,10 +245,11 @@ public class UICatalog
     private static void UICatalogMain (UICatalogCommandLineOptions options)
     {
         // Create the runner for executing scenarios with runtime config options
-        Runner runner = new (options.Driver, options.Force16Colors);
+        Runner runner = new ();
 
         if (!Options.DontEnableConfigurationManagement)
         {
+            runner.SetRuntimeConfig (options.Driver, options.Force16Colors);
             ConfigurationManager.Enable (ConfigLocations.All);
         }
         else

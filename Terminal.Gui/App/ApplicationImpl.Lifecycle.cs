@@ -239,7 +239,7 @@ internal partial class ApplicationImpl
         Trace.Lifecycle (MainThreadId?.ToString (), "Shutdown");
 
         // === 0. Stop all timers ===
-        TimedEvents?.StopAll ();
+        TimedEvents.StopAll ();
 
         // === 1. Stop all running runnables ===
         foreach (SessionToken token in SessionStack!.Reverse ())
@@ -344,12 +344,13 @@ internal partial class ApplicationImpl
 
         Delegate [] subscribers = eventDelegate.GetInvocationList ();
 
-        if (subscribers.Length > 0)
+        if (subscribers.Length <= 0)
         {
-            string subscriberInfo = string.Join (", ", subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"));
-
-            Debug.Fail ($"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}");
+            return;
         }
+        string subscriberInfo = string.Join (", ", subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"));
+
+        Debug.Fail ($"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}");
     }
 #endif
 

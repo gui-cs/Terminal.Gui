@@ -346,6 +346,8 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 #### Color Support
 - `SupportsTrueColor` - 24-bit color capability
 - `Force16Colors` - Force 16-color mode
+- `DefaultAttribute` - The terminal's actual default foreground/background colors, detected at startup via OSC 10/11 queries. Used by `Scheme` to resolve `Color.None` during role derivation. `null` if the terminal didn't respond (e.g., legacy console).
+- `ColorCapabilities` - The terminal's color capability level (`NoColor`, `Colors16`, `Colors256`, `TrueColor`), detected from `$TERM`, `$COLORTERM`, and other environment variables
 
 #### Content Buffer
 - `Contents` - Screen buffer array

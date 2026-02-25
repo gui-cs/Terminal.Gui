@@ -429,7 +429,7 @@ public class HexView : View, IDesignable
 
         Attribute editedAttribute = GetAttributeForRole (VisualRole.Editable);
         editedAttribute = editedAttribute with { Style = editedAttribute.Style | TextStyle.Italic | TextStyle.Underline };
-        Attribute editingAttribute = GetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
+        Attribute editingAttribute = GetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Normal);
         Attribute addressAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
 
         for (var line = 0; line < Viewport.Height; line++)

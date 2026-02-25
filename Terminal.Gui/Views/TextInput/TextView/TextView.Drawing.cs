@@ -144,7 +144,7 @@ public partial class TextView
         }
         else
         {
-            SetAttribute (GetAttributeForRole (VisualRole.Normal));
+            SetAttribute (GetAttributeForRole (VisualRole.Editable));
         }
     }
 
@@ -250,10 +250,8 @@ public partial class TextView
         {
             return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
-        currentAttribute = GetAttributeForRole (VisualRole.Editable);
 
-        return true;
-
+        return base.OnGettingAttributeForRole (VisualRole.Editable, ref currentAttribute);
     }
 
     private void ClearRegion (int left, int top, int right, int bottom)

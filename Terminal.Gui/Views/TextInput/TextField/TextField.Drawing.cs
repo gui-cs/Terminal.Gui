@@ -2,7 +2,6 @@ namespace Terminal.Gui.Views;
 
 public partial class TextField
 {
-
     /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
@@ -55,11 +54,7 @@ public partial class TextField
             }
             else if (ReadOnly)
             {
-                SetAttribute (
-                              idx >= _selectionStart && SelectedLength > 0 && idx < _selectionStart + SelectedLength
-                                  ? selectedAttribute
-                                  : readonlyAttribute
-                             );
+                SetAttribute (idx >= _selectionStart && SelectedLength > 0 && idx < _selectionStart + SelectedLength ? selectedAttribute : readonlyAttribute);
             }
             else if (!HasFocus && Enabled)
             {
@@ -68,11 +63,7 @@ public partial class TextField
             }
             else
             {
-                SetAttribute (
-                              idx >= _selectionStart && SelectedLength > 0 && idx < _selectionStart + SelectedLength
-                                  ? selectedAttribute
-                                  : normalAttribute
-                             );
+                SetAttribute (idx >= _selectionStart && SelectedLength > 0 && idx < _selectionStart + SelectedLength ? selectedAttribute : normalAttribute);
             }
 
             if (col + cols <= width)
@@ -119,19 +110,14 @@ public partial class TextField
             return;
         }
 
-        var renderAt = new Point (
-                                  Autocomplete.Context.CursorPosition,
-                                  0
-                                 );
+        var renderAt = new Point (Autocomplete.Context.CursorPosition, 0);
 
         Autocomplete.RenderOverlay (renderAt);
     }
 
     private void RenderCaption ()
     {
-        if (HasFocus
-            || string.IsNullOrEmpty (Title)
-            || Text.Length > 0)
+        if (HasFocus || string.IsNullOrEmpty (Title) || Text.Length > 0)
         {
             return;
         }
@@ -143,14 +129,12 @@ public partial class TextField
             TitleTextFormatter.Text = Title;
         }
 
-        var captionAttribute = new Attribute (
-                                              GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-                                              GetAttributeForRole (VisualRole.Editable).Background);
+        Attribute captionAttribute = new (GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
+                                           GetAttributeForRole (VisualRole.Editable).Background);
 
-        var hotKeyAttribute = new Attribute (
-                                             GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-                                             GetAttributeForRole (VisualRole.Editable).Background,
-                                             GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+        Attribute hotKeyAttribute = new (GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
+                                                   GetAttributeForRole (VisualRole.Editable).Background,
+                                                   GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // Use TitleTextFormatter to render the caption with hotkey support
         TitleTextFormatter.Draw (Driver, ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), captionAttribute, hotKeyAttribute);

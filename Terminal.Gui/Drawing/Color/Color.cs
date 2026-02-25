@@ -255,20 +255,20 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
 
     /// <summary>
-    ///     Returns a color with the same hue and saturation as this color, but with a significantly different lightness,
-    ///     making it suitable for use as a highlight or contrast color in UI elements.
+    ///     Returns a "highlighted" version of this color — visually more prominent against
+    ///     the given background context.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This method brightens the color if it is dark, or darkens it if it is light, ensuring the result is visually
-    ///         distinct
-    ///         from the original. The algorithm works in HSL color space and adjusts the lightness channel:
+    ///         The algorithm works in HSL color space and adjusts the lightness channel. When
+    ///         <paramref name="isDarkBackground"/> is provided, the direction is explicit. When <see langword="null"/>,
+    ///         direction is auto-detected from this color's own lightness:
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>If the color is dark (lightness &lt; 0.5), the lightness is increased (brightened).</description>
+    ///                 <description>Dark backgrounds (or dark colors when auto-detecting): lightness is increased.</description>
     ///             </item>
     ///             <item>
-    ///                 <description>If the color is light (lightness &gt;= 0.5), the lightness is decreased (darkened).</description>
+    ///                 <description>Light backgrounds (or light colors when auto-detecting): lightness is decreased.</description>
     ///             </item>
     ///             <item>
     ///                 <description>
@@ -277,55 +277,54 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///                 </description>
     ///             </item>
     ///         </list>
-    ///         This ensures the returned color is always visually distinct and suitable for highlighting or selection states.
-    ///     </para>
-    ///     <para>
-    ///         The returned color will always have the same hue and saturation as the original, but a different lightness.
     ///     </para>
     /// </remarks>
-    /// <param name="brightenAmount">The percent amount to brighten the color by. The default is <c>20%</c>.</param>
-    /// <returns>
-    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a contrasting lightness.
-    /// </returns>
-    /// <example>
-    ///     <code>
-    /// var baseColor = new Color(100, 100, 100);
-    /// var highlight = baseColor.GetHighlightColor();
-    /// // highlight will be a lighter or darker version of baseColor, depending on its original lightness.
-    /// </code>
-    /// </example>
-    public Color GetBrighterColor (double brightenAmount = 0.2)
+    /// <param name="brightenAmount">The percent amount to adjust the lightness by. The default is <c>20%</c>.</param>
+    /// <param name="isDarkBackground">
+    ///     If <see langword="true"/>, brightens (increases lightness) for visibility on dark backgrounds.
+    ///     If <see langword="false"/>, darkens (decreases lightness) for visibility on light backgrounds.
+    ///     If <see langword="null"/>, auto-detects based on this color's own lightness (default/backward-compatible behavior).
+    /// </param>
+    public Color GetBrighterColor (double brightenAmount = 0.2, bool? isDarkBackground = null)
     {
-        HSL? hsl = ColorConverter.RgbToHsl (new (R, G, B));
+        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
-        double lNorm = hsl.L / 255.0;
+        double lNorm = hsl.L / 100.0;
 
-        double newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + brightenAmount) : Math.Max (0.0, lNorm - brightenAmount);
+        // Determine direction: on dark bg, brighten (increase L); on light bg, darken (decrease L)
+        bool shouldIncrease = isDarkBackground ?? (lNorm < 0.5);
+
+        double newL = shouldIncrease ? Math.Min (1.0, lNorm + brightenAmount) : Math.Max (0.0, lNorm - brightenAmount);
 
         if (Math.Abs (newL - lNorm) < 0.1)
         {
-            newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + 2 * brightenAmount) : Math.Max (0.0, lNorm - 2 * brightenAmount);
+            newL = shouldIncrease ? Math.Min (1.0, lNorm + 2 * brightenAmount) : Math.Max (0.0, lNorm - 2 * brightenAmount);
         }
 
-        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
-        RGB? rgb = ColorConverter.HslToRgb (newHsl);
+        HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
+        RGB rgb = ColorConverter.HslToRgb (newHsl);
 
         return new (rgb.R, rgb.G, rgb.B);
     }
 
     /// <summary>
-    ///     Returns a color with the same hue and saturation as this color, but with a significantly lower lightness,
-    ///     making it suitable for use as a shadow or background contrast color in UI elements.
+    ///     Returns a "dimmed" version of this color appropriate for the given background context.
+    ///     On dark backgrounds, dims by reducing lightness (darker). On light backgrounds, dims by
+    ///     increasing lightness (lighter/washed out), moving the color toward the background.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This method darkens the color by reducing its lightness in HSL color space:
+    ///         The algorithm works in HSL color space and adjusts the lightness channel:
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>If the color is already very dark, returns <see cref="ColorName16.DarkGray"/>.</description>
+    ///                 <description>
+    ///                     If the color is already at the extreme for the given direction, returns a context-appropriate
+    ///                     gray (<see cref="ColorName16.DarkGray"/> for dark backgrounds,
+    ///                     <see cref="ColorName16.Gray"/> for light backgrounds).
+    ///                 </description>
     ///             </item>
     ///             <item>
-    ///                 <description>Otherwise, reduces the lightness by a fixed amount (default 30%).</description>
+    ///                 <description>Otherwise, adjusts lightness by the specified amount in the appropriate direction.</description>
     ///             </item>
     ///             <item>
     ///                 <description>
@@ -334,36 +333,61 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///                 </description>
     ///             </item>
     ///         </list>
-    ///         This ensures the returned color is always visually distinct and suitable for shadowing or de-emphasis.
     ///     </para>
     /// </remarks>
     /// <param name="dimAmount">The percent amount to dim the color by. The default is <c>20%</c>.</param>
-    /// <returns>
-    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a much lower lightness.
-    /// </returns>
-    public Color GetDimColor (double dimAmount = 0.2)
+    /// <param name="isDarkBackground">
+    ///     If <see langword="true"/>, dims by reducing lightness (darker, toward the dark background).
+    ///     If <see langword="false"/>, dims by increasing lightness (washed out, toward the light background).
+    ///     If <see langword="null"/>, always reduces lightness (default/backward-compatible behavior).
+    /// </param>
+    public Color GetDimmerColor (double dimAmount = 0.2, bool? isDarkBackground = null)
     {
         HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
-        double lNorm = hsl.L / 255.0;
-        double newL = Math.Max (0.0, lNorm - dimAmount);
+        double lNorm = hsl.L / 100.0;
 
-        // If the color is already very dark, return a standard dark gray for visibility
-        if (lNorm <= 0.1)
+        // Determine direction: on dark bg (or null/default), reduce L; on light bg, increase L
+        bool shouldDecrease = isDarkBackground ?? true;
+
+        // If the color is already at the extreme for the given direction, return a context-appropriate gray.
+        // Note: ColorHelper's HSL uses L in range 0-100.
+        if (shouldDecrease && hsl.L <= 10)
         {
             return new (ColorName16.DarkGray);
         }
 
+        if (!shouldDecrease && hsl.L >= 90)
+        {
+            return new (ColorName16.Gray);
+        }
+
+        double newL = shouldDecrease ? Math.Max (0.0, lNorm - dimAmount) : Math.Min (1.0, lNorm + dimAmount);
+
         // If the new lightness is too close to the original, force a bigger change
         if (Math.Abs (newL - lNorm) < 0.1)
         {
-            newL = Math.Max (0.0, lNorm - 2 * dimAmount);
+            newL = shouldDecrease ? Math.Max (0.0, lNorm - 2 * dimAmount) : Math.Min (1.0, lNorm + 2 * dimAmount);
         }
 
-        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
+        HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
         RGB rgb = ColorConverter.HslToRgb (newHsl);
 
         return new (rgb.R, rgb.G, rgb.B);
+    }
+
+    /// <summary>
+    ///     Returns <see langword="true"/> if this color is "dark" (HSL lightness &lt; 0.5).
+    /// </summary>
+    /// <returns>
+    ///     <see langword="true"/> if the color's HSL lightness is below 0.5; otherwise <see langword="false"/>.
+    /// </returns>
+    public bool IsDarkColor ()
+    {
+        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
+
+        // ColorHelper's HSL uses L in range 0-100
+        return hsl.L < 50;
     }
 
     #region Legacy Color Names

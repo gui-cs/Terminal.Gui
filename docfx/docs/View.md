@@ -444,7 +444,25 @@ Navigation controls keyboard focus movement:
 
 ### Scrolling
 
-Scrolling and scroll bar support is built into every View. See the [Scrolling Deep Dive](scrolling.md) for complete details.
+See the [Scrolling Deep Dive](scrolling.md) for complete details.
+
+Scrolling is built into every View:
+
+```csharp
+// Set content size larger than viewport
+view.SetContentSize(new Size(100, 100));
+
+// Scroll the content
+view.Viewport = view.Viewport with { Location = new Point(10, 10) };
+
+// Or use helper methods
+view.ScrollVertical(5);
+view.ScrollHorizontal(3);
+
+// Enable scrollbars
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
+```
 
 ---
 
@@ -537,9 +555,9 @@ View view = new ()
 // Set content larger than viewport
 view.SetContentSize (new Size (100, 100));
 
-// Enable scrollbars with auto-show
-view.VerticalScrollBar.AutoShow = true;
-view.HorizontalScrollBar.AutoShow = true;
+// Enable scrollbars with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
 // Add key bindings for scrolling
 view.KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
