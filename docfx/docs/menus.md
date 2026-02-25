@@ -142,7 +142,7 @@ Key features:
 - `TargetView` and `Command` enable command binding to other views
 - Automatically gets focus on mouse enter
 - Displays right-arrow glyph when it has a submenu
-- When `SubMenu` is set, a <xref:Terminal.Gui.Input.CommandBridge> connects the SubMenu back to this MenuItem (bridging `Activate` and `Accept` commands across the non-containment boundary)
+- When `SubMenu` is set, a `CommandBridge` connects the SubMenu back to this MenuItem (bridging `Activate` and `Accept` commands across the non-containment boundary)
 
 ### Menu
 
@@ -189,7 +189,7 @@ MenuBarItem fileMenuBarItem = new ("_File", [
 Key features:
 - `PopoverMenu` property holds the dropdown menu
 - `PopoverMenuOpen` tracks whether the popover is visible (CWP property with `PopoverMenuOpenChanging`/`PopoverMenuOpenChanged` events)
-- When `PopoverMenu` is set, a <xref:Terminal.Gui.Input.CommandBridge> connects the PopoverMenu back to this MenuBarItem, bridging `Activate` commands across the non-containment boundary
+- When `PopoverMenu` is set, a `CommandBridge` connects the PopoverMenu back to this MenuBarItem, bridging `Activate` commands across the non-containment boundary
 - Overrides `OnActivating` to toggle `PopoverMenuOpen`, with a guard that ignores `Bridged` commands (which are notifications from PopoverMenu internals, not toggle requests)
 - Has a custom `HotKey` handler that skips `SetFocus` before invoking `Activate`, preventing premature popover opening during MenuBarItem switching
 
@@ -344,7 +344,7 @@ Each menu component uses a specific command dispatch pattern:
 
 ### CommandBridge (Cross-Boundary Routing)
 
-The menu system has two non-containment boundaries that require <xref:Terminal.Gui.Input.CommandBridge>:
+The menu system has two non-containment boundaries that require `CommandBridge`:
 
 1. **MenuBarItem ↔ PopoverMenu:** `PopoverMenu` is not a SubView of `MenuBarItem` — it is registered with `Application.Popover` and lives outside the view hierarchy. The bridge brings `Activate` events from the PopoverMenu back to the MenuBarItem so they can bubble up through the MenuBar.
 

@@ -21,7 +21,7 @@ See the [Layout Deep Dive](layout.md) for the broader layout system context.
 
 ## Overview
 
-The <xref:Terminal.Gui.ViewBase.View.Arrangement> property controls how users can arrange views within their <xref:Terminal.Gui.ViewBase.View.SuperView>. The [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) enum provides flags that can be combined to specify arrangement behavior.
+The `Arrangement` property controls how users can arrange views within their `SuperView`. The [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) enum provides flags that can be combined to specify arrangement behavior.
 
 ### Arrangement Lexicon
 
@@ -123,7 +123,7 @@ var view2 = new View
 
 ## Arrange Mode (Interactive)
 
-**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via <xref:Terminal.Gui.App.Application.ArrangeKey>).
+**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via `Application.ArrangeKey`).
 
 ### Entering Arrange Mode
 
@@ -160,9 +160,9 @@ The [Border](~/api/Terminal.Gui.ViewBase.Border.yml) shows visual indicators bas
 
 For a View to be arrangeable:
 
-1. Must be part of a <xref:Terminal.Gui.ViewBase.View.SuperView>
+1. Must be part of a `SuperView`
 2. Position and dimensions must be independent of other SubViews
-3. Must have <xref:Terminal.Gui.ViewBase.View.Arrangement> flags set
+3. Must have `Arrangement` flags set
 4. Typically needs a [Border](~/api/Terminal.Gui.ViewBase.Border.yml) for mouse interaction
 
 ---
@@ -247,7 +247,7 @@ var window = new Window
 ### Moving with Mouse
 
 - **Click and drag** the top [Border](~/api/Terminal.Gui.ViewBase.Border.yml) to move the view
-- The view's <xref:Terminal.Gui.ViewBase.View.Frame> updates as it moves
+- The view's `Frame` updates as it moves
 - Release the mouse to complete the move
 
 ### Moving with Keyboard
@@ -289,7 +289,7 @@ var view = new View
 
 - **Click and drag** any enabled border edge
 - Resize indicators appear on hover
-- The view's <xref:Terminal.Gui.ViewBase.View.Width> and <xref:Terminal.Gui.ViewBase.View.Height> update
+- The view's `Width` and `Height` update
 
 ### Resizing with Keyboard
 
@@ -383,7 +383,7 @@ A view is modal when:
 
 - **Exclusive Input** - All keyboard and mouse input goes to the modal view
 - **Constrained Z-Order** - Modal view has Z-order of 1, everything else at 0
-- **Blocks Execution** - `IApplication.Run` blocks until <xref:Terminal.Gui.App.Application.RequestStop*> is called
+- **Blocks Execution** - `IApplication.Run` blocks until `Application.RequestStop()` is called
 - **Own SessionToken** - Each modal view has its own [SessionToken](~/api/Terminal.Gui.App.SessionToken.yml)
 
 ### Modal View Types
@@ -524,7 +524,7 @@ container.Add(window1, window2);
 ```
 
 **Z-Order:**
-- Order in <xref:Terminal.Gui.ViewBase.View.SubViews> determines Z-order
+- Order in `SubViews` determines Z-order
 - Later views appear above earlier views
 - Use [View.BringSubviewToFront](~/api/Terminal.Gui.ViewBase.yml) to change Z-order
 
@@ -677,7 +677,7 @@ Arrangement only works when:
 
 ### SuperViewRendersLineCanvas
 
-When creating splitters, set <xref:Terminal.Gui.ViewBase.View.SuperViewRendersLineCanvas> = `true`:
+When creating splitters, set `SuperViewRendersLineCanvas` = `true`:
 
 ```csharp
 rightPane.SuperViewRendersLineCanvas = true;
@@ -728,10 +728,10 @@ view.LayoutComplete += (s, e) =>
 
 ### API Reference
 
-- <xref:Terminal.Gui.ViewBase.View.Arrangement>
+- `Arrangement`
 - [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)
 - [Border](~/api/Terminal.Gui.ViewBase.Border.yml)
-- <xref:Terminal.Gui.App.Application.ArrangeKey>
+- `Application.ArrangeKey`
 - Runnable.Modal
 
 ### UICatalog Examples

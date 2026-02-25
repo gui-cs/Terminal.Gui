@@ -19,21 +19,21 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 * **The Source of Truth is Wikipedia** - We use this [Wikipedia article](https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts) as our guide for default key bindings.
 
-* **If It's Hot, It Works** - If a View with a <xref:Terminal.Gui.ViewBase.View.HotKey> is visible, and the HotKey is visible, the user should be able to press that HotKey and whatever behavior is defined for it should work. For example, in v1, when a Modal view was active, the HotKeys on MenuBar continued to show "hot". In v2 we strive to ensure this doesn't happen.
+* **If It's Hot, It Works** - If a View with a `HotKey` is visible, and the HotKey is visible, the user should be able to press that HotKey and whatever behavior is defined for it should work. For example, in v1, when a Modal view was active, the HotKeys on MenuBar continued to show "hot". In v2 we strive to ensure this doesn't happen.
 
 ## Keyboard APIs
 
 *Terminal.Gui* provides the following APIs for handling keyboard input:
 
 * **Key** - <xref:Terminal.Gui.Input.Key> provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible.
-* **Key Bindings** - Key Bindings provide a declarative method for handling keyboard input in View implementations. The View calls <xref:Terminal.Gui.ViewBase.View.AddCommand>(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses <xref:Terminal.Gui.Input.KeyBindings> to indicate which key presses will invoke the command. 
-* **Key Events** - The Key Bindings API is rich enough to support the vast majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. when capturing arbitrary typing by a user). Use <xref:Terminal.Gui.ViewBase.View.KeyDown> and related events in these cases.
+* **Key Bindings** - Key Bindings provide a declarative method for handling keyboard input in View implementations. The View calls `AddCommand()`(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses <xref:Terminal.Gui.Input.KeyBindings> to indicate which key presses will invoke the command. 
+* **Key Events** - The Key Bindings API is rich enough to support the vast majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. when capturing arbitrary typing by a user). Use `KeyDown` and related events in these cases.
 
 Each of these APIs are described more fully below.
 
 ### **[Key Bindings](~/api/Terminal.Gui.Input.KeyBindings.yml)**
 
-Key Bindings is the preferred way of handling keyboard input in View implementations. The View calls <xref:Terminal.Gui.ViewBase.View.AddCommand>(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses <xref:Terminal.Gui.Input.KeyBindings> to indicate which key presses will invoke the command. For example, if a View wants to respond to the user pressing the up arrow key to scroll up it would do this
+Key Bindings is the preferred way of handling keyboard input in View implementations. The View calls `AddCommand()`(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses <xref:Terminal.Gui.Input.KeyBindings> to indicate which key presses will invoke the command. For example, if a View wants to respond to the user pressing the up arrow key to scroll up it would do this
 
 ```cs
 public MyView : View
@@ -47,7 +47,7 @@ The `Character Map` Scenario includes a View called `CharMap` that is a good exa
 
 The [Command](~/api/Terminal.Gui.Input.Command.yml) enum lists generic operations that are implemented by views. For example `Command.Accept` in a `Button` results in the `Accepting` event 
 firing while in `TableView` it is bound to `CellActivated`. Not all commands
-are implemented by all views (e.g. you cannot scroll in a `Button`). Use the <xref:Terminal.Gui.ViewBase.View.GetSupportedCommands> method to determine which commands are implemented by a `View`. 
+are implemented by all views (e.g. you cannot scroll in a `Button`). Use the `GetSupportedCommands()` method to determine which commands are implemented by a `View`. 
 
 The default key for activating a button is `Space`. You can change this using 
 `KeyBindings.ReplaceKey()`:
@@ -61,15 +61,15 @@ Key Bindings can be added at the `Application` or `View` level.
 
 For **Application-scoped Key Bindings** there are two categories of Application-scoped Key Bindings:
 
-1) **Application Command Key Bindings** - Bindings for `Command`s supported by <xref:Terminal.Gui.App.Application>. For example, <xref:Terminal.Gui.App.Application.QuitKey>, which is bound to `Command.Quit` and results in <xref:Terminal.Gui.App.Application.RequestStop(Terminal.Gui.App.IRunnable)> being called.
+1) **Application Command Key Bindings** - Bindings for `Command`s supported by <xref:Terminal.Gui.App.Application>. For example, `Application.QuitKey`, which is bound to `Command.Quit` and results in <xref:Terminal.Gui.App.Application.RequestStop(Terminal.Gui.App.IRunnable)> being called.
 2) **Application Key Bindings** - Bindings for `Command`s supported on arbitrary `Views` that are meant to be invoked regardless of which part of the application is visible/active. 
 
-Use <xref:Terminal.Gui.App.Application.Keyboard.KeyBindings> to add or modify Application-scoped Key Bindings. For backward compatibility, <xref:Terminal.Gui.App.Application.KeyBindings> also provides access to the same key bindings.
+Use `Application.Keyboard.KeyBindings` to add or modify Application-scoped Key Bindings. For backward compatibility, `Application.KeyBindings` also provides access to the same key bindings.
 
 **View-scoped Key Bindings** also have two categories:
 
-1) **HotKey Bindings** - These bind to `Command`s that will be invoked regardless of whether the View has focus or not. The most common use-case for `HotKey` bindings is <xref:Terminal.Gui.ViewBase.View.HotKey>. For example, a `Button` with a `Title` of `_OK`, the user can press `Alt-O` and the button will be accepted regardless of whether it has focus or not. Add and modify HotKey bindings with <xref:Terminal.Gui.ViewBase.View.HotKeyBindings>.
-2) **Focused Bindings** - These bind to `Command`s that will be invoked only when the View has focus. Focused Key Bindings are the easiest way to enable a View to support responding to key events. Add and modify Focused bindings with <xref:Terminal.Gui.ViewBase.View.KeyBindings>.
+1) **HotKey Bindings** - These bind to `Command`s that will be invoked regardless of whether the View has focus or not. The most common use-case for `HotKey` bindings is `HotKey`. For example, a `Button` with a `Title` of `_OK`, the user can press `Alt-O` and the button will be accepted regardless of whether it has focus or not. Add and modify HotKey bindings with `HotKeyBindings`.
+2) **Focused Bindings** - These bind to `Command`s that will be invoked only when the View has focus. Focused Key Bindings are the easiest way to enable a View to support responding to key events. Add and modify Focused bindings with `KeyBindings`.
 
 **Application-Scoped** Key Bindings 
 
@@ -77,7 +77,7 @@ Use <xref:Terminal.Gui.App.Application.Keyboard.KeyBindings> to add or modify Ap
 
 A **HotKey** is a key press that selects a visible UI item. For selecting items across `View`s (e.g. a `Button` in a `Dialog`) the key press must have the `Alt` modifier. For selecting items within a `View` that are not `View`s themselves, the key press can be key without the `Alt` modifier.  For example, in a `Dialog`, a `Button` with the text of "_Text" can be selected with `Alt+T`. Or, in a `Menu` with "_File _Edit", `Alt+F` will select (show) the Strings.menuFile menu. If the Strings.menuFile menu has a sub-menu of Strings.cmdNew `Alt+N` or `N` will ONLY select the Strings.cmdNew sub-menu if the Strings.menuFile menu is already opened.
 
-By default, the `Text` of a `View` is used to determine the `HotKey` by looking for the first occurrence of the <xref:Terminal.Gui.ViewBase.View.HotKeySpecifier> (which is underscore (`_`) by default). The character following the underscore is the `HotKey`. If the `HotKeySpecifier` is not found in `Text`, the first character of `Text` is used as the `HotKey`. The `Text` of a `View` can be changed at runtime, and the `HotKey` will be updated accordingly. @"Terminal.Gui.View.HotKey" is `virtual` enabling this behavior to be customized.
+By default, the `Text` of a `View` is used to determine the `HotKey` by looking for the first occurrence of the `HotKeySpecifier` (which is underscore (`_`) by default). The character following the underscore is the `HotKey`. If the `HotKeySpecifier` is not found in `Text`, the first character of `Text` is used as the `HotKey`. The `Text` of a `View` can be changed at runtime, and the `HotKey` will be updated accordingly. @"Terminal.Gui.View.HotKey" is `virtual` enabling this behavior to be customized.
 
 ### **Shortcut**
 
@@ -91,28 +91,28 @@ The Command can be invoked even if the `View` that defines them is not focused o
 
 ### **Key Events**
 
-Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises the <xref:Terminal.Gui.Drivers.IDriver.KeyDown> event which invokes <xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> respectively.
+Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises the `IDriver.KeyDown` event which invokes <xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> respectively.
 
 > [!NOTE]
 > Most drivers/platforms do not support sensing distinct KeyUp events, therefore Terminal.Gui does not support them.
 
-<xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> raises <xref:Terminal.Gui.App.Application.KeyDown> and then calls <xref:Terminal.Gui.ViewBase.View.NewKeyDownEvent> on all runnable Views. If no View handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through <xref:Terminal.Gui.App.Application.Keyboard.KeyBindings>.
+<xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> raises `Application.KeyDown` and then calls `NewKeyDownEvent()` on all runnable Views. If no View handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through `Application.Keyboard.KeyBindings`.
 
-If a view is enabled, the <xref:Terminal.Gui.ViewBase.View.NewKeyDownEvent> method will do the following: 
+If a view is enabled, the `NewKeyDownEvent()` method will do the following: 
 
 1) If the view has a subview that has focus, 'NewKeyDown' on the focused view will be called. This is recursive. If the most-focused view handles the key press, processing stops.
-2) If there is no most-focused sub-view, or a most-focused sub-view does not handle the key press, <xref:Terminal.Gui.ViewBase.View.OnKeyDown> will be called. If the view handles the key press, processing stops.
-3) If <xref:Terminal.Gui.ViewBase.View.OnKeyDown> does not handle the event. <xref:Terminal.Gui.ViewBase.View.KeyDown> will be raised.
-4) If the view does not handle the key down event, any bindings for the key will be invoked (see the <xref:Terminal.Gui.ViewBase.View.KeyBindings> property). If the key is bound and any of it's command handlers return true, processing stops.
-5) If the key is not bound, or the bound command handlers do not return true, <xref:Terminal.Gui.ViewBase.View.OnKeyDownNotHandled> is called. 
+2) If there is no most-focused sub-view, or a most-focused sub-view does not handle the key press, `OnKeyDown()` will be called. If the view handles the key press, processing stops.
+3) If `OnKeyDown()` does not handle the event. `KeyDown` will be raised.
+4) If the view does not handle the key down event, any bindings for the key will be invoked (see the `KeyBindings` property). If the key is bound and any of it's command handlers return true, processing stops.
+5) If the key is not bound, or the bound command handlers do not return true, `OnKeyDownNotHandled()` is called. 
 
 ## **Application Key Handling**
 
-To define application key handling logic for an entire application in cases where the methods listed above are not suitable, use the <xref:Terminal.Gui.App.Application.KeyDown> event. 
+To define application key handling logic for an entire application in cases where the methods listed above are not suitable, use the `Application.KeyDown` event. 
 
 ## **Key Down/Up Events**
 
-*Terminal.Gui* supports key down events only via <xref:Terminal.Gui.ViewBase.View.OnKeyDown>.
+*Terminal.Gui* supports key down events only via `OnKeyDown()`.
 
 # General input model
 
@@ -136,9 +136,9 @@ To define application key handling logic for an entire application in cases wher
 ## Application
 
 * Implements support for `KeyBindingScope.Application`.
-* Keyboard functionality is now encapsulated in the <xref:Terminal.Gui.App.IKeyboard> interface, accessed via <xref:Terminal.Gui.App.Application.Keyboard>.
-* <xref:Terminal.Gui.App.Application.Keyboard> provides access to <xref:Terminal.Gui.Input.KeyBindings>, key binding configuration (QuitKey, ArrangeKey, navigation keys), and keyboard event handling.
-* For backward compatibility, <xref:Terminal.Gui.App.Application> still exposes static properties/methods that delegate to <xref:Terminal.Gui.App.Application.Keyboard> (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`, `IApplication.QuitKey`).
+* Keyboard functionality is now encapsulated in the <xref:Terminal.Gui.App.IKeyboard> interface, accessed via `Application.Keyboard`.
+* `Application.Keyboard` provides access to <xref:Terminal.Gui.Input.KeyBindings>, key binding configuration (QuitKey, ArrangeKey, navigation keys), and keyboard event handling.
+* For backward compatibility, <xref:Terminal.Gui.App.Application> still exposes static properties/methods that delegate to `Application.Keyboard` (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`, `IApplication.QuitKey`).
 * Exposes cancelable `KeyDown` events (via `Handled = true`). The `RaiseKeyDownEvent` method is public and can be used to simulate keyboard input, although it is preferred to use `InputInjector` for testing.
 * The <xref:Terminal.Gui.App.IKeyboard> interface enables testability with isolated keyboard instances that don't depend on static Application state.
 
@@ -156,7 +156,7 @@ The <xref:Terminal.Gui.App.IKeyboard> interface provides a decoupled, testable a
 
 1. **Decoupled State** - All keyboard-related state (key bindings, navigation keys, events) is encapsulated in <xref:Terminal.Gui.App.IKeyboard>, separate from the static <xref:Terminal.Gui.App.Application> class.
 
-2. **Dependency Injection** - The <xref:Terminal.Gui.App.Keyboard> implementation receives an <xref:Terminal.Gui.App.IApplication> reference, enabling it to interact with application state without static dependencies.
+2. **Dependency Injection** - The `Keyboard` implementation receives an <xref:Terminal.Gui.App.IApplication> reference, enabling it to interact with application state without static dependencies.
 
 3. **Testability** - Unit tests can create isolated <xref:Terminal.Gui.App.IKeyboard> instances with mock <xref:Terminal.Gui.App.IApplication> references, enabling parallel test execution without interference.
 
@@ -216,13 +216,13 @@ public class MyView : View
 ### Architecture Benefits
 
 - **Parallel Testing**: Multiple test methods can create and use separate <xref:Terminal.Gui.App.IKeyboard> instances simultaneously without state interference.
-- **Dependency Inversion**: <xref:Terminal.Gui.App.Keyboard> depends on <xref:Terminal.Gui.App.IApplication> interface rather than static <xref:Terminal.Gui.App.Application> class.
+- **Dependency Inversion**: `Keyboard` depends on <xref:Terminal.Gui.App.IApplication> interface rather than static <xref:Terminal.Gui.App.Application> class.
 - **Cleaner Code**: Keyboard functionality is organized in a dedicated interface rather than scattered across <xref:Terminal.Gui.App.Application> partial classes.
 - **Mockability**: Tests can provide mock <xref:Terminal.Gui.App.IApplication> implementations to test keyboard behavior in isolation.
 
 ### Implementation Details
 
-The <xref:Terminal.Gui.App.Keyboard> class implements <xref:Terminal.Gui.App.IKeyboard> and maintains:
+The `Keyboard` class implements <xref:Terminal.Gui.App.IKeyboard> and maintains:
 
 - **KeyBindings**: Application-scoped key binding dictionary
 - **Navigation Keys**: QuitKey, ArrangeKey, NextTabKey, PrevTabKey, NextTabGroupKey, PrevTabGroupKey

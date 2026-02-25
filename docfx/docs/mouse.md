@@ -785,8 +785,8 @@ These events work with `MouseState` to enable hover effects and visual feedback.
 - [Input Injection](input-injection.md) - Complete testing documentation
 - [View Layout](layout.md) - Understanding coordinate systems and layout
 - [Cancellable Work Pattern](cancellable-work-pattern.md) - Event processing pattern
-- <xref:Terminal.Gui.Input.IMouseGrabHandler> - API reference for mouse grab handling
-- <xref:Terminal.Gui.Input.IMouse> - API reference for the mouse interface
+- `IMouseGrabHandler` - API reference for mouse grab handling
+- `IMouse` - API reference for the mouse interface
 
 ## Mouse Tracing
 

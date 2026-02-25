@@ -8,7 +8,7 @@ Terminal.Gui provides a set of APIs for formatting text, line drawing, and chara
 
 # View Drawing API
 
-Terminal.Gui apps draw using the <xref:Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32)> and <xref:Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune)> APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the <xref:Terminal.Gui.Drawing.Attribute> that was most recently set via <xref:Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute)>. The driver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
+Terminal.Gui apps draw using the `Move()` and `AddRune()` APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the <xref:Terminal.Gui.Drawing.Attribute> that was most recently set via `SetAttribute()`. The driver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
 
 ## Drawing Lifecycle
 
@@ -18,16 +18,16 @@ Terminal.Gui apps draw using the <xref:Terminal.Gui.ViewBase.View.Move(System.In
 
 Each iteration of the <xref:Terminal.Gui.App.Application> MainLoop (throttled to a maximum rate) performs these steps in order:
 
-1. **Layout** - Views that need layout are measured and positioned (<xref:Terminal.Gui.ViewBase.View.LayoutSubviews> is called)
-2. **Draw** - Views that need drawing update the driver's back buffer (<xref:Terminal.Gui.ViewBase.View.Draw> is called)
+1. **Layout** - Views that need layout are measured and positioned (`LayoutSubviews()` is called)
+2. **Draw** - Views that need drawing update the driver's back buffer (`Draw()` is called)
 3. **Write** - The driver writes changed portions of the back buffer to the actual terminal
 4. **Cursor** - The driver ensures the cursor is positioned correctly with appropriate visibility
 
 ### When Drawing Actually Occurs
 
-- **Normal Operation**: Drawing happens automatically during MainLoop iterations when <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or <xref:Terminal.Gui.ViewBase.View.SubViewNeedsDraw> is set
+- **Normal Operation**: Drawing happens automatically during MainLoop iterations when `NeedsDraw` or `SubViewNeedsDraw` is set
 - **Forced Update**: <xref:Terminal.Gui.App.Application.LayoutAndDraw(System.Boolean)> can be called to immediately trigger layout and drawing outside of the normal iteration cycle
-- **Testing**: Tests can call <xref:Terminal.Gui.ViewBase.View.Draw> directly to update the back buffer, then call <xref:Terminal.Gui.Drivers.IDriver.Refresh> to output to the terminal
+- **Testing**: Tests can call `Draw()` directly to update the back buffer, then call `IDriver.Refresh()` to output to the terminal
 
 **Important**: Calling `View.Draw()` does not immediately update the terminal screen. It only updates the driver's back buffer. The actual terminal output occurs when the driver's `Refresh()` method is called, which happens automatically during MainLoop iterations.
 
@@ -39,53 +39,53 @@ See [Layout](layout.md) for more details of the Terminal.Gui coordinate system.
 
 ## Outputting unformatted text
 
-1) Moving the draw cursor using <xref:Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32)>.
-2) Setting the attributes using <xref:Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute)>.
-3) Outputting glyphs by calling <xref:Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune)> or <xref:Terminal.Gui.ViewBase.View.AddStr(System.String)> .
+1) Moving the draw cursor using `Move()`.
+2) Setting the attributes using `SetAttribute()`.
+3) Outputting glyphs by calling `AddRune()` or `AddStr()` .
 
 ## Outputting formatted text
 
 1) Adding the text to a <xref:Terminal.Gui.Text.TextFormatter> object.
-2) Setting formatting options, such as <xref:Terminal.Gui.Text.TextFormatter.Alignment>.
-3) Calling <xref:Terminal.Gui.Text.TextFormatter.Draw>(Terminal.Gui.IDriver, System.Drawing.Rectangle,Terminal.Gui.Attribute,Terminal.Gui.Attribute,System.Drawing.Rectangle).
+2) Setting formatting options, such as `TextFormatter.Alignment`.
+3) Calling `TextFormatter.Draw()`(Terminal.Gui.IDriver, System.Drawing.Rectangle,Terminal.Gui.Attribute,Terminal.Gui.Attribute,System.Drawing.Rectangle).
 
 ## Line drawing
 
 1) Add the lines via <xref:Terminal.Gui.Drawing.LineCanvas>
-2) Either render the line canvas via <xref:Terminal.Gui.Drawing.LineCanvas.GetMap> or let the <xref:Terminal.Gui.ViewBase.View> do so automatically (which enables automatic line joining across Views).
+2) Either render the line canvas via `LineCanvas.GetMap()` or let the <xref:Terminal.Gui.ViewBase.View> do so automatically (which enables automatic line joining across Views).
 
 ## When Drawing Occurs
 
 The <xref:Terminal.Gui.App.Application> MainLoop will iterate over all Views in the view hierarchy performing the following steps:
 
-0) Determines if <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or <xref:Terminal.Gui.ViewBase.View.SubViewNeedsDraw> are set. If neither is set, processing stops.
+0) Determines if `NeedsDraw` or `SubViewNeedsDraw` are set. If neither is set, processing stops.
 1) Sets the clip to the view's Frame.
-2) Draws the <xref:Terminal.Gui.ViewBase.View.Border> and <xref:Terminal.Gui.ViewBase.View.Padding> (but NOT the Margin).
+2) Draws the `Border` and `Padding` (but NOT the Margin).
 3) Sets the clip to the view's Viewport.
 4) Sets the Normal color scheme.
-5) Calls Draw on any <xref:Terminal.Gui.ViewBase.View.SubViews>.
-6) Draws <xref:Terminal.Gui.ViewBase.View.Text>.
+5) Calls Draw on any `SubViews`.
+6) Draws `Text`.
 7) Draws any non-text content (the base View does nothing.)
 8) Sets the clip back to the view's Frame.
-9) Draws <xref:Terminal.Gui.ViewBase.View.LineCanvas> (which may have been added to by any of the steps above).
-10) Draws the <xref:Terminal.Gui.ViewBase.View.Border> and <xref:Terminal.Gui.ViewBase.View.Padding> SubViews (just the subviews). (but NOT the Margin).
-11) The Clip at this point excludes all SubViews NOT INCLUDING their Margins. This clip is cached so <xref:Terminal.Gui.ViewBase.View.Margin> can be rendered later.
+9) Draws `LineCanvas` (which may have been added to by any of the steps above).
+10) Draws the `Border` and `Padding` SubViews (just the subviews). (but NOT the Margin).
+11) The Clip at this point excludes all SubViews NOT INCLUDING their Margins. This clip is cached so `Margin` can be rendered later.
 12) DrawComplete is raised.
 13) The current View's Frame NOT INCLUDING the Margin is excluded from the current Clip region.
 
-Most of the steps above can be overridden by developers using the standard [Terminal.Gui Cancellable Work Pattern](cancellable-work-pattern.md). For example, the base <xref:Terminal.Gui.ViewBase.View> always clears the viewport. To override this, a subclass can override <xref:Terminal.Gui.ViewBase.View.OnClearingViewport> to simply return `true`. Or, a user of `View` can subscribe to the <xref:Terminal.Gui.ViewBase.View.ClearingViewport> event and set the `Cancel` argument to `true`.
+Most of the steps above can be overridden by developers using the standard [Terminal.Gui Cancellable Work Pattern](cancellable-work-pattern.md). For example, the base <xref:Terminal.Gui.ViewBase.View> always clears the viewport. To override this, a subclass can override `OnClearingViewport()` to simply return `true`. Or, a user of `View` can subscribe to the `ClearingViewport` event and set the `Cancel` argument to `true`.
 
-Then, after the above steps have completed, the Mainloop will iterate through all views in the view hierarchy again, this time calling Draw on any <xref:Terminal.Gui.ViewBase.View.Margin> objects, using the cached Clip region mentioned above. This enables Margin to be transparent.
+Then, after the above steps have completed, the Mainloop will iterate through all views in the view hierarchy again, this time calling Draw on any `Margin` objects, using the cached Clip region mentioned above. This enables Margin to be transparent.
 
 ### Declaring that drawing is needed
 
-If a View need to redraw because something changed within it's Content Area it can call <xref:Terminal.Gui.ViewBase.View.SetNeedsDraw>. If a View needs to be redrawn because something has changed the size of the Viewport, it can call <xref:Terminal.Gui.ViewBase.View.SetNeedsLayout>.
+If a View need to redraw because something changed within it's Content Area it can call `SetNeedsDraw()`. If a View needs to be redrawn because something has changed the size of the Viewport, it can call `SetNeedsLayout()`.
 
 **Note**: Calling `SetNeedsDraw()` does not immediately cause drawing to occur. It marks the view as needing to be redrawn, which will happen in the next MainLoop iteration. To force immediate drawing (typically only needed in tests), call <xref:Terminal.Gui.App.Application.LayoutAndDraw(System.Boolean)>.
 
 ## Clipping
 
-Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with <xref:Terminal.Gui.Drawing.Region>. The driver.Clip is the application managed clip region and is managed by <xref:Terminal.Gui.App.Application>. Developers cannot change this directly, but can use <xref:Terminal.Gui.ViewBase.View.SetClipToScreen>, <xref:Terminal.Gui.ViewBase.View.SetClip>(Terminal.Gui.Region), <xref:Terminal.Gui.ViewBase.View.SetClipToFrame>, etc...
+Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with <xref:Terminal.Gui.Drawing.Region>. The driver.Clip is the application managed clip region and is managed by <xref:Terminal.Gui.App.Application>. Developers cannot change this directly, but can use `SetClipToScreen()`, `SetClip()`(Terminal.Gui.Region), `SetClipToFrame()`, etc...
 
 
 ## Cell
@@ -94,13 +94,13 @@ The <xref:Terminal.Gui.Drawing.Cell> class represents a single cell on the scree
 
 `Cell` is not exposed directly to the developer. Instead, the driver classes manage the `Cell` array that represents the screen.
 
-To draw a `Cell` to the screen, use <xref:Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32)> to specify the row and column coordinates and then use the <xref:Terminal.Gui.ViewBase.View.AddRune(System.Int32,System.Int32,System.Text.Rune)> method to draw a single glyph.  
+To draw a `Cell` to the screen, use `Move()` to specify the row and column coordinates and then use the `AddRune()` method to draw a single glyph.  
 
 ## Attribute 
 
-The <xref:Terminal.Gui.Drawing.Attribute> class represents the formatting attributes of a `Cell`. It exposes properties for the foreground and background colors as well as the text style. The foreground and background colors are of type <xref:Terminal.Gui.Drawing.Color>. Bold, underline, and other formatting attributes are supported via the <xref:Terminal.Gui.Drawing.Attribute.Style> property.
+The <xref:Terminal.Gui.Drawing.Attribute> class represents the formatting attributes of a `Cell`. It exposes properties for the foreground and background colors as well as the text style. The foreground and background colors are of type <xref:Terminal.Gui.Drawing.Color>. Bold, underline, and other formatting attributes are supported via the `Attribute.Style` property.
 
-Use <xref:Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute)> to indicate which Attribute subsequent <xref:Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune)> and <xref:Terminal.Gui.ViewBase.View.AddStr(System.String)> calls will use:
+Use `SetAttribute()` to indicate which Attribute subsequent `AddRune()` and `AddStr()` calls will use:
 
 ```cs
 // This is for illustration only. Developers typically use SetAttributeForRole instead.
@@ -108,7 +108,7 @@ SetAttribute (new Attribute (Color.Red, Color.Black, Style.Underline));
 AddStr ("Red on Black Underlined.");
 ```
 
-In the above example a hard-coded Attribute is set. Normally, developers will use <xref:Terminal.Gui.ViewBase.View.SetAttributeForRole(Terminal.Gui.Drawing.VisualRole)> to have the system use the Attributes associated with a `VisualRole` (see below).
+In the above example a hard-coded Attribute is set. Normally, developers will use `SetAttributeForRole()` to have the system use the Attributes associated with a `VisualRole` (see below).
 
 ```cs
 // Modify the View's Scheme such that Focus is Red on Black Underlined
@@ -223,7 +223,7 @@ See [View Deep Dive](View.md) for details.
 
 ## Diagnostics
 
-The <xref:Terminal.Gui.ViewBase.ViewDiagnosticFlags.DrawIndicator> flag can be set on <xref:Terminal.Gui.ViewBase.View.Diagnostics> to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or <xref:Terminal.Gui.ViewBase.View.SubViewNeedsDraw> is set.
+The `ViewDiagnosticFlags.DrawIndicator` flag can be set on `View.Diagnostics` to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either `NeedsDraw` or `SubViewNeedsDraw` is set.
 
 ## Accessing Application Drawing Context
 

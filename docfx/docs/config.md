@@ -166,7 +166,7 @@ Configuration is loaded from multiple locations with increasing precedence (high
    - Useful for container environments and CI/CD pipelines
 
 9. **[ConfigLocations.Runtime](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)** (Highest Precedence)
-   - Settings in <xref:Terminal.Gui.Configuration.ConfigurationManager.RuntimeConfig> string property
+   - Settings in `ConfigurationManager.RuntimeConfig` string property
    - In-memory configuration without files
 
 ### Precedence Diagram
@@ -412,7 +412,7 @@ This:
 
 ### Granular Control
 
-For more control, use ConfigurationManager.Load and <xref:Terminal.Gui.Configuration.ConfigurationManager.Apply> separately:
+For more control, use ConfigurationManager.Load and `ConfigurationManager.Apply()` separately:
 
 ```csharp
 // Enable without loading
@@ -957,7 +957,7 @@ ConfigurationManager.Enable(ConfigLocations.Runtime);
 - **[Drawing Deep Dive](drawing.md)** - Color and attribute system
 - **[View Deep Dive](View.md)** - View configuration properties
 - **[Theme Schema](https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json)** - JSON schema for validation
-- **[Default Config](../../Terminal.Gui/Resources/config.json)** - Complete default configuration
+- **[Default Config](https://raw.githubusercontent.com/gui-cs/Terminal.Gui/v2_develop/Terminal.Gui/Resources/config.json)** - Complete default configuration
 
 ### UICatalog Examples
 

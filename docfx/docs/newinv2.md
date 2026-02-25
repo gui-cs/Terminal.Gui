@@ -275,7 +275,7 @@ v2 provides full 24-bit color support by default:
 
 - **Implementation**: [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml) class handles RGB values
 - **Fallback**: Automatic 16-color mode for older terminals
-- **Driver Support**: <xref:Terminal.Gui.Drivers.IDriver.SupportsTrueColor> detection
+- **Driver Support**: `IDriver.SupportsTrueColor` detection
 - **Usage**: Direct RGB input via [Color](~/api/Terminal.Gui.Drawing.Color.yml) struct
 
 ```csharp
@@ -502,7 +502,7 @@ See the [Arrangement Deep Dive](arrangement.md) for complete details.
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via <xref:Terminal.Gui.App.Application.ArrangeKey>) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via `Application.ArrangeKey`) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -612,8 +612,8 @@ private bool HandleAccept ()
 ```
 
 **Configurable Keys:**
-- <xref:Terminal.Gui.App.Application.QuitKey> - Close app (default: Esc)
-- <xref:Terminal.Gui.App.Application.ArrangeKey> - Arrange mode (default: Ctrl+F5)
+- `Application.QuitKey` - Close app (default: Esc)
+- `Application.ArrangeKey` - Arrange mode (default: Ctrl+F5)
 - Navigation keys (Tab, F6, arrows)
 
 ### Mouse API
@@ -692,7 +692,7 @@ Logging.Debug ("Rendering view {ViewId}", view.Id);
 
 ### Metrics
 
-<xref:Terminal.Gui.App.Logging.Meter> provides performance metrics:
+`Logging.Meter` provides performance metrics:
 
 - Frame rate tracking
 - Redraw times

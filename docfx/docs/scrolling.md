@@ -14,7 +14,7 @@ Terminal.Gui provides a rich system for how [View](View.md) users can scroll con
 
 ## Overview
 
-The ability to scroll content is built into View. The <xref:Terminal.Gui.ViewBase.View.Viewport> represents the scrollable "viewport" into the View's Content Area (which is defined by the return value of <xref:Terminal.Gui.ViewBase.View.GetContentSize> ). 
+The ability to scroll content is built into View. The `Viewport` represents the scrollable "viewport" into the View's Content Area (which is defined by the return value of `GetContentSize()` ). 
 
 By default, [View](~/api/Terminal.Gui.ViewBase.yml), includes no bindings for the typical directional keyboard and mouse input and cause the Content Area.
 
@@ -22,25 +22,25 @@ Terminal.Gui also provides the ability show a visual scroll bar that responds to
 
 Scrolling with the mouse and keyboard are enabled by:
 
-1) Making the <xref:Terminal.Gui.ViewBase.View.Viewport> size smaller than the size returned by <xref:Terminal.Gui.ViewBase.View.GetContentSize>. 
-2) Creating key bindings for the appropriate directional keys, and calling <xref:Terminal.Gui.ViewBase.View.ScrollHorizontal>(System.Int32) / <xref:Terminal.Gui.ViewBase.View.ScrollVertical>(System.Int32) as needed.
-3) Subscribing to <xref:Terminal.Gui.ViewBase.View.MouseEvent> and calling calling <xref:Terminal.Gui.ViewBase.View.ScrollHorizontal>(System.Int32) / <xref:Terminal.Gui.ViewBase.View.ScrollVertical>(System.Int32) as needed.
-4) Enabling the ScrollBars built into View by setting the <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags.HasVerticalScrollBar> or <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags.HasHorizontalScrollBar> flags on the <xref:Terminal.Gui.ViewBase.View.ViewportSettings> property. Alternatively, the <xref:Terminal.Gui.Views.ScrollBar.VisibilityMode> property can be set to control scrollbar visibility manually.
+1) Making the `Viewport` size smaller than the size returned by `GetContentSize()`. 
+2) Creating key bindings for the appropriate directional keys, and calling `ScrollHorizontal()`(System.Int32) / `ScrollVertical()`(System.Int32) as needed.
+3) Subscribing to `MouseEvent` and calling calling `ScrollHorizontal()`(System.Int32) / `ScrollVertical()`(System.Int32) as needed.
+4) Enabling the ScrollBars built into View by setting the `ViewportSettingsFlags.HasVerticalScrollBar` or `ViewportSettingsFlags.HasHorizontalScrollBar` flags on the `ViewportSettings` property. Alternatively, the `ScrollBar.VisibilityMode` property can be set to control scrollbar visibility manually.
 
-While <xref:Terminal.Gui.Views.ScrollBar> can be used in a standalone manner to provide proportional scrolling, it is typically enabled automatically via the <xref:Terminal.Gui.ViewBase.View.HorizontalScrollBar> and <xref:Terminal.Gui.ViewBase.View.VerticalScrollBar> properties.
+While <xref:Terminal.Gui.Views.ScrollBar> can be used in a standalone manner to provide proportional scrolling, it is typically enabled automatically via the `HorizontalScrollBar` and `VerticalScrollBar` properties.
 
 ## ScrollBar Visibility
 
-The <xref:Terminal.Gui.Views.ScrollBar.VisibilityMode> property controls how a ScrollBar manages its <xref:Terminal.Gui.ViewBase.View.Visible> state. The <xref:Terminal.Gui.Views.ScrollBarVisibilityMode> enum provides these options:
+The `ScrollBar.VisibilityMode` property controls how a ScrollBar manages its `Visible` state. The <xref:Terminal.Gui.Views.ScrollBarVisibilityMode> enum provides these options:
 
-* `Manual` (default) - The scrollbar does not manage its own visibility. The developer controls <xref:Terminal.Gui.ViewBase.View.Visible> directly to show or hide the scrollbar.
+* `Manual` (default) - The scrollbar does not manage its own visibility. The developer controls `Visible` directly to show or hide the scrollbar.
 * `Auto` - The scrollbar is automatically shown when the scrollable content size exceeds the visible content size, and hidden otherwise.
 * `Always` - The scrollbar is always visible regardless of content size.
 * `None` - The scrollbar is always hidden regardless of content size or <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>.
 
 ### Enabling Built-in Scrollbars
 
-The recommended way to enable the built-in scrollbars (<xref:Terminal.Gui.ViewBase.View.VerticalScrollBar> and <xref:Terminal.Gui.ViewBase.View.HorizontalScrollBar>) is to use the <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags.HasVerticalScrollBar> and <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags.HasHorizontalScrollBar> flags:
+The recommended way to enable the built-in scrollbars (`VerticalScrollBar` and `HorizontalScrollBar`) is to use the `ViewportSettingsFlags.HasVerticalScrollBar` and `ViewportSettingsFlags.HasHorizontalScrollBar` flags:
 
 ```csharp
 // Enable vertical scrollbar with automatic visibility
@@ -78,7 +78,7 @@ These `UI Catalog` Scenarios illustrate Terminal.Gui scrolling:
 
 ## ViewportSettings
 
-The <xref:Terminal.Gui.ViewBase.View.ViewportSettings> property (of type <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>) controls the behavior of scrolling. 
+The `ViewportSettings` property (of type <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>) controls the behavior of scrolling. 
 
 **Negative Location Flags** - Allow scrolling before the content origin (0,0):
 
@@ -88,8 +88,8 @@ The <xref:Terminal.Gui.ViewBase.View.ViewportSettings> property (of type <xref:T
 
 **Greater Than Content Flags** - Allow scrolling past the last row/column:
 
-* `AllowXGreaterThanContentWidth` - If set, <xref:Terminal.Gui.ViewBase.View.Viewport> `.X` can be set to values greater than or equal to the content width, enabling scrolling beyond the right of the Content Area. When not set, `Viewport.X` is constrained so the last column remains visible.
-* `AllowYGreaterThanContentHeight` - If set, <xref:Terminal.Gui.ViewBase.View.Viewport> `.Y` can be set to values greater than or equal to the content height, enabling scrolling beyond the bottom of the Content Area. When not set, `Viewport.Y` is constrained so the last row remains visible.
+* `AllowXGreaterThanContentWidth` - If set, `Viewport` `.X` can be set to values greater than or equal to the content width, enabling scrolling beyond the right of the Content Area. When not set, `Viewport.X` is constrained so the last column remains visible.
+* `AllowYGreaterThanContentHeight` - If set, `Viewport` `.Y` can be set to values greater than or equal to the content height, enabling scrolling beyond the bottom of the Content Area. When not set, `Viewport.Y` is constrained so the last row remains visible.
 * `AllowLocationGreaterThanContentSize` - Combines both X and Y.
 
 **Blank Space Flags** - Allow blank space to appear when scrolling:
@@ -106,14 +106,14 @@ The <xref:Terminal.Gui.ViewBase.View.ViewportSettings> property (of type <xref:T
 
 **Drawing Flags** - Control clipping and clearing behavior:
 
-* `ClipContentOnly` - By default, clipping is applied to <xref:Terminal.Gui.ViewBase.View.Viewport>. Setting this flag will cause clipping to be applied to the visible content area.
-* `ClearContentOnly` - If set, <xref:Terminal.Gui.ViewBase.View.ClearViewport> will clear only the portion of the content area that is visible within the Viewport. This is useful for views that have a content area larger than the Viewport and want the area outside the content to be visually distinct. `ClipContentOnly` must be set for this to work.
+* `ClipContentOnly` - By default, clipping is applied to `Viewport`. Setting this flag will cause clipping to be applied to the visible content area.
+* `ClearContentOnly` - If set, `ClearViewport()` will clear only the portion of the content area that is visible within the Viewport. This is useful for views that have a content area larger than the Viewport and want the area outside the content to be visually distinct. `ClipContentOnly` must be set for this to work.
 * `Transparent` - The view does not clear its background when drawing.
 * `TransparentMouse` - Mouse events pass through areas not occupied by SubViews.
 
 **ScrollBar Flags** - Enable built-in scrollbars:
 
-* `HasVerticalScrollBar` - If set, the built-in <xref:Terminal.Gui.ViewBase.View.VerticalScrollBar> is enabled with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode.Auto> behavior. Clearing this flag disables the scrollbar.
-* `HasHorizontalScrollBar` - If set, the built-in <xref:Terminal.Gui.ViewBase.View.HorizontalScrollBar> is enabled with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode.Auto> behavior. Clearing this flag disables the scrollbar.
+* `HasVerticalScrollBar` - If set, the built-in `VerticalScrollBar` is enabled with `ScrollBarVisibilityMode.Auto` behavior. Clearing this flag disables the scrollbar.
+* `HasHorizontalScrollBar` - If set, the built-in `HorizontalScrollBar` is enabled with `ScrollBarVisibilityMode.Auto` behavior. Clearing this flag disables the scrollbar.
 * `HasScrollBars` - Combines both vertical and horizontal scrollbar flags.
 

@@ -166,7 +166,7 @@ Lets the user pick a date from a visual calendar.
 
 ## [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
 
-A modal dialog window with buttons across the bottom. When a button is pressed, [Terminal.Gui.App.IRunnable.Result](~/api/Terminal.Gui.App.IRunnable.Result.yml) is set to the button's index.
+A modal dialog window with buttons across the bottom. When a button is pressed, `IRunnable.Result` is set to the button's index.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -214,7 +214,7 @@ The base-class for [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) and [Sa
 
 ## [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml)
 
-Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary. [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) provides a type-safe version where a `[Flags]` enum can be provided.
+Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary. [FlagSelector-1](~/api/Terminal.Gui.Views.FlagSelector-1.yml) provides a type-safe version where a `[Flags]` enum can be provided.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -328,7 +328,7 @@ Provides a hex editor with the left side showing the hex values of the bytes in 
 
 ## [Label](~/api/Terminal.Gui.Views.Label.yml)
 
-Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When the user presses a hotkey that matches the [View.HotKey](~/api/Terminal.Gui.ViewBase.View.HotKey.yml) of the Label, the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml) will be activated.
+Displays text that describes the View next in the `View.SubViews`. When the user presses a hotkey that matches the `View.HotKey` of the Label, the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in `View.SubViews` will be activated.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -371,7 +371,7 @@ Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol defi
 
 ## [Line](~/api/Terminal.Gui.Views.Line.yml)
 
-Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) specified by [Line.Style](~/api/Terminal.Gui.Views.Line.Style.yml).
+Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) specified by `Line.Style`.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -458,7 +458,7 @@ A horizontal list of [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s. E
 
 ## [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)
 
-A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as items in a [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml). MenuBarItems hold a [MenuBarItem.PopoverMenu](~/api/Terminal.Gui.Views.MenuBarItem.PopoverMenu.yml) instead of a [MenuBarItem.SubMenu](~/api/Terminal.Gui.Views.MenuBarItem.SubMenu.yml).
+A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as items in a [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml). MenuBarItems hold a `MenuBarItem.PopoverMenu` instead of a `MenuBarItem.SubMenu`.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -535,7 +535,7 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 
 ## [OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml)
 
-Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time. [OptionSelector%601](~/api/Terminal.Gui.Views.OptionSelector%601.yml) provides a type-safe version where a enum can be provided.
+Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time. [OptionSelector-1](~/api/Terminal.Gui.Views.OptionSelector-1.yml) provides a type-safe version where a enum can be provided.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -630,13 +630,13 @@ Base implementation of [Terminal.Gui.App.IRunnable](~/api/Terminal.Gui.App.IRunn
 
 ## [Runnable\<T\>](~/api/Terminal.Gui.Views.Runnable-1.yml)
 
-Base implementation of [Terminal.Gui.App.IRunnable%601](~/api/Terminal.Gui.App.IRunnable%601.yml) for views that can be run as blocking sessions.
+Base implementation of [Terminal.Gui.App.IRunnable-1](~/api/Terminal.Gui.App.IRunnable-1.yml) for views that can be run as blocking sessions.
 
 
 
-## [RunnableWrapper\<T\>](~/api/Terminal.Gui.Views.RunnableWrapper-2.yml)
+## [RunnableWrapper\<T\>](~/api/Terminal.Gui.Views.Runnable-1.yml)
 
-Wraps any [View](~/api/Terminal.Gui.ViewBase.View.yml) to make it runnable with a typed result, similar to how [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) wraps [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml).
+Wraps any [View](~/api/Terminal.Gui.ViewBase.View.yml) to make it runnable with a typed result, similar to how [FlagSelector-1](~/api/Terminal.Gui.Views.FlagSelector-1.yml) wraps [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml).
 
 
 
@@ -674,7 +674,7 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 
 ## [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml)
 
-Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.View.Viewport.yml).
+Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the `View.Viewport`.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -719,13 +719,13 @@ Represents the proportion of the visible content to the Viewport in a [ScrollBar
 
 ## [SelectorBase](~/api/Terminal.Gui.Views.SelectorBase.yml)
 
-The abstract base class for [OptionSelector%601](~/api/Terminal.Gui.Views.OptionSelector%601.yml) and [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml).
+The abstract base class for [OptionSelector-1](~/api/Terminal.Gui.Views.OptionSelector-1.yml) and [FlagSelector-1](~/api/Terminal.Gui.Views.FlagSelector-1.yml).
 
 
 
 ## [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)
 
-Displays a command, help text, and a key binding. When the key specified by [Shortcut.Key](~/api/Terminal.Gui.Views.Shortcut.Key.yml) is pressed, the command will be invoked. Useful for displaying a command in [Bar](~/api/Terminal.Gui.Views.Bar.yml) such as a menu, toolbar, or status bar.
+Displays a command, help text, and a key binding. When the key specified by `Shortcut.Key` is pressed, the command will be invoked. Useful for displaying a command in [Bar](~/api/Terminal.Gui.Views.Bar.yml) such as a menu, toolbar, or status bar.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -921,7 +921,7 @@ Provides time editing functionality with specialized cursor behavior for time en
 
 ## [TreeView](~/api/Terminal.Gui.Views.TreeView.yml)
 
-Convenience implementation of generic [TreeView%601](~/api/Terminal.Gui.Views.TreeView%601.yml) for any tree were all nodes implement [ITreeNode](~/api/Terminal.Gui.Views.ITreeNode.yml). See TreeView Deep Dive for more information.
+Convenience implementation of generic [TreeView-1](~/api/Terminal.Gui.Views.TreeView-1.yml) for any tree were all nodes implement [ITreeNode](~/api/Terminal.Gui.Views.ITreeNode.yml). See TreeView Deep Dive for more information.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -951,7 +951,7 @@ Convenience implementation of generic [TreeView%601](~/api/Terminal.Gui.Views.Tr
 
 ## [TreeView\<T\>](~/api/Terminal.Gui.Views.TreeView-1.yml)
 
-Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined [ITreeBuilder%601](~/api/Terminal.Gui.Views.ITreeBuilder%601.yml). See TreeView Deep Dive for more information.
+Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined [ITreeBuilder-1](~/api/Terminal.Gui.Views.ITreeBuilder-1.yml). See TreeView Deep Dive for more information.
 
 
 
