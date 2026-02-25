@@ -36,7 +36,7 @@ public partial class View // Mouse APIs
     /// <param name="eventArgs"></param>
     /// <returns>
     ///     <see langword="true"/> if the event was canceled, <see langword="false"/> if not, <see langword="null"/> if the
-    ///     view is not visible. Cancelling the event
+    ///     view is not visible or not enabled. Cancelling the event
     ///     prevents Views higher in the visible hierarchy from receiving Enter/Leave events.
     /// </returns>
     internal bool? NewMouseEnterEvent (CancelEventArgs eventArgs)
