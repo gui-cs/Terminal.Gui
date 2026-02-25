@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
 ///     <see cref="MenuItem"/>.
 /// </summary>
-public class Menu : Bar
+public class Menu : Bar, IDesignable
 {
     /// <summary>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
@@ -300,6 +300,52 @@ public class Menu : Bar
     }
 
     #endregion ShowMenu / HideMenu
+
+    /// <inheritdoc/>
+    public override bool EnableForDesign ()
+    {
+        // Note: This menu is used by unit tests and the Menus scenario.
+        // If you modify it, you'll likely have to update unit tests.
+
+        Id = "enableForDesignMenu";
+
+        MenuItem formatItem = new ()
+        {
+            Title = "_Format",
+            Text = "Text formatting options",
+            SubMenu = new Menu ([
+                                    new MenuItem { Title = "_Bold", Text = "Bold text", Key = Key.B.WithCtrl },
+                                    new MenuItem { Title = "_Italic", Text = "Italic text", Key = Key.I.WithAlt },
+                                    new MenuItem { Title = "_Underline", Text = "Underline text", Key = Key.U.WithCtrl }
+                                ])
+        };
+
+        MenuItem viewItem = new ()
+        {
+            Title = "_View",
+            Text = "View options",
+            SubMenu = new Menu ([
+                                    new MenuItem { Title = "_Zoom In", Text = "Zoom in", Key = Key.D0.WithCtrl },
+                                    new MenuItem { Title = "Zoom _Out", Text = "Zoom out", Key = Key.D9.WithCtrl },
+                                    new Line (),
+                                    new MenuItem
+                                    {
+                                        Title = "_Layout",
+                                        Text = "Layout options",
+                                        SubMenu = new Menu ([
+                                                                new MenuItem { Title = "_Horizontal", Text = "Horizontal layout" },
+                                                                new MenuItem { Title = "_Vertical", Text = "Vertical layout" }
+                                                            ])
+                                    }
+                                ])
+        };
+
+        MenuItem aboutItem = new () { Title = "_About", Text = "About this demo" };
+
+        Add (formatItem, viewItem, new Line (), aboutItem);
+
+        return true;
+    }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

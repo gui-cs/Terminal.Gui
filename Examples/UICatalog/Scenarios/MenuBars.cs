@@ -1,11 +1,6 @@
 #nullable enable
 
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace UICatalog.Scenarios;
 
@@ -197,14 +192,14 @@ public class MenuBars : Scenario
             editModeStatusCb.ValueChanged += (_, _) => { editModeMenuItemCb?.Value = editModeStatusCb.Value; };
 
             MenuBar?.Accepted += (_, args) =>
-                                {
-                                    if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi)
-                                    {
-                                        return;
-                                    }
+                                 {
+                                     if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi)
+                                     {
+                                         return;
+                                     }
 
-                                    lastAcceptedText.Text = sourceView.Title!;
-                                };
+                                     lastAcceptedText.Text = sourceView.Title!;
+                                 };
 
             AddCommand (Command.Edit,
                         ctx =>
@@ -245,17 +240,13 @@ public class MenuBars : Scenario
             BottomMenuBar = new MenuBar { Title = "Bottom MenuBar", Y = Pos.AnchorEnd () };
 
             MenuItem statusItem = new () { Title = "_Status", Text = "Show status info" };
-            statusItem.Activated += (_, _) => MessageBox.Query (App!, "Status", "All systems operational.", buttons: Strings.btnOk);
+            statusItem.Activated += (_, _) => MessageBox.Query (App!, "Status", "All systems operational.", Strings.btnOk);
 
             MenuItem toolsSettingsItem = new () { Title = "Se_ttings...", Text = "Tool settings" };
-            toolsSettingsItem.Activated += (_, _) => MessageBox.Query (App!, "Settings", "This would be a settings dialog.", buttons: Strings.btnOk);
+            toolsSettingsItem.Activated += (_, _) => MessageBox.Query (App!, "Settings", "This would be a settings dialog.", Strings.btnOk);
 
             BottomMenuBar.Add (new MenuBarItem ("_Status",
-                                                [
-                                                    statusItem,
-                                                    new Line (),
-                                                    new MenuItem { Title = "_Refresh", Text = "Refresh status", Key = Key.R.WithCtrl }
-                                                ]));
+                                                [statusItem, new Line (), new MenuItem { Title = "_Refresh", Text = "Refresh status", Key = Key.R.WithCtrl }]));
 
             BottomMenuBar.Add (new MenuBarItem ("_Tools",
                                                 [

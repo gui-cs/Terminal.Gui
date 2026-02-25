@@ -166,6 +166,10 @@ Key features:
 - Uses `Schemes.Menu` color scheme by default
 - Sets `CommandsToBubbleUp = [Command.Accept, Command.Activate]` — enables command propagation up through the PopoverMenu hierarchy
 - Overrides `OnActivating` to dispatch `Activate` to the focused `MenuItem` (manual dispatch, not the `GetDispatchTarget` pattern)
+- `ShowMenu()` / `HideMenu()` control visibility and handle initialization; `HideMenu` cascades to visible SubMenus
+- `GetAllSubMenus()` performs depth-first traversal of the SubMenu hierarchy
+- `GetMenuItemsOfAllSubMenus()` collects all `MenuItem`s across the hierarchy, with optional predicate
+- `OnSelectedMenuItemChanged()` handles SubMenu display: hides peer SubMenus, shows the selected item's SubMenu, and performs basic positioning
 
 ### MenuBarItem
 
@@ -255,7 +259,7 @@ Key features:
 - `MouseFlags` property defines mouse button to show menu (default: right-click)
 - **Must be registered** with `Application.Popover` before calling `MakeVisible`
 - Auto-positions to ensure visibility on screen
-- Cascading submenus shown automatically on selection
+- SubMenu show/hide is handled by `Menu.OnSelectedMenuItemChanged()`; PopoverMenu's subscriber only adjusts positioning for screen boundaries via `GetMostVisibleLocationForSubMenu()`
 - Registers custom command handlers for `Command.Right` (enter submenu), `Command.Left` (leave submenu), and `Command.Quit` (close menu)
 
 **Important:** See the [Popovers Deep Dive](Popovers.md) for complete details on popover lifecycle and requirements.
@@ -308,7 +312,8 @@ Key features:
 
 3. **PopoverMenu contains Root Menu:**
    - `PopoverMenu.Root` is the top-level `Menu`
-   - The `PopoverMenu` manages showing/hiding of cascading menus
+   - `Menu` self-manages SubMenu show/hide and basic positioning via `OnSelectedMenuItemChanged()`
+   - `PopoverMenu` adjusts positioning for screen boundaries and manages its own visibility lifecycle
 
 4. **Menu contains MenuItems:**
    - `Menu.SubViews` contains `MenuItem` instances
@@ -414,9 +419,9 @@ The `_isSwitchingItem` guard prevents premature deactivation during the brief in
 
 1. User navigates with arrow keys or mouse
 2. `Menu.Focused` changes to new `MenuItem`
-3. `Menu.SelectedMenuItemChanged` event fires
-4. If new item has `SubMenu`, `PopoverMenu.ShowSubMenu()` is called
-5. Previous peer submenus are hidden
+3. `Menu.OnSelectedMenuItemChanged()` runs: hides peer SubMenus, shows selected item's SubMenu with basic positioning
+4. `Menu.SelectedMenuItemChanged` event fires
+5. When inside a `PopoverMenu`, the subscriber adjusts SubMenu positioning for screen boundaries
 
 ### MenuItem Acceptance Flow
 
@@ -625,9 +630,13 @@ User navigates → Menu.Focused changes
                         ↓
               SelectedMenuItem updated
                         ↓
+              Menu.OnSelectedMenuItemChanged ()
+                ├─ Hides peer SubMenus
+                ├─ Shows selected SubMenu (with basic positioning)
+                        ↓
               SelectedMenuItemChanged event
                         ↓
-              PopoverMenu shows/hides submenus
+              PopoverMenu adjusts SubMenu positioning (screen boundaries)
 ```
 
 ### Key Event Processing

@@ -1,11 +1,5 @@
 #nullable enable
 
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Menus", "Illustrates Menu and MenuItem")]
@@ -81,10 +75,10 @@ public class Menus : Scenario
             BorderStyle = LineStyle.Dashed;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void OnAccepted (ICommandContext? ctx) => base.OnAccepted (ctx);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
 
         /// <inheritdoc/>
@@ -119,9 +113,17 @@ public class Menus : Scenario
             Label subMenuLabel = new () { Title = "MenuItem with SubMenu:", X = 1, Y = Pos.Bottom (testMenu) + 1 };
             Add (subMenuLabel);
 
-            Menu subMenuDemo = new () { Y = Pos.Bottom (subMenuLabel), Id = "SubMenuDemo" };
-            ConfigureSubMenuDemo (subMenuDemo);
+            Menu subMenuDemo = new () { Y = Pos.Bottom (subMenuLabel) };
+            subMenuDemo.EnableForDesign ();
             Add (subMenuDemo);
+
+            // Wire up scenario-specific behavior for the About item
+            MenuItem? aboutItem = subMenuDemo.GetMenuItemsOfAllSubMenus (mi => mi.Title == "_About").FirstOrDefault ();
+
+            if (aboutItem is { })
+            {
+                aboutItem.Activated += (_, _) => MessageBox.Query (App!, "SubMenu Demo", "Demonstrates MenuItem.SubMenu for nested menus.", Strings.btnOk);
+            }
         }
 
         private void ConfigureTestMenu (Menu menu)
@@ -150,54 +152,14 @@ public class Menus : Scenario
             MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
 
             schemeOptionSelector.ValueChanged += (_, args) =>
-                                                  {
-                                                      if (args.Value is { } scheme)
-                                                      {
-                                                          menu.SchemeName = scheme.ToString ();
-                                                      }
-                                                  };
+                                                 {
+                                                     if (args.Value is { } scheme)
+                                                     {
+                                                         menu.SchemeName = scheme.ToString ();
+                                                     }
+                                                 };
 
             menu.Add (menuItem1, line, menuItemBorders, menuItemScheme);
-        }
-
-        private void ConfigureSubMenuDemo (Menu menu)
-        {
-            // Demonstrate MenuItem.SubMenu to create nested menu hierarchies
-            MenuItem formatItem = new ()
-            {
-                Title = "_Format",
-                Text = "Text formatting options",
-                SubMenu = new Menu ([
-                                        new MenuItem { Title = "_Bold", Text = "Bold text", Key = Key.B.WithCtrl },
-                                        new MenuItem { Title = "_Italic", Text = "Italic text", Key = Key.I.WithAlt },
-                                        new MenuItem { Title = "_Underline", Text = "Underline text", Key = Key.U.WithCtrl }
-                                    ])
-            };
-
-            MenuItem viewItem = new ()
-            {
-                Title = "_View",
-                Text = "View options",
-                SubMenu = new Menu ([
-                                        new MenuItem { Title = "_Zoom In", Text = "Zoom in", Key = Key.D0.WithCtrl },
-                                        new MenuItem { Title = "Zoom _Out", Text = "Zoom out", Key = Key.D9.WithCtrl },
-                                        new Line (),
-                                        new MenuItem
-                                        {
-                                            Title = "_Layout",
-                                            Text = "Layout options",
-                                            SubMenu = new Menu ([
-                                                                    new MenuItem { Title = "_Horizontal", Text = "Horizontal layout" },
-                                                                    new MenuItem { Title = "_Vertical", Text = "Vertical layout" }
-                                                                ])
-                                        }
-                                    ])
-            };
-
-            MenuItem simpleItem = new () { Title = "_About", Text = "About this demo" };
-            simpleItem.Activated += (_, _) => MessageBox.Query (App!, "SubMenu Demo", "Demonstrates MenuItem.SubMenu for nested menus.", Strings.btnOk);
-
-            menu.Add (formatItem, viewItem, new Line (), simpleItem);
         }
     }
 }
