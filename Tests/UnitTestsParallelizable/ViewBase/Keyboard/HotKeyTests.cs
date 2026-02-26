@@ -60,11 +60,13 @@ public class HotKeyTests
 
     // Claude - Opus 4.5
     [Fact]
-    public void AddKeyBindingsForHotKey_Rejects_Space ()
+    public void AddKeyBindingsForHotKey_Accepts_Space ()
     {
         View view = new () { HotKey = KeyCode.Z };
 
-        Assert.Throws<ArgumentException> (() => view.AddKeyBindingsForHotKey (view.HotKey, Key.Space));
+        view.AddKeyBindingsForHotKey (view.HotKey, Key.Space);
+        view.HotKeyBindings.TryGet (Key.Space, out KeyBinding binding);
+        Assert.Contains (Command.HotKey, binding.Commands);
     }
 
     [Fact]
@@ -313,7 +315,6 @@ public class HotKeyTests
     [InlineData (KeyCode.Tab)]
     [InlineData (KeyCode.Enter)]
     [InlineData (KeyCode.Esc)]
-    [InlineData (KeyCode.Space)]
     [InlineData (KeyCode.CursorLeft)]
     [InlineData (KeyCode.F1)]
     [InlineData (KeyCode.Null | KeyCode.ShiftMask)]
