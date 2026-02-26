@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -27,6 +28,8 @@ internal partial class ApplicationImpl
         }
 
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
+
+        Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"driverName: {driverName}");
 
         // Thread-safe fence check: Ensure we're not mixing application models
         // Use lock to make check-and-set atomic
@@ -233,6 +236,8 @@ internal partial class ApplicationImpl
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
 
+        Trace.Lifecycle (MainThreadId?.ToString (), "Shutdown");
+
         // === 0. Stop all timers ===
         TimedEvents.StopAll ();
 
@@ -246,7 +251,7 @@ internal partial class ApplicationImpl
         }
 
         // === 2. Close and dispose popover ===
-        if (Popover?.GetActivePopover () is View popover)
+        if (Popovers?.GetActivePopover () is View popover)
         {
             // This forcefully closes the popover; invoking Command.Quit would be more graceful
             // but since this is shutdown, doing this is ok.
@@ -254,8 +259,8 @@ internal partial class ApplicationImpl
         }
 
         // Any popovers added to Popover have their lifetime controlled by Popover
-        Popover?.Dispose ();
-        Popover = null;
+        Popovers?.Dispose ();
+        Popovers = null;
 
         // === 3. Clean up runnables ===
         SessionStack?.Clear ();

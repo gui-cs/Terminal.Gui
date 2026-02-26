@@ -117,27 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ctxSelectAll" xml:space="preserve">
-    <value>全て選択 (_S)</value>
-  </data>
-  <data name="ctxDeleteAll" xml:space="preserve">
-    <value>全て削除 (_D)</value>
-  </data>
-  <data name="ctxCopy" xml:space="preserve">
-    <value>コピー (_C)</value>
-  </data>
-  <data name="ctxCut" xml:space="preserve">
-    <value>切り取り (_T)</value>
-  </data>
-  <data name="ctxPaste" xml:space="preserve">
-    <value>貼り付け (_P)</value>
-  </data>
-  <data name="ctxUndo" xml:space="preserve">
-    <value>元に戻す (_U)</value>
-  </data>
-  <data name="ctxRedo" xml:space="preserve">
-    <value>やり直し (_R)</value>
-  </data>
   <data name="fdDirectory" xml:space="preserve">
     <value>ディレクトリ</value>
   </data>
@@ -273,9 +252,6 @@
   <data name="dpTitle" xml:space="preserve">
     <value>日付ピッカー</value>
   </data>
-  <data name="ctxColors" xml:space="preserve">
-    <value>絵の具 (_L)</value>
-  </data>
   <data name="cmdOpen" xml:space="preserve">
     <value>開く (_O)</value>
   </data>
@@ -292,7 +268,7 @@
     <value>コピー (_C)</value>
   </data>
   <data name="cmdPaste" xml:space="preserve">
-    <value />
+    <value>貼り付け (_P)</value>
   </data>
   <data name="cmdSelectAll" xml:space="preserve">
     <value>全て選択 (_S)</value>
@@ -300,37 +276,64 @@
   <data name="cmdNew" xml:space="preserve">
     <value>新規 (_N)</value>
   </data>
-  <data name="cmdOpen.Help" xml:space="preserve">
-    <value />
+  <data name="cmdOpen_Help" xml:space="preserve">
+    <value>ファイルを開く</value>
   </data>
-  <data name="cmdQuitHelp" xml:space="preserve">
-    <value />
+  <data name="cmdQuit_Help" xml:space="preserve">
+    <value>アプリケーションを終了</value>
   </data>
-  <data name="cmdSaveHelp" xml:space="preserve">
-    <value />
+  <data name="cmdSaveAs_Help" xml:space="preserve">
+    <value>名前を付けて保存</value>
   </data>
-  <data name="cmdSaveAsHelp" xml:space="preserve">
-    <value />
+  <data name="cmdCut_Help" xml:space="preserve">
+    <value>クリップボードに切り取り</value>
   </data>
-  <data name="cmdCut.Help" xml:space="preserve">
-    <value />
+  <data name="cmdCopy_Help" xml:space="preserve">
+    <value>クリップボードにコピー</value>
   </data>
-  <data name="cmdCopyHelp" xml:space="preserve">
-    <value />
+  <data name="cmdSelectAll_Help" xml:space="preserve">
+    <value>すべて選択</value>
   </data>
-  <data name="cmdSelectAllHelp" xml:space="preserve">
-    <value />
-  </data>
-  <data name="cmdNewHelp" xml:space="preserve">
-    <value />
+  <data name="cmdNew_Help" xml:space="preserve">
+    <value>新規</value>
   </data>
   <data name="fdSearchCaption" xml:space="preserve">
     <value>検索を入力</value>
   </data>
-  <data name="cmdPasteHelp" xml:space="preserve">
-    <value />
+  <data name="cmdPaste_Help" xml:space="preserve">
+    <value>クリップボードから貼り付け</value>
   </data>
   <data name="cmdQuit" xml:space="preserve">
-    <value />
+    <value>終了 (_X)</value>
+  </data>
+  <data name="cmdUndo" xml:space="preserve">
+    <value>元に戻す (_U)</value>
+  </data>
+  <data name="cmdUndo_Help" xml:space="preserve">
+    <value>元に戻す</value>
+  </data>
+  <data name="cmdRedo" xml:space="preserve">
+    <value>やり直し (_R)</value>
+  </data>
+  <data name="cmdRedo_Help" xml:space="preserve">
+    <value>やり直し</value>
+  </data>
+  <data name="cmdDeleteAll" xml:space="preserve">
+    <value>全て削除 (_D)</value>
+  </data>
+  <data name="cmdDeleteAll_Help" xml:space="preserve">
+    <value>すべて削除</value>
+  </data>
+  <data name="cmdEdit" xml:space="preserve">
+    <value>編集 (_E)</value>
+  </data>
+  <data name="cmdEdit_Help" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="cmdClose_Help" xml:space="preserve">
+    <value>閉じる</value>
+  </data>
+  <data name="cmdSave_Help" xml:space="preserve">
+    <value>ファイルを保存</value>
   </data>
 </root>

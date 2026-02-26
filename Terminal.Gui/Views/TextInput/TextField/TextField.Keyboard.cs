@@ -2,13 +2,11 @@ namespace Terminal.Gui.Views;
 
 public partial class TextField
 {
-
     /// <summary>
     ///     Provides autocomplete context menu based on suggestions at the current cursor position. Configure
     ///     <see cref="ISuggestionGenerator"/> to enable this feature.
     /// </summary>
     public IAutocomplete Autocomplete { get; set; }
-
 
     private void ProcessAutocomplete ()
     {
@@ -32,13 +30,22 @@ public partial class TextField
         List<Cell> currentLine = Cell.ToCellList (Text);
         int cursorPosition = Math.Min (InsertionPoint, currentLine.Count);
 
-        Autocomplete.Context = new (
-                                    currentLine,
-                                    cursorPosition,
-                                    Autocomplete.Context?.Canceled ?? false
-                                   );
+        Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context?.Canceled ?? false);
 
         Autocomplete.GenerateSuggestions (Autocomplete.Context);
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        // If we already have focus, cancel the hotkey so the key passes through
+        // to OnKeyDownNotHandled for text input (e.g. the 'E' in "_Enter Path").
+        return HasFocus;
     }
 
     /// <inheritdoc/>
@@ -84,16 +91,16 @@ public partial class TextField
 
         if (SuperView is { })
         {
-            if (Autocomplete.HostControl is null)
+            if (Autocomplete.HostControl is { })
             {
-                Autocomplete.HostControl = this;
-                Autocomplete.PopupInsideContainer = false;
+                return;
             }
+            Autocomplete.HostControl = this;
+            Autocomplete.PopupInsideContainer = false;
         }
         else
         {
             Autocomplete.HostControl = null;
         }
     }
-
 }

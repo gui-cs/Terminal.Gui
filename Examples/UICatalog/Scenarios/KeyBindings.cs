@@ -172,8 +172,8 @@ public class KeyBindingsDemo : View
 
         Initialized += (_, _) =>
                        {
-                           App?.Keyboard.KeyBindings.Add (Key.F4, this, Command.New);
-                           App?.Keyboard.KeyBindings.Add (Key.Q.WithAlt, this, Command.Quit);
+                           App?.Keyboard.KeyBindings.AddApp (Key.F4, this, Command.New);
+                           App?.Keyboard.KeyBindings.AddApp (Key.Q.WithAlt, this, Command.Quit);
                        };
 
         AddCommand (Command.Quit,

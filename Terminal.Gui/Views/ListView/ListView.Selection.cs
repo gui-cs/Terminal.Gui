@@ -333,6 +333,9 @@ public partial class ListView
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
 
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     #endregion
 
     /// <summary>This is a convenience property that is an alias for <see cref="Value"/>. Get or set the index of the currently selected item.</summary>
@@ -391,6 +394,7 @@ public partial class ListView
             ValueChangedEventArgs<int?> changedArgs = new (oldValue, field);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, field));
         }
     }
 }

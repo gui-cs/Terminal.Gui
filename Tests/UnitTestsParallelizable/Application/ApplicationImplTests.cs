@@ -475,7 +475,7 @@ public class ApplicationImplTests
         // After Init, Driver, Navigation, and Popover should be populated
         Assert.NotNull (v2.Driver);
         Assert.True (v2.Initialized);
-        Assert.NotNull (v2.Popover);
+        Assert.NotNull (v2.Popovers);
         Assert.NotNull (v2.Navigation);
         Assert.Null (v2.TopRunnableView); // Top is still null until Run
 

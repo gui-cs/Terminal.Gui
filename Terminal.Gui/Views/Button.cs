@@ -1,15 +1,10 @@
-﻿#nullable disable
-namespace Terminal.Gui.Views;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A button View that can be pressed with the mouse or keyboard.
+///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses <see cref="View.HotKey"/>,
+///         <c>Enter</c>, or <c>Space</c> or clicks with the mouse.
 /// </summary>
 /// <remarks>
-///     <para>
-///         The Button will raise the <see cref="View.Accepting"/> event when the user presses <see cref="View.HotKey"/>,
-///         <c>Enter</c>, or <c>Space</c>
-///         or clicks on the button with the mouse.
-///     </para>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         Button can act as the default <see cref="Command.Accept"/> handler for all peer-Views. See
@@ -17,46 +12,36 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         Set <see cref="View.MouseHoldRepeat"/> to <see langword="true"/> to have the
-///         <see cref="View.Accepting"/> event
-///         invoked repeatedly while the button is pressed.
+///         <see cref="View.Accepting"/> event invoked repeatedly while the button is pressed.
+///     </para>
+///     <para>
+///         Button does not raise <see cref="View.Activating"/> events.
 ///     </para>
 /// </remarks>
-public class Button : View, IDesignable
+public class Button : View, IDesignable, IAcceptTarget
 {
-    private static ShadowStyle _defaultShadow = ShadowStyle.Opaque; // Resources/config.json overrides
-    private static MouseState _defaultMouseHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides
-
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
     private readonly Rune _rightDefault;
-    private bool _isDefault;
 
     /// <summary>
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow
-    {
-        get => _defaultShadow;
-        set => _defaultShadow = value;
-    }
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Opaque;
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultMouseHighlightStates
-    {
-        get => _defaultMouseHighlightStates;
-        set => _defaultMouseHighlightStates = value;
-    }
+    public static MouseState DefaultMouseHighlightStates { get; set; } = MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
     {
-        base.TextAlignment = Alignment.Center;
-        base.VerticalTextAlignment = Alignment.Center;
+        TextAlignment = Alignment.Center;
+        VerticalTextAlignment = Alignment.Center;
 
         _leftBracket = Glyphs.LeftBracket;
         _rightBracket = Glyphs.RightBracket;
@@ -68,10 +53,8 @@ public class Button : View, IDesignable
 
         CanFocus = true;
 
-        AddCommand (Command.HotKey, HandleHotKeyCommand);
-
-        KeyBindings.ReplaceCommands (Key.Space, Command.HotKey);
-        KeyBindings.ReplaceCommands (Key.Enter, Command.HotKey);
+        KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
+        KeyBindings.ReplaceCommands (Key.Enter, Command.Accept);
 
         // Replace default Accept binding with HotKey for mouse clicks
         // These are managed dynamically when MouseHoldRepeat changes
@@ -84,10 +67,7 @@ public class Button : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<MouseFlags?> args)
-    {
-        SetMouseBindings (args.NewValue);
-    }
+    protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<MouseFlags?> args) => SetMouseBindings (args.NewValue);
 
     private void SetMouseBindings (MouseFlags? mouseHoldRepeat)
     {
@@ -101,7 +81,7 @@ public class Button : View, IDesignable
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
             // Add configured mouse event→HotKey binding
-            MouseBindings.Add (mouseHoldRepeat.Value, Command.HotKey);
+            MouseBindings.Add (mouseHoldRepeat.Value, Command.Accept);
         }
         else
         {
@@ -110,95 +90,42 @@ public class Button : View, IDesignable
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
             // Add Clicked→HotKey bindings (default behavior)
-            MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-            MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.HotKey);
-            MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
+            MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+            MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.Accept);
         }
     }
 
-    private bool? HandleHotKeyCommand (ICommandContext commandContext)
+    /// <inheritdoc />
+    protected override void OnHotKeyCommand (ICommandContext? commandContext)
     {
-        bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
-
-        bool? handled = RaiseActivating (commandContext);
-
-        if (handled == true)
-        {
-            return true;
-        }
-        SetFocus ();
-
-        handled = RaiseAccepting (commandContext);
-
-        if (handled == true)
-        {
-            return true;
-        }
-
-        // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
-        // TODO: no use-case has been identified for any View other than Button to act like this.
-        // If Accept was not handled...
-        if (cachedIsDefault && SuperView is { })
-        {
-            return SuperView.InvokeCommand (Command.Accept);
-        }
-
-        return false;
+        InvokeCommand (Command.Accept);
     }
 
-    private void Button_TitleChanged (object sender, EventArgs<string> e)
+    private void Button_TitleChanged (object? sender, EventArgs<string> e)
     {
         base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
     /// <inheritdoc/>
-    public override string Text
-    {
-        get => Title;
-        set => base.Text = Title = value;
-    }
+    public override string Text { get => Title; set => base.Text = Title = value; }
 
     /// <inheritdoc/>
-    public override Rune HotKeySpecifier
-    {
-        get => base.HotKeySpecifier;
-        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
-    }
+    public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
-    /// <summary>
-    ///     Gets or sets whether the <see cref="Button"/> will act as the default handler for <see cref="Command.Accept"/>
-    ///     commands on the <see cref="View.SuperView"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         If <see langword="true"/>:
-    ///     </para>
-    ///     <para>
-    ///         - The Button will display an indicator that it is the default Button.
-    ///     </para>
-    ///     <para>
-    ///         - When clicked, if the Accepting event is not handled, <see cref="Command.Accept"/> will be
-    ///         invoked on the SuperView.
-    ///     </para>
-    ///     <para>
-    ///         - If a peer-View receives <see cref="Command.Accept"/> and does not handle it, the command will be passed to
-    ///         the
-    ///         first Button in the SuperView that has <see cref="IsDefault"/> set to <see langword="true"/>. See
-    ///         <see cref="View.RaiseAccepting"/> for more information.
-    ///     </para>
-    /// </remarks>
+    /// <inheritdoc />
     public bool IsDefault
     {
-        get => _isDefault;
+        get;
         set
         {
-            if (_isDefault == value)
+            if (field == value)
             {
                 return;
             }
 
-            _isDefault = value;
+            field = value;
 
             UpdateTextFormatterText ();
             SetNeedsLayout ();
