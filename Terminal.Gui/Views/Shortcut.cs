@@ -179,27 +179,27 @@ public class Shortcut : View, IOrientation, IDesignable
         // Frame.Width is smaller than the natural width. Reduce width of HelpView.
         _maxHelpWidth = int.Max (0, GetContentSize ().Width - CommandView.Frame.Width - KeyView.Frame.Width);
 
+        Thickness t = new (ElementSpacing, 0, ElementSpacing, 0);
+
         if (_maxHelpWidth < 3)
         {
-            Thickness t = GetMarginThickness ();
-
             HelpView.Margin!.Thickness = _maxHelpWidth switch
-                                         {
-                                             0 or 1 =>
+            {
+                0 or 1 =>
 
-                                                 // Scrunch it by removing both margins
-                                                 new Thickness (t.Right - 1, t.Top, t.Left - 1, t.Bottom),
-                                             2 =>
+                    // Scrunch it by removing both margins
+                    new Thickness (t.Right - 1, t.Top, t.Left - 1, t.Bottom),
+                2 =>
 
-                                                 // Scrunch just the right margin
-                                                 new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom),
-                                             _ => HelpView.Margin!.Thickness
-                                         };
+                    // Scrunch just the right margin
+                    new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom),
+                _ => HelpView.Margin!.Thickness
+            };
         }
         else
         {
             // Reset to default
-            HelpView.Margin!.Thickness = GetMarginThickness ();
+            HelpView.Margin!.Thickness = t;
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
             HelpView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
@@ -272,9 +272,21 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         // Get the natural size of each subview
         Size screenSize = App?.Screen.Size ?? new Size (2048, 2048);
-        CommandView.SetRelativeLayout (screenSize);
-        HelpView.SetRelativeLayout (screenSize);
-        KeyView.SetRelativeLayout (screenSize);
+
+        if (CommandView.SuperView is { })
+        {
+            CommandView.SetRelativeLayout (screenSize);
+        }
+
+        if (HelpView.SuperView is { })
+        {
+            HelpView.SetRelativeLayout (screenSize);
+        }
+
+        if (KeyView.SuperView is { })
+        {
+            KeyView.SetRelativeLayout (screenSize);
+        }
 
         _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, SubViews, Dimension.Width);
 
@@ -282,8 +294,25 @@ public class Shortcut : View, IOrientation, IDesignable
         SetRelativeLayout (SuperView?.GetContentSize () ?? screenSize);
     }
 
-    // TODO: Enable setting of the margin thickness
-    private static Thickness GetMarginThickness () => new (1, 0, 1, 0);
+    /// <summary>
+    ///     Get or sets the spacing between the CommandView, HelpView, and KeyView. The default is 1.
+    /// </summary>
+    public int ElementSpacing
+    {
+        get => field;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            SetCommandViewDefaultLayout ();
+            SetHelpViewDefaultLayout ();
+            SetKeyViewDefaultLayout ();
+        }
+    } = 1;
 
     #region Accept/Activate/HotKey Command Handling
 
@@ -515,7 +544,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (CommandView.Margin is { })
         {
-            CommandView.Margin!.Thickness = GetMarginThickness ();
+            CommandView.Margin!.Thickness = new Thickness (ElementSpacing, 0, ElementSpacing, 0);
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
             CommandView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
@@ -661,13 +690,13 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <summary>
     ///     The subview that displays the help text for the command. Internal for unit testing.
     /// </summary>
-    public View HelpView { get; } = new () { /*ViewportSettings = ViewportSettingsFlags.TransparentMouse*/ };
+    public View HelpView { get; } = new ();
 
     private void SetHelpViewDefaultLayout ()
     {
         if (HelpView.Margin is { })
         {
-            HelpView.Margin!.Thickness = GetMarginThickness ();
+            HelpView.Margin!.Thickness = new Thickness (ElementSpacing, 0, ElementSpacing, 0);
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
             HelpView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
@@ -767,7 +796,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public View KeyView { get; } = new () { /*ViewportSettings = ViewportSettingsFlags.TransparentMouse*/ };
+    public View KeyView { get; } = new ();
 
     /// <summary>
     ///     Gets or sets the minimum size of the key text. Useful for aligning the key text with other <see cref="Shortcut"/>s.
@@ -791,7 +820,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (KeyView.Margin is { })
         {
-            KeyView.Margin!.Thickness = GetMarginThickness ();
+            KeyView.Margin!.Thickness = new Thickness (ElementSpacing, 0, ElementSpacing, 0);
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
             KeyView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
