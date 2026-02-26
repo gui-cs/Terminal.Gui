@@ -8,7 +8,7 @@ When running in a terminal, input arrives as a stream of characters. Beyond regu
 
 The ANSI handling subsystem has two main responsibilities:
 
-1. **Parsing** - Converting escape sequences from the terminal into Terminal.Gui events (`Key`, `Mouse`)
+1. **Parsing** - Converting escape sequences from the terminal into Terminal.Gui events (<xref:Terminal.Gui.Input.Key>, <xref:Terminal.Gui.Input.Mouse>)
 2. **Encoding** - Converting Terminal.Gui events back into escape sequences (primarily for testing)
 
 ## Architecture
@@ -91,7 +91,7 @@ Abstracts the storage of accumulated characters:
 
 ### AnsiKeyboardParser
 
-Matches input against registered patterns and converts to `Key` objects.
+Matches input against registered patterns and converts to <xref:Terminal.Gui.Input.Key> objects.
 
 **Pattern Priority:**
 1. `Ss3Pattern` - SS3 sequences (e.g., `ESC O P` → F1)
@@ -273,7 +273,7 @@ The scheduler tracks outstanding requests by `(Terminator, Value)` tuple:
 
 ### AnsiKeyboardEncoder
 
-Converts `Key` objects to escape sequences for input injection:
+Converts <xref:Terminal.Gui.Input.Key> objects to escape sequences for input injection:
 
 ```csharp
 AnsiKeyboardEncoder.Encode(Key.CursorUp);           // Returns "ESC[A"
@@ -283,7 +283,7 @@ AnsiKeyboardEncoder.Encode(Key.A.WithAlt);          // Returns "ESC a"
 
 ### AnsiMouseEncoder
 
-Converts `Mouse` events to SGR format:
+Converts <xref:Terminal.Gui.Input.Mouse> events to SGR format:
 
 ```csharp
 AnsiMouseEncoder.Encode(new Mouse 
@@ -325,7 +325,7 @@ EscSeqUtils.CSI_ClearScreen(ClearScreenOptions.EntireScreen)  // ESC[2J
 
 ### Known Terminators
 
-`EscSeqUtils.KnownTerminators` contains valid ANSI response terminators for CSI sequences, used by the parser to detect sequence completion.
+<xref:Terminal.Gui.Drivers.EscSeqUtils.KnownTerminators> contains valid ANSI response terminators for CSI sequences, used by the parser to detect sequence completion.
 
 ## Hyperlink Support (OSC 8)
 

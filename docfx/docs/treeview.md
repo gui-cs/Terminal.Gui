@@ -1,6 +1,6 @@
 # Tree View
 
-TreeView is a control for navigating hierarchical objects. It comes in two forms `TreeView` and `TreeView<T>`.
+TreeView is a control for navigating hierarchical objects. It comes in two forms <xref:Terminal.Gui.Views.TreeView> and `TreeView<T>`.
 
 [TreeView API Reference](~/api/Terminal.Gui.Views.TreeView.yml)
 
@@ -87,7 +87,7 @@ Alternatively you can simply tell the tree how the objects relate to one another
 
 ## `TreeView<T>`
 
-The generic `Treeview<T>` allows you to store any object hierarchy where nodes implement Type T. For example if you are working with `DirectoryInfo` and `FileInfo` objects then you could create a `TreeView<FileSystemInfo>`. If you don't have a shared interface/base class for all nodes you can still declare a `TreeView<object>`.
+The generic <xref:Terminal.Gui.Views.TreeView> allows you to store any object hierarchy where nodes implement Type T. For example if you are working with `DirectoryInfo` and `FileInfo` objects then you could create a `TreeView<FileSystemInfo>`. If you don't have a shared interface/base class for all nodes you can still declare a `TreeView<object>`.
 
 In order to use `TreeView<T>` you need to tell the tree how objects relate to one another (who are children of who). To do this you must provide an `ITreeBuilder<T>`.
 
