@@ -197,6 +197,14 @@ internal sealed class Arranger : IDisposable
     private readonly Dictionary<Button, ArrangeButtons> _buttonTypes = new ();
 
     /// <summary>
+    ///     Gets the button type for a given button. For testing purposes.
+    /// </summary>
+    internal bool TryGetButtonType (Button button, out ArrangeButtons buttonType)
+    {
+        return _buttonTypes.TryGetValue (button, out buttonType);
+    }
+
+    /// <summary>
     ///     Creates all the arrangement buttons based on parent's arrangement options.
     /// </summary>
     private void CreateArrangementButtons ()
