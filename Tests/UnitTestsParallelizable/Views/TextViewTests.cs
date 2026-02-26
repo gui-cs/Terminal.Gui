@@ -2631,15 +2631,15 @@ public class TextViewTests (ITestOutputHelper output)
 
         Assert.True (textView.Used);
 
-        Assert.True (textView.NewKeyDownEvent (Key.InsertChar));
+        Assert.True (textView.InvokeCommand (Command.ToggleOverwrite));
         Assert.False (textView.Used);
 
-        Assert.True (textView.NewKeyDownEvent (Key.InsertChar));
+        Assert.True (textView.InvokeCommand (Command.ToggleOverwrite));
         Assert.True (textView.Used);
     }
 
     [Fact]
-    public void Command_RightEnd_Draws_Cursor_At_End_Of_Line ()
+    public void InvokeCommand_RightEnd_Draws_Cursor_At_End_Of_Line ()
     {
         using IApplication app = Application.Create ().Init ();
 
@@ -2656,7 +2656,7 @@ public class TextViewTests (ITestOutputHelper output)
 
         Assert.Equal (new Rectangle (0, 0, 8, 3), textView.Viewport);
 
-        Assert.True (textView.NewKeyDownEvent (Key.End));
+        Assert.True (textView.InvokeCommand (Command.RightEnd));
         textView.Draw ();
 
         var expected = """
@@ -2671,7 +2671,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Command_Right_Draws_Cursor_At_Start_Of_NextLine ()
+    public void InvokeCommand_Right_Draws_Cursor_At_Start_Of_NextLine ()
     {
         using IApplication app = Application.Create ().Init ();
 
@@ -2689,7 +2689,7 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
 
         textView.InsertionPoint = new Point (16, 0); // End of first line
-        Assert.True (textView.NewKeyDownEvent (Key.CursorRight));
+        Assert.True (textView.InvokeCommand (Command.Right));
         textView.Draw ();
 
         var expected = """
@@ -2702,7 +2702,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Command_Left_Draws_Cursor_At_End_Of_PreviousLine ()
+    public void InvokeCommand_Left_Draws_Cursor_At_End_Of_PreviousLine ()
     {
         using IApplication app = Application.Create ().Init ();
 
@@ -2720,7 +2720,7 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
 
         textView.InsertionPoint = new Point (0, 1); // Start of second line
-        Assert.True (textView.NewKeyDownEvent (Key.CursorLeft));
+        Assert.True (textView.InvokeCommand (Command.Left));
         textView.Draw ();
 
         var expected = """
@@ -2735,7 +2735,7 @@ public class TextViewTests (ITestOutputHelper output)
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void Command_Down_MovesFocusToNextView_WhenCursorIsAtLastLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
+    public void KeyDown_CursorDown_MovesFocusToNextView_WhenCursorIsAtLastLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
     {
         using IApplication app = Application.Create ().Init ();
         Runnable runnable = new ();
@@ -2756,7 +2756,7 @@ public class TextViewTests (ITestOutputHelper output)
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void Command_Up_MovesFocusToPreviousView_WhenCursorIsAtFirstLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
+    public void KeyDown_CursorUp_MovesFocusToPreviousView_WhenCursorIsAtFirstLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
     {
         using IApplication app = Application.Create ().Init ();
         Runnable runnable = new ();
