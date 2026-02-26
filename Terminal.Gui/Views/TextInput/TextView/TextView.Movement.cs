@@ -80,6 +80,8 @@ public partial class TextView
 
     private bool MoveDown ()
     {
+        List<Cell> line = GetCurrentLine ();
+
         if (CurrentRow + 1 < _model.Count)
         {
             if (_columnTrack == -1)
@@ -91,7 +93,6 @@ public partial class TextView
 
             if (CurrentRow >= Viewport.Y + Viewport.Height)
             {
-                Viewport = Viewport with { Y = Viewport.Y + 1 };
                 SetNeedsDraw ();
             }
 
@@ -100,7 +101,17 @@ public partial class TextView
         }
         else if (CurrentRow > Viewport.Height)
         {
-            AdjustViewport ();
+            SetNeedsDraw ();
+        }
+        else if (CurrentRow == _model.Count - 1 && CurrentColumn < line.Count)
+        {
+            // Move to the last column of the last row
+            CurrentColumn = line.Count;
+
+            if (CurrentColumn > Viewport.X + Viewport.Width)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {
@@ -294,12 +305,20 @@ public partial class TextView
 
             if (CurrentRow < Viewport.Y)
             {
-                Viewport = Viewport with { Y = Viewport.Y - 1 };
                 SetNeedsDraw ();
             }
 
             TrackColumn ();
-            PositionCursor ();
+        }
+        else if (CurrentRow == 0 && CurrentColumn > 0)
+        {
+            // Move to the first column of the first row
+            CurrentColumn = 0;
+
+            if (Viewport.X > 0)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {

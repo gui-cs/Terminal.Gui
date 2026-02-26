@@ -2764,7 +2764,7 @@ public class TextViewTests (ITestOutputHelper output)
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void KeyDown_CursorDown_MovesFocusToNextView_WhenCursorIsAtLastLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
+    public void KeyDown_CursorDown_MovesFocusToNextView_WhenCursorIsAtLastColumnOfLastLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
     {
         using IApplication app = Application.Create ().Init ();
         Runnable runnable = new ();
@@ -2773,19 +2773,26 @@ public class TextViewTests (ITestOutputHelper output)
         runnable.Add (textView, nextView);
         app.Begin (runnable);
 
-        // Assert it's the last line
+        // Assert it's the last line at column 0
         Assert.Equal (textView.CurrentRow, textView.Lines - 1);
+        Assert.Equal (0, textView.CurrentColumn);
+
+        // Press Down - should insertion point to last column of last line
+        app.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
+        Assert.True (textView.HasFocus);
+        Assert.Equal (4, textView.CurrentColumn);
 
         // Press Down - should move focus to next view since we're at end of line
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorDown));
+        app.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
         Assert.False (textView.HasFocus);
+        Assert.Equal (4, textView.CurrentColumn);
         Assert.True (nextView.HasFocus);
     }
 
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void KeyDown_CursorUp_MovesFocusToPreviousView_WhenCursorIsAtFirstLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
+    public void KeyDown_CursorUp_MovesFocusToPreviousView_WhenCursorIsAtFirstColumnOfFirstLine_TabKeyAddsTab_TrueOrFalse (bool tabKeyAddsTab)
     {
         using IApplication app = Application.Create ().Init ();
         Runnable runnable = new ();
@@ -2800,9 +2807,18 @@ public class TextViewTests (ITestOutputHelper output)
         // Assert it's the first line
         Assert.Equal (0, textView.CurrentRow);
 
+        //  Move to end of first line
+        textView.InsertionPoint = new Point (4, 0);
+
+        // Press Up - should move insertion point to first column of first line
+        app.Keyboard.RaiseKeyDownEvent (Key.CursorUp);
+        Assert.True (textView.HasFocus);
+        Assert.Equal (0, textView.CurrentColumn);
+
         // Press Up - should move focus to previous view since we're at start of line
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorUp));
+        app.Keyboard.RaiseKeyDownEvent (Key.CursorUp);
         Assert.False (textView.HasFocus);
+        Assert.Equal (0, textView.CurrentColumn);
         Assert.True (previousView.HasFocus);
     }
 
