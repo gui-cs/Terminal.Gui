@@ -33,20 +33,38 @@ See [.claude/cookbook/common-patterns.md](.claude/cookbook/common-patterns.md) f
 
 **READ `.claude/REFRESH.md` first.** It contains a quick checklist to prevent common mistakes.
 
+## After Writing/Modifying Code
+
+**USE `.claude/POST-GENERATION-VALIDATION.md` to validate ALL code.** This catches the most common formatting violations AI agents make.
+
 ## Detailed Rules
 
 See `.claude/rules/` for detailed guidance:
+- `formatting.md` - **SPACING, BRACES, BLANK LINES** (most commonly violated!)
 - `type-declarations.md` - **No var** except built-in types
 - `target-typed-new.md` - Use `new ()` not `new TypeName()`
 - `terminology.md` - **SubView/SuperView**, never "child/parent"
 - `event-patterns.md` - Lambdas, closures, handlers
 - `collection-expressions.md` - Use `[...]` syntax
 - `cwp-pattern.md` - Cancellable Workflow Pattern
+- `code-layout.md` - Backing fields, member ordering
+- `api-documentation.md` - XML documentation requirements
+- `testing-patterns.md` - Test patterns and requirements
 
 ## Task-Specific Guides
 
 See `.claude/tasks/` for task checklists:
+- `scenario-modernization.md` - Upgrading UICatalog scenarios
+- `clean-code-review.md` - Creating clean git commit histories
 - `build-app.md` - Building applications with Terminal.Gui
+
+## Planning Mode
+
+When in planning mode:
+- **Create plan files in `./plans/`** (relative to the repository root)
+- Plan files should be markdown format
+- Include detailed implementation steps, file changes, and verification steps
+- Reference existing code patterns and reuse opportunities
 
 ---
 
@@ -79,11 +97,14 @@ dotnet test Tests/UnitTests --no-build
 
 ## Critical Rules (Summary)
 
-1. **No `var`** except: `int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`
-2. **Use `new ()`** not `new TypeName()`
-3. **Use `[...]`** not `new () { ... }` for collections
-4. **SubView/SuperView** for containment (Parent/Child only for non-containment refs)
-5. **Unused lambda params** - use `_`: `(_, _) => { }`
+1. **Space BEFORE `()` and `[]`** - `Method ()` not `Method()`, `array [i]` not `array[i]` (MOST VIOLATED!)
+2. **Braces on NEXT line** - ALL opening braces use Allman style
+3. **Blank lines** - before `return`/`break`/`continue`, after control blocks
+4. **No `var`** except: `int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`
+5. **Use `new ()`** not `new TypeName()`
+6. **Use `[...]`** not `new () { ... }` for collections
+7. **SubView/SuperView** for containment (Parent/Child only for non-containment refs)
+8. **Unused lambda params** - use `_`: `(_, _) => { }`
 
 ## Testing
 
@@ -104,8 +125,12 @@ dotnet test Tests/UnitTests --no-build
 
 ## What NOT to Do
 
+- Don't forget space before `()` and `[]` - this is the #1 mistake!
+- Don't put braces on same line (use Allman style)
+- Don't skip blank lines before returns or after control blocks
 - Don't use `var` for non-built-in types
 - Don't use redundant type names with `new`
 - Don't say "child/parent" for containment (use SubView/SuperView)
 - Don't modify unrelated code
 - Don't introduce new warnings
+- Don't skip POST-GENERATION-VALIDATION.md after writing code

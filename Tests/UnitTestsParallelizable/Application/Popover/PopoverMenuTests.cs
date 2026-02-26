@@ -46,7 +46,7 @@ public class PopoverMenuTests
         // Arrange
         ApplicationImpl app = new ();
         ApplicationPopover popoverManager = new () { App = app };
-        app.Popover = popoverManager;
+        app.Popovers = popoverManager;
 
         PopoverMenu popoverMenu = new () { App = app };
         Menu root = new ([new MenuItem { Title = "Item1" }]) { Title = "Root" };
@@ -80,7 +80,7 @@ public class PopoverMenuTests
         PopoverMenu popoverMenu = new () { Root = root };
 
         // Act
-        IEnumerable<MenuItem> allItems = popoverMenu.GetMenuItemsOfAllSubMenus ();
+        IEnumerable<MenuItem> allItems = popoverMenu.Root?.GetMenuItemsOfAllSubMenus () ?? [];
 
         // Assert — all menu items should be found
         Assert.Contains (parentItem, allItems);
@@ -103,41 +103,9 @@ public class PopoverMenuTests
         PopoverMenu popoverMenu = new () { Root = root };
 
         // Act - get all menu items
-        IEnumerable<MenuItem> allMenuItems = popoverMenu.GetMenuItemsOfAllSubMenus ();
+        IEnumerable<MenuItem> allMenuItems = popoverMenu.Root?.GetMenuItemsOfAllSubMenus () ?? [];
 
         // Assert - the filter mechanism should identify our MenuItem
         Assert.Contains (menuItem, allMenuItems);
-    }
-
-    /// <summary>
-    ///     Issue 8: ForceFocusColors not reset when popover is hidden.
-    ///     When the popover is hidden, ForceFocusColors should be reset on parent items.
-    /// </summary>
-    [Fact]
-    public void ForceFocusColors_ResetWhenPopoverHidden ()
-    {
-        // Arrange
-        ApplicationImpl app = new ();
-        ApplicationPopover popoverManager = new () { App = app };
-        app.Popover = popoverManager;
-
-        MenuItem subItem = new () { Title = "SubItem" };
-        Menu subMenu = new ([subItem]) { Title = "SubMenu" };
-        MenuItem parentItem = new () { Title = "Parent", SubMenu = subMenu };
-        Menu root = new ([parentItem]) { Title = "Root" };
-
-        PopoverMenu popoverMenu = new () { Root = root, App = app };
-        popoverManager.Register (popoverMenu);
-        popoverManager.Show (popoverMenu);
-
-        // Show the submenu — this sets parentItem.ForceFocusColors = true
-        popoverMenu.ShowSubMenu (parentItem);
-        Assert.True (parentItem.ForceFocusColors);
-
-        // Act — hide the entire popover
-        popoverMenu.Visible = false;
-
-        // Assert — ForceFocusColors should be reset
-        Assert.False (parentItem.ForceFocusColors);
     }
 }

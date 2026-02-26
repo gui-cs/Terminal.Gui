@@ -1,8 +1,10 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Helper class for support of <see cref="IPopover"/> views for <see cref="IApplication"/>. Held by
-///     <see cref="IApplication.Popover"/>
+///     <see cref="IApplication.Popovers"/>
 /// </summary>
 public sealed class ApplicationPopover : IDisposable
 {
@@ -120,11 +122,17 @@ public sealed class ApplicationPopover : IDisposable
         {
             return popover;
         }
-        popover.Current ??= App?.TopRunnableView as IRunnable;
+        popover.Owner ??= App?.TopRunnableView as IRunnable;
 
         if (popover is View popoverView)
         {
             popoverView.App = App;
+
+            if (!popoverView.IsInitialized)
+            {
+                popoverView.BeginInit ();
+                popoverView.EndInit ();
+            }
         }
 
         _popovers.Add (popover);
@@ -194,13 +202,13 @@ public sealed class ApplicationPopover : IDisposable
     /// <returns></returns>
     internal bool DispatchKeyDown (Key key)
     {
+        Trace.Keyboard ("Popovers", key, "Entry");
+
         // Do active first - Active gets all key down events.
         var activePopover = GetActivePopover () as View;
 
         if (activePopover is { Visible: true })
         {
-            // Logging.Debug ($"Active - Calling NewKeyDownEvent ({key}) on {activePopover.Title}");
-
             if (activePopover.NewKeyDownEvent (key))
             {
                 return true;
@@ -213,15 +221,18 @@ public sealed class ApplicationPopover : IDisposable
 
         foreach (IPopover popover in _popovers.ToList ())
         {
-            if (popover == activePopover || popover is not View popoverView || (popover.Current is { } && popover.Current != App?.TopRunnableView))
+            if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnableView))
             {
                 continue;
             }
 
+            Trace.Keyboard ("Popovers", key, "InactiveDispatch", $"Sending to {popoverView.ToIdentifyingString ()}");
+
             // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
-            // Logging.Debug ($"Inactive - Calling NewKeyDownEvent ({key}) on {popoverView.Title}");
             popoverView.App ??= App;
             hotKeyHandled = popoverView.NewKeyDownEvent (key);
+
+            Trace.Keyboard ("Popovers", key, "InactiveResult", $"{popoverView.ToIdentifyingString ()} returned {hotKeyHandled}");
 
             if (hotKeyHandled is true)
             {

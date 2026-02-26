@@ -88,8 +88,11 @@ public static class Program
                                {
                                    SetupLogging (logLevel);
 
+                                   Runner runner = new ();
+
                                    if (!disableCm)
                                    {
+                                       runner.SetRuntimeConfig(driver, force16 ? true : null);
                                        ConfigurationManager.Enable (ConfigLocations.All);
                                    }
 
@@ -103,7 +106,6 @@ public static class Program
                                    }
 
                                    // Pass force16 only if explicitly set (default false means not set)
-                                   Runner runner = new (driver, force16 ? true : null);
                                    runner.RunScenario (scenarioName, false);
                                },
                                scenarioArgument,
@@ -130,13 +132,15 @@ public static class Program
                                          SetupLogging (logLevel);
                                          Scenario.BenchmarkTimeout = timeout;
 
+                                         Runner runner = new ();
+
                                          if (!disableCm)
                                          {
+                                             // Pass force16 only if explicitly set
+                                             runner.SetRuntimeConfig (driver, force16 ? true : null);
                                              ConfigurationManager.Enable (ConfigLocations.All);
                                          }
 
-                                         // Pass force16 only if explicitly set
-                                         Runner runner = new (driver, force16 ? true : null);
                                          List<BenchmarkResults> results;
 
                                          if (string.IsNullOrEmpty (scenarioName))

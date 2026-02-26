@@ -397,7 +397,7 @@ public class KeyboardTests
         var view = new View ();
 
         // Act
-        keyboard.KeyBindings.Add (Key.A.WithCtrl, view, Command.Accept);
+        keyboard.KeyBindings.AddApp (Key.A.WithCtrl, view, Command.Accept);
 
         // Assert
         Assert.True (keyboard.KeyBindings.TryGet (Key.A.WithCtrl, out KeyBinding binding));

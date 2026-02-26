@@ -75,6 +75,7 @@ public sealed class TwoIntEditor<T> : View, IValue<T?> where T : struct
 
             ValueChangedEventArgs<T?> changedArgs = new (oldValue, _value);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
         }
     }
 
@@ -88,6 +89,9 @@ public sealed class TwoIntEditor<T> : View, IValue<T?> where T : struct
     ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<T?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     private void UpdateNumericUpDowns ()
     {

@@ -111,7 +111,7 @@ app.InjectMouse(new() {
 
 ### Mouse Click Helper Methods
 
-For simplified mouse click injection, use the `InputInjectionExtensions` helper methods. These encapsulate common click patterns and reduce boilerplate code.
+For simplified mouse click injection, use the <xref:Terminal.Gui.Testing.InputInjectionExtensions> helper methods. These encapsulate common click patterns and reduce boilerplate code.
 
 #### Available Helpers
 
@@ -253,7 +253,7 @@ DateTime now = time.Now;  // 2025-01-01 12:00:00.100
 
 ### Components Using Virtual Time
 
-All timing-dependent components accept `ITimeProvider`:
+All timing-dependent components accept <xref:Terminal.Gui.Time.ITimeProvider>:
 
 - **`MouseButtonClickTracker`** - Double/triple-click detection based on time thresholds
 - **`MouseInterpreter`** - Click timing and multi-click synthesis
@@ -432,7 +432,7 @@ public class VirtualTimeProvider : ITimeProvider
 
 **Usage:** Tests create and control virtual time explicitly
 
-**Key Design Decision:** All timing-dependent code uses `ITimeProvider` instead of `DateTime.Now` directly. This single change enables complete time control in tests.
+**Key Design Decision:** All timing-dependent code uses <xref:Terminal.Gui.Time.ITimeProvider> instead of `DateTime.Now` directly. This single change enables complete time control in tests.
 
 ### Layer 2: Input Source
 
@@ -548,7 +548,7 @@ public class TestInputSource : IInputSource
 
 **Key Characteristics:**
 - Thread-safe queue
-- Automatic timestamping via `ITimeProvider`
+- Automatic timestamping via <xref:Terminal.Gui.Time.ITimeProvider>
 - No background thread (synchronous testing)
 - Complete control over input sequence
 
@@ -696,7 +696,7 @@ public class InputProcessor : IInputProcessor
 
 **Key Features:**
 - Single `ProcessInput()` call processes all queued input
-- Automatic escape sequence timeout via `ITimeProvider`
+- Automatic escape sequence timeout via <xref:Terminal.Gui.Time.ITimeProvider>
 - Optional ANSI parsing for Pipeline mode
 - Click synthesis via `MouseInterpreter`
 
@@ -832,7 +832,7 @@ public class InputInjector : IInputInjector
 
 **Location:** `Terminal.Gui/Testing/InputInjectionExtensions.cs`
 
-**Purpose:** Convenient extension methods on `IApplication`
+**Purpose:** Convenient extension methods on <xref:Terminal.Gui.App.IApplication>
 
 #### Extension Methods
 

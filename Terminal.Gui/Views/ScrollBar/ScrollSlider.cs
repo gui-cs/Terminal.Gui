@@ -225,7 +225,7 @@ public sealed class ScrollSlider : View, IOrientation, IDesignable
 
         Scrolled?.Invoke (this, new (in distance));
 
-        RaiseActivating (new CommandContext (Command.Activate, new WeakReference<View> (this), new KeyBinding ([Command.Activate], null, distance)));
+        RaiseActivating (new CommandContext (Command.Activate, new WeakReference<View> (this), new CommandBinding ([Command.Activate], null, distance)));
     }
 
     /// <summary>

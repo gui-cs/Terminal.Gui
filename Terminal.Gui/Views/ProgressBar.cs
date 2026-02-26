@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.</summary>
@@ -43,7 +41,6 @@ public class ProgressBar : View, IDesignable
     private int _delta;
     private float _fraction;
     private bool _isActivity;
-    private ProgressBarStyle _progressBarStyle = ProgressBarStyle.Blocks;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
@@ -82,10 +79,10 @@ public class ProgressBar : View, IDesignable
     /// <summary>Gets/Sets the progress bar style based on the <see cref="Views.ProgressBarStyle"/></summary>
     public ProgressBarStyle ProgressBarStyle
     {
-        get => _progressBarStyle;
+        get;
         set
         {
-            _progressBarStyle = value;
+            field = value;
 
             switch (value)
             {
@@ -93,14 +90,17 @@ public class ProgressBar : View, IDesignable
                     SegmentCharacter = Glyphs.BlocksMeterSegment;
 
                     break;
+
                 case ProgressBarStyle.Continuous:
                     SegmentCharacter = Glyphs.ContinuousMeterSegment;
 
                     break;
+
                 case ProgressBarStyle.MarqueeBlocks:
                     SegmentCharacter = Glyphs.BlocksMeterSegment;
 
                     break;
+
                 case ProgressBarStyle.MarqueeContinuous:
                     SegmentCharacter = Glyphs.ContinuousMeterSegment;
 
@@ -109,7 +109,7 @@ public class ProgressBar : View, IDesignable
 
             SetNeedsDraw ();
         }
-    }
+    } = ProgressBarStyle.Blocks;
 
     /// <summary>Segment indicator for meter views.</summary>
     public Rune SegmentCharacter { get; set; } = Glyphs.BlocksMeterSegment;
@@ -134,7 +134,7 @@ public class ProgressBar : View, IDesignable
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
-        SetAttribute (GetAttributeForRole (VisualRole.Active));
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         Move (0, 0);
 
@@ -168,30 +168,28 @@ public class ProgressBar : View, IDesignable
             }
         }
 
-        if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
+        if (ProgressBarFormat == ProgressBarFormat.Simple || _isActivity)
         {
-            var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
-
-            var attr = new Attribute (
-                                      GetAttributeForRole (VisualRole.Active).Foreground,
-                                      GetAttributeForRole (VisualRole.Active).Background,
-                                      GetAttributeForRole (VisualRole.Active).Style);
-
-            if (_fraction > .5)
-            {
-                attr = new (
-                            GetAttributeForRole (VisualRole.Active).Background,
-                            GetAttributeForRole (VisualRole.Active).Foreground,
-                            GetAttributeForRole (VisualRole.Active).Style);
-            }
-
-            tf.Draw (
-                     driver: Driver,
-                     screen: ViewportToScreen (Viewport),
-                     normalColor: attr,
-                     hotColor: GetAttributeForRole (VisualRole.Normal),
-                     maximum: SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle));
+            return true;
         }
+        var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
+
+        var attr = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground,
+                                  GetAttributeForRole (VisualRole.Normal).Background,
+                                  GetAttributeForRole (VisualRole.Normal).Style);
+
+        if (_fraction > .5)
+        {
+            attr = new Attribute (GetAttributeForRole (VisualRole.Normal).Background,
+                                  GetAttributeForRole (VisualRole.Normal).Foreground,
+                                  GetAttributeForRole (VisualRole.Normal).Style);
+        }
+
+        tf.Draw (Driver,
+                 ViewportToScreen (Viewport),
+                 attr,
+                 GetAttributeForRole (VisualRole.Normal),
+                 SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle));
 
         return true;
     }

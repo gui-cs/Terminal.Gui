@@ -156,9 +156,10 @@ public class AllViewsTester : Scenario
         {
             X = Pos.AnchorEnd () - 1,
             Y = 0,
-            Width = 30,
+            Width = Dim.Percent(20),
             Height = Dim.Fill (),
-            SuperViewRendersLineCanvas = true
+            SuperViewRendersLineCanvas = true,
+            Arrangement = ViewArrangement.LeftResizable
         };
         _eventLog.Border!.Thickness = new Thickness (1);
 
@@ -216,28 +217,28 @@ public class AllViewsTester : Scenario
 
             // If we are to create a generic Type
             case true:
-            {
-                // For each of the <T> arguments
-                List<Type> typeArguments = [];
-
-                // use <object> or the original type if applicable
-                foreach (Type arg in type.GetGenericArguments ())
                 {
-                    if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                    // For each of the <T> arguments
+                    List<Type> typeArguments = [];
+
+                    // use <object> or the original type if applicable
+                    foreach (Type arg in type.GetGenericArguments ())
                     {
-                        typeArguments.Add (arg);
+                        if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                        {
+                            typeArguments.Add (arg);
+                        }
+                        else
+                        {
+                            typeArguments.Add (typeof (object));
+                        }
                     }
-                    else
-                    {
-                        typeArguments.Add (typeof (object));
-                    }
+
+                    // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
+                    type = type.MakeGenericType (typeArguments.ToArray ());
+
+                    break;
                 }
-
-                // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
-                type = type.MakeGenericType (typeArguments.ToArray ());
-
-                break;
-            }
         }
 
         // Ensure the type does not contain any generic parameters
