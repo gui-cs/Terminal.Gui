@@ -177,45 +177,81 @@ public class KeyBindingsTests
 
     // Claude - Opus 4.5
     /// <summary>
-    ///     Demonstrates that Space as a HotKeyBinding is swallowed by the focused view's
-    ///     Command.Activate KeyBinding (bound to Space in SetupKeyboard), so the HotKey never fires.
-    ///     This is the bug reported in issue #4759.
+    ///     Replicates issue #4759: A View several levels down has a HotKeyBinding for Key.Space.
+    ///     A *different* focused view (plain View with default Space→Activate binding) swallows
+    ///     the key via DefaultActivateHandler returning true, preventing the HotKey from firing.
+    ///     This test mirrors @mrazza's scenario: the HotKey should fire regardless of which
+    ///     view is focused, unless that view explicitly handles the key.
     /// </summary>
     [Fact]
-    public void Focused_Space_HotKey_Is_Swallowed_By_Focused_View ()
+    public void Space_HotKey_Fires_When_Sibling_View_Is_Focused ()
     {
         IApplication app = Application.Create ();
         app.Begin (new Runnable<bool> { CanFocus = true });
 
-        ScopedKeyBindingView view = new () { ExtraHotKey = Key.Space };
-        app!.TopRunnableView!.Add (view);
+        // The view with the Space HotKeyBinding — a few levels down, like mrazza's scenario
+        View container = new () { CanFocus = false };
+        View innerContainer = new () { CanFocus = false };
+        View hotKeyView = new () { CanFocus = false };
+        var hotKeyFired = false;
+        hotKeyView.HandlingHotKey += (_, _) => hotKeyFired = true;
+        hotKeyView.HotKeyBindings.Add (Key.Space, Command.HotKey);
 
-        // Verify Key.A (application-scoped) still works
-        app.Keyboard.RaiseKeyDownEvent (Key.A);
-        Assert.True (view.ApplicationCommandInvoked);
+        container.Add (innerContainer);
+        innerContainer.Add (hotKeyView);
+        app!.TopRunnableView!.Add (container);
 
-        // Verify Key.H (title-derived hotkey) still works
-        view.HotKeyCommandInvoked = false;
-        app.Keyboard.RaiseKeyDownEvent (Key.H);
-        Assert.True (view.HotKeyCommandInvoked);
+        // A separate focusable view (sibling) — plain View with default Space→Activate binding
+        View focusableView = new () { CanFocus = true };
+        app!.TopRunnableView!.Add (focusableView);
 
-        // Space HotKey should fire when no view is focused that binds Space
-        view.HotKeyCommandInvoked = false;
-        Assert.False (view.HasFocus);
+        // With no view focused, Space HotKey should fire
+        hotKeyFired = false;
         app.Keyboard.RaiseKeyDownEvent (Key.Space);
-        Assert.True (view.HotKeyCommandInvoked);
+        Assert.True (hotKeyFired);
 
-        // Now focus the view - Space should STILL fire the HotKey, but currently doesn't
-        // because DefaultActivateHandler (Command.Activate bound to Space) returns true,
-        // swallowing the key before HotKey dispatch runs.
-        view.HotKeyCommandInvoked = false;
-        view.CanFocus = true;
-        view.SetFocus ();
-        Assert.True (view.HasFocus);
+        // Focus the sibling view — it has default Space→Command.Activate from SetupKeyboard
+        focusableView.SetFocus ();
+        Assert.True (focusableView.HasFocus);
+
+        // Space HotKey should STILL fire — the focused view's Activate is unhandled/default
+        // BUG: DefaultActivateHandler returns true unconditionally, swallowing Space
+        // before InvokeCommandsBoundToHotKey runs on the SuperView hierarchy
+        hotKeyFired = false;
         app.Keyboard.RaiseKeyDownEvent (Key.Space);
+        Assert.True (hotKeyFired);
+    }
 
-        // BUG: This fails - Space is consumed by Command.Activate on the focused view
-        Assert.True (view.HotKeyCommandInvoked);
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that Enter (Command.Accept) as a HotKeyBinding works even when another
+    ///     view is focused. This is the asymmetry noted in #4759: DefaultAcceptHandler returns
+    ///     false for plain Views, so Enter leaks through to HotKey dispatch, while Space doesn't.
+    /// </summary>
+    [Fact]
+    public void Enter_HotKey_Fires_When_Sibling_View_Is_Focused ()
+    {
+        IApplication app = Application.Create ();
+        app.Begin (new Runnable<bool> { CanFocus = true });
+
+        // View with Enter HotKeyBinding
+        View hotKeyView = new () { CanFocus = false };
+        var hotKeyFired = false;
+        hotKeyView.HandlingHotKey += (_, _) => hotKeyFired = true;
+        hotKeyView.HotKeyBindings.Add (Key.Enter, Command.HotKey);
+        app!.TopRunnableView!.Add (hotKeyView);
+
+        // Separate focusable view with default Enter→Command.Accept
+        View focusableView = new () { CanFocus = true };
+        app!.TopRunnableView!.Add (focusableView);
+
+        focusableView.SetFocus ();
+        Assert.True (focusableView.HasFocus);
+
+        // Enter HotKey fires because DefaultAcceptHandler returns false for plain Views
+        hotKeyFired = false;
+        app.Keyboard.RaiseKeyDownEvent (Key.Enter);
+        Assert.True (hotKeyFired);
     }
 
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
