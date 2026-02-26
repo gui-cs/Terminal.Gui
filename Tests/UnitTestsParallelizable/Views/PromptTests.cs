@@ -351,7 +351,7 @@ public class PromptTests : TestDriverBase
         Type promptType = typeof (Prompt<,>);
         Type [] typeArguments = promptType.GetGenericArguments ();
 
-        List<Type> resolvedTypes = new ();
+        List<Type> resolvedTypes = [];
 
         foreach (Type arg in typeArguments)
         {
