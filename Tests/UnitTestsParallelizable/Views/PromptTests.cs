@@ -340,4 +340,50 @@ public class PromptTests : TestDriverBase
     }
 
     #endregion
+
+    #region Generic Type Instantiation Tests
+
+    [Fact]
+    public void Generic_Type_Can_Be_Instantiated_With_Constraints ()
+    {
+        // This test validates that when using reflection to create generic types,
+        // the constraint (TView : View) is properly satisfied
+        Type promptType = typeof (Prompt<,>);
+        Type [] typeArguments = promptType.GetGenericArguments ();
+
+        List<Type> resolvedTypes = new ();
+
+        foreach (Type arg in typeArguments)
+        {
+            if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+            {
+                resolvedTypes.Add (arg);
+            }
+            else
+            {
+                // Check if the generic parameter has constraints
+                Type [] constraints = arg.GetGenericParameterConstraints ();
+
+                // Use the first constraint type to satisfy the constraint
+                resolvedTypes.Add (constraints.Length > 0 ? constraints [0] : typeof (object));
+            }
+        }
+
+        // Should resolve to Prompt<View, object> (not Prompt<object, object>)
+        Assert.Equal (typeof (View), resolvedTypes [0]);
+        Assert.Equal (typeof (object), resolvedTypes [1]);
+
+        // Now actually create the type
+        Type constructedType = promptType.MakeGenericType (resolvedTypes.ToArray ());
+
+        Assert.False (constructedType.ContainsGenericParameters);
+
+        // Verify it can be instantiated
+        var instance = Activator.CreateInstance (constructedType);
+
+        Assert.NotNull (instance);
+        Assert.IsAssignableFrom<View> (instance);
+    }
+
+    #endregion
 }

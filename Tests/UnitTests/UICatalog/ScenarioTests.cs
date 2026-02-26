@@ -600,8 +600,24 @@ public class ScenarioTests : TestsAllViews
                     }
                     else
                     {
-                        typeArguments.Add (typeof (object));
+                        // Check if the generic parameter has constraints
+                        Type [] constraints = arg.GetGenericParameterConstraints ();
+
+                        // Use the first constraint type to satisfy the constraint
+                        typeArguments.Add (constraints.Length > 0 ? constraints [0] : typeof (object));
                     }
+                }
+
+                // And change what type we are instantiating from MyClass<T> to MyClass<object>
+                try
+                {
+                    type = type.MakeGenericType (typeArguments.ToArray ());
+                }
+                catch (ArgumentException ex)
+                {
+                    Logging.Warning ($"Cannot create generic type {type} with arguments [{string.Join (", ", typeArguments.Select (t => t.Name))}]: {ex.Message}");
+
+                    return null;
                 }
 
                 // Ensure the type does not contain any generic parameters
@@ -612,9 +628,6 @@ public class ScenarioTests : TestsAllViews
                     //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
                     return null;
                 }
-
-                // And change what type we are instantiating from MyClass<T> to MyClass<object>
-                type = type.MakeGenericType (typeArguments.ToArray ());
             }
 
             // Instantiate view
