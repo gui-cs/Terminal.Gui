@@ -445,9 +445,12 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     }
 
     /// <summary>
-    ///     INTERNAL: Gets the int value associated with a checkbox
+    ///     Gets the int value associated with a checkbox. For testing and advanced scenarios.
     /// </summary>
-    protected int GetCheckBoxValue (CheckBox checkbox)
+    /// <param name="checkbox">The checkbox to get the value for</param>
+    /// <returns>The integer value associated with the checkbox</returns>
+    /// <exception cref="InvalidOperationException">If the checkbox is not found or not part of this selector</exception>
+    public int GetCheckBoxValue (CheckBox checkbox)
     {
         if (_checkBoxValues.TryGetValue (checkbox, out int value))
         {

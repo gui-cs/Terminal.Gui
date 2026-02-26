@@ -53,10 +53,10 @@ public class OptionSelectorTests
         optionSelector.Labels = options;
         optionSelector.Value = 1;
 
-        CheckBox selectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox selectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => optionSelector.GetCheckBoxValue (cb) == 1);
         Assert.Equal (CheckState.Checked, selectedCheckBox.Value);
 
-        CheckBox unselectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 0);
+        CheckBox unselectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => optionSelector.GetCheckBoxValue (cb) == 0);
         Assert.Equal (CheckState.UnChecked, unselectedCheckBox.Value);
     }
 
@@ -342,10 +342,10 @@ public class OptionSelectorTests
         Assert.Equal (5, optionSelector.Value);
 
         // Verify that the CheckBox states align with the non-sequential Values
-        CheckBox selectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 5);
+        CheckBox selectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => optionSelector.GetCheckBoxValue (cb) == 5);
         Assert.Equal (CheckState.Checked, selectedCheckBox.Value);
 
-        CheckBox unselectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 0); // Index 0 corresponds to value 0
+        CheckBox unselectedCheckBox = optionSelector.SubViews.OfType<CheckBox> ().First (cb => optionSelector.GetCheckBoxValue (cb) == 0); // Index 0 corresponds to value 0
         Assert.Equal (CheckState.UnChecked, unselectedCheckBox.Value);
     }
 
