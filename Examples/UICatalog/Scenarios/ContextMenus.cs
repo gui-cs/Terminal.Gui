@@ -114,6 +114,30 @@ public class ContextMenus : Scenario
                 Title = $"PopoverMenu Host - Right-click or {PopoverMenu.DefaultKey}",
                 BorderStyle = LineStyle.Dashed
             };
+
+            _appWindow.CommandsToBubbleUp = [Command.Activate];
+
+            popoverMenuHost.Activated += (s, args) =>
+                                         {
+                                             // BUGBUG: Activated is never invoked here. Is command bridging from the PopoverMenu.Root to the PopoverMenuHost broken?
+
+                                             // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
+                                             if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "menuItemBorders" } bordersCheckbox)
+                                             {
+                                                 _appWindow.BorderStyle = (args.Value?.Value as CheckState?) == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+
+                                                 return;
+                                             }
+
+                                             if (args.Value?.TryGetSource (out source) is true
+                                                 && source?.SuperView is OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
+                                             {
+                                                 if (schemeOptionSelector.Value is { } scheme)
+                                                 {
+                                                     _appWindow.SchemeName = scheme.ToString ();
+                                                 }
+                                             }
+                                         };
             _appWindow.Add (popoverMenuHost);
         }
     }
@@ -203,9 +227,6 @@ public class ContextMenus : Scenario
                                               menu.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
                                           }
                                       };
-
-            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-            menuItemBorders.Accepting += (_, args) => args.Handled = true;
 
             OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
 
@@ -307,7 +328,8 @@ public class ContextMenus : Scenario
                                                },
                                                new Line (),
                                                new MenuItem { Title = Strings.cmdQuit, Action = () => app!.RequestStop () }
-                                           ]) { Key = _winContextMenuKey };
+                                           ])
+        { Key = _winContextMenuKey };
         app!.Popovers?.Register (_winContextMenu);
     }
 

@@ -2471,7 +2471,7 @@ public class MenuTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void Diagnostic_OptionSelector_CommandView_Activated_Flow ()
+    public void OptionSelector_CommandView_Activated_Bubbles_Through_Full_Chain ()
     {
         ListBackend traceBackend = new ();
         Trace.Backend = traceBackend;
@@ -2552,16 +2552,13 @@ public class MenuTests
                                                                      return $"  [{e.Phase}] {e.Id} ({e.Method}) {e.Message} [{dataStr}]";
                                                                  }));
 
-            // MenuItem.Activated should fire (from deferred CommandView_Activated)
+            // MenuItem.Activated should fire via BubbleActivatedUp after ConsumeDispatch
             Assert.True (menuItemActivatedCount > 0, $"MenuItem.Activated should have fired.\nTraces:\n{traceDump}");
 
-            // BUGBUG diagnosis: Does Menu.Activated fire?
-            // With ConsumeDispatch=true, Activating is consumed at the OptionSelector level.
-            // Shortcut.CommandView_Activated should propagate Activated to SuperView (Menu),
-            // but the routing check (e.Value?.Routing == BubblingUp) may fail.
+            // Menu.Activated should fire via BubbleActivatedUp (full chain propagation)
             Assert.True (menuActivatedCount > 0, $"Menu.Activated should have fired.\nTraces:\n{traceDump}");
 
-            // SuperView.Activated should also fire
+            // SuperView.Activated should also fire via BubbleActivatedUp
             Assert.True (superViewActivatedCount > 0, $"SuperView.Activated should have fired.\nTraces:\n{traceDump}");
 
             ((View)runnable).Dispose ();

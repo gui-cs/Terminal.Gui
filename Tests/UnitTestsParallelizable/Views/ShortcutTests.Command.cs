@@ -696,10 +696,10 @@ public partial class ShortcutTests
     ///     bubbles up from the CommandView (e.g., CheckBox click).
     ///     Expected order:
     ///     1. CheckBox.Activating
-    ///     2. Shortcut.Activating (from bubble-up)
-    ///     3. Shortcut.Activated (deferred, fires during CheckBox.Activated invocation)
-    ///     4. CheckBox.Activated (test handler fires after Shortcut's subscription)
-    ///     Key: CheckBox.OnActivated (state change) runs before both Activated events.
+    ///     2. Shortcut.Activating (from bubble-up during RaiseActivating)
+    ///     3. CheckBox.Activated (from CheckBox.RaiseActivated → OnActivated toggles state)
+    ///     4. Shortcut.Activated (from BubbleActivatedUp, after CheckBox completes)
+    ///     Key: Shortcut.Activated fires AFTER CheckBox.Activated, so Action sees updated state.
     /// </summary>
     [Fact]
     public void BubbleUp_Activate_Event_Ordering_CommandView_Completes_Before_Shortcut_Activated ()
@@ -727,15 +727,15 @@ public partial class ShortcutTests
         checkBox.InvokeCommand (Command.Activate);
 
         // Assert - Verify ordering:
-        // Shortcut.Activated fires during CheckBox.Activated event (Shortcut subscribed first),
-        // but CheckBox.OnActivated (state change) already ran before Activated events.
+        // CheckBox.Activated fires first (state change in OnActivated), then
+        // Shortcut.Activated fires via BubbleActivatedUp after CheckBox completes.
         Assert.Equal (4, eventLog.Count);
         Assert.Equal ("CheckBox.Activating", eventLog [0]);
         Assert.Equal ("Shortcut.Activating", eventLog [1]);
-        Assert.Equal ("Shortcut.Activated", eventLog [2]);
-        Assert.Equal ("CheckBox.Activated", eventLog [3]);
+        Assert.Equal ("CheckBox.Activated", eventLog [2]);
+        Assert.Equal ("Shortcut.Activated", eventLog [3]);
 
-        // CheckBox.OnActivated toggled state BEFORE Activated events fired
+        // CheckBox.OnActivated toggled state BEFORE Shortcut.Activated fired
         Assert.Equal (CheckState.Checked, checkBox.Value);
         Assert.Equal (CheckState.Checked, valueAtShortcutActivated);
     }
@@ -772,9 +772,7 @@ public partial class ShortcutTests
     // Claude - Opus 4.6
     /// <summary>
     ///     Verifies that a programmatic InvokeCommand on Shortcut (no binding, dispatch skipped)
-    ///     does not prevent a subsequent user click from firing Action. Before the fix,
-    ///     _activatedFiredThisCycle would get stuck at true after the programmatic invoke,
-    ///     causing CommandView_Activated to skip RaiseActivated on the next real activation.
+    ///     does not prevent a subsequent user click from firing Action.
     /// </summary>
     [Fact]
     public void Shortcut_Programmatic_Activate_Then_User_Click_Both_Fire_Action ()
@@ -787,7 +785,7 @@ public partial class ShortcutTests
         shortcut.InvokeCommand (Command.Activate);
         Assert.Equal (1, actionCount);
 
-        // Simulate user click (with binding → dispatch runs → CheckBox activates → CommandView_Activated fires)
+        // Simulate user click (with binding → dispatch runs → CheckBox activates → BubbleActivatedUp fires)
         KeyBinding kb = new ([Command.Activate], Key.Space, cb);
         CommandContext ctx = new (Command.Activate, new WeakReference<View> (cb), kb);
         cb.InvokeCommand (Command.Activate, ctx);
@@ -802,9 +800,9 @@ public partial class ShortcutTests
     ///     The framework dispatches DispatchDown after OnActivating but before Activated.
     ///     Expected order:
     ///     1. Shortcut.Activating (fires from RaiseActivating before framework dispatch)
-    ///     2. CheckBox.Activating (from DispatchDown during framework dispatch, after Activating event)
-    ///     3. CheckBox.Activated
-    ///     4. Shortcut.Activated (from CommandView_Activated deferred callback)
+    ///     2. CheckBox.Activating (from DispatchDown during framework dispatch)
+    ///     3. CheckBox.Activated (from CheckBox.RaiseActivated inside DispatchDown)
+    ///     4. Shortcut.Activated (from Shortcut's own RaiseActivated after dispatch completes)
     /// </summary>
     [Fact]
     public void BubbleDown_Activate_Event_Ordering_With_Binding_Source ()
@@ -836,17 +834,13 @@ public partial class ShortcutTests
         shortcut.InvokeCommand (Command.Activate, ctx);
 
         // Assert - Shortcut.Activating fires first (notification before dispatch),
-        // then DispatchDown fires CommandView events. Shortcut.Activated fires from
-        // CommandView_Activated (subscribed before test handler), so it interleaves
-        // with CheckBox.Activated.
+        // then DispatchDown fires CommandView events. Shortcut.Activated fires after
+        // DispatchDown completes (synchronous dispatch ensures state is updated).
         Assert.Equal (4, eventLog.Count);
         Assert.Equal ("Shortcut.Activating", eventLog [0]);
         Assert.Equal ("CheckBox.Activating", eventLog [1]);
-
-        // Shortcut.Activated fires during CheckBox.Activated event dispatch
-        // (CommandView_Activated subscribed before test handler)
-        Assert.Equal ("Shortcut.Activated", eventLog [2]);
-        Assert.Equal ("CheckBox.Activated", eventLog [3]);
+        Assert.Equal ("CheckBox.Activated", eventLog [2]);
+        Assert.Equal ("Shortcut.Activated", eventLog [3]);
 
         // CheckBox should have toggled
         Assert.Equal (CheckState.Checked, checkBox.Value);
@@ -854,9 +848,6 @@ public partial class ShortcutTests
     }
 
     // Claude - Opus 4.6
-    // TODO: FlagSelector consumes in OnActivating to prevent double-toggle, which prevents the
-    // bubble from reaching Shortcut. Shortcut's deferred activation pattern needs refactoring
-    // to work with FlagSelector's consumption model. See plans/bar-command-bubbling-status.md.
     /// <summary>
     ///     Verifies that when a FlagSelector is used as a Shortcut's CommandView, activating an
     ///     individual checkbox inside the FlagSelector (with a binding whose Source is the inner
@@ -905,7 +896,7 @@ public partial class ShortcutTests
         // FlagSelector.Activating fires (subscribers get a chance to cancel before dispatch),
         // but Shortcut.Activating doesn't fire (bubble doesn't reach Shortcut because FlagSelector
         // consumes during dispatch). Shortcut.Activated fires via the deferred path
-        // (FlagSelector.RaiseActivated → CommandView_Activated).
+        // (FlagSelector consumes via ConsumeDispatch → BubbleActivatedUp fires on Shortcut).
         Assert.Equal (1, valueChangedCount);
         Assert.Equal (0, shortcutActivatingCount);
         Assert.Equal (1, shortcutActivatedCount);

@@ -53,10 +53,8 @@ public class Menus : Scenario
                                           return;
                                       }
 
-                                      // BUGBUG: Activate is never raised when an optionSelector item is activated in the schemeOptionsSelector
-                                      // BUGBUG: Which is held by the MenuItem with the title "Scheme" in the test menu. So the code below doesn't ever run.
                                       if (args.Value?.TryGetSource (out source) is true
-                                          && source is OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
+                                          && source?.SuperView is OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
                                       {
                                           if (schemeOptionSelector.Value is { } scheme)
                                           {
@@ -129,7 +127,7 @@ public class Menus : Scenario
             Label testMenuLabel = new () { Title = "Menu with MenuItems:", X = 1, Y = Pos.Bottom (lastCommandLabel) + 1 };
             Add (testMenuLabel);
 
-            Menu testMenu = new () { Y = Pos.Bottom (testMenuLabel), Id = "TestMenu" };
+            Menu testMenu = new () { Y = Pos.Bottom (testMenuLabel), Id = "testMenu" };
             ConfigureTestMenu (testMenu);
             Add (testMenu);
 
@@ -137,7 +135,7 @@ public class Menus : Scenario
             Label subMenuLabel = new () { Title = "MenuItem with SubMenu:", X = 1, Y = Pos.Bottom (testMenu) + 1 };
             Add (subMenuLabel);
 
-            Menu subMenuDemo = new () { Y = Pos.Bottom (subMenuLabel) };
+            Menu subMenuDemo = new () { Id = "subMenuDemo", Y = Pos.Bottom (subMenuLabel) };
             subMenuDemo.EnableForDesign ();
             Add (subMenuDemo);
 
@@ -152,7 +150,7 @@ public class Menus : Scenario
 
         private void ConfigureTestMenu (Menu menu)
         {
-            MenuItem menuItem1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
+            MenuItem menuItem1 = new () { Id = "menuItem1", Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
 
             menuItem1.Activated += (s, args) =>
                                    {
@@ -170,7 +168,7 @@ public class Menus : Scenario
 
             Line line = new ();
 
-            MenuItem menuItemBorders = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+            MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
             menuItemBorders.CommandView = new CheckBox { Id = "menuItemBorders", Title = menuItemBorders.Title, CanFocus = false };
 
             // Use Action to set the menu's BorderStyle to Double when the Borders menu item is checked, and None when it is unchecked
@@ -186,7 +184,7 @@ public class Menus : Scenario
 
             OptionSelector<Schemes> schemeOptionSelector = new () { Id = "schemeOptionSelector", Title = "Scheme", CanFocus = true };
 
-            MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+            MenuItem menuItemScheme = new () { Id = "menuItemScheme", Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
 
             // Set the Menu's SchemeName to the selected scheme in the OptionSelector
             // Note: above we set the Scheme of the MenuHostView illustrating the commands bubble up

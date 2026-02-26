@@ -470,10 +470,16 @@ public partial class View // Command APIs
 
         if (RaiseActivating (ctx) is true)
         {
-            // If dispatch consumed the command, the composite view needs completion.
             if (_lastDispatchOccurred)
             {
                 RaiseActivated (ctx);
+
+                // ConsumeDispatch consumed the command internally, but ancestors still need
+                // notification. Walk up the SuperView chain and fire RaiseActivated on each
+                // ancestor that subscribes to this command via CommandsToBubbleUp.
+                // This replaces the old one-hop Shortcut.CommandView_Activated propagation
+                // with full-chain notification (e.g., MenuItem → Menu → SuperView).
+                BubbleActivatedUp (ctx);
             }
 
             return true;
@@ -485,21 +491,18 @@ public partial class View // Command APIs
         // "not consumed" so the originator continues.
         //
         // Composite views with ConsumeDispatch=true already completed above (RaiseActivating returned true).
-        // Composite views with ConsumeDispatch=false (relay) defer completion — they use the
-        // dispatch target's Activated event to fire their own RaiseActivated after the originator completes.
+        // Composite views with ConsumeDispatch=false (relay) receive Activated later via
+        // BubbleActivatedUp, after the originator completes its state change.
         if (ctx?.Routing == CommandRouting.BubblingUp)
         {
-            // For plain views (no dispatch target), fire Activated to complete the two-phase notification
-            // (matching DefaultAcceptHandler's behavior for bubble-up). This enables SuperViews to observe
-            // activation of their SubViews via the Activated event.
+            // Fire Activated only for plain views (no dispatch target). This enables
+            // SuperViews to observe SubView activation via the Activated event.
             //
-            // Relay-dispatch views (Shortcut, ConsumeDispatch=false) skip this — they fire Activated via
-            // the deferred CommandView_Activated callback AFTER the originator has completed its activation
-            // (e.g., CheckBox has toggled state). This ensures Action sees the updated state.
-            //
-            // Consume-dispatch views (Selectors, ConsumeDispatch=true) already completed above
-            // (RaiseActivating returned true at line 445).
-            if (!_lastDispatchOccurred && GetDispatchTarget (ctx) is null)
+            // Composite views (Shortcut/MenuItem with dispatch targets) skip Activated here
+            // because the originating view's state (e.g., CheckBox.Checked) hasn't been
+            // updated yet — we're still inside RaiseActivating. Composite ancestors receive
+            // Activated later via BubbleActivatedUp, after the originator completes.
+            if (GetDispatchTarget (ctx) is null)
             {
                 RaiseActivated (ctx);
             }
@@ -512,12 +515,16 @@ public partial class View // Command APIs
             SetFocus ();
         }
 
-        // For relay dispatch (ConsumeDispatch=false), the dispatch target's Activated event
-        // already fired RaiseActivated via the deferred completion callback (e.g., CommandView_Activated
-        // in Shortcut). Skip duplicate RaiseActivated.
-        if (!_lastDispatchOccurred)
+        // Always fire RaiseActivated. Dispatch completed synchronously,
+        // so CommandView state is already updated.
+        RaiseActivated (ctx);
+
+        // Notify composite ancestors (views with dispatch targets) that activation completed.
+        // Plain ancestors already received Activated during the BubblingUp phase of RaiseActivating.
+        // Skip for DispatchingDown — the dispatching view handles its own Activated after dispatch returns.
+        if (ctx?.Routing != CommandRouting.DispatchingDown)
         {
-            RaiseActivated (ctx);
+            BubbleActivatedUp (ctx, compositeOnly: true);
         }
 
         return true;
@@ -545,6 +552,59 @@ public partial class View // Command APIs
         }
 
         return false;
+    }
+
+    /// <summary>
+    ///     Walks up the SuperView chain from this view, firing <see cref="RaiseActivated"/> on
+    ///     ancestors whose <see cref="CommandsToBubbleUp"/> contains the command. Unlike
+    ///     <see cref="TryBubbleUp"/>, this does NOT re-invoke the full command pipeline
+    ///     (no <see cref="RaiseActivating"/>, no <see cref="DefaultActivateHandler"/>).
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <param name="compositeOnly">
+    ///     When <see langword="true"/>, only fires on composite views (those with a dispatch target).
+    ///     Plain views are assumed to have already received Activated during the BubblingUp phase.
+    ///     When <see langword="false"/>, fires on all ancestors (used after ConsumeDispatch where
+    ///     the BubblingUp phase was blocked).
+    /// </param>
+    private void BubbleActivatedUp (ICommandContext? ctx, bool compositeOnly = false)
+    {
+        if (ctx is null)
+        {
+            return;
+        }
+
+        View? current = this;
+
+        while (current is { })
+        {
+            View? next = current.SuperView;
+
+            // Handle Padding → Parent traversal (mirrors TryBubbleUp)
+            if (next is Padding padding)
+            {
+                next = padding.Parent;
+            }
+            else if (current is Padding selfPadding)
+            {
+                next = selfPadding.Parent;
+            }
+
+            if (next?.CommandsToBubbleUp.Contains (ctx.Command) == true)
+            {
+                if (!compositeOnly || next.GetDispatchTarget (ctx) is { })
+                {
+                    ICommandContext upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+                    next.RaiseActivated (upCtx);
+                }
+
+                current = next;
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     /// <summary>
