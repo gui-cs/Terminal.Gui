@@ -75,7 +75,11 @@ public readonly record struct CommandContext : ICommandContext
     /// <inheritdoc/>
     public override string ToString ()
     {
-        string routing = Routing == CommandRouting.BubblingUp ? Glyphs.UpArrow.ToString () : Routing == CommandRouting.DispatchingDown ? Glyphs.DownArrow.ToString () : "";
+        string routing = Routing == CommandRouting.BubblingUp
+                             ? Glyphs.UpArrow.ToString ()
+                             : Routing == CommandRouting.DispatchingDown
+                                 ? Glyphs.DownArrow.ToString ()
+                                 : "";
         string source = Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "";
         string binding = Binding is { } ? $", Binding={Binding}" : "";
         string value = Value is { } ? $", Value={Value}" : "";

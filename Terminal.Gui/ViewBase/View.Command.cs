@@ -149,7 +149,15 @@ public partial class View // Command APIs
         // Capture value from IValue if this view implements it
         object? value = this is IValue iValue ? iValue.GetValue () : null;
 
-        return InvokeCommand (command, new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding, Value = value });
+        return InvokeCommand (
+                              command,
+                              new CommandContext
+                              {
+                                  Command = command,
+                                  Source = new WeakReference<View> (this),
+                                  Binding = binding,
+                                  Value = value
+                              });
     }
 
     /// <summary>

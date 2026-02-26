@@ -205,21 +205,21 @@ public class MenuBars : Scenario
             editModeStatusCb.ValueChanged += (_, _) => { editModeMenuItemCb?.Value = editModeStatusCb.Value; };
 
             MenuBar?.Accepted += (_, args) =>
-                                 {
-                                     // Traditional way - extracting MenuItem from Source
-                                     if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem mi)
-                                     {
-                                         lastAcceptedText.Text = mi.Title!;
-                                     }
+            {
+                // Traditional way - extracting MenuItem from Source
+                if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem mi)
+                {
+                    lastAcceptedText.Text = mi.Title!;
+                }
 
-                                     // New way - using ctx.Value which contains the Menu's activated MenuItem
-                                     // Note: Value comes from the PopoverMenu (which implements IValue<MenuItem?>)
-                                     // and is automatically populated in the context when the command is invoked
-                                     if (args.Context?.Value is MenuItem menuItem)
-                                     {
-                                         lastAcceptedValueText.Text = $"{menuItem.Title} (from Menu.Value)";
-                                     }
-                                 };
+                // New way - using ctx.Value which contains the Menu's activated MenuItem
+                // Note: Value comes from the PopoverMenu (which implements IValue<MenuItem?>)
+                // and is automatically populated in the context when the command is invoked
+                if (args.Context?.Value is MenuItem menuItem)
+                {
+                    lastAcceptedValueText.Text = $"{menuItem.Title} (from Menu.Value)";
+                }
+            };
 
             AddCommand (Command.Edit,
                         ctx =>

@@ -61,7 +61,9 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
     {
         // When a MenuItem's Accept command bubbles up, capture it as our Value
         // before calling base, which will bubble it further.
-        if (args.Context?.Routing == CommandRouting.BubblingUp && args.Context.Source?.TryGetTarget (out View? source) == true && source is MenuItem menuItem)
+        if (args.Context?.Routing == CommandRouting.BubblingUp
+            && args.Context.Source?.TryGetTarget (out View? source) == true
+            && source is MenuItem menuItem)
         {
             Value = menuItem;
         }
