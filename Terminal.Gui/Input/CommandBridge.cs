@@ -93,7 +93,8 @@ public class CommandBridge : IDisposable
             Command = Command.Accept,
             Source = e.Context?.Source,
             Binding = e.Context?.Binding,
-            Routing = CommandRouting.Bridged
+            Routing = CommandRouting.Bridged,
+            Value = e.Context?.Value
         };
 
         owner.InvokeCommand (Command.Accept, bridgedCtx);
@@ -113,7 +114,8 @@ public class CommandBridge : IDisposable
             Command = Command.Activate,
             Source = e.Value?.Source,
             Binding = e.Value?.Binding,
-            Routing = CommandRouting.Bridged
+            Routing = CommandRouting.Bridged,
+            Value = e.Value?.Value
         };
 
         owner.InvokeCommand (Command.Activate, bridgedCtx);

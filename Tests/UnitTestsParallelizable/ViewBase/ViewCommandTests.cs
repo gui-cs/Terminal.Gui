@@ -1667,4 +1667,167 @@ public class ViewCommandTests
             return HandleOnCommandNotBound;
         }
     }
+
+    #region IValue Integration Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_WithIValueSource_PopulatesValue ()
+    {
+        var view = new TestValueView { Value = "test value" };
+        ICommandContext? capturedContext = null;
+
+        view.Accepting += (sender, args) =>
+                          {
+                              capturedContext = args.Context;
+                          };
+
+        view.InvokeCommand (Command.Accept);
+
+        Assert.NotNull (capturedContext);
+        Assert.Equal ("test value", capturedContext!.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_WithoutIValueSource_ValueIsNull ()
+    {
+        var view = new View ();
+        ICommandContext? capturedContext = null;
+
+        view.Accepting += (sender, args) =>
+                          {
+                              capturedContext = args.Context;
+                          };
+
+        view.InvokeCommand (Command.Accept);
+
+        Assert.NotNull (capturedContext);
+        Assert.Null (capturedContext!.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_WithBinding_PopulatesValueFromIValue ()
+    {
+        var view = new TestValueView { Value = 42 };
+        ICommandContext? capturedContext = null;
+
+        view.Accepting += (sender, args) =>
+                          {
+                              capturedContext = args.Context;
+                          };
+
+        KeyBinding binding = new ([Command.Accept]) { Key = Key.Enter };
+        view.InvokeCommand (Command.Accept, binding);
+
+        Assert.NotNull (capturedContext);
+        Assert.Equal (42, capturedContext!.Value);
+        Assert.NotNull (capturedContext.Binding);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_IValueReturnsNull_ValueIsNull ()
+    {
+        var view = new TestValueView { Value = null };
+        ICommandContext? capturedContext = null;
+
+        view.Accepting += (sender, args) =>
+                          {
+                              capturedContext = args.Context;
+                          };
+
+        view.InvokeCommand (Command.Accept);
+
+        Assert.NotNull (capturedContext);
+        Assert.Null (capturedContext!.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandBridge_PreservesValue_OnAccept ()
+    {
+        var owner = new View { Id = "owner" };
+        var remote = new TestValueView { Id = "remote", Value = "bridged value" };
+        ICommandContext? capturedContext = null;
+
+        owner.Accepting += (sender, args) =>
+                           {
+                               capturedContext = args.Context;
+                           };
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
+
+        // Invoke Accept on remote
+        remote.InvokeCommand (Command.Accept);
+
+        Assert.NotNull (capturedContext);
+        Assert.Equal ("bridged value", capturedContext!.Value);
+        Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandBridge_PreservesValue_OnActivate ()
+    {
+        var owner = new View { Id = "owner" };
+        var remote = new TestValueView { Id = "remote", Value = 123 };
+        ICommandContext? capturedContext = null;
+
+        owner.Activated += (sender, args) =>
+                           {
+                               capturedContext = args.Value;
+                           };
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Activate);
+
+        // Invoke Activate on remote
+        remote.InvokeCommand (Command.Activate);
+
+        Assert.NotNull (capturedContext);
+        Assert.Equal (123, capturedContext!.Value);
+        Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandBridge_NullValue_PropagatesCorrectly ()
+    {
+        var owner = new View { Id = "owner" };
+        var remote = new TestValueView { Id = "remote", Value = null };
+        ICommandContext? capturedContext = null;
+
+        owner.Accepting += (sender, args) =>
+                           {
+                               capturedContext = args.Context;
+                           };
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
+
+        // Invoke Accept on remote
+        remote.InvokeCommand (Command.Accept);
+
+        Assert.NotNull (capturedContext);
+        Assert.Null (capturedContext!.Value);
+        Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+    }
+
+    // Test view that implements IValue<object?>
+    private class TestValueView : View, IValue<object?>
+    {
+        private object? _value;
+
+        public object? Value
+        {
+            get => _value;
+            set => _value = value;
+        }
+
+        public event EventHandler<ValueChangingEventArgs<object?>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+    }
+
+    #endregion
 }

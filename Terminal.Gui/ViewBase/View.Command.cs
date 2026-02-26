@@ -144,8 +144,13 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommand (Command command, ICommandBinding? binding) =>
-        InvokeCommand (command, new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding });
+    public bool? InvokeCommand (Command command, ICommandBinding? binding)
+    {
+        // Capture value from IValue if this view implements it
+        object? value = this is IValue iValue ? iValue.GetValue () : null;
+
+        return InvokeCommand (command, new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding, Value = value });
+    }
 
     /// <summary>
     ///     Invokes the specified command given a context. This is the most general form of InvokeCommand and allows the caller
@@ -186,16 +191,23 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommand (Command command) =>
-        InvokeCommand (command,
-                       new CommandContext
-                       {
-                           Command = command,
-                           Source = new WeakReference<View> (this),
+    public bool? InvokeCommand (Command command)
+    {
+        // Capture value from IValue if this view implements it
+        object? value = this is IValue iValue ? iValue.GetValue () : null;
 
-                           // By definition, this invocation has no binding
-                           Binding = null
-                       });
+        return InvokeCommand (
+                              command,
+                              new CommandContext
+                              {
+                                  Command = command,
+                                  Source = new WeakReference<View> (this),
+
+                                  // By definition, this invocation has no binding
+                                  Binding = null,
+                                  Value = value
+                              });
+    }
 
     #endregion Invoke
 
