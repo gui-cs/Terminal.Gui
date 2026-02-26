@@ -35,11 +35,11 @@ The following example shows a basic Terminal.Gui application using the modern in
 
 ### Key aspects of the modern model:
 
-- Use `Application.Create()` to create an `IApplication` instance
-- The application initializes automatically when you call `Run<T>()`  
-- Use `app.Run<ExampleWindow>()` to run a window that implements `IRunnable`
+- Use [Application.Create()](xref:Terminal.Gui.App.Application.Create*) to create an <xref:Terminal.Gui.App.IApplication> instance
+- The application initializes automatically when you call `Run<T>()`
+- Use `app.Run<ExampleWindow>()` to run a window that implements <xref:Terminal.Gui.App.IRunnable>
 - Call `app.Dispose()` to clean up resources and restore the terminal
-- Event handling uses `Accepting` event instead of legacy `Accept` event
+- Event handling uses <xref:Terminal.Gui.ViewBase.View.Accepting> event instead of legacy `Accept` event
 - Set `e.Handled = true` in event handlers to prevent further processing
 
 When run the application looks as follows:

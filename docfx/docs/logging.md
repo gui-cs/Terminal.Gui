@@ -1,6 +1,6 @@
 # Logging
 
-Terminal.Gui provides comprehensive logging of library internals via the @Terminal.Gui.App.Logging class. Logging helps diagnose issues with terminals, keyboard layouts, drivers, and platform-specific behavior.
+Terminal.Gui provides comprehensive logging of library internals via the `Logging` class. Logging helps diagnose issues with terminals, keyboard layouts, drivers, and platform-specific behavior.
 
 > [!IMPORTANT]
 > **Do not use console loggers** - they interfere with Terminal.Gui's screen output. Use file, debug output, or network-based sinks instead.
@@ -24,7 +24,7 @@ Application.Shutdown();
 
 ## API Overview
 
-The @Terminal.Gui.App.Logging class provides:
+The `Logging` class provides:
 
 | Member | Description |
 |--------|-------------|
