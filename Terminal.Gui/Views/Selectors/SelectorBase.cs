@@ -46,6 +46,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         AddCommand (Command.Left, () => MovePrevious (Command.Left));
     }
 
+    // Stores the int value for each checkbox (replaces use of Data property)
+    private readonly Dictionary<CheckBox, int> _checkBoxValues = new ();
+
     private bool MoveNext (Command command)
     {
         if ((command == Command.Down && Orientation == Orientation.Horizontal) || (command == Command.Right && Orientation == Orientation.Vertical))
@@ -375,6 +378,12 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
         {
+            // Clean up checkbox value mapping (replaces use of Data property)
+            if (sv is CheckBox cb)
+            {
+                _checkBoxValues.Remove (cb);
+            }
+
             sv.Dispose ();
         }
 
@@ -425,12 +434,27 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             CanFocus = true,
             Title = label,
             Id = label,
-            Data = value,
             MouseHighlightStates = DefaultMouseHighlightStates,
             TabStop = TabBehavior
         };
 
+        // Store value in dictionary (replaces use of Data property)
+        _checkBoxValues [checkbox] = value;
+
         return checkbox;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Gets the int value associated with a checkbox
+    /// </summary>
+    protected int GetCheckBoxValue (CheckBox checkbox)
+    {
+        if (_checkBoxValues.TryGetValue (checkbox, out int value))
+        {
+            return value;
+        }
+
+        throw new InvalidOperationException ("CheckBox value not found");
     }
 
     private int _horizontalSpace = 2;
