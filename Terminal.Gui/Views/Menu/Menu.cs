@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
 ///     <see cref="MenuItem"/>.
 /// </summary>
-public class Menu : Bar, IDesignable
+public class Menu : Bar, IDesignable, IValue<MenuItem?>
 {
     /// <summary>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
@@ -55,6 +55,19 @@ public class Menu : Bar, IDesignable
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
     /// </summary>
     public MenuItem? SuperMenuItem { get; set; }
+
+    /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        // When a MenuItem's Accept command bubbles up, capture it as our Value
+        // before calling base, which will bubble it further.
+        if (args.Context?.Routing == CommandRouting.BubblingUp && args.Context.Source?.TryGetTarget (out View? source) == true && source is MenuItem menuItem)
+        {
+            Value = menuItem;
+        }
+
+        return base.OnAccepting (args);
+    }
 
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
@@ -300,6 +313,96 @@ public class Menu : Bar, IDesignable
     }
 
     #endregion ShowMenu / HideMenu
+
+    #region IValue<MenuItem?> Implementation
+
+    private MenuItem? _value;
+
+    /// <summary>
+    ///     Gets or sets the most recently activated <see cref="MenuItem"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is automatically set when a <see cref="MenuItem"/> within this menu raises
+    ///         the <see cref="View.Accepted"/> event (e.g., when the user presses Enter or double-clicks on a menu item).
+    ///     </para>
+    ///     <para>
+    ///         The value is captured before the <see cref="Command.Accept"/> command propagates up the hierarchy,
+    ///         enabling command handlers to access <see cref="ICommandContext.Value"/> to determine which
+    ///         menu item triggered the command.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property programmatically will raise <see cref="ValueChanging"/> and <see cref="ValueChanged"/>
+    ///         events following the Cancellable Work Pattern (CWP).
+    ///     </para>
+    /// </remarks>
+    public MenuItem? Value { get => _value; set => ChangeValue (value); }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<MenuItem?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<MenuItem?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<MenuItem?> args) => false;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<MenuItem?> args) { }
+
+    /// <summary>
+    ///     INTERNAL Sets Value.
+    /// </summary>
+    /// <param name="newValue">The new value.</param>
+    /// <returns>
+    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
+    ///     <see langword="null"/> if the state was not changed for some other reason.
+    /// </returns>
+    private bool? ChangeValue (MenuItem? newValue)
+    {
+        if (_value == newValue)
+        {
+            return null;
+        }
+
+        MenuItem? oldValue = _value;
+
+        ValueChangingEventArgs<MenuItem?> changingArgs = new (oldValue, newValue);
+
+        if (OnValueChanging (changingArgs) || changingArgs.Handled)
+        {
+            return true;
+        }
+
+        ValueChanging?.Invoke (this, changingArgs);
+
+        if (changingArgs.Handled)
+        {
+            return true;
+        }
+
+        _value = newValue;
+
+        ValueChangedEventArgs<MenuItem?> changedArgs = new (oldValue, _value);
+        OnValueChanged (changedArgs);
+        ValueChanged?.Invoke (this, changedArgs);
+
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
+
+        return false;
+    }
+
+    #endregion IValue<MenuItem?> Implementation
 
     /// <inheritdoc/>
     public override bool EnableForDesign ()

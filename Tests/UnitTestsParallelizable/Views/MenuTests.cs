@@ -2121,4 +2121,240 @@ public class MenuTests
     }
 
     #endregion Menu OnSelectedMenuItemChanged SubMenu Display
+
+    #region IValue<MenuItem?> Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ImplementsIValue ()
+    {
+        Menu menu = new ();
+
+        Assert.IsAssignableFrom<IValue<MenuItem?>> (menu);
+        Assert.IsAssignableFrom<IValue> (menu);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_DefaultsToNull ()
+    {
+        Menu menu = new ();
+
+        Assert.Null (menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_CanBeSetProgrammatically ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.Value = item;
+
+        Assert.Equal (item, menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_SetToSameValue_NoEventsRaised ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+        menu.Value = item;
+
+        int valueChangingCount = 0;
+        int valueChangedCount = 0;
+
+        menu.ValueChanging += (_, _) => valueChangingCount++;
+        menu.ValueChanged += (_, _) => valueChangedCount++;
+
+        menu.Value = item; // Set to same value
+
+        Assert.Equal (0, valueChangingCount);
+        Assert.Equal (0, valueChangedCount);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ValueChanging_CanBeCancelled ()
+    {
+        Menu menu = new ();
+        MenuItem item1 = new () { Title = "Item1" };
+        MenuItem item2 = new () { Title = "Item2" };
+        menu.Add (item1, item2);
+
+        menu.Value = item1;
+
+        menu.ValueChanging += (_, args) =>
+                              {
+                                  if (args.NewValue == item2)
+                                  {
+                                      args.Handled = true;
+                                  }
+                              };
+
+        menu.Value = item2; // Should be cancelled
+
+        Assert.Equal (item1, menu.Value); // Still item1
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ValueChanged_RaisedWhenValueChanges ()
+    {
+        Menu menu = new ();
+        MenuItem item1 = new () { Title = "Item1" };
+        MenuItem item2 = new () { Title = "Item2" };
+        menu.Add (item1, item2);
+
+        MenuItem? oldValue = null;
+        MenuItem? newValue = null;
+        int changedCount = 0;
+
+        menu.ValueChanged += (_, args) =>
+                             {
+                                 oldValue = args.OldValue;
+                                 newValue = args.NewValue;
+                                 changedCount++;
+                             };
+
+        menu.Value = item1;
+        Assert.Equal (1, changedCount);
+        Assert.Null (oldValue);
+        Assert.Equal (item1, newValue);
+
+        menu.Value = item2;
+        Assert.Equal (2, changedCount);
+        Assert.Equal (item1, oldValue);
+        Assert.Equal (item2, newValue);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ValueChangedUntyped_RaisedWhenValueChanges ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        object? capturedValue = null;
+        int untypedCount = 0;
+
+        menu.ValueChangedUntyped += (_, args) =>
+                                     {
+                                         capturedValue = args.NewValue;
+                                         untypedCount++;
+                                     };
+
+        menu.Value = item;
+
+        Assert.Equal (1, untypedCount);
+        Assert.Equal (item, capturedValue);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_SetOnAccepting_FromMenuItem ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.BeginInit ();
+        menu.EndInit ();
+
+        // Simulate MenuItem Accept bubbling up
+        item.InvokeCommand (Command.Accept);
+
+        Assert.Equal (item, menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_SetFromMenuItemAccept ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.BeginInit ();
+        menu.EndInit ();
+
+        // Simulate MenuItem Accept bubbling up
+        item.InvokeCommand (Command.Accept);
+
+        // Menu.Value should be set to the accepted MenuItem
+        Assert.Equal (item, menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_InvokeCommand_PopulatesContextValueWithMenuItem ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.BeginInit ();
+        menu.EndInit ();
+
+        // Set Menu.Value first
+        menu.Value = item;
+
+        ICommandContext? capturedContext = null;
+
+        menu.Accepting += (_, args) =>
+                          {
+                              capturedContext = args.Context;
+                          };
+
+        // When Menu itself invokes a command, ctx.Value should be populated from Menu.GetValue()
+        menu.InvokeCommand (Command.Accept);
+
+        Assert.NotNull (capturedContext);
+        Assert.Equal (item, capturedContext!.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_GetValue_ReturnsCurrentValue ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.Value = item;
+
+        IValue iValue = menu;
+        object? value = iValue.GetValue ();
+
+        Assert.Equal (item, value);
+
+        menu.Dispose ();
+    }
+
+    #endregion
 }
