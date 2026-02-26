@@ -1,8 +1,6 @@
 ﻿using System.Text;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests;
-
 
 public class HotKeyTests
 {
@@ -15,7 +13,7 @@ public class HotKeyTests
     [InlineData ((KeyCode)'你')] // Chinese ni
     public void AddKeyBindingsForHotKey_Sets (KeyCode key)
     {
-        var view = new View ();
+        View view = new ();
         view.HotKey = KeyCode.Z;
         Assert.Equal (string.Empty, view.Title);
         Assert.Equal (KeyCode.Z, view.HotKey);
@@ -60,35 +58,44 @@ public class HotKeyTests
         }
     }
 
+    // Claude - Opus 4.5
+    [Fact]
+    public void AddKeyBindingsForHotKey_Rejects_Space ()
+    {
+        View view = new () { HotKey = KeyCode.Z };
+
+        Assert.Throws<ArgumentException> (() => view.AddKeyBindingsForHotKey (view.HotKey, Key.Space));
+    }
+
     [Fact]
     public void AddKeyBindingsForHotKey_SetsBinding_Key ()
     {
-        var view = new View ();
+        View view = new ();
         view.HotKey = KeyCode.Z;
         Assert.Equal (string.Empty, view.Title);
         Assert.Equal (KeyCode.Z, view.HotKey);
 
         view.AddKeyBindingsForHotKey (view.HotKey, Key.A);
-        view.HotKeyBindings.TryGet (Key.A, out var binding);
+        view.HotKeyBindings.TryGet (Key.A, out KeyBinding binding);
         Assert.Equal (Key.A, binding.Key);
     }
 
     [Fact]
     public void AddKeyBindingsForHotKey_SetsBinding_Data ()
     {
-        var view = new View ();
+        View view = new ();
         view.HotKey = KeyCode.Z;
         Assert.Equal (KeyCode.Z, view.HotKey);
 
         view.AddKeyBindingsForHotKey (view.HotKey, Key.A, "data");
-        view.HotKeyBindings.TryGet (Key.A, out var binding);
+        view.HotKeyBindings.TryGet (Key.A, out KeyBinding binding);
         Assert.Equal ("data", binding.Data);
     }
 
     [Fact]
     public void Defaults ()
     {
-        var view = new View ();
+        View view = new ();
         Assert.Equal (string.Empty, view.Title);
         Assert.Equal (KeyCode.Null, view.HotKey);
 
@@ -111,7 +118,7 @@ public class HotKeyTests
     [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask, false)]
     public void NewKeyDownEvent_Runs_Default_HotKey_Command (KeyCode mask, bool expected)
     {
-        var view = new View { HotKeySpecifier = (Rune)'^', Title = "^Test" };
+        View view = new () { HotKeySpecifier = (Rune)'^', Title = "^Test" };
         view.CanFocus = true;
         Assert.False (view.HasFocus);
         view.NewKeyDownEvent (KeyCode.T | mask);
@@ -121,67 +128,53 @@ public class HotKeyTests
     [Fact]
     public void NewKeyDownEvent_Ignores_Focus_KeyBindings_SuperView ()
     {
-        var view = new View ();
+        View view = new ();
         view.HotKeyBindings.Add (Key.A, Command.HotKey);
-        view.KeyDownNotHandled += (s, e) => { Assert.Fail (); };
+        view.KeyDownNotHandled += (_, _) => { Assert.Fail (); };
 
-        var superView = new View ();
+        View superView = new ();
         superView.Add (view);
 
-        var ke = Key.A;
+        Key ke = Key.A;
         superView.NewKeyDownEvent (ke);
     }
 
     [Fact]
     public void NewKeyDownEvent_Honors_HotKey_KeyBindings_SuperView ()
     {
-        var view = new View ();
+        View view = new ();
         view.HotKeyBindings.Add (Key.A, Command.HotKey);
-        bool hotKeyInvoked = false;
-        view.HandlingHotKey += (s, e) => { hotKeyInvoked = true; };
+        var hotKeyInvoked = false;
+        view.HandlingHotKey += (_, _) => { hotKeyInvoked = true; };
 
-        bool notHandled = false;
-        view.KeyDownNotHandled += (s, e) => { notHandled = true; };
+        var notHandled = false;
+        view.KeyDownNotHandled += (_, _) => { notHandled = true; };
 
-        var superView = new View ();
+        View superView = new ();
         superView.Add (view);
 
-        var ke = Key.A;
+        Key ke = Key.A;
         superView.NewKeyDownEvent (ke);
 
         Assert.False (notHandled);
         Assert.True (hotKeyInvoked);
     }
 
-
     [Fact]
     public void NewKeyDownEvent_InNewKeyDownEvent_Invokes_HotKey_Command_With_SuperView ()
     {
-        var superView = new View ()
-        {
-            CanFocus = true
-        };
+        View superView = new () { CanFocus = true };
 
-        var view1 = new View
-        {
-            HotKeySpecifier = (Rune)'^',
-            Title = "view^1",
-            CanFocus = true
-        };
+        View view1 = new () { HotKeySpecifier = (Rune)'^', Title = "view^1", CanFocus = true };
 
-        var view2 = new View
-        {
-            HotKeySpecifier = (Rune)'^',
-            Title = "view^2",
-            CanFocus = true
-        };
+        View view2 = new () { HotKeySpecifier = (Rune)'^', Title = "view^2", CanFocus = true };
 
         superView.Add (view1, view2);
 
         superView.SetFocus ();
         Assert.True (view1.HasFocus);
 
-        var ke = Key.D2;
+        Key ke = Key.D2;
         superView.NewKeyDownEvent (ke);
         Assert.True (view2.HasFocus);
     }
@@ -189,7 +182,7 @@ public class HotKeyTests
     [Fact]
     public void Set_RemovesOldKeyBindings ()
     {
-        var view = new View ();
+        View view = new ();
         view.HotKey = KeyCode.A;
         Assert.Equal (string.Empty, view.Title);
         Assert.Equal (KeyCode.A, view.HotKey);
@@ -237,7 +230,7 @@ public class HotKeyTests
     [InlineData (KeyCode.Null)]
     public void Set_Sets_WithValidKey (KeyCode key)
     {
-        var view = new View ();
+        View view = new ();
         view.HotKey = key;
         Assert.Equal (key, view.HotKey);
     }
@@ -252,7 +245,7 @@ public class HotKeyTests
     [InlineData ((KeyCode)'ö')] // German o umlaut
     public void Set_SetsKeyBindings (KeyCode key)
     {
-        var view = new View ();
+        View view = new ();
         view.HotKey = key;
         Assert.Equal (string.Empty, view.Title);
         Assert.Equal (key, view.HotKey);
@@ -296,27 +289,19 @@ public class HotKeyTests
     [Fact]
     public void Set_Throws_If_Modifiers_Are_Included ()
     {
-        var view = new View ();
+        View view = new ();
 
         // A..Z must be naked (Alt is assumed)
         view.HotKey = Key.A.WithAlt;
         Assert.Throws<ArgumentException> (() => view.HotKey = Key.A.WithCtrl);
 
-        Assert.Throws<ArgumentException> (
-                                          () =>
-                                              view.HotKey =
-                                                  KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask
-                                         );
+        Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
 
         // All others must not have Ctrl (Alt is assumed)
         view.HotKey = Key.D1.WithAlt;
         Assert.Throws<ArgumentException> (() => view.HotKey = Key.D1.WithCtrl);
 
-        Assert.Throws<ArgumentException> (
-                                          () =>
-                                              view.HotKey =
-                                                  KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask
-                                         );
+        Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
 
         // Shift is ok (e.g. this is '!')
         view.HotKey = Key.D1.WithShift;
@@ -334,7 +319,7 @@ public class HotKeyTests
     [InlineData (KeyCode.Null | KeyCode.ShiftMask)]
     public void Set_Throws_With_Invalid_Key (KeyCode key)
     {
-        var view = new View ();
+        View view = new ();
         Assert.Throws<ArgumentException> (() => view.HotKey = key);
     }
 
@@ -353,7 +338,7 @@ public class HotKeyTests
     //[InlineData ("Test^!", (Key)'!')]
     public void Title_Change_Sets_HotKey (string title, KeyCode expectedHotKey)
     {
-        var view = new View { HotKeySpecifier = new Rune ('^'), Title = "^Hello" };
+        View view = new () { HotKeySpecifier = new Rune ('^'), Title = "^Hello" };
         Assert.Equal (KeyCode.H, view.HotKey);
 
         view.Title = title;
@@ -364,7 +349,7 @@ public class HotKeyTests
     [InlineData ("^Test")]
     public void Title_Empty_Sets_HotKey_To_Null (string title)
     {
-        var view = new View { HotKeySpecifier = (Rune)'^', Title = title };
+        View view = new () { HotKeySpecifier = (Rune)'^', Title = title };
 
         Assert.Equal (title, view.Title);
         Assert.Equal (KeyCode.T, view.HotKey);
@@ -403,11 +388,7 @@ public class HotKeyTests
     public void HotKeySpecifier_0xFFFF_With_Underscore_In_Title ()
     {
         // Arrange & Act: This is the scenario from the bug report
-        View view = new ()
-        {
-            HotKeySpecifier = (Rune)0xFFFF,
-            Title = "my label with an _underscore"
-        };
+        View view = new () { HotKeySpecifier = (Rune)0xFFFF, Title = "my label with an _underscore" };
 
         // Assert: HotKey should be empty (no hotkey should be set)
         Assert.Equal (KeyCode.Null, view.HotKey);
