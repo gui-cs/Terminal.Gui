@@ -46,7 +46,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         AddCommand (Command.Left, () => MovePrevious (Command.Left));
     }
 
-    // Stores the int value for each checkbox (replaces use of Data property)
+    // Stores the int value for each checkbox (replaced use of Data property)
     private readonly Dictionary<CheckBox, int> _checkBoxValues = new ();
 
     private bool MoveNext (Command command)
@@ -378,7 +378,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
         {
-            // Clean up checkbox value mapping (replaces use of Data property)
+            // Clean up checkbox value mapping (replaced use of Data property)
             if (sv is CheckBox cb)
             {
                 _checkBoxValues.Remove (cb);
@@ -438,7 +438,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             TabStop = TabBehavior
         };
 
-        // Store value in dictionary (replaces use of Data property)
+        // Store value in dictionary (replaced use of Data property)
         _checkBoxValues [checkbox] = value;
 
         return checkbox;

@@ -193,7 +193,7 @@ internal sealed class Arranger : IDisposable
     private Button? _topSizeButton;
     private Button? _bottomSizeButton;
 
-    // Stores the button type for each arrangement button (replaces use of Data property)
+    // Stores the button type for each arrangement button (replaced use of Data property)
     private readonly Dictionary<Button, ArrangeButtons> _buttonTypes = new ();
 
     /// <summary>
@@ -281,7 +281,7 @@ internal sealed class Arranger : IDisposable
 
         _border.Add (button);
 
-        // Store button type in dictionary (replaces use of Data property)
+        // Store button type in dictionary (replaced use of Data property)
         _buttonTypes [button] = buttonType;
 
         return button;
