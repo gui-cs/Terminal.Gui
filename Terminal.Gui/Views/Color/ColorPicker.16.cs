@@ -3,18 +3,25 @@ namespace Terminal.Gui.Views;
 /// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
 public class ColorPicker16 : View, IValue<ColorName16>
 {
-    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
-    public ColorPicker16 () => SetInitialProperties ();
-
     /// <summary>Columns of color boxes</summary>
     private const int COLS = 8;
 
     /// <summary>Rows of color boxes</summary>
     private const int ROWS = 2;
 
+    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
+    public ColorPicker16 ()
+    {
+        CanFocus = true;
+        AddCommands ();
+        AddKeyBindings ();
+
+        Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
+        Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
+        SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
+    }
+
     private int _boxHeight = 2;
-    private int _boxWidth = 4;
-    private int _selectColorIndex = (int)Color.Black;
 
     /// <summary>Height of a color box</summary>
     public int BoxHeight
@@ -34,6 +41,8 @@ public class ColorPicker16 : View, IValue<ColorName16>
         }
     }
 
+    private int _boxWidth = 4;
+
     /// <summary>Width of a color box</summary>
     public int BoxWidth
     {
@@ -51,6 +60,8 @@ public class ColorPicker16 : View, IValue<ColorName16>
             SetNeedsLayout ();
         }
     }
+
+    private int _selectColorIndex = (int)Color.Black;
 
     /// <summary>Cursor for the selected color.</summary>
     public Point Caret
@@ -200,12 +211,19 @@ public class ColorPicker16 : View, IValue<ColorName16>
                 return;
             }
 
+            if (value is < 0 or > (ColorName16)15)
+            {
+                throw new ArgumentOutOfRangeException (nameof (value), @"SelectedColor must be between 0 and 15.");
+            }
+
             _selectColorIndex = (int)value;
             SetNeedsDraw ();
 
             ValueChangedEventArgs<ColorName16> changedArgs = new (oldValue, value);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
         }
     }
 
@@ -214,6 +232,9 @@ public class ColorPicker16 : View, IValue<ColorName16>
 
     /// <inheritdoc/>
     object IValue.GetValue () => SelectedColor;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
     ///     Called when the <see cref="ColorPicker16"/> <see cref="Value"/> is changing.
@@ -243,28 +264,24 @@ public class ColorPicker16 : View, IValue<ColorName16>
         AddCommand (Command.Right, ctx => MoveRight (ctx));
         AddCommand (Command.Up, ctx => MoveUp (ctx));
         AddCommand (Command.Down, ctx => MoveDown (ctx));
+    }
 
-        AddCommand (Command.Activate,
-                    ctx =>
-                    {
-                        if (ctx?.Binding is not MouseBinding mouseCommandContext)
-                        {
-                            return false;
-                        }
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? commandContext)
+    {
+        base.OnActivated (commandContext);
 
-                        if (RaiseActivating (ctx) == true)
-                        {
-                            return true;
-                        }
+        if (commandContext?.Binding is MouseBinding { MouseEvent.Position: { } pos })
+        {
+            int col = pos.X / _boxWidth;
+            int row = pos.Y / _boxHeight;
 
-                        if (mouseCommandContext.MouseEvent is { })
-                        {
-                            Caret = new Point (mouseCommandContext.MouseEvent.Position!.Value.X / _boxWidth,
-                                               mouseCommandContext.MouseEvent.Position!.Value.Y / _boxHeight);
-                        }
-
-                        return SetFocus ();
-                    });
+            // Only set Caret if within valid color box bounds
+            if (col is >= 0 and < COLS && row is >= 0 and < ROWS)
+            {
+                Caret = new Point (col, row);
+            }
+        }
     }
 
     /// <summary>Add the KeyBindings.</summary>
@@ -328,16 +345,5 @@ public class ColorPicker16 : View, IValue<ColorName16>
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
-    }
-
-    private void SetInitialProperties ()
-    {
-        CanFocus = true;
-        AddCommands ();
-        AddKeyBindings ();
-
-        Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
-        Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-        SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
     }
 }

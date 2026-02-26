@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -59,7 +60,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="app">The <see cref="IApplication"/> instance that is running the input loop.</param>
     public async Task StartInputTaskAsync (IApplication? app)
     {
-        Logging.Trace ($"Booting... app: {app?.MainThreadId}");
+        Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", "Booting...");
 
         _inputTask = Task.Run (() => RunInput (app));
 
@@ -84,7 +85,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             Logging.Critical ($"app: {app?.MainThreadId} Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
-        Logging.Trace ($"app: {app?.MainThreadId} Booting complete");
+        Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", "Booting complete");
     }
 
     /// <inheritdoc/>
@@ -116,8 +117,6 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void BootMainLoop (IApplication? app)
     {
-        //Logging.Trace ($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
-
         lock (_oLockInitialization)
         {
             // Instance must be constructed on the thread in which it is used.
@@ -214,7 +213,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             }
             catch (OperationCanceledException)
             {
-                Logging.Trace ($"app: {app?.MainThreadId}Input loop canceled");
+                Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", $"{app?.MainThreadId}Input loop canceled");
             }
 
             _input.Dispose ();
@@ -228,7 +227,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         if (_stopCalled)
         {
-            Logging.Trace ($"app: {app?.MainThreadId} Input loop exited cleanly");
+            Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", $"Input loop exited cleanly");
         }
         else
         {

@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Numerics;
 
 namespace Terminal.Gui.Views;
@@ -31,6 +30,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
 
+        CanFocus = true;
+
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
@@ -44,7 +45,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        _down = new ()
+        _down = new Button
         {
             Height = 1,
             Width = 1,
@@ -53,10 +54,10 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Title = $"{Glyphs.DownArrow}",
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = ShadowStyle.None
         };
 
-        _number = new ()
+        _number = new View
         {
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
@@ -64,10 +65,10 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns ())),
             Height = 1,
             TextAlignment = Alignment.Center,
-            CanFocus = true,
+            CanFocus = true
         };
 
-        _up = new ()
+        _up = new Button
         {
             X = Pos.Right (_number),
             Y = Pos.Top (_number),
@@ -78,57 +79,47 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Title = $"{Glyphs.UpArrow}",
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = ShadowStyle.None
         };
-
-        CanFocus = true;
 
         _down.Accepting += OnDownButtonOnAccept;
         _up.Accepting += OnUpButtonOnAccept;
 
         Add (_down, _number, _up);
 
-        AddCommand (
-                    Command.Up,
-                    (ctx) =>
+        AddCommand (Command.Up,
+                    ctx =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
                         }
 
-                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseActivating (ctx) is true)
-                        //{
-                        //    return true;
-                        //}
+                        InvokeCommand (Command.Activate);
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
                             Value = (T)helper!.Add (v, i);
                         }
+
                         return true;
                     });
 
-        AddCommand (
-                    Command.Down,
-                    (ctx) =>
+        AddCommand (Command.Down,
+                    ctx =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
                         }
 
-                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseActivating (ctx) is true)
-                        //{
-                        //    return true;
-                        //}
+                        InvokeCommand (Command.Activate);
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
                             Value = (T)helper!.Subtract (v, i);
                         }
+
                         return true;
                     });
 
@@ -194,19 +185,18 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             ValueChangedEventArgs<T?> changedArgs = new (oldValue, _value);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
         }
     }
 
-    /// <summary>
-    ///     Raised when <see cref="Value"/> is about to change.
-    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
-    /// </summary>
+    /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<T?>>? ValueChanging;
 
-    /// <summary>
-    ///     Raised when <see cref="Value"/> has changed.
-    /// </summary>
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<T?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
     ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
@@ -218,27 +208,25 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
     /// </summary>
     protected virtual void OnValueChanged (ValueChangedEventArgs<T?> args) { }
 
-    private string _format = "{0}";
-
     /// <summary>
     ///     Gets or sets the format string used to display the value. The default is "{0}".
     /// </summary>
     public string Format
     {
-        get => _format;
+        get;
         set
         {
-            if (_format == value)
+            if (field == value)
             {
                 return;
             }
 
-            _format = value;
+            field = value;
 
-            FormatChanged?.Invoke (this, new (value));
+            FormatChanged?.Invoke (this, new EventArgs<string> (value));
             SetText ();
         }
-    }
+    } = "{0}";
 
     /// <summary>
     ///     Raised when <see cref="Format"/> has changed.
@@ -267,7 +255,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
 
             _increment = value;
 
-            IncrementChanged?.Invoke (this, new (value!));
+            IncrementChanged?.Invoke (this, new EventArgs<T> (value!));
         }
     }
 
@@ -277,8 +265,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
     public event EventHandler<EventArgs<T>>? IncrementChanged;
 
     // Prevent the drawing of Text
-    /// <inheritdoc />
-    protected override bool OnDrawingText () { return true; }
+    /// <inheritdoc/>
+    protected override bool OnDrawingText () => true;
 
     /// <summary>
     ///     Attempts to convert the specified <paramref name="value"/> to type <typeparamref name="TValue"/>.
@@ -335,16 +323,13 @@ internal static class NumericHelper
         Register<float> ();
         Register<double> ();
         Register<decimal> ();
+
         // Add more as needed
     }
 
-    private static void Register<T> () where T : INumber<T>
-    {
-        _helpers [typeof (T)] = new NumericHelperImpl<T> ();
-    }
+    private static void Register<T> () where T : INumber<T> => _helpers [typeof (T)] = new NumericHelperImpl<T> ();
 
-    public static bool TryGetHelper (Type t, out INumericHelper? helper)
-        => _helpers.TryGetValue (t, out helper);
+    public static bool TryGetHelper (Type t, out INumericHelper? helper) => _helpers.TryGetValue (t, out helper);
 
     private class NumericHelperImpl<T> : INumericHelper where T : INumber<T>
     {
