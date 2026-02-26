@@ -2187,6 +2187,35 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.True (tv.VerticalScrollBar.Visible, "Vertical scrollbar should be visible when content exceeds viewport height");
     }
 
+    [Fact]
+    public void ContentSize_Updates_When_Text_Is_Delected ()
+    {
+        // Arrange: Create a small TextView with ScrollBars enabled
+        TextView tv = new () { Width = 10, Height = 3, ScrollBars = true, Text = "A\nB\nC\nD" };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.SetRelativeLayout (new Size (100, 100));
+
+        Size initialContentSize = tv.GetContentSize ();
+        Assert.Equal (4, initialContentSize.Height); // Initially 4 lines
+
+        // With height=3 and 4 lines of content, vertical scrollbar should be visible
+        Assert.True (tv.VerticalScrollBar.Visible, "Vertical scrollbar should be visible when content exceeds viewport height");
+
+        // Act: Delete all text so that the lines are shorter than the viewport height (delete multiple lines)
+        for (int i = 0; i < 7; i++)
+        {
+            tv.NewKeyDownEvent (Key.Delete);
+        }
+
+        // Assert: ContentSize height should reflect the number of lines (1 line)
+        Size newContentSize = tv.GetContentSize ();
+        Assert.Equal (1, newContentSize.Height);
+
+        // With height=3 and 1 lines of content, vertical scrollbar should be invisible
+        Assert.False (tv.VerticalScrollBar.Visible, "Vertical scrollbar should be visible when content exceeds viewport height");
+    }
+
     // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
     /// <summary>
     ///     Tests that horizontal scrollbar appears when text width exceeds viewport width.
