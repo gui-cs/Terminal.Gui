@@ -27,99 +27,79 @@ This mirrors how `Prompt<TView, TResult>` generalizes `Dialog` — but for **non
 
 ## 2. Existing Work (PR #4412)
 
-PR #4412 contains foundational changes that this spec builds on. These changes are already implemented and tested:
+PR #4412 contains foundational changes this spec builds on:
 
-### 2.1 `PopoverMenu.Anchor` Property
-
-```csharp
-/// Gets or sets a delegate that returns the screen-relative rectangle used to
-/// anchor the menu when MakeVisible is called without an explicit position.
-public Func<Rectangle?>? Anchor { get; set; }
-```
-
-**Positioning priority chain** (implemented in `SetPosition`):
-1. Explicit `anchor` parameter to `MakeVisible(anchor:)`
-2. `Anchor` property delegate
-3. Explicit `idealScreenPosition` parameter
-4. Last mouse position (fallback)
-
-### 2.2 `PopoverMenu.GetAnchoredPosition()`
-
-Private method that positions a menu relative to an anchor rectangle:
-- **Below-anchor preferred** — places menu at `anchor.Bottom`
-- **Flips above** when `anchor.Bottom + menuHeight > screenHeight` and space above exists
-- **X clamped** to `[0, screenWidth - menuWidth]` to prevent overflow
-
-### 2.3 `MenuBarItem.PopoverMenuAnchor`
-
-```csharp
-/// Gets or sets a delegate that returns the screen-relative anchor rectangle
-/// used to position the PopoverMenu when this item opens.
-public Func<Rectangle?>? PopoverMenuAnchor { get; set; }
-```
-
-When `PopoverMenuOpen` is set to `true`, the anchor is resolved:
-```csharp
-Rectangle anchor = PopoverMenuAnchor?.Invoke () ?? FrameToScreen ();
-PopoverMenu.MakeVisible (anchor: anchor);
-```
-
-### 2.4 `Shortcut.ElementSpacing`
-
-```csharp
-/// Gets or sets the spacing between the CommandView, HelpView, and KeyView. Default is 1.
-public int ElementSpacing { get; set; } = 1;
-```
-
-Replaces the former hardcoded `GetMarginThickness()`. Used in dropdown scenarios to set `ElementSpacing = 0` for compact toggle buttons.
-
-### 2.5 `PopoverBaseImpl` Documentation Clarification
-
-Fullscreen (`Dim.Fill()`) is now documented as a **default, not a requirement**. Fixed-size popovers (autocomplete, tooltips, dropdowns) are explicitly supported. `PopoverMenu` must stay fullscreen because cascading submenus are SubViews and `AddViewportToClip` would clip them.
-
-### 2.6 `TextField` / `TextView` Anchor Integration
-
-Both now set `ContextMenu.Anchor = () => FrameToScreen ()` so keyboard-activated context menus position correctly relative to the owning view.
-
-### 2.7 `DropDownListExample` Scenario (POC)
-
-Demonstrates the dropdown pattern: `TextField` + `MenuBarItem` with `ElementSpacing = 0`, `PopoverMenuAnchor` pointing at the `TextField`'s frame. This is the throwaway POC that `PopoverEdit` will replace.
+- **`PopoverMenu.Anchor`** — `Func<Rectangle?>?` delegate for positioning. Priority: explicit anchor param → `Anchor` property → `idealScreenPosition` → mouse position.
+- **`GetAnchoredPosition()`** — Prefers below-anchor, flips above when overflow, clamps X to screen.
+- **`MenuBarItem.PopoverMenuAnchor`** — Delegates to `PopoverMenu.MakeVisible(anchor:)`. Falls back to `FrameToScreen()`.
+- **`Shortcut.ElementSpacing`** — Replaces hardcoded `GetMarginThickness()`. Used in dropdown scenarios for compact toggle buttons (`ElementSpacing = 0`).
+- **`PopoverBaseImpl` docs** — Fullscreen is a *default*, not a requirement. Fixed-size popovers explicitly supported.
+- **`TextField`/`TextView`** — Now set `ContextMenu.Anchor = () => FrameToScreen()` for keyboard-activated context menus.
+- **`DropDownListExample`** — Throwaway POC demonstrating TextField + MenuBarItem dropdown pattern.
 
 ---
 
 ## 3. Design Overview
 
-### 3.1 Type Hierarchy (New)
+### 3.1 The Core Insight: `MenuBarItem` Is Generic Popover Ownership
+
+Today `MenuBarItem` is ~260 lines, of which **~80% is generic popover-ownership boilerplate**:
+
+| Responsibility | Generic? |
+|---|---|
+| Owns a `PopoverMenu` property | Yes |
+| `CommandBridge` to relay Activate | Yes |
+| `RegisterPopover()` with `Application.Popover` | Yes |
+| `PopoverMenuOpen` CWP toggle | Yes |
+| `VisibleChanged` sync | Yes |
+| Close on focus loss (`OnHasFocusChanged`) | Yes |
+| `EndInit` initialization | Yes |
+| `Dispose` cleanup | Yes |
+| `PopoverMenuAnchor` (PR #4412) | Yes |
+| Custom `HotKey` handler (skip SetFocus) | **Menu-specific** |
+| `OnKeyDownNotHandled` close on same hotkey | **Menu-specific** |
+| `SubMenu` → throws | **Menu-specific** |
+
+The same boilerplate would be duplicated in `PopoverEdit`. It must be extracted.
+
+`IPopover` already has a TODO: `// TODO: Add WeakReference<View?>? Target {get; set;} - The view that commands will get bubbled up to` — this is exactly the "owner view" concept that `MenuBarItem` hand-rolls.
+
+### 3.2 Type Hierarchy
 
 ```
 PopoverBaseImpl (abstract, existing — Dim.Fill() default, not required)
-├── Popover<TView, TResult> (NEW — generic popover host)
-│   └── owns TView as its content view
-│   └── supports IValue<TResult> for result extraction
-│   └── inherits Anchor positioning from PopoverMenu refactor
 │
-├── PopoverMenu : Popover<Menu, MenuItem> (REFACTORED — was concrete, now specialization)
-│   └── fullscreen (required for cascading submenu clipping)
-│   └── menu-specific: cascading submenus, key binding propagation, arrow navigation
-```
-
-### 3.2 Companion View (New)
-
-```
-View
-└── PopoverEdit<TView, TResult> (NEW — the ComboBox replacement)
-    └── contains: TextField (display/edit)
-    └── contains: MenuBarItem (toggle glyph, ▼) — reuses existing dropdown infrastructure
-    └── owns: Popover<TView, TResult> via MenuBarItem.PopoverMenu or directly
-    └── uses: Anchor property to position below/above the TextField
-    └── implements: IValue<TResult>
+├── Popover<TView, TResult> (NEW — generic popover host WITH owner lifecycle)
+│   └── owns TView ContentView (SubView + CommandBridge)
+│   └── Target: WeakReference<View?> — the owner view (implements IPopover TODO)
+│   └── IsOpen CWP property — toggle visibility
+│   └── Anchor positioning — promoted from PopoverMenu
+│   └── Result extraction — mirrors Prompt<TView, TResult>
+│   └── Auto: register, bridge, visibility sync, close-on-owner-focus-loss
+│
+├── PopoverMenu : Popover<Menu, MenuItem> (REFACTORED)
+│   └── Root alias for ContentView
+│   └── Fullscreen (required for cascading submenu clipping)
+│   └── Menu-specific only: cascading submenus, key propagation, arrow nav
+│
+MenuBarItem : MenuItem (SIMPLIFIED — drops ~80% of boilerplate)
+│   └── Has PopoverMenu (typed as Popover<Menu, MenuItem>)
+│   └── Sets PopoverMenu.Target = this
+│   └── Lifecycle delegated to PopoverMenu base class
+│   └── Keeps only: HotKey skip-focus, hotkey-deactivation, SubMenu throwing
+│
+PopoverEdit<TView, TResult> : View, IValue<TResult?> (NEW — ComboBox replacement)
+│   └── Has Popover<TView, TResult>
+│   └── Sets Popover.Target = _textField (or this)
+│   └── Lifecycle is automatic via base class
+│   └── Just wires: TextField + toggle button + DisplayFormatter
 ```
 
 ### 3.3 Command Infrastructure Enhancement
 
 ```
 ICommandContext (existing)
-└── + object? Value { get; }        // NEW — carries the source view's IValue.GetValue()
+└── + object? Value { get; }        // NEW — carries source IValue.GetValue()
 
 CommandContext (existing record struct)
 └── + object? Value { get; init; }  // NEW — populated when source implements IValue
@@ -129,7 +109,7 @@ CommandContext (existing record struct)
 
 ## 4. Detailed Design
 
-### 4.1 `Popover<TView, TResult>` — Generic Popover Host
+### 4.1 `Popover<TView, TResult>` — Generic Popover Host with Owner Lifecycle
 
 **File:** `Terminal.Gui/Views/Popover.cs`
 **Namespace:** `Terminal.Gui.Views`
@@ -139,19 +119,35 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     where TView : View, new()
 {
     // --- Content ---
-    public TView? ContentView { get; set; }             // The hosted view (added as SubView)
+    public TView? ContentView { get; set; }             // Hosted view (SubView + CommandBridge)
 
-    // --- Result Extraction (mirrors Prompt<TView, TResult>) ---
-    public Func<TView, TResult?>? ResultExtractor { get; set; }
-    public TResult? Result { get; protected set; }
+    // --- Owner / Target ---
+    // Implements the IPopover TODO: "Add WeakReference<View?>? Target - view commands bubble up to"
+    public WeakReference<View?>? Target { get; set; }   // The view that owns this popover
+
+    // --- Open/Close (CWP — replaces MenuBarItem.PopoverMenuOpen) ---
+    public bool IsOpen { get; set; }                    // CWP property: toggles Visible + MakeVisible
+    protected virtual bool OnIsOpenChanging (ValueChangingEventArgs<bool> args);
+    public event EventHandler<ValueChangingEventArgs<bool>>? IsOpenChanging;
+    protected virtual void OnIsOpenChanged (ValueChangedEventArgs<bool> args);
+    public event EventHandler<ValueChangedEventArgs<bool>>? IsOpenChanged;
 
     // --- Anchor-based Positioning (promoted from PopoverMenu) ---
     public Func<Rectangle?>? Anchor { get; set; }
     public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null);
-    internal void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null);
 
-    // --- Events ---
+    // --- Result Extraction (mirrors Prompt<TView, TResult>) ---
+    public Func<TView, TResult?>? ResultExtractor { get; set; }
+    public TResult? Result { get; protected set; }
     public event EventHandler<ValueChangedEventArgs<TResult?>>? ResultChanged;
+
+    // --- Automatic Lifecycle (replaces MenuBarItem boilerplate) ---
+    // When Target is set:
+    //   - Auto-registers with Application.Popover on EndInit
+    //   - Auto-bridges Command.Activate from ContentView
+    //   - Syncs IsOpen ↔ Visible
+    //   - Closes (IsOpen = false) when Target loses focus
+    //   - Disposes bridge + deregisters on Dispose
 }
 ```
 
@@ -159,21 +155,25 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
 
 1. **Content management** — When `ContentView` is set, the previous content is removed and the new view is added as a SubView. A `CommandBridge` is established to relay `Command.Activate` from the content view to the popover.
 
-2. **Result extraction** — When the content view fires `Activate` (user makes a selection), the popover extracts a result using the same priority chain as `Prompt<TView, TResult>`:
+2. **Target / Owner lifecycle** — When `Target` is set, the popover subscribes to the target view's `HasFocusChanged` event and auto-closes when the target loses focus. This replaces the manual `OnHasFocusChanged` override in `MenuBarItem`. The `Target` also implements the existing TODO on `IPopover` line 72.
+
+3. **IsOpen CWP property** — Follows the Cancellable Workflow Pattern. Setting `IsOpen = true` calls `MakeVisible()`. Setting `IsOpen = false` sets `Visible = false`. `VisibleChanged` syncs back to `IsOpen`. This replaces `MenuBarItem.PopoverMenuOpen` — the exact same logic, generalized.
+
+4. **Result extraction** — When the content view fires `Activate`, the popover extracts a result using the same priority chain as `Prompt<TView, TResult>`:
    1. Use `ResultExtractor` delegate if provided.
    2. If `ContentView` implements `IValue<TResult>`, use `.Value`.
    3. If `TResult` is `string`, use `ContentView.Text`.
    4. Otherwise, `Result` remains `null`.
 
-3. **Visibility lifecycle** — Same as current `PopoverMenu`: `MakeVisible()` → `Application.Popover.Show()`, hiding restores focus. When the content fires `Activate`, the popover hides itself (the selection is complete).
+5. **Anchor-based positioning** — `Anchor` property and `GetAnchoredPosition()` promoted from `PopoverMenu`. Positioning priority: explicit `anchor` param → `Anchor` property → `idealScreenPosition` → mouse position. `GetAnchoredPosition`: prefer below, flip above, clamp X.
 
-4. **Anchor-based positioning** — The `Anchor` property and `GetAnchoredPosition()` logic currently in `PopoverMenu` is promoted to the base `Popover<TView, TResult>`. The positioning priority chain (anchor param > Anchor property > idealScreenPosition > mouse position) applies to all popover types. The `GetAnchoredPosition` method (prefer-below, flip-above, clamp-X) becomes the default positioning strategy.
+6. **Auto-registration** — During `EndInit`, if `Target` is set and `Application.Popover` is available, the popover auto-registers. This replaces `MenuBarItem.RegisterPopover()`.
 
-5. **Size flexibility** — `PopoverBaseImpl` defaults to `Dim.Fill()` but this is overridable. For non-cascading popovers (ColorPicker, DatePicker, ListView), the popover can be sized to fit the content view rather than filling the screen. Only `PopoverMenu` requires fullscreen for cascading submenu clipping.
+7. **Size flexibility** — `PopoverBaseImpl` defaults to `Dim.Fill()` but this is overridable. Non-cascading popovers can be fixed-size. Only `PopoverMenu` requires fullscreen for cascading submenu clipping.
 
 ### 4.2 `PopoverMenu` — Refactored as `Popover<Menu, MenuItem>`
 
-**File:** `Terminal.Gui/Views/Menu/PopoverMenu.cs` (same file, refactored)
+**File:** `Terminal.Gui/Views/Menu/PopoverMenu.cs` (same file, much thinner)
 
 ```csharp
 public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
@@ -186,51 +186,106 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     public static Key DefaultKey { get; set; }
     public MouseFlags MouseFlags { get; set; }
 
-    // Menu-specific behaviors preserved:
-    // - Cascading submenu management (ShowMenuItemSubMenu, GetMostVisibleLocationForSubMenu)
-    // - Key binding propagation (UpdateKeyBindings)
-    // - Left/Right arrow navigation between submenus (MoveLeft, MoveRight)
-    // - SelectedMenuItemChanged subscription for submenu positioning
-    // - QuitKey handling that propagates Accept
-    // - OnKeyDownNotHandled for matching menu item keys
-    // - Must remain fullscreen (cascading submenus are SubViews)
+    // Menu-specific overrides only:
+    // - OnSubViewAdded: setup SelectedMenuItemChanged, add all submenus
+    // - OnActivating/OnActivated/OnAccepting: menu command routing
+    // - OnKeyDownNotHandled: menu item key matching
+    // - OnVisibleChanged: ShowMenu/HideMenu on Root
+    // - MoveLeft/MoveRight: cursor key navigation
+    // - ShowMenuItemSubMenu, GetMostVisibleLocationForSubMenu: cascading
+    // - UpdateKeyBindings: key propagation
+    //
+    // DROPS (handled by base):
+    // - Anchor, MakeVisible, SetPosition, GetAnchoredPosition → base
+    // - _rootCommandBridge → base manages the ContentView bridge
+    // - RootOnVisibleChanged → base IsOpen sync
+    // - Dispose of bridge → base
+    // - EnableForDesign stays
+    //
+    // Must remain fullscreen (cascading submenus are SubViews that would be clipped)
 }
 ```
 
-**What moves to the base class:**
-- `Anchor` property → `Popover<TView, TResult>.Anchor`
-- `MakeVisible(Point?, Rectangle?)` → `Popover<TView, TResult>.MakeVisible()`
-- `SetPosition(Point?, Rectangle?)` → `Popover<TView, TResult>.SetPosition()`
-- `GetAnchoredPosition(View, Rectangle)` → `Popover<TView, TResult>.GetAnchoredPosition()`
-- `ContentView` management (`_rootCommandBridge`, add/remove SubView) → base class
-- `OnVisibleChanged` show/hide content → base class (PopoverMenu overrides for `ShowMenu`/`HideMenu`)
-
-**What stays in `PopoverMenu`:**
-- `Root` as alias for `ContentView`
-- Cascading submenu management (`ShowMenuItemSubMenu`, `GetMostVisibleLocationForSubMenu`)
-- `MoveLeft`/`MoveRight` keyboard handlers
-- `UpdateKeyBindings`
-- `MenuOnSelectedMenuItemChanged`
-- `OnActivating`/`OnActivated`/`OnAccepting` overrides for menu-specific command routing
-- `OnKeyDownNotHandled` for menu item key matching
-- `Key`/`DefaultKey`/`MouseFlags` properties
-- `OnSubViewAdded` handling for Menu subview setup
-
-**`Menu` must implement `IValue<MenuItem?>`:**
+**`Menu` must implement `IValue<MenuItem?>`** — enables automatic result extraction:
 
 ```csharp
 public class Menu : Bar, IDesignable, IValue<MenuItem?>
 {
-    // Value is the currently selected/activated MenuItem
-    public MenuItem? Value { get; set; }
+    public MenuItem? Value { get; set; }  // Currently selected/activated MenuItem
     public event EventHandler<ValueChangingEventArgs<MenuItem?>>? ValueChanging;
     public event EventHandler<ValueChangedEventArgs<MenuItem?>>? ValueChanged;
 }
 ```
 
-This enables `Popover<Menu, MenuItem>` to extract the selected `MenuItem` via `IValue<MenuItem>` without a custom `ResultExtractor`.
+### 4.3 `MenuBarItem` — Dramatically Simplified
 
-### 4.3 `ICommandContext` Enhancement — Value Propagation
+**File:** `Terminal.Gui/Views/Menu/MenuBarItem.cs` (same file, much smaller)
+
+Today `MenuBarItem` has ~260 lines. After the refactor, the generic popover-ownership boilerplate is gone:
+
+```csharp
+public class MenuBarItem : MenuItem, IDesignable
+{
+    // --- PopoverMenu property (now thin) ---
+    public PopoverMenu? PopoverMenu
+    {
+        get;
+        set
+        {
+            // Set Target, Anchor, handle PopoverMenuAnchor
+            // Delegates registration, bridging, visibility sync to Popover base class
+            field = value;
+            if (field is not null)
+            {
+                field.Target = new WeakReference<View?> (this);
+                field.Anchor = PopoverMenuAnchor ?? (() => FrameToScreen ());
+            }
+        }
+    }
+
+    // --- PopoverMenuAnchor (from PR #4412, unchanged) ---
+    public Func<Rectangle?>? PopoverMenuAnchor { get; set; }
+
+    // --- Convenience: delegates to PopoverMenu.IsOpen ---
+    public bool PopoverMenuOpen
+    {
+        get => PopoverMenu?.IsOpen ?? false;
+        set { if (PopoverMenu is { }) PopoverMenu.IsOpen = value; }
+    }
+
+    // --- Menu-specific only ---
+    // SetupCommands: HotKey handler that skips SetFocus before Activate
+    // OnActivating: toggle PopoverMenuOpen (bridged commands ignored)
+    // OnKeyDownNotHandled: close on same hotkey press
+    // SubMenu: throws InvalidOperationException
+    // OnHasFocusChanged: REMOVED — handled by Popover.Target focus tracking
+    // RegisterPopover: REMOVED — handled by Popover base class
+    // EndInit popover init: REMOVED — handled by Popover base class
+    // CommandBridge: REMOVED — handled by Popover base class
+    // VisibleChanged sync: REMOVED — handled by Popover.IsOpen sync
+    // Dispose cleanup: SIMPLIFIED — just null out PopoverMenu
+}
+```
+
+**What's removed from `MenuBarItem`:**
+- `_popoverBridge` and `CommandBridge.Connect` (~10 lines) → base class
+- `RegisterPopover()` (~5 lines) → base class
+- `EndInit` popover initialization (~12 lines) → base class
+- `OnHasFocusChanged` close-on-blur (~8 lines) → base class Target tracking
+- `PopoverMenuOpen` CWP property with full `CWPPropertyHelper.ChangeProperty` (~35 lines) → delegates to `PopoverMenu.IsOpen`
+- `OnPopoverMenuOpenChanging/Changed` virtual + events (~8 lines) → delegates to `PopoverMenu.IsOpenChanging/Changed`
+- `VisibleChanged` sync handler (~3 lines) → base class `IsOpen` sync
+- `Dispose` bridge cleanup (~10 lines) → base class
+
+**What stays:**
+- `SetupCommands` — custom HotKey handler (menu-specific focus race)
+- `OnActivating` — toggle logic + bridged-command-ignore (menu-specific)
+- `OnKeyDownNotHandled` — close on same hotkey (menu-specific)
+- `SubMenu` → throws (menu-specific)
+- Constructors (simplified)
+- `EnableForDesign`
+
+### 4.4 `ICommandContext` Enhancement — Value Propagation
 
 **Files:** `Terminal.Gui/Input/ICommandContext.cs`, `Terminal.Gui/Input/CommandContext.cs`
 
@@ -238,277 +293,259 @@ This enables `Popover<Menu, MenuItem>` to extract the selected `MenuItem` via `I
 public interface ICommandContext
 {
     // ... existing members ...
-
-    /// <summary>
-    ///     Gets the value from the source view at the time the command was invoked,
-    ///     if the source implements <see cref="IValue"/>.
-    /// </summary>
     public object? Value { get; }
 }
 
 public readonly record struct CommandContext : ICommandContext
 {
     // ... existing members ...
-
     public object? Value { get; init; }
-
     public CommandContext WithValue (object? value) => this with { Value = value };
 }
 ```
 
-**When Value is populated:**
+Populated from `IValue.GetValue()` at command invocation time. The `IValue` doc comments already reference `CommandContext.Value` — this implements that stated intent.
 
-When a command is invoked and the source `View` implements `IValue`, the `CommandContext.Value` is populated with `IValue.GetValue()`. This happens in the command invocation pipeline (likely in `View.InvokeCommand` or `CommandBridge.Connect`). This allows handlers up the command chain to access the source view's value without needing a direct reference to the source view or knowledge of its generic type.
+**Example: `MenuBar.Activated` with `ctx.Value`**
 
-The `IValue` doc comments already reference `CommandContext.Value` — this implements that stated intent.
+With `Menu : IValue<MenuItem?>`, when a `MenuItem` is activated inside a `PopoverMenu`, the value propagates through the bridge chain: `Menu` → `PopoverMenu` → `MenuBarItem` → `MenuBar`. At each step, `ctx.Value` carries the selected `MenuItem`. This enables clean handlers:
 
-**Impact on `Popover<TView, TResult>`:**
+```csharp
+// Clean — ctx.Value carries the selected MenuItem
+menuBar.Activated += (sender, args) =>
+{
+    if (args.Context?.Value is MenuItem selected)
+    {
+        textField.Text = selected.Title;
+    }
+};
+```
 
-When the content view fires `Activate` and the command is bridged to the popover, the `CommandContext.Value` carries the content view's value. The popover's `OnActivated` can use this to set `Result` directly, providing a second (complementary) path to result extraction alongside `ResultExtractor` and `IValue<TResult>`.
+Compare to the current POC in `DropDownListExample` which must manually search SubViews to find the selection — the `ctx.Value` approach eliminates that boilerplate entirely.
 
-### 4.4 `PopoverEdit<TView, TResult>` — The ComboBox Replacement
+### 4.5 `PopoverEdit<TView, TResult>` — The ComboBox Replacement
 
 **File:** `Terminal.Gui/Views/PopoverEdit.cs`
 **Namespace:** `Terminal.Gui.Views`
 
-This replaces the hacky POC `DropDownListExample` in PR #4412 with a proper reusable control.
+Replaces the throwaway `DropDownListExample` POC from PR #4412. Because `Popover<TView, TResult>` now handles all the ownership lifecycle, `PopoverEdit` is clean:
 
 ```csharp
 public class PopoverEdit<TView, TResult> : View, IValue<TResult?>, IDesignable
     where TView : View, new()
 {
-    // --- SubViews ---
-    private TextField _textField;                      // Display/edit area
-    private MenuBarItem _toggleButton;                 // Dropdown toggle (▼ glyph)
-                                                       // Uses MenuBarItem for existing popover infra
-                                                       // ElementSpacing = 0 for compact display
+    private TextField _textField;
+    private Button _toggleButton;                       // ▼ glyph (simpler than MenuBarItem now)
 
     // --- Popover ---
-    public Popover<TView, TResult> Popover { get; }   // The dropdown popover
+    public Popover<TView, TResult> Popover { get; }    // Target = _textField, Anchor = textfield frame
+                                                        // All lifecycle automatic
 
     // --- Configuration ---
-    public bool ReadOnly { get; set; }                 // If true, TextField is not editable
-    public Func<TView, TResult?>? ResultExtractor      // Delegates to Popover.ResultExtractor
-    { get; set; }
-    public Func<TResult?, string>? DisplayFormatter    // Converts TResult to display text
-    { get; set; }
+    public bool ReadOnly { get; set; }
+    public Func<TView, TResult?>? ResultExtractor { get; set; }
+    public Func<TResult?, string>? DisplayFormatter { get; set; }
 
     // --- IValue<TResult?> ---
     public TResult? Value { get; set; }
     public event EventHandler<ValueChangingEventArgs<TResult?>>? ValueChanging;
     public event EventHandler<ValueChangedEventArgs<TResult?>>? ValueChanged;
 
-    // --- Popover Open/Close ---
-    public bool IsOpen { get; }
-    public void Open ();
-    public void Close ();
-    public event EventHandler<ValueChangingEventArgs<bool>>? IsOpenChanging;
-    public event EventHandler<ValueChangedEventArgs<bool>>? IsOpenChanged;
+    // --- Convenience ---
+    public bool IsOpen => Popover.IsOpen;
+    public void Open () => Popover.IsOpen = true;
+    public void Close () => Popover.IsOpen = false;
 }
 ```
 
 **Key behaviors:**
+- **Anchor** — `Popover.Anchor = () => _textField.FrameToScreen()`.
+- **Target** — `Popover.Target = new WeakReference<View?>(this)` (or `_textField`).
+- **Toggle** — Button click, `F4`, `Alt+Down` set `Popover.IsOpen`. All lifecycle automatic.
+- **ReadOnly** — `true` = non-editable dropdown; `false` = editable combo-box.
+- **Value flow** — Selection → `Popover.Result` → `PopoverEdit.Value` → `TextField.Text` via `DisplayFormatter`.
+- **No boilerplate** — no manual bridge, registration, visibility sync, focus tracking. All handled by `Popover<TView, TResult>` base.
 
-1. **Layout** — The `TextField` fills the width minus the toggle button. The toggle button uses a `MenuBarItem` with `ElementSpacing = 0` and `Glyphs.DownArrow` as title, anchored to the right edge (matching the `DropDownListExample` POC pattern).
+Note: `PopoverEdit` can use a simple `Button` for the toggle now (instead of `MenuBarItem` as in the POC) because the popover lifecycle is handled by `Popover<TView, TResult>`. The `MenuBarItem` was only needed in the POC because it was the only thing that knew how to manage a popover.
 
-2. **Anchor integration** — The popover's `Anchor` is set to `() => _textField.FrameToScreen ()` so the dropdown aligns to the text field's left edge and drops below (or above if no space below), using the `GetAnchoredPosition` logic from PR #4412/#4751.
-
-3. **Toggle** — Clicking the toggle button, pressing `F4`, or pressing `Alt+Down` opens/closes the popover. The `MenuBarItem.PopoverMenuAnchor` delegates to the `Popover.Anchor`.
-
-4. **ReadOnly mode** — When `ReadOnly = true`, the `TextField` is not editable and clicking anywhere on the control opens the popover (like a classic non-editable ComboBox). When `ReadOnly = false`, the `TextField` is editable (like an editable ComboBox).
-
-5. **Value flow** — When the user selects an item in the popover:
-   - `Popover.Result` is set via the standard extraction chain.
-   - `PopoverEdit.Value` is updated from `Popover.Result`.
-   - `TextField.Text` is updated via `DisplayFormatter(Value)` (or `Value?.ToString()` by default).
-   - `ValueChanged` is raised.
-
-6. **Pre-selection** — When the popover opens, the current `Value` is used to pre-select the corresponding item in the content view (matching the `PopoverMenuOpenChanged` handler in the POC).
-
-7. **Registration** — The popover is registered with `Application.Popover` during `EndInit()`, following the same pattern as `MenuBarItem.RegisterPopover()`.
-
-8. **CommandBridge** — A bridge relays `Command.Activate` from the popover back to the `PopoverEdit`, enabling command propagation up the view hierarchy.
-
-### 4.5 `MenuBarItem` — Minimal Changes
-
-`MenuBarItem.PopoverMenu` property type stays `PopoverMenu` (which is now `Popover<Menu, MenuItem>` under the hood). Since `PopoverMenu` inherits from the generic base, `MenuBarItem` benefits from the generic infrastructure without API-breaking changes.
-
-The existing `PopoverMenuAnchor` property (from PR #4412) continues to work unchanged.
-
----
-
-## 5. Non-Generic Convenience Aliases
-
-For the most common use cases, provide non-generic aliases:
+### 4.6 Non-Generic Convenience Alias
 
 ```csharp
-// Simple dropdown with string values (ListView-based)
 public class PopoverEdit : PopoverEdit<ListView, string?>
 {
-    // Sets up a ListView as the content
-    // ResultExtractor defaults to getting the selected item's text
     public IListDataSource? Source { get; set; }  // Delegates to ListView.Source
 }
 ```
 
-This makes the common case simple:
+### 4.7 `IPopover` Enhancement
 
 ```csharp
-// Equivalent to old ComboBox
-PopoverEdit dropdown = new ()
+public interface IPopover
 {
-    Source = new ListWrapper<string> (["Option A", "Option B", "Option C"]),
-    ReadOnly = true
-};
+    IRunnable? Owner { get; set; }
+
+    // Implements the existing TODO on line 72:
+    /// <summary>
+    ///     Gets or sets the view that commands will be bubbled up to
+    ///     and that is tracked for focus-loss auto-close behavior.
+    /// </summary>
+    WeakReference<View?>? Target { get; set; }
+}
 ```
 
 ---
 
-## 6. Migration Plan
+## 5. Migration Plan
 
 ### Phase 1: Infrastructure (Command Context)
 1. Add `Value` property to `ICommandContext` and `CommandContext`.
 2. Wire `Value` population into command invocation pipeline.
 
-### Phase 2: Menu IValue
-3. Add `IValue<MenuItem?>` to `Menu`.
-4. Ensure existing menu tests still pass.
+### Phase 2: IPopover.Target
+3. Add `Target` property to `IPopover` (implements existing TODO).
+4. Add `Target` to `PopoverBaseImpl`.
 
-### Phase 3: Generic Popover
-5. Extract common popover logic from `PopoverMenu` into `Popover<TView, TResult>`:
-   - `Anchor` property
+### Phase 3: Menu IValue
+5. Add `IValue<MenuItem?>` to `Menu`.
+6. Verify existing tests pass.
+
+### Phase 4: Generic Popover
+7. Create `Popover<TView, TResult>` base class:
+   - `ContentView` management + `CommandBridge`
+   - `IsOpen` CWP property with visibility sync
+   - `Anchor` property + `GetAnchoredPosition`
    - `MakeVisible` / `SetPosition` with anchor priority chain
-   - `GetAnchoredPosition` (prefer-below, flip-above, clamp-X)
-   - Content view management and `CommandBridge`
    - Result extraction chain (ResultExtractor → IValue → Text)
-6. Refactor `PopoverMenu` to extend `Popover<Menu, MenuItem>`.
-7. `Root` becomes alias for `ContentView`.
-8. Merge PR #4412 changes (Anchor, GetAnchoredPosition, ElementSpacing) into the refactored code.
-9. Ensure all existing `PopoverMenu` and `MenuBar` tests pass.
+   - Auto-registration on `EndInit`
+   - Target-based focus-loss auto-close
+8. Refactor `PopoverMenu` to extend `Popover<Menu, MenuItem>`.
+   - `Root` becomes alias for `ContentView`
+   - Remove promoted code (Anchor, positioning, bridge, registration, visibility sync)
+   - Keep menu-specific overrides
+9. Simplify `MenuBarItem`:
+   - `PopoverMenuOpen` delegates to `PopoverMenu.IsOpen`
+   - Remove: bridge, registration, visibility sync, focus-loss handler, EndInit init
+   - Keep: HotKey handler, OnActivating toggle, OnKeyDownNotHandled, SubMenu throws
+10. Merge PR #4412 changes (Anchor, GetAnchoredPosition, ElementSpacing) into refactored code.
+11. All existing `PopoverMenu`, `MenuBar`, and `MenuBarItem` tests pass.
 
-### Phase 4: PopoverEdit
-10. Implement `PopoverEdit<TView, TResult>`.
-11. Implement the non-generic `PopoverEdit` convenience alias.
-12. Add unit tests to `UnitTestsParallelizable`.
+### Phase 5: PopoverEdit
+12. Implement `PopoverEdit<TView, TResult>`.
+13. Implement non-generic `PopoverEdit` convenience alias.
+14. Add unit tests to `UnitTestsParallelizable`.
 
-### Phase 5: ComboBox Replacement
-13. Replace all `ComboBox` usages with `PopoverEdit` (or `PopoverEdit<ListView, string?>`).
-14. Remove `ComboBox` class.
-15. Replace `DropDownListExample` POC scenario with proper `PopoverEdit` scenarios.
+### Phase 6: ComboBox Replacement
+15. Replace all `ComboBox` usages with `PopoverEdit`.
+16. Remove `ComboBox` class.
+17. Replace `DropDownListExample` POC with proper `PopoverEdit` scenarios.
 
-### Phase 6: Documentation
-16. Update `docfx/docs/` with Popover and PopoverEdit documentation.
-17. Add API documentation to all new public APIs.
-18. Close #4751 (Anchor positioning fully resolved).
+### Phase 7: Documentation
+18. Update `docfx/docs/` with Popover and PopoverEdit documentation.
+19. API documentation on all new public APIs.
+20. Close #4751 (Anchor positioning fully resolved).
 
 ---
 
-## 7. Key Design Decisions
+## 6. Key Design Decisions
 
 ### Q: Why `Popover<TView, TResult>` instead of `Popover<TView>` with separate result handling?
 
-**A:** Following the `Prompt<TView, TResult>` precedent. The two-type-parameter design enables:
-- Automatic result extraction via `IValue<TResult>`.
-- Type-safe `Result` property without casting.
-- `ResultExtractor` delegate for custom extraction.
-
-C# doesn't support partial generic specialization (`TResult Popover<TView>`), so the two-parameter form is necessary.
+**A:** Following the `Prompt<TView, TResult>` precedent. C# doesn't support partial generic specialization (`TResult Popover<TView>`), so the two-parameter form is necessary for type-safe `Result`.
 
 ### Q: Why not make `PopoverBaseImpl` generic directly?
 
-**A:** `PopoverBaseImpl` handles fundamental popover mechanics (screen-filling default, transparency, focus restoration, `Command.Quit`). These are independent of content type. Keeping `PopoverBaseImpl` non-generic means it stays usable for popovers that don't need typed content (e.g., tooltip popovers, notification popovers). The generic layer is `Popover<TView, TResult>`.
+**A:** `PopoverBaseImpl` handles fundamentals (transparency, focus restoration, `Command.Quit`). Keeping it non-generic means it's usable for popovers without typed content (tooltips, notifications). The generic layer is `Popover<TView, TResult>`.
 
 ### Q: Why add `Value` to `ICommandContext`?
 
-**A:** Today, when a command bubbles up through the hierarchy, handlers must:
-1. Get the source view from `ctx.Source` (a `WeakReference<View>`).
-2. Check if it implements `IValue`.
-3. Cast and extract.
+**A:** The `IValue` doc comments already reference `CommandContext.Value` but it doesn't exist. This implements that intent. Captures value at invocation time, available throughout the propagation chain without weak-ref chasing.
 
-This is boilerplate-heavy and breaks when the source is collected. Adding `Value` to `ICommandContext` captures the value at invocation time, making it available throughout the propagation chain. The `IValue` doc comments already reference `CommandContext.Value` — this implements that intent.
+### Q: Why does `Popover<TView, TResult>` handle owner lifecycle instead of a helper?
 
-### Q: What about `PopoverMenu`'s menu-specific behaviors?
-
-**A:** All menu-specific behaviors stay in `PopoverMenu`:
-- Cascading submenu management (`ShowMenuItemSubMenu`, `GetMostVisibleLocationForSubMenu`)
-- Keyboard navigation (`MoveLeft`, `MoveRight`)
-- Key binding propagation (`UpdateKeyBindings`)
-- `SelectedMenuItemChanged` event handling
-- `OnKeyDownNotHandled` for matching menu item keys
-- Fullscreen requirement (for cascading submenu clipping)
-
-The base `Popover<TView, TResult>` only handles: content hosting, result extraction, anchor-based positioning, visibility lifecycle, and command bridging. `PopoverMenu` overrides and extends as needed.
-
-### Q: Why does PopoverEdit use a MenuBarItem internally?
-
-**A:** PR #4412's `DropDownListExample` already proved this pattern works: a `MenuBarItem` with `ElementSpacing = 0` and `PopoverMenuAnchor` provides the toggle button, popover registration, anchor positioning, and open/close lifecycle — all for free. `PopoverEdit` formalizes this into a proper control with `IValue<TResult>` support, rather than requiring developers to manually wire up the composite view shown in the POC.
+**A:** Terminal.Gui uses helpers like `OrientationHelper` when multiple unrelated classes need the same behavior. Here, every popover owner needs the same lifecycle. Since `Popover<TView, TResult>` is the common base of all typed popovers, it's the natural place. No separate helper needed — the popover *is* the helper.
 
 ### Q: Why must PopoverMenu stay fullscreen?
 
-**A:** As documented in the PR #4412 changes: `View.AddViewportToClip` clips SubViews to the parent viewport before drawing. Since `PopoverMenu` adds cascading submenus as SubViews, a non-fullscreen `PopoverMenu` would clip any cascade extending beyond its frame. `MakeVisible` and `SetPosition` position `Root`'s `X`/`Y` within the fullscreen overlay, not the overlay itself. Other `Popover<TView, TResult>` subclasses that don't have cascading SubViews may use fixed sizing.
+**A:** `View.AddViewportToClip` clips SubViews to the parent viewport. Cascading submenus are SubViews, so a non-fullscreen `PopoverMenu` would clip cascades. `MakeVisible`/`SetPosition` position `Root`'s X/Y within the fullscreen overlay. Other `Popover<TView, TResult>` subclasses without cascading SubViews can be fixed-size.
+
+### Q: Why can `PopoverEdit` use a simple `Button` instead of `MenuBarItem`?
+
+**A:** The POC in PR #4412 used `MenuBarItem` because it was the only thing that knew how to manage a popover (register, bridge, toggle, position). Now that `Popover<TView, TResult>` handles all of that, a simple `Button` that sets `Popover.IsOpen = !Popover.IsOpen` is sufficient. `MenuBarItem`'s value was its popover infrastructure, which is now generic.
 
 ---
 
-## 8. Testing Strategy
+## 7. Testing Strategy
 
 All new tests go in `Tests/UnitTestsParallelizable/`.
 
 ### `Popover<TView, TResult>` Tests
-- Content view is added/removed correctly as SubView.
-- `ResultExtractor` is called on `Activate`.
-- `IValue<TResult>` extraction works when `ResultExtractor` is null.
-- String fallback to `Text` works when `TResult` is `string`.
-- `Result` is null when popover is dismissed (Quit/Escape).
-- `MakeVisible`/`SetPosition` position correctly with anchor priority chain.
-- Anchor prefer-below / flip-above / clamp-X behavior (ports existing PR #4412 tests).
-- `CommandBridge` relays `Activate` from content to popover.
+- Content view add/remove as SubView.
+- `ResultExtractor` called on Activate.
+- `IValue<TResult>` extraction when `ResultExtractor` is null.
+- String fallback to `Text` when `TResult` is `string`.
+- `Result` is null on dismiss (Quit/Escape).
+- `IsOpen` CWP property: set true → MakeVisible, set false → Visible = false.
+- `IsOpen` syncs from Visible changes.
+- `Target` focus-loss auto-close.
+- Auto-registration on EndInit.
+- Anchor priority chain (anchor param → Anchor prop → idealScreenPosition → mouse).
+- Anchor prefer-below / flip-above / clamp-X (ports PR #4412 tests).
+- `CommandBridge` relays Activate from content to popover.
 
-### `PopoverMenu` Tests
-- All existing `PopoverMenu` tests pass unchanged (regression).
+### `PopoverMenu` Regression Tests
+- All existing `PopoverMenu` tests pass unchanged.
 - All existing PR #4412 anchor tests pass unchanged.
-- `Root` property works as alias for `ContentView`.
+- `Root` works as alias for `ContentView`.
 - `Menu` `IValue<MenuItem>` returns selected item.
 
+### `MenuBarItem` Regression Tests
+- All existing `MenuBarItem` tests pass unchanged.
+- `PopoverMenuOpen` delegates to `PopoverMenu.IsOpen`.
+- Lifecycle (register, bridge, close-on-blur) works via base class.
+
 ### `ICommandContext.Value` Tests
-- `Value` is populated from `IValue` source on command invocation.
+- `Value` populated from `IValue` source on command invocation.
 - `Value` propagates through `CommandBridge`.
 - `Value` is `null` when source doesn't implement `IValue`.
 - `WithValue` creates new context preserving other fields.
 
 ### `PopoverEdit<TView, TResult>` Tests
-- Opens/closes popover on button click and keyboard shortcuts (`F4`, `Alt+Down`).
-- `Value` updates when item is selected in popover.
+- Opens/closes on button click, `F4`, `Alt+Down`.
+- `Value` updates on selection.
 - `TextField.Text` updates via `DisplayFormatter`.
 - `ReadOnly` mode prevents text editing.
-- Non-`ReadOnly` mode allows text editing.
-- `IValue<TResult>` interface works correctly.
-- Popover positions below by default, above when no space below (anchor behavior).
-- Registration with `Application.Popover` on `EndInit`.
-- Focus returns to `PopoverEdit` when popover closes.
-- Pre-selection of current value when popover opens.
+- `IValue<TResult>` interface works.
+- Anchor positioning (below default, above when no space).
+- Auto-registration on `EndInit`.
+- Focus returns on close.
+- Pre-selection of current value on open.
 
 ---
 
-## 9. Breaking Changes
+## 8. Breaking Changes
 
 | Change | Impact | Migration |
 |---|---|---|
-| `PopoverMenu` base class changes from `PopoverBaseImpl` to `Popover<Menu, MenuItem>` | Low — `Popover<Menu, MenuItem>` extends `PopoverBaseImpl` | None for most consumers. Subclasses of `PopoverMenu` may need minor adjustments. |
-| `PopoverMenu.SetPosition` changes from `public` to `internal` | Low — already changed in PR #4412 | Use `MakeVisible` instead |
+| `PopoverMenu` base: `PopoverBaseImpl` → `Popover<Menu, MenuItem>` | Low | None for most consumers |
+| `PopoverMenu.SetPosition` → `internal` | Low (already in PR #4412) | Use `MakeVisible` |
+| `MenuBarItem.PopoverMenuOpen` becomes delegate to `PopoverMenu.IsOpen` | Low | Events move to `PopoverMenu.IsOpenChanging`/`IsOpenChanged` |
+| `IPopover` gains `Target` property | Low — additive | N/A |
 | `Menu` implements `IValue<MenuItem?>` | None — additive | N/A |
-| `ICommandContext` gains `Value` property | Low — interface addition with default `null` | N/A |
-| `ComboBox` removed | High — all `ComboBox` usages must migrate | Replace with `PopoverEdit` or `PopoverEdit<ListView, string?>` |
+| `ICommandContext` gains `Value` | Low — additive | N/A |
+| `ComboBox` removed | High | Replace with `PopoverEdit` |
 
 ---
 
-## 10. Open Questions
+## 9. Open Questions
 
-1. **Naming:** Is `PopoverEdit` the right name? Alternatives: `DropDown<TView, TResult>`, `PopoverCombo`, `InlinePopover`. The issue title says "DropDown" but `PopoverEdit` better reflects the architecture.
+1. **Naming:** Is `PopoverEdit` the right name? Alternatives: `DropDown`, `PopoverCombo`. `PopoverEdit` reflects the architecture.
 
-2. **Non-generic alias:** Should the non-generic `PopoverEdit` use `ListView` or `Menu` as default `TView`? `ListView` is simpler for the common combo-box case; `Menu` provides richer item capabilities (icons, shortcuts, submenus).
+2. **Non-generic alias TView:** `ListView` (simpler for combo-box) vs `Menu` (richer items)?
 
-3. **Editable mode text-to-value:** When `ReadOnly = false` and the user types text, how is the text converted back to `TResult`? Options: a `Func<string, TResult?>? ValueParser` property, or rely on `IValue<TResult>` if the `TextField` itself provides it.
+3. **Editable mode parsing:** When `ReadOnly = false`, how is typed text converted to `TResult`? `Func<string, TResult?>? ValueParser`?
 
-4. **Filtering/autocomplete:** Should `PopoverEdit` natively support filtering the content view based on typed text? Or should this be left to the `TView` implementation (e.g., a filterable `ListView`)?
+4. **Filtering/autocomplete:** Native in `PopoverEdit`, or delegate to `TView`?
 
-5. **PopoverEdit internal toggle:** Should the toggle button be a `MenuBarItem` (reusing existing infrastructure) or a simpler `Button` with direct popover management? The `MenuBarItem` approach reuses proven code but adds conceptual weight; a `Button` is simpler but requires reimplementing popover lifecycle.
+5. **`Target` vs `Owner`:** `IPopover` already has `Owner` (typed as `IRunnable?`). Should `Target` (`WeakReference<View?>`) replace `Owner`, or coexist? `Owner` is for keyboard event scoping; `Target` is for command bubbling and focus tracking. They serve different purposes, but the naming needs clarity.
+
+6. **`PopoverMenuOpen` events:** Today `MenuBarItem` has `PopoverMenuOpenChanging`/`PopoverMenuOpenChanged` events. After the refactor, these are `PopoverMenu.IsOpenChanging`/`IsOpenChanged`. Should `MenuBarItem` forward them for backward compatibility, or is this an acceptable breaking change for V2 Beta?
