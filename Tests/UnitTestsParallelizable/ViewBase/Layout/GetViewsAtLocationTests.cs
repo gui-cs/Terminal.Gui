@@ -1094,4 +1094,69 @@ public class GetViewsAtLocationTests
         runnable.Dispose ();
         secondaryRunnable.Dispose ();
     }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ReturnsEmpty_WhenRootIsDisabled ()
+    {
+        TestView root = new (0, 0, 10, 10) { Enabled = false };
+        List<View?> result = View.GetViewsAtLocation (root, new (5, 5));
+        Assert.Empty (result);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ExcludesDisabledSubview ()
+    {
+        TestView root = new (0, 0, 10, 10);
+        TestView enabledSub = new (2, 2, 3, 3) { Enabled = true };
+        TestView disabledSub = new (6, 6, 3, 3) { Enabled = false };
+        root.Add (enabledSub);
+        root.Add (disabledSub);
+
+        // Point inside disabled subview - should only return root
+        List<View?> result = View.GetViewsAtLocation (root, new (7, 7));
+        Assert.Single (result);
+        Assert.Equal (root, result [0]);
+
+        // Point inside enabled subview - should return root and enabled subview
+        result = View.GetViewsAtLocation (root, new (3, 3));
+        Assert.Equal (2, result.Count);
+        Assert.Equal (root, result [0]);
+        Assert.Equal (enabledSub, result [1]);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ExcludesDisabledSubview_WithNestedSubviews ()
+    {
+        TestView root = new (0, 0, 20, 20);
+        TestView disabledParent = new (5, 5, 10, 10) { Enabled = false };
+        TestView enabledChild = new (2, 2, 4, 4) { Enabled = true };
+        root.Add (disabledParent);
+        disabledParent.Add (enabledChild);
+
+        // Point inside enabled child of disabled parent - should only return root
+        // because disabled parent is excluded from hit testing
+        List<View?> result = View.GetViewsAtLocation (root, new (9, 9));
+        Assert.Single (result);
+        Assert.Equal (root, result [0]);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void IncludesEnabledSubview_WhenBothEnabledAndDisabledSubviewsAtSameLocation ()
+    {
+        TestView root = new (0, 0, 20, 20);
+        TestView disabledSub = new (5, 5, 10, 10) { Enabled = false };
+        TestView enabledSub = new (5, 5, 10, 10) { Enabled = true };
+        root.Add (disabledSub);
+        root.Add (enabledSub);
+
+        // Point where both subviews overlap - should only return root and enabled subview
+        List<View?> result = View.GetViewsAtLocation (root, new (10, 10));
+        Assert.Equal (2, result.Count);
+        Assert.Equal (root, result [0]);
+        Assert.Equal (enabledSub, result [1]);
+    }
 }
