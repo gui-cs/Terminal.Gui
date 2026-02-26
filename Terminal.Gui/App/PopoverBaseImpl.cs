@@ -22,7 +22,14 @@ namespace Terminal.Gui.App;
 ///         This base class provides:
 ///     </para>
 ///     <list type="bullet">
-///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
+///         <item>
+///             Sets <see cref="View.Width"/> and <see cref="View.Height"/> to <see cref="Dim.Fill()"/> by default.
+///             This is a <em>default</em>, not a requirement — override <see cref="View.Width"/> and
+///             <see cref="View.Height"/> in derived classes for fixed-size popovers such as autocomplete dropdowns
+///             or tooltips. <see cref="ViewportSettingsFlags.TransparentMouse"/> ensures click-outside-to-dismiss
+///             works at any size. Fullscreen is only necessary when SubViews must extend beyond a fixed frame
+///             (e.g., <see cref="PopoverMenu"/> cascading submenus).
+///         </item>
 ///         <item>Transparent viewport settings for proper mouse event handling.</item>
 ///         <item>Automatic layout when becoming visible.</item>
 ///         <item>Focus restoration when hidden.</item>
@@ -44,7 +51,7 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///         Sets up default popover behavior:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
+    ///         <item>Sets <see cref="View.Width"/> to <see cref="Dim.Fill()"/> and <see cref="View.Height"/> to <see cref="Dim.Fill()"/> as defaults (can be overridden by derived classes).</item>
     ///         <item>Sets <see cref="View.CanFocus"/> to <see langword="true"/>.</item>
     ///         <item>Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
     ///         <item>Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when invoked.</item>

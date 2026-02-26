@@ -140,6 +140,7 @@ public partial class TextField : View, IDesignable, IValue<string>
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
+        ContextMenu.Anchor = () => FrameToScreen ();
         App?.Popovers?.Register (ContextMenu);
     }
 

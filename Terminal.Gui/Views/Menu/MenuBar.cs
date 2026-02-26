@@ -15,8 +15,9 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         <strong>Using MenuBar as a Dropdown List:</strong>
 ///         A MenuBar with a single <see cref="MenuBarItem"/> can be used as a dropdown list adjacent to a
-///         <see cref="TextField"/> or other control. Use <see cref="OpenMenu()"/> or
-///         <see cref="OpenMenu(Point?)"/> to programmatically open the menu at a specific screen position.
+///         <see cref="TextField"/> or other control. Set <see cref="MenuBarItem.PopoverMenuAnchor"/> to
+///         anchor the dropdown to the desired control, then set <see cref="MenuBarItem.PopoverMenuOpen"/> to
+///         <see langword="true"/> to open it.
 ///     </para>
 ///     <example>
 ///         <code>
@@ -26,8 +27,8 @@ namespace Terminal.Gui.Views;
 ///                 new MenuItem ("Item 1", null, () => tf.Text = "Item 1"),
 ///                 new MenuItem ("Item 2", null, () => tf.Text = "Item 2")
 ///             ]);
+///         menuBarItem.PopoverMenuAnchor = () => tf.FrameToScreen ();
 ///         MenuBar mb = new ([menuBarItem]) { CanFocus = true, Width = Dim.Auto (), Y = Pos.Top (tf), X = Pos.Right (tf) };
-///         mb.Enter += (_, _) => mb.OpenMenu (new Point (tf.FrameToScreen ().X, tf.FrameToScreen ().Bottom));
 ///         </code>
 ///     </example>
 /// </remarks>
@@ -362,34 +363,6 @@ public class MenuBar : Menu, IDesignable
     public bool IsOpen () => SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen);
 
     /// <summary>
-    ///     Opens the first <see cref="MenuBarItem"/> that has a <see cref="PopoverMenu"/> using the default position.
-    /// </summary>
-    /// <returns><see langword="true"/> if a menu was opened; <see langword="false"/> if no suitable item was found.</returns>
-    public bool OpenMenu () => OpenMenu (null);
-
-    /// <summary>
-    ///     Opens the first <see cref="MenuBarItem"/> that has a <see cref="PopoverMenu"/> at the specified screen
-    ///     position. Use this to align the dropdown with an adjacent control such as a <see cref="TextField"/>.
-    /// </summary>
-    /// <param name="position">
-    ///     The ideal screen-relative position at which to open the menu. If <see langword="null"/>, the menu is
-    ///     positioned at the default location (bottom-left of the first <see cref="MenuBarItem"/>).
-    /// </param>
-    /// <returns><see langword="true"/> if a menu was opened; <see langword="false"/> if no suitable item was found.</returns>
-    public bool OpenMenu (Point? position)
-    {
-        if (SubViews.OfType<MenuBarItem> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is not { } first)
-        {
-            return false;
-        }
-
-        Active = true;
-        ShowItem (first, position);
-
-        return true;
-    }
-
-    /// <summary>
     ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F9"/> and
     ///     can be configured using the <see cref="DefaultKey"/> configuraiton property.
     /// </summary>
@@ -602,11 +575,7 @@ public class MenuBar : Menu, IDesignable
     ///     Shows the specified popover, but only if the menu bar is active.
     /// </summary>
     /// <param name="menuBarItem"></param>
-    /// <param name="position">
-    ///     Optional screen position override. If provided, repositions the <see cref="PopoverMenu"/> after it opens.
-    ///     If <see langword="null"/>, the default position (bottom-left of the <see cref="MenuBarItem"/>) is used.
-    /// </param>
-    private void ShowItem (MenuBarItem? menuBarItem, Point? position = null)
+    private void ShowItem (MenuBarItem? menuBarItem)
     {
         Trace.Command (this, "Entry", $"Item={menuBarItem?.ToIdentifyingString ()} Active={Active}");
 
@@ -643,12 +612,6 @@ public class MenuBar : Menu, IDesignable
             }
 
             menuBarItem.PopoverMenuOpen = true;
-
-            // If a custom position was requested, reposition the popover after it has been made visible.
-            if (position.HasValue && menuBarItem.PopoverMenu?.Visible == true)
-            {
-                menuBarItem.PopoverMenu.SetPosition (position);
-            }
         }
         finally
         {

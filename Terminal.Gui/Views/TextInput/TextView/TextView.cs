@@ -265,6 +265,7 @@ public partial class TextView : View, IDesignable
 #endif
         }; ;
 
+        menu.Anchor = () => FrameToScreen ();
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         return menu;

@@ -13,6 +13,14 @@ namespace Terminal.Gui.Views;
 ///         <see cref="ApplicationPopover.Show"/>.
 ///     </para>
 ///     <para>
+///         <b>Why fullscreen:</b> Unlike <see cref="PopoverBaseImpl"/> (which can be any size),
+///         <c>PopoverMenu</c> must remain fullscreen because <see cref="Root"/> and all cascading submenus
+///         are added as SubViews. <c>View.AddViewportToClip</c> clips SubViews to the parent viewport
+///         before drawing, so a non-fullscreen <c>PopoverMenu</c> would clip any cascade that extends
+///         beyond its frame. <see cref="MakeVisible"/> and <see cref="SetPosition"/> position
+///         <see cref="Root"/>'s <c>X</c>/<c>Y</c> within the fullscreen overlay, not the overlay itself.
+///     </para>
+///     <para>
 ///         <b>Usage Example:</b>
 ///     </para>
 ///     <code>
@@ -291,27 +299,44 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
 
     /// <summary>
-    ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the
-    ///     menu will be adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over
-    ///     the first cell of the first <see cref="MenuItem"/>.
+    ///     Gets or sets a delegate that returns the screen-relative rectangle used to
+    ///     anchor the menu when <see cref="MakeVisible"/> is called without an explicit position.
+    ///     If <see langword="null"/> or the delegate returns <see langword="null"/>, the last
+    ///     mouse position is used (standard context menu behavior).
+    /// </summary>
+    /// <remarks>
+    ///     Set this to position the menu relative to the owning view when the menu may be
+    ///     activated via keyboard (where mouse position is unavailable or stale).
+    ///     The delegate is evaluated each time the menu opens, so coordinates are always current.
+    /// </remarks>
+    public Func<Rectangle?>? Anchor { get; set; }
+
+    /// <summary>
+    ///     Makes the popover menu visible and positions <see cref="Root"/> using the following priority:
+    ///     <paramref name="anchor"/> parameter, then <see cref="Anchor"/> property, then
+    ///     <paramref name="idealScreenPosition"/>, then the last mouse position.
     /// </summary>
     /// <param name="idealScreenPosition">
-    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
-    ///     used.
+    ///     The ideal screen-relative position for the menu. If <see langword="null"/> and no anchor is resolved,
+    ///     the current mouse position will be used.
+    /// </param>
+    /// <param name="anchor">
+    ///     An explicit screen-relative anchor rectangle. The menu is positioned below the anchor, or above if it
+    ///     won't fit below. Overrides <see cref="Anchor"/> and <paramref name="idealScreenPosition"/>.
     /// </param>
     /// <remarks>
     ///     <para>
     ///         IMPORTANT: The popover must be registered with <see cref="Application.Popover"/> before calling this
-    ///         method.
-    ///         Call <see cref="ApplicationPopover.Register"/> first.
+    ///         method. Call <see cref="ApplicationPopover.Register"/> first.
     ///     </para>
     ///     <para>
-    ///         This method internally calls <see cref="ApplicationPopover.Show"/>, which will throw
+    ///         This method positions <see cref="Root"/> (not the overlay itself) and then calls
+    ///         <see cref="ApplicationPopover.Show"/>, which will throw
     ///         <see cref="InvalidOperationException"/> if the popover is not registered.
     ///     </para>
     /// </remarks>
     /// <exception cref="InvalidOperationException">Thrown if the popover has not been registered.</exception>
-    public void MakeVisible (Point? idealScreenPosition = null)
+    public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         if (Visible)
         {
@@ -321,35 +346,36 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Ensure the Popover is sized correctly in case this is the first time we are being made visible
         Layout ();
 
-        SetPosition (idealScreenPosition);
+        SetPosition (idealScreenPosition, anchor);
 
         // Specific to PopoverMenu
         App!.Popovers?.Show (this);
     }
 
     /// <summary>
-    ///     Sets the position of the popover menu at <paramref name="idealScreenPosition"/>. The actual position will be
-    ///     adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over the first cell of
-    ///     the first <see cref="MenuItem"/> (if possible).
+    ///     Sets the position of <see cref="Root"/> using the following priority:
+    ///     <paramref name="anchor"/> parameter, then <see cref="Anchor"/> property, then
+    ///     <paramref name="idealScreenPosition"/>, then the last mouse position.
+    ///     This sets <see cref="Root"/>'s <c>X</c> and <c>Y</c>, not the overlay's position.
     /// </summary>
     /// <param name="idealScreenPosition">
-    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
-    ///     used.
+    ///     The ideal screen-relative position for the menu. If <see langword="null"/> and no anchor is resolved,
+    ///     the current mouse position will be used.
+    /// </param>
+    /// <param name="anchor">
+    ///     An explicit screen-relative anchor rectangle. Overrides <see cref="Anchor"/> and
+    ///     <paramref name="idealScreenPosition"/>.
     /// </param>
     /// <remarks>
     ///     This method only sets the position; it does not make the popover visible. Use <see cref="MakeVisible"/> to
     ///     both position and show the popover.
     /// </remarks>
-    public void SetPosition (Point? idealScreenPosition = null)
+    internal void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
-        idealScreenPosition ??= App?.Mouse.LastMousePosition;
-
-        if (idealScreenPosition is null || Root is null)
+        if (Root is null)
         {
             return;
         }
-
-        Point pos = idealScreenPosition.Value;
 
         if (!Root.IsInitialized)
         {
@@ -358,7 +384,23 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Root.EndInit ();
         }
 
-        pos = GetMostVisibleLocationForSubMenu (Root, pos);
+        // Ensure Root has been laid out so Frame.Width/Height are current
+        Root.Layout ();
+
+        // Priority: explicit anchor > Anchor property > explicit point > mouse position
+        Rectangle? resolvedAnchor = anchor ?? Anchor?.Invoke ();
+
+        Point pos;
+
+        if (resolvedAnchor.HasValue)
+        {
+            pos = GetAnchoredPosition (Root, resolvedAnchor.Value);
+        }
+        else
+        {
+            Point idealPos = idealScreenPosition ?? App?.Mouse.LastMousePosition ?? default;
+            pos = GetMostVisibleLocationForSubMenu (Root, idealPos);
+        }
 
         Root.X = pos.X;
         Root.Y = pos.Y;
@@ -625,6 +667,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <summary>
     ///     Calculates the most visible screen-relative location for the specified <paramref name="menu"/>.
+    ///     Coordinates returned are for <see cref="Root"/>'s <c>X</c>/<c>Y</c>.
     /// </summary>
     /// <param name="menu">The menu to position.</param>
     /// <param name="idealLocation">The ideal screen-relative location.</param>
@@ -638,6 +681,34 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         GetLocationEnsuringFullVisibility (menu, idealLocation.X, idealLocation.Y, out int nx, out int ny);
 
         return new Point (nx, ny);
+    }
+
+    /// <summary>
+    ///     Calculates the position for a menu anchored to <paramref name="anchor"/>. Prefers placing the menu
+    ///     below the anchor; flips above when it would overflow the screen bottom.
+    /// </summary>
+    /// <param name="menu">The menu to position.</param>
+    /// <param name="anchor">The screen-relative anchor rectangle (e.g. a <see cref="MenuBarItem"/> frame).</param>
+    /// <returns>A screen-relative position for <see cref="Root"/>'s <c>X</c>/<c>Y</c>.</returns>
+    private Point GetAnchoredPosition (Menu menu, Rectangle anchor)
+    {
+        int screenWidth = App?.Screen.Width ?? int.MaxValue;
+        int screenHeight = App?.Screen.Height ?? int.MaxValue;
+        int menuWidth = menu.Frame.Width;
+        int menuHeight = menu.Frame.Height;
+
+        // Vertical: prefer below anchor, flip above if it won't fit
+        int y = anchor.Bottom;
+
+        if (y + menuHeight > screenHeight && anchor.Top - menuHeight >= 0)
+        {
+            y = anchor.Top - menuHeight;
+        }
+
+        // Horizontal: left-align with anchor, clamp to screen
+        int x = Math.Max (0, Math.Min (anchor.Left, screenWidth - menuWidth));
+
+        return new (x, y);
     }
 
     #endregion

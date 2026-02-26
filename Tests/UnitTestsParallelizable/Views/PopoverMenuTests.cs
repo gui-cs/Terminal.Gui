@@ -270,4 +270,159 @@ public class PopoverMenuTests
     }
 
     #endregion
+
+    #region Positioning
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void MakeVisible_WithAnchor_PositionsBelowAnchor_WhenFits ()
+    {
+        // Arrange — 80×24 screen, anchor at (10, 5, 10, 1), menu height 4
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        MenuItem menuItem1 = new () { Id = "mi1", Title = "Item 1" };
+        MenuItem menuItem2 = new () { Id = "mi2", Title = "Item 2" };
+        MenuItem menuItem3 = new () { Id = "mi3", Title = "Item 3" };
+        PopoverMenu popoverMenu = new ([menuItem1, menuItem2, menuItem3]) { Id = "popoverMenu" };
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        app.Popovers?.Register (popoverMenu);
+
+        Rectangle anchor = new (10, 5, 10, 1);
+
+        // Act
+        popoverMenu.MakeVisible (anchor: anchor);
+
+        // Assert — menu should be positioned below the anchor
+        Assert.NotNull (popoverMenu.Root);
+        popoverMenu.Root.Layout ();
+        Assert.Equal (6, popoverMenu.Root.Frame.Y);
+        Assert.Equal (10, popoverMenu.Root.Frame.X);
+
+        popoverMenu.Dispose ();
+    }
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void MakeVisible_WithAnchor_FlipsAbove_WhenBelowOverflows ()
+    {
+        // Arrange — 80×25 screen (ANSI default), anchor near bottom
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        MenuItem menuItem1 = new () { Id = "mi1", Title = "Item 1" };
+        MenuItem menuItem2 = new () { Id = "mi2", Title = "Item 2" };
+        MenuItem menuItem3 = new () { Id = "mi3", Title = "Item 3" };
+        PopoverMenu popoverMenu = new ([menuItem1, menuItem2, menuItem3]) { Id = "popoverMenu" };
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        app.Popovers?.Register (popoverMenu);
+
+        // First, make visible at a normal position to get the menu laid out and measure its height
+        popoverMenu.MakeVisible (anchor: new Rectangle (10, 0, 10, 1));
+        Assert.NotNull (popoverMenu.Root);
+        popoverMenu.Root.Layout ();
+        int menuHeight = popoverMenu.Root.Frame.Height;
+        Assert.True (menuHeight > 0, "Menu should have non-zero height after layout");
+        popoverMenu.Visible = false;
+
+        // Place anchor so that anchor.Bottom + menuHeight > screenHeight (25)
+        int anchorY = 25 - menuHeight + 1; // ensures overflow by 1 row
+        Rectangle anchor = new (10, anchorY, 10, 1);
+
+        // Act
+        popoverMenu.MakeVisible (anchor: anchor);
+
+        // Assert — menu should flip above the anchor
+        popoverMenu.Root.Layout ();
+        Assert.Equal (anchorY - menuHeight, popoverMenu.Root.Frame.Y);
+
+        popoverMenu.Dispose ();
+    }
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void MakeVisible_WithAnchor_ClampsX_WhenRightEdgeOverflows ()
+    {
+        // Arrange — 80×24 screen, anchor near right edge at (75, 5, 10, 1)
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        MenuItem menuItem1 = new () { Id = "mi1", Title = "Long Menu Item 1" };
+        MenuItem menuItem2 = new () { Id = "mi2", Title = "Long Menu Item 2" };
+        PopoverMenu popoverMenu = new ([menuItem1, menuItem2]) { Id = "popoverMenu" };
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        app.Popovers?.Register (popoverMenu);
+
+        Rectangle anchor = new (75, 5, 10, 1);
+
+        // Act
+        popoverMenu.MakeVisible (anchor: anchor);
+
+        // Assert — X should be clamped so menu doesn't go off-screen right
+        Assert.NotNull (popoverMenu.Root);
+        popoverMenu.Root.Layout ();
+        int menuWidth = popoverMenu.Root.Frame.Width;
+        int rootX = popoverMenu.Root.Frame.X;
+        Assert.True (rootX + menuWidth <= 80, $"Root.Frame.X ({rootX}) + menuWidth ({menuWidth}) should be <= 80");
+        Assert.True (rootX >= 0, "Root.Frame.X should be >= 0");
+
+        popoverMenu.Dispose ();
+    }
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void MenuBarItem_PopoverMenuAnchor_UsesAnchorRect_NotMbiFrame ()
+    {
+        // Arrange — MenuBarItem with custom PopoverMenuAnchor pointing to (20, 10, 5, 1)
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        MenuItem menuItem = new () { Id = "menuItem1", Title = "Item _1" };
+        Menu menu = new ([menuItem]) { Id = "menu" };
+        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_File" };
+        PopoverMenu popoverMenu = new ();
+        menuBarItem.PopoverMenu = popoverMenu;
+        popoverMenu.Root = menu;
+
+        // Anchor to a custom rectangle, not the MenuBarItem's own frame
+        menuBarItem.PopoverMenuAnchor = () => new Rectangle (20, 10, 5, 1);
+
+        MenuBar menuBar = new ([menuBarItem]) { Id = "menuBar" };
+        hostView.Add (menuBar);
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        // Act
+        menuBarItem.SetFocus ();
+        menuBarItem.PopoverMenuOpen = true;
+
+        // Assert — Root should be positioned below the anchor at y=11, x=20
+        Assert.NotNull (popoverMenu.Root);
+        popoverMenu.Root.Layout ();
+        Assert.Equal (11, popoverMenu.Root.Frame.Y);
+        Assert.Equal (20, popoverMenu.Root.Frame.X);
+    }
+
+    #endregion
 }

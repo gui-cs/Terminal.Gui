@@ -216,6 +216,18 @@ public class MenuBarItem : MenuItem, IDesignable
     }
 
     /// <summary>
+    ///     Gets or sets a delegate that returns the screen-relative anchor rectangle
+    ///     used to position the <see cref="PopoverMenu"/> when this item opens.
+    ///     If <see langword="null"/> or the delegate returns <see langword="null"/>,
+    ///     this <see cref="MenuBarItem"/>'s own screen frame is used.
+    /// </summary>
+    /// <remarks>
+    ///     Use this to anchor the menu to a different control (e.g. a <see cref="TextField"/>
+    ///     paired with this button). The delegate is evaluated each time the menu opens.
+    /// </remarks>
+    public Func<Rectangle?>? PopoverMenuAnchor { get; set; }
+
+    /// <summary>
     ///     Gets whether the PopoverMenu is open and visible or not.
     /// </summary>
     public bool PopoverMenuOpen
@@ -244,7 +256,8 @@ public class MenuBarItem : MenuItem, IDesignable
                                                       // or unit tests without Application.Init).
                                                       if (PopoverMenu is { } && IsInitialized)
                                                       {
-                                                          PopoverMenu.MakeVisible (new Point (FrameToScreen ().X, FrameToScreen ().Bottom));
+                                                          Rectangle anchor = PopoverMenuAnchor?.Invoke () ?? FrameToScreen ();
+                                                          PopoverMenu.MakeVisible (anchor: anchor);
                                                       }
                                                   }
                                                   else

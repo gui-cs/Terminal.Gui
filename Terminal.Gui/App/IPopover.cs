@@ -36,8 +36,10 @@ namespace Terminal.Gui.App;
 ///     </para>
 ///     <para>
 ///         <b>Layout:</b><br/>
-///         When becoming visible, popovers are automatically laid out to fill the screen by default.
-///         Override <see cref="View.Width"/> and <see cref="View.Height"/> to customize size.
+///         <see cref="PopoverBaseImpl"/> sets <see cref="View.Width"/> and <see cref="View.Height"/> to
+///         <see cref="Dim.Fill()"/> by default. This is not a requirement of the interface — implementations
+///         may use any size. The only structural requirements are <see cref="ViewportSettingsFlags.Transparent"/>,
+///         <see cref="ViewportSettingsFlags.TransparentMouse"/>, and a <see cref="Command.Quit"/> binding.
 ///     </para>
 ///     <para>
 ///         <b>Mouse Events:</b><br/>

@@ -2033,12 +2033,12 @@ public class MenuBarTests
 
     #endregion
 
-    #region OpenMenu Tests
+    #region MenuBarItem.PopoverMenuOpen Tests
 
     // Claude - Sonnet 4.6
 
     [Fact]
-    public void OpenMenu_Opens_First_MenuBarItem ()
+    public void MenuBarItem_PopoverMenuOpen_ShowsPopover ()
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -2060,48 +2060,20 @@ public class MenuBarTests
         ((View)runnable).Add (hostView);
         app.Begin (runnable);
 
-        Assert.False (menuBar.Active);
         Assert.False (menuBar.IsOpen ());
 
         // Act
-        bool result = menuBar.OpenMenu ();
+        menuBarItem.SetFocus ();
+        menuBarItem.PopoverMenuOpen = true;
 
         // Assert
-        Assert.True (result);
-        Assert.True (menuBar.Active);
         Assert.True (menuBar.IsOpen ());
         Assert.True (menuBarItem.PopoverMenu.Visible);
     }
 
+    // Claude - Sonnet 4.6
     [Fact]
-    public void OpenMenu_Returns_False_When_No_MenuBarItem_Has_PopoverMenu ()
-    {
-        // Arrange
-        VirtualTimeProvider time = new ();
-        using IApplication app = Application.Create (time);
-        app.Init (DriverRegistry.Names.ANSI);
-        IRunnable runnable = new Runnable ();
-
-        View hostView = new () { Id = "host", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
-        MenuBarItem menuBarItem = new () { Id = "menuBarItem", Title = "_File" };
-
-        // No PopoverMenu set
-        MenuBar menuBar = new ([menuBarItem]) { Id = "menuBar" };
-        hostView.Add (menuBar);
-        ((View)runnable).Add (hostView);
-        app.Begin (runnable);
-
-        // Act
-        bool result = menuBar.OpenMenu ();
-
-        // Assert
-        Assert.False (result);
-        Assert.False (menuBar.Active);
-        Assert.False (menuBar.IsOpen ());
-    }
-
-    [Fact]
-    public void OpenMenu_WithNullPosition_UsesDefaultPosition ()
+    public void MenuBarItem_PopoverMenuAnchor_UsesCustomAnchor ()
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -2117,17 +2089,21 @@ public class MenuBarTests
         menuBarItem.PopoverMenu = popoverMenu;
         popoverMenu.Root = menu;
 
+        // Set custom anchor to a different location
+        menuBarItem.PopoverMenuAnchor = () => new Rectangle (20, 5, 10, 1);
+
         MenuBar menuBar = new ([menuBarItem]) { Id = "menuBar" };
         hostView.Add (menuBar);
         ((View)runnable).Add (hostView);
         app.Begin (runnable);
 
-        // Act - OpenMenu () overload delegates to OpenMenu (null)
-        bool result = menuBar.OpenMenu ();
+        // Act
+        menuBarItem.SetFocus ();
+        menuBarItem.PopoverMenuOpen = true;
 
         // Assert
-        Assert.True (result);
         Assert.True (menuBar.IsOpen ());
+        Assert.True (menuBarItem.PopoverMenu.Visible);
     }
 
     #endregion
