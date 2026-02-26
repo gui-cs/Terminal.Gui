@@ -121,27 +121,27 @@ public class MenuBars : Scenario
             MenuBar?.EnableForDesign (ref host);
             Add (MenuBar);
 
-            Label lastAcceptedLabel = new () { Title = "Last Accepted:", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastCommandLabel) };
+            Label lastActivatedLabel = new () { Title = "Last Activated:", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastCommandLabel) };
 
-            View lastAcceptedText = new ()
+            View lastActivatedText = new ()
             {
-                X = Pos.Right (lastAcceptedLabel) + 1, Y = Pos.Top (lastAcceptedLabel), Height = Dim.Auto (), Width = Dim.Auto ()
+                X = Pos.Right (lastActivatedLabel) + 1, Y = Pos.Top (lastActivatedLabel), Height = Dim.Auto (), Width = Dim.Auto ()
             };
 
-            Add (lastAcceptedLabel, lastAcceptedText);
+            Add (lastActivatedLabel, lastActivatedText);
 
             // Demonstrate ctx.Value containing the accepted MenuItem
-            Label lastAcceptedValueLabel = new ()
+            Label lastActivatedValueLabel = new ()
             {
-                Title = "Last Accepted (from ctx.Value):", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastAcceptedLabel)
+                Title = "Last Activated (from ctx.Value):", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastActivatedLabel)
             };
 
-            View lastAcceptedValueText = new ()
+            View lastActivatedValueText = new ()
             {
-                X = Pos.Right (lastAcceptedValueLabel) + 1, Y = Pos.Top (lastAcceptedValueLabel), Height = Dim.Auto (), Width = Dim.Auto ()
+                X = Pos.Right (lastActivatedValueLabel) + 1, Y = Pos.Top (lastActivatedValueLabel), Height = Dim.Auto (), Width = Dim.Auto ()
             };
 
-            Add (lastAcceptedValueLabel, lastAcceptedValueText);
+            Add (lastActivatedValueLabel, lastActivatedValueText);
 
             // MenuItem: AutoSave - Demos simple CommandView state tracking
             // In MenuBar.EnableForDesign, the auto save MenuItem does not specify a Command. But does
@@ -153,7 +153,7 @@ public class MenuBars : Scenario
 
             CheckBox autoSaveStatusCb = new ()
             {
-                Title = "AutoSave Status (MenuItem Binding to F10)", X = Pos.Left (lastAcceptedValueLabel), Y = Pos.Bottom (lastAcceptedValueLabel)
+                Title = "AutoSave Status (MenuItem Binding to F10)", X = Pos.Left (lastActivatedValueLabel), Y = Pos.Bottom (lastActivatedValueLabel)
             };
 
             autoSaveStatusCb.ValueChanged += (_, _) => { autoSaveMenuItemCb.Value = autoSaveStatusCb.Value; };
@@ -204,22 +204,22 @@ public class MenuBars : Scenario
 
             editModeStatusCb.ValueChanged += (_, _) => { editModeMenuItemCb?.Value = editModeStatusCb.Value; };
 
-            MenuBar?.Accepted += (_, args) =>
-            {
-                // Traditional way - extracting MenuItem from Source
-                if (args.Context?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem mi)
-                {
-                    lastAcceptedText.Text = mi.Title!;
-                }
+            MenuBar?.Activated += (_, args) =>
+                                 {
+                                     // Traditional way - extracting MenuItem from Source
+                                     if (args?.Value?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem mi)
+                                     {
+                                         lastActivatedText.Text = mi.Title!;
+                                     }
 
-                // New way - using ctx.Value which contains the Menu's activated MenuItem
-                // Note: Value comes from the PopoverMenu (which implements IValue<MenuItem?>)
-                // and is automatically populated in the context when the command is invoked
-                if (args.Context?.Value is MenuItem menuItem)
-                {
-                    lastAcceptedValueText.Text = $"{menuItem.Title} (from Menu.Value)";
-                }
-            };
+                                     // New way - using ctx.Value which contains the Menu's activated MenuItem
+                                     // Note: Value comes from the PopoverMenu (which implements IValue<MenuItem?>)
+                                     // and is automatically populated in the context when the command is invoked
+                                     if (args?.Value?.Value is MenuItem menuItem)
+                                     {
+                                         lastActivatedValueText.Text = $"{menuItem.Title} (from Menu.Value)";
+                                     }
+                                 };
 
             AddCommand (Command.Edit,
                         ctx =>
