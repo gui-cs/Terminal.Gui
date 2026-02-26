@@ -48,6 +48,9 @@ public readonly record struct CommandContext : ICommandContext
     /// <inheritdoc/>
     public CommandRouting Routing { get; init; }
 
+    /// <inheritdoc/>
+    public object? Value { get; init; }
+
     /// <summary>
     ///     Creates a new context with a different command, preserving all other fields.
     /// </summary>
@@ -62,6 +65,21 @@ public readonly record struct CommandContext : ICommandContext
     /// <returns>A new <see cref="CommandContext"/> with the specified routing.</returns>
     public CommandContext WithRouting (CommandRouting routing) => this with { Routing = routing };
 
+    /// <summary>
+    ///     Creates a new context with a different value, preserving all other fields.
+    /// </summary>
+    /// <param name="value">The new value.</param>
+    /// <returns>A new <see cref="CommandContext"/> with the specified value.</returns>
+    public CommandContext WithValue (object? value) => this with { Value = value };
+
     /// <inheritdoc/>
-    public override string ToString () => $"{(Routing == CommandRouting.BubblingUp ? Glyphs.UpArrow : Routing == CommandRouting.DispatchingDown ? Glyphs.DownArrow : "")}{Command} ({(Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "")}{(Binding is { } ? $", Binding={Binding}" : "")})";
+    public override string ToString ()
+    {
+        string routing = Routing == CommandRouting.BubblingUp ? Glyphs.UpArrow.ToString () : Routing == CommandRouting.DispatchingDown ? Glyphs.DownArrow.ToString () : "";
+        string source = Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "";
+        string binding = Binding is { } ? $", Binding={Binding}" : "";
+        string value = Value is { } ? $", Value={Value}" : "";
+
+        return $"{routing}{Command} ({source}{binding}{value})";
+    }
 }

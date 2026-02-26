@@ -548,4 +548,101 @@ public class CommandContextTests
     }
 
     #endregion
+
+    #region Value Property Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_DefaultValue_IsNull ()
+    {
+        CommandContext ctx = new ();
+
+        Assert.Null (ctx.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_Value_CanBeSet ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Value = "test value" };
+
+        Assert.Equal ("test value", ctx.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_WithValue_CreatesNewContext_PreservesOtherFields ()
+    {
+        View sourceView = new () { Id = "source" };
+        KeyBinding binding = new ([Command.Accept]) { Key = Key.Enter };
+
+        CommandContext ctx = new ()
+        {
+            Command = Command.Accept,
+            Source = new WeakReference<View> (sourceView),
+            Binding = binding,
+            Routing = CommandRouting.BubblingUp
+        };
+
+        CommandContext updated = ctx.WithValue ("new value");
+
+        // Original unchanged
+        Assert.Null (ctx.Value);
+
+        // Updated has new value, everything else preserved
+        Assert.Equal ("new value", updated.Value);
+        Assert.Equal (Command.Accept, updated.Command);
+        Assert.Equal (ctx.Source, updated.Source);
+        Assert.Equal (ctx.Binding, updated.Binding);
+        Assert.Equal (CommandRouting.BubblingUp, updated.Routing);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_WithValue_CanSetNull ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Value = "initial value" };
+
+        CommandContext updated = ctx.WithValue (null);
+
+        Assert.Equal ("initial value", ctx.Value);
+        Assert.Null (updated.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_ToString_IncludesValue_WhenNonNull ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Value = "test value" };
+
+        string result = ctx.ToString ();
+
+        Assert.Contains ("Value=test value", result);
+        Assert.Contains ("Accept", result);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_ToString_OmitsValue_WhenNull ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Value = null };
+
+        string result = ctx.ToString ();
+
+        Assert.DoesNotContain ("Value=", result);
+        Assert.Contains ("Accept", result);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ICommandContext_Value_IsAccessible ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Value = 42 };
+
+        ICommandContext iCtx = ctx;
+
+        Assert.Equal (42, iCtx.Value);
+    }
+
+    #endregion
 }

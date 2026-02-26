@@ -46,4 +46,23 @@ public interface ICommandContext
     ///     Gets the routing mode for this command invocation.
     /// </summary>
     public CommandRouting Routing { get; }
+
+    /// <summary>
+    ///     Gets the value from the source View if it implements <see cref="IValue"/>.
+    ///     This is automatically populated during command invocation when the source implements <see cref="IValue"/>,
+    ///     capturing the result of <see cref="IValue.GetValue"/> at the time the command was invoked.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This enables command handlers up the hierarchy to access the source view's value
+    ///         without needing to know the generic type parameter of <see cref="IValue{TValue}"/>.
+    ///     </para>
+    ///     <para>
+    ///         Will be <see langword="null"/> if the source view does not implement <see cref="IValue"/>,
+    ///         or if the source view's value is <see langword="null"/>.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="IValue"/>
+    /// <seealso cref="IValue.GetValue"/>
+    public object? Value { get; }
 }
