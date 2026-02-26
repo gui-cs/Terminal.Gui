@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -27,6 +28,8 @@ internal partial class ApplicationImpl
         }
 
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
+
+        Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"driverName: {driverName}");
 
         // Thread-safe fence check: Ensure we're not mixing application models
         // Use lock to make check-and-set atomic
@@ -88,10 +91,10 @@ internal partial class ApplicationImpl
 
         Initialized = true;
 
-        RaiseInitializedChanged (this, new (true));
+        RaiseInitializedChanged (this, new EventArgs<bool> (true));
         SubscribeDriverEvents ();
 
-        SynchronizationContext.SetSynchronizationContext (new ());
+        SynchronizationContext.SetSynchronizationContext (new SynchronizationContext ());
 
         _result = null;
 
@@ -201,7 +204,7 @@ internal partial class ApplicationImpl
         if (wasInitialized)
         {
             bool init = Initialized; // Will be false after ResetState
-            RaiseInitializedChanged (this, new (in init));
+            RaiseInitializedChanged (this, new EventArgs<bool> (in init));
         }
 
         // Clear the event to prevent memory leaks
@@ -233,8 +236,10 @@ internal partial class ApplicationImpl
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
 
+        Trace.Lifecycle (MainThreadId?.ToString (), "Shutdown");
+
         // === 0. Stop all timers ===
-        TimedEvents?.StopAll ();
+        TimedEvents.StopAll ();
 
         // === 1. Stop all running runnables ===
         foreach (SessionToken token in SessionStack!.Reverse ())
@@ -246,7 +251,7 @@ internal partial class ApplicationImpl
         }
 
         // === 2. Close and dispose popover ===
-        if (Popover?.GetActivePopover () is View popover)
+        if (Popovers?.GetActivePopover () is View popover)
         {
             // This forcefully closes the popover; invoking Command.Quit would be more graceful
             // but since this is shutdown, doing this is ok.
@@ -254,8 +259,8 @@ internal partial class ApplicationImpl
         }
 
         // Any popovers added to Popover have their lifetime controlled by Popover
-        Popover?.Dispose ();
-        Popover = null;
+        Popovers?.Dispose ();
+        Popovers = null;
 
         // === 3. Clean up runnables ===
         SessionStack?.Clear ();
@@ -322,7 +327,7 @@ internal partial class ApplicationImpl
     /// <summary>
     ///     Raises the <see cref="InitializedChanged"/> event.
     /// </summary>
-    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
+    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) => InitializedChanged?.Invoke (sender, e);
 
 #if DEBUG
     /// <summary>
@@ -339,28 +344,20 @@ internal partial class ApplicationImpl
 
         Delegate [] subscribers = eventDelegate.GetInvocationList ();
 
-        if (subscribers.Length > 0)
+        if (subscribers.Length <= 0)
         {
-            string subscriberInfo = string.Join (
-                                                 ", ",
-                                                 subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
-                                                                    )
-                                                );
-
-            Debug.Fail (
-                        $"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}"
-                       );
+            return;
         }
+        string subscriberInfo = string.Join (", ", subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"));
+
+        Debug.Fail ($"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}");
     }
 #endif
 
-    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
+    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) => ForceDriver = e.NewValue;
 
     /// <summary>
     ///     Unsubscribes from Application static property change events.
     /// </summary>
-    private void UnsubscribeApplicationEvents ()
-    {
-        Application.ForceDriverChanged -= OnForceDriverChanged;
-    }
+    private void UnsubscribeApplicationEvents () => Application.ForceDriverChanged -= OnForceDriverChanged;
 }

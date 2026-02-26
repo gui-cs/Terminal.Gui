@@ -282,6 +282,6 @@ public class ApplicationPopoverTests
         }
 
         /// <inheritdoc/>
-        public IRunnable? Current { get; set; }
+        public IRunnable? Owner { get; set; }
     }
 }

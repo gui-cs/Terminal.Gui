@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace Terminal.Gui.App;
 /// </summary>
 public class SessionToken
 {
-    internal SessionToken (IRunnable runnable) { Runnable = runnable; }
+    internal SessionToken (IRunnable runnable) => Runnable = runnable;
 
     /// <summary>
     ///     Gets or sets the runnable associated with this session.

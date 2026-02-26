@@ -52,7 +52,9 @@ public abstract class PopoverBaseImpl : View, IPopover
     /// </remarks>
     protected PopoverBaseImpl ()
     {
+#if DEBUG
         Id = "popoverBaseImpl";
+#endif
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
@@ -65,6 +67,10 @@ public abstract class PopoverBaseImpl : View, IPopover
 
         AddCommand (Command.Quit, Quit);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
+        KeyBindings.Remove (Key.Enter);
+
+        // Clear all mouse bindings so there's no conflict with subviews
+        MouseBindings.Clear ();
 
         return;
 
@@ -81,16 +87,14 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
     }
 
-    private IRunnable? _current;
-
     /// <inheritdoc/>
-    public IRunnable? Current
+    public IRunnable? Owner
     {
-        get => _current;
+        get;
         set
         {
-            _current = value;
-            App ??= (_current as View)?.App;
+            field = value;
+            App ??= (field as View)?.App;
         }
     }
 

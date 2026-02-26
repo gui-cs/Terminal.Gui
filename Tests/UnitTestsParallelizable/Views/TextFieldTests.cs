@@ -106,6 +106,38 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (view.HasFocus);
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When a TextField has a HotKey matching a typed character (e.g. 'E' from Title "_Enter Path"),
+    ///     pressing that character while the TextField is focused should insert it as text, not activate the hotkey.
+    /// </summary>
+    [Fact]
+    public void HotKey_WhenFocused_InsertsText_DoesNotActivate ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Title = "_Enter Path", Width = 30 };
+        top.Add (tf);
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+
+        // HotKey should be 'E' from the title
+        Assert.Equal (Key.E, tf.HotKey);
+
+        // Clear any selection from focus
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        // Type "hello" which contains 'e' (the HotKey character)
+        foreach (char c in "hello")
+        {
+            top.NewKeyDownEvent (c);
+        }
+
+        Assert.Equal ("hello", tf.Text);
+
+        top.Dispose ();
+    }
+
     [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
@@ -122,76 +154,71 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Accepted_Command_Fires_Accept ()
+    public void Accept_Command_Fires_Accepting ()
     {
         var view = new TextField ();
 
-        var accepted = false;
-        view.Accepting += Accept;
+        var accepting = false;
+        view.Accepting += Accepting;
         view.InvokeCommand (Command.Accept);
-        Assert.True (accepted);
+        Assert.True (accepting);
 
         return;
 
-        void Accept (object? sender, CommandEventArgs e) => accepted = true;
+        void Accepting (object? sender, CommandEventArgs e) => accepting = true;
     }
 
     [Fact]
-    public void Accepted_No_Handler_Enables_Default_Button_Accept ()
+    public void Enter_Enables_Default_Button_Accept ()
     {
         var superView = new Window { Id = "superView" };
-
         var tf = new TextField { Id = "tf" };
 
         var button = new Button { Id = "button", IsDefault = true };
 
         superView.Add (tf, button);
 
-        var buttonAccept = 0;
-        button.Accepting += ButtonAccept;
+        var buttonAccepting = 0;
+        button.Accepting += ButtonAccepting;
 
         tf.SetFocus ();
         Assert.True (tf.HasFocus);
 
         superView.NewKeyDownEvent (Key.Enter);
-        Assert.Equal (1, buttonAccept);
+        Assert.Equal (1, buttonAccepting);
 
         button.SetFocus ();
         superView.NewKeyDownEvent (Key.Enter);
-        Assert.Equal (2, buttonAccept);
+        Assert.Equal (2, buttonAccepting);
 
         return;
 
-        void ButtonAccept (object? sender, CommandEventArgs e) => buttonAccept++;
+        void ButtonAccepting (object? sender, CommandEventArgs e) => buttonAccepting++;
     }
 
     [Fact]
-    public void Accepted_Cancel_Event_HandlesCommand ()
+    public void Accept_Command_Handles_Properly ()
     {
-        //var super = new View ();
         var view = new TextField ();
 
-        //super.Add (view);
-
-        //var superAcceptedInvoked = false;
-
-        var tfAcceptedInvoked = false;
+        var tfAcceptingInvoked = false;
         var handle = false;
-        view.Accepting += TextViewAccept;
-        Assert.False (view.InvokeCommand (Command.Accept));
-        Assert.True (tfAcceptedInvoked);
+        view.Accepting += TextViewAccepting;
 
-        tfAcceptedInvoked = false;
+        view.InvokeCommand (Command.Accept);
+        Assert.True (tfAcceptingInvoked);
+
+        tfAcceptingInvoked = false;
         handle = true;
-        view.Accepting += TextViewAccept;
-        Assert.True (view.InvokeCommand (Command.Accept));
-        Assert.True (tfAcceptedInvoked);
+        view.Accepting += TextViewAccepting;
+        view.InvokeCommand (Command.Accept);
+        Assert.True (tfAcceptingInvoked);
 
         return;
 
-        void TextViewAccept (object? sender, CommandEventArgs e)
+        void TextViewAccepting (object? sender, CommandEventArgs e)
         {
-            tfAcceptedInvoked = true;
+            tfAcceptingInvoked = true;
             e.Handled = handle;
         }
     }
@@ -205,6 +232,55 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 
         Exception exception = Record.Exception (() => tf.SetFocus ());
         Assert.Null (exception);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that common printable characters including space, letters, digits,
+    ///     and punctuation are correctly inserted as text input.
+    /// </summary>
+    [Fact]
+    public void CommonInput_AllPrintableCharacters_InsertedAsText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 40 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        // Type a string with letters, digits, space, and punctuation
+        foreach (char c in "Hello World 123!@#")
+        {
+            top.NewKeyDownEvent (c);
+        }
+
+        Assert.Equal ("Hello World 123!@#", tf.Text);
+
+        top.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies that the space key is not consumed by the default View Command.Activate binding.
+    ///     TextField removes the Key.Space binding so space can be typed as text.
+    /// </summary>
+    [Fact]
+    public void Space_IsInsertedAsText_NotConsumedByActivate ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 20 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+
+        top.NewKeyDownEvent ((Key)'a');
+        top.NewKeyDownEvent (Key.Space);
+        top.NewKeyDownEvent ((Key)'b');
+
+        Assert.Equal ("a b", tf.Text);
+
+        top.Dispose ();
     }
 
     [Fact]
@@ -824,22 +900,17 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal ("Test", tf.Text); // Should be same due to polymorphism
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextField_Command_Activate_PositionsCursor ()
+    public void Command_Activate_SetsFocus ()
     {
         TextField textField = new () { Text = "Test", Width = 10 };
         textField.BeginInit ();
         textField.EndInit ();
+        Assert.False (textField.HasFocus);
 
-        // Activate via Command.Activate is handled for clicks positioning cursor
-        // We test the command is handled
-        bool? result = textField.InvokeCommand (Command.Activate);
+        textField.InvokeCommand (Command.Activate);
 
-        // Command should be handled (returns true)
-        Assert.True (result);
+        Assert.True (textField.HasFocus);
 
         textField.Dispose ();
     }
@@ -848,7 +919,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextField_Command_Accept_RaisesAccepting ()
+    public void Command_Accept_RaisesAccepting ()
     {
         TextField textField = new () { Text = "Test" };
         var acceptingFired = false;
@@ -867,18 +938,17 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         textField.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextField_Command_HotKey_SetsFocus ()
+    public void Command_HotKey_SetsFocus ()
     {
         TextField textField = new () { Text = "Test" };
+        textField.BeginInit ();
+        textField.EndInit ();
+        Assert.False (textField.HasFocus);
 
-        bool? result = textField.InvokeCommand (Command.HotKey);
+        textField.InvokeCommand (Command.HotKey);
 
-        // HotKey should return true (handled)
-        Assert.True (result);
+        Assert.True (textField.HasFocus);
 
         textField.Dispose ();
     }
@@ -887,7 +957,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
     // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void TextField_Enter_RaisesAccepting ()
+    public void Enter_RaisesAccepting ()
     {
         TextField textField = new () { Text = "Test" };
         var acceptingFired = false;

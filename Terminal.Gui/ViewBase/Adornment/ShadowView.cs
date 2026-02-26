@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -7,17 +5,14 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal class ShadowView : View
 {
-    private ShadowStyle _shadowStyle;
+    /// <inheritdoc/>
+    protected override bool OnDrawingText () => true;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingText () { return true; }
+    protected override bool OnClearingViewport () =>
 
-    /// <inheritdoc/>
-    protected override bool OnClearingViewport ()
-    {
         // Prevent clearing (so we can have transparency)
-        return true;
-    }
+        true;
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
@@ -43,7 +38,7 @@ internal class ShadowView : View
                 }
                 else
                 {
-                    DrawHorizontalShadowTransparent (Viewport);
+                    DrawHorizontalShadowTransparent ();
                 }
 
                 break;
@@ -59,11 +54,11 @@ internal class ShadowView : View
 
     public override ShadowStyle ShadowStyle
     {
-        get => _shadowStyle;
+        get;
         set
         {
             Visible = value != ShadowStyle.None;
-            _shadowStyle = value;
+            field = value;
 
             ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
@@ -87,7 +82,7 @@ internal class ShadowView : View
         AddRune (rectangle.Width - 1, 0, Glyphs.ShadowHorizontalEnd);
     }
 
-    private void DrawHorizontalShadowTransparent (Rectangle viewport)
+    private void DrawHorizontalShadowTransparent ()
     {
         Rectangle screen = ViewportToScreen (Viewport);
 
@@ -96,7 +91,7 @@ internal class ShadowView : View
             for (int c = Math.Max (0, screen.X + 1); c < screen.X + screen.Width; c++)
             {
                 Driver?.Move (c, r);
-                SetAttribute (GetAttributeUnderLocation (new (c, r)));
+                SetAttribute (GetAttributeUnderLocation (new Point (c, r)));
 
                 if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
                 {
@@ -136,18 +131,22 @@ internal class ShadowView : View
             for (int c = Math.Max (0, screen.X); c < screen.X + screen.Width; c++)
             {
                 Driver?.Move (c, r);
-                SetAttribute (GetAttributeUnderLocation (new (c, r)));
+                SetAttribute (GetAttributeUnderLocation (new Point (c, r)));
 
-                if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0)
-                    && c < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
+                if (ScreenContents is null
+                    || screen.X >= ScreenContents.GetLength (1)
+                    || r >= ScreenContents.GetLength (0)
+                    || c >= ScreenContents.GetLength (1)
+                    || r >= ScreenContents.GetLength (0))
                 {
-                    string grapheme = ScreenContents [r, c].Grapheme;
-                    AddStr (grapheme);
+                    continue;
+                }
+                string grapheme = ScreenContents [r, c].Grapheme;
+                AddStr (grapheme);
 
-                    if (grapheme.GetColumns () > 1)
-                    {
-                        c++;
-                    }
+                if (grapheme.GetColumns () > 1)
+                {
+                    c++;
                 }
             }
         }
@@ -158,43 +157,35 @@ internal class ShadowView : View
     // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4491
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not Adornment
-            || location.X < 0
-            || location.X >= App?.Screen.Width
+        if (SuperView is not Adornment || location.X < 0 || location.X >= App?.Screen.Width || location.Y < 0 || location.Y >= App?.Screen.Height
+            || ScreenContents == null
             || location.Y < 0
-            || location.Y >= App?.Screen.Height)
-        {
-            return Attribute.Default;
-        }
-
-        if (ScreenContents == null ||
-            location.Y < 0 || location.Y >= ScreenContents.GetLength (0) ||
-            location.X < 0 || location.X >= ScreenContents.GetLength (1))
+            || location.Y >= ScreenContents.GetLength (0)
+            || location.X < 0
+            || location.X >= ScreenContents.GetLength (1))
         {
             return Attribute.Default;
         }
 
         Attribute attr = ScreenContents [location.Y, location.X].Attribute!.Value;
 
-        var newAttribute =
-            new Attribute (
-                           ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDimColor (),
-                           ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDimColor (0.05),
-                           attr.Style);
+        var newAttribute = new Attribute (ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDimmerColor (),
+                                          ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.05),
+                                          attr.Style);
 
-        // If the BG is DarkGray, GetDimColor gave up. Instead of using the attribute in the Driver under the shadow,
+        // If the BG is DarkGray, GetDimmerColor gave up. Instead of using the attribute in the Driver under the shadow,
         // use the Normal attribute from the View under the shadow.
-        if (newAttribute.Background == Color.DarkGray)
+        if (newAttribute.Background != Color.DarkGray)
         {
-            List<View?> currentViewsUnderMouse = GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
-            View? underView = currentViewsUnderMouse.LastOrDefault ();
-            attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
-
-            newAttribute = new (
-                                ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Background.GetDimColor (),
-                                ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Foreground.GetDimColor (0.25),
-                                attr.Style);
+            return newAttribute;
         }
+        List<View?> currentViewsUnderMouse = GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
+        View? underView = currentViewsUnderMouse.LastOrDefault ();
+        attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
+
+        newAttribute = new Attribute (ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Background.GetDimmerColor (),
+                                      ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Foreground.GetDimmerColor (0.25),
+                                      attr.Style);
 
         return newAttribute;
     }

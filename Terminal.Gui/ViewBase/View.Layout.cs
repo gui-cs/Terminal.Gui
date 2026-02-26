@@ -1192,7 +1192,7 @@ public partial class View // Layout APIs
     public List<View?> GetViewsUnderLocation (in Point screenLocation, ViewportSettingsFlags excludeViewportSettingsFlags)
     {
         // PopoverHost - If visible, start with it instead of Top
-        if (App?.Popover?.GetActivePopover () is View { Visible: true } visiblePopover)
+        if (App?.Popovers?.GetActivePopover () is View { Visible: true } visiblePopover)
         {
             // BUGBUG: We do not traverse all visible runnables if there's an active popover. This may be a bug.
             List<View?> result = [];
@@ -1309,7 +1309,7 @@ public partial class View // Layout APIs
     ///     INTERNAL: Gets ALL Views (Subviews and Adornments) in the of <see cref="SuperView"/> hierarchcy that are at
     ///     <paramref name="location"/>,
     ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="Visible"/> set to
-    ///     <see langword="false"/> will not be included.
+    ///     <see langword="false"/> or <see cref="Enabled"/> set to <see langword="false"/> will not be included.
     ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
     /// </summary>
     /// <param name="superView">The root view from which the search for subviews begins.</param>
@@ -1317,7 +1317,7 @@ public partial class View // Layout APIs
     /// <returns>A list of views that are located under the specified point.</returns>
     internal static List<View?> GetViewsAtLocation (View? superView, in Point location)
     {
-        if (superView is null || !superView.Visible)
+        if (superView is null || !superView.Visible || !superView.Enabled)
         {
             return [];
         }
@@ -1374,7 +1374,7 @@ public partial class View // Layout APIs
             {
                 View subview = currentView.InternalSubViews [i];
 
-                if (subview.Visible && subview.FrameToScreen ().Contains (location))
+                if (subview.Visible && subview.Enabled && subview.FrameToScreen ().Contains (location))
                 {
                     viewsToProcess.Push (subview);
                 }

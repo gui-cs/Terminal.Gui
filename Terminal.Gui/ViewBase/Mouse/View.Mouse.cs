@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -35,13 +36,13 @@ public partial class View // Mouse APIs
     /// <param name="eventArgs"></param>
     /// <returns>
     ///     <see langword="true"/> if the event was canceled, <see langword="false"/> if not, <see langword="null"/> if the
-    ///     view is not visible. Cancelling the event
+    ///     view is not visible or not enabled. Cancelling the event
     ///     prevents Views higher in the visible hierarchy from receiving Enter/Leave events.
     /// </returns>
     internal bool? NewMouseEnterEvent (CancelEventArgs eventArgs)
     {
         // Pre-conditions
-        if (!CanBeVisible (this))
+        if (!CanBeVisible (this) || !Enabled)
         {
             return null;
         }
@@ -76,7 +77,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be visible to receive Enter events (Leave events are always received).
+    ///         A view must be visible and enabled to receive Enter events (Leave events are always received).
     ///     </para>
     ///     <para>
     ///         If the event is cancelled, the mouse event will not be propagated to other views and <see cref="MouseEnter"/>
@@ -103,7 +104,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be visible to receive Enter events (Leave events are always received).
+    ///         A view must be visible and enabled to receive Enter events (Leave events are always received).
     ///     </para>
     ///     <para>
     ///         If the event is cancelled, the mouse event will not be propagated to other views.
@@ -402,6 +403,8 @@ public partial class View // Mouse APIs
             return false;
         }
 
+        Trace.Mouse (this, mouse, "Entry");
+
         // 2. Setup MouseHoldRepeater if needed
         if (MouseHoldRepeater is null)
         {
@@ -426,6 +429,8 @@ public partial class View // Mouse APIs
         // 4. Low-level MouseEvent (cancellable)
         if (RaiseMouseEvent (mouse) || mouse.Handled)
         {
+            Trace.Mouse (this, mouse, "Exit", $"{true}");
+
             return true;
         }
 
@@ -436,6 +441,8 @@ public partial class View // Mouse APIs
             {
                 if (HandleAutoGrabPress (mouse))
                 {
+                    Trace.Mouse (this, mouse, "Exit", $"{true}");
+
                     return true;
                 }
             }
@@ -443,6 +450,8 @@ public partial class View // Mouse APIs
             {
                 if (HandleAutoGrabRelease (mouse))
                 {
+                    Trace.Mouse (this, mouse, "Exit", $"{true}");
+
                     return true;
                 }
             }
@@ -450,6 +459,8 @@ public partial class View // Mouse APIs
             {
                 if (HandleAutoGrabClicked (mouse))
                 {
+                    Trace.Mouse (this, mouse, "Exit", $"{mouse.Handled}");
+
                     return mouse.Handled;
                 }
             }
@@ -467,10 +478,16 @@ public partial class View // Mouse APIs
             // Only invoke commands on the configured mouse event - ignore everything else
             if ((mouse.Flags & MouseHoldRepeat.Value) != 0)
             {
-                return RaiseCommandsBoundToButtonFlags (mouse);
+                bool ret = RaiseCommandsBoundToButtonFlags (mouse);
+
+                Trace.Mouse (this, mouse, "Exit", $"{ret}");
+
+                return ret;
             }
 
             // Ignore all other events when MouseHoldRepeat is set
+            Trace.Mouse (this, mouse, "Exit", $"MouseHoldRepeat {false}");
+
             return false;
         }
 
@@ -478,10 +495,18 @@ public partial class View // Mouse APIs
         // Note: Released and Pressed are handled by HandleAutoGrabRelease/Press when ShouldAutoGrab
         if (mouse.IsSingleDoubleOrTripleClicked || ((mouse.IsReleased || mouse.IsPressed) && !ShouldAutoGrab))
         {
-            return RaiseCommandsBoundToButtonFlags (mouse);
+            bool ret = RaiseCommandsBoundToButtonFlags (mouse);
+
+            Trace.Mouse (this, mouse, "Exit", $"{ret}");
+
+            return ret;
         }
 
-        return mouse.IsWheel && RaiseCommandsBoundToWheelFlags (mouse);
+        bool result = mouse.IsWheel && RaiseCommandsBoundToWheelFlags (mouse);
+
+        Trace.Mouse (this, mouse, "Exit", $"{result}");
+
+        return result;
     }
 
     /// <summary>
@@ -569,6 +594,8 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/> if processing should stop; <see langword="false"/> otherwise.</returns>
     private bool HandleAutoGrabPress (Mouse mouse)
     {
+        Trace.Mouse (this, mouse, "AutoGrab");
+
         if (!mouse.IsPressed)
         {
             return false;
@@ -583,12 +610,13 @@ public partial class View // Mouse APIs
 
             for (int i = cached.Count - 1; i >= 0; i--)
             {
-                if (cached [i] is { Enabled: true } candidate)
+                if (cached [i] is not { Enabled: true } candidate)
                 {
-                    deepestEnabledView = candidate;
-
-                    break;
+                    continue;
                 }
+                deepestEnabledView = candidate;
+
+                break;
             }
 
             if (deepestEnabledView is { } && deepestEnabledView != this)
@@ -632,6 +660,8 @@ public partial class View // Mouse APIs
     /// <param name="mouse">The mouse event.</param>
     private bool HandleAutoGrabRelease (Mouse mouse)
     {
+        Trace.Mouse (this, mouse, "AutoGrab");
+
         if (!mouse.IsReleased)
         {
             return false;
@@ -674,6 +704,8 @@ public partial class View // Mouse APIs
     /// </returns>
     private bool HandleAutoGrabClicked (Mouse mouse)
     {
+        Trace.Mouse (this, mouse, "AutoGrab");
+
         if (!mouse.IsSingleDoubleOrTripleClicked)
         {
             return false;
@@ -761,10 +793,13 @@ public partial class View // Mouse APIs
             return args.Handled = false;
         }
 
-        //Logging.Trace ($"Invoking commands bound to mouse: {args.Flags}");
+        Trace.Mouse (this, args.Flags, args.Position!.Value, "Invoking");
+
         // By default, this will raise Activating/OnActivating - Subclasses can override this via
         // ReplaceCommand (Command.Activate ...).
         args.Handled = InvokeCommandsBoundToMouse (args) == true;
+
+        Trace.Mouse (this, args.Flags, args.Position!.Value, "Invoked", $"handled={args.Handled}");
 
         return args.Handled;
     }
@@ -793,7 +828,11 @@ public partial class View // Mouse APIs
             return args.Handled = false;
         }
 
+        Trace.Mouse (this, args.Flags, args.Position!.Value, "Invoking");
+
         args.Handled = InvokeCommandsBoundToMouse (args) == true;
+
+        Trace.Mouse (this, args.Flags, args.Position!.Value, "Invoked", $"handled={args.Handled}");
 
         return args.Handled;
     }
@@ -817,9 +856,7 @@ public partial class View // Mouse APIs
             return null;
         }
 
-        binding.MouseEvent = mouseEventArgs;
-
-        return InvokeCommands (binding.Commands, binding);
+        return InvokeCommands (binding.Commands, binding with { MouseEvent = mouseEventArgs, Source = new WeakReference<View> (this) });
     }
 
     #endregion Command Invocation

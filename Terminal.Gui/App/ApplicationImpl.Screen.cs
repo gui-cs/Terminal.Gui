@@ -61,7 +61,7 @@ internal partial class ApplicationImpl
 
         List<View?> views = [.. SessionStack!.Select (r => r.Runnable! as View)!];
 
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        if (Popovers?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             visiblePopover.SetNeedsDraw ();
             visiblePopover.SetNeedsLayout ();

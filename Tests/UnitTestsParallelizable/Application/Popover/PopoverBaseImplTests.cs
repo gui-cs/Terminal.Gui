@@ -21,12 +21,12 @@ public class PopoverBaseImplTests
     }
 
     [Fact]
-    public void Runnable_Property_CanBeSetAndGet ()
+    public void Owner_Property_CanBeSetAndGet ()
     {
         var popover = new TestPopover ();
         var top = new Runnable ();
-        popover.Current = top;
-        Assert.Same (top, popover.Current);
+        popover.Owner = top;
+        Assert.Same (top, popover.Owner);
     }
 
     [Fact]
