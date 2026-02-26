@@ -17,7 +17,9 @@
 _ReSharper.**
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 .vs/
 
 # Visual Studio cache files
@@ -75,8 +77,8 @@ log.*
 *.cobertura.xml
 
 # Claude Code local settings
-.claude/settings.json
 .claude/settings.local.json
+.claude/worktrees/
 .mcp.json
 .env
 tmpclaude-*-cwd

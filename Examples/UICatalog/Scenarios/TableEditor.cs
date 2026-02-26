@@ -1023,7 +1023,7 @@ public class TableEditor : Scenario
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        e.View?.App!.Popover?.Register (contextMenu);
+        e.View?.App!.Popovers?.Register (contextMenu);
         contextMenu?.MakeVisible (new Point (e.ScreenPosition.X + 1, e.ScreenPosition.Y + 1));
     }
 

@@ -80,7 +80,7 @@ public class MouseEnterLeaveTests
     }
 
     [Fact]
-    public void NewMouseEnterEvent_ViewIsDisabled_CallsOnMouseEnter ()
+    public void NewMouseEnterEvent_ViewIsDisabled_DoesNotCallOnMouseEnter ()
     {
         // Arrange
         var view = new TestView
@@ -95,8 +95,8 @@ public class MouseEnterLeaveTests
         bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
-        Assert.True (view.OnMouseEnterCalled);
-        Assert.False (cancelled);
+        Assert.False (view.OnMouseEnterCalled);
+        Assert.Null (cancelled);
         Assert.False (eventArgs.Cancel);
 
         // Cleanup
@@ -199,7 +199,7 @@ public class MouseEnterLeaveTests
     }
 
     [Fact]
-    public void NewMouseEnterEvent_ViewIsDisabled_RaisesMouseEnter ()
+    public void NewMouseEnterEvent_ViewIsDisabled_DoesNotRaiseMouseEnter ()
     {
         // Arrange
         var view = new TestView
@@ -214,8 +214,8 @@ public class MouseEnterLeaveTests
         bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
         // Assert
-        Assert.True (view.MouseEnterRaised);
-        Assert.False (cancelled);
+        Assert.False (view.MouseEnterRaised);
+        Assert.Null (cancelled);
         Assert.False (eventArgs.Cancel);
 
         // Cleanup

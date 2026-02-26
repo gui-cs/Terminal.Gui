@@ -25,14 +25,14 @@ public class InputInjectionExtensionsTests
 
         // First event: LeftButtonPressed
         Assert.IsType<MouseInjectionEvent> (events [0]);
-        MouseInjectionEvent pressEvent = (MouseInjectionEvent)events [0];
+        var pressEvent = (MouseInjectionEvent)events [0];
         Assert.Equal (MouseFlags.LeftButtonPressed, pressEvent.Mouse.Flags);
         Assert.Equal (clickPosition, pressEvent.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (10), pressEvent.Delay);
 
         // Second event: LeftButtonReleased
         Assert.IsType<MouseInjectionEvent> (events [1]);
-        MouseInjectionEvent releaseEvent = (MouseInjectionEvent)events [1];
+        var releaseEvent = (MouseInjectionEvent)events [1];
         Assert.Equal (MouseFlags.LeftButtonReleased, releaseEvent.Mouse.Flags);
         Assert.Equal (clickPosition, releaseEvent.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (10), releaseEvent.Delay);
@@ -80,14 +80,14 @@ public class InputInjectionExtensionsTests
 
         // First event: RightButtonPressed
         Assert.IsType<MouseInjectionEvent> (events [0]);
-        MouseInjectionEvent pressEvent = (MouseInjectionEvent)events [0];
+        var pressEvent = (MouseInjectionEvent)events [0];
         Assert.Equal (MouseFlags.RightButtonPressed, pressEvent.Mouse.Flags);
         Assert.Equal (clickPosition, pressEvent.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (10), pressEvent.Delay);
 
         // Second event: RightButtonReleased
         Assert.IsType<MouseInjectionEvent> (events [1]);
-        MouseInjectionEvent releaseEvent = (MouseInjectionEvent)events [1];
+        var releaseEvent = (MouseInjectionEvent)events [1];
         Assert.Equal (MouseFlags.RightButtonReleased, releaseEvent.Mouse.Flags);
         Assert.Equal (clickPosition, releaseEvent.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (10), releaseEvent.Delay);
@@ -135,28 +135,28 @@ public class InputInjectionExtensionsTests
 
         // First click: Press
         Assert.IsType<MouseInjectionEvent> (events [0]);
-        MouseInjectionEvent firstPress = (MouseInjectionEvent)events [0];
+        var firstPress = (MouseInjectionEvent)events [0];
         Assert.Equal (MouseFlags.LeftButtonPressed, firstPress.Mouse.Flags);
         Assert.Equal (clickPosition, firstPress.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (0), firstPress.Delay);
 
         // First click: Release
         Assert.IsType<MouseInjectionEvent> (events [1]);
-        MouseInjectionEvent firstRelease = (MouseInjectionEvent)events [1];
+        var firstRelease = (MouseInjectionEvent)events [1];
         Assert.Equal (MouseFlags.LeftButtonReleased, firstRelease.Mouse.Flags);
         Assert.Equal (clickPosition, firstRelease.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (10), firstRelease.Delay);
 
         // Second click: Press
         Assert.IsType<MouseInjectionEvent> (events [2]);
-        MouseInjectionEvent secondPress = (MouseInjectionEvent)events [2];
+        var secondPress = (MouseInjectionEvent)events [2];
         Assert.Equal (MouseFlags.LeftButtonPressed, secondPress.Mouse.Flags);
         Assert.Equal (clickPosition, secondPress.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (10), secondPress.Delay);
 
         // Second click: Release
         Assert.IsType<MouseInjectionEvent> (events [3]);
-        MouseInjectionEvent secondRelease = (MouseInjectionEvent)events [3];
+        var secondRelease = (MouseInjectionEvent)events [3];
         Assert.Equal (MouseFlags.LeftButtonReleased, secondRelease.Mouse.Flags);
         Assert.Equal (clickPosition, secondRelease.Mouse.ScreenPosition);
         Assert.Equal (TimeSpan.FromMilliseconds (10), secondRelease.Delay);
@@ -181,7 +181,7 @@ public class InputInjectionExtensionsTests
         // Assert - Should receive two clicks plus double-click event
         int pressCount = receivedFlags.Count (f => f.HasFlag (MouseFlags.LeftButtonPressed));
         int releaseCount = receivedFlags.Count (f => f.HasFlag (MouseFlags.LeftButtonReleased));
-        
+
         Assert.Equal (2, pressCount);
         Assert.Equal (2, releaseCount);
         Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.LeftButtonDoubleClicked));
@@ -203,7 +203,7 @@ public class InputInjectionExtensionsTests
         app.Begin (runnable);
 
         Button button = new () { Text = "Click Me" };
-        (runnable as View)?.Add (button);
+        runnable?.Add (button);
 
         var acceptingCalled = false;
         button.Accepting += (s, e) => acceptingCalled = true;
@@ -213,7 +213,7 @@ public class InputInjectionExtensionsTests
 
         // Assert
         Assert.True (acceptingCalled);
-        (runnable as View)?.Dispose ();
+        runnable?.Dispose ();
     }
 
     [Fact]
@@ -228,16 +228,16 @@ public class InputInjectionExtensionsTests
         app.Begin (runnable);
 
         CheckBox checkBox = new () { Text = "_Checkbox" };
-        (runnable as View)?.Add (checkBox);
+        runnable?.Add (checkBox);
 
         CheckState initialState = checkBox.Value;
 
         // Act - Double-click should toggle twice, returning to initial state
         app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (new Point (0, 0)));
 
-        // Assert - After double-click, state should be back to initial
-        Assert.Equal (initialState, checkBox.Value);
-        (runnable as View)?.Dispose ();
+        // Assert - After double-click, state should toggle
+        Assert.NotEqual (initialState, checkBox.Value);
+        runnable?.Dispose ();
     }
 
     [Fact]
@@ -252,9 +252,10 @@ public class InputInjectionExtensionsTests
         app.Begin (runnable);
 
         View testView = new () { Width = 10, Height = 5 };
-        (runnable as View)?.Add (testView);
+        runnable?.Add (testView);
 
         var rightClickReceived = false;
+
         testView.MouseEvent += (s, e) =>
                                {
                                    if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
@@ -268,7 +269,7 @@ public class InputInjectionExtensionsTests
 
         // Assert
         Assert.True (rightClickReceived);
-        (runnable as View)?.Dispose ();
+        runnable?.Dispose ();
     }
 
     #endregion

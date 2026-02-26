@@ -125,6 +125,19 @@ public interface IDriver : IDisposable
     /// <seealso cref="Driver.Force16Colors"/>
     bool Force16Colors { get; set; }
 
+    /// <summary>
+    ///     Gets the terminal's actual default foreground and background colors,
+    ///     queried via OSC 10/11 at driver startup.
+    ///     <see langword="null"/> if the terminal did not respond.
+    /// </summary>
+    Attribute? DefaultAttribute { get; }
+
+    /// <summary>
+    ///     Gets the terminal's color capabilities as detected from environment variables.
+    ///     <see langword="null"/> if detection has not been performed.
+    /// </summary>
+    TerminalColorCapabilities? ColorCapabilities { get; }
+
     #endregion Color Support
 
     #region Content Buffer
@@ -222,7 +235,7 @@ public interface IDriver : IDisposable
     /// <remarks>
     ///     <para>
     ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="rune"/> required, even if the new column value is outside of the
+    ///         <paramref name="rune"/> required, even if the new column value is outside the
     ///         <see cref="IDriver.Clip"/> or screen
     ///         dimensions defined by <see cref="IDriver.Cols"/>.
     ///     </para>
@@ -249,7 +262,7 @@ public interface IDriver : IDisposable
     /// <remarks>
     ///     <para>
     ///         When the method returns, <see cref="IDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="IDriver.Clip"/>
+    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="IDriver.Clip"/>
     ///         or screen
     ///         dimensions defined by <see cref="IDriver.Cols"/>.
     ///     </para>
@@ -348,12 +361,6 @@ public interface IDriver : IDisposable
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<Mouse>? MouseEvent;
-
-    /// <summary>
-    ///     Injects a mouse event. For unit tests.
-    /// </summary>
-    /// <param name="mouse">The mouse event to enqueue.</param>
-    void InjectMouseEvent (Mouse mouse);
 
     #endregion Input Events
 

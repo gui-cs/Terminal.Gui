@@ -1,20 +1,20 @@
-﻿namespace Terminal.Gui.Input;
+namespace Terminal.Gui.Input;
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
 /// <summary>
 ///     Describes the context in which a <see cref="Command"/> is being invoked.
-///     When a <see cref="Command"/> is invoked,
+///     When a <see cref="Command"/> is invoked via <see cref="View.InvokeCommand(Command)"/>
 ///     a context object is passed to Command handlers as an <see cref="ICommandContext"/> reference.
 /// </summary>
-/// <seealso cref="View.AddCommand(Command, View.CommandImplementation)"/>
-/// .
+/// <seealso cref="View.AddCommand(Command)"/>
+/// <seealso cref="View.InvokeCommand(Command)"/>
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 public interface ICommandContext
 {
     /// <summary>
     ///     The <see cref="Command"/> that is being invoked.
     /// </summary>
-    public Command Command { get; set; }
+    public Command Command { get; }
 
     /// <summary>
     ///     A weak reference to the View that was the source of the command invocation, if any.
@@ -22,9 +22,10 @@ public interface ICommandContext
     ///     Use <c>Source?.TryGetTarget(out View? view)</c> to safely access the source view.
     /// </summary>
     /// <remarks>
-    ///     Uses WeakReference to prevent memory leaks when views are disposed during command propagation.
+    ///     Uses WeakReference to prevent memory leaks and access to disposed views when views are disposed during command
+    ///     propagation.
     /// </remarks>
-    public WeakReference<View>? Source { get; set; }
+    public WeakReference<View>? Source { get; }
 
     /// <summary>
     ///     The binding that triggered the command.
@@ -35,9 +36,14 @@ public interface ICommandContext
     ///         <code>
     ///         if (ctx.Binding is KeyBinding kb) { /* key binding */ }
     ///         else if (ctx.Binding is MouseBinding mb) { /* mouse binding */ }
-    ///         else if (ctx.Binding is InputBinding ib) { /* programmatic */ }
+    ///         else if (ctx.Binding is CommandBinding ib) { /* programmatic */ }
     ///         </code>
     ///     </para>
     /// </remarks>
-    public IInputBinding? Binding { get; }
+    public ICommandBinding? Binding { get; }
+
+    /// <summary>
+    ///     Gets the routing mode for this command invocation.
+    /// </summary>
+    public CommandRouting Routing { get; }
 }
