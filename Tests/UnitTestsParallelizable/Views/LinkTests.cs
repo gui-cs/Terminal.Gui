@@ -401,8 +401,8 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         // Arrange
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        app.Driver?.SetScreenSize (40, 1);
-        app.Driver!.Force16Colors = true;
+        app.Driver!.SetScreenSize (40, 1);
+        app.Driver.Force16Colors = true;
 
         using Runnable window = new ()
         {
@@ -410,6 +410,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Height = Dim.Fill (),
             BorderStyle = LineStyle.None
         };
+        window.SetScheme (new (new Attribute (Color.Black, Color.White)));
 
         Link link = new ()
         {
@@ -420,14 +421,14 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Text = text,
             Url = url,
         };
-        //window.Add (link);
+        window.Add (link);
 
         app.Begin(window);
         app.LayoutAndDraw ();
         app.Driver.Refresh ();
 
         DriverAssert.AssertDriverOutputIs ("""
-            \x1b]8;;https://github.com\x1b\\\x1b[90m\x1b[47mGitHub\x1b]8;;\x1b\\\x1b[37m\x1b[100m
+            \x1b]8;;https://github.com\x1b\\\x1b[97m\x1b[40mGitHub\x1b]8;;\x1b\\\x1b[30m\x1b[107m
             """, _output, app.Driver);
     }
 }
