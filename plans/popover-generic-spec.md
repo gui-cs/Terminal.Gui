@@ -395,54 +395,29 @@ public interface IPopover
 
 ---
 
-## 5. Migration Plan
+## 5. Sub-Issues (Migration Plan)
 
-### Phase 1: Infrastructure (Command Context)
-1. Add `Value` property to `ICommandContext` and `CommandContext`.
-2. Wire `Value` population into command invocation pipeline.
+Each sub-issue includes unit tests and docfx/docs updates.
 
-### Phase 2: IPopover.Target
-3. Add `Target` property to `IPopover` (implements existing TODO).
-4. Add `Target` to `PopoverBaseImpl`.
+1. **#4763 — Add `ICommandContext.Value` and wire into command pipeline**
+   `ICommandContext.Value`, `CommandContext.Value`/`WithValue`, pipeline wiring,
+   `Menu : IValue<MenuItem?>`, MenuBars scenario enhancement showing `ctx.Value`.
 
-### Phase 3: Menu IValue
-5. Add `IValue<MenuItem?>` to `Menu`.
-6. Verify existing tests pass.
+2. **#4764 — Create `Popover<TView, TResult>` and refactor `PopoverMenu`**
+   `IPopover.Target`, `Popover<TView, TResult>` base class (content, target, IsOpen CWP,
+   anchor, result extraction, auto-lifecycle). Refactor `PopoverMenu` to extend it.
+   Merge PR #4412 changes. All existing tests pass.
 
-### Phase 4: Generic Popover
-7. Create `Popover<TView, TResult>` base class:
-   - `ContentView` management + `CommandBridge`
-   - `IsOpen` CWP property with visibility sync
-   - `Anchor` property + `GetAnchoredPosition`
-   - `MakeVisible` / `SetPosition` with anchor priority chain
-   - Result extraction chain (ResultExtractor → IValue → Text)
-   - Auto-registration on `EndInit`
-   - Target-based focus-loss auto-close
-8. Refactor `PopoverMenu` to extend `Popover<Menu, MenuItem>`.
-   - `Root` becomes alias for `ContentView`
-   - Remove promoted code (Anchor, positioning, bridge, registration, visibility sync)
-   - Keep menu-specific overrides
-9. Simplify `MenuBarItem`:
-   - `PopoverMenuOpen` delegates to `PopoverMenu.IsOpen`
-   - Remove: bridge, registration, visibility sync, focus-loss handler, EndInit init
-   - Keep: HotKey handler, OnActivating toggle, OnKeyDownNotHandled, SubMenu throws
-10. Merge PR #4412 changes (Anchor, GetAnchoredPosition, ElementSpacing) into refactored code.
-11. All existing `PopoverMenu`, `MenuBar`, and `MenuBarItem` tests pass.
+3. **#4765 — Simplify `MenuBarItem` (~80% code reduction)**
+   `PopoverMenuOpen` delegates to `PopoverMenu.IsOpen`. Remove bridge, registration,
+   visibility sync, focus-loss handler, EndInit init. Keep menu-specific code only.
 
-### Phase 5: PopoverEdit
-12. Implement `PopoverEdit<TView, TResult>`.
-13. Implement non-generic `PopoverEdit` convenience alias.
-14. Add unit tests to `UnitTestsParallelizable`.
+4. **#4766 — Implement `PopoverEdit<TView, TResult>` and replace `DropDownListExample`**
+   Generic + non-generic `PopoverEdit`. TextField + Button toggle. ReadOnly mode.
+   Replace `DropDownListExample` POC with proper scenarios.
 
-### Phase 6: ComboBox Replacement
-15. Replace all `ComboBox` usages with `PopoverEdit`.
-16. Remove `ComboBox` class.
-17. Replace `DropDownListExample` POC with proper `PopoverEdit` scenarios.
-
-### Phase 7: Documentation
-18. Update `docfx/docs/` with Popover and PopoverEdit documentation.
-19. API documentation on all new public APIs.
-20. Close #4751 (Anchor positioning fully resolved).
+5. **#4767 — Replace all `ComboBox` usages with `PopoverEdit` and remove `ComboBox`**
+   Audit and replace all usages. Delete ComboBox. Close #4751.
 
 ---
 
