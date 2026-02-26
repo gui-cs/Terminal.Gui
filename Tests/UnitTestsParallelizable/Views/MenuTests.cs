@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace ViewsTests;
 
 public class MenuTests
@@ -2354,6 +2356,221 @@ public class MenuTests
         Assert.Equal (item, value);
 
         menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_BubblingUp_SetsValue_FromMenuItem ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        Runnable runnable = new ();
+
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "TestItem" };
+        menu.Add (menuItem);
+        runnable.Add (menu);
+
+        app.Begin (runnable);
+
+        // Activate the MenuItem — its Activate command bubbles up to Menu
+        menuItem.InvokeCommand (Command.Activate);
+
+        // Menu.Value should have been set by OnActivating's BubblingUp path
+        Assert.Same (menuItem, menu.Value);
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_BubblingUp_DoesNotSetValue_ForNonMenuItem ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        Runnable runnable = new ();
+
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "TestItem" };
+        menu.Add (menuItem);
+        runnable.Add (menu);
+
+        app.Begin (runnable);
+
+        // Value should remain null when no MenuItem activation has occurred
+        Assert.Null (menu.Value);
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_BubblingUp_ContextValue_Contains_Title ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        Runnable runnable = new ();
+
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "TestItem" };
+        menu.Add (menuItem);
+        runnable.Add (menu);
+
+        app.Begin (runnable);
+
+        object? capturedValue = null;
+
+        menu.Activated += (_, args) =>
+                          {
+                              capturedValue = args?.Value?.Value;
+                          };
+
+        // Activate the MenuItem — ctx.Value should contain the Title from MenuItem.GetValue()
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.Equal ("TestItem", capturedValue);
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_Dispatch_InvokesOnFocusedMenuItem ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        Runnable runnable = new ();
+
+        Menu menu = new ();
+        MenuItem menuItem1 = new () { Title = "Item1", CanFocus = true };
+        MenuItem menuItem2 = new () { Title = "Item2", CanFocus = true };
+        menu.Add (menuItem1, menuItem2);
+        runnable.Add (menu);
+
+        app.Begin (runnable);
+
+        // Focus item2
+        menuItem2.SetFocus ();
+        Assert.True (menuItem2.HasFocus);
+
+        var item2ActivatedCount = 0;
+
+        menuItem2.Activated += (_, _) => item2ActivatedCount++;
+
+        // Invoke Activate on the Menu directly — should dispatch to the focused MenuItem
+        menu.InvokeCommand (Command.Activate);
+
+        Assert.True (item2ActivatedCount > 0);
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Diagnostic_OptionSelector_CommandView_Activated_Flow ()
+    {
+        ListBackend traceBackend = new ();
+        Trace.Backend = traceBackend;
+        Trace.CommandEnabled = true;
+
+        try
+        {
+            VirtualTimeProvider time = new ();
+            using IApplication app = Application.Create (time);
+            app.Init (DriverRegistry.Names.ANSI);
+            IRunnable runnable = new Runnable ();
+
+            View superView = new ()
+            {
+                Id = "superView",
+                CommandsToBubbleUp = [Command.Activate],
+                Width = Dim.Fill (),
+                Height = Dim.Fill ()
+            };
+            Menu menu = new () { Id = "menu" };
+            superView.Add (menu);
+
+            OptionSelector selector = new () { Id = "schemeOptionSelector", Labels = ["Opt1", "Opt2"] };
+            MenuItem menuItem = new () { Title = "Scheme", CommandView = selector };
+            menu.Add (menuItem);
+
+            ((View)runnable).Add (superView);
+            app.Begin (runnable);
+
+            // Track Activated events at each level
+            var menuItemActivatedCount = 0;
+            ICommandContext? menuItemActivatedCtx = null;
+
+            menuItem.Activated += (_, args) =>
+                                  {
+                                      menuItemActivatedCount++;
+                                      menuItemActivatedCtx = args.Value;
+                                  };
+
+            var menuActivatedCount = 0;
+            ICommandContext? menuActivatedCtx = null;
+
+            menu.Activated += (_, args) =>
+                              {
+                                  menuActivatedCount++;
+                                  menuActivatedCtx = args.Value;
+                              };
+
+            var superViewActivatedCount = 0;
+            ICommandContext? superViewActivatedCtx = null;
+
+            superView.Activated += (_, args) =>
+                                   {
+                                       superViewActivatedCount++;
+                                       superViewActivatedCtx = args.Value;
+                                   };
+
+            traceBackend.Clear ();
+
+            // Click on an inner CheckBox of the OptionSelector (simulates real user interaction)
+            CheckBox innerCb = selector.SubViews.OfType<CheckBox> ().ElementAt (1); // click Opt2
+            Point screenPos = innerCb.FrameToScreen ().Location;
+            app.InjectSequence (InputInjectionExtensions.LeftButtonClick (screenPos));
+
+            // Build trace dump for assertion messages
+            string traceDump = string.Join ("\n",
+                                            traceBackend.Entries
+                                                        .Where (e => e.Category == TraceCategory.Command)
+                                                        .Select (e =>
+                                                                 {
+                                                                     string dataStr = e.Data switch
+                                                                                      {
+                                                                                          ICommandContext ctx => $"Cmd={ctx.Command} Routing={ctx.Routing} Value={ctx.Value}",
+                                                                                          (Command cmd, CommandRouting routing) => $"Cmd={cmd} Routing={routing}",
+                                                                                          _ => e.Data?.ToString () ?? ""
+                                                                                      };
+
+                                                                     return $"  [{e.Phase}] {e.Id} ({e.Method}) {e.Message} [{dataStr}]";
+                                                                 }));
+
+            // MenuItem.Activated should fire (from deferred CommandView_Activated)
+            Assert.True (menuItemActivatedCount > 0, $"MenuItem.Activated should have fired.\nTraces:\n{traceDump}");
+
+            // BUGBUG diagnosis: Does Menu.Activated fire?
+            // With ConsumeDispatch=true, Activating is consumed at the OptionSelector level.
+            // Shortcut.CommandView_Activated should propagate Activated to SuperView (Menu),
+            // but the routing check (e.Value?.Routing == BubblingUp) may fail.
+            Assert.True (menuActivatedCount > 0, $"Menu.Activated should have fired.\nTraces:\n{traceDump}");
+
+            // SuperView.Activated should also fire
+            Assert.True (superViewActivatedCount > 0, $"SuperView.Activated should have fired.\nTraces:\n{traceDump}");
+
+            ((View)runnable).Dispose ();
+        }
+        finally
+        {
+            Trace.CommandEnabled = false;
+            Trace.Backend = new NullBackend ();
+        }
     }
 
     #endregion

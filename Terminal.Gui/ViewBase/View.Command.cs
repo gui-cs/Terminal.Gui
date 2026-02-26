@@ -1010,7 +1010,7 @@ public partial class View // Command APIs
                         return false;
                     }
 
-                    upCtx = new CommandContext (Command.Accept, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
+                    upCtx = new CommandContext (Command.Accept, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
 
                     // DefaultAcceptView redirect is a special case — it IS a consumption (not just a notification)
                     return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
@@ -1026,7 +1026,7 @@ public partial class View // Command APIs
         if (SuperView?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
             Trace.Command (this, ctx, "Routing", $"BubblingUp to {SuperView.ToIdentifyingString ()}");
-            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
+            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
 
             return SuperView.InvokeCommand (ctx.Command, upCtx);
         }
@@ -1035,7 +1035,7 @@ public partial class View // Command APIs
         {
             // Check if Padding's Parent wants this command bubbled up to it
             Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Parent.ToIdentifyingString ()}");
-            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
+            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
 
             return padding.Parent.InvokeCommand (ctx.Command, upCtx);
         }
@@ -1047,7 +1047,7 @@ public partial class View // Command APIs
 
         // Handle when THIS view is a Padding
         Trace.Command (this, ctx, "Routing", $"BubblingUp from Padding to {selfPadding.Parent.ToIdentifyingString ()}");
-        upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp };
+        upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
 
         return selfPadding.Parent.InvokeCommand (ctx.Command, upCtx);
     }

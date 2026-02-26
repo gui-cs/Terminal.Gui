@@ -480,4 +480,72 @@ public class MenuItemTests
     }
 
     #endregion SubMenu Command Propagation
+
+    #region IValue Implementation
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Implements_IValue ()
+    {
+        MenuItem menuItem = new () { Title = "TestItem" };
+
+        Assert.IsAssignableFrom<IValue> (menuItem);
+
+        menuItem.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_GetValue_Returns_Title ()
+    {
+        MenuItem menuItem = new () { Title = "MyTitle" };
+
+        IValue iValue = menuItem;
+        object? value = iValue.GetValue ();
+
+        Assert.Equal ("MyTitle", value);
+
+        menuItem.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_GetValue_Returns_Updated_Title ()
+    {
+        MenuItem menuItem = new () { Title = "Original" };
+
+        IValue iValue = menuItem;
+        Assert.Equal ("Original", iValue.GetValue ());
+
+        menuItem.Title = "Updated";
+        Assert.Equal ("Updated", iValue.GetValue ());
+
+        menuItem.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_InvokeCommand_Activate_ContextValue_Contains_Title ()
+    {
+        MenuItem menuItem = new () { Title = "TestItem" };
+
+        menuItem.BeginInit ();
+        menuItem.EndInit ();
+
+        ICommandContext? capturedContext = null;
+
+        menuItem.Activating += (_, args) =>
+                               {
+                                   capturedContext = args.Context;
+                               };
+
+        menuItem.InvokeCommand (Command.Activate);
+
+        Assert.NotNull (capturedContext);
+        Assert.Equal ("TestItem", capturedContext!.Value);
+
+        menuItem.Dispose ();
+    }
+
+    #endregion IValue Implementation
 }

@@ -191,13 +191,7 @@ public static class Trace
             return;
         }
 
-        Backend.Log (new TraceEntry (TraceCategory.Command,
-                                     view.ToIdentifyingString (),
-                                     phase,
-                                     method,
-                                     message,
-                                     DateTime.UtcNow,
-                                     (ctx?.Command ?? Input.Command.NotBound, ctx?.Routing ?? CommandRouting.Direct)));
+        Backend.Log (new TraceEntry (TraceCategory.Command, view.ToIdentifyingString (), phase, method, message, DateTime.UtcNow, ctx)); //(ctx?.Command ?? Input.Command.NotBound, ctx?.Routing ?? CommandRouting.Direct)));
     }
 
     /// <summary>

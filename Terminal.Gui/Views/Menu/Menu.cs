@@ -81,22 +81,30 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
             return true;
         }
 
-        // When a MenuItem's activation bubbles up, don't re-dispatch — let normal bubbling proceed.
+        // When a MenuItem's activation bubbles up, capture it as our Value and let normal bubbling proceed.
+        // MenuItem now implements IValue (returning Title), so ctx.Value is already populated by the framework.
         if (args.Context?.Routing == CommandRouting.BubblingUp)
         {
+            if (args.Context.Source?.TryGetTarget (out View? source) == true
+                && source is MenuItem menuItem)
+            {
+                Value = menuItem;
+            }
+
             return false;
         }
 
         // Dispatch Activate to the focused MenuItem. This enables callers to invoke
         // menu.InvokeCommand(Activate) and have it reach the selected MenuItem and its CommandView.
-        if (Focused is not MenuItem menuItem)
+        if (Focused is not MenuItem focusedMenuItem)
         {
             return false;
         }
+
         KeyBinding binding = new ([Command.Activate]);
-        WeakReference<View> source = new (this);
-        CommandContext ctx = new (Command.Activate, source, binding);
-        menuItem.InvokeCommand (Command.Activate, ctx);
+        WeakReference<View> sourceRef = new (this);
+        CommandContext ctx = new (Command.Activate, sourceRef, binding);
+        focusedMenuItem.InvokeCommand (Command.Activate, ctx);
 
         return true;
     }
