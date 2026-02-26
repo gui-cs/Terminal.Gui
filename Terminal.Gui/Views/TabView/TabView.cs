@@ -631,7 +631,7 @@ public class TabView : View
             tab = border.Parent as Tab;
         }
 
-        if (tab is { } && tab != SelectedTab)
+        if (tab is not null && tab != SelectedTab)
         {
             SelectedTab = tab;
             e.Handled = true;
