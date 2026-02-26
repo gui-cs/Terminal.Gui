@@ -203,14 +203,7 @@ public sealed class Themes : Scenario
             // use <object> or the original type if applicable
             foreach (Type arg in type.GetGenericArguments ())
             {
-                if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
-                {
-                    typeArguments.Add (arg);
-                }
-                else
-                {
-                    typeArguments.Add (typeof (object));
-                }
+                typeArguments.Add (GetSubstituteType (arg));
             }
 
             // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
@@ -243,6 +236,34 @@ public sealed class Themes : Scenario
         view.Initialized += OnViewInitialized;
 
         return view;
+    }
+
+    private Type GetSubstituteType (Type genericParam)
+    {
+        // If it's a non-nullable value type, keep it as-is
+        if (genericParam.IsValueType && Nullable.GetUnderlyingType (genericParam) == null)
+        {
+            return genericParam;
+        }
+
+        // Check constraints (e.g., where TView : View, new())
+        Type [] constraints = genericParam.GetGenericParameterConstraints ();
+
+        // Find the most derived base class constraint (ignore interfaces)
+        Type? baseConstraint = constraints
+            .Where (c => c.IsClass)
+            .OrderByDescending (c => c.GetInterfaces ().Length) // rough heuristic for "most derived"
+            .FirstOrDefault ();
+
+        if (baseConstraint != null)
+        {
+            // If the constraint itself is abstract or doesn't have a
+            // parameterless constructor, this may still fail at activation
+            return baseConstraint;
+        }
+
+        // No class constraint — fall back to object
+        return typeof (object);
     }
 
     private void OnViewInitialized (object? sender, EventArgs e)
