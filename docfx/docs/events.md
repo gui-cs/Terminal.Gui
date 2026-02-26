@@ -38,7 +38,7 @@ Use this decision tree to choose the right pattern:
 | Scenario | Pattern | Jump to |
 |----------|---------|---------|
 | Property change (cancellable) | `CWPPropertyHelper` | [Recipe 1](#recipe-1-cancellable-property-change) |
-| Action/workflow (cancellable) | Manual CWP or `CWPWorkflowHelper` | [Recipe 2](#recipe-2-cancellable-action-workflow) |
+| Action/workflow (cancellable) | Manual CWP or `CWPWorkflowHelper` | [Recipe 2](#recipe-2-cancellable-actionworkflow) |
 | Simple notification (no cancel) | `EventHandler` | [Recipe 3](#recipe-3-simple-notification) |
 | Property notification (MVVM) | `INotifyPropertyChanged` | [Recipe 4](#recipe-4-mvvm-property-notification) |
 
@@ -156,7 +156,7 @@ public class MyCustomDataView : MyDataView
 
 > [!NOTE]
 > This recipe uses `CancelEventArgs.Cancel` for standalone workflows that are not part of the command system.
-> For command-related events (e.g., `Accepting`, `Activating`), use `CommandEventArgs.Handled` instead (see [Command Deep Dive](command.md)).
+> For command-related events (e.g., <xref:Terminal.Gui.ViewBase.View.Accepting>, <xref:Terminal.Gui.ViewBase.View.Activating>), use `CommandEventArgs.Handled` instead (see [Command Deep Dive](command.md)).
 
 ```csharp
 public class MyProcessor : View
@@ -328,7 +328,7 @@ Terminal.Gui uses several types of events:
 | **View Lifecycle** | `Initialized`, `Disposed` | Simple notification |
 | **Property Change** | `TextChanging`, `TextChanged` | CWP with `Handled` |
 | **Drawing** | `DrawingContent`, `DrawComplete` | CWP with `Handled` |
-| **Command** | `Accepting`, `Activating` | CWP with `Handled` |
+| **Command** | <xref:Terminal.Gui.ViewBase.View.Accepting>, <xref:Terminal.Gui.ViewBase.View.Activating> | CWP with `Handled` |
 
 ## Event Context and Arguments
 
@@ -340,13 +340,13 @@ Terminal.Gui provides these event argument types:
 |------|----------|----------------|
 | `ValueChangingEventArgs<T>` | Pre-property-change | `CurrentValue`, `NewValue`, `Handled` |
 | `ValueChangedEventArgs<T>` | Post-property-change | `OldValue`, `NewValue` |
-| `CommandEventArgs` | Command execution | `Context`, `Handled` |
+| <xref:Terminal.Gui.Input.CommandEventArgs> | Command execution | `Context`, `Handled` |
 | `CancelEventArgs` | Cancellable operations | `Cancel` |
 | `MouseEventArgs` | Mouse input | `Position`, `Flags`, `Handled` |
 
 ### Command Context
 
-When handling command events, rich context is available through `ICommandContext`:
+When handling command events, rich context is available through <xref:Terminal.Gui.Input.ICommandContext>:
 
 ```csharp
 public interface ICommandContext
@@ -358,7 +358,7 @@ public interface ICommandContext
 }
 ```
 
-`CommandContext` is an immutable record struct. Use `WithCommand()` or `WithRouting()` to create modified copies.
+<xref:Terminal.Gui.Input.CommandContext> is an immutable record struct. Use `WithCommand()` or `WithRouting()` to create modified copies.
 
 > [!NOTE]
 > `Source` is a `WeakReference<View>` to prevent memory leaks during command propagation.
@@ -411,7 +411,7 @@ Understanding the difference between sources is important during event propagati
 | Property | Description | Changes During Propagation? |
 |----------|-------------|----------------------------|
 | `ICommandContext.Source` | `WeakReference<View>` to the view that first invoked the command | No (constant) |
-| `ICommandContext.Routing` | `CommandRouting` enum: `Direct`, `BubblingUp`, `DispatchingDown`, `Bridged` | **Yes** (changes at each hop) |
+| `ICommandContext.Routing` | <xref:Terminal.Gui.Input.CommandRouting> enum: `Direct`, `BubblingUp`, `DispatchingDown`, `Bridged` | **Yes** (changes at each hop) |
 | `ICommandBinding.Source` | View where binding was defined | No (constant) |
 | `sender` (event parameter) | View currently raising the event | **Yes** |
 
@@ -475,14 +475,14 @@ public interface IValue<TValue> : IValue
 
 | View | Value Type | Meaning |
 |------|-----------|---------|
-| `CheckBox` | `CheckState` | Current checked state (Unchecked, Checked, CheckedMark) |
-| `TextField` | `string` | Text content |
-| `TextView` | `string` | Full text content |
+| <xref:Terminal.Gui.Views.CheckBox> | `CheckState` | Current checked state (Unchecked, Checked, CheckedMark) |
+| <xref:Terminal.Gui.Views.TextField> | `string` | Text content |
+| <xref:Terminal.Gui.Views.TextView> | `string` | Full text content |
 | `DateField` | `DateTime?` | Selected date and time |
 | `TimeField` | `TimeSpan` | Selected time |
 | `ScrollBar` | `int` | Current scroll position |
 | `Slider` | `int` | Current slider value |
-| `ListView` | `int` | Selected item index |
+| <xref:Terminal.Gui.Views.ListView> | `int` | Selected item index |
 | `OptionSelector` | `int` | Selected option index |
 | `RadioGroup` | `int` | Selected radio button index |
 | `LineCanvas` | `List<Line>` | Collection of lines |

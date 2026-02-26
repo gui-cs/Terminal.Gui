@@ -39,6 +39,81 @@ The `scripts` folder contains PowerShell scripts to assist in generating and upd
 
 These scripts streamline the process of maintaining up-to-date documentation, ensuring that contributors can easily generate and verify documentation changes locally before committing them.
 
+## Adding API Xref Links to Docs
+
+When writing or editing `.md` files in `docfx/docs/`, use `<xref:uid>` syntax to link to API types and members instead of backtick code spans. DocFX resolves these at build time to clickable API reference links.
+
+### Finding UIDs
+
+All valid UIDs are in `docfx/_site/xrefmap.yml` (regenerated on each build). Search for the type name:
+
+```bash
+grep "ClassName" docfx/_site/xrefmap.yml | grep "^- uid:"
+```
+
+### Namespace Prefixes
+
+| Type | UID Prefix |
+|------|-----------|
+| `Command`, `CommandRouting`, `ICommandContext`, `CommandContext`, `ICommandBinding`, `CommandBridge` | `Terminal.Gui.Input.` |
+| `View` | `Terminal.Gui.ViewBase.View` |
+| All view classes (`Button`, `CheckBox`, `Dialog`, etc.) | `Terminal.Gui.Views.` |
+| `IAcceptTarget` | `Terminal.Gui.` |
+
+### Syntax
+
+```markdown
+<!-- Type reference (renders as nameWithType, e.g. "Command.Accept") -->
+<xref:Terminal.Gui.Input.Command.Accept>
+
+<!-- Method/property overload page -->
+<xref:Terminal.Gui.ViewBase.View.RaiseActivating*>
+
+<!-- Custom display text -->
+[My Link Text](xref:Terminal.Gui.Input.Command.Accept)
+```
+
+### Key UIDs for Command System
+
+| Symbol | UID |
+|--------|-----|
+| `Command` enum | `Terminal.Gui.Input.Command` |
+| `Command.Activate` | `Terminal.Gui.Input.Command.Activate` |
+| `Command.Accept` | `Terminal.Gui.Input.Command.Accept` |
+| `Command.HotKey` | `Terminal.Gui.Input.Command.HotKey` |
+| `CommandRouting` | `Terminal.Gui.Input.CommandRouting` |
+| `ICommandContext` | `Terminal.Gui.Input.ICommandContext` |
+| `CommandContext` | `Terminal.Gui.Input.CommandContext` |
+| `CommandBridge` | `Terminal.Gui.Input.CommandBridge` |
+| `IAcceptTarget` | `Terminal.Gui.IAcceptTarget` |
+| `View` | `Terminal.Gui.ViewBase.View` |
+| `View.CommandsToBubbleUp` | `Terminal.Gui.ViewBase.View.CommandsToBubbleUp` |
+| `View.DefaultAcceptView` | `Terminal.Gui.ViewBase.View.DefaultAcceptView` |
+| `View.ConsumeDispatch` | `Terminal.Gui.ViewBase.View.ConsumeDispatch` |
+| `View.GetDispatchTarget` | `Terminal.Gui.ViewBase.View.GetDispatchTarget*` |
+| `View.TryBubbleUp` | `Terminal.Gui.ViewBase.View.TryBubbleUp*` |
+| `View.DispatchDown` | `Terminal.Gui.ViewBase.View.DispatchDown*` |
+| `View.InvokeCommand` | `Terminal.Gui.ViewBase.View.InvokeCommand*` |
+| `View.RaiseActivating` | `Terminal.Gui.ViewBase.View.RaiseActivating*` |
+| `View.RaiseActivated` | `Terminal.Gui.ViewBase.View.RaiseActivated*` |
+| `View.RaiseAccepting` | `Terminal.Gui.ViewBase.View.RaiseAccepting*` |
+| `View.RaiseAccepted` | `Terminal.Gui.ViewBase.View.RaiseAccepted*` |
+| `View.RaiseHandlingHotKey` | `Terminal.Gui.ViewBase.View.RaiseHandlingHotKey*` |
+| `View.Activating` (event) | `Terminal.Gui.ViewBase.View.Activating` |
+| `View.Activated` (event) | `Terminal.Gui.ViewBase.View.Activated` |
+| `View.Accepting` (event) | `Terminal.Gui.ViewBase.View.Accepting` |
+| `View.Accepted` (event) | `Terminal.Gui.ViewBase.View.Accepted` |
+
+### Rules
+
+- Use `<xref:uid>` for type/member names in prose and table cells
+- Use `<xref:uid*>` (with `*`) for method overload pages
+- Leave code inside ` ```csharp ``` ` and ` ```mermaid ``` ` blocks unchanged
+- Do NOT link internal methods not in the xrefmap (e.g., `SetupCommands`, `TryDispatchToTarget`)
+- See `docfx/docs/command-diagrams.md` for real-world examples
+
+---
+
 ## AI Agent Source Index
 
 The `Generate-SourceIndex.ps1` script creates a file path index using the **Vercel-style format** for AI agent "retrieval-led reasoning". This approach is inspired by Vercel's work on optimizing LLM context for large codebases.
