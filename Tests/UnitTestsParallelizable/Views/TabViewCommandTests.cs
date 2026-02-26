@@ -80,4 +80,44 @@ public class TabViewCommandTests
 
         tabView.Dispose ();
     }
+
+    // Claude - Opus 4.5
+    // Regression test for infinite loop when activating a tab
+    // https://github.com/gui-cs/Terminal.Gui/issues/XXXX
+    [Fact]
+    public void TabView_Tab_Activating_DoesNotCauseInfiniteLoop ()
+    {
+        TabView tabView = new ()
+        {
+            Width = 40,
+            Height = 10
+        };
+        Tab tab1 = new () { Text = "Tab1" };
+        Tab tab2 = new () { Text = "Tab2" };
+        tabView.AddTab (tab1, true);
+        tabView.AddTab (tab2, false);
+        tabView.BeginInit ();
+        tabView.EndInit ();
+        tabView.LayoutSubViews (); // Trigger layout so Tab_Selecting is subscribed
+
+        // Verify setup
+        Assert.Equal (tab1, tabView.SelectedTab);
+
+        // Simulate tab activation (what happens when user clicks a tab or presses Enter/Space on it)
+        // This should switch to the tab without causing infinite recursion
+        var activationCount = 0;
+        tab2.Activating += (_, _) => activationCount++;
+
+        // Invoke Activate command on tab2
+        bool? result = tab2.InvokeCommand (Command.Activate);
+
+        // Should activate exactly once
+        Assert.Equal (1, activationCount);
+        Assert.True (result);
+
+        // Should have switched to tab2
+        Assert.Equal (tab2, tabView.SelectedTab);
+
+        tabView.Dispose ();
+    }
 }

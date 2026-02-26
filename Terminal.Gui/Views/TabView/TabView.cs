@@ -621,9 +621,30 @@ public class TabView : View
 
     internal void Tab_Selecting (object? sender, CommandEventArgs e)
     {
-        if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouseArgs })
+        // When a tab is activated (via mouse or keyboard), select it.
+        // Don't forward the mouse event back to _tabsBar.NewMouseEvent as that causes infinite recursion.
+        Tab? tab = sender as Tab;
+
+        // If sender is a Border, get the parent Tab
+        if (sender is Border border)
         {
-            e.Handled = _tabsBar.NewMouseEvent (mouseArgs) == true;
+            tab = border.Parent as Tab;
+        }
+
+        if (tab is { } && tab != SelectedTab)
+        {
+            SelectedTab = tab;
+            e.Handled = true;
+        }
+        else if (sender is View { Id: "leftScrollIndicator" })
+        {
+            SwitchTabBy (-1);
+            e.Handled = true;
+        }
+        else if (sender is View { Id: "rightScrollIndicator" })
+        {
+            SwitchTabBy (1);
+            e.Handled = true;
         }
     }
 
