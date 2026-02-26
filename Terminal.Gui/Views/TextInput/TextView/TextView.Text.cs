@@ -731,6 +731,9 @@ public partial class TextView
             CurrentColumn = line.Count;
         }
 
-        AdjustViewport ();
+        if (CurrentColumn < Viewport.X || CurrentColumn > Viewport.Width + Viewport.X)
+        {
+            SetNeedsDraw ();
+        }
     }
 }

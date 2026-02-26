@@ -97,7 +97,6 @@ public partial class TextView
             }
 
             TrackColumn ();
-            PositionCursor ();
         }
         else if (CurrentRow > Viewport.Height)
         {
