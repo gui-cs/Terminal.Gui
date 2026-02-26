@@ -4,9 +4,9 @@ Terminal.Gui v2 uses an instance-based application architecture that decouples v
 
 ## Key Features
 
-- **Instance-Based**: Use `Application.Create()` to get an `IApplication` instance instead of static methods
-- **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Runnable`
-- **Fluent API**: Chain `Init()` and `Run()` for elegant, concise code  
+- **Instance-Based**: Use [Application.Create()](xref:Terminal.Gui.App.Application.Create*) to get an <xref:Terminal.Gui.App.IApplication> instance instead of static methods
+- **IRunnable Interface**: Views implement <xref:Terminal.Gui.App.IRunnable> to participate in session management without inheriting from `Runnable`
+- **Fluent API**: Chain [Init()](xref:Terminal.Gui.App.IApplication.Init*) and [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) for elegant, concise code
 - **IDisposable Pattern**: Proper resource cleanup with `Dispose()` or `using` statements
 - **Automatic Disposal**: Framework-created runnables are automatically disposed
 - **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
@@ -78,7 +78,7 @@ sequenceDiagram
 
 ### Instance-Based vs Static
 
-**Terminal.Gui v2** supports both static and instance-based patterns. The static `Application` class is marked obsolete but still functional for backward compatibility. The recommended pattern is to use `Application.Create()` to get an `IApplication` instance:
+**Terminal.Gui v2** supports both static and instance-based patterns. The static <xref:Terminal.Gui.App.Application> class is marked obsolete but still functional for backward compatibility. The recommended pattern is to use [Application.Create()](xref:Terminal.Gui.App.Application.Create*) to get an <xref:Terminal.Gui.App.IApplication> instance:
 
 ```csharp
 // RECOMMENDED (v2 - instance-based with using statement):
@@ -112,11 +112,11 @@ top.Dispose ();
 Application.Shutdown (); // Obsolete - use Dispose() instead
 ```
 
-**Note:** The static `Application` class delegates to a singleton instance accessible via `Application.Instance`. `Application.Create()` creates a **new** application instance, enabling multiple application contexts and better testability.
+**Note:** The static <xref:Terminal.Gui.App.Application> class delegates to a singleton instance accessible via `Application.Instance`. [Application.Create()](xref:Terminal.Gui.App.Application.Create*) creates a **new** application instance, enabling multiple application contexts and better testability.
 
 ### View.App Property
 
-Every view now has an `App` property that references its application context:
+Every view now has an <xref:Terminal.Gui.ViewBase.View.App> property that references its application context:
 
 ```csharp
 public class View
@@ -135,7 +135,7 @@ public class View
 ```
 
 **Benefits:**
-- Views can be tested without `Application.Init()`
+- Views can be tested without [Application.Init()](xref:Terminal.Gui.App.IApplication.Init*)
 - Multiple applications can coexist
 - Clear ownership: views know their context
 - Reduced global state dependencies
@@ -162,7 +162,7 @@ public class MyView : View
 
 ## IRunnable Architecture
 
-Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples runnable behavior from the `Runnable` class hierarchy. Views can implement `IRunnable<TResult>` to participate in session management without inheritance constraints.
+Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples runnable behavior from the `Runnable` class hierarchy. Views can implement <xref:Terminal.Gui.App.IRunnable> to participate in session management without inheritance constraints.
 
 ### Key Benefits
 
@@ -203,9 +203,9 @@ if (result is { })
 
 **Key Methods:**
 
-- `Init()` - Returns `IApplication` for chaining
-- `Run<TRunnable>()` - Creates and runs runnable, returns `IApplication`
-- `GetResult()` / `GetResult<T>()` - Extract typed result after run
+- [Init()](xref:Terminal.Gui.App.IApplication.Init*) - Returns <xref:Terminal.Gui.App.IApplication> for chaining
+- [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) - Creates and runs runnable, returns <xref:Terminal.Gui.App.IApplication>
+- [GetResult()](xref:Terminal.Gui.App.IApplication.GetResult*) / `GetResult<T>()` - Extract typed result after run
 - `Dispose()` - Release all resources (called automatically with `using`)
 
 ### Disposal Semantics
@@ -214,7 +214,7 @@ if (result is { })
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|
-| `Run<TRunnable>()` | Framework | Framework | Automatic when `Run<T>()` returns |
+| [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) | Framework | Framework | Automatic when [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) returns |
 | `Run(IRunnable)` | Caller | Caller | Manual by caller |
 
 ```csharp
@@ -239,7 +239,7 @@ using (IApplication app = Application.Create ().Init ())
 
 ### Creating Runnable Views
 
-Derive from `Runnable<TResult>` or implement `IRunnable<TResult>`:
+Derive from `Runnable<TResult>` or implement <xref:Terminal.Gui.App.IRunnable>:
 
 ```csharp
 public class FileDialog : Runnable<string?>
@@ -275,8 +275,8 @@ public class FileDialog : Runnable<string?>
 
 ### Lifecycle Properties
 
-- **`IsRunning`** - True when runnable is on `SessionStack`
-- **`IsModal`** - True when runnable is at top of stack (capturing all input)
+- **<xref:Terminal.Gui.App.IRunnable.IsRunning>** - True when runnable is on <xref:Terminal.Gui.App.IApplication.SessionStack>
+- **<xref:Terminal.Gui.App.IRunnable.IsModal>** - True when runnable is at top of stack (capturing all input)
 - **`Result`** - Typed result value set before stopping
 
 ### Lifecycle Events (CWP-Compliant)
@@ -285,8 +285,8 @@ All events follow Terminal.Gui's Cancellable Work Pattern:
 
 | Event | Cancellable | When | Use Case |
 |-------|-------------|------|----------|
-| `IsRunningChanging` | ✓ | Before add/remove from stack | Extract result, prevent close |
-| `IsRunningChanged` | ✗ | After stack change | Post-start/stop cleanup |
+| <xref:Terminal.Gui.App.IRunnable.IsRunningChanging> | ✓ | Before add/remove from stack | Extract result, prevent close |
+| <xref:Terminal.Gui.App.IRunnable.IsRunningChanged> | ✗ | After stack change | Post-start/stop cleanup |
 | `IsModalChanged` | ✗ | After modal state change | Update UI after focus change |
 
 **Example - Result Extraction:**
@@ -322,7 +322,7 @@ protected override bool OnIsRunningChanging (bool oldValue, bool newValue)
 
 ### SessionStack
 
-The `SessionStack` manages all running `IRunnable` sessions:
+The <xref:Terminal.Gui.App.IApplication.SessionStack> manages all running <xref:Terminal.Gui.App.IRunnable> sessions:
 
 ```csharp
 public interface IApplication
@@ -342,14 +342,14 @@ public interface IApplication
 
 **Stack Behavior:**
 
-- Push: `Begin(IRunnable)` adds to top of stack
-- Pop: `End(SessionToken)` removes from stack
-- Peek: `TopRunnable` returns current modal runnable
-- All: `SessionStack` enumerates all running sessions
+- Push: [Begin()](xref:Terminal.Gui.App.IApplication.Begin*) adds to top of stack
+- Pop: [End()](xref:Terminal.Gui.App.IApplication.End*) removes from stack
+- Peek: <xref:Terminal.Gui.App.IApplication.TopRunnable> returns current modal runnable
+- All: <xref:Terminal.Gui.App.IApplication.SessionStack> enumerates all running sessions
 
 ## IApplication Interface
 
-The `IApplication` interface defines the application contract with support for both legacy `Runnable` and modern `IRunnable` patterns:
+The <xref:Terminal.Gui.App.IApplication> interface defines the application contract with support for both legacy `Runnable` and modern <xref:Terminal.Gui.App.IRunnable> patterns:
 
 ```csharp
 public interface IApplication
@@ -388,7 +388,7 @@ Terminal.Gui v2 modernized its terminology for clarity:
 
 ### Application.TopRunnable (formerly "Current", and before that "Top")
 
-The `TopRunnable` property represents the `IRunnable` on the top of the session stack (the active runnable session):
+The <xref:Terminal.Gui.App.IApplication.TopRunnable> property represents the <xref:Terminal.Gui.App.IRunnable> on the top of the session stack (the active runnable session):
 
 ```csharp
 // Access the top runnable session
@@ -405,11 +405,11 @@ View? topView = app.TopRunnableView;
 - Clearly indicates it's the top of the runnable session stack
 - Aligns with the IRunnable architecture
 - Distinguishes from other concepts like "Current" which could be ambiguous
-- Works with any view that implements `IRunnable`, not just `Runnable`
+- Works with any view that implements <xref:Terminal.Gui.App.IRunnable>, not just `Runnable`
 
 ### Application.SessionStack (formerly "Runnables")
 
-The `SessionStack` property is the stack of running sessions:
+The <xref:Terminal.Gui.App.IApplication.SessionStack> property is the stack of running sessions:
 
 ```csharp
 // Access all running sessions
@@ -424,12 +424,12 @@ var sessionCount = App?.SessionStack.Count ?? 0;
 
 **Why "SessionStack" instead of "Runnables"?**
 - Describes both content (sessions) and structure (stack)
-- Aligns with `SessionToken` terminology
+- Aligns with <xref:Terminal.Gui.App.SessionToken> terminology
 - Follows .NET naming patterns (descriptive + collection type)
 
 ## Migration from Static Application
 
-The static `Application` class delegates to a singleton instance and is marked obsolete. All static methods and properties are marked with `[Obsolete]` but remain functional for backward compatibility:
+The static <xref:Terminal.Gui.App.Application> class delegates to a singleton instance and is marked obsolete. All static methods and properties are marked with `[Obsolete]` but remain functional for backward compatibility:
 
 ```csharp
 public static partial class Application
@@ -447,7 +447,7 @@ public static partial class Application
 }
 ```
 
-**Important:** The static `Application` class uses a singleton (`Application.Instance`), while `Application.Create()` creates new instances. For new code, prefer the instance-based pattern using `Application.Create()`.
+**Important:** The static <xref:Terminal.Gui.App.Application> class uses a singleton (`Application.Instance`), while [Application.Create()](xref:Terminal.Gui.App.Application.Create*) creates new instances. For new code, prefer the instance-based pattern using [Application.Create()](xref:Terminal.Gui.App.Application.Create*).
 
 ### Migration Strategies
 
@@ -546,8 +546,8 @@ finally
 ### Dispose() and Result Retrieval
 
 - **`Dispose()`** - Standard IDisposable pattern for resource cleanup (required)
-- **`GetResult()`** / **`GetResult<T>()`** - Retrieve results after run completes
-- **`Shutdown()`** - Obsolete (use `Dispose()` instead)
+- **[GetResult()](xref:Terminal.Gui.App.IApplication.GetResult*)** / **`GetResult<T>()`** - Retrieve results after run completes
+- **[Shutdown()](xref:Terminal.Gui.App.Application.Shutdown*)** - Obsolete (use `Dispose()` instead)
 
 ```csharp
 // RECOMMENDED (using statement):
@@ -570,7 +570,7 @@ object? result = app.Run<MyDialog> ().Shutdown ();
 
 ### Input Thread Lifecycle
 
-When calling `Init()`, Terminal.Gui starts a dedicated input thread that continuously polls for console input. This thread must be stopped properly:
+When calling [Init()](xref:Terminal.Gui.App.IApplication.Init*), Terminal.Gui starts a dedicated input thread that continuously polls for console input. This thread must be stopped properly:
 
 ```csharp
 using Terminal.Gui.Drivers;
@@ -602,7 +602,7 @@ public void My_Test ()
 
 ### Singleton Re-initialization
 
-The legacy static `Application` singleton can be re-initialized after disposal (for backward compatibility with old tests):
+The legacy static <xref:Terminal.Gui.App.Application> singleton can be re-initialized after disposal (for backward compatibility with old tests):
 
 ```csharp
 // Test 1
@@ -628,7 +628,7 @@ app.Init (); // ❌ Throws ObjectDisposedException
 
 ### Begin and End
 
-Applications manage sessions through `Begin()` and `End()`:
+Applications manage sessions through [Begin()](xref:Terminal.Gui.App.IApplication.Begin*) and [End()](xref:Terminal.Gui.App.IApplication.End*):
 
 ```csharp
 using IApplication app = Application.Create ();
@@ -738,7 +738,7 @@ app.Init(driverName: DriverRegistry.Names.ANSI);
 
 ### ForceDriver Configuration Property
 
-The `ForceDriver` property is a configuration property that allows you to specify which driver to use. It can be set via code or through the configuration system (e.g., `config.json`):
+The <xref:Terminal.Gui.App.IApplication.ForceDriver> property is a configuration property that allows you to specify which driver to use. It can be set via code or through the configuration system (e.g., `config.json`):
 
 ```csharp
 using Terminal.Gui.Drivers;
@@ -768,7 +768,7 @@ For complete driver documentation including the Driver Registry pattern, see [Dr
 
 ### ForceDriverChanged Event
 
-The static `Application.ForceDriverChanged` event is raised when the `ForceDriver` property changes:
+The static `Application.ForceDriverChanged` event is raised when the <xref:Terminal.Gui.App.IApplication.ForceDriver> property changes:
 
 ```csharp
 using Terminal.Gui.Drivers;
@@ -784,7 +784,7 @@ Application.ForceDriver = DriverRegistry.Names.ANSI;
 
 ## View.Driver Property
 
-Similar to `View.App`, views now have a `Driver` property for accessing driver functionality.
+Similar to <xref:Terminal.Gui.ViewBase.View.App>, views now have a `Driver` property for accessing driver functionality.
 
 ```csharp
 public override void OnDrawContent (Rectangle viewport)
