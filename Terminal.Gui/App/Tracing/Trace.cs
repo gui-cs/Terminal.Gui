@@ -30,66 +30,109 @@ namespace Terminal.Gui.Tracing;
 public static class Trace
 {
     private static readonly AsyncLocal<ITraceBackend?> _asyncLocalBackend = new ();
+    private static readonly AsyncLocal<TraceCategory> _asyncLocalEnabledCategories = new ();
     private static readonly NullBackend _nullBackend = new ();
     private static readonly LoggingBackend _loggingBackend = new ();
 
     /// <summary>
+    ///     Gets or sets the enabled trace categories for the current async context.
+    ///     This property is thread-safe and isolated per async flow.
+    /// </summary>
+    public static TraceCategory EnabledCategories
+    {
+        get => _asyncLocalEnabledCategories.Value;
+        set
+        {
+            _asyncLocalEnabledCategories.Value = value;
+            EnsureBackendIfEnabled ();
+        }
+    }
+
+    /// <summary>
     ///     Gets or sets whether Application and Driver lifecycle tracing is enabled.
     ///     When enabled, automatically uses <see cref="LoggingBackend"/> if no backend is set.
+    ///     This property is thread-safe and isolated per async flow.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool LifecycleEnabled
     {
-        get;
+        get => EnabledCategories.HasFlag (TraceCategory.Lifecycle);
         set
         {
-            field = value;
-            EnsureBackendIfEnabled ();
+            if (value)
+            {
+                EnabledCategories |= TraceCategory.Lifecycle;
+            }
+            else
+            {
+                EnabledCategories &= ~TraceCategory.Lifecycle;
+            }
         }
     }
 
     /// <summary>
     ///     Gets or sets whether command tracing is enabled.
     ///     When enabled, automatically uses <see cref="LoggingBackend"/> if no backend is set.
+    ///     This property is thread-safe and isolated per async flow.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool CommandEnabled
     {
-        get;
+        get => EnabledCategories.HasFlag (TraceCategory.Command);
         set
         {
-            field = value;
-            EnsureBackendIfEnabled ();
+            if (value)
+            {
+                EnabledCategories |= TraceCategory.Command;
+            }
+            else
+            {
+                EnabledCategories &= ~TraceCategory.Command;
+            }
         }
     }
 
     /// <summary>
     ///     Gets or sets whether mouse tracing is enabled.
     ///     When enabled, automatically uses <see cref="LoggingBackend"/> if no backend is set.
+    ///     This property is thread-safe and isolated per async flow.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool MouseEnabled
     {
-        get;
+        get => EnabledCategories.HasFlag (TraceCategory.Mouse);
         set
         {
-            field = value;
-            EnsureBackendIfEnabled ();
+            if (value)
+            {
+                EnabledCategories |= TraceCategory.Mouse;
+            }
+            else
+            {
+                EnabledCategories &= ~TraceCategory.Mouse;
+            }
         }
     }
 
     /// <summary>
     ///     Gets or sets whether keyboard tracing is enabled.
     ///     When enabled, automatically uses <see cref="LoggingBackend"/> if no backend is set.
+    ///     This property is thread-safe and isolated per async flow.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool KeyboardEnabled
     {
-        get;
+        get => EnabledCategories.HasFlag (TraceCategory.Keyboard);
         set
         {
-            field = value;
-            EnsureBackendIfEnabled ();
+            if (value)
+            {
+                EnabledCategories |= TraceCategory.Keyboard;
+            }
+            else
+            {
+                EnabledCategories &= ~TraceCategory.Keyboard;
+            }
         }
     }
 
@@ -98,15 +141,22 @@ public static class Trace
     /// When enabled, automatically uses
     /// <see cref="LoggingBackend"/>
     /// if no backend is set.
+    /// This property is thread-safe and isolated per async flow.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool NavigationEnabled
     {
-        get;
+        get => EnabledCategories.HasFlag (TraceCategory.Navigation);
         set
         {
-            field = value;
-            EnsureBackendIfEnabled ();
+            if (value)
+            {
+                EnabledCategories |= TraceCategory.Navigation;
+            }
+            else
+            {
+                EnabledCategories &= ~TraceCategory.Navigation;
+            }
         }
     }
 
@@ -125,9 +175,58 @@ public static class Trace
         // Auto-switch to LoggingBackend if:
         // 1. Any category is enabled, AND
         // 2. No backend has been set (null) OR the backend is NullBackend
-        if ((LifecycleEnabled || CommandEnabled || MouseEnabled || KeyboardEnabled || NavigationEnabled) && (_asyncLocalBackend.Value is null || _asyncLocalBackend.Value is NullBackend))
+        if (EnabledCategories != TraceCategory.None && (_asyncLocalBackend.Value is null || _asyncLocalBackend.Value is NullBackend))
         {
             _asyncLocalBackend.Value = _loggingBackend;
+        }
+    }
+
+    /// <summary>
+    ///     Pushes a trace scope that enables the specified categories and optionally sets a backend.
+    ///     Returns an <see cref="IDisposable"/> that restores the previous state when disposed.
+    ///     This is thread-safe and works correctly with parallel tests.
+    /// </summary>
+    /// <param name="categories">The trace categories to enable.</param>
+    /// <param name="backend">Optional backend to use. If null, uses default backend selection.</param>
+    /// <returns>An <see cref="IDisposable"/> scope that restores previous tracing state.</returns>
+    /// <example>
+    ///     <code>
+    ///     using (Trace.PushScope (TraceCategory.Command | TraceCategory.Mouse))
+    ///     {
+    ///         // Command and Mouse tracing enabled in this scope
+    ///         CheckBox checkbox = new () { Id = "test" };
+    ///         checkbox.InvokeCommand (Command.Activate);
+    ///     }
+    ///     // Previous tracing state restored
+    ///     </code>
+    /// </example>
+    public static IDisposable PushScope (TraceCategory categories, ITraceBackend? backend = null)
+    {
+        return new TraceScope (categories, backend);
+    }
+
+    private sealed class TraceScope : IDisposable
+    {
+        private readonly TraceCategory _previousCategories;
+        private readonly ITraceBackend? _previousBackend;
+
+        public TraceScope (TraceCategory categories, ITraceBackend? backend)
+        {
+            _previousCategories = EnabledCategories;
+            _previousBackend = _asyncLocalBackend.Value;
+
+            EnabledCategories = categories;
+
+            if (backend is { })
+            {
+                Backend = backend;
+            }
+        }
+
+        public void Dispose ()
+        {
+            EnabledCategories = _previousCategories;
+            _asyncLocalBackend.Value = _previousBackend;
         }
     }
 

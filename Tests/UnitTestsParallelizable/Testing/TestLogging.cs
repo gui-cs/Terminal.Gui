@@ -55,6 +55,47 @@ public static class TestLogging
     /// </example>
     public static IDisposable Verbose (ITestOutputHelper output) => BindTo (output, LogLevel.Trace);
 
+    /// <summary>
+    ///     Binds Terminal.Gui logging to xUnit output with verbose logging (Trace and above)
+    ///     and enables the specified trace categories.
+    ///     Use this when debugging a specific test and you want to see trace output.
+    /// </summary>
+    /// <param name="output">The xUnit test output helper.</param>
+    /// <param name="traceCategories">The trace categories to enable.</param>
+    /// <returns>An <see cref="IDisposable"/> scope that restores previous state.</returns>
+    /// <example>
+    ///     <code>
+    ///     using (TestLogging.Verbose(_output, TraceCategory.Command | TraceCategory.Mouse))
+    ///     {
+    ///         // All log levels appear in test output, Command and Mouse tracing enabled
+    ///         CheckBox checkbox = new () { Id = "test" };
+    ///         checkbox.InvokeCommand (Command.Activate);
+    ///     }
+    ///     </code>
+    /// </example>
+    public static IDisposable Verbose (ITestOutputHelper output, TraceCategory traceCategories)
+    {
+        return new CompositeDisposable (BindTo (output, LogLevel.Trace), Tracing.Trace.PushScope (traceCategories));
+    }
+
+    private sealed class CompositeDisposable : IDisposable
+    {
+        private readonly IDisposable _first;
+        private readonly IDisposable _second;
+
+        public CompositeDisposable (IDisposable first, IDisposable second)
+        {
+            _first = first;
+            _second = second;
+        }
+
+        public void Dispose ()
+        {
+            _second.Dispose ();
+            _first.Dispose ();
+        }
+    }
+
     private sealed class TestOutputLogger (ITestOutputHelper output, LogLevel minLevel) : ILogger
     {
         public IDisposable? BeginScope<TState> (TState state) where TState : notnull => null;
