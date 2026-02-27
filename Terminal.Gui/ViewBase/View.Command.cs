@@ -318,21 +318,17 @@ public partial class View // Command APIs
         ctx = RefreshValue (ctx);
 
         // When entering via DispatchingDown, mark that Accepted will fire during dispatch.
+        // The outer (Direct) call checks this flag and skips its own RaiseAccepted.
         if (ctx?.Routing == CommandRouting.DispatchingDown)
         {
             _dispatchState |= DispatchState.AcceptedViaDispatch;
             Trace.Command (this, ctx, "DispatchFlag", "Setting AcceptedViaDispatch");
-        }
-
-        // Fire RaiseAccepted only if it hasn't already fired during a DispatchingDown call.
-        if (!_dispatchState.HasFlag (DispatchState.AcceptedViaDispatch))
-        {
-            Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted");
+            Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted (DispatchingDown)");
             RaiseAccepted (ctx);
         }
-        else if (ctx?.Routing == CommandRouting.DispatchingDown)
+        else if (!_dispatchState.HasFlag (DispatchState.AcceptedViaDispatch))
         {
-            Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted (DispatchingDown)");
+            Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted");
             RaiseAccepted (ctx);
         }
         else
@@ -543,16 +539,10 @@ public partial class View // Command APIs
         {
             _dispatchState |= DispatchState.ActivatedViaDispatch;
             Trace.Command (this, ctx, "DispatchFlag", "Setting ActivatedViaDispatch");
-        }
-
-        // Fire RaiseActivated only if it hasn't already fired during a DispatchingDown call.
-        if (!_dispatchState.HasFlag (DispatchState.ActivatedViaDispatch))
-        {
             RaiseActivated (ctx);
         }
-        else if (ctx?.Routing == CommandRouting.DispatchingDown)
+        else if (!_dispatchState.HasFlag (DispatchState.ActivatedViaDispatch))
         {
-            // This IS the DispatchingDown call — fire it (the flag was just set above).
             RaiseActivated (ctx);
         }
         else
@@ -659,7 +649,7 @@ public partial class View // Command APIs
             {
                 if (!compositeOnly || next.GetDispatchTarget (ctx) is { })
                 {
-                    ICommandContext upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+                    CommandContext upCtx = new (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
 
                     // Re-read the value from the ancestor's dispatch target, but only when
                     // the dispatch target is the same view as the command source (i.e., the
@@ -673,7 +663,7 @@ public partial class View // Command APIs
                         && ctx.Source?.TryGetTarget (out View? source) == true
                         && ReferenceEquals (source, dispatchTarget))
                     {
-                        upCtx = ((CommandContext)upCtx).WithValue (refreshedValue.GetValue ());
+                        upCtx = upCtx.WithValue (refreshedValue.GetValue ());
                     }
 
                     next.RaiseActivated (upCtx);
