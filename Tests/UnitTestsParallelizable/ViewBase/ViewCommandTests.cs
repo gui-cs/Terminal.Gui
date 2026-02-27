@@ -605,13 +605,15 @@ public class ViewCommandTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void InvokeCommands_Returns_True_If_No_Command_Handled ()
+    public void InvokeCommands_Returns_False_If_No_Command_Handled ()
     {
         var view = new ViewEventTester ();
 
         bool? result = view.InvokeCommands ([Command.Activate, Command.Accept], null);
 
-        Assert.True (result);
+        // Neither Activate nor Accept is genuinely handled by a plain view with no dispatch
+        // target and no bubble config — both return false, allowing key propagation to continue.
+        Assert.False (result);
     }
 
     [Fact]

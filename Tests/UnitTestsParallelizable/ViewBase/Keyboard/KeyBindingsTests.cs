@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Text;
+﻿using System.Text;
 
 namespace ViewBaseTests.Keyboard;
 
@@ -14,9 +13,9 @@ public class KeyBindingsTests
         IApplication app = Application.Create ();
         app.Begin (new Runnable<bool> { CanFocus = true });
 
-        var view = new ScopedKeyBindingView ();
+        ScopedKeyBindingView view = new ();
         var keyWasHandled = false;
-        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
+        view.KeyDownNotHandled += (_, _) => keyWasHandled = true;
 
         app!.TopRunnableView!.Add (view);
 
@@ -53,9 +52,9 @@ public class KeyBindingsTests
         IApplication? app = Application.Create ();
         app.Begin (new Runnable<bool> { CanFocus = true });
 
-        var view = new ScopedKeyBindingView ();
+        ScopedKeyBindingView view = new ();
         var keyWasHandled = false;
-        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
+        view.KeyDownNotHandled += (_, _) => keyWasHandled = true;
 
         app.Keyboard.RaiseKeyDownEvent (Key.Z);
         Assert.False (keyWasHandled);
@@ -78,11 +77,11 @@ public class KeyBindingsTests
         IApplication? app = Application.Create ();
         app.Begin (new Runnable<bool> { CanFocus = true });
 
-        var view = new ScopedKeyBindingView ();
+        ScopedKeyBindingView view = new ();
         app!.TopRunnableView!.Add (view);
 
         var keyWasHandled = false;
-        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
+        view.KeyDownNotHandled += (_, _) => keyWasHandled = true;
 
         keyWasHandled = false;
         app.Keyboard.RaiseKeyDownEvent (Key.H);
@@ -107,9 +106,9 @@ public class KeyBindingsTests
         IApplication? app = Application.Create ();
         app.Begin (new Runnable<bool> { CanFocus = true });
 
-        var view = new ScopedKeyBindingView ();
+        ScopedKeyBindingView view = new ();
         var keyWasHandled = false;
-        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
+        view.KeyDownNotHandled += (_, _) => keyWasHandled = true;
 
         app.Keyboard.RaiseKeyDownEvent (Key.Z);
         Assert.False (keyWasHandled);
@@ -126,9 +125,9 @@ public class KeyBindingsTests
         IApplication? app = Application.Create ();
         app.Begin (new Runnable<bool> ());
 
-        var view = new ScopedKeyBindingView ();
+        ScopedKeyBindingView view = new ();
         var keyWasHandled = false;
-        view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
+        view.KeyDownNotHandled += (_, _) => keyWasHandled = true;
 
         app!.TopRunnableView!.Add (view);
 
@@ -151,23 +150,18 @@ public class KeyBindingsTests
         var acceptRaised = 0;
         var activateRaised = 0;
 
-        var view = new View
-        {
-            CanFocus = true,
-            HotKeySpecifier = new Rune ('_'),
-            Title = "_Test"
-        };
+        View view = new () { CanFocus = true, HotKeySpecifier = new Rune ('_'), Title = "_Test" };
         app!.TopRunnableView!.Add (view);
 
-        view.HandlingHotKey += (s, e) => hotKeyRaised++;
-        view.Accepting += (s, e) => acceptRaised++;
-        view.Activating += (s, e) => activateRaised++;
+        view.HandlingHotKey += (_, _) => hotKeyRaised++;
+        view.Accepting += (_, _) => acceptRaised++;
+        view.Activating += (_, _) => activateRaised++;
 
         Assert.Equal (KeyCode.T, view.HotKey);
         app.Keyboard.RaiseKeyDownEvent (Key.T);
-        Assert.Equal(1, hotKeyRaised);
-        Assert.Equal(0, acceptRaised);
-        Assert.Equal(1, activateRaised);
+        Assert.Equal (1, hotKeyRaised);
+        Assert.Equal (0, acceptRaised);
+        Assert.Equal (1, activateRaised);
 
         app.Keyboard.RaiseKeyDownEvent (Key.T.WithAlt);
         Assert.Equal (2, hotKeyRaised);
@@ -175,16 +169,65 @@ public class KeyBindingsTests
         Assert.Equal (2, activateRaised);
 
         view.HotKey = KeyCode.E;
-        app.Keyboard.RaiseKeyDownEvent(Key.E.WithAlt);
+        app.Keyboard.RaiseKeyDownEvent (Key.E.WithAlt);
         Assert.Equal (3, hotKeyRaised);
         Assert.Equal (0, acceptRaised);
         Assert.Equal (3, activateRaised);
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Validates that unhandled default KeyBinding commands (Activate for Space, Accept for Enter)
+    ///     do not block HotKey dispatch. When a focused plain View has a default binding for a key but
+    ///     doesn't genuinely handle the command (no dispatch target, no bubble config), the key should
+    ///     propagate to <see cref="View.InvokeCommandsBoundToHotKey"/> so that HotKeyBindings on
+    ///     sibling/ancestor views can fire. See issue #4759.
+    /// </summary>
+    [Theory]
+    [InlineData ("Space")] // Space → Command.Activate (via SetupKeyboard)
+    [InlineData ("Enter")] // Enter → Command.Accept (via SetupKeyboard)
+    public void Unhandled_Default_KeyBinding_Does_Not_Block_HotKey (string keyName)
+    {
+        Key key = keyName == "Space" ? Key.Space : Key.Enter;
+
+        IApplication app = Application.Create ();
+        app.Begin (new Runnable<bool> { CanFocus = true });
+
+        // A view with a HotKeyBinding for the key under test
+        View hotKeyView = new () { CanFocus = false };
+        var hotKeyFired = false;
+        hotKeyView.HandlingHotKey += (_, _) => hotKeyFired = true;
+        hotKeyView.HotKeyBindings.Add (key, Command.HotKey);
+        app!.TopRunnableView!.Add (hotKeyView);
+
+        // A separate plain focused view — has default KeyBindings from SetupKeyboard
+        // but does not genuinely handle Activate or Accept
+        View focusableView = new () { CanFocus = true };
+        app!.TopRunnableView!.Add (focusableView);
+
+        // HotKey fires when nothing is focused
+        app.Keyboard.RaiseKeyDownEvent (key);
+        Assert.True (hotKeyFired);
+
+        // HotKey still fires when a sibling with unhandled default bindings is focused
+        focusableView.SetFocus ();
+        Assert.True (focusableView.HasFocus);
+
+        hotKeyFired = false;
+        app.Keyboard.RaiseKeyDownEvent (key);
+        Assert.True (hotKeyFired);
     }
 
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
 
     public class ScopedKeyBindingView : View
     {
+        /// <summary>
+        ///     If set, an additional HotKeyBinding is added via <see cref="View.HotKeyBindings"/> for this key.
+        ///     This bypasses <see cref="View.AddKeyBindingsForHotKey"/> validation, allowing keys like Space.
+        /// </summary>
+        public Key? ExtraHotKey { get; set; }
+
         /// <inheritdoc/>
         public override void EndInit ()
         {
@@ -196,6 +239,11 @@ public class KeyBindingsTests
             App!.Keyboard.KeyBindings.AddApp (Key.A, this, Command.Save);
             HotKey = KeyCode.H;
             KeyBindings.Add (Key.F, Command.Left);
+
+            if (ExtraHotKey is { })
+            {
+                HotKeyBindings.Add (ExtraHotKey, Command.HotKey);
+            }
         }
 
         public bool ApplicationCommandInvoked { get; set; }

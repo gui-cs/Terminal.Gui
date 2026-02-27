@@ -539,7 +539,16 @@ public partial class View // Command APIs
             BubbleActivatedUp (ctx, compositeOnly: true);
         }
 
-        return true;
+        // Report as handled if:
+        // - Activate was dispatched to a target (composite view consumed it), or
+        // - Activate will bubble to ancestor (so it will be processed up the chain), or
+        // - Activate bubbled up from a SubView (the full chain processed the command).
+        // Report as not handled when Activate originated from a local key binding (e.g., Space key)
+        // on a plain view with no dispatch target and no bubble config — this allows the key to
+        // propagate to HotKey dispatch. (Mirrors DefaultAcceptHandler's logic; fixes #4759.)
+        bool activateWillBubble = CommandWillBubbleToAncestor (Command.Activate);
+
+        return _lastDispatchOccurred || activateWillBubble;
     }
 
     /// <summary>
