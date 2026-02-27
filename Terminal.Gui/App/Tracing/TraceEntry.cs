@@ -10,10 +10,4 @@ namespace Terminal.Gui.Tracing;
 /// <param name="Message">Optional additional context message.</param>
 /// <param name="Timestamp">When the trace was captured.</param>
 /// <param name="Data">Category-specific data (Command, MouseFlags, Key, etc.).</param>
-public readonly record struct TraceEntry (TraceCategory Category,
-                                          string Id,
-                                          string Phase,
-                                          string Method,
-                                          string? Message,
-                                          DateTime Timestamp,
-                                          object? Data);
+public readonly record struct TraceEntry (TraceCategory Category, string Id, string Phase, string Method, string? Message, DateTime Timestamp, object? Data);

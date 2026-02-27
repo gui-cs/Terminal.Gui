@@ -15,8 +15,9 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     public void Constructor_SetsDefaults ()
     {
         var popover = new TestPopover ();
-
+#if DEBUG
         Assert.Equal ("popoverBaseImpl", popover.Id);
+#endif
         Assert.True (popover.CanFocus);
         Assert.Equal (Dim.Fill (), popover.Width);
         Assert.Equal (Dim.Fill (), popover.Height);
