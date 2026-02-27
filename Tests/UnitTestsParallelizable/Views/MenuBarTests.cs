@@ -1955,7 +1955,6 @@ public class MenuBarTests
         finally
         {
             Trace.EnabledCategories = TraceCategory.None;
-            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
