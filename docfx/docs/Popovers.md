@@ -4,7 +4,7 @@ Popovers are transient UI elements that appear above other content to display co
 
 ## Overview
 
-Normally, Views cannot draw outside of their `Viewport`. To display content that appears to "pop over" other views, Terminal.Gui provides the popover system via @Terminal.Gui.Application.Popover. Popovers differ from alternatives like modifying `Border` or `Margin` behavior because they:
+Normally, Views cannot draw outside of their `Viewport`. To display content that appears to "pop over" other views, Terminal.Gui provides the popover system via `Application.Popover`. Popovers differ from alternatives like modifying <xref:Terminal.Gui.ViewBase.Border> or <xref:Terminal.Gui.ViewBase.Margin> behavior because they:
 
 - Are managed centrally by the application
 - Support focus and keyboard event routing
@@ -23,13 +23,13 @@ Application.Popover (static accessor)
                             └── PopoverMenu (concrete implementation)
 ```
 
-### @Terminal.Gui.IPopover — The Contract
+### <xref:Terminal.Gui.App.IPopover> — The Contract
 
-The @Terminal.Gui.IPopover interface defines the minimal contract: a single `Current` property that associates the popover with a specific @Terminal.Gui.IRunnable. This association controls keyboard event scoping — if `Current` is `null`, the popover receives all keyboard events globally; if set, events only flow when the associated runnable is the active `TopRunnableView`.
+The <xref:Terminal.Gui.App.IPopover> interface defines the minimal contract: a single `Current` property that associates the popover with a specific <xref:Terminal.Gui.App.IRunnable>. This association controls keyboard event scoping — if `Current` is `null`, the popover receives all keyboard events globally; if set, events only flow when the associated runnable is the active `TopRunnableView`.
 
-### @Terminal.Gui.PopoverBaseImpl — The Foundation
+### `PopoverBaseImpl` — The Foundation
 
-@Terminal.Gui.PopoverBaseImpl provides the standard popover behavior that all concrete popovers inherit. It configures:
+`PopoverBaseImpl` provides the standard popover behavior that all concrete popovers inherit. It configures:
 
 - **Full-screen sizing** — `Width = Dim.Fill()`, `Height = Dim.Fill()`
 - **Transparency** — `ViewportSettings.Transparent | ViewportSettings.TransparentMouse`
@@ -37,15 +37,15 @@ The @Terminal.Gui.IPopover interface defines the minimal contract: a single `Cur
 - **Focus management** — Restores focus to the previously-focused view when hidden
 - **Layout on show** — Lays out the popover to fit the screen when becoming visible
 
-### @Terminal.Gui.ApplicationPopover — The Manager
+### <xref:Terminal.Gui.App.ApplicationPopover> — The Manager
 
-@Terminal.Gui.ApplicationPopover is a singleton held by `IApplication.Popover` that manages the lifecycle of all popovers. It maintains a list of registered popovers and tracks the single active (visible) popover. Only one popover can be active at a time — showing a new one automatically hides the previous one.
+<xref:Terminal.Gui.App.ApplicationPopover> is a singleton held by `IApplication.Popover` that manages the lifecycle of all popovers. It maintains a list of registered popovers and tracks the single active (visible) popover. Only one popover can be active at a time — showing a new one automatically hides the previous one.
 
 ## The Transparency Model
 
 Popovers use a "full-screen transparent overlay" technique. Instead of drawing a small popup widget directly, a popover fills the entire screen with `Dim.Fill()` but sets its viewport to be transparent. This means:
 
-- The popover view itself is invisible — only its SubViews (like a @Terminal.Gui.Menu) are drawn
+- The popover view itself is invisible — only its SubViews (like a <xref:Terminal.Gui.Views.Menu>) are drawn
 - Mouse clicks that don't hit a SubView pass through to views beneath (via `TransparentMouse`)
 - This naturally creates the "click outside to dismiss" behavior without complex hit-testing
 
@@ -55,7 +55,7 @@ This approach is elegant because the framework's existing transparency system ha
 
 ### Using PopoverMenu
 
-The easiest way to create a popover is to use @Terminal.Gui.PopoverMenu, which provides a cascading menu implementation:
+The easiest way to create a popover is to use <xref:Terminal.Gui.Views.PopoverMenu>, which provides a cascading menu implementation:
 
 ```csharp
 // Create a popover menu with menu items
@@ -77,7 +77,7 @@ contextMenu.MakeVisible (new Point (10, 5)); // Specific location
 
 ### Creating a Custom Popover
 
-To create a custom popover, inherit from @Terminal.Gui.PopoverBaseImpl:
+To create a custom popover, inherit from `PopoverBaseImpl`:
 
 ```csharp
 public class MyCustomPopover : PopoverBaseImpl
@@ -109,14 +109,14 @@ Application.Popover?.Show (myPopover);
 
 A View qualifies as a popover if it:
 
-1. **Implements @Terminal.Gui.IPopover** — Provides the `Current` property for runnable association
+1. **Implements <xref:Terminal.Gui.App.IPopover>* — Provides the `Current` property for runnable association
 2. **Is Focusable** — `CanFocus = true` to receive keyboard input
 3. **Is Transparent** — `ViewportSettings` includes both:
    - `ViewportSettings.Transparent` — Allows content beneath to show through
    - `ViewportSettings.TransparentMouse` — Mouse clicks outside SubViews pass through
 4. **Handles Quit** — Binds `Application.QuitKey` to `Command.Quit` and sets `Visible = false`
 
-@Terminal.Gui.PopoverBaseImpl provides all these requirements by default.
+`PopoverBaseImpl` provides all these requirements by default.
 
 ## Registration and Lifecycle
 
@@ -197,7 +197,7 @@ The popover lifecycle is driven entirely by the `Visible` property — there is 
 
 **Becoming visible (`Visible` changes to `true`):**
 1. `PopoverBaseImpl.OnVisibleChanging()` calls `Layout(App.Screen.Size)` to size the popover to the screen
-2. `PopoverMenu.OnVisibleChanged()` adds the root @Terminal.Gui.Menu as a SubView
+2. `PopoverMenu.OnVisibleChanged()` adds the root <xref:Terminal.Gui.Views.Menu> as a SubView
 3. The popover receives focus
 
 **Becoming hidden (`Visible` changes to `false`):**
@@ -211,7 +211,7 @@ This pattern means setting `Visible = false` is equivalent to calling `Hide()` �
 
 ### Dispatch Order
 
-When a key is pressed, @Terminal.Gui.ApplicationPopover.DispatchKeyDown routes it through popovers in a specific order:
+When a key is pressed, `ApplicationPopover.DispatchKeyDown()` routes it through popovers in a specific order:
 
 1. **Active (visible) popover** receives ALL key events first. If it handles the key, processing stops.
 2. **Inactive (hidden) popovers** each receive the key event, filtered by their `Current` runnable association. Popovers whose `Current` doesn't match the active `TopRunnableView` are skipped.
@@ -236,7 +236,7 @@ Application.Popover?.Register (menu);
 
 ### Runnable Association
 
-The @Terminal.Gui.IPopover.Current property associates a popover with a specific @Terminal.Gui.IRunnable:
+The `IPopover.Current` property associates a popover with a specific <xref:Terminal.Gui.App.IRunnable>:
 
 - If `null`: Popover receives all keyboard events from the application
 - If set: Popover only receives events when the associated runnable is active
@@ -263,7 +263,7 @@ myPopover.Current = myWindow; // Only active when myWindow is the top runnable
 
 ### Default Layout
 
-@Terminal.Gui.PopoverBaseImpl sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()`, making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
+`PopoverBaseImpl` sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()` (see <xref:Terminal.Gui.ViewBase.Dim>), making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
 
 ### Custom Sizing
 
@@ -282,7 +282,7 @@ public class MyPopover : PopoverBaseImpl
 
 ### Positioning with PopoverMenu
 
-@Terminal.Gui.PopoverMenu provides positioning helpers:
+<xref:Terminal.Gui.Views.PopoverMenu> provides positioning helpers:
 
 ```csharp
 // Position at specific screen coordinates
@@ -301,15 +301,15 @@ The menu automatically adjusts position to ensure it remains fully visible on sc
 
 ### PopoverMenu
 
-@Terminal.Gui.PopoverMenu is a sophisticated cascading menu implementation used for:
+<xref:Terminal.Gui.Views.PopoverMenu> is a sophisticated cascading menu implementation used for:
 - Context menus
-- @Terminal.Gui.MenuBar drop-down menus
+- <xref:Terminal.Gui.Views.MenuBar> drop-down menus
 - Custom menu scenarios
 
 **Key Features:**
 - Cascading submenus with automatic positioning
 - Keyboard navigation (arrow keys, hotkeys)
-- Automatic key binding discovery from Commands — menu items that specify a `Command` automatically display the correct keyboard shortcut
+- Automatic key binding discovery from Commands — menu items that specify a <xref:Terminal.Gui.Input.Command> automatically display the correct keyboard shortcut
 - Mouse support
 - Separator lines via `new Line ()`
 
@@ -437,10 +437,10 @@ Application.Popover?.Register (commandPalette);
 
 ## API Reference
 
-- @Terminal.Gui.IPopover - Interface for popover views
-- @Terminal.Gui.PopoverBaseImpl - Abstract base class for custom popovers
-- @Terminal.Gui.PopoverMenu - Cascading menu implementation
-- @Terminal.Gui.ApplicationPopover - Popover manager (accessed via `Application.Popover`)
+- <xref:Terminal.Gui.App.IPopover> - Interface for popover views
+- `PopoverBaseImpl` - Abstract base class for custom popovers
+- <xref:Terminal.Gui.Views.PopoverMenu> - Cascading menu implementation
+- <xref:Terminal.Gui.App.ApplicationPopover> - Popover manager (accessed via `Application.Popover`)
 
 ## See Also
 

@@ -93,7 +93,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
 
-        if ((int)checkBox.Data! == Value
+        if (GetCheckBoxValue (checkBox) == Value
             && (ctx?.Routing == CommandRouting.DispatchingDown
                 || (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)))
         {
@@ -103,12 +103,12 @@ public class OptionSelector : SelectorBase, IDesignable
         }
         else
         {
-            if (Value == (int)checkBox.Data!)
+            if (Value == GetCheckBoxValue (checkBox))
             {
                 return;
             }
 
-            Value = (int)checkBox.Data!;
+            Value = GetCheckBoxValue (checkBox);
         }
     }
 
@@ -143,15 +143,13 @@ public class OptionSelector : SelectorBase, IDesignable
 
     /// <summary>
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
-    ///     to the current <see cref="SelectorBase.Value"/> is checked. Throws <see cref="InvalidOperationException"/>
-    ///     if a checkbox's Data property is not set.
+    ///     to the current <see cref="SelectorBase.Value"/> is checked.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
     public override void UpdateChecked ()
     {
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            var value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            int value = GetCheckBoxValue (cb);
 
             cb.Value = value == Value ? CheckState.Checked : CheckState.UnChecked;
         }

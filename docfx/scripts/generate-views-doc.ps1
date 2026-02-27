@@ -75,18 +75,18 @@ foreach ($file in $viewFiles) {
         $description = $description -replace '<p>|</p>', ''  # Remove paragraph tags
         $description = $description -replace '<a href="[^"]+">([^<]+)</a>', '$1'  # Remove links but keep text
         
-        # Convert ALL xref tags to markdown links
-        $description = $description -replace '<xref href="([^"]+)"[^>]*>([^<]+)</xref>', '[$2](~/api/$1.yml)'
-        $description = $description -replace '<see cref="([^"]+)"/>', '[$1](~/api/$1.yml)'
+        # Convert ALL xref tags to docfx xref-style markdown links
+        $description = $description -replace '<xref href="([^"]+)"[^>]*>([^<]+)</xref>', '[$2](xref:$1)'
+        $description = $description -replace '<see cref="([^"]+)"/>', '<xref:$1>'
         $description = $description -replace '<c>([^<]+)</c>', '`$1`'
-        
+
         # Convert code tags to backticks
         $description = $description -replace '<code>([^<]*)</code>', '`$1`'
-        
-        # Fix any remaining xref tags
-        $description = $description -replace '<xref href="([^"]+)"[^>]*></xref>', '[$1](~/api/$1.yml)'
-        
-        # Extract just the class name from full type names
+
+        # Fix any remaining empty xref tags
+        $description = $description -replace '<xref href="([^"]+)"[^>]*></xref>', '<xref:$1>'
+
+        # Extract just the class name from full type names in link text (not the xref UID)
         $description = $description -replace '\[Terminal\.Gui\.Views\.([^\]]+)\]', '[$1]'
         $description = $description -replace '\[Terminal\.Gui\.ViewBase\.([^\]]+)\]', '[$1]'
         $description = $description -replace '\[Terminal\.Gui\.Drawing\.([^\]]+)\]', '[$1]'
@@ -123,8 +123,11 @@ foreach ($file in $viewFiles) {
             Write-Host "  Error running OutputView for $($file.Name): $_" -ForegroundColor Red
         }
         
+        # Build xref UID: file basename uses '-N' for generics, but the UID uses '`N'
+        $xrefUid = $file.BaseName -replace '-(\d+)$', '`$1'
+
         Write-Host "Found view: $name"
-        $views += "## [$name](~/api/$($file.BaseName).yml)`n`n$description`n`n$viewOutput`n"
+        $views += "## [$name](xref:$xrefUid)`n`n$description`n`n$viewOutput`n"
     }
     catch {
         Write-Host "  Error processing $($file.Name): $_" -ForegroundColor Red
