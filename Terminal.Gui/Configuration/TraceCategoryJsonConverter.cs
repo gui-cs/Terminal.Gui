@@ -22,7 +22,7 @@ internal class TraceCategoryJsonConverter : JsonConverter<TraceCategory>
             // Handle single string: "Command"
             string value = reader.GetString ()!;
 
-            if (Enum.TryParse<TraceCategory> (value, ignoreCase: true, out TraceCategory result))
+            if (Enum.TryParse (value, true, out TraceCategory result))
             {
                 return result;
             }
@@ -33,7 +33,7 @@ internal class TraceCategoryJsonConverter : JsonConverter<TraceCategory>
         if (reader.TokenType == JsonTokenType.StartArray)
         {
             // Handle array format: ["Command", "Mouse"]
-            TraceCategory result = TraceCategory.None;
+            var result = TraceCategory.None;
 
             while (reader.Read ())
             {
@@ -42,18 +42,19 @@ internal class TraceCategoryJsonConverter : JsonConverter<TraceCategory>
                     break;
                 }
 
-                if (reader.TokenType == JsonTokenType.String)
+                if (reader.TokenType != JsonTokenType.String)
                 {
-                    string value = reader.GetString ()!;
+                    continue;
+                }
+                string value = reader.GetString ()!;
 
-                    if (Enum.TryParse<TraceCategory> (value, ignoreCase: true, out TraceCategory category))
-                    {
-                        result |= category;
-                    }
-                    else
-                    {
-                        throw new JsonException ($"Invalid TraceCategory value in array: '{value}'");
-                    }
+                if (Enum.TryParse (value, true, out TraceCategory category))
+                {
+                    result |= category;
+                }
+                else
+                {
+                    throw new JsonException ($"Invalid TraceCategory value in array: '{value}'");
                 }
             }
 
@@ -80,7 +81,7 @@ internal class TraceCategoryJsonConverter : JsonConverter<TraceCategory>
         }
 
         // Check if it's a single flag (power of 2)
-        if ((value != TraceCategory.None) && ((int)value & ((int)value - 1)) == 0)
+        if (((int)value & ((int)value - 1)) == 0)
         {
             // Single flag - write as string
             writer.WriteStringValue (value.ToString ());

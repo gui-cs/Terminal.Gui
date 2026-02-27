@@ -1,4 +1,4 @@
-// Claude - Sonnet 4.6
+// Claude - Opus 4.5
 
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
@@ -9,6 +9,7 @@ namespace ApplicationTests;
 /// <summary>
 ///     Tests for thread-safe tracing behavior.
 ///     These tests verify that tracing is properly isolated per-thread and per-async-context.
+///     All tests work correctly in both Debug and Release builds.
 /// </summary>
 public class ThreadSafeTraceTests
 {
@@ -153,9 +154,14 @@ public class ThreadSafeTraceTests
                 View view = new () { Id = "test" };
                 Trace.Command (view, Command.Accept, CommandRouting.Direct, "TestPhase", "TestMessage");
 
+#if DEBUG
                 Assert.Single (backend.Entries);
                 Assert.Equal (TraceCategory.Command, backend.Entries [0].Category);
                 Assert.Contains ("test", backend.Entries [0].Id);
+#else
+                // In Release, [Conditional("DEBUG")] removes Trace.Command calls
+                Assert.Empty (backend.Entries);
+#endif
             }
         }
         finally
@@ -177,9 +183,6 @@ public class ThreadSafeTraceTests
 
                 CheckBox checkbox = new () { Id = "checkbox" };
                 checkbox.InvokeCommand (Command.Activate);
-
-                // If we get here without exception, the test passes
-                _output.WriteLine ("✓ Command tracing enabled successfully");
             }
 
             // After scope, tracing should be disabled
@@ -208,8 +211,13 @@ public class ThreadSafeTraceTests
 
                 await Task.Delay (10);
 
+#if DEBUG
                 // This test should only see its own traces
                 Assert.All (backend.Entries, entry => Assert.Contains ("parallel-test-1", entry.Id));
+#else
+                Assert.Empty (backend.Entries);
+#endif
+
                 Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             }
         }
@@ -236,8 +244,13 @@ public class ThreadSafeTraceTests
 
                 await Task.Delay (10);
 
+#if DEBUG
                 // This test should only see its own traces
                 Assert.All (backend.Entries, entry => Assert.Contains ("parallel-test-2", entry.Id));
+#else
+                Assert.Empty (backend.Entries);
+#endif
+
                 Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
                 Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             }
@@ -262,7 +275,6 @@ public class ThreadSafeTraceTests
                       () =>
                       {
                           // Thread pool threads may or may not see the async-local value depending on ExecutionContext flow
-                          // For manual threads created with new Thread(), they should see None
                           capturedCategories = Trace.EnabledCategories;
 
                           // Set different categories in other thread
@@ -272,9 +284,6 @@ public class ThreadSafeTraceTests
             // This thread should still have Command enabled
             Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             Assert.Equal (TraceCategory.Command, Trace.EnabledCategories);
-
-            // The captured values may vary depending on ExecutionContext flow,
-            // but at minimum, changes in the other thread should not affect this thread
         }
         finally
         {
@@ -305,8 +314,6 @@ public class ThreadSafeTraceTests
 
             // Main thread backend should be unchanged
             Assert.Same (mainBackend, Trace.Backend);
-
-            // The other execution context may see the main backend or NullBackend depending on flow
         }
         finally
         {
@@ -334,7 +341,11 @@ public class ThreadSafeTraceTests
                 View view = new () { Id = "async-test" };
                 Trace.Command (view, Command.Accept, CommandRouting.Direct, "AfterAwait");
 
+#if DEBUG
                 Assert.Single (backend.Entries);
+#else
+                Assert.Empty (backend.Entries);
+#endif
             }
         }
         finally

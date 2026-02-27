@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.Tests;
@@ -73,26 +74,15 @@ public static class TestLogging
     ///     }
     ///     </code>
     /// </example>
-    public static IDisposable Verbose (ITestOutputHelper output, TraceCategory traceCategories)
+    public static IDisposable Verbose (ITestOutputHelper output, TraceCategory traceCategories) =>
+        new CompositeDisposable (BindTo (output, LogLevel.Trace), Trace.PushScope (traceCategories));
+
+    private sealed class CompositeDisposable (IDisposable first, IDisposable second) : IDisposable
     {
-        return new CompositeDisposable (BindTo (output, LogLevel.Trace), Tracing.Trace.PushScope (traceCategories));
-    }
-
-    private sealed class CompositeDisposable : IDisposable
-    {
-        private readonly IDisposable _first;
-        private readonly IDisposable _second;
-
-        public CompositeDisposable (IDisposable first, IDisposable second)
-        {
-            _first = first;
-            _second = second;
-        }
-
         public void Dispose ()
         {
-            _second.Dispose ();
-            _first.Dispose ();
+            second.Dispose ();
+            first.Dispose ();
         }
     }
 
@@ -102,13 +92,7 @@ public static class TestLogging
 
         public bool IsEnabled (LogLevel logLevel) => logLevel >= minLevel;
 
-        public void Log<TState> (
-            LogLevel logLevel,
-            EventId eventId,
-            TState state,
-            Exception? exception,
-            Func<TState, Exception?, string> formatter
-        )
+        public void Log<TState> (LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled (logLevel))
             {
@@ -116,15 +100,15 @@ public static class TestLogging
             }
 
             string levelTag = logLevel switch
-            {
-                LogLevel.Trace => "TRC",
-                LogLevel.Debug => "DBG",
-                LogLevel.Information => "INF",
-                LogLevel.Warning => "WRN",
-                LogLevel.Error => "ERR",
-                LogLevel.Critical => "CRT",
-                _ => "???"
-            };
+                              {
+                                  LogLevel.Trace => "TRC",
+                                  LogLevel.Debug => "DBG",
+                                  LogLevel.Information => "INF",
+                                  LogLevel.Warning => "WRN",
+                                  LogLevel.Error => "ERR",
+                                  LogLevel.Critical => "CRT",
+                                  _ => "???"
+                              };
 
             try
             {

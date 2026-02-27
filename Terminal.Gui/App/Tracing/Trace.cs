@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Tracing;
 
@@ -35,7 +36,7 @@ public static class Trace
     ///     This property is thread-safe and isolated per async flow.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    [System.Text.Json.Serialization.JsonConverter (typeof (Configuration.TraceCategoryJsonConverter))]
+    [JsonConverter (typeof (TraceCategoryJsonConverter))]
     public static TraceCategory EnabledCategories
     {
         get => _asyncLocalEnabledCategories.Value;
@@ -96,10 +97,7 @@ public static class Trace
     ///     // Previous tracing state restored
     ///     </code>
     /// </example>
-    public static IDisposable PushScope (TraceCategory categories, ITraceBackend? backend = null)
-    {
-        return new TraceScope (categories, backend);
-    }
+    public static IDisposable PushScope (TraceCategory categories, ITraceBackend? backend = null) => new TraceScope (categories, backend);
 
     #region Lifecycle Tracing
 
