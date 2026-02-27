@@ -1,6 +1,10 @@
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
+
 namespace ViewBaseTests.Commands;
 
-public class ViewCommandTests
+public class ViewCommandTests (ITestOutputHelper output)
 {
     #region OnAccept/Accept tests
 
@@ -1557,13 +1561,13 @@ public class ViewCommandTests
 
         AcceptTargetTestView defaultAcceptView = new () { IsDefault = true, Id = "defaultAcceptView", CanFocus = true };
         superView.Add (defaultAcceptView);
-        int defaultAcceptViewAcceptingCount = 0;
+        var defaultAcceptViewAcceptingCount = 0;
         defaultAcceptView.Accepting += (_, _) => defaultAcceptViewAcceptingCount++;
 
-        int superViewAcceptedCount = 0;
+        var superViewAcceptedCount = 0;
         superView.Accepted += (_, _) => superViewAcceptedCount++;
 
-        int superViewAcceptingCount = 0;
+        var superViewAcceptingCount = 0;
         superView.Accepting += (_, _) => superViewAcceptingCount++;
 
         // Act: Invoke Accept directly on the superView (not on a subview)
@@ -1572,9 +1576,10 @@ public class ViewCommandTests
         // Assert: The DefaultAcceptView's Accepting should have fired
         Assert.Equal (1, defaultAcceptViewAcceptingCount);
 
-        // Assert: The superView's Accepted should have fired after the DefaultAcceptView handled Accept
-        Assert.Equal (1, superViewAcceptedCount);
+        // Assert: The superView's Accepting should have fired
+        Assert.Equal (1, superViewAcceptingCount);
 
+        // Assert: The superView's Accepted should have fired after the DefaultAcceptView handled Accept
         Assert.Equal (1, superViewAcceptedCount);
     }
 
@@ -1674,159 +1679,313 @@ public class ViewCommandTests
     [Fact]
     public void InvokeCommand_WithIValueSource_PopulatesValue ()
     {
-        var view = new TestValueView { Value = "test value" };
-        ICommandContext? capturedContext = null;
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        view.Accepting += (sender, args) =>
-                          {
-                              capturedContext = args.Context;
-                          };
+            TestValueView view = new () { Id = "valueView", Value = "test value" };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
 
-        view.InvokeCommand (Command.Accept);
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
 
-        Assert.NotNull (capturedContext);
-        Assert.Equal ("test value", capturedContext!.Value);
+            view.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal ("test value", capturedContext!.Value);
+        }
     }
 
     // Claude - Opus 4.5
     [Fact]
     public void InvokeCommand_WithoutIValueSource_ValueIsNull ()
     {
-        var view = new View ();
-        ICommandContext? capturedContext = null;
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        view.Accepting += (sender, args) =>
-                          {
-                              capturedContext = args.Context;
-                          };
+            View view = new () { Id = "plainView" };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
 
-        view.InvokeCommand (Command.Accept);
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
 
-        Assert.NotNull (capturedContext);
-        Assert.Null (capturedContext!.Value);
+            view.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Null (capturedContext!.Value);
+        }
     }
 
     // Claude - Opus 4.5
     [Fact]
     public void InvokeCommand_WithBinding_PopulatesValueFromIValue ()
     {
-        var view = new TestValueView { Value = 42 };
-        ICommandContext? capturedContext = null;
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        view.Accepting += (sender, args) =>
-                          {
-                              capturedContext = args.Context;
-                          };
+            TestValueView view = new () { Id = "valueView", Value = 42 };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
 
-        KeyBinding binding = new ([Command.Accept]) { Key = Key.Enter };
-        view.InvokeCommand (Command.Accept, binding);
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
 
-        Assert.NotNull (capturedContext);
-        Assert.Equal (42, capturedContext!.Value);
-        Assert.NotNull (capturedContext.Binding);
+            KeyBinding binding = new ([Command.Accept]) { Key = Key.Enter };
+            view.InvokeCommand (Command.Accept, binding);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal (42, capturedContext!.Value);
+            Assert.NotNull (capturedContext.Binding);
+        }
     }
 
     // Claude - Opus 4.5
     [Fact]
     public void InvokeCommand_IValueReturnsNull_ValueIsNull ()
     {
-        var view = new TestValueView { Value = null };
-        ICommandContext? capturedContext = null;
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        view.Accepting += (sender, args) =>
-                          {
-                              capturedContext = args.Context;
-                          };
+            TestValueView view = new () { Id = "nullValueView", Value = null };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
 
-        view.InvokeCommand (Command.Accept);
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
 
-        Assert.NotNull (capturedContext);
-        Assert.Null (capturedContext!.Value);
+            view.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Null (capturedContext!.Value);
+        }
     }
 
     // Claude - Opus 4.5
     [Fact]
     public void CommandBridge_PreservesValue_OnAccept ()
     {
-        var owner = new View { Id = "owner" };
-        var remote = new TestValueView { Id = "remote", Value = "bridged value" };
-        ICommandContext? capturedContext = null;
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        owner.Accepting += (sender, args) =>
-                           {
-                               capturedContext = args.Context;
-                           };
+            View owner = new () { Id = "owner" };
+            TestValueView remote = new () { Id = "remote", Value = "bridged value" };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
 
-        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
+            owner.Accepting += (_, args) =>
+                               {
+                                   acceptingCount++;
+                                   capturedContext = args.Context;
+                               };
 
-        // Invoke Accept on remote
-        remote.InvokeCommand (Command.Accept);
+            using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
 
-        Assert.NotNull (capturedContext);
-        Assert.Equal ("bridged value", capturedContext!.Value);
-        Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+            // Invoke Accept on remote
+            remote.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal ("bridged value", capturedContext!.Value);
+            Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+        }
     }
 
     // Claude - Opus 4.5
     [Fact]
     public void CommandBridge_PreservesValue_OnActivate ()
     {
-        var owner = new View { Id = "owner" };
-        var remote = new TestValueView { Id = "remote", Value = 123 };
-        ICommandContext? capturedContext = null;
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        owner.Activated += (sender, args) =>
-                           {
-                               capturedContext = args.Value;
-                           };
+            View owner = new () { Id = "owner" };
+            TestValueView remote = new () { Id = "remote", Value = 123 };
+            ICommandContext? capturedContext = null;
+            var activatedCount = 0;
 
-        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Activate);
+            owner.Activated += (_, args) =>
+                               {
+                                   activatedCount++;
+                                   capturedContext = args.Value;
+                               };
 
-        // Invoke Activate on remote
-        remote.InvokeCommand (Command.Activate);
+            using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Activate);
 
-        Assert.NotNull (capturedContext);
-        Assert.Equal (123, capturedContext!.Value);
-        Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+            // Invoke Activate on remote
+            remote.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, activatedCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal (123, capturedContext!.Value);
+            Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+        }
     }
 
     // Claude - Opus 4.5
     [Fact]
     public void CommandBridge_NullValue_PropagatesCorrectly ()
     {
-        var owner = new View { Id = "owner" };
-        var remote = new TestValueView { Id = "remote", Value = null };
-        ICommandContext? capturedContext = null;
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        owner.Accepting += (sender, args) =>
-                           {
-                               capturedContext = args.Context;
-                           };
+            View owner = new () { Id = "owner" };
+            TestValueView remote = new () { Id = "remote", Value = null };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
 
-        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
+            owner.Accepting += (_, args) =>
+                               {
+                                   acceptingCount++;
+                                   capturedContext = args.Context;
+                               };
 
-        // Invoke Accept on remote
-        remote.InvokeCommand (Command.Accept);
+            using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
 
-        Assert.NotNull (capturedContext);
-        Assert.Null (capturedContext!.Value);
-        Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+            // Invoke Accept on remote
+            remote.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Null (capturedContext!.Value);
+            Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+        }
     }
 
     // Test view that implements IValue<object?>
     private class TestValueView : View, IValue<object?>
     {
-        private object? _value;
-
-        public object? Value
-        {
-            get => _value;
-            set => _value = value;
-        }
+        public object? Value { get; set; }
 
         public event EventHandler<ValueChangingEventArgs<object?>>? ValueChanging;
         public event EventHandler<ValueChangedEventArgs<object?>>? ValueChanged;
         public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+    }
+
+    /// <summary>
+    ///     A view that implements <see cref="IValue{T}"/> and increments its value in
+    ///     <see cref="OnActivated"/>, similar to how <see cref="CheckBox"/> advances its
+    ///     <see cref="CheckState"/>. Used to test the command pipeline independently of CheckBox.
+    /// </summary>
+    private class ToggleView : View, IValue<int>
+    {
+        /// <summary>Gets the number of times <see cref="OnActivated"/> has been called.</summary>
+        public int ActivatedCount { get; private set; }
+
+        public int Value
+        {
+            get;
+            set
+            {
+                if (field == value)
+                {
+                    return;
+                }
+
+                int old = field;
+                field = value;
+                ValueChanged?.Invoke (this, new ValueChangedEventArgs<int> (old, value));
+                ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+            }
+        }
+
+        public event EventHandler<ValueChangingEventArgs<int>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
+
+        private event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+        event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
+        {
+            add => ValueChangedUntyped += value;
+            remove => ValueChangedUntyped -= value;
+        }
+
+        /// <inheritdoc/>
+        protected override void OnActivated (ICommandContext? commandContext)
+        {
+            base.OnActivated (commandContext);
+            ActivatedCount++;
+            Value++;
+        }
+    }
+
+    /// <summary>
+    ///     A minimal composite view that relays <see cref="Command.Activate"/> to a dispatch
+    ///     target (its first SubView), replicating the containment pattern of
+    ///     <see cref="Shortcut"/>/<see cref="MenuItem"/> without depending on those classes.
+    /// </summary>
+    private class RelayComposite : View
+    {
+        public RelayComposite () => CommandsToBubbleUp = [Command.Activate];
+
+        protected override View? GetDispatchTarget (ICommandContext? ctx) => SubViews.FirstOrDefault ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Proves the double-activation bug: when a view that mutates state in
+    ///     <see cref="View.OnActivated"/> is the dispatch target of a relay composite, and
+    ///     activation starts on the target itself (e.g., mouse click), the command bubbles up
+    ///     to the composite which dispatches back down. This causes
+    ///     <see cref="View.OnActivated"/> to fire twice: once from the inner DispatchDown,
+    ///     and again from the originator's own <c>RaiseActivated</c>. The state mutation
+    ///     (Value++) therefore happens twice instead of once.
+    /// </summary>
+    [Fact]
+    public void OnActivated_Fires_Once_When_Originator_Is_DispatchTarget ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
+
+            // Arrange: RelayComposite contains ToggleView as dispatch target
+            ToggleView toggleView = new () { Id = "toggleView" };
+
+            RelayComposite composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            var compositeActivatedCount = 0;
+
+            composite.Activated += (_, _) => compositeActivatedCount++;
+
+            Assert.Equal (0, toggleView.Value);
+            Assert.Equal (0, toggleView.ActivatedCount);
+
+            // Act: Invoke Activate on the dispatch target itself (simulates a mouse click).
+            // The binding is required so TryDispatchToTarget's relay guard passes.
+            KeyBinding binding = new ([Command.Activate], Key.Space, composite);
+            CommandContext ctx = new (Command.Activate, new WeakReference<View> (toggleView), binding);
+            toggleView.InvokeCommand (Command.Activate, ctx);
+
+            // Assert: OnActivated should fire exactly ONCE, so Value should be 1.
+            // BUG: Currently fires twice (inner DispatchDown + outer RaiseActivated),
+            // so Value ends up at 2 and ActivatedCount is 2.
+            Assert.Equal (1, toggleView.ActivatedCount);
+            Assert.Equal (1, toggleView.Value);
+            Assert.Equal (1, compositeActivatedCount);
+        }
     }
 
     #endregion

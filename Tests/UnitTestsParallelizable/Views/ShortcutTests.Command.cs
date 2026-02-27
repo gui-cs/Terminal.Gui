@@ -1,4 +1,6 @@
 using JetBrains.Annotations;
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
 
 namespace ViewsTests;
 
@@ -179,7 +181,7 @@ public partial class ShortcutTests
         Assert.Equal (1, shortcutActivatingRaised);
         Assert.Equal (1, commandViewActivatingRaised);
     }
-    
+
     [Fact]
     public void CommandView_Command_Activate_Bubbles_To_Shortcut_SuperView ()
     {
@@ -704,40 +706,45 @@ public partial class ShortcutTests
     [Fact]
     public void BubbleUp_Activate_Event_Ordering_CommandView_Completes_Before_Shortcut_Activated ()
     {
-        // Arrange
-        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+            // Arrange
+            CheckBox checkBox = new () { Id = "checkBox", Title = "_Toggle", CanFocus = false };
 
-        List<string> eventLog = [];
-        CheckState? valueAtShortcutActivated = null;
+            Shortcut shortcut = new () { Id = "shortcut", Key = Key.T, CommandView = checkBox };
 
-        checkBox.Activating += (_, _) => eventLog.Add ("CheckBox.Activating");
-        checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
+            List<string> eventLog = [];
+            CheckState? valueAtShortcutActivated = null;
 
-        shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
+            checkBox.Activating += (_, _) => eventLog.Add ("CheckBox.Activating");
+            checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
 
-        shortcut.Activated += (_, _) =>
-                              {
-                                  valueAtShortcutActivated = checkBox.Value;
-                                  eventLog.Add ("Shortcut.Activated");
-                              };
+            shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
 
-        // Act - Invoke Activate directly on the CheckBox (simulates bubble-up from click)
-        checkBox.InvokeCommand (Command.Activate);
+            shortcut.Activated += (_, _) =>
+                                  {
+                                      valueAtShortcutActivated = checkBox.Value;
+                                      eventLog.Add ("Shortcut.Activated");
+                                  };
 
-        // Assert - Verify ordering:
-        // CheckBox.Activated fires first (state change in OnActivated), then
-        // Shortcut.Activated fires via BubbleActivatedUp after CheckBox completes.
-        Assert.Equal (4, eventLog.Count);
-        Assert.Equal ("CheckBox.Activating", eventLog [0]);
-        Assert.Equal ("Shortcut.Activating", eventLog [1]);
-        Assert.Equal ("CheckBox.Activated", eventLog [2]);
-        Assert.Equal ("Shortcut.Activated", eventLog [3]);
+            // Act - Invoke Activate directly on the CheckBox (simulates bubble-up from click)
+            checkBox.InvokeCommand (Command.Activate);
 
-        // CheckBox.OnActivated toggled state BEFORE Shortcut.Activated fired
-        Assert.Equal (CheckState.Checked, checkBox.Value);
-        Assert.Equal (CheckState.Checked, valueAtShortcutActivated);
+            // Assert - Verify ordering:
+            // CheckBox.Activated fires first (state change in OnActivated), then
+            // Shortcut.Activated fires via BubbleActivatedUp after CheckBox completes.
+            Assert.Equal (4, eventLog.Count);
+            Assert.Equal ("CheckBox.Activating", eventLog [0]);
+            Assert.Equal ("Shortcut.Activating", eventLog [1]);
+            Assert.Equal ("CheckBox.Activated", eventLog [2]);
+            Assert.Equal ("Shortcut.Activated", eventLog [3]);
+
+            // CheckBox.OnActivated toggled state BEFORE Shortcut.Activated fired
+            Assert.Equal (CheckState.Checked, checkBox.Value);
+            Assert.Equal (CheckState.Checked, valueAtShortcutActivated);
+        }
     }
 
     // Claude - Opus 4.6
@@ -750,8 +757,11 @@ public partial class ShortcutTests
     [Fact]
     public void Activate_Cancelled_After_Dispatch_Does_Not_Fire_Activated ()
     {
-        CheckBox cb = new () { Title = "_Test" };
-        Shortcut shortcut = new () { Key = Key.T, CommandView = cb };
+        using IDisposable logging = TestLogging.Verbose (output);
+        Trace.CommandEnabled = true;
+
+        CheckBox cb = new () { Id = "cb", Title = "_Test" };
+        Shortcut shortcut = new () { Id = "shortcut", Key = Key.T, CommandView = cb };
         var activatedCount = 0;
         shortcut.Activated += (_, _) => activatedCount++;
 
@@ -777,8 +787,11 @@ public partial class ShortcutTests
     [Fact]
     public void Shortcut_Programmatic_Activate_Then_User_Click_Both_Fire_Action ()
     {
+        using IDisposable logging = TestLogging.Verbose (output);
+        Trace.CommandEnabled = true;
+
         var actionCount = 0;
-        CheckBox cb = new () { Title = "_Test" };
+        CheckBox cb = new () { Id = "cb", Title = "_Test" };
         Shortcut shortcut = new () { Key = Key.T, CommandView = cb, Action = () => actionCount++ };
 
         // Programmatic invoke (no binding → dispatch skipped, Action fires via OnActivated)
@@ -807,44 +820,49 @@ public partial class ShortcutTests
     [Fact]
     public void BubbleDown_Activate_Event_Ordering_With_Binding_Source ()
     {
-        // Arrange
-        CheckBox checkBox = new () { Title = "_Toggle", CanFocus = false };
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        Shortcut shortcut = new () { Key = Key.T, CommandView = checkBox };
+            // Arrange
+            CheckBox checkBox = new () { Id = "checkBox", Title = "_Toggle", CanFocus = false };
 
-        List<string> eventLog = [];
-        CheckState? valueAtShortcutActivated = null;
+            Shortcut shortcut = new () { Id = "shortcut", Key = Key.T, CommandView = checkBox };
 
-        checkBox.Activating += (_, _) => eventLog.Add ("CheckBox.Activating");
-        checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
+            List<string> eventLog = [];
+            CheckState? valueAtShortcutActivated = null;
 
-        shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
+            checkBox.Activating += (_, _) => eventLog.Add ("CheckBox.Activating");
+            checkBox.Activated += (_, _) => eventLog.Add ("CheckBox.Activated");
 
-        shortcut.Activated += (_, _) =>
-                              {
-                                  valueAtShortcutActivated = checkBox.Value;
-                                  eventLog.Add ("Shortcut.Activated");
-                              };
+            shortcut.Activating += (_, _) => eventLog.Add ("Shortcut.Activating");
 
-        // Act - Invoke Activate with a binding source (the Shortcut), which triggers DispatchDown
-        // to the CommandView. This simulates what happens on HotKey press or mouse click on
-        // the Shortcut's non-CommandView area (e.g., HelpView or KeyView).
-        KeyBinding binding = new ([Command.Activate], Key.T, shortcut);
-        CommandContext ctx = new (Command.Activate, new WeakReference<View> (shortcut), binding);
-        shortcut.InvokeCommand (Command.Activate, ctx);
+            shortcut.Activated += (_, _) =>
+                                  {
+                                      valueAtShortcutActivated = checkBox.Value;
+                                      eventLog.Add ("Shortcut.Activated");
+                                  };
 
-        // Assert - Shortcut.Activating fires first (notification before dispatch),
-        // then DispatchDown fires CommandView events. Shortcut.Activated fires after
-        // DispatchDown completes (synchronous dispatch ensures state is updated).
-        Assert.Equal (4, eventLog.Count);
-        Assert.Equal ("Shortcut.Activating", eventLog [0]);
-        Assert.Equal ("CheckBox.Activating", eventLog [1]);
-        Assert.Equal ("CheckBox.Activated", eventLog [2]);
-        Assert.Equal ("Shortcut.Activated", eventLog [3]);
+            // Act - Invoke Activate with a binding source (the Shortcut), which triggers DispatchDown
+            // to the CommandView. This simulates what happens on HotKey press or mouse click on
+            // the Shortcut's non-CommandView area (e.g., HelpView or KeyView).
+            KeyBinding binding = new ([Command.Activate], Key.T, shortcut);
+            CommandContext ctx = new (Command.Activate, new WeakReference<View> (shortcut), binding);
+            shortcut.InvokeCommand (Command.Activate, ctx);
 
-        // CheckBox should have toggled
-        Assert.Equal (CheckState.Checked, checkBox.Value);
-        Assert.Equal (CheckState.Checked, valueAtShortcutActivated);
+            // Assert - Shortcut.Activating fires first (notification before dispatch),
+            // then DispatchDown fires CommandView events. Shortcut.Activated fires after
+            // DispatchDown completes (synchronous dispatch ensures state is updated).
+            Assert.Equal (4, eventLog.Count);
+            Assert.Equal ("Shortcut.Activating", eventLog [0]);
+            Assert.Equal ("CheckBox.Activating", eventLog [1]);
+            Assert.Equal ("CheckBox.Activated", eventLog [2]);
+            Assert.Equal ("Shortcut.Activated", eventLog [3]);
+
+            // CheckBox should have toggled
+            Assert.Equal (CheckState.Checked, checkBox.Value);
+            Assert.Equal (CheckState.Checked, valueAtShortcutActivated);
+        }
     }
 
     // Claude - Opus 4.6
@@ -859,10 +877,13 @@ public partial class ShortcutTests
     [Fact]
     public void FlagSelector_CommandView_SubView_Activate_Does_Not_Duplicate ()
     {
-        // Arrange
-        FlagSelector flagSelector = new () { Values = [1, 2, 4], Labels = ["Flag1", "Flag2", "Flag3"] };
+        using IDisposable logging = TestLogging.Verbose (output);
+        Trace.CommandEnabled = true;
 
-        Shortcut shortcut = new () { Key = Key.F5, CommandView = flagSelector };
+        // Arrange
+        FlagSelector flagSelector = new () { Id = "flagSelector", Values = [1, 2, 4], Labels = ["Flag1", "Flag2", "Flag3"] };
+
+        Shortcut shortcut = new () { Id = "shortcut", Key = Key.F5, CommandView = flagSelector };
 
         // FlagSelector defaults Value to the first item (1) when Values is set.
         // Clear it so we can detect a single toggle.
@@ -917,10 +938,13 @@ public partial class ShortcutTests
     [Fact]
     public void OptionSelector_CommandView_Enter_Activates_And_Accepts ()
     {
-        // Arrange
-        OptionSelector optionSelector = new () { CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };
+        using IDisposable logging = TestLogging.Verbose (output);
+        Trace.CommandEnabled = true;
 
-        Shortcut shortcut = new () { Key = Key.F6, CommandView = optionSelector };
+        // Arrange
+        OptionSelector optionSelector = new () { Id = "optionSelector", CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };
+
+        Shortcut shortcut = new () { Id = "shortcut", Key = Key.F6, CommandView = optionSelector };
 
         Assert.Equal (0, optionSelector.Value); // First option is active by default
 
@@ -963,10 +987,13 @@ public partial class ShortcutTests
     [Fact]
     public void OptionSelector_CommandView_Direct_Accept_Activates_Focused_Item ()
     {
-        // Arrange
-        OptionSelector optionSelector = new () { CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };
+        using IDisposable logging = TestLogging.Verbose (output);
+        Trace.CommandEnabled = true;
 
-        Shortcut shortcut = new () { Key = Key.F6, CommandView = optionSelector };
+        // Arrange
+        OptionSelector optionSelector = new () { Id = "optionSelector", CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };
+
+        Shortcut shortcut = new () { Id = "shortcut", Key = Key.F6, CommandView = optionSelector };
 
         Assert.Equal (0, optionSelector.Value); // First option is active by default
 

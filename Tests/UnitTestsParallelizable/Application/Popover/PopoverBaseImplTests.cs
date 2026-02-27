@@ -1,7 +1,11 @@
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
+
 namespace ApplicationTests.Popover;
 
 [Collection ("Application Tests")]
-public class PopoverBaseImplTests
+public class PopoverBaseImplTests (ITestOutputHelper output)
 {
     // Minimal concrete implementation for testing
     private class TestPopover : PopoverBaseImpl
@@ -89,137 +93,164 @@ public class PopoverBaseImplTests
     [Fact]
     public void Target_Set_Creates_Bridge_Activated_Reaches_Target ()
     {
-        TestPopover popover = new ();
-        View target = new ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        popover.Target = new WeakReference<View> (target);
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
 
-        bool activatedFired = false;
-        ICommandContext? capturedCtx = null;
+            popover.Target = new WeakReference<View> (target);
 
-        target.Activated += (_, args) =>
-                            {
-                                activatedFired = true;
-                                capturedCtx = args.Value;
-                            };
+            var activatedCount = 0;
+            ICommandContext? capturedCtx = null;
 
-        popover.InvokeCommand (Command.Activate);
+            target.Activated += (_, args) =>
+                                {
+                                    activatedCount++;
+                                    capturedCtx = args.Value;
+                                };
 
-        Assert.True (activatedFired);
-        Assert.NotNull (capturedCtx);
-        Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, activatedCount);
+            Assert.NotNull (capturedCtx);
+            Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+        }
     }
 
     // Claude - Opus 4.6
     [Fact]
     public void Target_Set_Creates_Bridge_Accepted_Reaches_Target ()
     {
-        TestPopover popover = new ();
-        View target = new ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        popover.Target = new WeakReference<View> (target);
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
 
-        bool acceptedFired = false;
-        ICommandContext? capturedCtx = null;
+            popover.Target = new WeakReference<View> (target);
 
-        target.Accepted += (_, args) =>
-                           {
-                               acceptedFired = true;
-                               capturedCtx = args.Context;
-                           };
+            var acceptedCount = 0;
+            ICommandContext? capturedCtx = null;
 
-        popover.InvokeCommand (Command.Accept);
+            target.Accepted += (_, args) =>
+                               {
+                                   acceptedCount++;
+                                   capturedCtx = args.Context;
+                               };
 
-        Assert.True (acceptedFired);
-        Assert.NotNull (capturedCtx);
-        Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+            popover.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptedCount);
+            Assert.NotNull (capturedCtx);
+            Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+        }
     }
 
     // Claude - Opus 4.6
     [Fact]
     public void Target_Activated_Bubbles_Through_Target_SuperView_Chain ()
     {
-        TestPopover popover = new ();
-        View target = new ();
-        View superView = new () { CommandsToBubbleUp = [Command.Activate] };
-        superView.Add (target);
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        popover.Target = new WeakReference<View> (target);
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
+            View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+            superView.Add (target);
 
-        bool superViewActivatedFired = false;
+            popover.Target = new WeakReference<View> (target);
 
-        superView.Activated += (_, _) =>
-                               {
-                                   superViewActivatedFired = true;
-                               };
+            var superViewActivatedCount = 0;
 
-        popover.InvokeCommand (Command.Activate);
+            superView.Activated += (_, _) => { superViewActivatedCount++; };
 
-        Assert.True (superViewActivatedFired);
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, superViewActivatedCount);
+        }
     }
 
     // Claude - Opus 4.6
     [Fact]
     public void Target_Changed_Disposes_Old_Bridge_Uses_New ()
     {
-        TestPopover popover = new ();
-        View viewA = new ();
-        View viewB = new ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        popover.Target = new WeakReference<View> (viewA);
+            TestPopover popover = new ();
+            View viewA = new () { Id = "viewA" };
+            View viewB = new () { Id = "viewB" };
 
-        // Change target to viewB
-        popover.Target = new WeakReference<View> (viewB);
+            popover.Target = new WeakReference<View> (viewA);
 
-        bool viewAActivated = false;
-        bool viewBActivated = false;
+            // Change target to viewB
+            popover.Target = new WeakReference<View> (viewB);
 
-        viewA.Activated += (_, _) => { viewAActivated = true; };
-        viewB.Activated += (_, _) => { viewBActivated = true; };
+            var viewAActivatedCount = 0;
+            var viewBActivatedCount = 0;
 
-        popover.InvokeCommand (Command.Activate);
+            viewA.Activated += (_, _) => { viewAActivatedCount++; };
+            viewB.Activated += (_, _) => { viewBActivatedCount++; };
 
-        Assert.False (viewAActivated);
-        Assert.True (viewBActivated);
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (0, viewAActivatedCount);
+            Assert.Equal (1, viewBActivatedCount);
+        }
     }
 
     // Claude - Opus 4.6
     [Fact]
     public void Target_Set_Null_Disposes_Bridge ()
     {
-        TestPopover popover = new ();
-        View target = new ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        popover.Target = new WeakReference<View> (target);
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
 
-        // Now set target to null
-        popover.Target = null;
+            popover.Target = new WeakReference<View> (target);
 
-        bool activatedFired = false;
-        target.Activated += (_, _) => { activatedFired = true; };
+            // Now set target to null
+            popover.Target = null;
 
-        popover.InvokeCommand (Command.Activate);
+            var activatedCount = 0;
+            target.Activated += (_, _) => { activatedCount++; };
 
-        Assert.False (activatedFired);
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (0, activatedCount);
+        }
     }
 
     // Claude - Opus 4.6
     [Fact]
     public void Dispose_Cleans_Up_Target_Bridge ()
     {
-        TestPopover popover = new ();
-        View target = new ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        popover.Target = new WeakReference<View> (target);
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
 
-        popover.Dispose ();
+            popover.Target = new WeakReference<View> (target);
 
-        bool activatedFired = false;
-        target.Activated += (_, _) => { activatedFired = true; };
+            popover.Dispose ();
 
-        // The popover is disposed, so invoking a command on it should not bridge
-        popover.InvokeCommand (Command.Activate);
+            var activatedCount = 0;
+            target.Activated += (_, _) => { activatedCount++; };
 
-        Assert.False (activatedFired);
+            // The popover is disposed, so invoking a command on it should not bridge
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (0, activatedCount);
+        }
     }
 }

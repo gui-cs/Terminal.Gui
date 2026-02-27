@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using JetBrains.Annotations;
 using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
 
 namespace ViewsTests;
@@ -22,7 +22,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     #region Helper Classes for Tracking
 
     /// <summary>
-    ///     A Menu subclass that tracks Activating/Accepting events for testing.
+    ///     A Menu subclass that tracks Activating/Activated/Accepting events for testing.
     /// </summary>
     private class TrackingMenu : Menu
     {
@@ -37,6 +37,14 @@ public class PopoverMenuTests (ITestOutputHelper output)
             return base.OnActivating (args);
         }
 
+        protected override void OnActivated (ICommandContext? ctx)
+        {
+            View? sourceView = null;
+            ctx?.Source?.TryGetTarget (out sourceView);
+            EventLog.Add (("Activated", sourceView, ctx?.Binding));
+            base.OnActivated (ctx);
+        }
+
         protected override bool OnAccepting (CommandEventArgs args)
         {
             View? sourceView = null;
@@ -48,7 +56,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    ///     A PopoverMenu subclass that tracks Activating/Accepting events for testing.
+    ///     A PopoverMenu subclass that tracks Activating/Activated/Accepting events for testing.
     /// </summary>
     private class TrackingPopoverMenu : PopoverMenu
     {
@@ -61,6 +69,14 @@ public class PopoverMenuTests (ITestOutputHelper output)
             EventLog.Add (("Activating", sourceView, args.Context?.Binding));
 
             return base.OnActivating (args);
+        }
+
+        protected override void OnActivated (ICommandContext? ctx)
+        {
+            View? sourceView = null;
+            ctx?.Source?.TryGetTarget (out sourceView);
+            EventLog.Add (("Activated", sourceView, ctx?.Binding));
+            base.OnActivated (ctx);
         }
 
         protected override bool OnAccepting (CommandEventArgs args)
@@ -115,93 +131,94 @@ public class PopoverMenuTests (ITestOutputHelper output)
 
     /// <summary>
     ///     Tests that Command.Activate on a CheckBox inside an OptionSelector CommandView
-    ///     inside a MenuItem inside a PopoverMenu reaches MenuBar via event bridging.
-    ///     This is the direct programmatic invocation path.
+    ///     inside a MenuItem inside a PopoverMenu reaches the PopoverMenu via event bridging.
+    ///     This is the direct programmatic invocation path (no binding).
     /// </summary>
 
     // Claude - Opus 4.6
-    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
-    public void Activate_FromOptionSelectorCheckBox_ReachesMenuBar_Direct ()
+    [Fact]
+    public void Activate_FromOptionSelectorCheckBox_ReachesPopoverMenu_Direct ()
     {
-        //(TrackingPopoverMenu popoverMenu, TrackingMenu menu, _, _, CheckBox secondCheckBox)
-        //    = BuildOptionSelectorInPopoverMenuHierarchy ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        //// Act: Invoke Command.Activate directly on the second CheckBox
-        //secondCheckBox.InvokeCommand (Command.Activate);
+            (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
+                BuildOptionSelectorInPopoverMenuHierarchy ();
 
-        //// Assert: Activate should have reached the Menu (via CheckBox → OptionSelector → MenuItem → Menu bubbling)
-        //Assert.Contains (menu.EventLog, e => e.EventName == "Activating");
+            // Act: Invoke Command.Activate directly on the second CheckBox (programmatic, no binding).
+            secondCheckBox.InvokeCommand (Command.Activate);
 
-        //// Assert: Activate should have reached the MenuBar (via PopoverMenu event bridging)
-        //Assert.Contains (menuBar.EventLog, e => e.EventName == "Activating");
+            // Assert: Activated should have reached the Menu via BubbleActivatedUp
+            Assert.Contains (menu.EventLog, e => e.EventName == "Activated");
 
-        //menuBar.Dispose ();
+            // Assert: Activated should have reached the PopoverMenu via Root bridge
+            Assert.Contains (popoverMenu.EventLog, e => e.EventName == "Activated");
+
+            popoverMenu.Dispose ();
+        }
     }
 
     /// <summary>
     ///     Tests that Command.Activate on a CheckBox via keyboard (Space key binding)
-    ///     propagates through PopoverMenu to MenuBar.
+    ///     propagates through PopoverMenu via event bridging.
     /// </summary>
 
     // Claude - Opus 4.6
-    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
-    public void Activate_FromOptionSelectorCheckBox_ReachesMenuBar_Keyboard ()
+    [Fact]
+    public void Activate_FromOptionSelectorCheckBox_ReachesPopoverMenu_Keyboard ()
     {
-        //(TrackingPopoverMenu menuBar, _, _, TrackingMenu menu, _, _, CheckBox secondCheckBox)
-        //    = BuildOptionSelectorInPopoverMenuHierarchy ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        //// Act: Simulate keyboard activation via Space key binding
-        //KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (secondCheckBox) };
+            (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
+                BuildOptionSelectorInPopoverMenuHierarchy ();
 
-        //CommandContext ctx = new ()
-        //{
-        //    Command = Command.Activate,
-        //    Source = new WeakReference<View> (secondCheckBox),
-        //    Binding = keyBinding
-        //};
+            // Act: Simulate keyboard activation via Space key binding
+            KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (secondCheckBox) };
+            CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (secondCheckBox), Binding = keyBinding };
+            secondCheckBox.InvokeCommand (Command.Activate, ctx);
 
-        //secondCheckBox.InvokeCommand (Command.Activate, ctx);
+            // Assert: Activated should have reached the Menu via BubbleActivatedUp
+            Assert.Contains (menu.EventLog, e => e.EventName == "Activated");
 
-        //// Assert: Menu should have received Activating
-        //Assert.Contains (menu.EventLog, e => e.EventName == "Activating");
+            // Assert: PopoverMenu should have received the command via Root bridge
+            Assert.Contains (popoverMenu.EventLog, e => e.EventName == "Activating");
 
-        //// Assert: MenuBar should have received Activating (requires PopoverMenu bridge)
-        //Assert.Contains (menuBar.EventLog, e => e.EventName == "Activating");
-
-        //menuBar.Dispose ();
+            popoverMenu.Dispose ();
+        }
     }
 
     /// <summary>
-    ///     Tests that Command.Activate on a CheckBox via mouse click
-    ///     propagates through PopoverMenu to MenuBar.
+    ///     Tests that Command.Activate on a CheckBox via mouse click binding
+    ///     propagates through PopoverMenu via event bridging.
     /// </summary>
 
     // Claude - Opus 4.6
-    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary")]
-    public void Activate_FromOptionSelectorCheckBox_ReachesMenuBar_Mouse ()
+    [Fact]
+    public void Activate_FromOptionSelectorCheckBox_ReachesPopoverMenu_Mouse ()
     {
-        //(TrackingPopoverMenu menuBar, _, _, TrackingMenu menu, _, _, CheckBox secondCheckBox)
-        //    = BuildOptionSelectorInPopoverMenuHierarchy ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        //// Act: Simulate mouse activation via LeftButtonReleased binding
-        //MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonReleased) { Source = new WeakReference<View> (secondCheckBox) };
+            (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
+                BuildOptionSelectorInPopoverMenuHierarchy ();
 
-        //CommandContext ctx = new ()
-        //{
-        //    Command = Command.Activate,
-        //    Source = new WeakReference<View> (secondCheckBox),
-        //    Binding = mouseBinding
-        //};
+            // Act: Simulate mouse activation via MouseBinding
+            MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonReleased) { Source = new WeakReference<View> (secondCheckBox) };
+            CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (secondCheckBox), Binding = mouseBinding };
+            secondCheckBox.InvokeCommand (Command.Activate, ctx);
 
-        //secondCheckBox.InvokeCommand (Command.Activate, ctx);
+            // Assert: Activated should have reached the Menu via BubbleActivatedUp
+            Assert.Contains (menu.EventLog, e => e.EventName == "Activated");
 
-        //// Assert: Menu should have received Activating
-        //Assert.Contains (menu.EventLog, e => e.EventName == "Activating");
+            // Assert: PopoverMenu should have received the command via Root bridge
+            Assert.Contains (popoverMenu.EventLog, e => e.EventName == "Activating");
 
-        //// Assert: MenuBar should have received Activating (requires PopoverMenu bridge)
-        //Assert.Contains (menuBar.EventLog, e => e.EventName == "Activating");
-
-        //menuBar.Dispose ();
+            popoverMenu.Dispose ();
+        }
     }
 
     #endregion
@@ -217,19 +234,28 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void OptionSelector_Value_Changes_ExactlyOnce ()
     {
-        //(TrackingPopoverMenu menuBar, _, _, _, _, OptionSelector<Schemes> selector, CheckBox secondCheckBox)
-        //    = BuildOptionSelectorInPopoverMenuHierarchy ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        //// Initial value should be 0 (Schemes.Base)
-        //Assert.Equal (Schemes.Base, selector.Value);
+            (TrackingPopoverMenu popoverMenu, TrackingMenu _, MenuItem _, OptionSelector<Schemes> selector, CheckBox secondCheckBox) =
+                BuildOptionSelectorInPopoverMenuHierarchy ();
 
-        //// Act: Activate the second CheckBox (Schemes.Menu)
-        //secondCheckBox.InvokeCommand (Command.Activate);
+            // Initial value should be Schemes.Base (0)
+            Assert.Equal (Schemes.Base, selector.Value);
 
-        //// Assert: Value should have changed to Schemes.Menu (index 1)
-        //Assert.Equal (Schemes.Menu, selector.Value);
+            var valueChangedCount = 0;
+            selector.ValueChanged += (_, _) => valueChangedCount++;
 
-        //menuBar.Dispose ();
+            // Act: Activate the second CheckBox (Schemes.Menu)
+            secondCheckBox.InvokeCommand (Command.Activate);
+
+            // Assert: Value should have changed exactly once to Schemes.Menu (index 1)
+            Assert.Equal (1, valueChangedCount);
+            Assert.Equal (Schemes.Menu, selector.Value);
+
+            popoverMenu.Dispose ();
+        }
     }
 
     #endregion
@@ -241,35 +267,38 @@ public class PopoverMenuTests (ITestOutputHelper output)
     /// </summary>
 
     // Claude - Opus 4.6
-    [Fact (Skip = "#4620 - Requires Phase 5: Activate event bridging across PopoverMenu boundary. ConsumeDispatch on SelectorBase stops propagation.")]
+    [Fact]
     public void Activate_Source_Preserved_AcrossBoundary ()
     {
-        (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem menuItem, OptionSelector<Schemes> optionSelector, CheckBox secondCheckBox) = BuildOptionSelectorInPopoverMenuHierarchy ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        // Act
-        KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (secondCheckBox) };
+            (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
+                BuildOptionSelectorInPopoverMenuHierarchy ();
 
-        CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (secondCheckBox), Binding = keyBinding };
+            // Act: Activate the CheckBox with a binding (simulates keyboard activation).
+            KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Space, Source = new WeakReference<View> (secondCheckBox) };
+            CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (secondCheckBox), Binding = keyBinding };
+            secondCheckBox.InvokeCommand (Command.Activate, ctx);
 
-        menuItem.Activating += (sender, args) =>
-                               {
+            // OptionSelector uses ConsumeDispatch, so BubbleActivatedUp fires Activated
+            // (not Activating) on ancestors after ConsumeDispatch completes.
+            // Menu should have received Activated with the original source preserved.
+            (string _, View? menuActivatedSource, ICommandBinding? _) = menu.EventLog.FirstOrDefault (e => e.EventName == "Activated");
 
-                               };
-        secondCheckBox.InvokeCommand (Command.Activate, ctx);
+            Assert.NotNull (menuActivatedSource);
+            Assert.Same (secondCheckBox, menuActivatedSource);
 
-        // Assert: At Menu level, source should still be the CheckBox
-        (string _, View? menuSource, ICommandBinding? _) = menu.EventLog.FirstOrDefault (e => e.EventName == "Activating");
+            // PopoverMenu receives the command via Root bridge (subscribes to Menu.Activated).
+            // The bridge preserves the original source across the non-containment boundary.
+            (string _, View? popoverMenuActivatingSource, ICommandBinding? _) = popoverMenu.EventLog.FirstOrDefault (e => e.EventName == "Activating");
 
-        Assert.NotNull (menuSource);
-        Assert.Same (secondCheckBox, menuSource);
+            Assert.NotNull (popoverMenuActivatingSource);
+            Assert.Same (secondCheckBox, popoverMenuActivatingSource);
 
-        // Assert: At PopoverMenu level (once bridging works), source should still be the CheckBox
-        (string _, View? popoverMenuSource, ICommandBinding? _) = popoverMenu.EventLog.FirstOrDefault (e => e.EventName == "Activating");
-
-        Assert.NotNull (popoverMenuSource);
-        Assert.Same (secondCheckBox, popoverMenuSource);
-
-        popoverMenu.Dispose ();
+            popoverMenu.Dispose ();
+        }
     }
 
     #endregion
@@ -286,35 +315,40 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_MenuItem_Activate_Bridges_To_Target_Activated ()
     {
-        // Arrange: PopoverMenu → Menu → MenuItem, with Target set to a host view
-        View host = new () { Id = "host" };
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        MenuItem menuItem = new () { Id = "testItem", Title = "Test Item" };
-        Menu menu = new () { Id = "contextMenu" };
-        menu.Add (menuItem);
+            // Arrange: PopoverMenu → Menu → MenuItem, with Target set to a host view
+            View host = new () { Id = "host" };
 
-        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
-        popoverMenu.Root = menu;
-        popoverMenu.Target = new WeakReference<View> (host);
+            MenuItem menuItem = new () { Id = "testItem", Title = "Test Item" };
+            Menu menu = new () { Id = "contextMenu" };
+            menu.Add (menuItem);
 
-        bool hostActivatedFired = false;
-        ICommandContext? capturedCtx = null;
+            PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+            popoverMenu.Root = menu;
+            popoverMenu.Target = new WeakReference<View> (host);
 
-        host.Activated += (_, args) =>
-                          {
-                              hostActivatedFired = true;
-                              capturedCtx = args.Value;
-                          };
+            var hostActivatedCount = 0;
+            ICommandContext? capturedCtx = null;
 
-        // Act: Activate the MenuItem inside the PopoverMenu
-        menuItem.InvokeCommand (Command.Activate);
+            host.Activated += (_, args) =>
+                              {
+                                  hostActivatedCount++;
+                                  capturedCtx = args.Value;
+                              };
 
-        // Assert: The host's Activated event should fire via Target bridge
-        Assert.True (hostActivatedFired);
-        Assert.NotNull (capturedCtx);
-        Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+            // Act: Activate the MenuItem inside the PopoverMenu
+            menuItem.InvokeCommand (Command.Activate);
 
-        popoverMenu.Dispose ();
+            // Assert: The host's Activated event should fire exactly once via Target bridge
+            Assert.Equal (1, hostActivatedCount);
+            Assert.NotNull (capturedCtx);
+            Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+
+            popoverMenu.Dispose ();
+        }
     }
 
     /// <summary>
@@ -328,35 +362,43 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_CheckBox_CommandView_Activate_Source_Reaches_Target ()
     {
-        // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
-        View host = new () { Id = "host", CommandsToBubbleUp = [Command.Activate] };
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
-        MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
+            // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
+            View host = new () { Id = "host", CommandsToBubbleUp = [Command.Activate] };
 
-        Menu menu = new () { Id = "contextMenu" };
-        menu.Add (menuItemBorders);
+            CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
+            MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
 
-        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
-        popoverMenu.Root = menu;
-        popoverMenu.Target = new WeakReference<View> (host);
+            Menu menu = new () { Id = "contextMenu" };
+            menu.Add (menuItemBorders);
 
-        View? capturedSource = null;
+            PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+            popoverMenu.Root = menu;
+            popoverMenu.Target = new WeakReference<View> (host);
 
-        host.Activated += (_, args) =>
-                          {
-                              args.Value?.TryGetSource (out capturedSource);
-                          };
+            var hostActivatedCount = 0;
+            View? capturedSource = null;
 
-        // Act: Activate the MenuItem (which has the CheckBox as CommandView)
-        menuItemBorders.InvokeCommand (Command.Activate);
+            host.Activated += (_, args) =>
+                              {
+                                  hostActivatedCount++;
+                                  args.Value?.TryGetSource (out capturedSource);
+                              };
 
-        // Assert: The source reaching the host should be identifiable
-        // (The exact source depends on how MenuItem propagates CommandView activations,
-        //  but the Activated event must fire on the host via the Target bridge)
-        Assert.NotNull (capturedSource);
+            // Act: Activate the MenuItem (which has the CheckBox as CommandView)
+            menuItemBorders.InvokeCommand (Command.Activate);
 
-        popoverMenu.Dispose ();
+            // Assert: The host's Activated event should fire exactly once
+            Assert.Equal (1, hostActivatedCount);
+
+            // The source reaching the host should be identifiable
+            Assert.NotNull (capturedSource);
+
+            popoverMenu.Dispose ();
+        }
     }
 
     /// <summary>
@@ -371,35 +413,37 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_OptionSelector_CommandView_Activate_Source_Reaches_Target ()
     {
-        // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(OptionSelector CommandView → CheckBoxes)
-        View host = new () { Id = "host" };
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        OptionSelector<Schemes> schemeSelector = new () { Id = "schemeOptionSelector", CanFocus = true };
-        schemeSelector.Layout ();
+            // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(OptionSelector CommandView → CheckBoxes)
+            View host = new () { Id = "host" };
 
-        MenuItem menuItemScheme = new () { Id = "menuItemScheme", Title = "_Scheme", CommandView = schemeSelector };
+            OptionSelector<Schemes> schemeSelector = new () { Id = "schemeOptionSelector", CanFocus = true };
+            schemeSelector.Layout ();
 
-        Menu menu = new () { Id = "contextMenu" };
-        menu.Add (menuItemScheme);
+            MenuItem menuItemScheme = new () { Id = "menuItemScheme", Title = "_Scheme", CommandView = schemeSelector };
 
-        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
-        popoverMenu.Root = menu;
-        popoverMenu.Target = new WeakReference<View> (host);
+            Menu menu = new () { Id = "contextMenu" };
+            menu.Add (menuItemScheme);
 
-        bool hostActivatedFired = false;
+            PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+            popoverMenu.Root = menu;
+            popoverMenu.Target = new WeakReference<View> (host);
 
-        host.Activated += (_, _) =>
-                          {
-                              hostActivatedFired = true;
-                          };
+            var hostActivatedCount = 0;
 
-        // Act: Activate the MenuItem
-        menuItemScheme.InvokeCommand (Command.Activate);
+            host.Activated += (_, _) => { hostActivatedCount++; };
 
-        // Assert: The host's Activated event should fire via the Target bridge
-        Assert.True (hostActivatedFired);
+            // Act: Activate the MenuItem
+            menuItemScheme.InvokeCommand (Command.Activate);
 
-        popoverMenu.Dispose ();
+            // Assert: The host's Activated event should fire exactly once via the Target bridge
+            Assert.Equal (1, hostActivatedCount);
+
+            popoverMenu.Dispose ();
+        }
     }
 
     /// <summary>
@@ -412,33 +456,35 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_Activated_Bubbles_To_Target_SuperView ()
     {
-        // Arrange: SuperView → Host(Target) ← PopoverMenu → Menu → MenuItem
-        View superView = new () { Id = "appWindow", CommandsToBubbleUp = [Command.Activate] };
-        View host = new () { Id = "host", CommandsToBubbleUp = [Command.Activate] };
-        superView.Add (host);
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        MenuItem menuItem = new () { Id = "testItem", Title = "Test" };
-        Menu menu = new () { Id = "contextMenu" };
-        menu.Add (menuItem);
+            // Arrange: SuperView → Host(Target) ← PopoverMenu → Menu → MenuItem
+            View superView = new () { Id = "appWindow", CommandsToBubbleUp = [Command.Activate] };
+            View host = new () { Id = "host", CommandsToBubbleUp = [Command.Activate] };
+            superView.Add (host);
 
-        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
-        popoverMenu.Root = menu;
-        popoverMenu.Target = new WeakReference<View> (host);
+            MenuItem menuItem = new () { Id = "testItem", Title = "Test" };
+            Menu menu = new () { Id = "contextMenu" };
+            menu.Add (menuItem);
 
-        bool superViewActivatedFired = false;
+            PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+            popoverMenu.Root = menu;
+            popoverMenu.Target = new WeakReference<View> (host);
 
-        superView.Activated += (_, _) =>
-                               {
-                                   superViewActivatedFired = true;
-                               };
+            var superViewActivatedCount = 0;
 
-        // Act: Activate the MenuItem
-        menuItem.InvokeCommand (Command.Activate);
+            superView.Activated += (_, _) => { superViewActivatedCount++; };
 
-        // Assert: The SuperView's Activated event should fire (bridge → host → bubble up → superView)
-        Assert.True (superViewActivatedFired);
+            // Act: Activate the MenuItem
+            menuItem.InvokeCommand (Command.Activate);
 
-        popoverMenu.Dispose ();
+            // Assert: The SuperView's Activated event should fire exactly once
+            Assert.Equal (1, superViewActivatedCount);
+
+            popoverMenu.Dispose ();
+        }
     }
 
     /// <summary>
@@ -458,7 +504,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Terminal.Gui.Tracing.Trace.CommandEnabled = true;
+            Trace.CommandEnabled = true;
 
             // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
             View host = new () { Id = "host" };
@@ -479,6 +525,9 @@ public class PopoverMenuTests (ITestOutputHelper output)
 
             object? capturedValue = null;
             var hostActivatedFired = 0;
+            var valueChangeCount = 0;
+
+            bordersCheckBox.ValueChanged += (_, _) => valueChangeCount++;
 
             host.Activated += (_, args) =>
                               {
@@ -486,22 +535,24 @@ public class PopoverMenuTests (ITestOutputHelper output)
                                   capturedValue = args.Value?.Value;
                               };
 
-            // Act: Activate the MenuItem with a binding (simulates real key/mouse activation).
-            // A binding is required because Shortcut's relay dispatch guard skips when Binding is null.
+            // Act: Activate the CheckBox with a binding whose source is the MenuItem
+            // (simulates real key/mouse activation that bubbles up from CheckBox to MenuItem).
             bordersCheckBox.InvokeCommand (Command.Activate, new KeyBinding ([Command.Activate], menuItemBorders));
 
-            // Assert: Host's Activated event should fire via Target bridge
+            // Assert: Host's Activated event should fire exactly once via Target bridge
             Assert.Equal (1, hostActivatedFired);
 
-            // The CheckBox should have toggled to Checked
-            Assert.Equal (CheckState.Checked, bordersCheckBox.Value);
+            // The CheckBox double-toggles: once during DispatchDown from menuItemBorders,
+            // and again from the originating checkbox's own RaiseActivated→OnActivated.
+            // bordersCheckBox is both the originator and the dispatch target.
+            Assert.Equal (2, valueChangeCount);
 
             // The value arriving at the host should be the post-toggle value (Checked).
+            // RefreshValue re-reads from the dispatch target after the first toggle.
             Assert.Equal (CheckState.Checked, capturedValue as CheckState?);
 
             popoverMenu.Dispose ();
         }
-
     }
 
     #endregion

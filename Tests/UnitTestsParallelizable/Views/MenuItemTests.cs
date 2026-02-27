@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel;
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class MenuItemTests
+public class MenuItemTests (ITestOutputHelper output)
 {
     /// <summary>Test view that exposes AddCommand publicly for testing.</summary>
     private class TestTargetView : View
@@ -527,24 +530,32 @@ public class MenuItemTests
     [Fact]
     public void MenuItem_InvokeCommand_Activate_ContextValue_Contains_Title ()
     {
-        MenuItem menuItem = new () { Title = "TestItem" };
+        using (TestLogging.Verbose (output))
+        {
+            Trace.CommandEnabled = true;
 
-        menuItem.BeginInit ();
-        menuItem.EndInit ();
+            MenuItem menuItem = new () { Title = "TestItem" };
 
-        ICommandContext? capturedContext = null;
+            menuItem.BeginInit ();
+            menuItem.EndInit ();
 
-        menuItem.Activating += (_, args) =>
-                               {
-                                   capturedContext = args.Context;
-                               };
+            ICommandContext? capturedContext = null;
+            var activatingCount = 0;
 
-        menuItem.InvokeCommand (Command.Activate);
+            menuItem.Activating += (_, args) =>
+                                   {
+                                       activatingCount++;
+                                       capturedContext = args.Context;
+                                   };
 
-        Assert.NotNull (capturedContext);
-        Assert.Equal ("TestItem", capturedContext!.Value);
+            menuItem.InvokeCommand (Command.Activate);
 
-        menuItem.Dispose ();
+            Assert.Equal (1, activatingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal ("TestItem", capturedContext!.Value);
+
+            menuItem.Dispose ();
+        }
     }
 
     #endregion IValue Implementation

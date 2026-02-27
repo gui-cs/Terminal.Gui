@@ -1,10 +1,12 @@
 using System.Text;
 using JetBrains.Annotations;
+using Terminal.Gui.Tests;
+using Xunit.Abstractions;
 
 namespace ViewsTests;
 
 [TestSubject (typeof (Shortcut))]
-public partial class ShortcutTests
+public partial class ShortcutTests (ITestOutputHelper output)
 {
     // CommandView Test view for Shortcut tests
     private sealed class TestCommandView : View, IValue<int?>
