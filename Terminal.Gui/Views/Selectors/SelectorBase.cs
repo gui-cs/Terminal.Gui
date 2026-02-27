@@ -46,6 +46,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         AddCommand (Command.Left, () => MovePrevious (Command.Left));
     }
 
+    // Stores the int value for each checkbox (replaced use of Data property)
+    private readonly Dictionary<CheckBox, int> _checkBoxValues = new ();
+
     private bool MoveNext (Command command)
     {
         if ((command == Command.Down && Orientation == Orientation.Horizontal) || (command == Command.Right && Orientation == Orientation.Vertical))
@@ -375,6 +378,12 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
         {
+            // Clean up checkbox value mapping (replaced use of Data property)
+            if (sv is CheckBox cb)
+            {
+                _checkBoxValues.Remove (cb);
+            }
+
             sv.Dispose ();
         }
 
@@ -425,12 +434,30 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             CanFocus = true,
             Title = label,
             Id = label,
-            Data = value,
             MouseHighlightStates = DefaultMouseHighlightStates,
             TabStop = TabBehavior
         };
 
+        // Store value in dictionary (replaced use of Data property)
+        _checkBoxValues [checkbox] = value;
+
         return checkbox;
+    }
+
+    /// <summary>
+    ///     Gets the int value associated with a checkbox. For testing and advanced scenarios.
+    /// </summary>
+    /// <param name="checkbox">The checkbox to get the value for</param>
+    /// <returns>The integer value associated with the checkbox</returns>
+    /// <exception cref="InvalidOperationException">If the checkbox is not found or not part of this selector</exception>
+    public int GetCheckBoxValue (CheckBox checkbox)
+    {
+        if (_checkBoxValues.TryGetValue (checkbox, out int value))
+        {
+            return value;
+        }
+
+        throw new InvalidOperationException ("CheckBox value not found");
     }
 
     private int _horizontalSpace = 2;
