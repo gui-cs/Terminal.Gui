@@ -721,6 +721,8 @@ public partial class View // Command APIs
             return ctx;
         }
 
+        Trace.Command (this, ctx, "Value");
+
         if (GetDispatchTarget (ctx) is IValue targetValue)
         {
             return cc.WithValue (targetValue.GetValue ());

@@ -1,4 +1,7 @@
+using System.Diagnostics;
 using JetBrains.Annotations;
+using Terminal.Gui.Tests;
+using Xunit.Abstractions;
 
 namespace ViewsTests;
 
@@ -14,7 +17,7 @@ namespace ViewsTests;
 ///     </code>
 /// </summary>
 [TestSubject (typeof (PopoverMenu))]
-public class PopoverMenuTests
+public class PopoverMenuTests (ITestOutputHelper output)
 {
     #region Helper Classes for Tracking
 
@@ -453,46 +456,52 @@ public class PopoverMenuTests
     [Fact]
     public void Target_CheckBox_CommandView_Activate_Source_Reaches_Target_And_Value_Is_Correct ()
     {
-        // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
-        View host = new () { Id = "host" };
+        using (TestLogging.Verbose (output))
+        {
+            Terminal.Gui.Tracing.Trace.CommandEnabled = true;
 
-        CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
+            // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
+            View host = new () { Id = "host" };
 
-        // CheckBox starts UnChecked
-        Assert.Equal (CheckState.UnChecked, bordersCheckBox.Value);
+            CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
 
-        MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
+            // CheckBox starts UnChecked
+            Assert.Equal (CheckState.UnChecked, bordersCheckBox.Value);
 
-        Menu menu = new () { Id = "contextMenu" };
-        menu.Add (menuItemBorders);
+            MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
 
-        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
-        popoverMenu.Root = menu;
-        popoverMenu.Target = new WeakReference<View> (host);
+            Menu menu = new () { Id = "contextMenu" };
+            menu.Add (menuItemBorders);
 
-        object? capturedValue = null;
-        bool hostActivatedFired = false;
+            PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+            popoverMenu.Root = menu;
+            popoverMenu.Target = new WeakReference<View> (host);
 
-        host.Activated += (_, args) =>
-                          {
-                              hostActivatedFired = true;
-                              capturedValue = args.Value?.Value;
-                          };
+            object? capturedValue = null;
+            var hostActivatedFired = 0;
 
-        // Act: Activate the MenuItem with a binding (simulates real key/mouse activation).
-        // A binding is required because Shortcut's relay dispatch guard skips when Binding is null.
-        menuItemBorders.InvokeCommand (Command.Activate, new KeyBinding ([Command.Activate], menuItemBorders));
+            host.Activated += (_, args) =>
+                              {
+                                  hostActivatedFired++;
+                                  capturedValue = args.Value?.Value;
+                              };
 
-        // The CheckBox should have toggled to Checked
-        Assert.Equal (CheckState.Checked, bordersCheckBox.Value);
+            // Act: Activate the MenuItem with a binding (simulates real key/mouse activation).
+            // A binding is required because Shortcut's relay dispatch guard skips when Binding is null.
+            bordersCheckBox.InvokeCommand (Command.Activate, new KeyBinding ([Command.Activate], menuItemBorders));
 
-        // Assert: Host's Activated event should fire via Target bridge
-        Assert.True (hostActivatedFired);
+            // Assert: Host's Activated event should fire via Target bridge
+            Assert.Equal (1, hostActivatedFired);
 
-        // The value arriving at the host should be the post-toggle value (Checked).
-        Assert.Equal (CheckState.Checked, capturedValue as CheckState?);
+            // The CheckBox should have toggled to Checked
+            Assert.Equal (CheckState.Checked, bordersCheckBox.Value);
 
-        popoverMenu.Dispose ();
+            // The value arriving at the host should be the post-toggle value (Checked).
+            Assert.Equal (CheckState.Checked, capturedValue as CheckState?);
+
+            popoverMenu.Dispose ();
+        }
+
     }
 
     #endregion
