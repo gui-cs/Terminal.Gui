@@ -470,7 +470,7 @@ public partial class TextView
 
             if (CurrentColumn < Viewport.X)
             {
-                Viewport = Viewport with { X = Viewport.X - 1 };
+                SetNeedsDraw ();
             }
         }
         else
@@ -971,7 +971,7 @@ public partial class TextView
 
         if (CurrentRow >= Viewport.Y + Viewport.Height)
         {
-            Viewport = Viewport with { Y = Viewport.Y + 1 };
+            SetNeedsDraw ();
         }
 
         CurrentColumn = 0;
@@ -980,7 +980,7 @@ public partial class TextView
 
         if (!_wordWrap && CurrentColumn < Viewport.X)
         {
-            Viewport = Viewport with { X = 0 };
+            SetNeedsDraw ();
         }
 
         SetNeedsDraw ();

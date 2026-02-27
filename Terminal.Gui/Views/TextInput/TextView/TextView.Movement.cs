@@ -7,7 +7,12 @@ public partial class TextView
     {
         CurrentRow = _model.Count - 1;
         List<Cell> line = GetCurrentLine ();
-        CurrentColumn = line.Count;
+        CurrentColumn = line.Count + 1;
+
+        if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn > Viewport.X + Viewport.Width)
+        {
+            SetNeedsDraw ();
+        }
         TrackColumn ();
         DoNeededAction ();
 
@@ -177,7 +182,6 @@ public partial class TextView
         }
 
         CurrentColumn = 0;
-        Viewport = Viewport with { X = 0 };
         DoNeededAction ();
 
         return true;

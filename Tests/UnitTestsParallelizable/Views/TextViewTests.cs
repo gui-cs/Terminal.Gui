@@ -2874,5 +2874,61 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (expectedCursorY, textView.Cursor.Position!.Value.Y);
     }
 
+    [Fact]
+    public void MoveEnd_AdjustsViewportToShowInsertionPoint_When_InsertionPointIsBeyondViewport ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        TextView textView = new () { Width = 5, Height = 5, BorderStyle = LineStyle.Single, App = app};
+        textView.Text = "Line1\nLine2\nLine3\nLine4\nLine5";
+
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        // Content size only updates after initialization, so it should reflect the size of the text content (5 lines of 6 characters each)
+        Assert.Equal (new Size (6, 5), textView.GetContentSize ());
+
+        // Assert initial state - insertion point at (0,0) and viewport shows top-left 3x3 area
+        Assert.Equal (Point.Empty, textView.InsertionPoint);
+        Assert.Equal (new Rectangle (0, 0, 3, 3), textView.Viewport);
+
+        // Cursor is always screen relative, so it should be at (0,0) initially in viewport coordinates
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+
+        textView.Draw ();
+
+        var expected = """
+                       ┌───┐
+                       │Lin│
+                       │Lin│
+                       │Lin│
+                       └───┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        // Invoke MoveEnd method - should move insertion point to last column of the last line
+        Assert.True (textView.MoveEnd ());
+        Assert.Equal (new Point (5, 4), textView.InsertionPoint);
+        Assert.Equal (new Rectangle (3, 2, 3, 3), textView.Viewport);
+
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌───┐
+                   │e3 │
+                   │e4 │
+                   │e5 │
+                   └───┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative, so it should be at (0,0) initially in viewport coordinates
+        Assert.Equal (new Point (3, 3), textView.Cursor.Position!.Value);
+    }
+
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
 }

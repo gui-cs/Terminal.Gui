@@ -57,6 +57,11 @@ public partial class TextView
         int contentWidth = WordWrap ? Viewport.Width : _model.GetMaxVisibleLine (0, _model.Count, TabWidth);
 
         SetContentSize (new Size (contentWidth, contentHeight));
+        if (GetContentSize () == new Size (contentWidth + 1, contentHeight))
+        {
+            return;
+        }
+        SetContentSize (new Size (contentWidth + 1, contentHeight));
         UpdateHorizontalScrollBarVisibility ();
     }
 
