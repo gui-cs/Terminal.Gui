@@ -218,17 +218,19 @@ UICatalog includes built-in logging UI. Access via the **Logging** menu to:
 
 ## View Event Tracing
 
-Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` namespace) for debugging event flow through the view hierarchy. Three categories can be enabled independently:
+Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` namespace) for debugging event flow through the view hierarchy. Categories can be enabled independently and are **thread-safe** (isolated per async execution context):
 
 | Category | Property | What It Traces |
 |----------|----------|----------------|
 | Command | `Trace.CommandEnabled` | Command routing (InvokeCommand, bubbling, dispatch) |
 | Mouse | `Trace.MouseEnabled` | Mouse events (clicks, drags, wheel) |
 | Keyboard | `Trace.KeyboardEnabled` | Keyboard events (key down, key up) |
+| Navigation | `Trace.NavigationEnabled` | Focus and TabBehavior navigation |
+| Lifecycle | `Trace.LifecycleEnabled` | Application and Driver lifecycle events |
 
 ### Enabling Tracing
 
-**Via code:**
+**Via individual properties:**
 
 ```csharp
 using Terminal.Gui.Tracing;
@@ -236,6 +238,27 @@ using Terminal.Gui.Tracing;
 Trace.CommandEnabled = true;   // Command routing
 Trace.MouseEnabled = true;     // Mouse events
 Trace.KeyboardEnabled = true;  // Keyboard events
+```
+
+**Via flags-based API:**
+
+```csharp
+// Enable multiple categories at once
+Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
+
+// Check enabled categories
+if (Trace.EnabledCategories.HasFlag (TraceCategory.Command)) { ... }
+```
+
+**Via scoped tracing (recommended for tests):**
+
+```csharp
+// Tracing automatically restored on dispose
+using (Trace.PushScope (TraceCategory.Command | TraceCategory.Keyboard))
+{
+    // Tracing enabled only in this scope
+    view.InvokeCommand (Command.Activate);
+}
 ```
 
 When tracing is enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
@@ -254,24 +277,48 @@ When tracing is enabled, output automatically goes to `Logging.Trace` via the `L
 
 ### Custom Trace Backends
 
-For testing or custom logging, use `Trace.Backend`:
+For testing or custom logging, use `Trace.PushScope` with a custom backend:
 
 ```csharp
 using Terminal.Gui.Tracing;
 
-// Capture traces for assertions
+// Capture traces for assertions - thread-safe
 ListBackend backend = new ();
-Trace.Backend = backend;
-Trace.CommandEnabled = true;
 
-// ... run code ...
-
-// Inspect captured traces
-foreach (TraceEntry entry in backend.Entries)
+using (Trace.PushScope (TraceCategory.Command, backend))
 {
-    Console.WriteLine ($"{entry.Category}: {entry.ViewId} - {entry.Phase}");
+    // ... run code ...
+
+    // Inspect captured traces
+    foreach (TraceEntry entry in backend.Entries)
+    {
+        Console.WriteLine ($"{entry.Category}: {entry.Id} - {entry.Phase}");
+    }
 }
 ```
+
+### Testing with Tracing
+
+Use `TestLogging.Verbose` to enable both logging and tracing in xUnit tests:
+
+```csharp
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+
+[Fact]
+public void MyTest ()
+{
+    // Enable logging and tracing in one call
+    using (TestLogging.Verbose (_output, TraceCategory.Command))
+    {
+        // Logs and traces appear in xUnit test output
+        CheckBox checkbox = new () { Id = "test" };
+        checkbox.InvokeCommand (Command.Activate);
+    }
+}
+```
+
+This approach is **thread-safe** and works correctly with parallel test execution.
 
 See [Command Deep Dive - Command Route Tracing](command.md#command-route-tracing) for detailed command tracing information.
 
