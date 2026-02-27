@@ -119,10 +119,8 @@ public class ContextMenus : Scenario
 
             popoverMenuHost.Activated += (s, args) =>
                                          {
-                                             // BUGBUG: Activated is never invoked here. Is command bridging from the PopoverMenu.Root to the PopoverMenuHost broken?
-
                                              // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
-                                             if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "menuItemBorders" } bordersCheckbox)
+                                             if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" } bordersCheckbox)
                                              {
                                                  _appWindow.BorderStyle = (args.Value?.Value as CheckState?) == CheckState.Checked ? LineStyle.Double : LineStyle.None;
 
@@ -179,6 +177,7 @@ public class ContextMenus : Scenario
             base.EndInit ();
 
             _popoverMenu = new PopoverMenu { Title = "ContextMenu", Id = "PopoverMenuHostContextMenu" };
+            _popoverMenu.Target = new WeakReference<View> (this); // Bridge commands to this host
 
             Menu testContextMenu = new () { Id = "TestContextMenu" };
             _popoverMenu.Root = testContextMenu;
@@ -218,7 +217,7 @@ public class ContextMenus : Scenario
             Line line = new ();
 
             MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
-            menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
+            menuItemBorders.CommandView = new CheckBox { Id = "bordersCheckbox", Title = menuItemBorders.Title, CanFocus = false };
 
             menuItemBorders.Action += () =>
                                       {
@@ -228,7 +227,7 @@ public class ContextMenus : Scenario
                                           }
                                       };
 
-            OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+            OptionSelector<Schemes> schemeOptionSelector = new () { Id = "schemeOptionSelector", Title = "Scheme", CanFocus = true };
 
             MenuItem menuItemScheme = new ()
             {

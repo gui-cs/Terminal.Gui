@@ -277,6 +277,8 @@ public partial class View // Command APIs
             // still needs its Accepted event to fire for subscribers (e.g., parentMenuItem.Accepted).
             if (_lastDispatchOccurred || ctx?.Routing == CommandRouting.Bridged)
             {
+                ctx = RefreshValue (ctx);
+
                 RaiseAccepted (ctx);
             }
 
@@ -306,10 +308,14 @@ public partial class View // Command APIs
         // Composite views with dispatch targets always get completion on bubble.
         if (ctx?.Routing == CommandRouting.BubblingUp && GetDispatchTarget (ctx) is { })
         {
+            ctx = RefreshValue (ctx);
+
             RaiseAccepted (ctx);
 
             return false;
         }
+
+        ctx = RefreshValue (ctx);
 
         Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted");
         RaiseAccepted (ctx);
@@ -472,6 +478,8 @@ public partial class View // Command APIs
         {
             if (_lastDispatchOccurred)
             {
+                ctx = RefreshValue (ctx);
+
                 RaiseActivated (ctx);
 
                 // ConsumeDispatch consumed the command internally, but ancestors still need
@@ -514,6 +522,10 @@ public partial class View // Command APIs
         {
             SetFocus ();
         }
+
+        // Refresh the value from the dispatch target (e.g. CheckBox after toggle) so that
+        // RaiseActivated and BubbleActivatedUp carry the post-change value.
+        ctx = RefreshValue (ctx);
 
         // Always fire RaiseActivated. Dispatch completed synchronously,
         // so CommandView state is already updated.
@@ -691,6 +703,30 @@ public partial class View // Command APIs
 
         OnActivated (ctx);
         Activated?.Invoke (this, new EventArgs<ICommandContext?> (ctx));
+    }
+
+    /// <summary>
+    ///     Re-reads the current <see cref="IValue.GetValue"/> from the dispatch target and returns
+    ///     a context with the refreshed value. Only checks the dispatch target (e.g. a
+    ///     <see cref="Shortcut"/>'s <c>CommandView</c>) — the actual <see cref="IValue"/> view whose
+    ///     state changed during command processing. Does NOT fall back to
+    ///     <see cref="ICommandContext.Source"/> because the source may be a different <see cref="IValue"/>
+    ///     (e.g. <see cref="MenuItem"/> whose <c>GetValue</c> returns the Title, not the
+    ///     <see cref="CheckBox"/> state).
+    /// </summary>
+    private ICommandContext? RefreshValue (ICommandContext? ctx)
+    {
+        if (ctx is not CommandContext cc)
+        {
+            return ctx;
+        }
+
+        if (GetDispatchTarget (ctx) is IValue targetValue)
+        {
+            return cc.WithValue (targetValue.GetValue ());
+        }
+
+        return ctx;
     }
 
     /// <summary>
@@ -1080,15 +1116,17 @@ public partial class View // Command APIs
             }
         }
 
-        // TODO: Add to Popover ability to hold a ref to its creator (Target?) and bubble to it here.
-
         // Check if SuperView wants this command bubbled up to it
         if (SuperView?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
-            Trace.Command (this, ctx, "Routing", $"BubblingUp to {SuperView.ToIdentifyingString ()}");
-            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+            // Refresh value from the dispatch target (e.g. CheckBox after toggle) so that
+            // the bubbled context carries the post-change value.
+            ICommandContext? refreshed = RefreshValue (ctx);
 
-            return SuperView.InvokeCommand (ctx.Command, upCtx);
+            Trace.Command (this, refreshed, "Routing", $"BubblingUp to {SuperView.ToIdentifyingString ()}");
+            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding) { Routing = CommandRouting.BubblingUp, Value = refreshed.Value };
+
+            return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }
 
         if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)

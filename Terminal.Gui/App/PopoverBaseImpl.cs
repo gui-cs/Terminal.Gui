@@ -112,6 +112,8 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
     }
 
+    private CommandBridge? _targetBridge;
+
     /// <summary>
     ///     Gets or sets the target <see cref="View"/> of this popover as a weak reference. This is typically the view that
     ///     triggered the popover to be shown.
@@ -120,7 +122,24 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///     This is useful for scenarios where the View that triggered the popover is not part of the popover's view hierarchy,
     ///     but still wants commands to be handled in the context of that view.
     /// </summary>
-    public WeakReference<View>? Target { get; set; }
+    public WeakReference<View>? Target
+    {
+        get;
+        set
+        {
+            // Tear down old bridge
+            _targetBridge?.Dispose ();
+            _targetBridge = null;
+
+            field = value;
+
+            // Create bridge: when this popover fires Activated/Accepted, bridge to Target
+            if (value?.TryGetTarget (out View? targetView) == true)
+            {
+                _targetBridge = CommandBridge.Connect (targetView, this, Command.Activate, Command.Accept);
+            }
+        }
+    }
 
     /// <summary>
     ///     Called when the <see cref="View.Visible"/> property is changing. Handles layout and focus management.
@@ -164,5 +183,17 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
 
         return ret;
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            _targetBridge?.Dispose ();
+            _targetBridge = null;
+        }
+
+        base.Dispose (disposing);
     }
 }
