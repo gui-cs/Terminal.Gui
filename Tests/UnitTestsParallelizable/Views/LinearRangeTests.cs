@@ -17,9 +17,9 @@ public class LinearRangeOptionTests : TestDriverBase
     [Fact]
     public void LinearRange_Option_Values_Constructor ()
     {
-        LinearRangeOption<int> o = new ("1 thousand", new ('y'), 1000);
+        LinearRangeOption<int> o = new ("1 thousand", new Rune ('y'), 1000);
         Assert.Equal ("1 thousand", o.Legend);
-        Assert.Equal (new ('y'), o.LegendAbbr);
+        Assert.Equal (new Rune ('y'), o.LegendAbbr);
         Assert.Equal (1000, o.Data);
     }
 
@@ -33,7 +33,7 @@ public class LinearRangeOptionTests : TestDriverBase
     [Fact]
     public void LinearRangeOption_ToString_WhenPopulated_WithInt ()
     {
-        LinearRangeOption<int> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new ('l'), Data = 1 };
+        LinearRangeOption<int> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new Rune ('l'), Data = 1 };
 
         Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data=1}", sliderOption.ToString ());
     }
@@ -41,7 +41,7 @@ public class LinearRangeOptionTests : TestDriverBase
     [Fact]
     public void LinearRangeOption_ToString_WhenPopulated_WithSizeF ()
     {
-        LinearRangeOption<SizeF> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new ('l'), Data = new (32, 11) };
+        LinearRangeOption<SizeF> sliderOption = new () { Legend = "Lord flibble", LegendAbbr = new Rune ('l'), Data = new SizeF (32, 11) };
 
         Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data={Width=32, Height=11}}", sliderOption.ToString ());
     }
@@ -167,14 +167,14 @@ public class LinearRangeTests : TestDriverBase
 
         // Act
         LinearRange<int> slider = new (options);
-        slider.SetRelativeLayout (new (100, 100));
+        slider.SetRelativeLayout (new Size (100, 100));
 
         // Assert
         // 0123456789
         // 1 2 3
         Assert.Equal (1, slider.MinimumInnerSpacing);
-        Assert.Equal (new (5, 2), slider.GetContentSize ());
-        Assert.Equal (new (5, 2), slider.Frame.Size);
+        Assert.Equal (new Size (5, 2), slider.GetContentSize ());
+        Assert.Equal (new Size (5, 2), slider.Frame.Size);
         Assert.NotNull (slider);
         Assert.NotNull (slider.Options);
         Assert.Equal (options.Count, slider.Options.Count);
@@ -184,7 +184,7 @@ public class LinearRangeTests : TestDriverBase
     public void MovePlus_Should_MoveFocusRight_When_OptionIsAvailable ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 });
 
         // Act
         bool result = slider.MovePlus ();
@@ -198,7 +198,7 @@ public class LinearRangeTests : TestDriverBase
     public void MovePlus_Should_NotMoveFocusRight_When_AtEnd ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 });
 
         slider.FocusedOption = 3;
 
@@ -214,7 +214,7 @@ public class LinearRangeTests : TestDriverBase
     public void OnOptionFocused_Event_Cancelled ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3 });
         var eventRaised = false;
         var cancel = false;
         slider.OptionFocused += (sender, args) => eventRaised = true;
@@ -223,7 +223,7 @@ public class LinearRangeTests : TestDriverBase
         // Create args with cancel set to false
         cancel = false;
 
-        LinearRangeEventArgs<int> args = new (new (), newFocusedOption) { Cancel = cancel };
+        LinearRangeEventArgs<int> args = new (new Dictionary<int, LinearRangeOption<int>> (), newFocusedOption) { Cancel = cancel };
         Assert.Equal (0, slider.FocusedOption);
 
         // Act
@@ -236,7 +236,7 @@ public class LinearRangeTests : TestDriverBase
         // Create args with cancel set to true
         cancel = true;
 
-        args = new (new (), newFocusedOption) { Cancel = cancel };
+        args = new LinearRangeEventArgs<int> (new Dictionary<int, LinearRangeOption<int>> (), newFocusedOption) { Cancel = cancel };
 
         // Act
         slider.OnOptionFocused (2, args);
@@ -250,11 +250,11 @@ public class LinearRangeTests : TestDriverBase
     public void OnOptionFocused_Event_Raised ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3 });
         var eventRaised = false;
         slider.OptionFocused += (sender, args) => eventRaised = true;
         var newFocusedOption = 1;
-        LinearRangeEventArgs<int> args = new (new (), newFocusedOption);
+        LinearRangeEventArgs<int> args = new (new Dictionary<int, LinearRangeOption<int>> (), newFocusedOption);
 
         // Act
         slider.OnOptionFocused (newFocusedOption, args);
@@ -282,7 +282,7 @@ public class LinearRangeTests : TestDriverBase
     public void Set_Should_Not_UnSetFocusedOption_When_EmptyNotAllowed ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 }) { AllowEmpty = false };
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 }) { AllowEmpty = false };
 
         Assert.NotEmpty (slider.GetSetOptions ());
 
@@ -300,7 +300,7 @@ public class LinearRangeTests : TestDriverBase
     public void Set_Should_SetFocusedOption ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 });
 
         // Act
         slider.FocusedOption = 2;
@@ -316,7 +316,7 @@ public class LinearRangeTests : TestDriverBase
     public void TryGetOptionByPosition_InvalidPosition_Failure ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3 });
         var x = 10;
         var y = 10;
         var threshold = 2;
@@ -340,7 +340,7 @@ public class LinearRangeTests : TestDriverBase
     public void TryGetOptionByPosition_ValidPositionHorizontal_Success (int x, int y, int threshold, int expectedData)
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 });
 
         // 0123456789
         // 1234
@@ -370,7 +370,7 @@ public class LinearRangeTests : TestDriverBase
     public void TryGetOptionByPosition_ValidPositionVertical_Success (int x, int y, int threshold, int expectedData)
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
 
         // Set auto size to true to enable testing
@@ -399,7 +399,7 @@ public class LinearRangeTests : TestDriverBase
     public void TryGetPositionByOption_InvalidOption_Failure ()
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3 });
         int option = -1;
         (int, int) expectedPosition = (-1, -1);
 
@@ -418,7 +418,7 @@ public class LinearRangeTests : TestDriverBase
     public void TryGetPositionByOption_ValidOptionHorizontal_Success (int option, int expectedX, int expectedY)
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 });
 
         // Set auto size to true to enable testing
         slider.MinimumInnerSpacing = 2;
@@ -442,7 +442,7 @@ public class LinearRangeTests : TestDriverBase
     public void TryGetPositionByOption_ValidOptionVertical_Success (int option, int expectedX, int expectedY)
     {
         // Arrange
-        LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+        LinearRange<int> slider = new (new List<int> { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
 
         // Set auto size to true to enable testing
@@ -471,9 +471,9 @@ public class LinearRangeTests : TestDriverBase
 
         Size expectedSize = slider.Frame.Size;
 
-        Assert.Equal (new (6, 3), expectedSize);
+        Assert.Equal (new Size (6, 3), expectedSize);
 
-        view.SetContentSize (new (1, 1));
+        view.SetContentSize (new Size (1, 1));
 
         view.LayoutSubViews ();
         slider.SetRelativeLayout (view.Viewport.Size);
@@ -495,9 +495,9 @@ public class LinearRangeTests : TestDriverBase
 
         Size expectedSize = slider.Frame.Size;
 
-        Assert.Equal (new (10, 3), expectedSize);
+        Assert.Equal (new Size (10, 3), expectedSize);
 
-        view.SetContentSize (new (1, 1));
+        view.SetContentSize (new Size (1, 1));
 
         view.LayoutSubViews ();
         slider.SetRelativeLayout (view.Viewport.Size);
@@ -519,9 +519,9 @@ public class LinearRangeTests : TestDriverBase
 
         Size expectedSize = slider.Frame.Size;
 
-        Assert.Equal (new (6, 10), expectedSize);
+        Assert.Equal (new Size (6, 10), expectedSize);
 
-        view.SetContentSize (new (1, 1));
+        view.SetContentSize (new Size (1, 1));
 
         view.LayoutSubViews ();
         slider.SetRelativeLayout (view.Viewport.Size);
@@ -539,7 +539,7 @@ public class LinearRangeTests : TestDriverBase
         slider.EndInit ();
 
         // Act/Assert
-        slider.Options = [new ()];
+        slider.Options = [new LinearRangeOption<int> ()];
     }
 
     // Add more tests for different scenarios and edge cases.
@@ -794,5 +794,52 @@ public class LinearRangeCWPTests : TestDriverBase
         Assert.True (changingRaised);
         Assert.True (changedRaised);
         Assert.Equal (newValue, linearRange.UseMinimumSize);
+    }
+
+    // Copilot
+    [Fact]
+    public void Command_Activate_Calls_SetFocusedOption ()
+    {
+        LinearRange<int> linearRange = new ();
+
+        linearRange.Options =
+        [
+            new LinearRangeOption<int> ("A", new Rune ('a'), 1),
+            new LinearRangeOption<int> ("B", new Rune ('b'), 2),
+            new LinearRangeOption<int> ("C", new Rune ('c'), 3)
+        ];
+
+        linearRange.FocusedOption = 1;
+
+        bool? result = linearRange.InvokeCommand (Command.Activate);
+
+        // DefaultActivateHandler returns false for views without dispatch targets or bubble config,
+        // but the side effect (SetFocusedOption via OnActivated) still occurs.
+        Assert.False (result);
+        Assert.Contains (1, linearRange.GetSetOptions ());
+
+        linearRange.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Command_Accept_Calls_SetFocusedOption ()
+    {
+        LinearRange<int> linearRange = new ();
+
+        linearRange.Options =
+        [
+            new LinearRangeOption<int> ("A", new Rune ('a'), 1),
+            new LinearRangeOption<int> ("B", new Rune ('b'), 2),
+            new LinearRangeOption<int> ("C", new Rune ('c'), 3)
+        ];
+
+        linearRange.FocusedOption = 2;
+
+        bool? result = linearRange.InvokeCommand (Command.Accept);
+
+        Assert.Contains (2, linearRange.GetSetOptions ());
+
+        linearRange.Dispose ();
     }
 }

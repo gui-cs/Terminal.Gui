@@ -266,12 +266,18 @@ public class PromptTests : TestDriverBase
     [Fact]
     public void Prompt_Works_With_Color_Result ()
     {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
         ColorPicker colorPicker = new () { SelectedColor = Color.Red };
 
-        using Prompt<ColorPicker, Color> dialog = new (colorPicker) { ResultExtractor = cp => cp.SelectedColor };
+        using Prompt<ColorPicker, Color> prompt = new (colorPicker);
+        prompt.ResultExtractor = cp => cp.SelectedColor;
 
-        // Manually invoke the extractor to verify it works
-        Color? result = dialog.ResultExtractor?.Invoke (colorPicker);
+        app.StopAfterFirstIteration = true;
+        app.Iteration += (_, _) => { prompt.InvokeCommand (Command.Accept); };
+
+        Color? result = app.Run (prompt) as Color?;
 
         Assert.NotNull (result);
         Assert.Equal (Color.Red, result.Value);
@@ -285,11 +291,11 @@ public class PromptTests : TestDriverBase
 
         ColorPicker colorPicker = new () { SelectedColor = Color.Red };
 
-        using Prompt<ColorPicker, string?> dialog = new (colorPicker);
+        using Prompt<ColorPicker, string?> prompt = new (colorPicker);
 
         app.StopAfterFirstIteration = true;
-        app.Iteration += (_, _) => { dialog.InvokeCommand (Command.Accept); };
-        object? result = app.Run (dialog);
+        app.Iteration += (_, _) => { prompt.InvokeCommand (Command.Accept); };
+        object? result = app.Run (prompt);
 
         Assert.NotNull (result);
         Assert.Equal ("Red", result);

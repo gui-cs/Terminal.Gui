@@ -480,33 +480,63 @@ public class SelectorBaseTests
     [Fact]
     public void DoubleClickAccepts_True_AcceptOnDoubleClick ()
     {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var selector = new OptionSelector { DoubleClickAccepts = true };
         selector.Labels = ["Option1", "Option2"];
-        selector.Layout ();
+
+        (runnable as View)?.Add (selector);
+        app.Begin (runnable);
 
         var acceptCount = 0;
         selector.Accepting += (_, _) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new Mouse { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (1, acceptCount);
+        Assert.Equal (0, selector.Value); // Should select the first option on double-click
+
+        checkBox = selector.SubViews.OfType<CheckBox> ().Last ();
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
+
+        Assert.Equal (2, acceptCount);
+        Assert.Equal (1, selector.Value); // Should select the 2nd option on double-click
     }
 
     [Fact]
     public void DoubleClickAccepts_False_DoesNotAcceptOnDoubleClick ()
     {
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var selector = new OptionSelector { DoubleClickAccepts = false };
         selector.Labels = ["Option1", "Option2"];
-        selector.Layout ();
+
+        (runnable as View)?.Add (selector);
+        app.Begin (runnable);
 
         var acceptCount = 0;
         selector.Accepting += (_, _) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new Mouse { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (0, acceptCount);
+        Assert.Equal (0, selector.Value);
+
+        checkBox = selector.SubViews.OfType<CheckBox> ().Last ();
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
+
+        Assert.Equal (0, acceptCount);
+        Assert.Equal (1, selector.Value); // Should select the second option on double-click
     }
 
     #endregion
@@ -539,7 +569,7 @@ public class SelectorBaseTests
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
         Assert.Equal ("Test Option", checkBox.Title);
         Assert.Equal ("Test Option", checkBox.Id);
-        Assert.Equal (42, checkBox.Data);
+        Assert.Equal (42, selector.GetCheckBoxValue (checkBox));
         Assert.True (checkBox.CanFocus);
     }
 
@@ -616,7 +646,12 @@ public class SelectorBaseTests
         using IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
         using Runnable runnable = new ();
         var view1 = new View { CanFocus = true };
-        var selector = new OptionSelector { Styles = selectorStyles };
+
+        OptionSelector selector = new ()
+        {
+            Styles = selectorStyles,
+            TabBehavior = TabBehavior.NoStop
+        };
         List<string> options = ["Option1", "Option2", "Option3"];
         selector.Labels = options;
         var view2 = new View { CanFocus = true };

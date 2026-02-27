@@ -389,6 +389,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             ValueChangedEventArgs<int> changedArgs = new (oldValue, _value);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
 
             OnScrolled (distance);
             Scrolled?.Invoke (this, new EventArgs<int> (in distance));
@@ -412,6 +413,9 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>Called when <see cref="Value"/> has changed. Indicates how much to scroll.</summary>
     protected virtual void OnScrolled (int distance) { }

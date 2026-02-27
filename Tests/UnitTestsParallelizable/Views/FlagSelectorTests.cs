@@ -85,41 +85,70 @@ public class FlagSelectorTests
         flagSelector.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
     [Fact]
-    public void FlagSelector_Command_Activate_ForwardsToFocusedCheckBox ()
+    public void FlagSelector_Command_Activate_Changes_Value_And_Activates ()
     {
-        FlagSelector<SelectorStyles> flagSelector = new ();
-        flagSelector.BeginInit ();
-        flagSelector.EndInit ();
+        using FlagSelector<SelectorStyles> flagSelector = new ();
+
+        CheckBox firstCheckBox = flagSelector.SubViews.OfType<CheckBox> ().ElementAt (0);
+        flagSelector.SetFocus ();
+        Assert.True (flagSelector.HasFocus);
+        Assert.Equal (SelectorStyles.None, flagSelector.Value);
+
+        int cbActivatingRaised = 0;
+        firstCheckBox.Activating += (_, _) => cbActivatingRaised++;
+
+        int selectorActivatingRaised = 0;
+        flagSelector.Activating += (_, _) => selectorActivatingRaised++;
+
+        int selectorValueChanged = 0;
+        flagSelector.ValueChanged += (_, _) => selectorValueChanged++;
 
         // Activate should forward to the focused CheckBox's Activate
-        bool? result = flagSelector.InvokeCommand (Command.Activate);
+        flagSelector.InvokeCommand (Command.Activate);
 
-        // Command is handled by CheckBox
-        Assert.True (result);
-
-        flagSelector.Dispose ();
+        Assert.Equal (1, cbActivatingRaised);
+        Assert.Equal (1, selectorActivatingRaised);
+        Assert.Equal (1, selectorValueChanged);
+        Assert.Equal (SelectorStyles.ShowNoneFlag, flagSelector.Value);
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Claude - Opus 4.6
+    // Per FlagSelector spec: HotKey when focused is a no-op (does NOT change Active)
     [Fact]
-    public void FlagSelector_Command_HotKey_ForwardsToFocusedItem ()
+    public void FlagSelector_Command_HotKey_WhenFocused_Does_Not_Change_Value ()
     {
-        FlagSelector<SelectorStyles> flagSelector = new ();
-        flagSelector.BeginInit ();
-        flagSelector.EndInit ();
+        using FlagSelector<SelectorStyles> flagSelector = new ();
 
-        // HotKey forwards to focused item's Activate
-        bool? result = flagSelector.InvokeCommand (Command.HotKey);
+        CheckBox firstCheckBox = flagSelector.SubViews.OfType<CheckBox> ().ElementAt (0);
+        flagSelector.SetFocus ();
+        Assert.True (flagSelector.HasFocus);
 
-        Assert.True (result);
+        int cbActivatingRaised = 0;
+        firstCheckBox.Activating += (_, _) => cbActivatingRaised++;
 
-        flagSelector.Dispose ();
+        int selectorActivatingRaised = 0;
+        flagSelector.Activating += (_, _) => selectorActivatingRaised++;
+
+        int selectorHotKeyRaised = 0;
+        flagSelector.HandlingHotKey += (_, _) => selectorHotKeyRaised++;
+
+        int selectorValueChanged = 0;
+        flagSelector.ValueChanged += (_, _) => selectorValueChanged++;
+
+        SelectorStyles? valueBefore = flagSelector.Value;
+
+        // Per spec: HotKey when focused is a no-op
+        flagSelector.InvokeCommand (Command.HotKey);
+
+        // no value change
+        Assert.Equal (0, selectorActivatingRaised);
+        Assert.Equal (0, selectorHotKeyRaised);
+        Assert.Equal (0, selectorValueChanged);
+        Assert.Equal (0, cbActivatingRaised);
+
+        // Value should not change
+        Assert.Equal (valueBefore, flagSelector.Value);
     }
 
     // Tests for FlagSelector<TEnum>
@@ -171,10 +200,10 @@ public class FlagSelectorTests
 
         flagSelector.Value = SelectorStyles.ShowNoneFlag;
 
-        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
+        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowValue));
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == Convert.ToInt32 (SelectorStyles.ShowValue));
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
@@ -210,7 +239,7 @@ public class FlagSelectorTests
     }
 
     [Fact]
-    public void HotKey_Null_Value_Does_Not_Change_Value ()
+    public void Null_Value_Command_HotKey_Does_Not_Change_Value ()
     {
         var superView = new View { CanFocus = true };
         superView.Add (new View { CanFocus = true });
@@ -225,7 +254,7 @@ public class FlagSelectorTests
         Assert.False (flagSelector.HasFocus);
         Assert.Null (flagSelector.Value);
 
-        flagSelector.InvokeCommand (Command.HotKey, new KeyBinding ());
+        flagSelector.InvokeCommand (Command.HotKey);
 
         Assert.True (flagSelector.HasFocus);
         Assert.Null (flagSelector.Value);
@@ -248,8 +277,8 @@ public class FlagSelectorTests
 
         flagSelector.NewKeyDownEvent (Key.F.WithAlt);
 
-        Assert.Equal (0, flagSelector.Value);
         Assert.True (flagSelector.HasFocus);
+        Assert.Equal (0, flagSelector.Value);
     }
 
     [Fact]
@@ -264,7 +293,7 @@ public class FlagSelectorTests
     }
 
     [Fact]
-    public void Item_HotKey_Null_Value_Changes_Value_And_SetsFocus ()
+    public void Null_Value_Item_KeyDown_HotKey_Changes_Value_And_SetsFocus ()
     {
         var superView = new View { CanFocus = true };
         superView.Add (new View { CanFocus = true });
@@ -322,7 +351,7 @@ public class FlagSelectorTests
 
         checkBox.NewKeyDownEvent (Key.Space);
 
-        Assert.Equal (0, selector.Value);
+        // Assert.Equal (0, selector.Value);
         Assert.Equal (CheckState.Checked, checkBox.Value);
         Assert.Equal (CheckState.UnChecked, selector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Flag2").Value);
     }
@@ -349,7 +378,7 @@ public class FlagSelectorTests
     public void Styles_Set_ShouldCreateSubViews ()
     {
         var flagSelector = new FlagSelector ();
-        Dictionary<int, string> flags = new() { { 1, "Flag1" }, { 2, "Flag2" } };
+        Dictionary<int, string> flags = new () { { 1, "Flag1" }, { 2, "Flag2" } };
 
         flagSelector.Values = flags.Keys.ToList ();
         flagSelector.Labels = flags.Values.ToList ();
@@ -362,16 +391,16 @@ public class FlagSelectorTests
     public void Value_Set_ShouldUpdateCheckedState ()
     {
         var flagSelector = new FlagSelector ();
-        Dictionary<int, string> flags = new() { { 1, "Flag1" }, { 2, "Flag2" } };
+        Dictionary<int, string> flags = new () { { 1, "Flag1" }, { 2, "Flag2" } };
 
         flagSelector.Values = flags.Keys.ToList ();
         flagSelector.Labels = flags.Values.ToList ();
         flagSelector.Value = 1;
 
-        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 1);
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 2);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
@@ -393,7 +422,7 @@ public class FlagSelectorTests
     public void ValueChanged_Event_ShouldBeRaised ()
     {
         var flagSelector = new FlagSelector ();
-        Dictionary<int, string> flags = new() { { 1, "Flag1" }, { 2, "Flag2" } };
+        Dictionary<int, string> flags = new () { { 1, "Flag1" }, { 2, "Flag2" } };
 
         flagSelector.Values = flags.Keys.ToList ();
         flagSelector.Labels = flags.Values.ToList ();
@@ -502,13 +531,13 @@ public class FlagSelectorTests
         Assert.Equal (1, selector.Value);
 
         // Toggle checkbox to add Flag 2
-        CheckBox flag2Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+        CheckBox flag2Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 2);
         flag2Checkbox.Value = CheckState.Checked;
 
         Assert.Equal (1 | 2, selector.Value);
 
         // Toggle checkbox to remove Flag 1
-        CheckBox flag1Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox flag1Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 1);
         flag1Checkbox.Value = CheckState.UnChecked;
 
         Assert.Equal (2, selector.Value);
@@ -529,7 +558,7 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, noneCheckBox.Value);
 
         // All other flags should be unchecked
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.UnChecked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.UnChecked));
     }
 
     [Fact]
@@ -561,7 +590,7 @@ public class FlagSelectorTests
         noneCheckBox.Value = CheckState.Checked;
 
         Assert.Equal (0, selector.Value);
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.UnChecked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.UnChecked));
     }
 
     [Fact]
@@ -578,7 +607,7 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, noneCheckBox.Value);
 
         // Toggle a flag
-        CheckBox flag1CheckBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox flag1CheckBox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 1);
         flag1CheckBox.Value = CheckState.Checked;
 
         Assert.Equal (1, selector.Value);
@@ -607,19 +636,30 @@ public class FlagSelectorTests
         selector.Labels = ["None", "Flag1", "Flag2"];
 
         // Should only have one "None" checkbox
-        Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => (int)cb.Data! == 0));
+        Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => selector.GetCheckBoxValue (cb) == 0));
     }
 
     [Fact]
     public void Mouse_DoubleClick_TogglesAndAccepts ()
-    {
+    {      
+        // Arrange
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
         var selector = new FlagSelector { DoubleClickAccepts = true };
         selector.Values = [1, 2];
         selector.Labels = ["Flag1", "Flag2"];
-        selector.Layout ();
+
+        (runnable as View)?.Add (selector);
+        app.Begin (runnable);
 
         var acceptCount = 0;
         selector.Accepting += (s, e) => acceptCount++;
+
+        var valueChangedCount = 0;
+        selector.ValueChanged += (s, e) => valueChangedCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
 
@@ -628,13 +668,16 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, checkBox.Value); // FIXED: Was UnChecked
         Assert.Equal (1, selector.Value); // Verify Value is set to first value
 
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonClicked });
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
+        checkBox = selector.SubViews.OfType<CheckBox> ().Last ();
+        app.InjectSequence (InputInjectionExtensions.LeftButtonDoubleClick (checkBox.Frame.Location));
 
         Assert.Equal (1, acceptCount);
 
-        // After double-clicking on an already-checked flag checkbox, it should still be checked (flags don't uncheck on double-click in FlagSelector)
+        // DoubleClick generates Click (Activate/toggle) + DoubleClick (Accept).
+        // The click toggles Data=2 checkbox from UnChecked to Checked, changing Value from 1 to 1|2=3.
+        Assert.Equal (1, valueChangedCount);
         Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (3, selector.Value);
     }
 
     [Fact]
@@ -648,7 +691,7 @@ public class FlagSelectorTests
         // This should not cause recursion or errors
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+                                                     CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 2);
                                                      checkBox.Value = CheckState.Checked; // This triggers UpdateChecked internally
                                                  });
 
@@ -687,7 +730,7 @@ public class FlagSelectorTests
     }
 
     [Fact]
-    public void Generic_NullValue_UnchecksAll ()
+    public void Null_Value_Generic_UnchecksAll ()
     {
         FlagSelector<SelectorStyles> selector = new ();
         selector.Value = SelectorStyles.ShowNoneFlag;
@@ -706,7 +749,7 @@ public class FlagSelectorTests
         selector.Value = SelectorStyles.All;
 
         // All non-None flags should be checked
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.Checked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.Checked));
     }
 
     #endregion

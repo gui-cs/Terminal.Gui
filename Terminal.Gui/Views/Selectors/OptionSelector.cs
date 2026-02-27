@@ -2,8 +2,8 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
-// DoubleClick - Focus, Select, and Accept the item under the mouse.
-// Click - Focus, Select, and do NOT Accept the item under the mouse.
+// DoubleClick - Focus, Activate, and Accept the item under the mouse (CanFocus or not)
+// Click - Focus, Activate, and do NOT Accept the item under the mouse (CanFocus or not).
 // CanFocus - Not Focused:
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Focus item. If item is not active, make Active. Do NOT Accept.
@@ -14,7 +14,7 @@ namespace Terminal.Gui.Views;
 //  Space key - If focused item is Active, move focus to and Activate next. Else, Activate current. Do NOT Accept.
 //  Enter key - Activate and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
-//  Item HotKey - If item is not active, make Active. Do NOT Accept.
+//  Item HotKey - If item is not active, make Active. Do NOT Accept. If item is active, do nothing.
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting a single item from a list of options.
@@ -24,80 +24,92 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class OptionSelector : SelectorBase, IDesignable
 {
+    // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
+    // really wants that.
     /// <inheritdoc/>
-    public OptionSelector () =>
-
-        // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
-        // really wants that.
-        base.Value = 0;
+    public OptionSelector () => base.Value = 0;
 
     /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    protected override View? GetDispatchTarget (ICommandContext? ctx)
     {
-        if (base.OnHandlingHotKey (args))
+        // Only dispatch Activate, not Accept. Accept should bubble naturally.
+        if (ctx?.Command != Command.Activate)
         {
-            return true;
+            return null;
         }
 
-        if (!CanFocus)
+        if (ctx.Source?.TryGetTarget (out View? source) != true || source is not CheckBox cb)
         {
-            if (RaiseActivating (args.Context) is true)
-            {
-                return true;
-            }
-        }
-        else if (!HasFocus && Value is null)
-        {
-            if (RaiseActivating (args.Context) is true)
-            {
-                return true;
-            }
-
-            SetFocus ();
-            Value = Values? [0];
-
-            return true;
+            return Focused;
         }
 
-        return false;
+        if (ctx.Binding is { } && ctx.Binding.Commands.Contains (Command.Accept) && cb.Value == CheckState.Checked)
+        {
+            return null;
+        }
+
+        // When a CheckBox's activation bubbles up, the source IS the CheckBox
+        return source;
     }
 
+    /// <summary>
+    ///     Consumes: OptionSelector owns selection state, not the individual CheckBoxes.
+    /// </summary>
+    protected override bool ConsumeDispatch => true;
+
     /// <inheritdoc/>
-    protected override bool OnActivating (CommandEventArgs args)
+    protected override void OnActivated (ICommandContext? ctx)
     {
-        if (base.OnActivating (args))
+        base.OnActivated (ctx);
+
+        // Apply the value change. Runs for ALL activation paths uniformly.
+        // No routing-direction check needed — the framework handled dispatch/consumption.
+        ApplyActivation (ctx);
+    }
+
+    /// <summary>
+    ///     Applies the value change based on the activation source.
+    /// </summary>
+    private void ApplyActivation (ICommandContext? ctx)
+    {
+        CheckBox? checkBox = null;
+
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is CheckBox cb)
         {
-            return true;
+            checkBox = cb;
+        }
+        else if (ctx?.Routing == CommandRouting.DispatchingDown && Focused is CheckBox focusedCb)
+        {
+            // External dispatch (e.g. Menu → MenuItem → OptionSelector): the DispatchingDown guard
+            // blocked dispatch to inner CheckBoxes. Use the currently focused CheckBox as the
+            // selection target — SetFocus() was called before OnActivated, so Focused is reliable.
+            checkBox = focusedCb;
         }
 
-        if (!CanFocus || !args.Context.TryGetSource (out View? source) || source is not CheckBox checkBox)
+        if (checkBox is null)
         {
             Cycle ();
 
-            return false;
+            return;
         }
 
-        if (args.Context?.Binding is KeyBinding && (int)checkBox.Data! == Value)
+        if (GetCheckBoxValue (checkBox) == Value
+            && (ctx?.Routing == CommandRouting.DispatchingDown
+                || (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)))
         {
-            // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
+            // Caused by Key.Space or a SuperView...
+            // If the checkbox is already checked, we cycle to the next one.
             Cycle ();
         }
         else
         {
-            if (Value == (int)checkBox.Data!)
+            if (Value == GetCheckBoxValue (checkBox))
             {
-                return true;
+                return;
             }
 
-            Value = (int)checkBox.Data!;
-
-            // if (HasFocus)
-            {
-                UpdateChecked ();
-            }
+            Value = GetCheckBoxValue (checkBox);
         }
-
-        return false;
     }
 
     /// <inheritdoc/>
@@ -111,68 +123,6 @@ public class OptionSelector : SelectorBase, IDesignable
         }
 
         checkbox.RadioStyle = true;
-
-        checkbox.Activating += OnCheckboxOnActivating;
-        checkbox.Accepting += OnCheckboxOnAccepting;
-    }
-
-    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-
-        // Verify at most one is checked
-        Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
-
-        if (args.Context?.Binding is MouseBinding && checkbox.Value == CheckState.Checked)
-        {
-            // If user clicks with mouse and item is already checked, do nothing
-            args.Handled = true;
-
-            return;
-        }
-
-        if (args.Context is { Binding: KeyBinding, Command: Command.HotKey })
-        {
-            if (checkbox.Value == CheckState.Checked)
-            {
-                // If user uses an item hotkey and the item is already checked, do nothing
-                args.Handled = true;
-
-                return;
-            }
-        }
-
-        if (checkbox.CanFocus)
-        {
-            // For Select, if the view is focusable and SetFocus succeeds, by definition,
-            // the event is handled. So return what SetFocus returns.
-            checkbox.SetFocus ();
-        }
-
-        // Selecting doesn't normally propagate, so we do it here
-        if (InvokeCommand (Command.Activate, args.Context) is true)
-        {
-            // Do not return here; we want to toggle the checkbox state
-            args.Handled = true;
-
-            return;
-        }
-
-        args.Handled = true;
-    }
-
-    private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-
-        Value = (int)checkbox.Data!;
-        args.Handled = false; // Do not set to false; let Accepting propagate
     }
 
     private void Cycle ()
@@ -193,15 +143,13 @@ public class OptionSelector : SelectorBase, IDesignable
 
     /// <summary>
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
-    ///     to the current <see cref="SelectorBase.Value"/> is checked. Throws <see cref="InvalidOperationException"/>
-    ///     if a checkbox's Data property is not set.
+    ///     to the current <see cref="SelectorBase.Value"/> is checked.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
     public override void UpdateChecked ()
     {
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            var value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            int value = GetCheckBoxValue (cb);
 
             cb.Value = value == Value ? CheckState.Checked : CheckState.UnChecked;
         }
@@ -229,12 +177,7 @@ public class OptionSelector : SelectorBase, IDesignable
                 return 0;
             }
 
-            if (HasFocus)
-            {
-                return SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
-            }
-
-            return field;
+            return HasFocus ? SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused) : field;
         }
         set
         {

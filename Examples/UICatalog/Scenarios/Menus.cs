@@ -1,25 +1,17 @@
 #nullable enable
 
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Menus", "Illustrates MenuBar, Menu, and MenuItem")]
+[ScenarioMetadata ("Menus", "Illustrates Menu and MenuItem")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Menus")]
-[ScenarioCategory ("Shortcuts")]
 public class Menus : Scenario
 {
+    private EventLog? _eventLog;
+
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Logging.Logger = CreateLogger ();
 
         using IApplication app = Application.Create ();
         app.Init ();
@@ -27,395 +19,147 @@ public class Menus : Scenario
         using Runnable runnable = new ();
         runnable.Title = GetQuitKeyAndName ();
 
-        ObservableCollection<string> eventSource = [];
-
-        ListView eventLog = new ()
+        _eventLog = new EventLog
         {
-            Title = "Event Log",
+            Id = "eventLog",
             X = Pos.AnchorEnd (),
-            Width = Dim.Auto (),
-            Height = Dim.Fill (), // Make room for some wide things
+            Height = Dim.Fill (),
             SchemeName = "Runnable",
-            Source = new ListWrapper<string> (eventSource)
+            BorderStyle = LineStyle.Double,
+            Title = "E_vents",
+            Arrangement = ViewArrangement.LeftResizable
         };
-        eventLog.Border!.Thickness = new Thickness (0, 1, 0, 0);
 
-        MenuHost menuHostView = new ()
+        MenuDemoHost menuHostView = new ()
         {
             Id = "menuHostView",
-            Title = $"Menu Host - Use {PopoverMenu.DefaultKey} for Popover Menu",
+            Title = "Menu Demo Host",
             X = 0,
             Y = 0,
-            Width = Dim.Fill ()! - Dim.Width (eventLog),
+            Width = Dim.Fill () - Dim.Width (_eventLog),
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Dotted
         };
         runnable.Add (menuHostView);
 
-        menuHostView.CommandNotBound += (o, args) =>
+        _eventLog.SetViewToLog (runnable);
+        _eventLog.SetViewToLog (menuHostView);
+
+        runnable.Initialized += (_, _) =>
+                                {
+                                    foreach (Menu menu in menuHostView.SubViews.OfType<Menu> ())
+                                    {
+                                        _eventLog.SetViewToLog (menu);
+
+                                        foreach (MenuItem mi in menu.SubViews.OfType<MenuItem> ())
                                         {
-                                            if (o is not View sender || args.Handled)
-                                            {
-                                                return;
-                                            }
+                                            _eventLog.SetViewToLog (mi);
+                                            _eventLog.SetViewToLog (mi.CommandView);
+                                        }
+                                    }
+                                };
 
-                                            Logging.Debug ($"{sender.Id} CommandNotBound: {args.Context?.Command}");
-                                            eventSource.Add ($"{sender.Id} CommandNotBound: {args.Context?.Command}");
-                                            eventLog.MoveDown ();
-                                        };
-
-        menuHostView.Accepting += (o, args) =>
-                                  {
-                                      if (o is not View sender || args.Handled)
-                                      {
-                                          return;
-                                      }
-
-                                      string sourceTitle = args.Context?.Source.ToIdentifyingString () ?? "(null)";
-                                      Logging.Debug ($"{sender.Id} Accepting: {sourceTitle}");
-                                      eventSource.Add ($"{sender.Id} Accepting: {sourceTitle}: ");
-                                      eventLog.MoveDown ();
-                                  };
-
-        menuHostView.ContextMenu!.Accepted += (o, args) =>
-                                              {
-                                                  if (o is not View sender || args.Handled)
-                                                  {
-                                                      return;
-                                                  }
-
-                                                  var sourceText = "(null)";
-
-                                                  if (args.Context?.TryGetSource (out View? sourceView) == true)
-                                                  {
-                                                      sourceText = sourceView.Text;
-                                                  }
-                                                  Logging.Debug ($"{sender.Id} Accepted: {sourceText}");
-                                                  eventSource.Add ($"{sender.Id} Accepted: {sourceText}: ");
-                                                  eventLog.MoveDown ();
-                                              };
-
-        runnable.Add (eventLog);
+        runnable.Add (_eventLog);
 
         app.Run (runnable);
     }
 
     /// <summary>
-    ///     A demo view class that contains a menu bar and a popover menu.
+    ///     A demo view class that demonstrates Menu and MenuItem as direct SubViews.
     /// </summary>
-    public class MenuHost : View
+    public class MenuDemoHost : View
     {
-        internal PopoverMenu? ContextMenu { get; private set; }
-
-        public MenuHost ()
+        public MenuDemoHost ()
         {
             CanFocus = true;
             BorderStyle = LineStyle.Dashed;
+        }
 
-            AddCommand (Command.Context,
-                        _ =>
-                        {
-                            ContextMenu?.MakeVisible ();
+        /// <inheritdoc/>
+        protected override void OnAccepted (ICommandContext? ctx) => base.OnAccepted (ctx);
 
-                            return true;
-                        });
+        /// <inheritdoc/>
+        protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
 
-            MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
-            KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
+        /// <inheritdoc/>
+        public override void EndInit ()
+        {
+            base.EndInit ();
 
-            //AddCommand (
-            //            Command.Cancel,
-            //            ctx =>
-            //            {
-            //                if (App?.Popover?.GetActivePopover () as PopoverMenu is { Visible: true } visiblePopover)
-            //                {
-            //                    visiblePopover.Visible = false;
-            //                }
-
-            //                return true;
-            //            });
-
-            //MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Cancel);
-
-            Label lastCommandLabel = new () { Title = "_Last Command:", X = 15, Y = 10 };
+            Label lastCommandLabel = new () { Title = "_Last Command:", X = 1, Y = 0 };
 
             View lastCommandText = new () { X = Pos.Right (lastCommandLabel) + 1, Y = Pos.Top (lastCommandLabel), Height = Dim.Auto (), Width = Dim.Auto () };
 
             Add (lastCommandLabel, lastCommandText);
 
-            AddCommand (Command.New, HandleCommand);
-            HotKeyBindings.Add (Key.F2, Command.New);
-
-            AddCommand (Command.Open, HandleCommand);
-            HotKeyBindings.Add (Key.F3, Command.Open);
-
-            AddCommand (Command.Save, HandleCommand);
-            HotKeyBindings.Add (Key.F4, Command.Save);
-
-            AddCommand (Command.SaveAs, HandleCommand);
-            HotKeyBindings.Add (Key.A.WithCtrl, Command.SaveAs);
-
             AddCommand (Command.Quit,
                         _ =>
                         {
-                            Logging.Debug ("MenuHost Command.Quit - RequestStop");
                             App?.RequestStop ();
 
                             return true;
                         });
             HotKeyBindings.Add (Application.QuitKey, Command.Quit);
 
-            AddCommand (Command.Cut, HandleCommand);
-            HotKeyBindings.Add (Key.X.WithCtrl, Command.Cut);
+            // --- Test Menu: demonstrates Menu with MenuItems ---
+            Label testMenuLabel = new () { Title = "Menu with MenuItems:", X = 1, Y = Pos.Bottom (lastCommandLabel) + 1 };
+            Add (testMenuLabel);
 
-            AddCommand (Command.Copy, HandleCommand);
-            HotKeyBindings.Add (Key.C.WithCtrl, Command.Copy);
+            Menu testMenu = new () { Y = Pos.Bottom (testMenuLabel), Id = "TestMenu" };
+            ConfigureTestMenu (testMenu);
+            Add (testMenu);
 
-            AddCommand (Command.Paste, HandleCommand);
-            HotKeyBindings.Add (Key.V.WithCtrl, Command.Paste);
+            // --- SubMenu Demo: demonstrates MenuItem.SubMenu for nested menus ---
+            Label subMenuLabel = new () { Title = "MenuItem with SubMenu:", X = 1, Y = Pos.Bottom (testMenu) + 1 };
+            Add (subMenuLabel);
 
-            AddCommand (Command.SelectAll, HandleCommand);
-            HotKeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
+            Menu subMenuDemo = new () { Y = Pos.Bottom (subMenuLabel) };
+            subMenuDemo.EnableForDesign ();
+            Add (subMenuDemo);
 
-            // BUGBUG: This must come before we create the MenuBar or it will not work.
-            // BUGBUG: This is due to TODO's in PopoverMenu where key bindings are not
-            // BUGBUG: updated after the MenuBar is created.
-            App?.Keyboard.KeyBindings.Remove (Key.F5);
-            App?.Keyboard.KeyBindings.Add (Key.F5, this, Command.Edit);
+            // Wire up scenario-specific behavior for the About item
+            MenuItem? aboutItem = subMenuDemo.GetMenuItemsOfAllSubMenus (mi => mi.Title == "_About").FirstOrDefault ();
 
-            var menuBar = new MenuBar { Title = "MenuHost MenuBar" };
-            MenuHost host = this;
-            menuBar.EnableForDesign (ref host);
-
-            Add (menuBar);
-
-            Label lastAcceptedLabel = new () { Title = "Last Accepted:", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastCommandLabel) };
-
-            View lastAcceptedText = new ()
+            if (aboutItem is { })
             {
-                X = Pos.Right (lastAcceptedLabel) + 1, Y = Pos.Top (lastAcceptedLabel), Height = Dim.Auto (), Width = Dim.Auto ()
-            };
-
-            Add (lastAcceptedLabel, lastAcceptedText);
-
-            // MenuItem: AutoSave - Demos simple CommandView state tracking
-            // In MenuBar.EnableForDesign, the auto save MenuItem does not specify a Command. But does
-            // set a Key (F10). MenuBar adds this key as a hotkey and thus if it's pressed, it toggles the MenuItem
-            // CB.
-            // So that is needed is to mirror the two check boxes.
-            var autoSaveMenuItemCb = menuBar.GetMenuItemsWithTitle ("_Auto Save").FirstOrDefault ()?.CommandView as CheckBox;
-            Debug.Assert (autoSaveMenuItemCb is { });
-
-            CheckBox autoSaveStatusCb = new ()
-            {
-                Title = "AutoSave Status (MenuItem Binding to F10)", X = Pos.Left (lastAcceptedLabel), Y = Pos.Bottom (lastAcceptedLabel)
-            };
-
-            autoSaveStatusCb.ValueChanged += (_, _) => { autoSaveMenuItemCb!.Value = autoSaveStatusCb.Value; };
-            autoSaveMenuItemCb.ValueChanged += (_, _) => { autoSaveStatusCb!.Value = autoSaveMenuItemCb.Value; };
-
-            Add (autoSaveStatusCb);
-
-            // MenuItem: Enable Overwrite - Demos View Key Binding
-            // In MenuBar.EnableForDesign, to overwrite MenuItem specifies a Command (Command.EnableOverwrite).
-            // Ctrl+W is bound to Command.EnableOverwrite by this View.
-            // Thus, when Ctrl+W is pressed the MenuBar never sees it, but the command is invoked on this.
-            // If the user clicks on the MenuItem, Accept will be raised.
-            CheckBox enableOverwriteStatusCb = new ()
-            {
-                Title = "Enable Overwrite (View Binding to Ctrl+W)", X = Pos.Left (autoSaveStatusCb), Y = Pos.Bottom (autoSaveStatusCb)
-            };
-
-            // The source of truth is our status CB; any time it changes, update the menu item
-            var enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithTitle ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
-
-            enableOverwriteStatusCb.ValueChanged += (_, _) =>
-                                                    {
-                                                        if (enableOverwriteMenuItemCb is { })
-                                                        {
-                                                            enableOverwriteMenuItemCb.Value = enableOverwriteStatusCb.Value;
-                                                        }
-                                                    };
-
-            menuBar.Accepted += (_, args) =>
-                                {
-                                    if (!(args.Context?.TryGetSource (out View? sourceView) == true)
-                                        || sourceView is not MenuItem mi
-                                        || mi.CommandView != enableOverwriteMenuItemCb)
-                                    {
-                                        return;
-                                    }
-
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
-
-                                    // Set Cancel to true to stop propagation of Accepting to superview
-                                    args.Handled = true;
-
-                                    // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
-                                    enableOverwriteStatusCb.Value = ((CheckBox)mi.CommandView).Value;
-                                    lastAcceptedText.Text = sourceView.Title;
-                                };
-
-            HotKeyBindings.Add (Key.W.WithCtrl, Command.EnableOverwrite);
-
-            AddCommand (Command.EnableOverwrite,
-                        ctx =>
-                        {
-                            // The command was invoked. Toggle the status Cb.
-                            enableOverwriteStatusCb.AdvanceCheckState ();
-
-                            return HandleCommand (ctx);
-                        });
-            Add (enableOverwriteStatusCb);
-
-            // MenuItem: EditMode - Demos App Level Key Bindings
-            // In MenuBar.EnableForDesign, the edit mode MenuItem specifies a Command (Command.Edit).
-            // F5 is bound to Command.EnableOverwrite as an Applicatio-Level Key Binding
-            // Thus when F5 is pressed the MenuBar never sees it, but the command is invoked on this, via
-            // a Application.KeyBinding.
-            // If the user clicks on the MenuItem, Accept will be raised.
-            CheckBox editModeStatusCb = new ()
-            {
-                Title = "EditMode (App Binding to F5)", X = Pos.Left (enableOverwriteStatusCb), Y = Pos.Bottom (enableOverwriteStatusCb)
-            };
-
-            // The source of truth is our status CB; any time it changes, update the menu item
-            var editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
-
-            editModeStatusCb.ValueChanged += (_, _) =>
-                                             {
-                                                 if (editModeMenuItemCb is { })
-                                                 {
-                                                     editModeMenuItemCb.Value = editModeStatusCb.Value;
-                                                 }
-                                             };
-
-            menuBar.Accepted += (_, args) =>
-                                {
-                                    if (!(args.Context?.TryGetSource (out View? sourceView) == true)
-                                        || sourceView is not MenuItem mi
-                                        || mi.CommandView != editModeMenuItemCb)
-                                    {
-                                        return;
-                                    }
-
-                                    Logging.Debug ($"menuBar.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
-
-                                    // Set Cancel to true to stop propagation of Accepting to superview
-                                    args.Handled = true;
-
-                                    // Since overwrite uses a MenuItem.Command the menu item CB is the source of truth
-                                    editModeMenuItemCb.Value = ((CheckBox)mi.CommandView).Value;
-                                    lastAcceptedText.Text = sourceView.Title;
-                                };
-
-            AddCommand (Command.Edit,
-                        ctx =>
-                        {
-                            // The command was invoked. Toggle the status Cb.
-                            editModeStatusCb.AdvanceCheckState ();
-
-                            return HandleCommand (ctx);
-                        });
-
-            Add (editModeStatusCb);
-
-            // Set up the Context Menu
-            ContextMenu = new PopoverMenu { Title = "ContextMenu", Id = "ContextMenu" };
-
-            ContextMenu.EnableForDesign (ref host);
-            App?.Popover?.Register (ContextMenu);
-
-            ContextMenu.Visible = false;
-
-            // Demo of PopoverMenu as a context menu
-            // If we want Commands from the ContextMenu to be handled by the MenuHost
-            // we need to subscribe to the ContextMenu's Accepted event.
-            ContextMenu!.Accepted += (_, args) =>
-                                     {
-                                         Logging.Debug ($"ContextMenu.Accepted: {args.Context?.Source.ToIdentifyingString ()}");
-
-                                         // Forward the event to the MenuHost
-                                         if (args.Context is { })
-                                         {
-                                             //InvokeCommand (args.Context.Command);
-                                         }
-                                     };
-
-            // Add a button to open the contextmenu
-            var openBtn = new Button { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
-
-            openBtn.Accepting += (_, e) =>
-                                 {
-                                     e.Handled = true;
-                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {e.Context?.Source.ToIdentifyingString ()}");
-                                     NewKeyDownEvent (menuBar.Key);
-                                 };
-
-            Add (openBtn);
-
-            //var hideBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (openBtn), Text = "Toggle Menu._Visible" };
-            //hideBtn.Accepting += (s, e) => { menuBar.Visible = !menuBar.Visible; };
-            //appWindow.Add (hideBtn);
-
-            //var enableBtn = new Button { X = Pos.Center (), Y = Pos.Bottom (hideBtn), Text = "_Toggle Menu.Enable" };
-            //enableBtn.Accepting += (s, e) => { menuBar.Enabled = !menuBar.Enabled; };
-            //appWindow.Add (enableBtn);
-
-            autoSaveStatusCb.SetFocus ();
-
-            return;
-
-            // Add the commands supported by this View
-            bool? HandleCommand (ICommandContext? ctx)
-            {
-                lastCommandText.Text = ctx?.Command!.ToString ()!;
-
-                Logging.Debug ($"lastCommand: {lastCommandText.Text}");
-
-                return true;
+                aboutItem.Activated += (_, _) => MessageBox.Query (App!, "SubMenu Demo", "Demonstrates MenuItem.SubMenu for nested menus.", Strings.btnOk);
             }
         }
 
-        /// <inheritdoc/>
-        protected override void Dispose (bool disposing)
+        private void ConfigureTestMenu (Menu menu)
         {
-            if (ContextMenu is { })
-            {
-                ContextMenu.Dispose ();
-                ContextMenu = null;
-            }
+            MenuItem menuItem1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
+            menuItem1.Activated += (_, _) => MessageBox.Query (App!, "This is a MessageBox", "This is a message box message", Strings.btnOk);
 
-            base.Dispose (disposing);
+            Line line = new ();
+
+            MenuItem menuItemBorders = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+            menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
+
+            menuItemBorders.Action += () =>
+                                      {
+                                          if (menuItemBorders.CommandView is CheckBox cb)
+                                          {
+                                              menu.BorderStyle = cb.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                          }
+                                      };
+
+            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+            menuItemBorders.Accepting += (_, args) => args.Handled = true;
+
+            OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+
+            MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+
+            schemeOptionSelector.ValueChanged += (_, args) =>
+                                                 {
+                                                     if (args.Value is { } scheme)
+                                                     {
+                                                         menu.SchemeName = scheme.ToString ();
+                                                     }
+                                                 };
+
+            menu.Add (menuItem1, line, menuItemBorders, menuItemScheme);
         }
-    }
-
-    private const string LOGFILE_LOCATION = "./logs";
-    private static readonly string _logFilePath = string.Empty;
-    private static readonly LoggingLevelSwitch _logLevelSwitch = new ();
-
-    private static ILogger CreateLogger ()
-    {
-        // Configure Serilog to write logs to a file
-        _logLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
-
-        Log.Logger = new LoggerConfiguration ().MinimumLevel.ControlledBy (_logLevelSwitch)
-                                               .Enrich.FromLogContext () // Enables dynamic enrichment
-                                               .WriteTo.Debug ()
-                                               .WriteTo.File (_logFilePath,
-                                                              rollingInterval: RollingInterval.Day,
-                                                              outputTemplate:
-                                                              "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                                               .CreateLogger ();
-
-        // Create a logger factory compatible with Microsoft.Extensions.Logging
-        using ILoggerFactory loggerFactory = LoggerFactory.Create (builder =>
-                                                                   {
-                                                                       builder.AddSerilog (dispose: true) // Integrate Serilog with ILogger
-                                                                              .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
-                                                                   });
-
-        // Get an ILogger instance
-        return loggerFactory.CreateLogger ("Global Logger");
     }
 }

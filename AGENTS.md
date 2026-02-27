@@ -92,6 +92,14 @@ Process guides in `.claude/workflows/`:
 - [Build & Test Workflow](/.claude/workflows/build-test-workflow.md) - Build, test, and troubleshooting
 - [PR Workflow](/.claude/workflows/pr-workflow.md) - Submitting pull requests
 
+## Planning Mode
+
+When creating implementation plans:
+- **Create plan files in `./plans/`** (relative to repository root: `D:\s\gui-cs\Terminal.Gui\plans\`)
+- Use markdown format with clear sections
+- Include: problem statement, implementation steps, file changes, verification steps
+- Reference existing patterns and reuse opportunities from exploration
+
 ## Task-Specific Guides
 
 See `.claude/tasks/` for specialized checklists:
@@ -188,6 +196,7 @@ See `.claude/cookbook/` for common UI patterns:
 |App/Mouse:{IMouse.cs,IMouseGrabHandler.cs,MouseImpl.cs}
 |App/Runnable:{IRunnable.cs,SessionToken.cs,SessionTokenEventArgs.cs}
 |App/Timeout:{ITimedEvents.cs,LogarithmicTimeout.cs,SmoothAcceleratingTimeout.cs,TimedEvents.cs,Timeout.cs,TimeoutEventArgs.cs}
+|App/Tracing:{ITraceBackend.cs,ListBackend.cs,LoggingBackend.cs,NullBackend.cs,Trace.cs,TraceCategory.cs,TraceEntry.cs}
 |Configuration:{AppSettingsScope.cs,AttributeJsonConverter.cs,ColorJsonConverter.cs,ConcurrentDictionaryJsonConverter.cs,ConfigLocations.cs,ConfigProperty.cs,ConfigurationManager.cs,ConfigurationManagerEventArgs.cs,ConfigurationManagerNotEnabledException.cs,ConfigurationPropertyAttribute.cs,DeepCloner.cs,DictionaryJsonConverter.cs,KeyCodeJsonConverter.cs,KeyJsonConverter.cs,RuneJsonConverter.cs,SchemeJsonConverter.cs,SchemeManager.cs,Scope.cs,ScopeJsonConverter.cs,SettingsScope.cs,SourceGenerationContext.cs,SourcesManager.cs,ThemeManager.cs,ThemeScope.cs}
 |Drawing:{Attribute.cs,Cell.cs,CellEventArgs.cs,FillPair.cs,Glyphs.cs,Gradient.cs,GradientFill.cs,GraphemeHelper.cs,IFill.cs,Region.cs,RegionOp.cs,Ruler.cs,Scheme.cs,Schemes.cs,SolidFill.cs,TextStyle.cs,Thickness.cs,VisualRole.cs,VisualRoleEventArgs.cs}
 |Drawing/Color:{AnsiColorCode.cs,Color.ColorExtensions.cs,Color.ColorName.cs,Color.ColorParseException.cs,Color.cs,Color.Formatting.cs,Color.Operators.cs,ColorModel.cs,ColorQuantizer.cs,ColorStrings.cs,IColorDistance.cs,IColorNameResolver.cs,ICustomColorFormatter.cs,StandardColor.cs,StandardColors.cs,StandardColorsNameResolver.cs}
@@ -196,24 +205,25 @@ See `.claude/cookbook/` for common UI patterns:
 |Drawing/Sixel:{SixelEncoder.cs,SixelSupportDetector.cs,SixelSupportResult.cs,SixelToRender.cs}
 |Drivers:{ComponentFactoryImpl.cs,Cursor.cs,CursorStyle.cs,Driver.cs,DriverImpl.cs,DriverRegistry.cs,IComponentFactory.cs,IDriver.cs,ISizeMonitor.cs,PlatformDetection.cs,SizeMonitorImpl.cs}
 |Drivers/AnsiDriver:{AnsiComponentFactory.cs,AnsiInput.cs,AnsiInputProcessor.cs,AnsiOutput.cs,AnsiPlatform.cs,AnsiSizeMonitor.cs,FakeClipboard.cs}
-|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IHeld.cs,Osc8UrlLinker.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs}
+|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IHeld.cs,Osc8UrlLinker.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs,TerminalColorDetector.cs}
 |Drivers/AnsiHandling/EscSeqUtils:{EscSeqReqStatus.cs,EscSeqRequests.cs,EscSeqUtils.cs}
 |Drivers/DotNetDriver:{INetInput.cs,NetComponentFactory.cs,NetInput.cs,NetInputProcessor.cs,NetKeyConverter.cs,NetOutput.cs,NetWinVTConsole.cs}
 |Drivers/Input:{ConsoleInputSource.cs,IInput.cs,IInputProcessor.cs,IInputSource.cs,InputImpl.cs,InputProcessorImpl.cs,InputRecord.cs,ITestableInput.cs,TestInputSource.cs}
 |Drivers/Keyboard:{ConsoleKeyInfoExtensions.cs,ConsoleKeyMapping.cs,IKeyConverter.cs,KeyCode.cs,VK.cs}
 |Drivers/Mouse:{MouseButtonClickTracker.cs,MouseInterpreter.cs}
 |Drivers/Output:{IOutput.cs,IOutputBuffer.cs,OutputBase.cs,OutputBufferImpl.cs}
+|Drivers/TerminalEnvironment:{ColorCapabilityLevel.cs,TerminalColorCapabilities.cs,TerminalEnvironmentDetector.cs}
 |Drivers/UnixDriver:{IUnixInput.cs,SuspendHelper.cs,UnixClipboard.cs,UnixComponentFactory.cs,UnixInput.cs,UnixInputProcessor.cs,UnixIOHelper.cs,UnixOutput.cs,UnixRawModeHelper.cs}
 |Drivers/WindowsDriver:{ClipboardImpl.cs,CursorVisibility.cs,IWindowsInput.cs,WindowsComponentFactory.cs,WindowsConsole.cs,WindowsInput.cs,WindowsInputProcessor.cs,WindowsKeyboardLayout.cs,WindowsKeyConverter.cs,WindowsKeyHelper.cs,WindowsOutput.cs,WindowsVTInputHelper.cs,WindowsVTOutputHelper.cs}
 |FileServices:{DefaultSearchMatcher.cs,FileSystemColorProvider.cs,FileSystemIconProvider.cs,FileSystemInfoStats.cs,FileSystemTreeBuilder.cs,IFileOperations.cs,ISearchMatcher.cs}
-|Input:{Command.cs,CommandContext.cs,CommandEventArgs.cs,ICommandContext.cs,IInputBinding.cs,InputBinding.cs,InputBindings.cs}
+|Input:{Command.cs,CommandBinding.cs,CommandBindingsBase.cs,CommandBridge.cs,CommandContext.cs,CommandContextExtensions.cs,CommandEventArgs.cs,CommandOutcome.cs,CommandRouting.cs,IAcceptTarget.cs,ICommandBinding.cs,ICommandContext.cs}
 |Input/Keyboard:{Key.cs,KeyBinding.cs,KeyBindings.cs,KeyChangedEventArgs.cs,KeyEqualityComparer.cs,KeystrokeNavigatorEventArgs.cs}
 |Input/Mouse:{GrabMouseEventArgs.cs,Mouse.cs,MouseBinding.cs,MouseBindings.cs,MouseFlags.cs,MouseFlagsChangedEventArgs.cs}
 |Resources:{GlobalResources.cs,ResourceManagerWrapper.cs,Strings.Designer.cs}
 |Testing:{IInputInjector.cs,InputInjectionEvent.cs,InputInjectionExtensions.cs,InputInjectionMode.cs,InputInjectionOptions.cs,InputInjector.cs}
 |Text:{NerdFonts.cs,RuneExtensions.cs,StringExtensions.cs,TextDirection.cs,TextFormatter.cs}
 |Time:{FuncTimeProvider.cs,ITimeProvider.cs,ITimer.cs,SystemTimeProvider.cs,VirtualTimeProvider.cs}
-|ViewBase:{DrawAdornmentsEventArgs.cs,DrawContext.cs,DrawEventArgs.cs,IDesignable.cs,IValue.cs,View.Adornments.cs,View.Arrangement.cs,View.Command.cs,View.Content.cs,View.cs,View.Cursor.cs,View.Diagnostics.cs,View.Drawing.Attribute.cs,View.Drawing.Clipping.cs,View.Drawing.cs,View.Drawing.Primitives.cs,View.Drawing.Scheme.cs,View.Hierarchy.cs,View.Keyboard.cs,View.Layout.cs,View.Navigation.cs,View.NeedsDraw.cs,View.ScrollBars.cs,View.Text.cs,ViewCollectionHelpers.cs,ViewDiagnosticFlags.cs,ViewEventArgs.cs,ViewportSettingsFlags.cs}
+|ViewBase:{DrawAdornmentsEventArgs.cs,DrawContext.cs,DrawEventArgs.cs,IDesignable.cs,IValue.cs,View.Adornments.cs,View.Arrangement.cs,View.Command.cs,View.Content.cs,View.cs,View.Cursor.cs,View.Diagnostics.cs,View.Drawing.Attribute.cs,View.Drawing.Clipping.cs,View.Drawing.cs,View.Drawing.Primitives.cs,View.Drawing.Scheme.cs,View.Hierarchy.cs,View.Keyboard.cs,View.Layout.cs,View.Navigation.cs,View.NeedsDraw.cs,View.ScrollBars.cs,View.Text.cs,ViewCollectionHelpers.cs,ViewDiagnosticFlags.cs,ViewEventArgs.cs,ViewExtensions.cs,ViewportSettingsFlags.cs,WeakReferenceExtensions.cs}
 |ViewBase/Adornment:{Adornment.cs,ArrangeButtons.cs,Arranger.cs,Border.Arrangment.cs,Border.cs,BorderSettings.cs,Margin.cs,Padding.cs,ParentManipulator.cs,ShadowStyle.cs,ShadowView.cs}
 |ViewBase/EnumExtensions:{AddOrSubtractExtensions.cs,AlignmentExtensions.cs,AlignmentModesExtensions.cs,BorderSettingsExtensions.cs,DimAutoStyleExtensions.cs,DimensionExtensions.cs,DimPercentModeExtensions.cs,SideExtensions.cs,ViewDiagnosticFlagsExtensions.cs}
 |ViewBase/Helpers:{StackExtensions.cs}
@@ -232,7 +242,7 @@ See `.claude/cookbook/` for common UI patterns:
 |Views/ListView:{IListDataSource.cs,ListView.Commands.cs,ListView.cs,ListView.Drawing.cs,ListView.Movement.cs,ListView.Selection.cs,ListViewEventArgs.cs,ListWrapper.cs}
 |Views/Menu:{Menu.cs,MenuBar.cs,MenuBarItem.cs,MenuItem.cs,PopoverMenu.cs}
 |Views/Runnable:{Runnable.cs,RunnableTResult.cs}
-|Views/ScrollBar:{ScrollBar.cs,ScrollSlider.cs}
+|Views/ScrollBar:{ScrollBar.cs,ScrollBarVisibilityMode.cs,ScrollSlider.cs}
 |Views/Selectors:{FlagSelector.cs,FlagSelectorTEnum.cs,OptionSelector.cs,OptionSelectorTEnum.cs,SelectorBase.cs,SelectorStyles.cs}
 |Views/SpinnerView:{SpinnerStyle.cs,SpinnerView.cs}
 |Views/TableView:{CellActivatedEventArgs.cs,CellColorGetterArgs.cs,CellToggledEventArgs.cs,CheckBoxTableSourceWrapper.cs,CheckBoxTableSourceWrapperByIndex.cs,CheckBoxTableSourceWrapperByObject.cs,ColumnStyle.cs,DataTableSource.cs,EnumerableTableSource.cs,IEnumerableTableSource.cs,ITableSource.cs,ListColumnStyle.cs,ListTableSource.cs,RowColorGetterArgs.cs,SelectedCellChangedEventArgs.cs,TableSelection.cs,TableStyle.cs,TableView.cs,TableView.Drawing.cs,TableView.Mouse.cs,TableView.Navigation.cs,TableView.Selection.cs,TreeTableSource.cs}
@@ -410,5 +420,9 @@ See `.claude/cookbook/` for common UI patterns:
 |IFileOperations|Interface|GetFiles,GetDirectories,Exists
 |FileSystemTreeBuilder|Class|Build file trees
 ```
+
+
+
+
 
 
