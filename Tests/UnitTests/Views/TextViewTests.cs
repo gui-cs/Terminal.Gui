@@ -1469,24 +1469,38 @@ This is the second line.
     {
         var tv = new TextView { Width = 10, Height = 5 };
 
+        Assert.Equal (new Size (10, 5), tv.GetContentSize ());
+
+        tv.BeginInit ();
+        tv.EndInit ();
+
         // add 100 lines of wide text to view
         for (var i = 0; i < 100; i++)
         {
             tv.Text += new string ('x', 100) + Environment.NewLine;
         }
 
+        // The content size is only updated after the BeginInit/EndInit call, so we need to check it after that.
+        Assert.Equal (new Size (101, 101), tv.GetContentSize ());
         Assert.Equal (0, tv.InsertionPoint.Y);
         tv.ScrollTo (50);
         Assert.Equal (0, tv.InsertionPoint.Y);
+        Assert.Equal (new Point (0, 50), tv.Viewport.Location);
 
         tv.NewKeyDownEvent (Key.P);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
     }
 
-    [Fact (Skip = "Broken with new scrollbar stuff")]
+    [Fact]
     [SetupFakeApplication]
     public void ScrollTo_InsertionPoint ()
     {
         var tv = new TextView { Width = 10, Height = 5 };
+
+        Assert.Equal (new Size (10, 5), tv.GetContentSize ());
+
+        tv.BeginInit ();
+        tv.EndInit ();
 
         // add 100 lines of wide text to view
         for (var i = 0; i < 100; i++)
@@ -1494,9 +1508,12 @@ This is the second line.
             tv.Text += new string ('x', 100) + (i == 99 ? "" : Environment.NewLine);
         }
 
+        // The content size is only updated after the BeginInit/EndInit call, so we need to check it after that.
+        Assert.Equal (new Size (101, 100), tv.GetContentSize ());
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         tv.ScrollTo (50);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
+        Assert.Equal (new Point (0, 50), tv.Viewport.Location);
 
         tv.InsertionPoint = new Point (tv.Viewport.X, tv.Viewport.Y);
         Assert.Equal (new Point (0, 50), tv.InsertionPoint);

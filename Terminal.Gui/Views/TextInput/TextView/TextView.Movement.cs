@@ -41,10 +41,13 @@ public partial class TextView
     ///     <paramref name="isRow"/> is false.
     /// </summary>
     /// <param name="idx">
-    ///     Row that should be displayed at the top or Column that should be displayed at the left, if the value
+    ///     The row that should be displayed at the top or the column that should be displayed at the left, if the value
     ///     is negative it will be reset to zero
     /// </param>
     /// <param name="isRow">If true (default) the <paramref name="idx"/> is a row, column otherwise.</param>
+    /// <remarks>
+    ///     The <see cref="CurrentRow"/> and <see cref="CurrentColumn"/> will not be changed by this method.
+    /// </remarks>
     public void ScrollTo (int idx, bool isRow = true)
     {
         if (idx < 0)
