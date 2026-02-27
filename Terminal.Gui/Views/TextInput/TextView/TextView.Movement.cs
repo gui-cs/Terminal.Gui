@@ -153,6 +153,11 @@ public partial class TextView
         if (CurrentColumn > 0)
         {
             CurrentColumn--;
+
+            if (Viewport.X > 0 && CurrentColumn < Viewport.X)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {
@@ -160,14 +165,13 @@ public partial class TextView
             {
                 CurrentRow--;
 
-                if (CurrentRow < Viewport.Y)
-                {
-                    Viewport = Viewport with { Y = Viewport.Y - 1 };
-                }
-                SetNeedsDraw ();
-
                 List<Cell> currentLine = GetCurrentLine ();
                 CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
+
+                if (CurrentRow < Viewport.Y || CurrentColumn > Viewport.Width)
+                {
+                    SetNeedsDraw ();
+                }
             }
             else
             {
@@ -256,6 +260,11 @@ public partial class TextView
         if (CurrentColumn < currentLine.Count)
         {
             CurrentColumn++;
+
+            if (CurrentColumn >= currentLine.Count || CurrentColumn >= Viewport.Width)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {
@@ -266,9 +275,8 @@ public partial class TextView
 
                 if (CurrentRow >= Viewport.Y + Viewport.Height)
                 {
-                    Viewport = Viewport with { Y = Viewport.Y + 1 };
+                    SetNeedsDraw ();
                 }
-                SetNeedsDraw ();
             }
             else
             {

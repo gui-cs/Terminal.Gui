@@ -2718,7 +2718,13 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
 
         textView.InsertionPoint = new Point (16, 0); // End of first line
+        Assert.True (textView.NeedsDraw);
+        textView.Draw (); // Draw before invoking command to ensure NeedsDraw is false
+        Assert.False (textView.NeedsDraw);
         Assert.True (textView.InvokeCommand (Command.Right));
+        Assert.Equal (new Point (0, 1), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 1), textView.Viewport.Location);
+        textView.SetClipToScreen ();
         textView.Draw ();
 
         var expected = """
@@ -2728,6 +2734,53 @@ public class TextViewTests (ITestOutputHelper output)
                        """;
 
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+    }
+
+    [Fact]
+    public void InvokeCommand_Right_BeforeLastColumn_Draws_Cursor_At_End_Of_Line ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1 Testing Line 1\n2 Testing Line 2",
+            Width = 10,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
+
+        textView.InsertionPoint = new Point (15, 0); // Before the last column of first line
+        Assert.True (textView.NeedsDraw);
+        textView.Draw (); // Draw before invoking command to ensure NeedsDraw is false
+        Assert.False (textView.NeedsDraw);
+        Assert.True (textView.InvokeCommand (Command.Right));
+        Assert.Equal (new Point (16, 0), textView.InsertionPoint);
+        Assert.Equal (new Point (9, 0), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        var expected = """
+                       ┌────────┐
+                       │ Line 1 │
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (8, 1), textView.Cursor.Position!.Value);
     }
 
     [Fact]
@@ -2749,7 +2802,13 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
 
         textView.InsertionPoint = new Point (0, 1); // Start of second line
+        Assert.True (textView.NeedsDraw);
+        textView.Draw (); // Draw before invoking command to ensure NeedsDraw is false
+        Assert.False (textView.NeedsDraw);
         Assert.True (textView.InvokeCommand (Command.Left));
+        Assert.Equal (new Point (16, 0), textView.InsertionPoint);
+        Assert.Equal (new Point (9, 0), textView.Viewport.Location);
+        textView.SetClipToScreen ();
         textView.Draw ();
 
         var expected = """
@@ -2759,6 +2818,54 @@ public class TextViewTests (ITestOutputHelper output)
                        """;
 
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (8, 1), textView.Cursor.Position!.Value);
+    }
+
+    [Fact]
+    public void InvokeCommand_Left_AfterFirstColumn_Draws_Cursor_At_Start_Of_Line ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1 Testing Line 1\n2 Testing Line 1",
+            Width = 10,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
+
+        textView.InsertionPoint = new Point (1, 1); // After first column of second line
+        textView.Viewport = new Rectangle (1, 1, 8, 1); // Scroll to the first column of second line
+        Assert.True (textView.NeedsDraw);
+        textView.Draw (); // Draw before invoking command to ensure NeedsDraw is false
+        Assert.False (textView.NeedsDraw);
+        Assert.True (textView.InvokeCommand (Command.Left));
+        Assert.Equal (new Point (0, 1), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 1), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        var expected = """
+                       ┌────────┐
+                       │2 Testin│
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
     }
 
     [Theory]
@@ -2878,7 +2985,7 @@ public class TextViewTests (ITestOutputHelper output)
     public void MoveEnd_AdjustsViewportToShowInsertionPoint_When_InsertionPointIsBeyondViewport ()
     {
         using IApplication app = Application.Create ().Init ();
-        TextView textView = new () { Width = 5, Height = 5, BorderStyle = LineStyle.Single, App = app};
+        TextView textView = new () { Width = 5, Height = 5, BorderStyle = LineStyle.Single, App = app };
         textView.Text = "Line1\nLine2\nLine3\nLine4\nLine5";
 
         textView.BeginInit ();
