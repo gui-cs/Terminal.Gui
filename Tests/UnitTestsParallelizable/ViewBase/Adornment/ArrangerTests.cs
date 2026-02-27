@@ -174,7 +174,7 @@ public class ArrangerTests
         // Assert - Check button count and verify expected button exists
         IEnumerable<Button> buttons = border.SubViews.OfType<Button> ();
         Assert.Equal (expectedCount, buttons.Count ());
-        Assert.Contains (buttons, b => b.Data is ArrangeButtons type && type == expectedButtonType);
+        Assert.Contains (buttons, b => arranger.TryGetButtonType (b, out ArrangeButtons type) && type == expectedButtonType);
     }
 
     [Fact]
@@ -190,12 +190,12 @@ public class ArrangerTests
         // Assert - Move, AllSize, and all four directional buttons should be visible (Resizable includes all directions)
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Equal (6, visibleButtons.Count ());
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.Move);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.AllSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.LeftSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.RightSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.TopSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.BottomSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.Move);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.AllSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.LeftSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.RightSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.TopSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.BottomSize);
     }
 
     [Fact]
@@ -211,11 +211,11 @@ public class ArrangerTests
         // Assert - AllSize plus all four directional resize buttons should be visible
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Equal (5, visibleButtons.Count ());
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.AllSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.LeftSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.RightSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.TopSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.BottomSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.AllSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.LeftSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.RightSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.TopSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.BottomSize);
     }
 
     #endregion
@@ -817,7 +817,7 @@ public class ArrangerTests
         // Assert
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
-        Assert.True (visibleButtons.First().Data is ArrangeButtons.Move);
+        Assert.True (arranger.TryGetButtonType (visibleButtons.First (), out ArrangeButtons type) && type == ArrangeButtons.Move);
     }
 
     [Fact]
@@ -833,7 +833,7 @@ public class ArrangerTests
         // Assert
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
-        Assert.True (visibleButtons.First ().Data is ArrangeButtons.LeftSize);
+        Assert.True (arranger.TryGetButtonType (visibleButtons.First (), out ArrangeButtons type) && type == ArrangeButtons.LeftSize);
     }
 
     [Fact]
@@ -849,7 +849,7 @@ public class ArrangerTests
         // Assert
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
-        Assert.True (visibleButtons.First ().Data is ArrangeButtons.RightSize);
+        Assert.True (arranger.TryGetButtonType (visibleButtons.First (), out ArrangeButtons type) && type == ArrangeButtons.RightSize);
     }
 
     [Fact]
@@ -865,7 +865,7 @@ public class ArrangerTests
         // Assert
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
-        Assert.True (visibleButtons.First ().Data is ArrangeButtons.TopSize);
+        Assert.True (arranger.TryGetButtonType (visibleButtons.First (), out ArrangeButtons type) && type == ArrangeButtons.TopSize);
     }
 
     [Fact]
@@ -881,7 +881,7 @@ public class ArrangerTests
         // Assert
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
-        Assert.True (visibleButtons.First ().Data is ArrangeButtons.BottomSize);
+        Assert.True (arranger.TryGetButtonType (visibleButtons.First (), out ArrangeButtons type) && type == ArrangeButtons.BottomSize);
     }
 
     [Fact]
@@ -897,11 +897,11 @@ public class ArrangerTests
         // Assert - Resizable flag creates AllSize AND all four directional buttons
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Equal (5, visibleButtons.Count ());
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.AllSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.LeftSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.RightSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.TopSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.BottomSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.AllSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.LeftSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.RightSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.TopSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.BottomSize);
     }
 
     [Fact]
@@ -917,12 +917,12 @@ public class ArrangerTests
         // Assert - Should show Move, AllSize, and all four directional buttons
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Equal (6, visibleButtons.Count ());
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.Move);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.AllSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.LeftSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.RightSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.TopSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.BottomSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.Move);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.AllSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.LeftSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.RightSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.TopSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.BottomSize);
     }
 
     [Fact]
@@ -938,8 +938,8 @@ public class ArrangerTests
         // Assert
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Equal (2, visibleButtons.Count ());
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.LeftSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.RightSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.LeftSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.RightSize);
     }
 
     [Fact]
@@ -955,8 +955,8 @@ public class ArrangerTests
         // Assert
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Equal (2, visibleButtons.Count ());
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.TopSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.BottomSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.TopSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.BottomSize);
     }
 
     [Fact]
@@ -972,11 +972,11 @@ public class ArrangerTests
         // Assert - AllSize plus all four directional buttons visible
         IEnumerable<Button> visibleButtons = border.SubViews.OfType<Button> ().Where (b => b.Visible);
         Assert.Equal (5, visibleButtons.Count ());
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.AllSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.LeftSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.RightSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.TopSize);
-        Assert.Contains (visibleButtons, b => b.Data is ArrangeButtons.BottomSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.AllSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.LeftSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.RightSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.TopSize);
+        Assert.Contains (visibleButtons, b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.BottomSize);
     }
 
     [Fact]
@@ -1022,7 +1022,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert - Verify button properties
-        Button moveButton = border.SubViews.OfType<Button> ().First (b => b.Data is ArrangeButtons.Move);
+        Button moveButton = border.SubViews.OfType<Button> ().First (b => arranger.TryGetButtonType (b, out var bType) && bType == ArrangeButtons.Move);
         Assert.True (moveButton.CanFocus);
         Assert.Equal (1, moveButton.Frame.Width);
         Assert.Equal (1, moveButton.Frame.Height);
