@@ -26,7 +26,7 @@ When `InvokeCommand(Command.Activate)` is called with no binding:
 
 Proven by: `Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_Direct`
 
-## Fix
+## Plan (Original)
 
 All changes in `Terminal.Gui/ViewBase/View.Command.cs`.
 
@@ -105,21 +105,134 @@ Add `Trace.Command` calls:
 - When `ActivatedViaDispatch`/`AcceptedViaDispatch` flag is set
 - When the flag causes a skip of `RaiseActivated`/`RaiseAccepted`
 
-## Files to Modify
+## Implementation (What Was Actually Done)
+
+Implemented in commits `053f75c` (logic) and `5f11a59` (cleanup). All changes in `Terminal.Gui/ViewBase/View.Command.cs` except one test expectation change.
+
+### What matched the plan
+
+Steps 1–5 were implemented as designed:
+
+1. **`DispatchState` flags enum** replaced `_lastDispatchOccurred` exactly as specified. All boolean references were migrated to `HasFlag` checks.
+
+2. **Double-fire guard** in `DefaultActivateHandler` implemented as specified: `DispatchingDown` sets `ActivatedViaDispatch`, outer call checks the flag and skips.
+
+3. **Value refresh in `BubbleActivatedUp`** implemented with a scoping refinement (see below).
+
+4. **Accept path** got the same `AcceptedViaDispatch` pattern.
+
+5. **Trace logging** added for flag-set and skip events.
+
+### Additional discoveries from tracing (deviations from plan)
+
+Two issues were discovered by adding `Trace.Command` calls and observing the actual command flow:
+
+#### Discovery 1: BubblingUp-phase early firing on plain views
+
+**Problem:** The original code fired `RaiseActivated` on plain views (no dispatch target) during the BubblingUp phase of `RaiseActivating`. This happened *before* the originator completed its state change (e.g., before ToggleView's `OnActivated` incremented Value). When these plain ancestors had bridges (e.g., Menu → PopoverMenu), the bridge forwarded the stale pre-change value.
+
+**Trace evidence:** The trace showed `RaiseActivated` firing on Menu during BubblingUp with Value=0, then the bridge forwarding that to PopoverMenu → host, all before the originator's `RaiseActivated` at line 532 which triggers the actual state mutation.
+
+**Fix:** Removed the early `RaiseActivated` during BubblingUp for ALL views (not just composite ones). The BubblingUp handler now always returns `false` without firing `RaiseActivated`. Instead, ALL ancestors (both plain and composite) receive `Activated` later via `BubbleActivatedUp`, which runs after the originator completes its state change. This is the key difference from the plan, which only addressed composite views.
+
+**Code change:**
+```csharp
+// BubblingUp handler — before:
+if (ctx?.Routing == CommandRouting.BubblingUp)
+{
+    if (GetDispatchTarget (ctx) is null)
+    {
+        RaiseActivated (ctx);  // ← fired with stale value
+    }
+    return false;
+}
+
+// After:
+if (ctx?.Routing == CommandRouting.BubblingUp)
+{
+    return false;  // No early firing — BubbleActivatedUp handles ALL ancestors
+}
+```
+
+**Corresponding change:** `BubbleActivatedUp` was changed from `compositeOnly: true` to no filter, notifying all ancestors:
+```csharp
+// Before:
+BubbleActivatedUp (ctx, compositeOnly: true);
+// After:
+BubbleActivatedUp (ctx);
+```
+
+#### Discovery 2: Self-value refresh scope
+
+**Problem:** After `RaiseActivated`, the code re-reads `IValue.GetValue()` to capture post-change values. The plan suggested reading from `this` unconditionally. But tracing showed this was wrong for intermediate views in bridge chains: MenuBarItem (which implements IValue via MenuItem) would overwrite the original MenuItem value with its own Title ("Test" instead of "TestItem").
+
+**Trace evidence:** When MenuItem "TestItem" activated, the command propagated through the bridge chain: MenuItem → Menu → PopoverMenu → MenuBarItem → MenuBar. Without scoping, MenuBarItem's self-value refresh would read `MenuBarItem.GetValue()` (returns Title="Test"), overwriting the original value ("TestItem").
+
+**Fix:** The self-value refresh after `RaiseActivated` is guarded by a source-identity check:
+```csharp
+// Only refresh when this view IS the command source
+if (this is IValue selfValue
+    && ctx is CommandContext cc
+    && ctx.Source?.TryGetTarget (out View? src) == true
+    && ReferenceEquals (src, this))
+{
+    ctx = cc.WithValue (selfValue.GetValue ());
+}
+```
+
+The same scoping applies in `BubbleActivatedUp` when refreshing from ancestors' dispatch targets:
+```csharp
+// Only refresh from dispatch target when it matches the command source
+View? dispatchTarget = next.GetDispatchTarget (ctx);
+if (dispatchTarget is IValue refreshedValue
+    && ctx.Source?.TryGetTarget (out View? source) == true
+    && ReferenceEquals (source, dispatchTarget))
+{
+    upCtx = upCtx.WithValue (refreshedValue.GetValue ());
+}
+```
+
+### Additional fix: DefaultActivateHandler return value
+
+**Problem:** `DefaultActivateHandler` previously returned `true` unconditionally. This prevented key propagation from continuing when Activate originated from a local key binding on a plain view (no dispatch target, no bubble config). This was inconsistent with `DefaultAcceptHandler` which returns `false` in that case to allow HotKey dispatch.
+
+**Fix:** Changed to return a computed value:
+```csharp
+bool activateWillBubble = CommandWillBubbleToAncestor (Command.Activate);
+return _dispatchState.HasFlag (DispatchState.DispatchOccurred) || activateWillBubble;
+```
+
+This mirrors `DefaultAcceptHandler`'s existing pattern and fixes #4759 (Space HotKeyBinding swallowed by focused view).
+
+### Test changes
+
+| Test | Change |
+|------|--------|
+| `InvokeCommands_Returns_True_If_No_Command_Handled` | Renamed to `InvokeCommands_Returns_False_If_No_Command_Handled` — plain views with no dispatch target and no bubble config now correctly return `false` |
+| `Target_CheckBox_CommandView_Activate_With_KeyBinding_Source_Reaches_Target_And_Value_Is_Correct` | Updated expected `valueChangeCount` from 2 to 1 — the double-fire fix means CheckBox only toggles once |
+
+## Files Modified
 
 | File | Change |
 |------|--------|
-| `Terminal.Gui/ViewBase/View.Command.cs` | Add `DispatchState` flags enum; replace `_lastDispatchOccurred`; guard double-fire in both handlers; refresh value in `BubbleActivatedUp` and after `RaiseActivated` |
+| `Terminal.Gui/ViewBase/View.Command.cs` | Add `DispatchState` flags enum; replace `_lastDispatchOccurred`; guard double-fire in both Activate and Accept handlers; defer all ancestor notification to `BubbleActivatedUp`; scope self-value refresh to command source only; fix return value for key propagation |
+| `Tests/UnitTestsParallelizable/ViewBase/ViewCommandTests.cs` | Rename test; update assertion for `false` return from plain view |
+| `Tests/UnitTestsParallelizable/Views/PopoverMenuTests.cs` | Update `valueChangeCount` from 2 to 1 |
 
-## Verification
+## Verification (Actual Results)
 
-1. **3 new ViewCommandTests pass:**
-   - `OnActivated_Fires_Once_When_Originator_Is_DispatchTarget` — ActivatedCount=1, Value=1
-   - `OnActivated_Fires_Once_When_Originator_Is_DispatchTarget_Direct` — ActivatedCount=1, Value=1 (already passes, keep passing)
-   - `Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_Direct` — hostActivatedCount=1, capturedValue=1
-   - `Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_WithBinding` — hostActivatedCount=1, capturedValue=1, valueChangeCount=1
+1. **4 ViewCommandTests pass:**
+   - `OnActivated_Fires_Once_When_Originator_Is_DispatchTarget` — ActivatedCount=1, Value=1 ✅
+   - `OnActivated_Fires_Once_When_Originator_Is_DispatchTarget_Direct` — ActivatedCount=1, Value=1 ✅
+   - `Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_Direct` — hostActivatedCount=1, capturedValue=1 ✅
+   - `Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_WithBinding` — hostActivatedCount=1, capturedValue=1, valueChangeCount=1 ✅
 2. **PopoverMenu tests pass:**
-   - `Target_CheckBox_CommandView_Activate_Direct_Source_Reaches_Target_And_Value_Is_Correct`
-   - `Target_CheckBox_CommandView_Activate_With_KeyBinding_Source_Reaches_Target_And_Value_Is_Correct` — update expected `valueChangeCount` from 2 to 1
-3. **All ~14,300 parallel + ~985 non-parallel tests still pass** (run in both Debug and Release)
-4. **ShortcutTests event ordering**: `BubbleUp_Activate_Event_Ordering` and `BubbleDown_Activate_Event_Ordering` must keep correct 4-event ordering
+   - `Target_CheckBox_CommandView_Activate_Direct_Source_Reaches_Target_And_Value_Is_Correct` ✅
+   - `Target_CheckBox_CommandView_Activate_With_KeyBinding_Source_Reaches_Target_And_Value_Is_Correct` — `valueChangeCount` now 1 ✅
+3. **MenuBar tests pass:**
+   - `MenuBar_Activated_ContextValue_ContainsMenuItem` ✅
+   - `MenuBar_Activated_ContextValue_WithFocusedMenuItem` ✅
+4. **ShortcutTests event ordering preserved:**
+   - `BubbleUp_Activate_Event_Ordering` ✅
+   - `BubbleDown_Activate_Event_Ordering` ✅
+5. **Full test suite: 14,344 parallel + 985 non-parallel — 0 failures** ✅
