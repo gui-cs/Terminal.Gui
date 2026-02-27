@@ -334,9 +334,7 @@ For debugging command routing issues, Terminal.Gui provides a tracing system via
 using Terminal.Gui.Tracing;
 
 // Enable command tracing (thread-safe, per async context)
-Trace.CommandEnabled = true;
-
-// Or use flags-based API
+// Enable tracing via flags-based API
 Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
 
 // For testing, use scoped tracing
@@ -355,7 +353,15 @@ Tracing can also be enabled via configuration:
 
 ```json
 {
-  "Trace.CommandEnabled": true
+  "Trace.EnabledCategories": "Command"
+}
+```
+
+Or enable multiple categories:
+
+```json
+{
+  "Trace.EnabledCategories": ["Command", "Mouse"]
 }
 ```
 
