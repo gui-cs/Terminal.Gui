@@ -23,9 +23,12 @@ public partial class TextView
     public bool MoveHome ()
     {
         CurrentRow = 0;
-        Viewport = Viewport with { Y = 0 };
         CurrentColumn = 0;
-        Viewport = Viewport with { X = 0 };
+
+        if (Viewport.Y > 0 || Viewport.X > 0)
+        {
+            SetNeedsDraw ();
+        }
         TrackColumn ();
         DoNeededAction ();
 

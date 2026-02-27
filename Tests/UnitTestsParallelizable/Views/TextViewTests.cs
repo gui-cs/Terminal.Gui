@@ -2891,7 +2891,7 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (Point.Empty, textView.InsertionPoint);
         Assert.Equal (new Rectangle (0, 0, 3, 3), textView.Viewport);
 
-        // Cursor is always screen relative, so it should be at (0,0) initially in viewport coordinates
+        // Cursor is always screen relative, so it should be at (1,1) initially in viewport coordinates
         Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
 
         textView.Draw ();
@@ -2926,8 +2926,64 @@ public class TextViewTests (ITestOutputHelper output)
 
         textView.PositionCursor ();
 
-        // Cursor is always screen relative, so it should be at (0,0) initially in viewport coordinates
+        // Cursor is always screen relative, so it should be at (3,3) in viewport coordinates
         Assert.Equal (new Point (3, 3), textView.Cursor.Position!.Value);
+    }
+
+    [Fact]
+    public void MoveHome_AdjustsViewportToShowInsertionPoint_When_InsertionPointIsBeyondViewport ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        TextView textView = new () { Width = 5, Height = 5, BorderStyle = LineStyle.Single, App = app };
+        textView.Text = "Line1\nLine2\nLine3\nLine4\nLine5";
+
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        // Content size only updates after initialization, so it should reflect the size of the text content (5 lines of 6 characters each)
+        Assert.Equal (new Size (6, 5), textView.GetContentSize ());
+
+        // Move insertion point to last column of last line
+        textView.InsertionPoint = new Point (5, 4);
+        Assert.Equal (new Rectangle (3, 2, 3, 3), textView.Viewport);
+
+        textView.Draw ();
+
+        var expected = """
+                   ┌───┐
+                   │e3 │
+                   │e4 │
+                   │e5 │
+                   └───┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        // Cursor is always screen relative, so it should be at (3,3) in viewport coordinates
+        Assert.Equal (new Point (3, 3), textView.Cursor.Position!.Value);
+
+        // Invoke MoveHome method - should move insertion point to first column of first line
+        Assert.True (textView.MoveHome ());
+        Assert.Equal (Point.Empty, textView.InsertionPoint);
+        Assert.Equal (new Rectangle (0, 0, 3, 3), textView.Viewport);
+
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌───┐
+                   │Lin│
+                   │Lin│
+                   │Lin│
+                   └───┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative, so it should be at (1,1) initially in viewport coordinates
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
     }
 
     private TextView CreateTextView () => new () { Width = 30, Height = 10 };
