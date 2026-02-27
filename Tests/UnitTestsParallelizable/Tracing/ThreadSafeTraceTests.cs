@@ -46,39 +46,17 @@ public class ThreadSafeTraceTests
     }
 
     [Fact]
-    public void IndividualProperties_ReflectEnabledCategories ()
+    public void EnabledCategories_HasFlagWorks ()
     {
         try
         {
             Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Keyboard;
 
-            Assert.True (Trace.CommandEnabled);
-            Assert.True (Trace.KeyboardEnabled);
-            Assert.False (Trace.MouseEnabled);
-            Assert.False (Trace.NavigationEnabled);
-            Assert.False (Trace.LifecycleEnabled);
-        }
-        finally
-        {
-            Trace.EnabledCategories = TraceCategory.None;
-        }
-    }
-
-    [Fact]
-    public void SettingIndividualProperties_UpdatesEnabledCategories ()
-    {
-        try
-        {
-            Trace.EnabledCategories = TraceCategory.None;
-
-            Trace.CommandEnabled = true;
-            Assert.Equal (TraceCategory.Command, Trace.EnabledCategories);
-
-            Trace.MouseEnabled = true;
-            Assert.Equal (TraceCategory.Command | TraceCategory.Mouse, Trace.EnabledCategories);
-
-            Trace.CommandEnabled = false;
-            Assert.Equal (TraceCategory.Mouse, Trace.EnabledCategories);
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Navigation));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Lifecycle));
         }
         finally
         {
@@ -95,10 +73,10 @@ public class ThreadSafeTraceTests
 
             using (Trace.PushScope (TraceCategory.Command))
             {
-                Assert.True (Trace.CommandEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             }
 
-            Assert.False (Trace.CommandEnabled);
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             Assert.Equal (TraceCategory.None, Trace.EnabledCategories);
         }
         finally
@@ -116,21 +94,21 @@ public class ThreadSafeTraceTests
 
             using (Trace.PushScope (TraceCategory.Command))
             {
-                Assert.True (Trace.CommandEnabled);
-                Assert.False (Trace.MouseEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
 
                 using (Trace.PushScope (TraceCategory.Keyboard))
                 {
-                    Assert.False (Trace.CommandEnabled);
-                    Assert.True (Trace.KeyboardEnabled);
+                    Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                    Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard));
                 }
 
-                Assert.True (Trace.CommandEnabled);
-                Assert.False (Trace.KeyboardEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard));
             }
 
-            Assert.True (Trace.MouseEnabled);
-            Assert.False (Trace.CommandEnabled);
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
         }
         finally
         {
@@ -150,11 +128,11 @@ public class ThreadSafeTraceTests
             using (Trace.PushScope (TraceCategory.Command, customBackend))
             {
                 Assert.Same (customBackend, Trace.Backend);
-                Assert.True (Trace.CommandEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             }
 
             Assert.IsType<NullBackend> (Trace.Backend);
-            Assert.False (Trace.CommandEnabled);
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
         }
         finally
         {
@@ -194,8 +172,8 @@ public class ThreadSafeTraceTests
         {
             using (TestLogging.Verbose (_output, TraceCategory.Command))
             {
-                Assert.True (Trace.CommandEnabled);
-                Assert.False (Trace.MouseEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
 
                 CheckBox checkbox = new () { Id = "checkbox" };
                 checkbox.InvokeCommand (Command.Activate);
@@ -205,7 +183,7 @@ public class ThreadSafeTraceTests
             }
 
             // After scope, tracing should be disabled
-            Assert.False (Trace.CommandEnabled);
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
         }
         finally
         {
@@ -232,7 +210,7 @@ public class ThreadSafeTraceTests
 
                 // This test should only see its own traces
                 Assert.All (backend.Entries, entry => Assert.Contains ("parallel-test-1", entry.Id));
-                Assert.True (Trace.CommandEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             }
         }
         finally
@@ -260,8 +238,8 @@ public class ThreadSafeTraceTests
 
                 // This test should only see its own traces
                 Assert.All (backend.Entries, entry => Assert.Contains ("parallel-test-2", entry.Id));
-                Assert.True (Trace.MouseEnabled);
-                Assert.False (Trace.CommandEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+                Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             }
         }
         finally
@@ -278,7 +256,6 @@ public class ThreadSafeTraceTests
             Trace.EnabledCategories = TraceCategory.Command;
 
             TraceCategory capturedCategories = TraceCategory.None;
-            bool capturedCommandEnabled = false;
 
             // Use Task.Run to run on a thread pool thread without ExecutionContext flow
             Task.Run (
@@ -287,14 +264,13 @@ public class ThreadSafeTraceTests
                           // Thread pool threads may or may not see the async-local value depending on ExecutionContext flow
                           // For manual threads created with new Thread(), they should see None
                           capturedCategories = Trace.EnabledCategories;
-                          capturedCommandEnabled = Trace.CommandEnabled;
 
                           // Set different categories in other thread
                           Trace.EnabledCategories = TraceCategory.Mouse;
                       }).Wait ();
 
             // This thread should still have Command enabled
-            Assert.True (Trace.CommandEnabled);
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             Assert.Equal (TraceCategory.Command, Trace.EnabledCategories);
 
             // The captured values may vary depending on ExecutionContext flow,
@@ -347,12 +323,12 @@ public class ThreadSafeTraceTests
         {
             using (Trace.PushScope (TraceCategory.Command, backend))
             {
-                Assert.True (Trace.CommandEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
 
                 // EnabledCategories should flow across await
                 await Task.Delay (1);
 
-                Assert.True (Trace.CommandEnabled);
+                Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
                 Assert.Same (backend, Trace.Backend);
 
                 View view = new () { Id = "async-test" };

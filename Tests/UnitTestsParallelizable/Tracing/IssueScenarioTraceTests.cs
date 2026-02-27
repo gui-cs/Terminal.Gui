@@ -58,7 +58,7 @@ public class IssueScenarioTraceTests
             checkbox.InvokeCommand (Command.Accept);
 
             // No trace output expected
-            Assert.False (Trace.CommandEnabled);
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             _output.WriteLine ("✓ This test has tracing disabled, without affecting other parallel tests");
         }
     }
@@ -71,8 +71,8 @@ public class IssueScenarioTraceTests
     {
         using (TestLogging.Verbose (_output, TraceCategory.Mouse))
         {
-            Assert.True (Trace.MouseEnabled);
-            Assert.False (Trace.CommandEnabled);
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
 
             _output.WriteLine ("✓ Mouse tracing enabled independently from Command tracing in other tests");
         }
@@ -107,10 +107,10 @@ public class IssueScenarioTraceTests
     {
         using (Trace.PushScope (TraceCategory.Command | TraceCategory.Mouse | TraceCategory.Keyboard))
         {
-            Assert.True (Trace.CommandEnabled);
-            Assert.True (Trace.MouseEnabled);
-            Assert.True (Trace.KeyboardEnabled);
-            Assert.False (Trace.NavigationEnabled);
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Navigation));
 
             // Can also check with HasFlag
             Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
@@ -134,8 +134,8 @@ public class IssueScenarioTraceTests
                                    using (Trace.PushScope (TraceCategory.Command))
                                    {
                                        await Task.Delay (10);
-                                       Assert.True (Trace.CommandEnabled);
-                                       Assert.False (Trace.MouseEnabled);
+                                       Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
                                        await Task.Delay (10);
                                    }
                                });
@@ -146,8 +146,8 @@ public class IssueScenarioTraceTests
                                    using (Trace.PushScope (TraceCategory.Mouse))
                                    {
                                        await Task.Delay (10);
-                                       Assert.False (Trace.CommandEnabled);
-                                       Assert.True (Trace.MouseEnabled);
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                                       Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
                                        await Task.Delay (10);
                                    }
                                });
@@ -158,8 +158,8 @@ public class IssueScenarioTraceTests
                                    using (Trace.PushScope (TraceCategory.None))
                                    {
                                        await Task.Delay (10);
-                                       Assert.False (Trace.CommandEnabled);
-                                       Assert.False (Trace.MouseEnabled);
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
                                        await Task.Delay (10);
                                    }
                                });

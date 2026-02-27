@@ -11,27 +11,27 @@ public class TraceTests
     public void CommandEnabled_Default_IsFalse ()
     {
         // Clean state
-        Trace.CommandEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
-        Assert.False (Trace.CommandEnabled);
+        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
     }
 
     [Fact]
     public void MouseEnabled_Default_IsFalse ()
     {
         // Clean state
-        Trace.MouseEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
-        Assert.False (Trace.MouseEnabled);
+        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
     }
 
     [Fact]
     public void KeyboardEnabled_Default_IsFalse ()
     {
         // Clean state
-        Trace.KeyboardEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
-        Assert.False (Trace.KeyboardEnabled);
+        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard));
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         try
         {
@@ -62,7 +62,7 @@ public class TraceTests
         }
         finally
         {
-            Trace.CommandEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -72,7 +72,7 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.MouseEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Mouse;
 
         try
         {
@@ -86,7 +86,7 @@ public class TraceTests
         }
         finally
         {
-            Trace.MouseEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -96,7 +96,7 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.KeyboardEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Keyboard;
 
         try
         {
@@ -110,7 +110,7 @@ public class TraceTests
         }
         finally
         {
-            Trace.KeyboardEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -120,9 +120,9 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = false;
-        Trace.MouseEnabled = false;
-        Trace.KeyboardEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
+        Trace.EnabledCategories = TraceCategory.None;
+        Trace.EnabledCategories = TraceCategory.None;
 
         try
         {
@@ -144,9 +144,7 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = true;
-        Trace.MouseEnabled = false;
-        Trace.KeyboardEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Keyboard;
 
         try
         {
@@ -163,8 +161,7 @@ public class TraceTests
         }
         finally
         {
-            Trace.CommandEnabled = false;
-            Trace.KeyboardEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -224,7 +221,7 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         try
         {
@@ -239,7 +236,7 @@ public class TraceTests
         }
         finally
         {
-            Trace.CommandEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -249,9 +246,9 @@ public class TraceTests
     {
         // Reset to NullBackend
         Trace.Backend = new NullBackend ();
-        Trace.CommandEnabled = false;
-        Trace.MouseEnabled = false;
-        Trace.KeyboardEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
+        Trace.EnabledCategories = TraceCategory.None;
+        Trace.EnabledCategories = TraceCategory.None;
 
         // Verify starting state
         Assert.IsType<NullBackend> (Trace.Backend);
@@ -259,13 +256,13 @@ public class TraceTests
         try
         {
             // Enable a category - should auto-switch to LoggingBackend
-            Trace.MouseEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Mouse;
 
             Assert.IsType<LoggingBackend> (Trace.Backend);
         }
         finally
         {
-            Trace.MouseEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -276,19 +273,100 @@ public class TraceTests
         // Set explicit ListBackend
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
         try
         {
             // Enable a category - should NOT overwrite explicit backend
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             Assert.Same (backend, Trace.Backend);
         }
         finally
         {
-            Trace.CommandEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
+        }
+    }
+
+    [Theory]
+    [InlineData (TraceCategory.None, "\"None\"")]
+    [InlineData (TraceCategory.Command, "\"Command\"")]
+    [InlineData (TraceCategory.Mouse, "\"Mouse\"")]
+    [InlineData (TraceCategory.All, "\"All\"")]
+    [InlineData (TraceCategory.Command | TraceCategory.Mouse, "[\"Command\",\"Mouse\"]")]
+    [InlineData (TraceCategory.Command | TraceCategory.Keyboard | TraceCategory.Navigation, "[\"Command\",\"Keyboard\",\"Navigation\"]")]
+    public void TraceCategoryJsonConverter_RoundTrip (TraceCategory category, string expectedJson)
+    {
+        // Arrange
+        var options = new System.Text.Json.JsonSerializerOptions ();
+        options.Converters.Add (new Terminal.Gui.Configuration.TraceCategoryJsonConverter ());
+
+        // Act - Serialize
+        string json = System.Text.Json.JsonSerializer.Serialize (category, options);
+
+        // Assert - Verify JSON format
+        Assert.Equal (expectedJson, json);
+
+        // Act - Deserialize
+        TraceCategory deserialized = System.Text.Json.JsonSerializer.Deserialize<TraceCategory> (json, options);
+
+        // Assert - Verify round-trip
+        Assert.Equal (category, deserialized);
+    }
+
+    [Fact]
+    public void TraceCategoryJsonConverter_DeserializeFromNumber ()
+    {
+        // Arrange
+        var options = new System.Text.Json.JsonSerializerOptions ();
+        options.Converters.Add (new Terminal.Gui.Configuration.TraceCategoryJsonConverter ());
+        string json = "6"; // Command (2) | Mouse (4)
+
+        // Act
+        TraceCategory deserialized = System.Text.Json.JsonSerializer.Deserialize<TraceCategory> (json, options);
+
+        // Assert
+        Assert.Equal (TraceCategory.Command | TraceCategory.Mouse, deserialized);
+    }
+
+    [Fact]
+    public void EnabledCategories_ConfigurationManager_RoundTrip ()
+    {
+        try
+        {
+            // Save original state
+            TraceCategory originalCategories = Trace.EnabledCategories;
+
+            // Test setting via property
+            Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
+            Assert.Equal (TraceCategory.Command | TraceCategory.Mouse, Trace.EnabledCategories);
+
+            // Test that ConfigurationProperty attribute is present
+            System.Reflection.PropertyInfo? property = typeof (Trace).GetProperty (nameof (Trace.EnabledCategories));
+            Assert.NotNull (property);
+
+            ConfigurationPropertyAttribute? attr = property.GetCustomAttributes (typeof (ConfigurationPropertyAttribute), false)
+                                                            .Cast<ConfigurationPropertyAttribute> ()
+                                                            .FirstOrDefault ();
+
+            Assert.NotNull (attr);
+            Assert.Equal (typeof (SettingsScope), attr.Scope);
+
+            // Test that JsonConverter attribute is present
+            System.Text.Json.Serialization.JsonConverterAttribute? converterAttr = property.GetCustomAttributes (typeof (System.Text.Json.Serialization.JsonConverterAttribute), false)
+                                                                                            .Cast<System.Text.Json.Serialization.JsonConverterAttribute> ()
+                                                                                            .FirstOrDefault ();
+
+            Assert.NotNull (converterAttr);
+            Assert.Equal (typeof (Terminal.Gui.Configuration.TraceCategoryJsonConverter), converterAttr.ConverterType);
+
+            // Restore original state
+            Trace.EnabledCategories = originalCategories;
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
         }
     }
 }
