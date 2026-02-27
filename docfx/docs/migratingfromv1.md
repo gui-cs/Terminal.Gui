@@ -30,7 +30,7 @@ For detailed breaking change documentation, check out this Discussion: https://g
 
 Terminal.Gui v2 represents a major architectural evolution with these key improvements:
 
-1. **Instance-Based Application Model** - Move from static `Application` to `IApplication` instances
+1. **Instance-Based Application Model** - Move from static <xref:Terminal.Gui.App.Application> to <xref:Terminal.Gui.App.IApplication> instances
 2. **IRunnable Architecture** - Interface-based runnable pattern with type-safe results
 3. **Simplified Layout** - Removed Absolute/Computed distinction, improved adornments
 4. **24-bit TrueColor** - Full color support by default
@@ -80,7 +80,7 @@ Application.Shutdown(); // Obsolete - use Dispose() instead
 
 ### IRunnable Architecture
 
-v2 introduces `IRunnable<TResult>` for type-safe, runnable views:
+v2 introduces <xref:Terminal.Gui.App.IRunnable> for type-safe, runnable views:
 
 ```csharp
 // Create a dialog that returns a typed result
@@ -139,7 +139,7 @@ using (var app = Application.Create().Init())
 - "Whoever creates it, owns it"
 - `Run<TRunnable>()`: Framework creates → Framework disposes
 - `Run(IRunnable)`: Caller creates → Caller disposes
-- Always dispose `IApplication` (use `using` statement)
+- Always dispose <xref:Terminal.Gui.App.IApplication> (use `using` statement)
 
 ### View.App Property
 
@@ -576,9 +576,9 @@ view.MouseEvent += (s, e) =>
 
 **Key Changes:**
 - `View.MouseClick` event has been **removed**
-- Use `MouseBindings` to map mouse events to `Command`s
-- Default mouse bindings invoke `Command.Activate` which raises the `Activating` event
-- For custom behavior, override `OnActivating` or subscribe to the `Activating` event
+- Use `MouseBindings` to map mouse events to <xref:Terminal.Gui.Input.Command>s
+- Default mouse bindings invoke <xref:Terminal.Gui.Input.Command.Activate> which raises the <xref:Terminal.Gui.ViewBase.View.Activating> event
+- For custom behavior, override `OnActivating` or subscribe to the <xref:Terminal.Gui.ViewBase.View.Activating> event
 - For low-level mouse handling, use `MouseEvent` directly
 
 **Migration Pattern:**
@@ -675,7 +675,7 @@ view.CanFocus = true; // Default was true
 view.CanFocus = true; // Default is FALSE - must opt-in
 ```
 
-**Important:** In v2, `CanFocus` defaults to `false`. Views that want focus must explicitly set it.
+**Important:** In v2, <xref:Terminal.Gui.ViewBase.View.CanFocus> defaults to `false`. Views that want focus must explicitly set it.
 
 ### Focus Changes
 
@@ -1037,7 +1037,7 @@ v2 implements `IDisposable` throughout the API.
 
 1. **Whoever creates it, owns it** - If you create a View, you must dispose it
 2. **Framework-created instances** - The framework disposes what it creates
-3. **Always use `using` statements** - For `IApplication` instances
+3. **Always use `using` statements** - For <xref:Terminal.Gui.App.IApplication> instances
 
 ```csharp
 // ✅ Correct disposal pattern
@@ -1072,7 +1072,7 @@ using (var app = Application.Create().Init())
 | `Application.Driver` | `app.Driver` | Property on IApplication instance |
 | `Bounds` | `Viewport` | Viewport can have non-zero location for scrolling |
 | `Rect` | `Rectangle` | Standard .NET type |
-| `MouseClick` event | `Activating` event | Via Command.Activate |
+| `MouseClick` event | <xref:Terminal.Gui.ViewBase.View.Activating> event | Via Command.Activate |
 | `Enter`/`Leave` events | `HasFocusChanged` event | Unified focus event |
 | `Button.Clicked` | `Button.Accepting` | Consistent with Command pattern |
 | `AutoSize` | `Dim.Auto()` | Part of layout system |

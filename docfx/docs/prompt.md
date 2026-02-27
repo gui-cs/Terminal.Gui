@@ -501,10 +501,10 @@ DateTime? date = mainWindow.Prompt<DatePicker, DateTime> (...);
 
 ## See Also
 
-- [Dialog](xref:Terminal.Gui.Dialog) - Base class for modal dialogs
-- [Runnable](xref:Terminal.Gui.Runnable) - Session management and lifecycle
+- [Dialog](xref:Terminal.Gui.Views.Dialog) - Base class for modal dialogs
+- [Runnable](xref:Terminal.Gui.Views.Runnable) - Session management and lifecycle
 - [Application Architecture](application.md) - Understanding the IApplication pattern
 - [View](View.md) - Base View class and Text property
-- [IValue\<T\>](xref:Terminal.Gui.IValue`1) - Interface for views with typed values
+- [IValue\<T\>](xref:Terminal.Gui.ViewBase.IValue`1) - Interface for views with typed values
 - [AttributePicker](xref:Terminal.Gui.Views.AttributePicker) - Example IValue implementation
 - [Cancellable Work Pattern](cancellable-work-pattern.md) - CWP event pattern used by IValue
