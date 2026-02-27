@@ -96,7 +96,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -126,7 +126,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -156,7 +156,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -181,7 +181,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View viewA = new () { Id = "viewA" };
@@ -211,7 +211,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -236,7 +236,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };

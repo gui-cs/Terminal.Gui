@@ -708,7 +708,7 @@ public partial class ShortcutTests
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange
             CheckBox checkBox = new () { Id = "checkBox", Title = "_Toggle", CanFocus = false };
@@ -758,7 +758,7 @@ public partial class ShortcutTests
     public void Activate_Cancelled_After_Dispatch_Does_Not_Fire_Activated ()
     {
         using IDisposable logging = TestLogging.Verbose (output);
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         CheckBox cb = new () { Id = "cb", Title = "_Test" };
         Shortcut shortcut = new () { Id = "shortcut", Key = Key.T, CommandView = cb };
@@ -788,7 +788,7 @@ public partial class ShortcutTests
     public void Shortcut_Programmatic_Activate_Then_User_Click_Both_Fire_Action ()
     {
         using IDisposable logging = TestLogging.Verbose (output);
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         var actionCount = 0;
         CheckBox cb = new () { Id = "cb", Title = "_Test" };
@@ -822,7 +822,7 @@ public partial class ShortcutTests
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange
             CheckBox checkBox = new () { Id = "checkBox", Title = "_Toggle", CanFocus = false };
@@ -878,7 +878,7 @@ public partial class ShortcutTests
     public void FlagSelector_CommandView_SubView_Activate_Does_Not_Duplicate ()
     {
         using IDisposable logging = TestLogging.Verbose (output);
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange
         FlagSelector flagSelector = new () { Id = "flagSelector", Values = [1, 2, 4], Labels = ["Flag1", "Flag2", "Flag3"] };
@@ -939,7 +939,7 @@ public partial class ShortcutTests
     public void OptionSelector_CommandView_Enter_Activates_And_Accepts ()
     {
         using IDisposable logging = TestLogging.Verbose (output);
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange
         OptionSelector optionSelector = new () { Id = "optionSelector", CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };
@@ -988,7 +988,7 @@ public partial class ShortcutTests
     public void OptionSelector_CommandView_Direct_Accept_Activates_Focused_Item ()
     {
         using IDisposable logging = TestLogging.Verbose (output);
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange
         OptionSelector optionSelector = new () { Id = "optionSelector", CanFocus = true, Labels = ["Option1", "Option2", "Option3"] };

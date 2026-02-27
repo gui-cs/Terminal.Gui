@@ -1,3 +1,4 @@
+using Terminal.Gui.Input;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
@@ -1681,7 +1682,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestValueView view = new () { Id = "valueView", Value = "test value" };
             ICommandContext? capturedContext = null;
@@ -1707,7 +1708,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             View view = new () { Id = "plainView" };
             ICommandContext? capturedContext = null;
@@ -1733,7 +1734,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestValueView view = new () { Id = "valueView", Value = 42 };
             ICommandContext? capturedContext = null;
@@ -1761,7 +1762,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             TestValueView view = new () { Id = "nullValueView", Value = null };
             ICommandContext? capturedContext = null;
@@ -1787,7 +1788,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             View owner = new () { Id = "owner" };
             TestValueView remote = new () { Id = "remote", Value = "bridged value" };
@@ -1818,7 +1819,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             View owner = new () { Id = "owner" };
             TestValueView remote = new () { Id = "remote", Value = 123 };
@@ -1849,7 +1850,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             View owner = new () { Id = "owner" };
             TestValueView remote = new () { Id = "remote", Value = null };
@@ -1958,7 +1959,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: RelayComposite contains ToggleView as dispatch target
             ToggleView toggleView = new () { Id = "toggleView" };
@@ -1986,6 +1987,125 @@ public class ViewCommandTests (ITestOutputHelper output)
             Assert.Equal (1, toggleView.Value);
             Assert.Equal (1, compositeActivatedCount);
         }
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When a ToggleView is the dispatch target of a RelayComposite, and a
+    ///     <see cref="CommandBridge"/> connects the composite's Activated event to a host view,
+    ///     the host should see the post-toggle value and exactly one Activated event.
+    ///     Direct invocation (no binding) — the toggle fires once, but the value in the bridged
+    ///     context is stale (captured before OnActivated mutated it).
+    ///     Replicates <c>Target_CheckBox_CommandView_Activate_Direct_Source_Reaches_Target_And_Value_Is_Correct</c>
+    ///     without depending on PopoverMenu, MenuItem, or CheckBox.
+    /// </summary>
+    [Fact]
+    public void Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_Direct ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: Host ← Bridge ← Composite → ToggleView (dispatch target)
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        RelayComposite composite = new () { Id = "composite" };
+        composite.Add (toggleView);
+
+        View host = new () { Id = "host" };
+
+        // Bridge: composite.Activated → host.InvokeCommand(Activate, Bridged)
+        using CommandBridge bridge = CommandBridge.Connect (host, composite, Command.Activate);
+
+        object? capturedValue = null;
+        var hostActivatedCount = 0;
+        var valueChangeCount = 0;
+
+        toggleView.ValueChanged += (_, _) => valueChangeCount++;
+
+        host.Activated += (_, args) =>
+                          {
+                              hostActivatedCount++;
+                              capturedValue = args.Value?.Value;
+                          };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Direct invocation on the toggle view (no binding).
+        toggleView.InvokeCommand (Command.Activate);
+
+        // Assert: The toggle should happen exactly once (no double-fire in the direct path).
+        Assert.Equal (1, toggleView.ActivatedCount);
+        Assert.Equal (1, toggleView.Value);
+        Assert.Equal (1, valueChangeCount);
+
+        // Assert: Host's Activated event should fire exactly once.
+        Assert.Equal (1, hostActivatedCount);
+
+        // The value at the host should be the post-toggle value (1).
+        // BUG: The context carries a stale Value=0 because RefreshValue at the composite
+        // level doesn't re-read the dispatch target's value after the originator's
+        // OnActivated has mutated it.
+        Assert.Equal (1, capturedValue as int?);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Same as <see cref="Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_Direct"/>
+    ///     but with a <see cref="KeyBinding"/> whose source is the composite (simulates key activation
+    ///     that bubbles from the toggle view up to the composite).
+    ///     The binding enables TryDispatchToTarget's relay guard, causing the composite to
+    ///     DispatchDown back to the toggle view — triggering the double-fire bug.
+    ///     Replicates <c>Target_CheckBox_CommandView_Activate_With_KeyBinding</c> without depending on
+    ///     PopoverMenu, MenuItem, or CheckBox.
+    /// </summary>
+    [Fact]
+    public void Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_WithBinding ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: Host ← Bridge ← Composite → ToggleView (dispatch target)
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        RelayComposite composite = new () { Id = "composite" };
+        composite.Add (toggleView);
+
+        View host = new () { Id = "host" };
+
+        using CommandBridge bridge = CommandBridge.Connect (host, composite, Command.Activate);
+
+        object? capturedValue = null;
+        var hostActivatedCount = 0;
+        var valueChangeCount = 0;
+
+        toggleView.ValueChanged += (_, _) => valueChangeCount++;
+
+        host.Activated += (_, args) =>
+                          {
+                              hostActivatedCount++;
+                              capturedValue = args.Value?.Value;
+                          };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Invoke with a binding whose source is the composite.
+        KeyBinding binding = new ([Command.Activate], Key.Space, composite);
+        toggleView.InvokeCommand (Command.Activate, binding);
+
+        // Assert: OnActivated should fire exactly once, so Value should be 1.
+        // BUG: Double-fire (DispatchDown + originator's RaiseActivated) causes
+        // ActivatedCount=2 and Value=2.
+        Assert.Equal (1, toggleView.ActivatedCount);
+        Assert.Equal (1, toggleView.Value);
+        Assert.Equal (1, valueChangeCount);
+
+        // Assert: Host's Activated event should fire exactly once.
+        Assert.Equal (1, hostActivatedCount);
+
+        // The value at the host should be the post-toggle value (1).
+        Assert.Equal (1, capturedValue as int?);
     }
 
     #endregion

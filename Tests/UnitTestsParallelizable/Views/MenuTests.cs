@@ -2318,7 +2318,7 @@ public class MenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             Menu menu = new ();
             MenuItem item = new () { Title = "Item1" };
@@ -2421,7 +2421,7 @@ public class MenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);
@@ -2460,7 +2460,7 @@ public class MenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);
@@ -2500,7 +2500,7 @@ public class MenuTests (ITestOutputHelper output)
         {
             ListBackend traceBackend = new ();
             Trace.Backend = traceBackend;
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             try
             {
@@ -2593,7 +2593,7 @@ public class MenuTests (ITestOutputHelper output)
             }
             finally
             {
-                Trace.CommandEnabled = false;
+                Trace.EnabledCategories = TraceCategory.None;
                 Trace.Backend = new NullBackend ();
             }
         }

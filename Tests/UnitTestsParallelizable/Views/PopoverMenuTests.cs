@@ -141,7 +141,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -170,7 +170,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -201,7 +201,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -236,7 +236,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu _, MenuItem _, OptionSelector<Schemes> selector, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -272,7 +272,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -317,7 +317,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: PopoverMenu → Menu → MenuItem, with Target set to a host view
             View host = new () { Id = "host" };
@@ -364,7 +364,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
             View host = new () { Id = "host", CommandsToBubbleUp = [Command.Activate] };
@@ -415,7 +415,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(OptionSelector CommandView → CheckBoxes)
             View host = new () { Id = "host" };
@@ -458,7 +458,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: SuperView → Host(Target) ← PopoverMenu → Menu → MenuItem
             View superView = new () { Id = "appWindow", CommandsToBubbleUp = [Command.Activate] };
@@ -487,6 +487,60 @@ public class PopoverMenuTests (ITestOutputHelper output)
         }
     }
 
+    [Fact]
+    public void Target_CheckBox_CommandView_Activate_Direct_Source_Reaches_Target_And_Value_Is_Correct ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
+        View host = new () { Id = "host" };
+
+        CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
+
+        // CheckBox starts UnChecked
+        Assert.Equal (CheckState.UnChecked, bordersCheckBox.Value);
+
+        MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
+
+        Menu menu = new () { Id = "contextMenu" };
+        menu.Add (menuItemBorders);
+
+        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+        popoverMenu.Root = menu;
+        popoverMenu.Target = new WeakReference<View> (host);
+
+        object? capturedValue = null;
+        var hostActivatedFired = 0;
+        var valueChangeCount = 0;
+
+        bordersCheckBox.ValueChanged += (_, _) => valueChangeCount++;
+
+        host.Activated += (_, args) =>
+        {
+            hostActivatedFired++;
+            capturedValue = args.Value?.Value;
+        };
+
+        // Act: Activate the CheckBox with a binding whose source is the MenuItem
+        bordersCheckBox.InvokeCommand (Command.Activate);
+
+        // Assert: Host's Activated event should fire exactly once via Target bridge
+        Assert.Equal (1, hostActivatedFired);
+
+        // The CheckBox double-toggles: once during DispatchDown from menuItemBorders,
+        // and again from the originating checkbox's own RaiseActivated→OnActivated.
+        // bordersCheckBox is both the originator and the dispatch target.
+        Assert.Equal (1, valueChangeCount);
+
+        // The value arriving at the host should be the post-toggle value (Checked).
+        // RefreshValue re-reads from the dispatch target after the first toggle.
+        Assert.Equal (CheckState.Checked, capturedValue as CheckState?);
+
+        popoverMenu.Dispose ();
+    }
+
     /// <summary>
     ///     Proves that when a <see cref="MenuItem"/> has a <see cref="CheckBox"/> as its CommandView,
     ///     activating the MenuItem bridges through <see cref="PopoverMenu.Target"/> to the host,
@@ -500,59 +554,129 @@ public class PopoverMenuTests (ITestOutputHelper output)
 
     // Claude - Opus 4.6
     [Fact]
-    public void Target_CheckBox_CommandView_Activate_Source_Reaches_Target_And_Value_Is_Correct ()
+    public void Target_CheckBox_CommandView_Activate_With_KeyBinding_Source_Reaches_Target_And_Value_Is_Correct ()
     {
-        using (TestLogging.Verbose (output))
-        {
-            Trace.CommandEnabled = true;
+        using IDisposable verbose = TestLogging.Verbose (output);
 
-            // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
-            View host = new () { Id = "host" };
+        Trace.EnabledCategories = TraceCategory.Command;
 
-            CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
+        // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
+        View host = new () { Id = "host" };
 
-            // CheckBox starts UnChecked
-            Assert.Equal (CheckState.UnChecked, bordersCheckBox.Value);
+        CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
 
-            MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
+        // CheckBox starts UnChecked
+        Assert.Equal (CheckState.UnChecked, bordersCheckBox.Value);
 
-            Menu menu = new () { Id = "contextMenu" };
-            menu.Add (menuItemBorders);
+        MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
 
-            PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
-            popoverMenu.Root = menu;
-            popoverMenu.Target = new WeakReference<View> (host);
+        Menu menu = new () { Id = "contextMenu" };
+        menu.Add (menuItemBorders);
 
-            object? capturedValue = null;
-            var hostActivatedFired = 0;
-            var valueChangeCount = 0;
+        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+        popoverMenu.Root = menu;
+        popoverMenu.Target = new WeakReference<View> (host);
 
-            bordersCheckBox.ValueChanged += (_, _) => valueChangeCount++;
+        object? capturedValue = null;
+        var hostActivatedFired = 0;
+        var valueChangeCount = 0;
 
-            host.Activated += (_, args) =>
-                              {
-                                  hostActivatedFired++;
-                                  capturedValue = args.Value?.Value;
-                              };
+        bordersCheckBox.ValueChanged += (_, _) => valueChangeCount++;
 
-            // Act: Activate the CheckBox with a binding whose source is the MenuItem
-            // (simulates real key/mouse activation that bubbles up from CheckBox to MenuItem).
-            bordersCheckBox.InvokeCommand (Command.Activate, new KeyBinding ([Command.Activate], menuItemBorders));
+        host.Activated += (_, args) =>
+                          {
+                              hostActivatedFired++;
+                              capturedValue = args.Value?.Value;
+                          };
 
-            // Assert: Host's Activated event should fire exactly once via Target bridge
-            Assert.Equal (1, hostActivatedFired);
+        // Act: Activate the CheckBox with a binding whose source is the MenuItem
+        // (simulates key activation that bubbles up from CheckBox to MenuItem).
+        bordersCheckBox.InvokeCommand (Command.Activate, new KeyBinding ([Command.Activate], menuItemBorders));
 
-            // The CheckBox double-toggles: once during DispatchDown from menuItemBorders,
-            // and again from the originating checkbox's own RaiseActivated→OnActivated.
-            // bordersCheckBox is both the originator and the dispatch target.
-            Assert.Equal (2, valueChangeCount);
+        // Assert: Host's Activated event should fire exactly once via Target bridge
+        Assert.Equal (1, hostActivatedFired);
 
-            // The value arriving at the host should be the post-toggle value (Checked).
-            // RefreshValue re-reads from the dispatch target after the first toggle.
-            Assert.Equal (CheckState.Checked, capturedValue as CheckState?);
+        // The CheckBox double-toggles: once during DispatchDown from menuItemBorders,
+        // and again from the originating checkbox's own RaiseActivated→OnActivated.
+        // bordersCheckBox is both the originator and the dispatch target.
+        Assert.Equal (2, valueChangeCount);
 
-            popoverMenu.Dispose ();
-        }
+        // The value arriving at the host should be the post-toggle value (Checked).
+        // RefreshValue re-reads from the dispatch target after the first toggle.
+        Assert.Equal (CheckState.Checked, capturedValue as CheckState?);
+
+        popoverMenu.Dispose ();
+    }
+
+    [Fact]
+    public void Target_CheckBox_Mouse_Click_Source_Reaches_Target_And_Value_Is_Correct ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        // Arrange - mirror the Menus.cs scenario: MenuBar inside a focusable host view
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
+        View host = new () { Id = "host" };
+
+        (runnable as View)!.Add (host);
+        app.Begin (runnable);
+
+        CheckBox bordersCheckBox = new () { Id = "bordersCheckbox", Title = "_Borders", CanFocus = false };
+
+        // CheckBox starts UnChecked
+        Assert.Equal (CheckState.UnChecked, bordersCheckBox.Value);
+
+        MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", CommandView = bordersCheckBox };
+
+        Menu menu = new () { Id = "contextMenu", BorderStyle = LineStyle.Dashed };
+        menu.Add (menuItemBorders);
+
+        PopoverMenu popoverMenu = new () { Id = "popoverMenu" };
+        popoverMenu.Root = menu;
+        popoverMenu.Target = new WeakReference<View> (host);
+
+        app.Popovers?.Register (popoverMenu);
+        popoverMenu.MakeVisible ();
+
+        object? capturedValue = null;
+        var hostActivatedFired = 0;
+        var valueChangeCount = 0;
+
+        bordersCheckBox.ValueChanged += (_, _) => valueChangeCount++;
+
+        host.Activated += (_, args) =>
+                          {
+                              hostActivatedFired++;
+                              capturedValue = args.Value?.Value;
+                          };
+
+        // BUGBUG: This is why it's bad to use complex views in unrelated unit tests: Shortcut puts a transparent to mouse
+        // BUGBUG: Margin to the left of CommandView. Clicking on (0,0) of the checkbox, actually passes through to the shortcut
+        // BUGBUG: and activates the MenuItem before the click reaches the CheckBox, meaning this test wouldn't be testing what we think it's testing.
+        // BUGBUG: The fix is to offset the click point by (1,0) to ensure it hits the CheckBox's area and not the Shortcut margin.
+        Point screenPoint = bordersCheckBox.FrameToScreen ().Location;
+        screenPoint.Offset (new Point (1, 0));
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (screenPoint));
+
+        // Assert: Host's Activated event should fire exactly once via Target bridge
+        Assert.Equal (1, hostActivatedFired);
+
+        // The CheckBox double-toggles: once during DispatchDown from menuItemBorders,
+        // and again from the originating checkbox's own RaiseActivated→OnActivated.
+        // bordersCheckBox is both the originator and the dispatch target.
+        Assert.Equal (1, valueChangeCount);
+
+        // The value arriving at the host should be the post-toggle value (Checked).
+        // RefreshValue re-reads from the dispatch target after the first toggle.
+        Assert.Equal (CheckState.Checked, capturedValue as CheckState?);
+
+        popoverMenu.Dispose ();
     }
 
     #endregion

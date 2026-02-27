@@ -2041,7 +2041,7 @@ public class MenuBarTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);
@@ -2149,7 +2149,7 @@ public class MenuBarTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);

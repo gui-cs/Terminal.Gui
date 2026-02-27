@@ -532,7 +532,7 @@ public class MenuItemTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (output))
         {
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             MenuItem menuItem = new () { Title = "TestItem" };
 
