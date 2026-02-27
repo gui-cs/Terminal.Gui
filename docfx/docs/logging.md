@@ -176,6 +176,7 @@ public class MyTests
 | `TestLogging.BindTo(output)` | Default - only Warning and above |
 | `TestLogging.BindTo(output, LogLevel.Debug)` | Custom minimum level |
 | `TestLogging.Verbose(output)` | All levels (Trace and above) |
+| `TestLogging.Verbose(output, TraceCategory.Command)` | All levels + event tracing for specified categories |
 
 ### Direct PushLogger Usage
 
@@ -218,36 +219,35 @@ UICatalog includes built-in logging UI. Access via the **Logging** menu to:
 
 ## View Event Tracing
 
-Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` namespace) for debugging event flow through the view hierarchy. Categories can be enabled independently and are **thread-safe** (isolated per async execution context):
+Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` namespace) for debugging event flow through the view hierarchy. Categories can be enabled independently and are **thread-safe** (isolated per async execution context via `AsyncLocal<T>`):
 
-| Category | Property | What It Traces |
-|----------|----------|----------------|
-| Command | `Trace.CommandEnabled` | Command routing (InvokeCommand, bubbling, dispatch) |
-| Mouse | `Trace.MouseEnabled` | Mouse events (clicks, drags, wheel) |
-| Keyboard | `Trace.KeyboardEnabled` | Keyboard events (key down, key up) |
-| Navigation | `Trace.NavigationEnabled` | Focus and TabBehavior navigation |
-| Lifecycle | `Trace.LifecycleEnabled` | Application and Driver lifecycle events |
+| Category | Flag | What It Traces |
+|----------|------|----------------|
+| Command | `TraceCategory.Command` | Command routing (InvokeCommand, bubbling, dispatch) |
+| Mouse | `TraceCategory.Mouse` | Mouse events (clicks, drags, wheel) |
+| Keyboard | `TraceCategory.Keyboard` | Keyboard events (key down, key up) |
+| Navigation | `TraceCategory.Navigation` | Focus and TabBehavior navigation |
+| Lifecycle | `TraceCategory.Lifecycle` | Application and Driver lifecycle events |
+| All | `TraceCategory.All` | All categories combined |
+
+> [!IMPORTANT]
+> All trace methods are marked with `[Conditional("DEBUG")]` and have **zero overhead in Release builds**. The compiler removes trace calls entirely in Release configuration. Tests that assert on trace capture use `#if DEBUG` to validate capture in Debug and validate no-capture in Release.
 
 ### Enabling Tracing
 
-**Via individual properties:**
+**Via `EnabledCategories` flags:**
 
 ```csharp
 using Terminal.Gui.Tracing;
 
-Trace.CommandEnabled = true;   // Command routing
-Trace.MouseEnabled = true;     // Mouse events
-Trace.KeyboardEnabled = true;  // Keyboard events
-```
-
-**Via flags-based API:**
-
-```csharp
 // Enable multiple categories at once
 Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
 
 // Check enabled categories
 if (Trace.EnabledCategories.HasFlag (TraceCategory.Command)) { ... }
+
+// Enable all
+Trace.EnabledCategories = TraceCategory.All;
 ```
 
 **Via scoped tracing (recommended for tests):**
@@ -259,18 +259,24 @@ using (Trace.PushScope (TraceCategory.Command | TraceCategory.Keyboard))
     // Tracing enabled only in this scope
     view.InvokeCommand (Command.Activate);
 }
+// Previous tracing state restored
 ```
 
-When tracing is enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
+When tracing is enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`. If no backend has been set and any category is enabled, `LoggingBackend` is automatically activated.
 
 **Via configuration:**
 
 ```json
 {
-  "Trace.CommandEnabled": true,
-  "Trace.MouseEnabled": false,
-  "Trace.KeyboardEnabled": true
+  "Trace.EnabledCategories": ["Command", "Mouse"]
 }
+```
+
+Single values and legacy numeric formats are also supported:
+
+```json
+{ "Trace.EnabledCategories": "Command" }
+{ "Trace.EnabledCategories": 6 }
 ```
 
 **Via UICatalog:** Toggle in **Logging** menu → **Command Trace** / **Mouse Trace** / **Keyboard Trace**
@@ -289,13 +295,21 @@ using (Trace.PushScope (TraceCategory.Command, backend))
 {
     // ... run code ...
 
-    // Inspect captured traces
+    // Inspect captured traces (DEBUG builds only - entries will be empty in Release)
     foreach (TraceEntry entry in backend.Entries)
     {
         Console.WriteLine ($"{entry.Category}: {entry.Id} - {entry.Phase}");
     }
 }
 ```
+
+Available backends:
+
+| Backend | Description |
+|---------|-------------|
+| `NullBackend` | No-op (default when no categories are enabled) |
+| `LoggingBackend` | Forwards to `Logging.Trace()` with category-specific formatting |
+| `ListBackend` | Captures entries to a list for programmatic inspection in tests |
 
 ### Testing with Tracing
 
@@ -318,7 +332,7 @@ public void MyTest ()
 }
 ```
 
-This approach is **thread-safe** and works correctly with parallel test execution.
+This approach is **thread-safe** and works correctly with parallel test execution. Each async context (test, task) has its own isolated trace configuration via `AsyncLocal<T>`.
 
 See [Command Deep Dive - Command Route Tracing](command.md#command-route-tracing) for detailed command tracing information.
 
