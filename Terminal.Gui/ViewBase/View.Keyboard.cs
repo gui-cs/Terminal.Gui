@@ -131,9 +131,9 @@ public partial class View // Keyboard APIs
 
         Key baseKey = newKey.NoAlt.NoShift.NoCtrl;
 
-        if (newKey != Key.Empty && (baseKey == Key.Space || Rune.IsControl (baseKey.AsRune)))
+        if (newKey != Key.Empty && Rune.IsControl (baseKey.AsRune))
         {
-            throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
+            throw new ArgumentException (@$"HotKey must be a printable key ({hotKey}).");
         }
 
         if (newKey != baseKey)
