@@ -117,25 +117,25 @@ public class ContextMenus : Scenario
 
             _appWindow.CommandsToBubbleUp = [Command.Activate];
 
-            popoverMenuHost.Activated += (s, args) =>
-                                         {
-                                             // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
-                                             if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" } bordersCheckbox)
-                                             {
-                                                 _appWindow.BorderStyle = (args.Value?.Value as CheckState?) == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+            _appWindow.Activated += (s, args) =>
+                                    {
+                                        // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
+                                        if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" } bordersCheckbox)
+                                        {
+                                            _appWindow.BorderStyle = (args.Value?.Value as CheckState?) == CheckState.Checked ? LineStyle.Double : LineStyle.None;
 
-                                                 return;
-                                             }
+                                            return;
+                                        }
 
-                                             if (args.Value?.TryGetSource (out source) is true
-                                                 && source?.SuperView is OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
-                                             {
-                                                 if (schemeOptionSelector.Value is { } scheme)
-                                                 {
-                                                     _appWindow.SchemeName = scheme.ToString ();
-                                                 }
-                                             }
-                                         };
+                                        if (args.Value?.TryGetSource (out source) is true
+                                            && source?.SuperView is OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
+                                        {
+                                            if (schemeOptionSelector.Value is { } scheme)
+                                            {
+                                                _appWindow.SchemeName = scheme.ToString ();
+                                            }
+                                        }
+                                    };
             _appWindow.Add (popoverMenuHost);
         }
     }
