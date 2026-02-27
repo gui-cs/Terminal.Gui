@@ -596,10 +596,9 @@ public class PopoverMenuTests (ITestOutputHelper output)
         // Assert: Host's Activated event should fire exactly once via Target bridge
         Assert.Equal (1, hostActivatedFired);
 
-        // The CheckBox double-toggles: once during DispatchDown from menuItemBorders,
-        // and again from the originating checkbox's own RaiseActivated→OnActivated.
-        // bordersCheckBox is both the originator and the dispatch target.
-        Assert.Equal (2, valueChangeCount);
+        // With the double-fire fix, the CheckBox toggles exactly once:
+        // UnChecked → Checked. The dispatch guard prevents the second toggle.
+        Assert.Equal (1, valueChangeCount);
 
         // The value arriving at the host should be the post-toggle value (Checked).
         // RefreshValue re-reads from the dispatch target after the first toggle.
