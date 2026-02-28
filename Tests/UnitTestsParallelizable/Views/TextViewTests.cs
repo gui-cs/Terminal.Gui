@@ -3119,7 +3119,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void InvokeCommand_PageDown_PageUp_TrackColumns_And_Draws_Cursor_Correctly ()
+    public void InvokeCommand_PageDown_PageUp_TrackColumns_AtMiddle_And_Draws_Cursor_Correctly ()
     {
         using IApplication app = Application.Create ().Init ();
 
@@ -3166,6 +3166,77 @@ public class TextViewTests (ITestOutputHelper output)
         {
             // PageUp - Move to the previous page
             Assert.True (textView.InvokeCommand (Command.PageUp));
+            Assert.Equal (new Point (columnToTrack, i - 1), textView.InsertionPoint);
+            textView.PositionCursor ();
+
+            if (i == 1)
+            {
+                Assert.Equal (new Point (0, i - 1), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 1), textView.Cursor.Position!.Value);
+            }
+            else
+            {
+                Assert.Equal (new Point (0, i - 2), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 2), textView.Cursor.Position!.Value);
+            }
+        }
+    }
+
+    [Fact]
+    public void InvokeCommand_PageDown_PageUp_TrackColumns_AtEnd_And_Draws_Cursor_Correctly ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1111111\n222222\n33333\n4444",
+            Width = 10,
+            Height = 4,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 2), textView.Viewport);
+
+        int columnToTrack = textView.GetCurrentLine ().Count; // End of first line
+        textView.InsertionPoint = new Point (columnToTrack, 0);
+        Assert.Equal (Point.Empty, textView.Viewport.Location);
+
+        for (var i = 0; i < 3; i++)
+        {
+            // PageDown - Move to the next page
+            Assert.True (textView.InvokeCommand (Command.PageDown));
+            columnToTrack = textView.GetCurrentLine ().Count;
+            Assert.Equal (new Point (columnToTrack, i + 1), textView.InsertionPoint);
+            textView.PositionCursor ();
+
+            if (i == 2)
+            {
+                Assert.Equal (new Point (0, i), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 2), textView.Cursor.Position!.Value);
+            }
+            else
+            {
+                Assert.Equal (new Point (0, i + 1), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 1), textView.Cursor.Position!.Value);
+            }
+        }
+
+        for (var i = 3; i > 0; i--)
+        {
+            // PageUp - Move to the previous page
+            Assert.True (textView.InvokeCommand (Command.PageUp));
+            columnToTrack = textView.GetCurrentLine ().Count;
             Assert.Equal (new Point (columnToTrack, i - 1), textView.InsertionPoint);
             textView.PositionCursor ();
 
