@@ -197,9 +197,23 @@ public partial class TextView
         return true;
     }
 
+    // MovePageDown and MovePageUp are a bit more complex than the other movement methods because they need to move the viewport as well as the cursor. The logic is as follows:
+    // 1. Determine the number of lines to move (nPageDnShift or nPageUpShift) based on the height of the viewport.
+    // 2. If the current row is within the bounds of the model, check if the column track is set. If not, set it to the current column.
+    // 3. For MovePageDown, check if the viewport can be moved down by nPageDnShift lines without exceeding the model count. If so, move the viewport down and set needs draw.
+    // 4. For MovePageUp, check if the viewport can be moved up by nPageUpShift lines without going below zero. If so, move the viewport up and set needs draw.
+    // 5. For MovePageDown, check if the current row can be moved down by nPageDnShift lines without exceeding the model count. If so, move the current row down. If not, move it to the last line of the model.
+    // 6. For MovePageUp, check if the current row can be moved up by nPageUpShift lines without going below zero. If so, move the current row up. If not, move it to the first line of the model.
+    // 7. Track the column and position the cursor.
+    // 8. Return true to indicate that the movement was handled.
+    // The logic for moving the viewport and the cursor is intertwined because when moving a page up or down, we want to ensure that the cursor remains visible within the viewport. Therefore, we need to adjust the viewport position accordingly when the cursor moves beyond the current viewport bounds.
+    // The use of the _columnTrack variable is to remember the column position when moving up or down, so that when we move back up or down, we can try to maintain the same column position if possible. This is a common behavior in text editors where moving up or down tries to keep the cursor in the same column if it can.
+    // The checks for whether to set needs draw are based on whether the viewport has actually changed. If the viewport position changes, we need to redraw the view to reflect the new visible lines. If the cursor moves outside the current viewport, we also need to redraw to ensure the cursor is visible.
+    // MovePageDown and MovePageUp are the only movement methods that does shouldn't call the DoNeededAction method because the AdjustViewport method may cause the viewport location to change with wrongly calculated values.
+
     private bool MovePageDown ()
     {
-        int nPageDnShift = Viewport.Height - 1;
+        int nPageDnShift = Viewport.Height;
 
         if (CurrentRow >= 0 && CurrentRow < _model.Count)
         {
@@ -208,26 +222,36 @@ public partial class TextView
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow = CurrentRow + nPageDnShift > _model.Count ? _model.Count > 0 ? _model.Count - 1 : 0 : CurrentRow + nPageDnShift;
-
-            if (Viewport.Y < CurrentRow - nPageDnShift)
+            if (Viewport.Y < Viewport.Y + nPageDnShift && Viewport.Y < _model.Count - nPageDnShift)
             {
-                Viewport = Viewport with { Y = CurrentRow >= _model.Count ? CurrentRow - nPageDnShift : Viewport.Y + nPageDnShift };
+                Viewport = Viewport with
+                {
+                    Y = Viewport.Y + nPageDnShift >= _model.Count
+                            ? _model.Count - nPageDnShift
+                            : Math.Min (Viewport.Y + nPageDnShift - (nPageDnShift > 1 ? 1 : 0), _model.Count - nPageDnShift)
+                };
                 SetNeedsDraw ();
             }
 
+            if (CurrentRow + nPageDnShift < _model.Count)
+            {
+                CurrentRow = CurrentRow + nPageDnShift - (nPageDnShift > 1 ? 1 : 0);
+                SetNeedsDraw ();
+            }
+            else if (CurrentRow < _model.Count)
+            {
+                CurrentRow = _model.Count - 1;
+            }
             TrackColumn ();
             PositionCursor ();
         }
-
-        DoNeededAction ();
 
         return true;
     }
 
     private bool MovePageUp ()
     {
-        int nPageUpShift = Viewport.Height - 1;
+        int nPageUpShift = Viewport.Height;
 
         if (CurrentRow > 0)
         {
@@ -236,19 +260,24 @@ public partial class TextView
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow = CurrentRow - nPageUpShift < 0 ? 0 : CurrentRow - nPageUpShift;
-
-            if (CurrentRow < Viewport.Y)
+            if (Viewport.Y > Viewport.Y - nPageUpShift)
             {
-                Viewport = Viewport with { Y = Viewport.Y - nPageUpShift < 0 ? 0 : Viewport.Y - nPageUpShift };
+                Viewport = Viewport with { Y = Viewport.Y - nPageUpShift < 0 ? 0 : Viewport.Y - nPageUpShift + (nPageUpShift > 1 ? 1 : 0) };
                 SetNeedsDraw ();
             }
 
+            if (CurrentRow - nPageUpShift >= 0)
+            {
+                CurrentRow = CurrentRow - nPageUpShift + (nPageUpShift > 1 ? 1 : 0);
+                SetNeedsDraw ();
+            }
+            else if (CurrentRow > 0)
+            {
+                CurrentRow = 0;
+            }
             TrackColumn ();
             PositionCursor ();
         }
-
-        DoNeededAction ();
 
         return true;
     }
@@ -577,7 +606,6 @@ public partial class TextView
 
     private bool ProcessPageDown ()
     {
-        ResetColumnTrack ();
 
         if (_shiftSelecting && IsSelecting)
         {
@@ -589,7 +617,6 @@ public partial class TextView
 
     private bool ProcessPageDownExtend ()
     {
-        ResetColumnTrack ();
         StartSelecting ();
 
         return MovePageDown ();
@@ -597,7 +624,6 @@ public partial class TextView
 
     private bool ProcessPageUp ()
     {
-        ResetColumnTrack ();
 
         if (_shiftSelecting && IsSelecting)
         {
@@ -609,7 +635,6 @@ public partial class TextView
 
     private bool ProcessPageUpExtend ()
     {
-        ResetColumnTrack ();
         StartSelecting ();
 
         return MovePageUp ();

@@ -2868,6 +2868,324 @@ public class TextViewTests (ITestOutputHelper output)
         Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
     }
 
+    [Fact]
+    public void InvokeCommand_PageDown_PageUp_With_ViewportHeight_One_Draws_Cursor_Correctly ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1111\n22222\n333333",
+            Width = 10,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 1), textView.Viewport);
+
+        // PageDown - Move to the next page
+        Assert.True (textView.NeedsDraw);
+        textView.Draw (); // Draw before invoking command to ensure NeedsDraw is false
+        Assert.False (textView.NeedsDraw);
+        Assert.True (textView.InvokeCommand (Command.PageDown));
+        Assert.Equal (new Point (0, 1), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 1), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        var expected = """
+                       ┌────────┐
+                       │22222   │
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+
+        // PageDown - Move to the next page
+        Assert.True (textView.InvokeCommand (Command.PageDown));
+        Assert.Equal (new Point (0, 2), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 2), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌────────┐
+                   │333333  │
+                   └────────┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+
+        // PageUp - Move previous page
+        Assert.True (textView.InvokeCommand (Command.PageUp));
+        Assert.Equal (new Point (0, 1), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 1), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                       ┌────────┐
+                       │22222   │
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+
+        // PageUp - Move previous page
+        Assert.True (textView.InvokeCommand (Command.PageUp));
+        Assert.Equal (new Point (0, 0), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 0), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌────────┐
+                   │1111    │
+                   └────────┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+    }
+
+    [Fact]
+    public void InvokeCommand_PageDown_PageUp_With_ViewportHeight_GraterThanOne_Draws_Cursor_Correctly ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1111111111\n22222222222\n333333333333\n4444444444444",
+            Width = 10,
+            Height = 4,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 2), textView.Viewport);
+
+        // PageDown - Move to the next page
+        Assert.True (textView.NeedsDraw);
+        textView.Draw (); // Draw before invoking command to ensure NeedsDraw is false
+        Assert.False (textView.NeedsDraw);
+        Assert.True (textView.InvokeCommand (Command.PageDown));
+        Assert.Equal (new Point (0, 1), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 1), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        var expected = """
+                       ┌────────┐
+                       │22222222│
+                       │33333333│
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+
+        // PageDown - Move to the next page
+        Assert.True (textView.InvokeCommand (Command.PageDown));
+        Assert.Equal (new Point (0, 2), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 2), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌────────┐
+                   │33333333│
+                   │44444444│
+                   └────────┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+
+        // PageDown - Move to the last line and should stay on the last line and not scroll further
+        Assert.True (textView.InvokeCommand (Command.PageDown));
+        Assert.Equal (new Point (0, 3), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 2), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌────────┐
+                   │33333333│
+                   │44444444│
+                   └────────┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 2), textView.Cursor.Position!.Value);
+
+        // PageUp - Move previous page
+        Assert.True (textView.InvokeCommand (Command.PageUp));
+        Assert.Equal (new Point (0, 2), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 1), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                       ┌────────┐
+                       │22222222│
+                       │33333333│
+                       └────────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 2), textView.Cursor.Position!.Value);
+
+        // PageUp - Move previous page
+        Assert.True (textView.InvokeCommand (Command.PageUp));
+        Assert.Equal (new Point (0, 1), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 0), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌────────┐
+                   │11111111│
+                   │22222222│
+                   └────────┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 2), textView.Cursor.Position!.Value);
+
+        // PageUp - Move to the first line and should stay on the first line and not scroll further
+        Assert.True (textView.InvokeCommand (Command.PageUp));
+        Assert.Equal (new Point (0, 0), textView.InsertionPoint);
+        Assert.Equal (new Point (0, 0), textView.Viewport.Location);
+        textView.SetClipToScreen ();
+        textView.Draw ();
+
+        expected = """
+                   ┌────────┐
+                   │11111111│
+                   │22222222│
+                   └────────┘
+                   """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+
+        textView.PositionCursor ();
+
+        // Cursor is always screen relative
+        Assert.Equal (new Point (1, 1), textView.Cursor.Position!.Value);
+    }
+
+    [Fact]
+    public void InvokeCommand_PageDown_PageUp_TrackColumns_And_Draws_Cursor_Correctly ()
+    {
+        using IApplication app = Application.Create ().Init ();
+
+        TextView textView = new ()
+        {
+            Text = "1111111111\n22222222222\n333333333333\n4444444444444",
+            Width = 10,
+            Height = 4,
+            BorderStyle = LineStyle.Single,
+            Driver = app.Driver
+        };
+        textView.BeginInit ();
+        textView.EndInit ();
+
+        Assert.Equal (new Rectangle (0, 0, 8, 2), textView.Viewport);
+
+        var columnToTrack = 5; // Middle of first line
+        textView.InsertionPoint = new Point (columnToTrack, 0);
+
+        for (var i = 0; i < 3; i++)
+        {
+            // PageDown - Move to the next page
+            Assert.True (textView.InvokeCommand (Command.PageDown));
+            Assert.Equal (new Point (columnToTrack, i + 1), textView.InsertionPoint);
+            textView.PositionCursor ();
+
+            if (i == 2)
+            {
+                Assert.Equal (new Point (0, i), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 2), textView.Cursor.Position!.Value);
+            }
+            else
+            {
+                Assert.Equal (new Point (0, i + 1), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 1), textView.Cursor.Position!.Value);
+            }
+        }
+
+        for (var i = 3; i > 0; i--)
+        {
+            // PageUp - Move to the previous page
+            Assert.True (textView.InvokeCommand (Command.PageUp));
+            Assert.Equal (new Point (columnToTrack, i - 1), textView.InsertionPoint);
+            textView.PositionCursor ();
+
+            if (i == 1)
+            {
+                Assert.Equal (new Point (0, i - 1), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 1), textView.Cursor.Position!.Value);
+            }
+            else
+            {
+                Assert.Equal (new Point (0, i - 2), textView.Viewport.Location);
+
+                // Cursor is always screen relative
+                Assert.Equal (new Point (columnToTrack + 1, 2), textView.Cursor.Position!.Value);
+            }
+        }
+    }
+
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
