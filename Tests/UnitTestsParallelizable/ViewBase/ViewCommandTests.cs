@@ -2335,6 +2335,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     ///     relays an <c>Activated</c> event to an owner, and the owner (or its ancestor) tries to
     ///     cancel via <c>OnActivating</c>, the originator's state has already changed because the
     ///     bridge fires from the post-event (<c>Activated</c>), not the pre-event (<c>Activating</c>).
+    ///     Also verifies that a <c>BridgedCancellation</c> trace warning is emitted.
     ///
     ///     Topology (uses only View base classes):
     ///     <code>
@@ -2349,9 +2350,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Bridge_Ancestor_Cancel_OnActivating_Does_Not_Prevent_Originator_State_Change ()
     {
-        using IDisposable verbose = TestLogging.Verbose (output);
-
-        Trace.EnabledCategories = TraceCategory.Command;
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
 
         // Arrange: toggleView inside container, bridged to owner, owner inside ancestor.
         ToggleView toggleView = new () { Id = "toggleView" };
@@ -2395,10 +2395,8 @@ public class ViewCommandTests (ITestOutputHelper output)
         Assert.Equal (1, toggleView.Value); // State change already happened
         Assert.Equal (1, valueAtAncestorActivating); // Was already 1 when ancestor saw it
 
-        // This is the bug: if cancellation worked properly, we'd expect:
-        //   toggleView.Value == 0  (state change prevented)
-        //   valueAtAncestorActivating == 0  (no change yet when Activating fired)
-        // But instead both are 1.
+        // Verify the BridgedCancellation trace warning was emitted.
+        Assert.Contains (traceBackend.Entries, e => e.Phase == "BridgedCancellation" && e.Message!.Contains ("OnActivated"));
     }
 
     // Claude - Opus 4.6
@@ -2407,6 +2405,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     ///     <c>OnActivating</c> DOES prevent the originator's state change, because <c>TryBubbleUp</c>
     ///     calls <c>SuperView.InvokeCommand</c> during <c>RaiseActivating</c> (the pre-event phase).
     ///     The originator's <c>OnActivated</c> only fires if <c>RaiseActivating</c> succeeds.
+    ///     No <c>BridgedCancellation</c> trace warning should appear.
     ///
     ///     Topology:
     ///     <code>
@@ -2420,9 +2419,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Direct_Ancestor_Cancel_OnActivating_Prevents_Originator_State_Change ()
     {
-        using IDisposable verbose = TestLogging.Verbose (output);
-
-        Trace.EnabledCategories = TraceCategory.Command;
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
 
         // Arrange: toggleView inside ancestor (direct containment, no bridge).
         ToggleView toggleView = new () { Id = "toggleView" };
@@ -2456,6 +2454,148 @@ public class ViewCommandTests (ITestOutputHelper output)
         // toggleView.OnActivated never fires, so Value remains 0.
         Assert.Equal (0, toggleView.Value);
         Assert.Equal (0, valueAtAncestorActivating);
+
+        // No BridgedCancellation warning — this is a direct containment path.
+        Assert.DoesNotContain (traceBackend.Entries, e => e.Phase == "BridgedCancellation");
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Accept-side analog of the bridge cancellation bug: when a <see cref="CommandBridge"/>
+    ///     relays an <c>Accepted</c> event to an owner, and the owner (or its ancestor) tries to
+    ///     cancel via <c>OnAccepting</c>, the originator's state has already changed because the
+    ///     bridge fires from the post-event (<c>Accepted</c>).
+    ///     Verifies that a <c>BridgedCancellation</c> trace warning is emitted.
+    ///
+    ///     Topology:
+    ///     <code>
+    ///     ancestor (Accepting handler cancels)
+    ///       └── owner  ← Bridge(Accept) ←  acceptToggleView (mutates in OnAccepted)
+    ///     </code>
+    /// </summary>
+    [Fact]
+    public void Bridge_Ancestor_Cancel_OnAccepting_Does_Not_Prevent_Originator_State_Change ()
+    {
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
+
+        // Arrange: acceptToggleView bridged to owner, owner inside ancestor.
+        AcceptToggleView acceptToggleView = new () { Id = "acceptToggleView" };
+
+        View owner = new () { Id = "owner" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Accept];
+        ancestor.Add (owner);
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, acceptToggleView, Command.Accept);
+
+        int? valueAtAncestorAccepting = null;
+        var ancestorAcceptingFired = false;
+
+        ancestor.Accepting += (_, args) =>
+                               {
+                                   ancestorAcceptingFired = true;
+                                   valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
+
+                                   // Cancel — this should prevent further processing,
+                                   // but cannot undo the acceptToggleView's state change.
+                                   args.Handled = true;
+                               };
+
+        Assert.Equal (0, acceptToggleView.AcceptedCount);
+
+        // Act: Accept on the remote view.
+        acceptToggleView.InvokeCommand (Command.Accept);
+
+        // Assert: The bridge should have caused ancestor.Accepting to fire.
+        Assert.True (ancestorAcceptingFired, "ancestor.Accepting should have fired via bridge");
+
+        // By the time ancestor's Accepting handler fires, acceptToggleView.OnAccepted
+        // has already been called. The cancellation is too late.
+        Assert.Equal (1, acceptToggleView.AcceptedCount); // State change already happened
+        Assert.Equal (1, valueAtAncestorAccepting); // Was already 1 when ancestor saw it
+
+        // Verify the BridgedCancellation trace warning was emitted.
+        Assert.Contains (traceBackend.Entries, e => e.Phase == "BridgedCancellation" && e.Message!.Contains ("OnAccepted"));
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Contrast test for Accept: in the normal (non-bridge) bubble-up path, cancelling at the
+    ///     ancestor's <c>OnAccepting</c> DOES prevent the originator's state change, because
+    ///     <c>TryBubbleUp</c> calls <c>SuperView.InvokeCommand</c> during <c>RaiseAccepting</c>
+    ///     (the pre-event phase). No <c>BridgedCancellation</c> trace warning should appear.
+    ///
+    ///     Topology:
+    ///     <code>
+    ///     ancestor (Accepting handler cancels)
+    ///       └── acceptToggleView (mutates in OnAccepted)
+    ///     </code>
+    /// </summary>
+    [Fact]
+    public void Direct_Ancestor_Cancel_OnAccepting_Prevents_Originator_State_Change ()
+    {
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
+
+        // Arrange: acceptToggleView inside ancestor (direct containment, no bridge).
+        AcceptToggleView acceptToggleView = new () { Id = "acceptToggleView" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Accept];
+        ancestor.Add (acceptToggleView);
+
+        int? valueAtAncestorAccepting = null;
+        var ancestorAcceptingFired = false;
+
+        ancestor.Accepting += (_, args) =>
+                               {
+                                   ancestorAcceptingFired = true;
+                                   valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
+
+                                   // Cancel — in the direct path, this DOES prevent
+                                   // the originator's OnAccepted from firing.
+                                   args.Handled = true;
+                               };
+
+        Assert.Equal (0, acceptToggleView.AcceptedCount);
+
+        // Act: Accept on the view directly.
+        acceptToggleView.InvokeCommand (Command.Accept);
+
+        // Assert: ancestor.Accepting should have fired via TryBubbleUp.
+        Assert.True (ancestorAcceptingFired, "ancestor.Accepting should have fired via TryBubbleUp");
+
+        // In the direct containment path, cancellation at the ancestor DOES work:
+        // acceptToggleView.OnAccepted never fires, so AcceptedCount remains 0.
+        Assert.Equal (0, acceptToggleView.AcceptedCount);
+        Assert.Equal (0, valueAtAncestorAccepting);
+
+        // No BridgedCancellation warning — this is a direct containment path.
+        Assert.DoesNotContain (traceBackend.Entries, e => e.Phase == "BridgedCancellation");
+    }
+
+    #endregion
+
+    #region Bridge Cancellation Test Helpers
+
+    /// <summary>
+    ///     A minimal view that tracks Accept-side state changes.
+    ///     Increments <see cref="AcceptedCount"/> in <see cref="OnAccepted"/> to
+    ///     provide a trackable state change for bridge cancellation tests.
+    /// </summary>
+    private class AcceptToggleView : View
+    {
+        /// <summary>Gets the number of times <see cref="OnAccepted"/> has been called.</summary>
+        public int AcceptedCount { get; private set; }
+
+        /// <inheritdoc/>
+        protected override void OnAccepted (ICommandContext? commandContext)
+        {
+            base.OnAccepted (commandContext);
+            AcceptedCount++;
+        }
     }
 
     #endregion

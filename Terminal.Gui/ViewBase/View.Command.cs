@@ -399,8 +399,16 @@ public partial class View // Command APIs
 
         if (!args.Handled)
         {
-            // Use TryBubbleToSuperView helper to handle Activate bubbling (opt-in via CommandsToBubbleUp)
+            // Use TryBubbleToSuperView helper to handle Accept bubbling (opt-in via CommandsToBubbleUp)
             args.Handled = TryBubbleUp (ctx, args.Handled) is true;
+        }
+
+        // Warn if cancellation (not dispatch) occurred on a bridged command.
+        if (args.Handled && ctx?.Routing == CommandRouting.Bridged && !_dispatchState.HasFlag (DispatchState.DispatchOccurred))
+        {
+            Trace.Command (this, ctx, "BridgedCancellation",
+                           "Cancellation across a CommandBridge has no effect. "
+                           + "The remote view's OnAccepted has already fired before the bridge relayed the command.");
         }
 
         // Do not return null as the event was raised.
@@ -720,6 +728,14 @@ public partial class View // Command APIs
         // This allows derived classes to handle the event and potentially cancel it.
         if (OnActivating (args) || args.Handled)
         {
+            // Warn if cancellation occurs on a bridged command — the remote side has already committed.
+            if (ctx?.Routing == CommandRouting.Bridged)
+            {
+                Trace.Command (this, ctx, "BridgedCancellation",
+                               "Cancellation across a CommandBridge has no effect. "
+                               + "The remote view's OnActivated has already fired before the bridge relayed the command.");
+            }
+
             return true;
         }
 
@@ -737,6 +753,14 @@ public partial class View // Command APIs
         {
             // Use TryBubbleToSuperView helper to handle Activate bubbling (opt-in via CommandsToBubbleUp)
             args.Handled = TryBubbleUp (ctx, args.Handled) is true;
+        }
+
+        // Warn if cancellation (not dispatch) occurred on a bridged command.
+        if (args.Handled && ctx?.Routing == CommandRouting.Bridged && !_dispatchState.HasFlag (DispatchState.DispatchOccurred))
+        {
+            Trace.Command (this, ctx, "BridgedCancellation",
+                           "Cancellation across a CommandBridge has no effect. "
+                           + "The remote view's OnActivated has already fired before the bridge relayed the command.");
         }
 
         return args.Handled;

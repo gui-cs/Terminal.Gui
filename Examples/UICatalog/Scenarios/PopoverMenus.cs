@@ -189,9 +189,11 @@ public class PopoverMenus : Scenario
         /// <inheritdoc/>
         protected override bool OnActivating (CommandEventArgs? args)
         {
-            // This demonstrates that cancelling Activating works on this side of the command bridge.
-            // BUGBUG: This prevents the command from propagating up, but the checkbox state is already toggled
-            // BUGBUG: by the time we get here!
+            // Known limitation: Cancellation across a CommandBridge cannot prevent the remote view's
+            // state change. The bridge fires from the post-event (Activated), so the checkbox's
+            // OnActivated (which toggles the state) has already executed by the time this handler
+            // runs. The framework emits a "BridgedCancellation" trace warning when this is detected.
+            // See plans/bridge-activating-cancellation-bug.md for full analysis.
             if (args?.Context.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
             {
                 return true;

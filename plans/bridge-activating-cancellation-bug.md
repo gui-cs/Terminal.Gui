@@ -136,17 +136,32 @@ Instead of preventing the state change, allow it to happen but revert it if canc
 **Pros:** No changes to the pre-event pipeline.
 **Cons:** Not all state changes are easily reversible. Adds complexity.
 
-## Recommendation
+## Resolution: Option B with Detection
 
-**Option C** provides the cleanest fix if the design intent is that `OnActivating` should be a universal veto point. However, it requires careful handling to avoid re-entry and double-fire issues.
+**Decision:** Accept the limitation (Option B) and add runtime detection.
 
-**Option B** is acceptable if the bridge is documented as a notification-only mechanism where cancellation is not supported. The BUGBUG comment in `PopoverMenus.cs` should be updated to explain this limitation.
+The bridge is a notification-only mechanism — cancellation across it is not supported. To aid developers, `RaiseActivating` and `RaiseAccepting` now emit a `BridgedCancellation` trace warning when cancellation is attempted on a bridged command. The warning reads:
+
+> Cancellation across a CommandBridge has no effect. The remote view's OnActivated/OnAccepted has already fired before the bridge relayed the command.
+
+This warning fires when all three conditions are met:
+1. `ctx.Routing == CommandRouting.Bridged`
+2. `args.Handled == true` (someone cancelled)
+3. `!DispatchOccurred` (not a dispatch — dispatch across a bridge is fine)
+
+### Changes Made
+
+| File | Change |
+|------|--------|
+| `Terminal.Gui/ViewBase/View.Command.cs` | Added `BridgedCancellation` trace warnings in `RaiseActivating` (2 sites) and `RaiseAccepting` (1 site) |
+| `Examples/UICatalog/Scenarios/PopoverMenus.cs:192` | Updated BUGBUG → known limitation comment |
+| `Tests/.../ViewCommandTests.cs` | 4 tests (bridge+direct × activate+accept), `AcceptToggleView` helper |
 
 ## Files
 
 | File | Role |
 |------|------|
-| `Terminal.Gui/Input/CommandBridge.cs` | Bridge implementation — subscribes to `Activated` only |
-| `Terminal.Gui/ViewBase/View.Command.cs` | `DefaultActivateHandler`, `BubbleActivatedUp`, `RaiseActivating` |
-| `Examples/UICatalog/Scenarios/PopoverMenus.cs:192` | Original BUGBUG comment |
-| `Tests/.../ViewCommandTests.cs` | Two new tests reproducing and contrasting the bug |
+| `Terminal.Gui/Input/CommandBridge.cs` | Bridge implementation — subscribes to `Activated`/`Accepted` only (unchanged) |
+| `Terminal.Gui/ViewBase/View.Command.cs` | `RaiseActivating`/`RaiseAccepting` — `BridgedCancellation` trace warnings |
+| `Examples/UICatalog/Scenarios/PopoverMenus.cs:192` | Known limitation comment (was BUGBUG) |
+| `Tests/.../ViewCommandTests.cs` | Four tests reproducing and contrasting the bug for both Activate and Accept |
