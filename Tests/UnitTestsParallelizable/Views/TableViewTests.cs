@@ -147,6 +147,7 @@ public class TableViewTests
         app.Begin (runnable);
 
         tableView = new ();
+        tableView.Viewport = new (0, 0, 25, 10);
 
         tf1 = new ();
         tf2 = new ();

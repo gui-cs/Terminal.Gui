@@ -29,43 +29,43 @@ public sealed class LoggingBackend : ITraceBackend
         Logging.Trace (message, entry.Method, $"{entry.Category}:{entry.Phase}");
     }
 
-    private string FormatNavigation (TraceEntry entry) => string.Empty;
+    private string FormatNavigation (TraceEntry _) => string.Empty;
 
-    private string FormatLifecycle (TraceEntry entry) => string.Empty;
+    private string FormatLifecycle (TraceEntry _) => string.Empty;
 
     private static string FormatCommand (TraceEntry entry)
     {
-        if (entry.Data is (Command cmd, CommandRouting routing))
+        if (entry.Data is not (Command cmd, CommandRouting routing))
         {
-            string arrow = routing switch
-                           {
-                               CommandRouting.BubblingUp => "↑",
-                               CommandRouting.DispatchingDown => "↓",
-                               CommandRouting.Bridged => "↔",
-                               _ => "•"
-                           };
-
-            return $"{arrow} {cmd}";
+            return string.Empty;
         }
 
-        return string.Empty;
+        string arrow = routing switch
+                       {
+                           CommandRouting.BubblingUp => "↑",
+                           CommandRouting.DispatchingDown => "↓",
+                           CommandRouting.Bridged => "↔",
+                           _ => "•"
+                       };
+
+        return $"{arrow} {cmd}";
     }
 
     private static string FormatMouse (TraceEntry entry)
     {
-        if (entry.Data is (MouseFlags flags, Point pos))
+        switch (entry.Data)
         {
-            return $"{flags} @({pos.X},{pos.Y})";
+            case (MouseFlags flags, Point pos): return $"{flags} @({pos.X},{pos.Y})";
+
+            case Mouse mouse:
+            {
+                Point mousePos = mouse.Position ?? Point.Empty;
+
+                return $"{mouse.Flags} @({mousePos.X},{mousePos.Y})";
+            }
+
+            default: return string.Empty;
         }
-
-        if (entry.Data is Mouse mouse)
-        {
-            Point mousePos = mouse.Position ?? Point.Empty;
-
-            return $"{mouse.Flags} @({mousePos.X},{mousePos.Y})";
-        }
-
-        return string.Empty;
     }
 
     private static string FormatKeyboard (TraceEntry entry)
