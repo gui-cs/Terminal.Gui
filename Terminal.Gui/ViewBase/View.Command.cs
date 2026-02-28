@@ -267,7 +267,7 @@ public partial class View // Command APIs
         // Reset before RaiseAccepting — early-exit paths (OnAccepting returns true, Accepting
         // event sets Handled=true) skip TryDispatchToTarget. Without this reset, the flag would
         // retain its value from a prior invocation, causing spurious completion events.
-        _lastDispatchOccurred = false;
+        _dispatchState = DispatchState.None;
 
         if (RaiseAccepting (ctx) is true)
         {
@@ -275,7 +275,7 @@ public partial class View // Command APIs
             // Bridged commands also need completion: the bridge brings a command from a remote
             // view (e.g., SubMenu), TryBubbleUp propagates it to the SuperView, but the owner
             // still needs its Accepted event to fire for subscribers (e.g., parentMenuItem.Accepted).
-            if (_lastDispatchOccurred || ctx?.Routing == CommandRouting.Bridged)
+            if (_dispatchState.HasFlag (DispatchState.DispatchOccurred) || ctx?.Routing == CommandRouting.Bridged)
             {
                 ctx = RefreshValue (ctx);
 
@@ -317,8 +317,24 @@ public partial class View // Command APIs
 
         ctx = RefreshValue (ctx);
 
-        Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted");
-        RaiseAccepted (ctx);
+        // When entering via DispatchingDown, mark that Accepted will fire during dispatch.
+        // The outer (Direct) call checks this flag and skips its own RaiseAccepted.
+        if (ctx?.Routing == CommandRouting.DispatchingDown)
+        {
+            _dispatchState |= DispatchState.AcceptedViaDispatch;
+            Trace.Command (this, ctx, "DispatchFlag", "Setting AcceptedViaDispatch");
+            Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted (DispatchingDown)");
+            RaiseAccepted (ctx);
+        }
+        else if (!_dispatchState.HasFlag (DispatchState.AcceptedViaDispatch))
+        {
+            Trace.Command (this, ctx, "Routing", "Calling RaiseAccepted");
+            RaiseAccepted (ctx);
+        }
+        else
+        {
+            Trace.Command (this, ctx, "SkipAccepted", "AcceptedViaDispatch already set — skipping duplicate RaiseAccepted");
+        }
 
         // Report as handled if:
         // - Accept was redirected to DefaultAcceptView (DispatchDown performed), or
@@ -472,11 +488,11 @@ public partial class View // Command APIs
         // Reset before RaiseActivating — early-exit paths (OnActivating returns true, Activating
         // event sets Handled=true) skip TryDispatchToTarget. Without this reset, the flag would
         // retain its value from a prior invocation, causing spurious completion events.
-        _lastDispatchOccurred = false;
+        _dispatchState = DispatchState.None;
 
         if (RaiseActivating (ctx) is true)
         {
-            if (_lastDispatchOccurred)
+            if (_dispatchState.HasFlag (DispatchState.DispatchOccurred))
             {
                 ctx = RefreshValue (ctx);
 
@@ -499,22 +515,11 @@ public partial class View // Command APIs
         // "not consumed" so the originator continues.
         //
         // Composite views with ConsumeDispatch=true already completed above (RaiseActivating returned true).
-        // Composite views with ConsumeDispatch=false (relay) receive Activated later via
+        // ALL ancestors (both composite and plain) receive Activated later via
         // BubbleActivatedUp, after the originator completes its state change.
+        // This ensures bridges on plain views (e.g., Menu → PopoverMenu) see the post-change value.
         if (ctx?.Routing == CommandRouting.BubblingUp)
         {
-            // Fire Activated only for plain views (no dispatch target). This enables
-            // SuperViews to observe SubView activation via the Activated event.
-            //
-            // Composite views (Shortcut/MenuItem with dispatch targets) skip Activated here
-            // because the originating view's state (e.g., CheckBox.Checked) hasn't been
-            // updated yet — we're still inside RaiseActivating. Composite ancestors receive
-            // Activated later via BubbleActivatedUp, after the originator completes.
-            if (GetDispatchTarget (ctx) is null)
-            {
-                RaiseActivated (ctx);
-            }
-
             return false;
         }
 
@@ -527,19 +532,57 @@ public partial class View // Command APIs
         // RaiseActivated and BubbleActivatedUp carry the post-change value.
         ctx = RefreshValue (ctx);
 
-        // Always fire RaiseActivated. Dispatch completed synchronously,
-        // so CommandView state is already updated.
-        RaiseActivated (ctx);
+        // When entering via DispatchingDown, mark that Activated will fire during dispatch.
+        // The outer (Direct) call checks this flag and skips its own RaiseActivated to prevent
+        // double-fire when the originator IS the dispatch target.
+        if (ctx?.Routing == CommandRouting.DispatchingDown)
+        {
+            _dispatchState |= DispatchState.ActivatedViaDispatch;
+            Trace.Command (this, ctx, "DispatchFlag", "Setting ActivatedViaDispatch");
+            RaiseActivated (ctx);
+        }
+        else if (!_dispatchState.HasFlag (DispatchState.ActivatedViaDispatch))
+        {
+            RaiseActivated (ctx);
+        }
+        else
+        {
+            Trace.Command (this, ctx, "SkipActivated", "ActivatedViaDispatch already set — skipping duplicate RaiseActivated");
+        }
 
-        // Notify composite ancestors (views with dispatch targets) that activation completed.
-        // Plain ancestors already received Activated during the BubblingUp phase of RaiseActivating.
+        // After RaiseActivated, re-read this view's own value (if it implements IValue)
+        // so that BubbleActivatedUp carries the post-change value even when the originator
+        // IS the IValue (e.g., ToggleView mutates Value in OnActivated).
+        // Only refresh when this view is the command source — intermediate views in a bridge
+        // chain (e.g., MenuBarItem receiving a bridged command) should not overwrite the
+        // original source's value.
+        if (this is IValue selfValue
+            && ctx is CommandContext cc
+            && ctx.Source?.TryGetTarget (out View? src) == true
+            && ReferenceEquals (src, this))
+        {
+            ctx = cc.WithValue (selfValue.GetValue ());
+        }
+
+        // Notify ALL ancestors (composite and plain) that activation completed.
+        // This replaces the old BubblingUp-phase RaiseActivated on plain views, ensuring
+        // bridges on plain views (e.g., Menu → PopoverMenu) see the post-change value.
         // Skip for DispatchingDown — the dispatching view handles its own Activated after dispatch returns.
         if (ctx?.Routing != CommandRouting.DispatchingDown)
         {
-            BubbleActivatedUp (ctx, compositeOnly: true);
+            BubbleActivatedUp (ctx);
         }
 
-        return true;
+        // Report as handled if:
+        // - Activate was dispatched to a target (composite view consumed it), or
+        // - Activate will bubble to ancestor (so it will be processed up the chain), or
+        // - Activate bubbled up from a SubView (the full chain processed the command).
+        // Report as not handled when Activate originated from a local key binding (e.g., Space key)
+        // on a plain view with no dispatch target and no bubble config — this allows the key to
+        // propagate to HotKey dispatch. (Mirrors DefaultAcceptHandler's logic; fixes #4759.)
+        bool activateWillBubble = CommandWillBubbleToAncestor (Command.Activate);
+
+        return _dispatchState.HasFlag (DispatchState.DispatchOccurred) || activateWillBubble;
     }
 
     /// <summary>
@@ -606,7 +649,23 @@ public partial class View // Command APIs
             {
                 if (!compositeOnly || next.GetDispatchTarget (ctx) is { })
                 {
-                    ICommandContext upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+                    CommandContext upCtx = new (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+
+                    // Re-read the value from the ancestor's dispatch target, but only when
+                    // the dispatch target is the same view as the command source (i.e., the
+                    // originator IS the dispatch target). This ensures post-change values
+                    // (e.g., after ToggleView mutated in OnActivated) are carried correctly
+                    // without overwriting values from unrelated dispatch targets (e.g., MenuBar
+                    // dispatching to MenuBarItem would overwrite the MenuItem value).
+                    View? dispatchTarget = next.GetDispatchTarget (ctx);
+
+                    if (dispatchTarget is IValue refreshedValue
+                        && ctx.Source?.TryGetTarget (out View? source) == true
+                        && ReferenceEquals (source, dispatchTarget))
+                    {
+                        upCtx = upCtx.WithValue (refreshedValue.GetValue ());
+                    }
+
                     next.RaiseActivated (upCtx);
                 }
 
@@ -897,11 +956,25 @@ public partial class View // Command APIs
     protected virtual bool ConsumeDispatch => false;
 
     /// <summary>
-    ///     Tracks whether a dispatch occurred during the last <see cref="RaiseActivating"/> or
-    ///     <see cref="RaiseAccepting"/> call. Used by <see cref="DefaultActivateHandler"/> and
-    ///     <see cref="DefaultAcceptHandler"/> to determine whether to call <c>RaiseActivated</c>/<c>RaiseAccepted</c>.
+    ///     Tracks dispatch state during the current command invocation. Used to prevent double-fire
+    ///     of <c>RaiseActivated</c>/<c>RaiseAccepted</c> when the originator is also the dispatch target.
     /// </summary>
-    private bool _lastDispatchOccurred;
+    [Flags]
+    private enum DispatchState
+    {
+        None = 0,
+
+        /// <summary>A dispatch (relay or consume) occurred during this invocation.</summary>
+        DispatchOccurred = 1,
+
+        /// <summary><see cref="RaiseActivated"/> already fired during a <see cref="CommandRouting.DispatchingDown"/> call.</summary>
+        ActivatedViaDispatch = 2,
+
+        /// <summary><see cref="RaiseAccepted"/> already fired during a <see cref="CommandRouting.DispatchingDown"/> call.</summary>
+        AcceptedViaDispatch = 4
+    }
+
+    private DispatchState _dispatchState;
 
     /// <summary>
     ///     Attempts to dispatch the command to the <see cref="GetDispatchTarget"/> view.
@@ -913,7 +986,7 @@ public partial class View // Command APIs
     {
         Trace.Command (this, ctx, "Entry");
 
-        _lastDispatchOccurred = false;
+        _dispatchState = DispatchState.None;
 
         View? target = GetDispatchTarget (ctx);
 
@@ -957,7 +1030,7 @@ public partial class View // Command APIs
                 DispatchDown (target, ctx);
             }
 
-            _lastDispatchOccurred = true;
+            _dispatchState |= DispatchState.DispatchOccurred;
 
             return true;
         }
@@ -968,7 +1041,7 @@ public partial class View // Command APIs
             return false;
         }
         DispatchDown (target, ctx);
-        _lastDispatchOccurred = true;
+        _dispatchState |= DispatchState.DispatchOccurred;
 
         return false;
     }

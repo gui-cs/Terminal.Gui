@@ -5,10 +5,10 @@ using System.Globalization;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ContextMenus", "Illustrates PopoverMenu as a context menu")]
+[ScenarioMetadata ("PopoverMenus", "Illustrates PopoverMenu as a context menu")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Menus")]
-public class ContextMenus : Scenario
+public class PopoverMenus : Scenario
 {
     private PopoverMenu? _winContextMenu;
     private TextField? _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
@@ -16,6 +16,7 @@ public class ContextMenus : Scenario
     private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
 
     private Window? _appWindow;
+    private EventLog? _eventLog;
 
     public override void Main ()
     {
@@ -58,6 +59,17 @@ public class ContextMenus : Scenario
             const int WIDTH = 20;
 
             CreateWinContextMenu ((sender as Window)!.App);
+
+            _eventLog = new EventLog
+            {
+                Id = "eventLog",
+                X = Pos.AnchorEnd (),
+                Height = Dim.Fill (),
+                SchemeName = "Runnable",
+                BorderStyle = LineStyle.Double,
+                Title = "E_vents",
+                Arrangement = ViewArrangement.LeftResizable
+            };
 
             Label label = new () { X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenuKey}' to open the Window context menu." };
             _appWindow.Add (label);
@@ -109,7 +121,7 @@ public class ContextMenus : Scenario
             {
                 X = Pos.Center (),
                 Y = Pos.Bottom (_tfMiddle!) + 1,
-                Width = 50,
+                Width = Dim.Fill () - Dim.Width (_eventLog),
                 Height = 10,
                 Title = $"PopoverMenu Host - Right-click or {PopoverMenu.DefaultKey}",
                 BorderStyle = LineStyle.Dashed
@@ -136,7 +148,12 @@ public class ContextMenus : Scenario
                                             }
                                         }
                                     };
+
+            _eventLog.SetViewToLog (_appWindow);
+            _eventLog.SetViewToLog (popoverMenuHost);
+
             _appWindow.Add (popoverMenuHost);
+            _appWindow.Add (_eventLog);
         }
     }
 

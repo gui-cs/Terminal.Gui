@@ -1,8 +1,10 @@
+using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class MenuBarTests
+public class MenuBarTests (ITestOutputHelper output)
 {
     [Fact]
     public void Command_HotKey_Activates ()
@@ -290,8 +292,8 @@ public class MenuBarTests
         Assert.NotNull (optionSelector);
         Assert.Equal (Schemes.Base, optionSelector.Value);
 
-        // Find the "Error" checkbox (index 4)
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        // Find the "Error" checkbox (index 4 in the Schemes enum)
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
         Assert.NotNull (errorCheckBox);
 
         // Subscribe to ValueChanged
@@ -358,7 +360,7 @@ public class MenuBarTests
         OptionSelector<Schemes>? optionSelector = optionMenuItem!.CommandView as OptionSelector<Schemes>;
         Assert.Equal (Schemes.Base, optionSelector!.Value);
 
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
 
         Schemes? newValue = null;
         var valueChangedCount = 0;
@@ -419,7 +421,7 @@ public class MenuBarTests
         OptionSelector<Schemes>? optionSelector = optionMenuItem!.CommandView as OptionSelector<Schemes>;
         Assert.Equal (Schemes.Base, optionSelector!.Value);
 
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
 
         var valueChangedCount = 0;
 
@@ -1361,7 +1363,7 @@ public class MenuBarTests
         Assert.NotNull (optionSelector);
 
         // Click on the Error checkbox
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
         Assert.NotNull (errorCheckBox);
         errorCheckBox.SetFocus ();
         Point errorScreenPos = errorCheckBox.FrameToScreen ().Location;
@@ -1890,8 +1892,8 @@ public class MenuBarTests
     {
         ListBackend traceBackend = new ();
         Trace.Backend = traceBackend;
-        Trace.CommandEnabled = true;
-        Trace.KeyboardEnabled = true;
+        Trace.EnabledCategories |= TraceCategory.Command;
+        Trace.EnabledCategories |= TraceCategory.Keyboard;
 
         try
         {
@@ -1951,8 +1953,8 @@ public class MenuBarTests
         }
         finally
         {
-            Trace.CommandEnabled = false;
-            Trace.KeyboardEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -2037,38 +2039,47 @@ public class MenuBarTests
     [Fact]
     public void MenuBar_Activated_ContextValue_ContainsMenuItem ()
     {
-        VirtualTimeProvider time = new ();
-        using IApplication app = Application.Create (time);
-        app.Init (DriverRegistry.Names.ANSI);
-        Runnable runnable = new ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
 
-        MenuBar menuBar = new ();
-        runnable.Add (menuBar);
+            VirtualTimeProvider time = new ();
+            using IApplication app = Application.Create (time);
+            app.Init (DriverRegistry.Names.ANSI);
+            Runnable runnable = new ();
 
-        MenuItem menuItem = new () { Title = "TestItem" };
-        PopoverMenu popoverMenu = new ([menuItem]);
-        MenuBarItem menuBarItem = new ("Test", popoverMenu);
-        menuBar.Add (menuBarItem);
+            MenuBar menuBar = new ();
+            runnable.Add (menuBar);
 
-        // Register the popoverMenu with Application
-        app.Popovers?.Register (popoverMenu);
+            MenuItem menuItem = new () { Title = "TestItem" };
+            PopoverMenu popoverMenu = new ([menuItem]);
+            MenuBarItem menuBarItem = new ("Test", popoverMenu);
+            menuBar.Add (menuBarItem);
 
-        string? lastActivatedValueText = null;
+            // Register the popoverMenu with Application
+            app.Popovers?.Register (popoverMenu);
 
-        menuBar.Activated += (_, args) =>
-                             {
-                                 if (args?.Value?.Value is string title)
+            string? lastActivatedValueText = null;
+            var menuBarActivatedCount = 0;
+
+            menuBar.Activated += (_, args) =>
                                  {
-                                     lastActivatedValueText = title;
-                                 }
-                             };
+                                     menuBarActivatedCount++;
 
-        // Invoke Activate command on the MenuItem
-        menuItem.InvokeCommand (Command.Activate);
+                                     if (args?.Value?.Value is string title)
+                                     {
+                                         lastActivatedValueText = title;
+                                     }
+                                 };
 
-        Assert.Equal (menuItem.Title, lastActivatedValueText);
+            // Invoke Activate command on the MenuItem
+            menuItem.InvokeCommand (Command.Activate);
 
-        runnable.Dispose ();
+            Assert.Equal (1, menuBarActivatedCount);
+            Assert.Equal (menuItem.Title, lastActivatedValueText);
+
+            runnable.Dispose ();
+        }
     }
 
     // Claude - Opus 4.6
@@ -2136,46 +2147,55 @@ public class MenuBarTests
     [Fact]
     public void MenuBar_Activated_ContextValue_WithFocusedMenuItem ()
     {
-        VirtualTimeProvider time = new ();
-        using IApplication app = Application.Create (time);
-        app.Init (DriverRegistry.Names.ANSI);
-        Runnable runnable = new ();
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
 
-        MenuBar menuBar = new ();
-        runnable.Add (menuBar);
+            VirtualTimeProvider time = new ();
+            using IApplication app = Application.Create (time);
+            app.Init (DriverRegistry.Names.ANSI);
+            Runnable runnable = new ();
 
-        MenuItem menuItem = new () { Title = "TestItem" };
-        PopoverMenu popoverMenu = new ([menuItem]);
-        MenuBarItem menuBarItem = new ("Test", popoverMenu);
-        menuBar.Add (menuBarItem);
+            MenuBar menuBar = new ();
+            runnable.Add (menuBar);
 
-        app.Popovers?.Register (popoverMenu);
-        app.Begin (runnable);
+            MenuItem menuItem = new () { Title = "TestItem" };
+            PopoverMenu popoverMenu = new ([menuItem]);
+            MenuBarItem menuBarItem = new ("Test", popoverMenu);
+            menuBar.Add (menuBarItem);
 
-        string? lastActivatedValueText = null;
+            app.Popovers?.Register (popoverMenu);
+            app.Begin (runnable);
 
-        menuBar.Activated += (_, args) =>
-                             {
-                                 if (args?.Value?.Value is string title)
+            string? lastActivatedValueText = null;
+            var menuBarActivatedCount = 0;
+
+            menuBar.Activated += (_, args) =>
                                  {
-                                     lastActivatedValueText = title;
-                                 }
-                             };
+                                     menuBarActivatedCount++;
 
-        // Focus the MenuItem (simulates real user interaction)
-        Menu? menu = popoverMenu.SubViews.OfType<Menu> ().FirstOrDefault ();
-        Assert.NotNull (menu);
+                                     if (args?.Value?.Value is string title)
+                                     {
+                                         lastActivatedValueText = title;
+                                     }
+                                 };
 
-        popoverMenu.Visible = true;
-        menuItem.SetFocus ();
-        Assert.True (menuItem.HasFocus);
+            // Focus the MenuItem (simulates real user interaction)
+            Menu? menu = popoverMenu.SubViews.OfType<Menu> ().FirstOrDefault ();
+            Assert.NotNull (menu);
 
-        // Invoke Activate - should not stack overflow and ctx.Value should work
-        menuItem.InvokeCommand (Command.Activate);
+            popoverMenu.Visible = true;
+            menuItem.SetFocus ();
+            Assert.True (menuItem.HasFocus);
 
-        Assert.Equal (menuItem.Title, lastActivatedValueText);
+            // Invoke Activate - should not stack overflow and ctx.Value should work
+            menuItem.InvokeCommand (Command.Activate);
 
-        runnable.Dispose ();
+            Assert.Equal (1, menuBarActivatedCount);
+            Assert.Equal (menuItem.Title, lastActivatedValueText);
+
+            runnable.Dispose ();
+        }
     }
 
     #endregion

@@ -569,7 +569,7 @@ public class SelectorBaseTests
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
         Assert.Equal ("Test Option", checkBox.Title);
         Assert.Equal ("Test Option", checkBox.Id);
-        Assert.Equal (42, checkBox.Data);
+        Assert.Equal (42, selector.GetCheckBoxValue (checkBox));
         Assert.True (checkBox.CanFocus);
     }
 
