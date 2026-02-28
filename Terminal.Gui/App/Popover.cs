@@ -94,6 +94,11 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     ///         When set, the previous content view (if any) is removed and disposed. Event subscriptions
     ///         are updated accordingly.
     ///     </para>
+    ///     <para>
+    ///         If set to <see langword="null"/>, a default <typeparamref name="TView"/> instance is created
+    ///         automatically. This ensures <see cref="ContentView"/> is never <see langword="null"/> after
+    ///         construction.
+    ///     </para>
     /// </remarks>
     public TView? ContentView
     {
