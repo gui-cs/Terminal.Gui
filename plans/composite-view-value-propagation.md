@@ -174,8 +174,7 @@ MenuBar?.Activated += (_, args) =>
 
 **Pros:** More information-rich; `ctx.Value` remains the "right" value; full chain available for
 debugging and complex scenarios; subscriber can always recover any level's value.
-**Cons:** Breaking change on `Value` semantics (it becomes the last, not the single value);
-allocates a new list on each bubble step; `ICommandContext` interface gains new member;
+**Cons:** Allocates a new list on each bubble step; `ICommandContext` interface gains new member;
 in multi-layer scenarios subscriber must know which index (or use `.FirstOrDefault`) to find the
 right value — couples subscriber to hierarchy depth/composition.
 
@@ -337,7 +336,7 @@ unrelated purposes does not accidentally affect the command value chain unless i
 
 | Criterion | B: Value Chain | C: Opaque Flag |
 |-----------|----------------|----------------|
-| Public API changes | `ICommandContext.Values` (breaking: `Value` semantics change) | `View.OpaqueCommandValue` (protected virtual, additive) |
+| Public API changes | `ICommandContext.Values`; `Value` becomes `Values[^1]` | `View.OpaqueCommandValue` (protected virtual, additive) |
 | Framework changes | `RefreshValue` + multiple sites | +6 lines in `DefaultActivateHandler` |
 | Selector changes | Reorder `OnActivated` + append value | Reorder `OnActivated` + set flag |
 | Direct subscriber | `ctx.Value = composite's value` ✓ | `ctx.Value = composite's value` ✓ |
@@ -346,7 +345,7 @@ unrelated purposes does not accidentally affect the command value chain unless i
 | Information available | Full value chain in `ctx.Values` | Single value (outermost opaque composite's) |
 | Future composite support | Convention (must append) | Declaration (set flag) |
 | Accidental participation | Any `IValue` in chain appends (by design, but verbose) | Only explicit `OpaqueCommandValue=true` views participate |
-| Breaking changes | Yes — `ctx.Value` semantics change from single to last-of-chain | No |
+| `ctx.Value` semantics | `Values[^1]` — last appended (outermost composite) | Single value (replaced by each `OpaqueCommandValue` composite) |
 
 ---
 
