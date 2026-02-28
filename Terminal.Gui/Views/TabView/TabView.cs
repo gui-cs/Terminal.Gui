@@ -623,7 +623,7 @@ public class TabView : View
     {
         // When a tab is activated (via mouse or keyboard), select it.
         // Don't forward the mouse event back to _tabsBar.NewMouseEvent as that causes infinite recursion.
-        Tab? tab = sender as Tab;
+        var tab = sender as Tab;
 
         // If sender is a Border, get the parent Tab
         if (sender is Border border)
@@ -631,7 +631,7 @@ public class TabView : View
             tab = border.Parent as Tab;
         }
 
-        if (tab is not null && tab != SelectedTab)
+        if (tab is { } && tab != SelectedTab)
         {
             SelectedTab = tab;
             e.Handled = true;

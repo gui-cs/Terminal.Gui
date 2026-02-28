@@ -87,11 +87,7 @@ public class TabViewCommandTests
     [Fact]
     public void TabView_Tab_Activating_DoesNotCauseInfiniteLoop ()
     {
-        TabView tabView = new ()
-        {
-            Width = 40,
-            Height = 10
-        };
+        TabView tabView = new () { Width = 40, Height = 10 };
         Tab tab1 = new () { Text = "Tab1" };
         Tab tab2 = new () { Text = "Tab2" };
         tabView.AddTab (tab1, true);
