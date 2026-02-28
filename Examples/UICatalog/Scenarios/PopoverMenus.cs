@@ -132,16 +132,6 @@ public class PopoverMenus : Scenario
 
             _appWindow.CommandsToBubbleUp = [Command.Activate];
 
-            _appWindow.Activating += (_, args) =>
-                                     {
-                                         // This demonstrates that cancelling Activating works. Note the Activated handler below sets _appWindow.BorderStyle
-                                         // However, that code will never execute because we mark the event as handled here.
-                                         if (args.Context.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
-                                         {
-                                             // args.Handled = true;
-                                         }
-                                     };
-
             _appWindow.Activated += (_, args) =>
                                     {
                                         // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
@@ -186,21 +176,24 @@ public class PopoverMenus : Scenario
             CommandsToBubbleUp = [Command.Activate];
         }
 
-        /// <inheritdoc/>
-        protected override bool OnActivating (CommandEventArgs? args)
-        {
-            // Known limitation: Cancellation across a CommandBridge cannot prevent the remote view's
-            // state change. The bridge fires from the post-event (Activated), so the checkbox's
-            // OnActivated (which toggles the state) has already executed by the time this handler
-            // runs. The framework emits a "BridgedCancellation" trace warning when this is detected.
-            // See plans/bridge-activating-cancellation-bug.md for full analysis.
-            if (args?.Context.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
-            {
-                return true;
-            }
+        // This is commented out intentionally; this whole piece of code is just here to demonstrate
+        // the limitation described below.
+        ///// <inheritdoc/>
+        //protected override bool OnActivating (CommandEventArgs args)
+        //{
+        //    // Known limitation: Cancellation across a CommandBridge cannot prevent the remote view's
+        //    // state change. The bridge fires from the post-event (Activated), so the checkbox's
+        //    // OnActivated (which toggles the state) has already executed by the time this handler
+        //    // runs. The framework emits a "BridgedCancellation" trace warning when this is detected.
+        //    // See plans/bridge-activating-cancellation-bug.md for full analysis.
 
-            return base.OnActivating (args);
-        }
+        //    if (args.Context.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
+        //    {
+        //        return true;
+        //    }
+
+        //    return base.OnActivating (args);
+        //}
 
         public override void EndInit ()
         {
