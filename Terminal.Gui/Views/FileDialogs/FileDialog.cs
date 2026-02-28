@@ -184,7 +184,6 @@ public class FileDialog : Dialog, IDesignable
         _tableView.Style.ShowVerticalHeaderLines = true;
         _tableView.Style.AlwaysShowHeaders = true;
         _tableView.Style.ShowHorizontalHeaderUnderline = true;
-        _tableView.Style.ShowHorizontalScrollIndicators = true;
 
         _history = new FileDialogHistory (this);
 
@@ -1091,7 +1090,10 @@ public class FileDialog : Dialog, IDesignable
                 _history.ClearForward ();
             }
 
-            _tableView.RowOffset = 0;
+            if (_tableView.Viewport.Y != 0)
+            {
+                _tableView.Viewport = _tableView.Viewport with {Y = 0};
+            }
             _tableView.SelectedRow = 0;
 
             SetNeedsDraw ();
