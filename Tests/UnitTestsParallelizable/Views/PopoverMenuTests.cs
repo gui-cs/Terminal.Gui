@@ -303,12 +303,12 @@ public class PopoverMenuTests (ITestOutputHelper output)
 
     #endregion
 
-    #region Target Bridging (ContextMenus pattern)
+    #region Target Bridging (PopoverMenus pattern)
 
     /// <summary>
-    ///     Proves the ContextMenus pattern works: a PopoverMenu with Target set to a host view
+    ///     Proves the PopoverMenus pattern works: a PopoverMenu with Target set to a host view
     ///     bridges Activated to the host when a MenuItem is activated inside the PopoverMenu.
-    ///     This mirrors the <c>popoverMenuHost.Activated</c> handler in ContextMenus.cs.
+    ///     This mirrors the <c>popoverMenuHost.Activated</c> handler in PopoverMenus.cs.
     /// </summary>
 
     // Claude - Opus 4.6
@@ -352,10 +352,10 @@ public class PopoverMenuTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    ///     Proves the ContextMenus pattern for CheckBox CommandView:
+    ///     Proves the PopoverMenus pattern for CheckBox CommandView:
     ///     When a MenuItem has a CheckBox as its CommandView, activating the CheckBox should
     ///     bridge through PopoverMenu.Target to the host, and TryGetSource should identify
-    ///     the CheckBox. This mirrors the <c>bordersCheckbox</c> pattern in ContextMenus.cs.
+    ///     the CheckBox. This mirrors the <c>bordersCheckbox</c> pattern in PopoverMenus.cs.
     /// </summary>
 
     // Claude - Opus 4.6
@@ -402,11 +402,11 @@ public class PopoverMenuTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    ///     Proves the ContextMenus pattern for OptionSelector CommandView:
+    ///     Proves the PopoverMenus pattern for OptionSelector CommandView:
     ///     When a MenuItem has an OptionSelector as its CommandView, activating a CheckBox
     ///     inside the OptionSelector should bridge through PopoverMenu.Target to the host,
     ///     and TryGetSource should identify the CheckBox within the OptionSelector.
-    ///     This mirrors the <c>schemeOptionSelector</c> pattern in ContextMenus.cs.
+    ///     This mirrors the <c>schemeOptionSelector</c> pattern in PopoverMenus.cs.
     /// </summary>
 
     // Claude - Opus 4.6
@@ -449,7 +449,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     /// <summary>
     ///     Proves that when PopoverMenu.Target is set and the target has CommandsToBubbleUp,
     ///     the activation bridges through to the target's SuperView. This mirrors the full
-    ///     ContextMenus hierarchy: _appWindow (SuperView) → popoverMenuHost (Target) → PopoverMenu.
+    ///     PopoverMenus hierarchy: _appWindow (SuperView) → popoverMenuHost (Target) → PopoverMenu.
     /// </summary>
 
     // Claude - Opus 4.6
@@ -545,7 +545,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     ///     Proves that when a <see cref="MenuItem"/> has a <see cref="CheckBox"/> as its CommandView,
     ///     activating the MenuItem bridges through <see cref="PopoverMenu.Target"/> to the host,
     ///     and <see cref="ICommandContext.Value"/> carries the CheckBox's post-toggle
-    ///     <see cref="CheckState"/>. This mirrors the <c>bordersCheckbox</c> pattern in ContextMenus.cs.
+    ///     <see cref="CheckState"/>. This mirrors the <c>bordersCheckbox</c> pattern in PopoverMenus.cs.
     /// </summary>
     /// <remarks>
     ///     The fix uses <c>RefreshValue</c> in <c>TryBubbleUp</c> and <c>DefaultActivateHandler</c>
