@@ -70,6 +70,7 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     public Popover (TView? contentView)
     {
         // Do this to support debugging traces where Title gets set
+        // Unicode Character 'REPLACEMENT CHARACTER' (U+FFFF) is used to indicate an invalid HotKeySpecifier
         base.HotKeySpecifier = (Rune)'\xffff';
 
         Border?.Settings &= ~BorderSettings.Title;
@@ -324,11 +325,11 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     public void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         // Try anchor parameter, then Anchor property, then mouse position
-        Rectangle? anchorRect = anchor ?? Anchor?.Invoke ();
+        Rectangle? effectiveAnchor = anchor ?? Anchor?.Invoke ();
 
-        if (anchorRect is { })
+        if (effectiveAnchor is { })
         {
-            idealScreenPosition = new Point (anchorRect.Value.X, anchorRect.Value.Y + anchorRect.Value.Height);
+            idealScreenPosition = new Point (effectiveAnchor.Value.X, effectiveAnchor.Value.Y + effectiveAnchor.Value.Height);
         }
 
         idealScreenPosition ??= App?.Mouse.LastMousePosition;

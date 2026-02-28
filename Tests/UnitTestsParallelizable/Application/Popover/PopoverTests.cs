@@ -144,12 +144,12 @@ public class PopoverTests
         Popover<Label, string> popover = new () { App = app };
         popoverManager.Register (popover);
 
-        var fired = false;
+        var isOpenChangedFired = false;
         bool? newValue = null;
 
         popover.IsOpenChanged += (_, e) =>
                                  {
-                                     fired = true;
+                                     isOpenChangedFired = true;
                                      newValue = e.NewValue;
                                  };
 
@@ -157,7 +157,7 @@ public class PopoverTests
         popover.IsOpen = true;
 
         // Assert
-        Assert.True (fired);
+        Assert.True (isOpenChangedFired);
         Assert.True (newValue);
     }
 
@@ -219,12 +219,12 @@ public class PopoverTests
 
         popoverManager.Register (popover);
 
-        var fired = false;
+        var resultChangedFired = false;
         string? newResult = null;
 
         popover.ResultChanged += (_, e) =>
                                  {
-                                     fired = true;
+                                     resultChangedFired = true;
                                      newResult = e.NewValue;
                                  };
 
@@ -233,7 +233,7 @@ public class PopoverTests
         popover.Visible = false;
 
         // Assert
-        Assert.True (fired);
+        Assert.True (resultChangedFired);
         Assert.Equal ("Result 1", newResult);
     }
 
