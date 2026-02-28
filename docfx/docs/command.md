@@ -4,6 +4,12 @@
 
 - [See Also](#see-also)
 - [Getting Started](#getting-started)
+  - [Declarative Command Binding](#declarative-command-binding)
+  - [Responding to Button Clicks](#responding-to-button-clicks)
+  - [Responding to State Changes](#responding-to-state-changes)
+  - [Cancelling an Action](#cancelling-an-action)
+  - [Listening to Events from SubViews](#listening-to-events-from-subviews)
+  - [The Two-Phase Pattern](#the-two-phase-pattern)
 - [Architecture Overview](#architecture-overview)
 - [Command Routing](#command-routing)
 - [Value Propagation](#value-propagation)
@@ -27,7 +33,142 @@
 * [Cancellable Work Pattern](cancellable-work-pattern.md)
 * [Events](events.md)
 
-## Overview
+## Getting Started
+
+Terminal.Gui uses the <xref:Terminal.Gui.Input.Command> enum as a **standardized vocabulary** for user actions. Views declare what they do using Commands rather than ad-hoc event names — this enables a consistent, localizable, and composable command system across the entire toolkit.
+
+The enum defines over 50 commands spanning several categories:
+
+| Category | Examples | Purpose |
+|----------|----------|---------|
+| **Lifecycle** | `Activate`, `Accept`, `HotKey` | Core view interaction (toggle, confirm, focus) |
+| **Editing** | `Cut`, `Copy`, `Paste`, `Undo`, `Redo` | Clipboard and text editing |
+| **Movement** | `Up`, `Down`, `PageUp`, `WordRight` | Cursor and selection navigation |
+| **Selection** | `SelectAll`, `UpExtend`, `ToggleExtend` | Extending selection ranges |
+| **Semantic** | `Save`, `Open`, `New`, `Context`, `Refresh` | Application-level actions |
+| **Navigation** | `NextTabStop`, `PreviousTabGroup` | Focus movement between views |
+
+The three **lifecycle commands** — `Activate`, `Accept`, and `HotKey` — drive the event system that most application code interacts with:
+
+| Command | What It Means | Common Triggers |
+|---------|---------------|-----------------|
+| **Activate** | Change state or toggle (e.g., check a checkbox, select a list item) | Space, mouse click |
+| **Accept** | Confirm or submit (e.g., press a button, submit a dialog) | Enter, double-click |
+| **HotKey** | Focus and activate via keyboard shortcut | Alt+letter, Shortcut.Key |
+
+### Declarative Command Binding
+
+The real power of `Command` is **declarative binding**. <xref:Terminal.Gui.Views.Shortcut> and <xref:Terminal.Gui.Views.MenuItem> can be constructed with just a target view and a command — the framework automatically resolves the key binding, display text, and help text from localized resources:
+
+```csharp
+// Declarative: "this menu item invokes Cut on the editor"
+MenuItem cutItem = new (editor, Command.Cut);
+// Automatically:
+//   Key      = Ctrl+X        (from editor's key bindings)
+//   Title    = "Cu_t"        (from GlobalResources "cmdCut")
+//   HelpText = "Cut to clipboard" (from GlobalResources "cmdCut_Help")
+
+MenuItem saveItem = new (editor, Command.Save);
+//   Key      = Ctrl+S
+//   Title    = "_Save"
+//   HelpText = "Save file"
+```
+
+This means views can advertise their capabilities via `AddCommand`, and menus/shortcuts can bind to them without hardcoding strings or key bindings. Localization comes for free — translating the resource strings is all that's needed.
+
+Views register their command handlers declaratively too:
+
+```csharp
+// Inside a custom View's constructor
+AddCommand (Command.Copy, () => Copy ());
+AddCommand (Command.Cut, () => Cut ());
+AddCommand (Command.Context, () => ShowContextMenu ());
+```
+
+### Responding to Button Clicks
+
+The most common pattern is subscribing to a view's **Accepted** event to react when the user confirms an action:
+
+```csharp
+Button okButton = new () { Text = "OK" };
+okButton.Accepted += (_, args) =>
+{
+    MessageBox.Query ("Result", "You clicked OK!", "Close");
+};
+```
+
+### Responding to State Changes
+
+Use the **Activated** event to react when a view's state changes (e.g., a checkbox is toggled):
+
+```csharp
+CheckBox darkMode = new () { Text = "Dark Mode" };
+darkMode.Activated += (_, args) =>
+{
+    // args.Value?.Value contains the view's current value
+    bool isChecked = args.Value?.Value is CheckState.Checked;
+    ApplyTheme (isChecked);
+};
+```
+
+### Cancelling an Action
+
+Use the **Activating** or **Accepting** event to prevent an action before it happens. Set `args.Cancel = true` to cancel:
+
+```csharp
+TextField nameField = new ();
+nameField.Accepting += (_, args) =>
+{
+    if (string.IsNullOrEmpty (nameField.Text))
+    {
+        args.Cancel = true;  // Prevent Accept — name is required
+        MessageBox.ErrorQuery ("Error", "Name cannot be empty.", "OK");
+    }
+};
+```
+
+### Listening to Events from SubViews
+
+By default, events don't propagate up the view hierarchy. To receive events from SubViews, set `CommandsToBubbleUp` on the ancestor:
+
+```csharp
+Window myWindow = new () { Title = "My App" };
+myWindow.CommandsToBubbleUp = [Command.Activate, Command.Accept];
+
+// Now myWindow.Activated fires when ANY SubView activates
+myWindow.Activated += (_, args) =>
+{
+    // Identify which SubView fired via TryGetSource
+    if (args.Value?.TryGetSource (out View? source) is true)
+    {
+        // source is the originating view
+    }
+
+    // Or find a specific value type in the chain
+    if (args.Value?.Value is CheckState state)
+    {
+        // A CheckBox (or a view containing one) was toggled
+    }
+};
+```
+
+### The Two-Phase Pattern
+
+Every command follows a two-phase pattern:
+
+1. **Pre-event** (`Activating` / `Accepting`) — Fires *before* the action. Handlers can cancel by setting `args.Cancel = true`.
+2. **Post-event** (`Activated` / `Accepted`) — Fires *after* the action completes. The view's state has already changed.
+
+```
+User presses Space on CheckBox
+  → Activating fires (cancellable)
+  → CheckBox toggles its state
+  → Activated fires (state already changed, ctx.Value available)
+```
+
+> The rest of this document covers the internal architecture. For common recipes, skip to [How To](#how-to).
+
+## Architecture Overview
 
 The <xref:Terminal.Gui.Input.Command> system provides a standardized framework for view actions (selecting, accepting, activating). It integrates with keyboard/mouse input handling and uses the *Cancellable Work Pattern* for extensibility and cancellation. As commands propagate through the view hierarchy, each <xref:Terminal.Gui.IValue>-implementing view appends its value to the <xref:Terminal.Gui.Input.ICommandContext.Values> chain, enabling ancestors to inspect the full value history (see [Value Propagation](#value-propagation)).
 

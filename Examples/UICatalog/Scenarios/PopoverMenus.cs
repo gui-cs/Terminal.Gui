@@ -132,6 +132,16 @@ public class PopoverMenus : Scenario
 
             _appWindow.CommandsToBubbleUp = [Command.Activate];
 
+            _appWindow.Activating += (_, args) =>
+                                     {
+                                         // This demonstrates that cancelling Activating works. Note the Activated handler below sets _appWindow.BorderStyle
+                                         // However, that code will never execute because we mark the event as handled here.
+                                         if (args.Context.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
+                                         {
+                                             // args.Handled = true;
+                                         }
+                                     };
+
             _appWindow.Activated += (_, args) =>
                                     {
                                         // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
@@ -177,19 +187,19 @@ public class PopoverMenus : Scenario
         }
 
         /// <inheritdoc/>
-        protected override void OnActivated (ICommandContext? ctx)
+        protected override bool OnActivating (CommandEventArgs? args)
         {
-            base.OnActivated (ctx);
-
-            MenuItem? menuItem = _popoverMenu?.Root?.GetMenuItemsOfAllSubMenus (item => item.Id == "menuItemBorders").FirstOrDefault ();
-
-            if (menuItem?.CommandView is CheckBox bordersCheckBox)
+            // This demonstrates that cancelling Activating works on this side of the command bridge.
+            // BUGBUG: This prevents the command from propagating up, but the checkbox state is already toggled
+            // BUGBUG: by the time we get here!
+            if (args?.Context.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
             {
-                BorderStyle = bordersCheckBox.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                return true;
             }
+
+            return base.OnActivating (args);
         }
 
-        /// <inheritdoc/>
         public override void EndInit ()
         {
             base.EndInit ();
