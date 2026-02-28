@@ -2326,4 +2326,137 @@ public class ViewCommandTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region Bridge Cancellation Bug (PopoverMenus.cs line 192)
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Replicates the BUGBUG at PopoverMenus.cs line 192: when a <see cref="CommandBridge"/>
+    ///     relays an <c>Activated</c> event to an owner, and the owner (or its ancestor) tries to
+    ///     cancel via <c>OnActivating</c>, the originator's state has already changed because the
+    ///     bridge fires from the post-event (<c>Activated</c>), not the pre-event (<c>Activating</c>).
+    ///
+    ///     Topology (uses only View base classes):
+    ///     <code>
+    ///     ancestor (Activating handler cancels for specific source)
+    ///       └── owner  ← Bridge ←  container (CommandsToBubbleUp=[Activate])
+    ///                                  └── toggleView (IValue, mutates in OnActivated)
+    ///     </code>
+    ///
+    ///     Expected: cancelling at the ancestor's Activating should prevent the state change.
+    ///     Actual:   toggleView.Value has already incremented by the time ancestor's Activating fires.
+    /// </summary>
+    [Fact]
+    public void Bridge_Ancestor_Cancel_OnActivating_Does_Not_Prevent_Originator_State_Change ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: toggleView inside container, bridged to owner, owner inside ancestor.
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        View container = new () { Id = "container" };
+        container.CommandsToBubbleUp = [Command.Activate];
+        container.Add (toggleView);
+
+        View owner = new () { Id = "owner" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Activate];
+        ancestor.Add (owner);
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, container, Command.Activate);
+
+        // Track the toggleView.Value at the moment ancestor's Activating fires.
+        int? valueAtAncestorActivating = null;
+        var ancestorActivatingFired = false;
+
+        ancestor.Activating += (_, args) =>
+                                {
+                                    ancestorActivatingFired = true;
+                                    valueAtAncestorActivating = toggleView.Value;
+
+                                    // Cancel — this should prevent further processing,
+                                    // but cannot undo the toggleView's state change.
+                                    args.Handled = true;
+                                };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Activate the toggleView directly (simulates a user click on the inner view).
+        toggleView.InvokeCommand (Command.Activate);
+
+        // Assert: The bridge should have caused ancestor.Activating to fire.
+        Assert.True (ancestorActivatingFired, "ancestor.Activating should have fired via bridge");
+
+        // BUGBUG: By the time ancestor's Activating handler fires, toggleView.Value
+        // has already been incremented. The cancellation is too late.
+        Assert.Equal (1, toggleView.Value); // State change already happened
+        Assert.Equal (1, valueAtAncestorActivating); // Was already 1 when ancestor saw it
+
+        // This is the bug: if cancellation worked properly, we'd expect:
+        //   toggleView.Value == 0  (state change prevented)
+        //   valueAtAncestorActivating == 0  (no change yet when Activating fired)
+        // But instead both are 1.
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Contrast test: in the normal (non-bridge) bubble-up path, cancelling at the ancestor's
+    ///     <c>OnActivating</c> DOES prevent the originator's state change, because <c>TryBubbleUp</c>
+    ///     calls <c>SuperView.InvokeCommand</c> during <c>RaiseActivating</c> (the pre-event phase).
+    ///     The originator's <c>OnActivated</c> only fires if <c>RaiseActivating</c> succeeds.
+    ///
+    ///     Topology:
+    ///     <code>
+    ///     ancestor (Activating handler cancels)
+    ///       └── toggleView (IValue, mutates in OnActivated)
+    ///     </code>
+    ///
+    ///     This proves the asymmetry: direct containment bubbling supports cancellation;
+    ///     bridge-based bubbling does not.
+    /// </summary>
+    [Fact]
+    public void Direct_Ancestor_Cancel_OnActivating_Prevents_Originator_State_Change ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: toggleView inside ancestor (direct containment, no bridge).
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Activate];
+        ancestor.Add (toggleView);
+
+        int? valueAtAncestorActivating = null;
+        var ancestorActivatingFired = false;
+
+        ancestor.Activating += (_, args) =>
+                                {
+                                    ancestorActivatingFired = true;
+                                    valueAtAncestorActivating = toggleView.Value;
+
+                                    // Cancel — in the direct path, this DOES prevent
+                                    // the originator's OnActivated from firing.
+                                    args.Handled = true;
+                                };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Activate the toggleView directly.
+        toggleView.InvokeCommand (Command.Activate);
+
+        // Assert: ancestor.Activating should have fired via TryBubbleUp.
+        Assert.True (ancestorActivatingFired, "ancestor.Activating should have fired via TryBubbleUp");
+
+        // In the direct containment path, cancellation at the ancestor DOES work:
+        // toggleView.OnActivated never fires, so Value remains 0.
+        Assert.Equal (0, toggleView.Value);
+        Assert.Equal (0, valueAtAncestorActivating);
+    }
+
+    #endregion
 }
