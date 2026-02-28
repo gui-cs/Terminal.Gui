@@ -448,6 +448,11 @@ The bridge preserves the <xref:Terminal.Gui.Input.ICommandContext.Values> chain 
 
 Both references are weak — the bridge does not prevent GC. The bridge is one-way; create two bridges for bidirectional routing.
 
+> [!IMPORTANT]
+> **Cancellation does not work across a bridge.** Because the bridge subscribes to the remote view's post-events (`Activated`/`Accepted`), the remote view's `OnActivated`/`OnAccepted` has already fired — and any state change has already occurred — before the bridge relays the command to the owner. If the owner (or an ancestor) sets `args.Handled = true` in `Activating`/`Accepting`, it will stop further propagation on the owner's side, but it **cannot undo or prevent** the state change that already happened on the remote side.
+>
+> The framework detects this situation and emits a `BridgedCancellation` trace warning (visible when `Trace.EnabledCategories` includes `TraceCategory.Command`). If you need cancellation semantics, use direct containment (`SuperView`/SubView with `CommandsToBubbleUp`) instead of a bridge.
+
 ## How To
 
 ### Subscribe to Activated Events
@@ -553,6 +558,9 @@ _subMenuBridge.Dispose ();
 ```
 
 The bridge preserves the `Values` chain, so values accumulated in the remote view's hierarchy are visible to the owner's subscribers. The bridge uses weak references — it does not prevent GC.
+
+> [!WARNING]
+> Cancellation (`Activating`/`Accepting` with `args.Handled = true`) does not propagate back across a bridge — the remote view's state has already changed. See the [CommandBridge section](#commandbridge) for details.
 
 > [!TIP]
 > See `MenuItem.SubMenu` in `MenuItem.cs` for a working example of bridging across non-containment boundaries.
