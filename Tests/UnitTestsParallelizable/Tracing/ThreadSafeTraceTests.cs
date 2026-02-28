@@ -262,7 +262,7 @@ public class ThreadSafeTraceTests
     }
 
     [Fact]
-    public void EnabledCategories_IsAsyncLocal_DoesNotFlowToThreadPoolThreads ()
+    public void EnabledCategories_IsAsyncLocal_IsolatesAcrossExecutionContexts ()
     {
         try
         {
@@ -270,18 +270,19 @@ public class ThreadSafeTraceTests
 
             TraceCategory capturedCategories = TraceCategory.None;
 
-            // Use Task.Run to run on a thread pool thread without ExecutionContext flow
+            // Task.Run flows ExecutionContext by default, so the async-local value is visible in the task.
+            // The key isolation behavior is that changes in the task don't affect the parent context.
             Task.Run (
                       () =>
                       {
-                          // Thread pool threads may or may not see the async-local value depending on ExecutionContext flow
+                          // Task sees parent's value due to ExecutionContext flow
                           capturedCategories = Trace.EnabledCategories;
 
-                          // Set different categories in other thread
+                          // Set different categories in task context
                           Trace.EnabledCategories = TraceCategory.Mouse;
                       }).Wait ();
 
-            // This thread should still have Command enabled
+            // Parent context is unchanged despite modifications in the task
             Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
             Assert.Equal (TraceCategory.Command, Trace.EnabledCategories);
         }

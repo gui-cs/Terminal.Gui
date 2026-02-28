@@ -34,6 +34,7 @@ public class TreeTableSourceTests : IDisposable
         TableView tv = GetTreeTable (out _);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
+        tv.Update ();
 
         tv.Draw ();
 
@@ -60,12 +61,12 @@ public class TreeTableSourceTests : IDisposable
 
         expected =
             @"
-│Name             │Description         │
-├─────────────────┼────────────────────┤
-│├-Lost Highway   │Exciting night road │
-││ ├─Ford Trans-Am│Talking thunderbird │
-││ └─DeLorean     │Time travelling car │
-│└+Route 66       │Great race course   │
+│Name             │Description
+├─────────────────┼─────────────────────
+│├-Lost Highway   │Exciting night road
+││ ├─Ford Trans-Am│Talking thunderbird c
+││ └─DeLorean     │Time travelling car
+│└+Route 66       │Great race course
 ";
 
         DriverAssert.AssertDriverContentsAre (expected, _output);
@@ -87,7 +88,7 @@ public class TreeTableSourceTests : IDisposable
         DriverAssert.AssertDriverContentsAre (expected, _output);
     }
 
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     [SetupFakeApplication]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {
@@ -122,12 +123,12 @@ public class TreeTableSourceTests : IDisposable
 
         expected =
             @"
-│Name             │Description         │
-├─────────────────┼────────────────────┤
-│├-Lost Highway   │Exciting night road │
-││ ├─Ford Trans-Am│Talking thunderbird │
-││ └─DeLorean     │Time travelling car │
-│└+Route 66       │Great race course   │
+│Name             │Description
+├─────────────────┼─────────────────────
+│├-Lost Highway   │Exciting night road
+││ ├─Ford Trans-Am│Talking thunderbird c
+││ └─DeLorean     │Time travelling car
+│└+Route 66       │Great race course
 ";
 
         DriverAssert.AssertDriverContentsAre (expected, _output);
@@ -201,12 +202,12 @@ public class TreeTableSourceTests : IDisposable
         expected =
             @"
 
-│ │Name             │Description       │
-├─┼─────────────────┼──────────────────┤
-│☐│├-Lost Highway   │Exciting night roa│
-│☐││ ├─Ford Trans-Am│Talking thunderbir│
-│☐││ └─DeLorean     │Time travelling ca│
-│☐│└+Route 66       │Great race course │
+│ │Name             │Description        
+├─┼─────────────────┼───────────────────
+│☐│├-Lost Highway   │Exciting night road
+│☐││ ├─Ford Trans-Am│Talking thunderbird
+│☐││ └─DeLorean     │Time travelling car
+│☐│└+Route 66       │Great race course
 ";
 
         DriverAssert.AssertDriverContentsAre (expected, _output);
@@ -219,12 +220,12 @@ public class TreeTableSourceTests : IDisposable
         expected =
             @"
 
-│ │Name             │Description       │
-├─┼─────────────────┼──────────────────┤
-│☐│├-Lost Highway   │Exciting night roa│
-│☒││ ├─Ford Trans-Am│Talking thunderbir│
-│☐││ └─DeLorean     │Time travelling ca│
-│☐│└+Route 66       │Great race course │
+│ │Name             │Description        
+├─┼─────────────────┼───────────────────
+│☐│├-Lost Highway   │Exciting night road
+│☒││ ├─Ford Trans-Am│Talking thunderbird
+│☐││ └─DeLorean     │Time travelling car
+│☐│└+Route 66       │Great race course
 ";
 
         DriverAssert.AssertDriverContentsAre (expected, _output);

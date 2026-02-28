@@ -34,28 +34,28 @@ public partial class TableView
         switch (me.Flags)
         {
             case MouseFlags.WheeledDown:
-                RowOffset++;
+                Viewport = Viewport with {Y = Viewport.Y + 1};
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
                 return true;
 
             case MouseFlags.WheeledUp:
-                RowOffset--;
+                Viewport = Viewport with {Y = Viewport.Y - 1};
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
                 return true;
 
             case MouseFlags.WheeledRight:
-                ColumnOffset++;
+                Viewport = Viewport with {X = Viewport.X + 1};
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
                 return true;
 
             case MouseFlags.WheeledLeft:
-                ColumnOffset--;
+                Viewport = Viewport with { X = Viewport.X - 1};
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
@@ -67,20 +67,6 @@ public partial class TableView
 
         if (me.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            if (_scrollLeftPoint != null && _scrollLeftPoint.Value.X == boundsX && _scrollLeftPoint.Value.Y == boundsY)
-            {
-                ColumnOffset--;
-                EnsureValidScrollOffsets ();
-                SetNeedsDraw ();
-            }
-
-            if (_scrollRightPoint != null && _scrollRightPoint.Value.X == boundsX && _scrollRightPoint.Value.Y == boundsY)
-            {
-                ColumnOffset++;
-                EnsureValidScrollOffsets ();
-                SetNeedsDraw ();
-            }
-
             Point? hit = ScreenToCell (boundsX, boundsY);
 
             if (hit is { })

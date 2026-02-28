@@ -238,6 +238,7 @@ Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` na
 **Via `EnabledCategories` flags:**
 
 ```csharp
+using Terminal.Gui;
 using Terminal.Gui.Tracing;
 
 // Enable multiple categories at once

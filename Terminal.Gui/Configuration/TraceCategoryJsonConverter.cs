@@ -44,7 +44,7 @@ internal class TraceCategoryJsonConverter : JsonConverter<TraceCategory>
 
                 if (reader.TokenType != JsonTokenType.String)
                 {
-                    continue;
+                    throw new JsonException ($"Unexpected token type in TraceCategory array: {reader.TokenType}");
                 }
                 string value = reader.GetString ()!;
 
