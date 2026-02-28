@@ -1,4 +1,3 @@
-using Terminal.Gui.Input;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
@@ -118,9 +117,9 @@ public class ViewCommandTests (ITestOutputHelper output)
         View view = new ();
         var acceptedInvokedCount = 0;
 
-        view.Accepting += (sender, e) => { e.Handled = false; };
+        view.Accepting += (_, e) => { e.Handled = false; };
 
-        view.Accepted += (sender, e) => { acceptedInvokedCount++; };
+        view.Accepted += (_, _) => { acceptedInvokedCount++; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (1, acceptedInvokedCount);
@@ -132,9 +131,9 @@ public class ViewCommandTests (ITestOutputHelper output)
         View view = new ();
         var acceptedInvokedCount = 0;
 
-        view.Accepting += (sender, e) => { e.Handled = true; };
+        view.Accepting += (_, e) => { e.Handled = true; };
 
-        view.Accepted += (sender, e) => { acceptedInvokedCount++; };
+        view.Accepted += (_, _) => { acceptedInvokedCount++; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (0, acceptedInvokedCount);
@@ -146,11 +145,11 @@ public class ViewCommandTests (ITestOutputHelper output)
         View view = new ();
         var acceptedInvokedCount = 0;
 
-        view.Accepted += (sender, e) =>
+        view.Accepted += (_, e) =>
                          {
                              acceptedInvokedCount++;
 
-                             // Accepted event has Handled property but it doesn't affect flow
+                             // Accepted event has Handled property, but it doesn't affect flow
                              e.Handled = false;
                          };
 
@@ -163,7 +162,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         OnAcceptedTestView view = new ();
 
-        view.Accepting += (sender, e) => { e.Handled = false; };
+        view.Accepting += (_, e) => { e.Handled = false; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (1, view.OnAcceptedCallCount);
@@ -174,7 +173,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         OnAcceptedTestView view = new ();
 
-        view.Accepting += (sender, e) => { e.Handled = true; };
+        view.Accepting += (_, e) => { e.Handled = true; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (0, view.OnAcceptedCallCount);
@@ -299,7 +298,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         var activatingInvoked = 0;
         view.Activating += ViewOnActivating;
 
-        bool? ret = view.InvokeCommand (Command.Activate);
+        view.InvokeCommand (Command.Activate);
         Assert.Equal (1, activatingInvoked);
 
         return;
@@ -1983,8 +1982,6 @@ public class ViewCommandTests (ITestOutputHelper output)
             toggleView.InvokeCommand (Command.Activate, ctx);
 
             // Assert: OnActivated should fire exactly ONCE, so Value should be 1.
-            // BUG: Currently fires twice (inner DispatchDown + outer RaiseActivated),
-            // so Value ends up at 2 and ActivatedCount is 2.
             Assert.Equal (1, toggleView.ActivatedCount);
             Assert.Equal (1, toggleView.Value);
             Assert.Equal (1, compositeActivatedCount);
@@ -2045,7 +2042,6 @@ public class ViewCommandTests (ITestOutputHelper output)
         Assert.Equal (1, hostActivatedCount);
 
         // The value at the host should be the post-toggle value (1).
-        // BUG: The context carries a stale Value=0 because RefreshValue at the composite
         // level doesn't re-read the dispatch target's value after the originator's
         // OnActivated has mutated it.
         Assert.Equal (1, capturedValue as int?);
@@ -2097,8 +2093,6 @@ public class ViewCommandTests (ITestOutputHelper output)
         toggleView.InvokeCommand (Command.Activate, binding);
 
         // Assert: OnActivated should fire exactly once, so Value should be 1.
-        // BUG: Double-fire (DispatchDown + originator's RaiseActivated) causes
-        // ActivatedCount=2 and Value=2.
         Assert.Equal (1, toggleView.ActivatedCount);
         Assert.Equal (1, toggleView.Value);
         Assert.Equal (1, valueChangeCount);
@@ -2121,10 +2115,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     /// </summary>
     private class CompositeValueView : View, IValue<int?>
     {
-        public CompositeValueView ()
-        {
-            CommandsToBubbleUp = [Command.Activate];
-        }
+        public CompositeValueView () => CommandsToBubbleUp = [Command.Activate];
 
         public int? Value { get; set; }
 
@@ -2186,13 +2177,13 @@ public class ViewCommandTests (ITestOutputHelper output)
             composite.InvokeCommand (Command.Activate);
 
             // Assert: ctx.Value is the composite's int? (42), not CheckState/int from ToggleView.
-            Assert.Equal ((int?)42, capturedValue as int?);
+            Assert.Equal (42, capturedValue as int?);
             Assert.NotNull (capturedValues);
 
             // The chain should contain the composite's initial value, the dispatch target's
             // value, and the composite's post-mutation value.
             Assert.True (capturedValues!.Count >= 2);
-            Assert.Equal ((int?)42, capturedValues [^1] as int?);
+            Assert.Equal (42, capturedValues [^1] as int?);
 
             composite.Dispose ();
         }
@@ -2221,16 +2212,13 @@ public class ViewCommandTests (ITestOutputHelper output)
 
             object? ancestorCapturedValue = null;
 
-            ancestor.Activated += (_, args) =>
-                                  {
-                                      ancestorCapturedValue = args.Value?.Value;
-                                  };
+            ancestor.Activated += (_, args) => { ancestorCapturedValue = args.Value?.Value; };
 
             // Act
             composite.InvokeCommand (Command.Activate);
 
             // Assert: ancestor sees the composite's value (42), not ToggleView's value.
-            Assert.Equal ((int?)42, ancestorCapturedValue as int?);
+            Assert.Equal (42, ancestorCapturedValue as int?);
 
             ancestor.Dispose ();
         }
@@ -2252,10 +2240,7 @@ public class ViewCommandTests (ITestOutputHelper output)
 
             IReadOnlyList<object?>? capturedValues = null;
 
-            sourceView.Activated += (_, args) =>
-                                    {
-                                        capturedValues = args.Value?.Values;
-                                    };
+            sourceView.Activated += (_, args) => { capturedValues = args.Value?.Values; };
 
             // Act: simple activation on an IValue view
             sourceView.InvokeCommand (Command.Activate);
@@ -2305,7 +2290,7 @@ public class ViewCommandTests (ITestOutputHelper output)
             Assert.True (hostCapturedValues!.Count >= 2);
 
             // The last value should be the composite's value (42)
-            Assert.Equal ((int?)42, hostCapturedValue as int?);
+            Assert.Equal (42, hostCapturedValue as int?);
 
             host.Dispose ();
             composite.Dispose ();
@@ -2328,10 +2313,7 @@ public class ViewCommandTests (ITestOutputHelper output)
 
             IReadOnlyList<object?>? capturedValues = null;
 
-            plainView.Activated += (_, args) =>
-                                   {
-                                       capturedValues = args.Value?.Values;
-                                   };
+            plainView.Activated += (_, args) => { capturedValues = args.Value?.Values; };
 
             plainView.InvokeCommand (Command.Activate);
 

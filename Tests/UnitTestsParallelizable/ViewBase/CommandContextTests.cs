@@ -116,8 +116,11 @@ public class CommandContextTests
     [Fact]
     public void PatternMatching_MouseBinding_WithMouseEvent_Works ()
     {
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
-        mouseBinding.MouseEvent = new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (10, 20) };
+        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked)
+        {
+            Source = new WeakReference<View> (new View { Id = "mouseSource" }),
+            MouseEvent = new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (10, 20) }
+        };
 
         ICommandContext ctx = new CommandContext { Command = Command.Activate, Source = new WeakReference<View> (new View ()), Binding = mouseBinding };
 
@@ -186,7 +189,7 @@ public class CommandContextTests
         {
             View? kbSource = null;
             Assert.True (kb.Source?.TryGetTarget (out kbSource) == true);
-            Assert.Equal ("bindingSource", kbSource?.Id);
+            Assert.Equal ("bindingSource", kbSource.Id);
         }
         else
         {
@@ -213,7 +216,7 @@ public class CommandContextTests
         {
             View? mbSource = null;
             Assert.True (mb.Source?.TryGetTarget (out mbSource) == true);
-            Assert.Equal ("bindingSource", mbSource?.Id);
+            Assert.Equal ("bindingSource", mbSource.Id);
         }
         else
         {
@@ -250,7 +253,8 @@ public class CommandContextTests
     [Fact]
     public void CommandEventArgs_Context_WithMouseBinding_Works ()
     {
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
+        MouseBinding mouseBinding =
+            new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
 
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (new View { Id = "invoker" }), Binding = mouseBinding };
 
@@ -332,7 +336,7 @@ public class CommandContextTests
         {
             View? sv = null;
             Assert.True (ib.Source?.TryGetTarget (out sv) == true);
-            Assert.Equal ("programmatic", sv?.Id);
+            Assert.Equal ("programmatic", sv.Id);
             Assert.Equal ("data", ib.Data);
         }
         else
@@ -417,7 +421,7 @@ public class CommandContextTests
     }
 
     #endregion
-    
+
     #region WeakReference Behavior Tests
 
     [Fact]
@@ -427,11 +431,11 @@ public class CommandContextTests
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView) };
 
         View? retrievedView = null;
-        var success = ctx.Source?.TryGetTarget (out retrievedView);
+        bool? success = ctx.Source?.TryGetTarget (out retrievedView);
 
         Assert.True (success);
         Assert.NotNull (retrievedView);
-        Assert.Equal ("weakRefTest", retrievedView?.Id);
+        Assert.Equal ("weakRefTest", retrievedView.Id);
     }
 
     // Claude - Opus 4.6
@@ -470,10 +474,7 @@ public class CommandContextTests
 
         CommandContext ctx = new ()
         {
-            Command = Command.Accept,
-            Source = new WeakReference<View> (sourceView),
-            Binding = binding,
-            Routing = CommandRouting.BubblingUp
+            Command = Command.Accept, Source = new WeakReference<View> (sourceView), Binding = binding, Routing = CommandRouting.BubblingUp
         };
 
         CommandContext updated = ctx.WithCommand (Command.Activate);
@@ -492,11 +493,7 @@ public class CommandContextTests
     [Fact]
     public void WithRouting_CreatesNewContext_PreservesOtherFields ()
     {
-        CommandContext ctx = new ()
-        {
-            Command = Command.Accept,
-            Routing = CommandRouting.Direct
-        };
+        CommandContext ctx = new () { Command = Command.Accept, Routing = CommandRouting.Direct };
 
         CommandContext updated = ctx.WithRouting (CommandRouting.DispatchingDown);
 
@@ -578,10 +575,7 @@ public class CommandContextTests
 
         CommandContext ctx = new ()
         {
-            Command = Command.Accept,
-            Source = new WeakReference<View> (sourceView),
-            Binding = binding,
-            Routing = CommandRouting.BubblingUp
+            Command = Command.Accept, Source = new WeakReference<View> (sourceView), Binding = binding, Routing = CommandRouting.BubblingUp
         };
 
         CommandContext updated = ctx.WithValue ("new value");
@@ -632,7 +626,7 @@ public class CommandContextTests
     {
         CommandContext ctx = new () { Command = Command.Accept, Values = ["test value"] };
 
-        string result = ctx.ToString ();
+        var result = ctx.ToString ();
 
         Assert.Contains ("Value=test value", result);
         Assert.Contains ("Accept", result);
@@ -644,7 +638,7 @@ public class CommandContextTests
     {
         CommandContext ctx = new () { Command = Command.Accept };
 
-        string result = ctx.ToString ();
+        var result = ctx.ToString ();
 
         Assert.DoesNotContain ("Value=", result);
         Assert.Contains ("Accept", result);

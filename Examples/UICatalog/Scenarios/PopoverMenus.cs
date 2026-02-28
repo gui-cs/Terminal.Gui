@@ -29,7 +29,10 @@ public class PopoverMenus : Scenario
         _cultureInfos = Application.SupportedCultures;
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new () { Title = GetQuitKeyAndName (), Arrangement = ViewArrangement.Fixed, SchemeName = "Runnable" };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.Arrangement = ViewArrangement.Fixed;
+        appWindow.SchemeName = "Runnable";
         _appWindow = appWindow;
 
         // Changing the key-bindings of a View is not allowed, however,
@@ -129,23 +132,21 @@ public class PopoverMenus : Scenario
 
             _appWindow.CommandsToBubbleUp = [Command.Activate];
 
-            _appWindow.Activated += (s, args) =>
+            _appWindow.Activated += (_, args) =>
                                     {
                                         // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
-                                        if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" } bordersCheckbox)
+                                        if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
                                         {
-                                            _appWindow.BorderStyle = (args.Value?.Value as CheckState?) == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                            _appWindow.BorderStyle = args.Value?.Value as CheckState? == CheckState.Checked ? LineStyle.Double : LineStyle.None;
 
                                             return;
                                         }
 
-                                        if (args.Value?.TryGetSource (out source) is true
-                                            && source?.SuperView is OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
+                                        // Use ICommandContext.Values to get the Scheme (this assumes the only View down the _appWindow hierarchy that has
+                                        // an IValue type of Schemes is the schemesOptionSelector).
+                                        if (args.Value?.Values.FirstOrDefault (v => v is Schemes) is Schemes scheme)
                                         {
-                                            if (schemeOptionSelector.Value is { } scheme)
-                                            {
-                                                _appWindow.SchemeName = scheme.ToString ();
-                                            }
+                                            _appWindow.SchemeName = scheme.ToString ();
                                         }
                                     };
 
@@ -344,8 +345,7 @@ public class PopoverMenus : Scenario
                                                },
                                                new Line (),
                                                new MenuItem { Title = Strings.cmdQuit, Action = () => app!.RequestStop () }
-                                           ])
-        { Key = _winContextMenuKey };
+                                           ]) { Key = _winContextMenuKey };
         app!.Popovers?.Register (_winContextMenu);
     }
 

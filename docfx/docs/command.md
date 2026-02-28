@@ -1,5 +1,26 @@
 # Command Deep Dive
 
+## Table of Contents
+
+- [See Also](#see-also)
+- [Getting Started](#getting-started)
+- [Architecture Overview](#architecture-overview)
+- [Command Routing](#command-routing)
+- [Value Propagation](#value-propagation)
+- [Default Handlers](#default-handlers)
+- [Dispatch (Composite Pattern)](#dispatch-composite-pattern)
+- [Command Bubbling](#command-bubbling)
+- [CommandBridge](#commandbridge)
+- [How To](#how-to)
+  - [Subscribe to Activated Events](#subscribe-to-activated-events)
+  - [Build a Composite View (Consume Dispatch)](#build-a-composite-view-consume-dispatch)
+  - [Build a Relay View](#build-a-relay-view)
+  - [Bridge Commands Across Non-Containment Boundaries](#bridge-commands-across-non-containment-boundaries)
+- [Shortcut Dispatch](#shortcut-dispatch)
+- [Selector Dispatch](#selector-dispatch)
+- [View Command Behaviors](#view-command-behaviors)
+- [Command Route Tracing](#command-route-tracing)
+
 ## See Also
 
 * [Lexicon & Taxonomy](lexicon.md)
@@ -8,7 +29,7 @@
 
 ## Overview
 
-The <xref:Terminal.Gui.Input.Command> system provides a standardized framework for view actions (selecting, accepting, activating). It integrates with keyboard/mouse input handling and uses the *Cancellable Work Pattern* for extensibility and cancellation.
+The <xref:Terminal.Gui.Input.Command> system provides a standardized framework for view actions (selecting, accepting, activating). It integrates with keyboard/mouse input handling and uses the *Cancellable Work Pattern* for extensibility and cancellation. As commands propagate through the view hierarchy, each <xref:Terminal.Gui.IValue>-implementing view appends its value to the <xref:Terminal.Gui.Input.ICommandContext.Values> chain, enabling ancestors to inspect the full value history (see [Value Propagation](#value-propagation)).
 
 Central concepts:
 
@@ -58,7 +79,7 @@ public enum CommandRouting
 }
 ```
 
-<xref:Terminal.Gui.Input.ICommandContext> carries the routing mode, source view (weak reference), and binding:
+<xref:Terminal.Gui.Input.ICommandContext> carries the routing mode, source view (weak reference), binding, and accumulated values:
 
 ```csharp
 public interface ICommandContext
@@ -67,10 +88,70 @@ public interface ICommandContext
     WeakReference<View>? Source { get; }
     ICommandBinding? Binding { get; }
     CommandRouting Routing { get; }
+    IReadOnlyList<object?> Values { get; }
+    object? Value { get; }
 }
 ```
 
-<xref:Terminal.Gui.Input.CommandContext> is an immutable record struct. Use `WithCommand()` or `WithRouting()` to create modified copies.
+- **`Values`** — Append-only chain of values accumulated as the command propagates. Each <xref:Terminal.Gui.IValue>-implementing view appends its value via `WithValue()`. Ordered innermost (originator) to outermost.
+- **`Value`** — Convenience accessor returning `Values[^1]` (the most recently appended value), or `null` if empty.
+
+<xref:Terminal.Gui.Input.CommandContext> is an immutable record struct. Use `WithCommand()`, `WithRouting()`, or `WithValue()` to create modified copies.
+
+## Value Propagation
+
+As a command flows through the view hierarchy, <xref:Terminal.Gui.Input.ICommandContext.Values> accumulates a chain of values from each <xref:Terminal.Gui.IValue>-implementing view that participates. This enables ancestors to inspect values from any layer — not just the outermost composite.
+
+### How Values Accumulate
+
+1. **Origin** — The originating view (e.g., <xref:Terminal.Gui.Views.CheckBox>) processes the command. Its value is not yet in the chain.
+2. **Dispatch target refresh** — When a composite view dispatches to an inner target, `RefreshValue()` re-reads the target's `IValue.GetValue()` and appends it via `WithValue()`.
+3. **Composite post-mutation** — After `RaiseActivated`, a `ConsumeDispatch` composite (e.g., <xref:Terminal.Gui.Views.OptionSelector>) may have updated its own value. The framework appends the composite's post-mutation value so `ctx.Value` reflects the composite's semantic value.
+4. **Ancestor notification** — `BubbleActivatedUp` walks the SuperView chain, preserving `Values` at each hop. If an ancestor has a dispatch target that is the command source, its refreshed value is also appended.
+
+### Value vs Values
+
+| Accessor | Returns | Use When |
+|----------|---------|----------|
+| `Value` | `Values[^1]` (last appended) | You only need the outermost composite's value |
+| `Values` | Full ordered chain | You need to find a specific inner value by type or position |
+
+### Example Chain
+
+Consider a <xref:Terminal.Gui.Views.CheckBox> inside an <xref:Terminal.Gui.Views.OptionSelector> inside a <xref:Terminal.Gui.Views.MenuItem>:
+
+```
+CheckBox (CheckState.Checked)
+  → OptionSelector (int? selectedIndex)
+    → MenuItem (Title string)
+```
+
+When the `Activated` event reaches an ancestor:
+
+- `ctx.Values[0]` = `CheckState.Checked` (dispatch target refresh)
+- `ctx.Values[1]` = `2` (OptionSelector's post-mutation index)
+- `ctx.Values[2]` = `"Dark"` (MenuItem's value via bridge)
+- `ctx.Value` = `"Dark"` (last appended = outermost)
+
+Use LINQ to find a specific type anywhere in the chain:
+
+```csharp
+if (ctx.Values?.FirstOrDefault (v => v is Schemes) is Schemes scheme)
+{
+    // Found the Schemes value regardless of its position
+}
+```
+
+### Struct Value Semantics
+
+<xref:Terminal.Gui.Input.CommandContext> is a `readonly record struct`. Each call to `WithValue()` creates a **new copy** — it does not mutate the original. This means:
+
+- A caller's local variable is unaffected by `WithValue()` calls inside `RaiseActivated` or other methods that receive a copy.
+- `BubbleActivatedUp` receives exactly the values the caller appended — no double-counting from inner `WithValue()` calls on separate copies.
+
+### Performance
+
+`WithValue()` uses `[..Values, value]`, which copies the entire list on each call — O(N²) total for N appends. This is acceptable for typical UI hierarchies (3–5 levels). If extreme depths are ever needed, consider an immutable linked list or builder.
 
 ## Default Handlers
 
@@ -222,7 +303,118 @@ Because the bridge calls <xref:Terminal.Gui.ViewBase.View.InvokeCommand*> (not <
 
 `TryDispatchToTarget` has a `Bridged` routing guard to prevent the bridged command from dispatching down into the owner's CommandView — the bridge brings commands *up*, not *down*.
 
+The bridge preserves the <xref:Terminal.Gui.Input.ICommandContext.Values> chain across the boundary: `Values = e.Context?.Values ?? []`. This ensures that values accumulated in the remote view's hierarchy are visible to the owner's `Activated`/`Accepted` subscribers and to any further bubbling.
+
 Both references are weak — the bridge does not prevent GC. The bridge is one-way; create two bridges for bidirectional routing.
+
+## How To
+
+### Subscribe to Activated Events
+
+To react when a view (or any of its descendants) completes an activation, subscribe to the <xref:Terminal.Gui.ViewBase.View.Activated> event. To receive bubbled events from SubViews, set <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp>:
+
+```csharp
+// Opt in to receive Activate commands bubbled from SubViews
+myWindow.CommandsToBubbleUp = [Command.Activate];
+
+myWindow.Activated += (_, args) =>
+{
+    // Pattern 1: Identify the originator by type or Id using TryGetSource
+    if (args.Value?.TryGetSource (out View? source) is true
+        && source is CheckBox { Id: "bordersCheckbox" } bordersCheckbox)
+    {
+        // Handle the specific originator
+        myWindow.BorderStyle = args.Value?.Value as CheckState? == CheckState.Checked
+            ? LineStyle.Double
+            : LineStyle.None;
+
+        return;
+    }
+
+    // Pattern 2: Search the Values chain by type — finds a value
+    // regardless of its position in the hierarchy
+    if (args.Value?.Values?.FirstOrDefault (v => v is Schemes) is Schemes scheme)
+    {
+        myWindow.SchemeName = scheme.ToString ();
+    }
+};
+```
+
+**Pattern 1** uses `TryGetSource()` to identify *which* view originated the command. This is useful when multiple SubViews bubble the same command and you need to distinguish them.
+
+**Pattern 2** searches `Values` by type using LINQ. This is the idiomatic way to find a specific value in a deep hierarchy without caring about its position in the chain. For example, an `OptionSelector` inside a `MenuItem` inside a `PopoverMenu` produces a chain with multiple values — searching by type avoids fragile index-based access.
+
+> [!TIP]
+> See the `PopoverMenus` scenario in UICatalog for a working example of both patterns. See also `Menus.cs` for Menu-specific event handling.
+
+### Build a Composite View (Consume Dispatch)
+
+To build a composite view that owns its SubViews' state (like <xref:Terminal.Gui.Views.OptionSelector>):
+
+1. Override <xref:Terminal.Gui.ViewBase.View.GetDispatchTarget*> to return the SubView that should receive commands.
+2. Override <xref:Terminal.Gui.ViewBase.View.ConsumeDispatch> to return `true` — the composite handles the command; inner activations don't propagate.
+3. Implement <xref:Terminal.Gui.IValue> (or <xref:Terminal.Gui.IValue`1>) to expose the composite's semantic value.
+4. Apply state changes in <xref:Terminal.Gui.ViewBase.View.OnActivated*>.
+
+```csharp
+public class MySelector : View, IValue<int?>
+{
+    protected override View? GetDispatchTarget (ICommandContext? ctx) => Focused;
+    protected override bool ConsumeDispatch => true;
+
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+        // Apply state changes here — the framework appends
+        // GetValue() to ctx.Values after this method returns.
+    }
+
+    public int? GetTypedValue () => _selectedIndex;
+    public object? GetValue () => GetTypedValue ();
+}
+```
+
+> [!TIP]
+> See <xref:Terminal.Gui.Views.OptionSelector> and <xref:Terminal.Gui.Views.FlagSelector> for complete implementations.
+
+### Build a Relay View
+
+To build a relay view that forwards commands to an inner target without consuming them (like <xref:Terminal.Gui.Views.Shortcut>):
+
+1. Override <xref:Terminal.Gui.ViewBase.View.GetDispatchTarget*> to return the target SubView (e.g., `CommandView`).
+2. Leave <xref:Terminal.Gui.ViewBase.View.ConsumeDispatch> as `false` (default).
+3. Use deferred completion: subscribe to the target's `Activated` event and call <xref:Terminal.Gui.ViewBase.View.RaiseActivated*> from the callback.
+
+```csharp
+public class MyRelay : View
+{
+    protected override View? GetDispatchTarget (ICommandContext? ctx) => _commandView;
+
+    // ConsumeDispatch defaults to false — relay pattern.
+    // The framework dispatches via DispatchDown, then the
+    // originator continues its own activation.
+}
+```
+
+> [!TIP]
+> See <xref:Terminal.Gui.Views.Shortcut> for the complete relay pattern with deferred completion.
+
+### Bridge Commands Across Non-Containment Boundaries
+
+When a view references another view that is **not** a SubView (e.g., a <xref:Terminal.Gui.Views.MenuItem> that owns a `SubMenu`), use <xref:Terminal.Gui.Input.CommandBridge> to relay commands across the boundary:
+
+```csharp
+// Bridge Activate and Accept from SubMenu → this MenuItem
+_subMenuBridge = CommandBridge.Connect (this, subMenu, Command.Activate, Command.Accept);
+
+// Tear down when no longer needed
+_subMenuBridge.Dispose ();
+```
+
+The bridge preserves the `Values` chain, so values accumulated in the remote view's hierarchy are visible to the owner's subscribers. The bridge uses weak references — it does not prevent GC.
+
+> [!TIP]
+> See `MenuItem.SubMenu` in `MenuItem.cs` for a working example of bridging across non-containment boundaries.
 
 ## Shortcut Dispatch
 
@@ -325,43 +517,19 @@ When an inner <xref:Terminal.Gui.Views.CheckBox> activates (via click/space), th
 
 For debugging command routing issues, Terminal.Gui provides a tracing system via `Tracing.Trace`. Command tracing captures detailed information about command flow through the view hierarchy.
 
-> [!TIP]
-> `Trace` also supports Mouse and Keyboard tracing. See [Logging - View Event Tracing](logging.md#view-event-tracing) for the full tracing API.
-
 ### Enabling Tracing
 
 ```csharp
 using Terminal.Gui.Tracing;
 
-// Enable command tracing (thread-safe, per async context)
 // Enable tracing via flags-based API
 Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
 
-// For testing, use scoped tracing
+// For testing, use scoped tracing (thread-safe, per async context)
 using (Trace.PushScope (TraceCategory.Command))
 {
     view.InvokeCommand (Command.Activate);
     // Tracing enabled only in this scope
-}
-```
-
-Tracing is **thread-safe** and isolated per async execution context, making it safe to use in parallel tests.
-
-When enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
-
-Tracing can also be enabled via configuration:
-
-```json
-{
-  "Trace.EnabledCategories": "Command"
-}
-```
-
-Or enable multiple categories:
-
-```json
-{
-  "Trace.EnabledCategories": ["Command", "Mouse"]
 }
 ```
 
@@ -377,76 +545,13 @@ When enabled, trace entries are logged via `Logging.Trace` with the format:
 
 - **Phase**: `Entry`, `Exit`, `Routing`, `Event`, or `Handler`
 - **Arrow**: `↑` (BubblingUp), `↓` (DispatchingDown), `↔` (Bridged), `•` (Direct)
-- **Command**: The command being routed (e.g., `Activate`, `Accept`)
-- **ViewId**: The view's identifying string
-- **Method**: The method where the trace occurred
 
 Example output:
 
 ```
 [Entry] • Activate @ Button("OK"){X=10,Y=5} (DefaultActivateHandler)
-[Entry] • Activate @ Button("OK"){X=10,Y=5} (RaiseActivating)
-[Event] • Activate @ Button("OK"){X=10,Y=5} (RaiseActivating) - Invoking Activating event
 [Routing] ↑ Activate @ Button("OK"){X=10,Y=5} (TryBubbleUp) - BubblingUp to Dialog("Confirm")
 [Event] • Activate @ Button("OK"){X=10,Y=5} (RaiseActivated)
 ```
 
-### Custom Backends
-
-Implement `ITraceBackend` for custom trace handling:
-
-```csharp
-using Terminal.Gui.Tracing;
-
-public class MyTraceBackend : ITraceBackend
-{
-    public void Log (TraceEntry entry)
-    {
-        // Custom handling - write to file, send to debugger, etc.
-    }
-
-    public void Clear () { }
-}
-
-Trace.Backend = new MyTraceBackend ();
-```
-
-### Testing with ListBackend
-
-Use `ListBackend` to capture traces for test assertions. Use `Trace.PushScope` for thread-safe test isolation:
-
-```csharp
-using Terminal.Gui.Tracing;
-
-ListBackend backend = new ();
-
-// Scoped tracing - automatically restored on dispose
-using (Trace.PushScope (TraceCategory.Command, backend))
-{
-    view.InvokeCommand (Command.Activate);
-
-    Assert.Contains (backend.Entries, e => e.Phase == "Entry");
-    Assert.Contains (backend.Entries, e => e.Category == TraceCategory.Command);
-}
-```
-
-For xUnit tests, use `TestLogging.Verbose` with trace categories:
-
-```csharp
-[Fact]
-public void MyTest ()
-{
-    using (TestLogging.Verbose (_output, TraceCategory.Command))
-    {
-        // Tracing enabled, output goes to xUnit test output
-        checkbox.InvokeCommand (Command.Activate);
-    }
-}
-```
-
-### Performance
-
-- All `Trace.Command` calls are marked with `[Conditional("DEBUG")]` — **zero overhead in Release builds**
-- Tracing uses `AsyncLocal<T>` for thread safety — each async context has isolated trace settings
-- Safe for parallel test execution — tests won't interfere with each other
-- When tracing is disabled, all methods early-return with minimal overhead
+> See [Logging - View Event Tracing](logging.md#view-event-tracing) for custom backends, testing patterns, and performance details.

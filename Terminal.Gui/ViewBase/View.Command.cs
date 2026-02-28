@@ -275,12 +275,13 @@ public partial class View // Command APIs
             // Bridged commands also need completion: the bridge brings a command from a remote
             // view (e.g., SubMenu), TryBubbleUp propagates it to the SuperView, but the owner
             // still needs its Accepted event to fire for subscribers (e.g., parentMenuItem.Accepted).
-            if (_dispatchState.HasFlag (DispatchState.DispatchOccurred) || ctx?.Routing == CommandRouting.Bridged)
+            if (!_dispatchState.HasFlag (DispatchState.DispatchOccurred) && ctx?.Routing != CommandRouting.Bridged)
             {
-                ctx = RefreshValue (ctx);
-
-                RaiseAccepted (ctx);
+                return true;
             }
+            ctx = RefreshValue (ctx);
+
+            RaiseAccepted (ctx);
 
             return true;
         }
@@ -492,30 +493,37 @@ public partial class View // Command APIs
 
         if (RaiseActivating (ctx) is true)
         {
-            if (_dispatchState.HasFlag (DispatchState.DispatchOccurred))
+            if (!_dispatchState.HasFlag (DispatchState.DispatchOccurred))
             {
-                ctx = RefreshValue (ctx);
-
-                RaiseActivated (ctx);
-
-                // After RaiseActivated, the composite may have updated its own value
-                // (e.g., OptionSelector.ApplyActivation updates Value in OnActivated).
-                // Append the composite's post-mutation value so that ctx.Value reflects
-                // the composite's semantic value, not the dispatch target's raw value.
-                if (this is IValue compositeValue && ctx is CommandContext ccComposite)
-                {
-                    object? postMutationValue = compositeValue.GetValue ();
-                    ctx = ccComposite.WithValue (postMutationValue);
-                    Trace.Command (this, ctx, "CompositeValue", $"Appended composite value: {postMutationValue}");
-                }
-
-                // ConsumeDispatch consumed the command internally, but ancestors still need
-                // notification. Walk up the SuperView chain and fire RaiseActivated on each
-                // ancestor that subscribes to this command via CommandsToBubbleUp.
-                // This replaces the old one-hop Shortcut.CommandView_Activated propagation
-                // with full-chain notification (e.g., MenuItem → Menu → SuperView).
-                BubbleActivatedUp (ctx);
+                return true;
             }
+            ctx = RefreshValue (ctx);
+
+            RaiseActivated (ctx);
+
+            // After RaiseActivated, the composite may have updated its own value
+            // (e.g., OptionSelector.ApplyActivation updates Value in OnActivated).
+            // Append the composite's post-mutation value so that ctx.Value reflects
+            // the composite's semantic value, not the dispatch target's raw value.
+            //
+            // Note on struct value semantics: `ccComposite` is captured from `ctx`
+            // BEFORE RaiseActivated was called. Inside RaiseActivated (line ~782),
+            // WithValue() is also called — but on a LOCAL copy of the struct, so the
+            // caller's ctx/ccComposite is unaffected. BubbleActivatedUp therefore
+            // receives the composite value appended once, not twice.
+            if (this is IValue compositeValue && ctx is CommandContext ccComposite)
+            {
+                object? postMutationValue = compositeValue.GetValue ();
+                ctx = ccComposite.WithValue (postMutationValue);
+                Trace.Command (this, ctx, "CompositeValue", $"Appended composite value: {postMutationValue}");
+            }
+
+            // ConsumeDispatch consumed the command internally, but ancestors still need
+            // notification. Walk up the SuperView chain and fire RaiseActivated on each
+            // ancestor that subscribes to this command via CommandsToBubbleUp.
+            // This replaces the old one-hop Shortcut.CommandView_Activated propagation
+            // with full-chain notification (e.g., MenuItem → Menu → SuperView).
+            BubbleActivatedUp (ctx);
 
             return true;
         }
@@ -567,10 +575,7 @@ public partial class View // Command APIs
         // Only refresh when this view is the command source — intermediate views in a bridge
         // chain (e.g., MenuBarItem receiving a bridged command) should not overwrite the
         // original source's value.
-        if (this is IValue selfValue
-            && ctx is CommandContext cc
-            && ctx.Source?.TryGetTarget (out View? src) == true
-            && ReferenceEquals (src, this))
+        if (this is IValue selfValue && ctx is CommandContext cc && ctx.Source?.TryGetTarget (out View? src) == true && ReferenceEquals (src, this))
         {
             ctx = cc.WithValue (selfValue.GetValue ());
         }
@@ -640,52 +645,52 @@ public partial class View // Command APIs
             return;
         }
 
-        View? current = this;
+        for (View? ancestor = GetBubbleAncestor (this);
+             ancestor?.CommandsToBubbleUp.Contains (ctx.Command) == true;
+             ancestor = GetBubbleAncestor (ancestor))
+        {
+            if (compositeOnly && ancestor.GetDispatchTarget (ctx) is null)
+            {
+                continue;
+            }
+            CommandContext upCtx = new (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
-        while (current is { })
+            // Re-read the value from the ancestor's dispatch target, but only when
+            // the dispatch target is the same view as the command source (i.e., the
+            // originator IS the dispatch target). This ensures post-change values
+            // (e.g., after ToggleView mutated in OnActivated) are carried correctly
+            // without overwriting values from unrelated dispatch targets (e.g., MenuBar
+            // dispatching to MenuBarItem would overwrite the MenuItem value).
+            View? dispatchTarget = ancestor.GetDispatchTarget (ctx);
+
+            if (dispatchTarget is IValue refreshedValue
+                && ctx.Source?.TryGetTarget (out View? source) == true
+                && ReferenceEquals (source, dispatchTarget))
+            {
+                upCtx = upCtx.WithValue (refreshedValue.GetValue ());
+            }
+
+            ancestor.RaiseActivated (upCtx);
+        }
+
+        return;
+
+        // Resolves the next ancestor, handling Padding → Parent traversal (mirrors TryBubbleUp).
+        static View? GetBubbleAncestor (View current)
         {
             View? next = current.SuperView;
 
-            // Handle Padding → Parent traversal (mirrors TryBubbleUp)
             if (next is Padding padding)
             {
-                next = padding.Parent;
+                return padding.Parent;
             }
-            else if (current is Padding selfPadding)
+
+            if (current is Padding selfPadding)
             {
-                next = selfPadding.Parent;
+                return selfPadding.Parent;
             }
 
-            if (next?.CommandsToBubbleUp.Contains (ctx.Command) == true)
-            {
-                if (!compositeOnly || next.GetDispatchTarget (ctx) is { })
-                {
-                    CommandContext upCtx = new (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
-
-                    // Re-read the value from the ancestor's dispatch target, but only when
-                    // the dispatch target is the same view as the command source (i.e., the
-                    // originator IS the dispatch target). This ensures post-change values
-                    // (e.g., after ToggleView mutated in OnActivated) are carried correctly
-                    // without overwriting values from unrelated dispatch targets (e.g., MenuBar
-                    // dispatching to MenuBarItem would overwrite the MenuItem value).
-                    View? dispatchTarget = next.GetDispatchTarget (ctx);
-
-                    if (dispatchTarget is IValue refreshedValue
-                        && ctx.Source?.TryGetTarget (out View? source) == true
-                        && ReferenceEquals (source, dispatchTarget))
-                    {
-                        upCtx = upCtx.WithValue (refreshedValue.GetValue ());
-                    }
-
-                    next.RaiseActivated (upCtx);
-                }
-
-                current = next;
-            }
-            else
-            {
-                break;
-            }
+            return next;
         }
     }
 
@@ -779,9 +784,7 @@ public partial class View // Command APIs
         // semantic value, not the dispatch target's raw value.
         // Guard: only when DispatchOccurred is set — this means DefaultActivateHandler's
         // ConsumeDispatch branch initiated RaiseActivated (not BubbleActivatedUp or other paths).
-        if (_dispatchState.HasFlag (DispatchState.DispatchOccurred)
-            && this is IValue selfValue
-            && ctx is CommandContext cc)
+        if (_dispatchState.HasFlag (DispatchState.DispatchOccurred) && this is IValue selfValue && ctx is CommandContext cc)
         {
             ctx = cc.WithValue (selfValue.GetValue ());
         }
@@ -1224,7 +1227,11 @@ public partial class View // Command APIs
             ICommandContext? refreshed = RefreshValue (ctx);
 
             Trace.Command (this, refreshed, "Routing", $"BubblingUp to {SuperView.ToIdentifyingString ()}");
-            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding) { Routing = CommandRouting.BubblingUp, Values = refreshed.Values };
+
+            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding)
+            {
+                Routing = CommandRouting.BubblingUp, Values = refreshed.Values
+            };
 
             return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }

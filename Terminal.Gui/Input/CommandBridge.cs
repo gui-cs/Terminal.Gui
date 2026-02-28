@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Input;
 
 /// <summary>
@@ -86,7 +88,7 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Tracing.Trace.Command (owner, e.Context, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
+        Trace.Command (owner, e.Context, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {
@@ -107,7 +109,7 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Tracing.Trace.Command (owner, e.Value, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
+        Trace.Command (owner, e.Value, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {

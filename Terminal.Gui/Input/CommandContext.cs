@@ -77,6 +77,11 @@ public readonly record struct CommandContext : ICommandContext
     ///     Creates a new context with the specified value appended to the <see cref="Values"/> chain.
     ///     The new value becomes the last element, making it the new <see cref="Value"/>.
     /// </summary>
+    /// <remarks>
+    ///     The spread expression <c>[..Values, value]</c> copies the entire list on each call,
+    ///     giving O(N²) total allocations for N appends. This is acceptable for typical UI hierarchies
+    ///     (3–5 levels deep). If extreme depths are ever needed, consider an immutable linked list or builder.
+    /// </remarks>
     /// <param name="value">The value to append.</param>
     /// <returns>A new <see cref="CommandContext"/> with the value appended to <see cref="Values"/>.</returns>
     public CommandContext WithValue (object? value) => this with { Values = [..Values, value] };
