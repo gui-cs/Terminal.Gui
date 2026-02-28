@@ -333,9 +333,19 @@ For debugging command routing issues, Terminal.Gui provides a tracing system via
 ```csharp
 using Terminal.Gui.Tracing;
 
-// Enable command tracing
-Trace.CommandEnabled = true;
+// Enable command tracing (thread-safe, per async context)
+// Enable tracing via flags-based API
+Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
+
+// For testing, use scoped tracing
+using (Trace.PushScope (TraceCategory.Command))
+{
+    view.InvokeCommand (Command.Activate);
+    // Tracing enabled only in this scope
+}
 ```
+
+Tracing is **thread-safe** and isolated per async execution context, making it safe to use in parallel tests.
 
 When enabled, output automatically goes to `Logging.Trace` via the `LoggingBackend`.
 
@@ -343,7 +353,15 @@ Tracing can also be enabled via configuration:
 
 ```json
 {
-  "Trace.CommandEnabled": true
+  "Trace.EnabledCategories": "Command"
+}
+```
+
+Or enable multiple categories:
+
+```json
+{
+  "Trace.EnabledCategories": ["Command", "Mouse"]
 }
 ```
 
@@ -395,23 +413,40 @@ Trace.Backend = new MyTraceBackend ();
 
 ### Testing with ListBackend
 
-Use `ListBackend` to capture traces for test assertions:
+Use `ListBackend` to capture traces for test assertions. Use `Trace.PushScope` for thread-safe test isolation:
 
 ```csharp
 using Terminal.Gui.Tracing;
 
 ListBackend backend = new ();
-Trace.Backend = backend;
-Trace.CommandEnabled = true;
 
-view.InvokeCommand (Command.Activate);
+// Scoped tracing - automatically restored on dispose
+using (Trace.PushScope (TraceCategory.Command, backend))
+{
+    view.InvokeCommand (Command.Activate);
 
-Assert.Contains (backend.Entries, e => e.Phase == "Entry");
-Assert.Contains (backend.Entries, e => e.Category == TraceCategory.Command);
+    Assert.Contains (backend.Entries, e => e.Phase == "Entry");
+    Assert.Contains (backend.Entries, e => e.Category == TraceCategory.Command);
+}
+```
+
+For xUnit tests, use `TestLogging.Verbose` with trace categories:
+
+```csharp
+[Fact]
+public void MyTest ()
+{
+    using (TestLogging.Verbose (_output, TraceCategory.Command))
+    {
+        // Tracing enabled, output goes to xUnit test output
+        checkbox.InvokeCommand (Command.Activate);
+    }
+}
 ```
 
 ### Performance
 
 - All `Trace.Command` calls are marked with `[Conditional("DEBUG")]` — **zero overhead in Release builds**
-- The backend uses `AsyncLocal<T>` for thread safety in parallel test execution
+- Tracing uses `AsyncLocal<T>` for thread safety — each async context has isolated trace settings
+- Safe for parallel test execution — tests won't interfere with each other
 - When tracing is disabled, all methods early-return with minimal overhead
