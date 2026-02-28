@@ -7,6 +7,28 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public partial class TableView
 {
+    /// <summary>
+    /// calculates the current header height based on what is visible
+    /// This respects the viewport Y position and the AlwaysShowHeaders style
+    /// </summary>
+    /// <returns>height</returns>
+    protected int CurrentHeaderHeightVisible ()
+    {
+        if (!ShouldRenderHeaders ())
+        {
+            return 0;
+        }
+
+        if (Style.AlwaysShowHeaders)
+        {
+            return Math.Min (GetHeaderHeight (), Viewport.Height);
+        }
+        else
+        {
+            return Math.Min (Math.Max (GetHeaderHeight () - Viewport.Y, 0), Viewport.Height);
+        }
+    }
+
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext context)
     {
@@ -15,12 +37,14 @@ public partial class TableView
         _scrollLeftPoint = null;
 
         // What columns to render at what X offset in viewport
-        ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
+        ColumnToRender [] cellInfos = NonHiddenCellInfos ();
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
-        //invalidate current row (prevents scrolling around leaving old characters in the frame
+        // invalidate current row (prevents scrolling around leaving old characters in the frame
         AddStr (new string (' ', Viewport.Width));
         var line = 0;
+        int headerLinesHandled = 0;
+        var availableWidth = GetContentSize ().Width;
 
         if (ShouldRenderHeaders ())
         {
@@ -30,36 +54,57 @@ public partial class TableView
                 │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
                 └────────────────────┴──────────┴───────────┴──────────────┴─────────┘
             */
+
+            bool ShouldRenderNextHeaderLine ()
+            {
+                //is the header line not scrolled or shall it always be shown? and do we have space to render it?
+                return (Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height;
+            }
+
             if (Style.ShowHorizontalHeaderOverline)
             {
-                RenderHeaderOverline (line, Viewport.Width, columnsToRender);
-                line++;
+                if (ShouldRenderNextHeaderLine())
+                {
+                    RenderHeaderOverline (line, availableWidth, cellInfos);
+                    line++;
+                }
+                headerLinesHandled++;
             }
 
             if (Style.ShowHeaders)
             {
-                RenderHeaderMidline (line, columnsToRender);
-                line++;
+                if (ShouldRenderNextHeaderLine())
+                {
+                    RenderHeaderMidline (line, availableWidth, cellInfos);
+                    line++;
+                }
+                headerLinesHandled++;
             }
 
             if (Style.ShowHorizontalHeaderUnderline)
             {
-                RenderHeaderUnderline (line, Viewport.Width, columnsToRender);
-                line++;
+                if (ShouldRenderNextHeaderLine())
+                {
+                    RenderHeaderUnderline (line, availableWidth, cellInfos);
+                    line++;
+                }
+                headerLinesHandled++;
             }
         }
 
         int headerLinesConsumed = line;
 
-        //render the cells
+        var locRowOffset = Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - headerLinesHandled, 0);
+
+        // render the cells
         for (; line < Viewport.Height; line++)
         {
             ClearLine (line, Viewport.Width);
 
-            //work out what Row to render
-            int rowToRender = RowOffset + (line - headerLinesConsumed);
+            // work out what Row to render
+            int rowToRender = locRowOffset + (line - headerLinesConsumed);
 
-            //if we have run off the end of the table
+            // if we have run off the end of the table
             if (TableIsNullOrInvisible () || rowToRender < 0)
             {
                 continue;
@@ -70,13 +115,13 @@ public partial class TableView
             {
                 if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline)
                 {
-                    RenderBottomLine (line, Viewport.Width, columnsToRender);
+                    RenderBottomLine (line, availableWidth, cellInfos);
                 }
 
                 continue;
             }
 
-            RenderRow (line, rowToRender, columnsToRender);
+            RenderRow (line, rowToRender, cellInfos);
         }
 
         return true;
@@ -106,7 +151,7 @@ public partial class TableView
 
             // invert the color of the current cell for the first character
             SetAttribute (new Attribute (cellAttribute.Foreground, cellAttribute.Background, TextStyle.Reverse));
-            AddRune ((Rune)render [0]);
+            AddRune (render [0]);
 
             if (render.Length <= 1)
             {
@@ -157,20 +202,28 @@ public partial class TableView
                 }
             }
 
-            AddRuneAt (c, row, rune);
+            RenderRune (c, row, rune);
         }
     }
 
-    private void RenderHeaderMidline (int row, ColumnToRender [] columnsToRender)
+    private void RenderRune (int col, int row, Rune rune)
+    {
+        if (col >= Viewport.X && col < Viewport.X + Viewport.Width)
+        {
+            AddRuneAt (col - Viewport.X, row, rune);
+        }
+    }
+
+    private void RenderHeaderMidline (int row, int availableWidth, ColumnToRender [] columnsToRender)
     {
         // Renders something like:
         // │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
         ClearLine (row, Viewport.Width);
 
-        //render start of line
+        // render start of line
         if (_style.ShowVerticalHeaderLines)
         {
-            AddRune (0, row, Glyphs.VLine);
+            RenderRune (0, row, Glyphs.VLine);
         }
 
         for (var i = 0; i < columnsToRender.Length; i++)
@@ -179,7 +232,7 @@ public partial class TableView
             ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
             string colName = _table.ColumnNames [current.Column];
             RenderSeparator (current.X - 1, row, true);
-            Move (current.X, row);
+            Move (current.X - Viewport.X, row);
             AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
 
             if (!Style.ExpandLastColumn && current.IsVeryLast)
@@ -188,10 +241,10 @@ public partial class TableView
             }
         }
 
-        //render end of line
+        // render end of line
         if (_style.ShowVerticalHeaderLines)
         {
-            AddRune (Viewport.Width - 1, row, Glyphs.VLine);
+            RenderRune (availableWidth - 1, row, Glyphs.VLine);
         }
     }
 
@@ -229,40 +282,13 @@ public partial class TableView
 
             if (App?.Screen.Height > 0)
             {
-                AddRuneAt (c, row, rune);
+                RenderRune (c, row, rune);
             }
         }
     }
 
     private void RenderHeaderUnderline (int row, int availableWidth, ColumnToRender [] columnsToRender)
     {
-        /*
-         *  First lets work out if we should be rendering scroll indicators
-         */
-        // are there are visible columns to the left that have been pushed
-        // off the screen due to horizontal scrolling?
-        bool moreColumnsToLeft = ColumnOffset > 0;
-
-        // if we moved left would we find a new column (or are they all invisible?)
-        if (!TryGetNearestVisibleColumn (ColumnOffset - 1, false, false, out _))
-        {
-            moreColumnsToLeft = false;
-        }
-
-        // are there visible columns to the right that have not yet been reached?
-        // lets find out, what is the column index of the last column we are rendering
-        int lastColumnIdxRendered = ColumnOffset + columnsToRender.Length - 1;
-
-        // are there more valid indexes?
-        bool moreColumnsToRight = lastColumnIdxRendered < Table.Columns;
-
-        // if we went right from the last column would we find a new visible column?
-        if (!TryGetNearestVisibleColumn (lastColumnIdxRendered + 1, true, false, out _))
-        {
-            // no we would not
-            moreColumnsToRight = false;
-        }
-
         /*
          *  Now lets draw the line itself
          */
@@ -281,15 +307,6 @@ public partial class TableView
                 {
                     // for first character render line
                     rune = Style.ShowVerticalCellLines ? Glyphs.LeftTee : Glyphs.LLCorner;
-
-                    // unless we have horizontally scrolled along
-                    // in which case render an arrow, to indicate user
-                    // can scroll left
-                    if (Style.ShowHorizontalScrollIndicators && moreColumnsToLeft)
-                    {
-                        rune = Glyphs.LeftArrow;
-                        _scrollLeftPoint = new Point (c, row);
-                    }
                 }
 
                 // if the next column is the start of a header
@@ -302,15 +319,6 @@ public partial class TableView
                 {
                     // for the last character in the table
                     rune = Style.ShowVerticalCellLines ? Glyphs.RightTee : Glyphs.LRCorner;
-
-                    // unless there is more of the table we could horizontally
-                    // scroll along to see. In which case render an arrow,
-                    // to indicate user can scroll right
-                    if (Style.ShowHorizontalScrollIndicators && moreColumnsToRight)
-                    {
-                        rune = Glyphs.RightArrow;
-                        _scrollRightPoint = new Point (c, row);
-                    }
                 }
 
                 // if the next console column is the last column's end
@@ -320,7 +328,7 @@ public partial class TableView
                 }
             }
 
-            AddRuneAt (c, row, rune);
+            RenderRune (c, row, rune);
         }
     }
 
@@ -329,7 +337,9 @@ public partial class TableView
         bool focused = HasFocus;
         Scheme rowScheme = Style.RowColorGetter?.Invoke (new RowColorGetterArgs (Table, rowToRender)) ?? GetScheme ();
 
-        //start by clearing the entire line
+        // start by clearing the entire line
+        // not needed, see Attribute below:
+        ClearLine (row, Viewport.Width);
         Move (0, row);
         Attribute? attribute;
 
@@ -350,9 +360,6 @@ public partial class TableView
         {
             ColumnToRender current = columnsToRender [i];
             ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
-
-            // move to start of cell (in line with header positions)
-            Move (current.X, row);
 
             // Set scheme based on whether the current cell is the selected one
             bool isSelectedCell = IsSelected (current.Column, rowToRender);
@@ -382,6 +389,7 @@ public partial class TableView
 
             // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
             bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
+            Move (current.X - Viewport.X, row);
             RenderCell (cellColor, render, isPrimaryCell);
 
             // Reset scheme to normal for drawing separators if we drew text with custom scheme
@@ -425,9 +433,15 @@ public partial class TableView
 
         SetAttribute (rowScheme.Normal);
 
-        //render start and end of line
-        AddRune (0, row, Glyphs.VLine);
-        AddRune (Viewport.Width - 1, row, Glyphs.VLine);
+        // render start and end of line
+        RenderRune (0, row, Glyphs.VLine);
+
+        var lastCol = columnsToRender.LastOrDefault ();
+
+        if (lastCol != null)
+        {
+            RenderRune (lastCol.X + lastCol.Width - 1, row, Glyphs.VLine);
+        }
     }
 
     private void RenderSeparator (int col, int row, bool isHeader)
@@ -438,10 +452,17 @@ public partial class TableView
         }
 
         bool renderLines = isHeader ? _style.ShowVerticalHeaderLines : _style.ShowVerticalCellLines;
-        Rune symbol = renderLines ? Glyphs.VLine : (Rune)SeparatorSymbol;
-        AddRune (col, row, symbol);
+        Rune symbol = renderLines ? Glyphs.VLine : (Rune) SeparatorSymbol;
+        RenderRune (col, row, symbol);
     }
 
+    /// <summary>
+    /// This decides if we should render headers at all (no matter what the style settings are)
+    /// This may be a candidate to remove in future
+    /// (old implementation needed this logic to decide if the header is in current view (RowOffset))
+    /// </summary>
+    /// <returns></returns>
+#warning a candidate to remove
     private bool ShouldRenderHeaders ()
     {
         if (TableIsNullOrInvisible ())
@@ -449,6 +470,6 @@ public partial class TableView
             return false;
         }
 
-        return Style.AlwaysShowHeaders || _rowOffset == 0;
+        return true;
     }
 }

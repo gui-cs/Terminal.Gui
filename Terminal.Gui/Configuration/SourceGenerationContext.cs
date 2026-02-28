@@ -44,5 +44,7 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (ConcurrentDictionary<string, ThemeScope>))]
 [JsonSerializable (typeof (Dictionary<string, Scheme>))]
 
+[JsonSerializable (typeof (TraceCategory))]
+
 internal partial class SourceGenerationContext : JsonSerializerContext
 { }
