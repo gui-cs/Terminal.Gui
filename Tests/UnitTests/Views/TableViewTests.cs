@@ -211,8 +211,8 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.RowOffset = 20;
         tableView.ColumnOffset = 10;
 
-        Assert.Equal (1, tableView.RowOffset);
-        Assert.Equal (1, tableView.ColumnOffset);
+        Assert.Equal (0, tableView.RowOffset); //row offset should be 0 since there are no more rows to scroll vertically (all 2 rows fit in the viewport)
+        Assert.Equal (0, tableView.ColumnOffset); // column offset should be 0 since there are no more columns to scroll horizontally (all 2 columns fit in the viewport)
     }
 
     [Fact]
@@ -448,10 +448,10 @@ public class TableViewTests (ITestOutputHelper output)
         // columns unless there is sufficient space
         var expected =
             $@"
-│A│B                    │
-├─┼─────────────────────►
-│1│2                    │
-│1│2                    │
+│A│B│Very Long Column
+├─┼─┼────────────────────
+│1│2│aaaaaaaaaaaaaaaaaaaa
+│1│2│aaa
 ";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -467,10 +467,10 @@ public class TableViewTests (ITestOutputHelper output)
 
         expected =
             $@"
-│A│B│Very Long Column   │
-├─┼─┼───────────────────┤
-│1│2│aaaaaaaaaaaaaaaaaaa│
-│1│2│aaa                │
+│A│B│Very Long Column
+├─┼─┼────────────────────
+│1│2│aaaaaaaaaaaaaaaaaaaa
+│1│2│aaa
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -481,7 +481,7 @@ public class TableViewTests (ITestOutputHelper output)
         // RepresentationGetter and apply max length there
 
         style.RepresentationGetter = s => { return s.ToString ().Length < 15 ? s.ToString () : s.ToString ().Substring (0, 13) + "..."; };
-        tableView.SetNeedsDraw ();
+        tableView.Update();
         AutoInitShutdownAttribute.RunIteration ();
 
         expected =
@@ -530,11 +530,10 @@ public class TableViewTests (ITestOutputHelper output)
 
         expected =
             $@"
-│A│B    │
-├─┼─────►
-│1│2    │
-│1│2    │
-
+│A│B│Very
+├─┼─┼────
+│1│2│aaaa
+│1│2│aaa
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -546,10 +545,10 @@ public class TableViewTests (ITestOutputHelper output)
 
         expected =
             $@"
-│A│B│Very│
-├─┼─┼────┤
-│1│2│aaaa│
-│1│2│aaa │
+│A│B│Very
+├─┼─┼─────
+│1│2│aaaaa
+│1│2│aaa
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -562,31 +561,32 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.ExpandLastColumn = false;
         tableView.MaxCellWidth = 10;
         tableView.MinCellWidth = 3;
+        tableView.Update();
 
         AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
-│A  │B  │Very Long │    │
-├───┼───┼──────────┼────┤
-│1  │2  │aaaaaaaaaa│    │
-│1  │2  │aaa       │    │
+│A  │B  │Very Long │
+├───┼───┼──────────┤
+│1  │2  │aaaaaaaaaa│
+│1  │2  │aaa       │
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
 
         // MaxCellWidth limits MinCellWidth
         tableView.MaxCellWidth = 5;
         tableView.MinCellWidth = 10;
-        tableView.SetNeedsDraw ();
+        tableView.Update ();
 
         AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
-│A    │B    │Very │     │
-├─────┼─────┼─────┼─────┤
-│1    │2    │aaaaa│     │
-│1    │2    │aaa  │     │
+│A    │B    │Very │
+├─────┼─────┼─────┤
+│1    │2    │aaaaa│
+│1    │2    │aaa  │
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -622,14 +622,14 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.NewKeyDownEvent (Key.PageDown);
 
         // window height is 5 rows 2 are header so page down should give 3 new rows
-        Assert.Equal (3, tableView.SelectedRow);
+        Assert.Equal (5, tableView.SelectedRow);
         Assert.Equal (1, tableView.RowOffset);
 
         // header is no longer visible so page down should give 5 new rows
         tableView.NewKeyDownEvent (Key.PageDown);
 
-        Assert.Equal (8, tableView.SelectedRow);
-        Assert.Equal (4, tableView.RowOffset);
+        Assert.Equal (10, tableView.SelectedRow);
+        Assert.Equal (6, tableView.RowOffset);
         top.Dispose ();
     }
 
@@ -675,88 +675,6 @@ public class TableViewTests (ITestOutputHelper output)
         // Scrolled off the page by 1 row so it should only have moved down 1 line of RowOffset
         Assert.Equal (4, tableView.SelectedRow);
         Assert.Equal (1, tableView.RowOffset);
-    }
-
-    [Fact]
-    [SetupFakeApplication]
-    public void ScrollIndicators ()
-    {
-        var tableView = new TableView ()
-        {
-            App = ApplicationImpl.Instance
-        };
-        tableView.BeginInit ();
-        tableView.EndInit ();
-
-        tableView.SchemeName = "Runnable";
-
-        // 3 columns are visibile
-        tableView.Viewport = new (0, 0, 7, 5);
-        tableView.Style.ShowHorizontalHeaderUnderline = true;
-        tableView.Style.ShowHorizontalHeaderOverline = false;
-        tableView.Style.AlwaysShowHeaders = true;
-        tableView.Style.SmoothHorizontalScrolling = true;
-
-        var dt = new DataTable ();
-        dt.Columns.Add ("A");
-        dt.Columns.Add ("B");
-        dt.Columns.Add ("C");
-        dt.Columns.Add ("D");
-        dt.Columns.Add ("E");
-        dt.Columns.Add ("F");
-
-        dt.Rows.Add (1, 2, 3, 4, 5, 6);
-
-        tableView.Table = new DataTableSource (dt);
-
-        // select last visible column
-        tableView.SelectedColumn = 2; // column C
-
-        tableView.Draw ();
-
-        // user can only scroll right so sees right indicator
-        // Because first column in table is A
-        var expected =
-            $@"
-│A│B│C│
-├─┼─┼─►
-│1│2│3│";
-
-        DriverAssert.AssertDriverContentsAre (expected, output);
-
-        // Scroll right
-        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
-
-        // since A is now pushed off screen we get indicator showing
-        // that user can scroll left to see first column
-        tableView.SetClipToScreen ();
-        tableView.Draw ();
-
-        expected =
-            $@"
-│B│C│D│
-◄─┼─┼─►
-│2│3│4│";
-
-        DriverAssert.AssertDriverContentsAre (expected, output);
-
-        // Scroll right twice more (to end of columns)
-        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
-        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
-
-        tableView.SetClipToScreen ();
-        tableView.Draw ();
-
-        expected =
-            $@"
-│D│E│F│
-◄─┼─┼─┤
-│4│5│6│";
-
-        DriverAssert.AssertDriverContentsAre (expected, output);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -888,6 +806,123 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+    [SetupFakeApplication]
+    public void ScrollLeft_SmoothScrolling ()
+    {
+        var tableView = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        tableView.SchemeName = "Runnable";
+        tableView.LayoutSubViews ();
+
+        // 3 columns are visible
+        tableView.Viewport = new (0, 0, 7, 5);
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.SmoothHorizontalScrolling = true;
+
+        var dt = new DataTable ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+        dt.Columns.Add ("C");
+        dt.Columns.Add ("D");
+        dt.Columns.Add ("E");
+        dt.Columns.Add ("F");
+
+        dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+        tableView.Table = new DataTableSource (dt);
+
+        // select column D which is just off the right of the screen
+        tableView.ColumnOffset = 3; // column D
+        tableView.SelectedColumn = 3; // column D
+
+        tableView.Draw ();
+
+        var expected =
+            $@"
+│D│E│F│
+│4│5│6│";
+
+        DriverAssert.AssertDriverContentsAre (expected, output);
+
+        // Scroll left
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorLeft });
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        expected =
+            $@"
+│C│D│E│
+│3│4│5│";
+
+        DriverAssert.AssertDriverContentsAre (expected, output);
+    }
+
+    [Fact]
+    [SetupFakeApplication]
+    public void ScrollLeft_WithoutSmoothScrolling ()
+    {
+        var tableView = new TableView ()
+        {
+            App = ApplicationImpl.Instance
+        };
+
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = "Runnable";
+
+        // 3 columns are visible
+        tableView.Viewport = new (0, 0, 7, 5);
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.SmoothHorizontalScrolling = false;
+
+        var dt = new DataTable ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+        dt.Columns.Add ("C");
+        dt.Columns.Add ("D");
+        dt.Columns.Add ("E");
+        dt.Columns.Add ("F");
+
+        dt.Rows.Add (1, 2, 3, 4, 5, 6);
+
+        tableView.Table = new DataTableSource (dt);
+
+        // select column D which is just off the right of the screen
+        tableView.ColumnOffset = 3; // column D
+        tableView.SelectedColumn = 3; // column D
+
+        tableView.Draw ();
+
+        var expected =
+            $@"
+│D│E│F│
+│4│5│6│";
+
+        DriverAssert.AssertDriverContentsAre (expected, output);
+
+        // Scroll left
+        tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorLeft });
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        expected =
+            $@"
+│A│B│C│
+│1│2│3│";
+
+        DriverAssert.AssertDriverContentsAre (expected, output);
+    }
+
+    [Fact]
     public void SelectedCellChanged_NotFiredForSameValue ()
     {
         var tableView = new TableView { Table = BuildTable (25, 50) };
@@ -967,7 +1002,7 @@ public class TableViewTests (ITestOutputHelper output)
         var expected =
             $@"
 │A│B│C│
-└─┴─┴─►
+└─┴─┴─┴
  1 2 3
 ───────";
 
@@ -997,9 +1032,9 @@ public class TableViewTests (ITestOutputHelper output)
         var expected =
             $@"
 │A│B│C│
-├─┼─┼─►
+├─┼─┼─┼
 │1│2│3│
-└─┴─┴─┘";
+└─┴─┴─┴";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
     }
@@ -1341,10 +1376,10 @@ public class TableViewTests (ITestOutputHelper output)
         tv.Draw ();
 
         var expected = $@"
-┌─┬─┬────┐
-│A│B│    │
-├─┼─┼────┤
-│1│2│    │
+┌─┬──────┐
+│A│B     │
+├─┼──────┤
+│1│2     │
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
     }
@@ -1403,14 +1438,11 @@ public class TableViewTests (ITestOutputHelper output)
         tv.Style.ShowHorizontalHeaderOverline = true;
         tv.Style.ShowHorizontalHeaderUnderline = true;
 
-        // Horizontal scrolling option is part of the underline
-        tv.Style.ShowHorizontalScrollIndicators = true;
-
         tv.Draw ();
 
         var expected = $@"
-┌─┬─┐
-├─┼─►
+┌─┬─┬
+├─┼─┼
 │1│2│
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -1449,7 +1481,7 @@ public class TableViewTests (ITestOutputHelper output)
         tv.Draw ();
 
         var expected = $@"
-┌─┬─┐
+┌─┬─┬
 │1│2│
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -1466,13 +1498,10 @@ public class TableViewTests (ITestOutputHelper output)
         tv.Style.ShowHorizontalHeaderOverline = false;
         tv.Style.ShowHorizontalHeaderUnderline = true;
 
-        // Horizontal scrolling option is part of the underline
-        tv.Style.ShowHorizontalScrollIndicators = true;
-
         tv.Draw ();
 
         var expected = $@"
-├─┼─►
+├─┼─┼
 │1│2│
 ";
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -1679,7 +1708,7 @@ public class TableViewTests (ITestOutputHelper output)
         var expected =
             $@"
 │A│B│C│
-├─┼─┼─►
+├─┼─┼─┼
 │1│2│3│
 │1│2│3│";
 
@@ -1757,7 +1786,7 @@ public class TableViewTests (ITestOutputHelper output)
         var expected =
             $@"
 │A│B│C│
-├─┼─┼─►
+├─┼─┼─┼
 │1│2│3│
 │1│2│3│";
 
@@ -1914,9 +1943,9 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
 
-        tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
+        tableView.Update ();
 
         tableView.LayoutSubViews ();
         tableView.Draw ();
@@ -1924,7 +1953,7 @@ public class TableViewTests (ITestOutputHelper output)
         var expected =
             $@"
 │B│C│D│
-├─┼─┼─►
+├─┼─┼─┼
 │2│3│4│";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -1965,7 +1994,6 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
 
-        tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
 
         tableView.ColumnOffset = 1;
@@ -1975,9 +2003,9 @@ public class TableViewTests (ITestOutputHelper output)
         // normally we should have scroll indicators because A,E and F are of screen
         var expected =
             $@"
-│B│C│D│
-◄─┼─┼─►
-│2│3│4│";
+B│C│D│E
+─┼─┼─┼─
+2│3│4│5";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -1987,9 +2015,9 @@ public class TableViewTests (ITestOutputHelper output)
 
         expected =
             $@"
-│B│C│D│
-◄─┼─┼─┤
-│2│3│4│";
+B│C│D│E
+─┼─┼─┼─
+2│3│4│5";
         tableView.SetNeedsDraw ();
         tableView.SetClipToScreen ();
         tableView.Draw ();
@@ -2001,9 +2029,9 @@ public class TableViewTests (ITestOutputHelper output)
 
         expected =
             $@"
-│B│C│D│
-├─┼─┼─┤
-│2│3│4│";
+B│C│D│E
+─┼─┼─┼─
+2│3│4│5";
         tableView.SetNeedsDraw ();
         tableView.SetClipToScreen ();
         tableView.Draw ();
@@ -2017,7 +2045,6 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
 
-        tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.LayoutSubViews ();
         tableView.SetNeedsDraw ();
@@ -2028,7 +2055,7 @@ public class TableViewTests (ITestOutputHelper output)
         var expected =
             $@"
 │A│B│C│
-├─┼─┼─►
+├─┼─┼─┼
 │1│2│3│";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
@@ -2041,7 +2068,7 @@ public class TableViewTests (ITestOutputHelper output)
         expected =
             $@"
 │A│B│C│
-├─┼─┼─┤
+├─┼─┼─┼
 │1│2│3│";
         tableView.SetNeedsDraw ();
         tableView.SetClipToScreen ();
@@ -2103,12 +2130,12 @@ public class TableViewTests (ITestOutputHelper output)
 
         tableView.SelectedColumn = 2;
         tableView.EnsureSelectedCellIsVisible ();
-        Assert.Equal (0, tableView.ColumnOffset);
+        Assert.Equal (smooth ? 0 : 2, tableView.ColumnOffset);
 
         // Selecting D should move the visible table area to fit D onto the screen
         tableView.SelectedColumn = 3;
         tableView.EnsureSelectedCellIsVisible ();
-        Assert.Equal (smooth ? 1 : 3, tableView.ColumnOffset);
+        Assert.Equal (smooth ? 0 : 2, tableView.ColumnOffset);
     }
 
     [Fact]
@@ -2118,6 +2145,7 @@ public class TableViewTests (ITestOutputHelper output)
         TableView tableView = GetABCDEFTableView (out _);
 
         tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
+        tableView.Update ();
         tableView.LayoutSubViews ();
         tableView.Draw ();
 
@@ -2284,11 +2312,11 @@ public class TableViewTests (ITestOutputHelper output)
         var expected =
             $@"
 │A│B│C│
-├─┼─┼─►
+├─┼─┼─┼
 │1│2│3│
 │1│2│3│
 │1│2│3│
-└─┴─┴─┘";
+└─┴─┴─┴";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -2325,6 +2353,7 @@ public class TableViewTests (ITestOutputHelper output)
         tv.FullRowSelect = true;
         tv.Style.ShowVerticalCellLines = false;
         tv.Style.ShowVerticalHeaderLines = false;
+        tv.Update ();
 
         // Clicking in bottom row
         tv.NewMouseEvent (
@@ -2338,11 +2367,11 @@ public class TableViewTests (ITestOutputHelper output)
 
         var expected =
             $@"
-A B C
+A B C D
 ───────
-1 2 3
-1 2 3
-1 2 3";
+1 2 3 4
+1 2 3 4
+1 2 3 4";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -2392,11 +2421,11 @@ A B C
         var expected =
             $@"
 │A│B│C│
-├─┼─┼─►
+├─┼─┼─┼
 │1│2│3│
 │1│2│3│
 │1│2│3│
-└─┴─┴─┘";
+└─┴─┴─┴";
 
         DriverAssert.AssertDriverContentsAre (expected, output);
 
@@ -2468,10 +2497,10 @@ A B C
 
         var vertPerpExpected =
             $@"
-│Item 0│Item 4│Item 8   │
-│Item 1│Item 5│Item 9   │
-│Item 2│Item 6│Item 10  │
-│Item 3│Item 7│Item 11  │";
+│Item 0│Item 4│Item 8 │It
+│Item 1│Item 5│Item 9 │It
+│Item 2│Item 6│Item 10│It
+│Item 3│Item 7│Item 11│It";
 
         var vertParaExpected =
             $@"
@@ -2697,7 +2726,7 @@ A B C
         var expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│";
@@ -2721,7 +2750,7 @@ A B C
         expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│";
@@ -2737,7 +2766,7 @@ A B C
         expected =
             @$"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│";
@@ -2766,7 +2795,7 @@ A B C
         var expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│";
@@ -2786,7 +2815,7 @@ A B C
         expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│";
@@ -2874,7 +2903,7 @@ A B C
         var expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│";
@@ -2894,7 +2923,7 @@ A B C
         expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│";
@@ -2914,7 +2943,7 @@ A B C
         expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│";
@@ -2933,7 +2962,7 @@ A B C
         expected =
             $@"
 │ │A│B│
-├─┼─┼─►
+├─┼─┼─┼
 │{Glyphs.CheckStateUnChecked}│1│2│
 │{Glyphs.CheckStateChecked}│1│2│
 │{Glyphs.CheckStateUnChecked}│1│2│";
