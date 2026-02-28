@@ -22,10 +22,49 @@ public partial class TableView
         set
         {
             _table = value;
+            RefreshContentSize ();
             Update ();
         }
     }
 
+    public bool UseAllRowsForContentCalculation
+    {
+        get => field;
+        set
+        {
+            field = value;
+            RefreshContentSize ();
+        }
+    }
+
+    /// <summary>
+    /// Recalculates and updates the content size based on the current state.
+    /// </summary>
+    /// <remarks>Call this method after making changes that affect the content's dimensions to ensure the
+    /// layout remains accurate.
+    /// Also call this if data in Table has changed.</remarks>
+    public void RefreshContentSize ()
+    {
+        SetContentSize (CalculateContentSize ());
+    }
+
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        base.OnViewportChanged (e);
+
+        if (inCalculatingContentSize)
+        {
+            return;
+        }
+        if (e.OldViewport.Size != e.NewViewport.Size ||
+            !UseAllRowsForContentCalculation && e.OldViewport.Y != e.NewViewport.Y)
+        {
+            RefreshContentSize (); //mainly needed only for ExpandLastColumn?!
+        }
+    }
+
+    /// <inheritdoc />
     /// <summary>
     ///     Moves or extends the selection to the final cell in the table (nX,nY). If <see cref="FullRowSelect"/> is
     ///     enabled then selection instead moves to ( <see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
@@ -126,6 +165,7 @@ public partial class TableView
         dt.Columns.Add (new DataColumn ("DoubleCol", typeof (double)));
         dt.Columns.Add (new DataColumn ("NullsCol", typeof (string)));
         dt.Columns.Add (new DataColumn ("Unicode", typeof (string)));
+        dt.Columns.Add (new DataColumn ("VarLength", typeof (string))); //ColIdx = 6
 
         for (var i = 0; i < cols - explicitCols; i++)
         {
@@ -133,6 +173,20 @@ public partial class TableView
         }
 
         var r = new Random (100);
+
+        string NumberText (int len)
+        {
+            string result = string.Empty;
+
+            for (int i = 1; i <= len; i++)
+            {
+                result += i % 10;
+            }
+
+            return result;
+        }
+
+        var numberText = NumberText (rows);
 
         for (var i = 0; i < rows; i++)
         {
@@ -143,7 +197,8 @@ public partial class TableView
                 r.Next (i),
                 r.NextDouble () * i - 0.5 /*add some negatives to demo styles*/,
                 DBNull.Value,
-                "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables"
+                "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables",
+                numberText [..i],
             ];
 
             for (var j = 0; j < cols - explicitCols; j++)

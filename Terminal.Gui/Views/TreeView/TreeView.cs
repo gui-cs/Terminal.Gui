@@ -276,7 +276,9 @@ public class TreeView<T> : View, ITreeView where T : class
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
 
         KeyBindings.Remove (ObjectActivationKey);
-        KeyBindings.Add (ObjectActivationKey, Command.Accept);
+        KeyBindings.Add (ObjectActivationKey, Command.Activate);
+
+        KeystrokeNavigator.Matcher = new TreeViewCollectionNavigatorMatcher<T> (this);
     }
 
     /// <summary>
@@ -1214,7 +1216,7 @@ public class TreeView<T> : View, ITreeView where T : class
         }
 
         // If not a keybinding, is the key a searchable key press?
-        if (KeystrokeNavigator.Matcher.IsCompatibleKey (key) && AllowLetterBasedNavigation)
+        if (KeystrokeNavigator.Matcher.IsCompatibleKey (key) && AllowLetterBasedNavigation && selectedObject != null)
         {
             // If there has been a call to InvalidateMap since the last time
             // we need a new one to reflect the new exposed tree state
@@ -1222,6 +1224,13 @@ public class TreeView<T> : View, ITreeView where T : class
 
             // Find the current selected object within the tree
             int current = map.IndexOf (b => b.Model == SelectedObject);
+
+            // The currently selected object is no longer in line map somehow
+            if(current < 0)
+            {
+                return false;
+            }
+
             int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)key);
 
             if (newIndex is int && newIndex != -1)
@@ -1458,7 +1467,7 @@ public class TreeView<T> : View, ITreeView where T : class
         cachedLineMap = new ReadOnlyCollection<Branch<T>> (toReturn);
 
         // Update the collection used for search-typing
-        KeystrokeNavigator.Collection = cachedLineMap.Select (b => AspectGetter (b.Model)).ToArray ();
+        KeystrokeNavigator.Collection = cachedLineMap.Select (b => b.Model).ToArray ();
 
         return cachedLineMap;
     }
