@@ -504,8 +504,9 @@ public partial class View // Command APIs
                 // the composite's semantic value, not the dispatch target's raw value.
                 if (this is IValue compositeValue && ctx is CommandContext ccComposite)
                 {
-                    ctx = ccComposite.WithValue (compositeValue.GetValue ());
-                    Trace.Command (this, ctx, "CompositeValue", $"Appended composite value: {compositeValue.GetValue ()}");
+                    object? postMutationValue = compositeValue.GetValue ();
+                    ctx = ccComposite.WithValue (postMutationValue);
+                    Trace.Command (this, ctx, "CompositeValue", $"Appended composite value: {postMutationValue}");
                 }
 
                 // ConsumeDispatch consumed the command internally, but ancestors still need

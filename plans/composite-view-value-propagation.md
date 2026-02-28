@@ -388,3 +388,67 @@ not the originating composite's value — regardless of design intent. Adding `I
 view for unrelated reasons would accidentally change command value semantics. Option C solves
 this with an explicit `OpaqueCommandValue` opt-in; Option B solves it by retaining the full
 chain. Option A provides neither the explicitness of C nor the richness of B.
+
+---
+
+## Implementation: Option B Selected
+
+### API Changes
+
+1. **`ICommandContext.Values`**: New `IReadOnlyList<object?> Values` property. Contains all values
+   accumulated as the command propagates up the view hierarchy.
+
+2. **`ICommandContext.Value`**: Now a computed property returning `Values[^1]` (the last appended
+   value). Returns `null` when `Values` is empty.
+
+3. **`CommandContext.WithValue(object?)`**: Changed from replacing `Value` to appending to `Values`.
+   Returns a new context with the value appended to the chain.
+
+### Framework Changes
+
+1. **`InvokeCommand`**: Initial context created with `Values = [sourceValue]` when source implements
+   `IValue`; `Values = []` for non-`IValue` views.
+
+2. **`RefreshValue`**: Appends (not replaces) the dispatch target's post-change value to the chain.
+
+3. **`RaiseActivated`**: After `OnActivated` completes, if `DispatchOccurred` and `this is IValue`,
+   appends the composite's post-mutation value. This ensures direct `Activated` subscribers see the
+   composite's semantic value. Guarded by `_dispatchState.HasFlag(DispatchOccurred)` to prevent
+   unrelated `IValue` ancestors (like MenuBar receiving a bridged command) from appending stale values.
+
+4. **`DefaultActivateHandler` ConsumeDispatch branch**: After `RaiseActivated`, also appends the
+   composite's value for the `BubbleActivatedUp` context (since `RaiseActivated`'s local append
+   doesn't propagate back to the caller due to struct value semantics).
+
+5. **`BubbleActivatedUp`**: Carries `Values` chain through ancestor notifications. Dispatch-target
+   refresh preserved for the `ReferenceEquals(source, dispatchTarget)` case.
+
+6. **`CommandBridge`**: Carries `Values` (not just `Value`) across bridge boundaries.
+
+### Key Design Decisions
+
+- **`_dispatchState.HasFlag(DispatchOccurred)` guard in `RaiseActivated`**: MenuBar inherits IValue
+  from Menu. Without this guard, BubbleActivatedUp → RaiseActivated on MenuBar would append
+  `MenuBar.GetValue()` which returns null (the *MenuBar's* Menu._value, not the PopoverMenu's
+  Menu._value). The DispatchOccurred flag only fires when the view's own DefaultActivateHandler
+  consumed a dispatch, preventing spurious appends from bridged/bubbled contexts.
+
+- **Struct value semantics**: `CommandContext` is a readonly record struct. `RaiseActivated` appends
+  to a local copy; the caller's ctx is unaffected. Both the ConsumeDispatch branch and the self-
+  refresh block must separately append to their own ctx references.
+
+### Verification Results
+
+- 4 RED regression tests → GREEN:
+  - `OptionSelectorTests.Activated_Event_Value_Is_OptionSelector_Int_Not_CheckState`
+  - `FlagSelectorTests.Activated_Event_Value_Is_FlagSelector_Bitmask_Not_CheckState`
+  - `OptionSelectorTests.Activated_Event_Ancestor_Receives_OptionSelector_Value_Via_BubbleActivatedUp`
+  - `FlagSelectorTests.Activated_Event_Ancestor_Receives_FlagSelector_Value_Via_BubbleActivatedUp`
+- 5 new base-level ViewCommandTests (using test-only classes):
+  - `Values_ConsumeDispatch_Composite_Appends_Own_Value`
+  - `Values_BubbleActivatedUp_Carries_Composite_Value_To_Ancestor`
+  - `Values_Chain_Accumulates_From_Source_Through_Composites`
+  - `Values_Bridge_Preserves_Full_Chain`
+  - `Values_NonIValue_View_Has_Empty_Values`
+- 14,357 parallelizable tests pass, 0 failures
+- 1,012 non-parallelizable tests pass, 0 failures

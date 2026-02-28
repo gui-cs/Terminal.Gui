@@ -79,7 +79,7 @@ public readonly record struct CommandContext : ICommandContext
     /// </summary>
     /// <param name="value">The value to append.</param>
     /// <returns>A new <see cref="CommandContext"/> with the value appended to <see cref="Values"/>.</returns>
-    public CommandContext WithValue (object? value) => this with { Values = [..(Values ?? []), value] };
+    public CommandContext WithValue (object? value) => this with { Values = [..Values, value] };
 
     /// <inheritdoc/>
     public override string ToString ()
