@@ -9,7 +9,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         <b>IMPORTANT:</b> Must be registered with <see cref="Application.Popover"/> via
-///         <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/> or
+///         <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/> or
 ///         <see cref="ApplicationPopover.Show"/>.
 ///     </para>
 ///     <para>
@@ -41,7 +41,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="menuItems">The views to use as menu items. Null elements become separator lines.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<View?>? menuItems) : this (new Menu (menuItems?.Select (item => item ?? new Line ()))) { }
 
@@ -50,7 +50,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="menuItems">The menu items to display in the popover.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems)) { }
 
@@ -59,7 +59,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="root">The root menu that contains the top-level menu items.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (Menu? root) : base (root)
     {
