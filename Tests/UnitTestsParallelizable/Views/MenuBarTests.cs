@@ -290,8 +290,8 @@ public class MenuBarTests
         Assert.NotNull (optionSelector);
         Assert.Equal (Schemes.Base, optionSelector.Value);
 
-        // Find the "Error" checkbox (index 4)
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        // Find the "Error" checkbox (index 4 in the Schemes enum)
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
         Assert.NotNull (errorCheckBox);
 
         // Subscribe to ValueChanged
@@ -358,7 +358,7 @@ public class MenuBarTests
         OptionSelector<Schemes>? optionSelector = optionMenuItem!.CommandView as OptionSelector<Schemes>;
         Assert.Equal (Schemes.Base, optionSelector!.Value);
 
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
 
         Schemes? newValue = null;
         var valueChangedCount = 0;
@@ -419,7 +419,7 @@ public class MenuBarTests
         OptionSelector<Schemes>? optionSelector = optionMenuItem!.CommandView as OptionSelector<Schemes>;
         Assert.Equal (Schemes.Base, optionSelector!.Value);
 
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
 
         var valueChangedCount = 0;
 
@@ -1361,7 +1361,7 @@ public class MenuBarTests
         Assert.NotNull (optionSelector);
 
         // Click on the Error checkbox
-        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+        CheckBox? errorCheckBox = optionSelector.SubViews.OfType<CheckBox> ().ElementAtOrDefault ((int)Schemes.Error);
         Assert.NotNull (errorCheckBox);
         errorCheckBox.SetFocus ();
         Point errorScreenPos = errorCheckBox.FrameToScreen ().Location;
@@ -1881,8 +1881,8 @@ public class MenuBarTests
     {
         ListBackend traceBackend = new ();
         Trace.Backend = traceBackend;
-        Trace.CommandEnabled = true;
-        Trace.KeyboardEnabled = true;
+        Trace.EnabledCategories |= TraceCategory.Command;
+        Trace.EnabledCategories |= TraceCategory.Keyboard;
 
         try
         {
@@ -1954,8 +1954,7 @@ public class MenuBarTests
         }
         finally
         {
-            Trace.CommandEnabled = false;
-            Trace.KeyboardEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }

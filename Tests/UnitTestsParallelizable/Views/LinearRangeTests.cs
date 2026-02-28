@@ -813,7 +813,9 @@ public class LinearRangeCWPTests : TestDriverBase
 
         bool? result = linearRange.InvokeCommand (Command.Activate);
 
-        Assert.True (result);
+        // DefaultActivateHandler returns false for views without dispatch targets or bubble config,
+        // but the side effect (SetFocusedOption via OnActivated) still occurs.
+        Assert.False (result);
         Assert.Contains (1, linearRange.GetSetOptions ());
 
         linearRange.Dispose ();

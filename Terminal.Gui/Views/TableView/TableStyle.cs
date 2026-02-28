@@ -63,12 +63,6 @@ public class TableStyle
     /// <summary>True to render a solid line under the headers</summary>
     public bool ShowHorizontalHeaderUnderline { get; set; } = true;
 
-    /// <summary>
-    ///     True to render a arrows on the right/left of the table when there are more column(s) that can be scrolled to.
-    ///     Requires <see cref="ShowHorizontalHeaderUnderline"/> to be true. Defaults to true
-    /// </summary>
-    public bool ShowHorizontalScrollIndicators { get; set; } = true;
-
     /// <summary>True to render a solid line vertical line between cells</summary>
     public bool ShowVerticalCellLines { get; set; } = true;
 

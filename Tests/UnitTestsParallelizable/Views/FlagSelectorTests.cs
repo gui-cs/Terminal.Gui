@@ -200,10 +200,10 @@ public class FlagSelectorTests
 
         flagSelector.Value = SelectorStyles.ShowNoneFlag;
 
-        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
+        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowValue));
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == Convert.ToInt32 (SelectorStyles.ShowValue));
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
@@ -397,10 +397,10 @@ public class FlagSelectorTests
         flagSelector.Labels = flags.Values.ToList ();
         flagSelector.Value = 1;
 
-        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 1);
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 2);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
@@ -531,13 +531,13 @@ public class FlagSelectorTests
         Assert.Equal (1, selector.Value);
 
         // Toggle checkbox to add Flag 2
-        CheckBox flag2Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+        CheckBox flag2Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 2);
         flag2Checkbox.Value = CheckState.Checked;
 
         Assert.Equal (1 | 2, selector.Value);
 
         // Toggle checkbox to remove Flag 1
-        CheckBox flag1Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox flag1Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 1);
         flag1Checkbox.Value = CheckState.UnChecked;
 
         Assert.Equal (2, selector.Value);
@@ -558,7 +558,7 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, noneCheckBox.Value);
 
         // All other flags should be unchecked
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.UnChecked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.UnChecked));
     }
 
     [Fact]
@@ -590,7 +590,7 @@ public class FlagSelectorTests
         noneCheckBox.Value = CheckState.Checked;
 
         Assert.Equal (0, selector.Value);
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.UnChecked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.UnChecked));
     }
 
     [Fact]
@@ -607,7 +607,7 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, noneCheckBox.Value);
 
         // Toggle a flag
-        CheckBox flag1CheckBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox flag1CheckBox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 1);
         flag1CheckBox.Value = CheckState.Checked;
 
         Assert.Equal (1, selector.Value);
@@ -636,7 +636,7 @@ public class FlagSelectorTests
         selector.Labels = ["None", "Flag1", "Flag2"];
 
         // Should only have one "None" checkbox
-        Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => (int)cb.Data! == 0));
+        Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => selector.GetCheckBoxValue (cb) == 0));
     }
 
     [Fact]
@@ -691,7 +691,7 @@ public class FlagSelectorTests
         // This should not cause recursion or errors
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+                                                     CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 2);
                                                      checkBox.Value = CheckState.Checked; // This triggers UpdateChecked internally
                                                  });
 
@@ -749,7 +749,7 @@ public class FlagSelectorTests
         selector.Value = SelectorStyles.All;
 
         // All non-None flags should be checked
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.Checked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.Checked));
     }
 
     #endregion

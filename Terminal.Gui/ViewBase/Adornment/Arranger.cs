@@ -193,6 +193,17 @@ internal sealed class Arranger : IDisposable
     private Button? _topSizeButton;
     private Button? _bottomSizeButton;
 
+    // Stores the button type for each arrangement button (replaced use of Data property)
+    private readonly Dictionary<Button, ArrangeButtons> _buttonTypes = new ();
+
+    /// <summary>
+    ///     Gets the button type for a given button. For testing purposes.
+    /// </summary>
+    internal bool TryGetButtonType (Button button, out ArrangeButtons buttonType)
+    {
+        return _buttonTypes.TryGetValue (button, out buttonType);
+    }
+
     /// <summary>
     ///     Creates all the arrangement buttons based on parent's arrangement options.
     /// </summary>
@@ -262,14 +273,16 @@ internal sealed class Arranger : IDisposable
             Text = $"{glyph}",
             X = x,
             Y = y,
-            Visible = false,
-            Data = buttonType
+            Visible = false
         };
 
         button.KeyBindings.Remove (Key.Space);
         button.KeyBindings.Remove (Key.Enter);
 
         _border.Add (button);
+
+        // Store button type in dictionary (replaced use of Data property)
+        _buttonTypes [button] = buttonType;
 
         return button;
     }
@@ -409,6 +422,8 @@ internal sealed class Arranger : IDisposable
         {
             return;
         }
+
+        _buttonTypes.Remove (button);
         _border.Remove (button);
         button.Dispose ();
         button = null;
@@ -438,7 +453,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal ViewArrangement GetFocusedArrangement ()
     {
-        if (_border.Focused?.Data is ArrangeButtons button)
+        if (_border.Focused is Button focusedButton && _buttonTypes.TryGetValue (focusedButton, out ArrangeButtons button))
         {
             return GetArrangementForButton (button);
         }
