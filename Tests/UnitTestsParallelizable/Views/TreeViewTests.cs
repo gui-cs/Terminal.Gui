@@ -544,15 +544,7 @@ public class TreeViewTests
 
         Assert.False (called);
 
-        // no object is selected yet so no event should happen
-        tree.NewKeyDownEvent (Key.Enter);
-
-        Assert.Null (activated);
-        Assert.False (called);
-
-        // down to select factory
-        tree.NewKeyDownEvent (Key.CursorDown);
-
+        // NOTE: Activation causes implicit focusing so the first object gets selected
         tree.NewKeyDownEvent (Key.Enter);
 
         Assert.True (called);
@@ -580,13 +572,6 @@ public class TreeViewTests
         // no object is selected yet so no event should happen
         tree.NewKeyDownEvent (Key.Enter);
 
-        Assert.Null (activated);
-        Assert.False (called);
-
-        // down to select factory
-        tree.NewKeyDownEvent (Key.CursorDown);
-
-        tree.NewKeyDownEvent (Key.Enter);
 
         // Enter is not the activation key in this unit test
         Assert.Null (activated);

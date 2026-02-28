@@ -176,7 +176,8 @@ public class FileDialog : Dialog, IDesignable
         Style.TreeStyle = _treeView.Style;
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
-
+        _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
+        
         _tableViewContainer.Add (_tableView);
 
         _tableView.Style.ShowHorizontalHeaderOverline = true;
@@ -453,6 +454,7 @@ public class FileDialog : Dialog, IDesignable
         _treeRoots = Style.TreeRootGetter ();
         Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
 
+        
         _treeView.AddObjects (_treeRoots.Keys);
 
         // if filtering on file type is configured then create the ComboBox and establish
