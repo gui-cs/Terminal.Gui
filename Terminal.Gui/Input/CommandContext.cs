@@ -34,6 +34,7 @@ public readonly record struct CommandContext : ICommandContext
         Command = command;
         Binding = binding;
         Source = source;
+        Values = [];
     }
 
     /// <inheritdoc/>
@@ -49,7 +50,14 @@ public readonly record struct CommandContext : ICommandContext
     public CommandRouting Routing { get; init; }
 
     /// <inheritdoc/>
-    public object? Value { get; init; }
+    public IReadOnlyList<object?> Values
+    {
+        get => field ?? [];
+        init;
+    } = [];
+
+    /// <inheritdoc/>
+    public object? Value => Values is { Count: > 0 } ? Values [^1] : null;
 
     /// <summary>
     ///     Creates a new context with a different command, preserving all other fields.
@@ -66,11 +74,12 @@ public readonly record struct CommandContext : ICommandContext
     public CommandContext WithRouting (CommandRouting routing) => this with { Routing = routing };
 
     /// <summary>
-    ///     Creates a new context with a different value, preserving all other fields.
+    ///     Creates a new context with the specified value appended to the <see cref="Values"/> chain.
+    ///     The new value becomes the last element, making it the new <see cref="Value"/>.
     /// </summary>
-    /// <param name="value">The new value.</param>
-    /// <returns>A new <see cref="CommandContext"/> with the specified value.</returns>
-    public CommandContext WithValue (object? value) => this with { Value = value };
+    /// <param name="value">The value to append.</param>
+    /// <returns>A new <see cref="CommandContext"/> with the value appended to <see cref="Values"/>.</returns>
+    public CommandContext WithValue (object? value) => this with { Values = [..(Values ?? []), value] };
 
     /// <inheritdoc/>
     public override string ToString ()
@@ -82,8 +91,9 @@ public readonly record struct CommandContext : ICommandContext
                                  : "";
         string source = Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "";
         string binding = Binding is { } ? $", Binding={Binding}" : "";
-        string value = Value is { } ? $", Value={Value}" : "";
+        string value = Values is { Count: > 0 } ? $", Value={Value}" : "";
+        string values = Values is { Count: > 1 } ? $", Values=[{string.Join (", ", Values)}]" : "";
 
-        return $"{routing}{Command} ({source}{binding}{value})";
+        return $"{routing}{Command} ({source}{binding}{value}{values})";
     }
 }

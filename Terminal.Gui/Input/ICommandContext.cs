@@ -48,9 +48,28 @@ public interface ICommandContext
     public CommandRouting Routing { get; }
 
     /// <summary>
-    ///     Gets the value from the source View if it implements <see cref="IValue"/>.
-    ///     This is automatically populated during command invocation when the source implements <see cref="IValue"/>,
-    ///     capturing the result of <see cref="IValue.GetValue"/> at the time the command was invoked.
+    ///     Gets all values accumulated as the command propagated up the view hierarchy.
+    ///     Each <see cref="IValue"/>-implementing view in the chain appends its value via
+    ///     <see cref="IValue.GetValue"/> as the command bubbles up. The list is ordered from
+    ///     innermost (originator) to outermost (last composite to append).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Use <see cref="Value"/> as a shortcut to access the most recently appended value
+    ///         (<c>Values[^1]</c>), which is typically the outermost composite's value.
+    ///     </para>
+    ///     <para>
+    ///         Will be empty if no <see cref="IValue"/>-implementing views participated.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="Value"/>
+    /// <seealso cref="IValue"/>
+    public IReadOnlyList<object?> Values { get; }
+
+    /// <summary>
+    ///     Gets the most recently appended value from <see cref="Values"/>, or <see langword="null"/>
+    ///     if <see cref="Values"/> is empty. This is a convenience accessor equivalent to
+    ///     <c>Values.Count > 0 ? Values[^1] : null</c>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -58,10 +77,14 @@ public interface ICommandContext
     ///         without needing to know the generic type parameter of <see cref="IValue{TValue}"/>.
     ///     </para>
     ///     <para>
-    ///         Will be <see langword="null"/> if the source view does not implement <see cref="IValue"/>,
-    ///         or if the source view's value is <see langword="null"/>.
+    ///         In a simple hierarchy (e.g., <c>OptionSelector</c> → ancestor), <c>Value</c> will be
+    ///         the composite's semantic value (e.g., <c>int?</c> index). In a multi-layer hierarchy
+    ///         (e.g., <c>OptionSelector</c> inside <c>MenuItem</c> inside <c>PopoverMenu</c>),
+    ///         <c>Value</c> will be the outermost composite's value (e.g., <c>MenuItem</c>).
+    ///         Use <see cref="Values"/> to inspect inner values.
     ///     </para>
     /// </remarks>
+    /// <seealso cref="Values"/>
     /// <seealso cref="IValue"/>
     /// <seealso cref="IValue.GetValue"/>
     public object? Value { get; }

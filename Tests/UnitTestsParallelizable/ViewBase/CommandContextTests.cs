@@ -564,7 +564,7 @@ public class CommandContextTests
     [Fact]
     public void CommandContext_Value_CanBeSet ()
     {
-        CommandContext ctx = new () { Command = Command.Accept, Value = "test value" };
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["test value"] };
 
         Assert.Equal ("test value", ctx.Value);
     }
@@ -589,8 +589,9 @@ public class CommandContextTests
         // Original unchanged
         Assert.Null (ctx.Value);
 
-        // Updated has new value, everything else preserved
+        // Updated has new value appended, everything else preserved
         Assert.Equal ("new value", updated.Value);
+        Assert.Single (updated.Values);
         Assert.Equal (Command.Accept, updated.Command);
         Assert.Equal (ctx.Source, updated.Source);
         Assert.Equal (ctx.Binding, updated.Binding);
@@ -599,21 +600,37 @@ public class CommandContextTests
 
     // Claude - Opus 4.5
     [Fact]
-    public void CommandContext_WithValue_CanSetNull ()
+    public void CommandContext_WithValue_Appends_Not_Replaces ()
     {
-        CommandContext ctx = new () { Command = Command.Accept, Value = "initial value" };
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["initial value"] };
+
+        CommandContext updated = ctx.WithValue ("second value");
+
+        Assert.Equal ("initial value", ctx.Value);
+        Assert.Equal ("second value", updated.Value);
+        Assert.Equal (2, updated.Values.Count);
+        Assert.Equal ("initial value", updated.Values [0]);
+        Assert.Equal ("second value", updated.Values [1]);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_WithValue_CanAppendNull ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["initial value"] };
 
         CommandContext updated = ctx.WithValue (null);
 
         Assert.Equal ("initial value", ctx.Value);
         Assert.Null (updated.Value);
+        Assert.Equal (2, updated.Values.Count);
     }
 
     // Claude - Opus 4.5
     [Fact]
     public void CommandContext_ToString_IncludesValue_WhenNonNull ()
     {
-        CommandContext ctx = new () { Command = Command.Accept, Value = "test value" };
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["test value"] };
 
         string result = ctx.ToString ();
 
@@ -625,7 +642,7 @@ public class CommandContextTests
     [Fact]
     public void CommandContext_ToString_OmitsValue_WhenNull ()
     {
-        CommandContext ctx = new () { Command = Command.Accept, Value = null };
+        CommandContext ctx = new () { Command = Command.Accept };
 
         string result = ctx.ToString ();
 
@@ -637,11 +654,34 @@ public class CommandContextTests
     [Fact]
     public void ICommandContext_Value_IsAccessible ()
     {
-        CommandContext ctx = new () { Command = Command.Accept, Value = 42 };
+        CommandContext ctx = new () { Command = Command.Accept, Values = [42] };
 
         ICommandContext iCtx = ctx;
 
         Assert.Equal (42, iCtx.Value);
+    }
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void CommandContext_Values_Empty_By_Default ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept };
+
+        Assert.Empty (ctx.Values);
+        Assert.Null (ctx.Value);
+    }
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void CommandContext_Values_Chain_Returns_Last_As_Value ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["first", "second", "third"] };
+
+        Assert.Equal ("third", ctx.Value);
+        Assert.Equal (3, ctx.Values.Count);
+        Assert.Equal ("first", ctx.Values [0]);
+        Assert.Equal ("second", ctx.Values [1]);
+        Assert.Equal ("third", ctx.Values [2]);
     }
 
     #endregion

@@ -2111,4 +2111,237 @@ public class ViewCommandTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region Values Chain Tests (Option B)
+
+    /// <summary>
+    ///     A ConsumeDispatch composite that implements <see cref="IValue{T}"/> and updates its own
+    ///     value in <see cref="OnActivated"/>. Replicates the OptionSelector/FlagSelector pattern
+    ///     without depending on those classes.
+    /// </summary>
+    private class CompositeValueView : View, IValue<int?>
+    {
+        public CompositeValueView ()
+        {
+            CommandsToBubbleUp = [Command.Activate];
+        }
+
+        public int? Value { get; set; }
+
+        /// <inheritdoc/>
+        protected override bool ConsumeDispatch => true;
+
+        /// <inheritdoc/>
+        protected override View? GetDispatchTarget (ICommandContext? ctx) => SubViews.FirstOrDefault ();
+
+        /// <inheritdoc/>
+        protected override void OnActivated (ICommandContext? ctx)
+        {
+            base.OnActivated (ctx);
+
+            // Simulate what OptionSelector.ApplyActivation does: update own value after base fires.
+            Value = 42;
+        }
+
+        public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+        private event EventHandler<ValueChangedEventArgs<object?>>? _valueChangedUntyped;
+
+        event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
+        {
+            add => _valueChangedUntyped += value;
+            remove => _valueChangedUntyped -= value;
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     When a ConsumeDispatch composite implements <see cref="IValue"/>, <see cref="ICommandContext.Value"/>
+    ///     delivered to direct <see cref="View.Activated"/> subscribers must be the composite's
+    ///     post-mutation value (appended to <see cref="ICommandContext.Values"/>), not the
+    ///     dispatch target's raw value.
+    /// </summary>
+    [Fact]
+    public void Values_ConsumeDispatch_Composite_Appends_Own_Value ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            ToggleView toggleView = new () { Id = "toggleView" };
+            CompositeValueView composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            object? capturedValue = null;
+            IReadOnlyList<object?>? capturedValues = null;
+
+            composite.Activated += (_, args) =>
+                                   {
+                                       capturedValue = args.Value?.Value;
+                                       capturedValues = args.Value?.Values;
+                                   };
+
+            // Act: programmatic invocation dispatches to the focused ToggleView.
+            composite.InvokeCommand (Command.Activate);
+
+            // Assert: ctx.Value is the composite's int? (42), not CheckState/int from ToggleView.
+            Assert.Equal ((int?)42, capturedValue as int?);
+            Assert.NotNull (capturedValues);
+
+            // The chain should contain the composite's initial value, the dispatch target's
+            // value, and the composite's post-mutation value.
+            Assert.True (capturedValues!.Count >= 2);
+            Assert.Equal ((int?)42, capturedValues [^1] as int?);
+
+            composite.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     When a ConsumeDispatch composite implements <see cref="IValue"/>,
+    ///     ancestors receiving <see cref="View.Activated"/> via <see cref="View.CommandsToBubbleUp"/>
+    ///     must see the composite's post-mutation value in <see cref="ICommandContext.Value"/>.
+    /// </summary>
+    [Fact]
+    public void Values_BubbleActivatedUp_Carries_Composite_Value_To_Ancestor ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            ToggleView toggleView = new () { Id = "toggleView" };
+            CompositeValueView composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            View ancestor = new () { Id = "ancestor" };
+            ancestor.CommandsToBubbleUp = [Command.Activate];
+            ancestor.Add (composite);
+
+            object? ancestorCapturedValue = null;
+
+            ancestor.Activated += (_, args) =>
+                                  {
+                                      ancestorCapturedValue = args.Value?.Value;
+                                  };
+
+            // Act
+            composite.InvokeCommand (Command.Activate);
+
+            // Assert: ancestor sees the composite's value (42), not ToggleView's value.
+            Assert.Equal ((int?)42, ancestorCapturedValue as int?);
+
+            ancestor.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     <see cref="ICommandContext.Values"/> accumulates values as the command propagates.
+    ///     The initial value from the source is the first entry; subsequent composites append.
+    /// </summary>
+    [Fact]
+    public void Values_Chain_Accumulates_From_Source_Through_Composites ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestValueView sourceView = new () { Id = "source", Value = "initial" };
+
+            IReadOnlyList<object?>? capturedValues = null;
+
+            sourceView.Activated += (_, args) =>
+                                    {
+                                        capturedValues = args.Value?.Values;
+                                    };
+
+            // Act: simple activation on an IValue view
+            sourceView.InvokeCommand (Command.Activate);
+
+            // Assert: Values contains the source view's value
+            Assert.NotNull (capturedValues);
+            Assert.Contains ("initial", capturedValues!);
+
+            sourceView.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     When a <see cref="CommandBridge"/> bridges an Activated event,
+    ///     <see cref="ICommandContext.Values"/> is preserved across the bridge,
+    ///     including all accumulated values from the originating chain.
+    /// </summary>
+    [Fact]
+    public void Values_Bridge_Preserves_Full_Chain ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            ToggleView toggleView = new () { Id = "toggleView" };
+            CompositeValueView composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            View host = new () { Id = "host" };
+            using CommandBridge bridge = CommandBridge.Connect (host, composite, Command.Activate);
+
+            IReadOnlyList<object?>? hostCapturedValues = null;
+            object? hostCapturedValue = null;
+
+            host.Activated += (_, args) =>
+                              {
+                                  hostCapturedValues = args.Value?.Values;
+                                  hostCapturedValue = args.Value?.Value;
+                              };
+
+            // Act
+            composite.InvokeCommand (Command.Activate);
+
+            // Assert: Bridge carries the full Values chain, including composite's value
+            Assert.NotNull (hostCapturedValues);
+            Assert.True (hostCapturedValues!.Count >= 2);
+
+            // The last value should be the composite's value (42)
+            Assert.Equal ((int?)42, hostCapturedValue as int?);
+
+            host.Dispose ();
+            composite.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     Non-IValue views do not add to the <see cref="ICommandContext.Values"/> chain.
+    ///     Only views implementing <see cref="IValue"/> contribute values.
+    /// </summary>
+    [Fact]
+    public void Values_NonIValue_View_Has_Empty_Values ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            View plainView = new () { Id = "plainView" };
+
+            IReadOnlyList<object?>? capturedValues = null;
+
+            plainView.Activated += (_, args) =>
+                                   {
+                                       capturedValues = args.Value?.Values;
+                                   };
+
+            plainView.InvokeCommand (Command.Activate);
+
+            // Assert: No values accumulated for non-IValue view
+            Assert.NotNull (capturedValues);
+            Assert.Empty (capturedValues!);
+
+            plainView.Dispose ();
+        }
+    }
+
+    #endregion
 }

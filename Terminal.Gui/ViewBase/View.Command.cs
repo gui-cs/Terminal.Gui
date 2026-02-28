@@ -147,9 +147,9 @@ public partial class View // Command APIs
     public bool? InvokeCommand (Command command, ICommandBinding? binding)
     {
         // Capture value from IValue if this view implements it
-        object? value = this is IValue iValue ? iValue.GetValue () : null;
+        IReadOnlyList<object?> values = this is IValue iValue ? [iValue.GetValue ()] : [];
 
-        return InvokeCommand (command, new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding, Value = value });
+        return InvokeCommand (command, new CommandContext { Command = command, Source = new WeakReference<View> (this), Binding = binding, Values = values });
     }
 
     /// <summary>
@@ -194,7 +194,7 @@ public partial class View // Command APIs
     public bool? InvokeCommand (Command command)
     {
         // Capture value from IValue if this view implements it
-        object? value = this is IValue iValue ? iValue.GetValue () : null;
+        IReadOnlyList<object?> values = this is IValue iValue ? [iValue.GetValue ()] : [];
 
         return InvokeCommand (command,
                               new CommandContext
@@ -204,7 +204,7 @@ public partial class View // Command APIs
 
                                   // By definition, this invocation has no binding
                                   Binding = null,
-                                  Value = value
+                                  Values = values
                               });
     }
 
@@ -498,6 +498,16 @@ public partial class View // Command APIs
 
                 RaiseActivated (ctx);
 
+                // After RaiseActivated, the composite may have updated its own value
+                // (e.g., OptionSelector.ApplyActivation updates Value in OnActivated).
+                // Append the composite's post-mutation value so that ctx.Value reflects
+                // the composite's semantic value, not the dispatch target's raw value.
+                if (this is IValue compositeValue && ctx is CommandContext ccComposite)
+                {
+                    ctx = ccComposite.WithValue (compositeValue.GetValue ());
+                    Trace.Command (this, ctx, "CompositeValue", $"Appended composite value: {compositeValue.GetValue ()}");
+                }
+
                 // ConsumeDispatch consumed the command internally, but ancestors still need
                 // notification. Walk up the SuperView chain and fire RaiseActivated on each
                 // ancestor that subscribes to this command via CommandsToBubbleUp.
@@ -649,7 +659,7 @@ public partial class View // Command APIs
             {
                 if (!compositeOnly || next.GetDispatchTarget (ctx) is { })
                 {
-                    CommandContext upCtx = new (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+                    CommandContext upCtx = new (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
                     // Re-read the value from the ancestor's dispatch target, but only when
                     // the dispatch target is the same view as the command source (i.e., the
@@ -761,6 +771,20 @@ public partial class View // Command APIs
         Trace.Command (this, ctx, "Event");
 
         OnActivated (ctx);
+
+        // After OnActivated, a ConsumeDispatch composite that just consumed a dispatch may have
+        // updated its own value (e.g., OptionSelector.ApplyActivation updates Value in OnActivated).
+        // Append its post-mutation value so that direct Activated subscribers see the composite's
+        // semantic value, not the dispatch target's raw value.
+        // Guard: only when DispatchOccurred is set — this means DefaultActivateHandler's
+        // ConsumeDispatch branch initiated RaiseActivated (not BubbleActivatedUp or other paths).
+        if (_dispatchState.HasFlag (DispatchState.DispatchOccurred)
+            && this is IValue selfValue
+            && ctx is CommandContext cc)
+        {
+            ctx = cc.WithValue (selfValue.GetValue ());
+        }
+
         Activated?.Invoke (this, new EventArgs<ICommandContext?> (ctx));
     }
 
@@ -1181,7 +1205,7 @@ public partial class View // Command APIs
                         return false;
                     }
 
-                    upCtx = new CommandContext (Command.Accept, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+                    upCtx = new CommandContext (Command.Accept, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
                     // DefaultAcceptView redirect is a special case — it IS a consumption (not just a notification)
                     return SuperView?.InvokeCommand (Command.Accept, upCtx) is true;
@@ -1199,7 +1223,7 @@ public partial class View // Command APIs
             ICommandContext? refreshed = RefreshValue (ctx);
 
             Trace.Command (this, refreshed, "Routing", $"BubblingUp to {SuperView.ToIdentifyingString ()}");
-            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding) { Routing = CommandRouting.BubblingUp, Value = refreshed.Value };
+            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding) { Routing = CommandRouting.BubblingUp, Values = refreshed.Values };
 
             return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }
@@ -1208,7 +1232,7 @@ public partial class View // Command APIs
         {
             // Check if Padding's Parent wants this command bubbled up to it
             Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Parent.ToIdentifyingString ()}");
-            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
             return padding.Parent.InvokeCommand (ctx.Command, upCtx);
         }
@@ -1220,7 +1244,7 @@ public partial class View // Command APIs
 
         // Handle when THIS view is a Padding
         Trace.Command (this, ctx, "Routing", $"BubblingUp from Padding to {selfPadding.Parent.ToIdentifyingString ()}");
-        upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Value = ctx.Value };
+        upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
         return selfPadding.Parent.InvokeCommand (ctx.Command, upCtx);
     }
