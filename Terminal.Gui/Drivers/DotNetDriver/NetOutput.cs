@@ -39,7 +39,12 @@ public class NetOutput : OutputBase, IOutput
         {
             Size size = new (Console.WindowWidth, Console.WindowHeight);
 
-            return size.IsEmpty ? new (80, 25) : size;
+            if (Console.IsInputRedirected || Console.IsOutputRedirected)
+            {
+                return new Size (80, 25);
+            }
+
+            return size.IsEmpty ? new Size (80, 25) : size;
         }
         catch (IOException)
         {
