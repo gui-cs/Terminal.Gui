@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Abstract base class for popover views in Terminal.Gui. Implements <see cref="IPopover"/>.
+///     Abstract base class for popover views in Terminal.Gui. Implements <see cref="IPopoverView"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -41,10 +41,10 @@ namespace Terminal.Gui.App;
 ///         set <see cref="View.Visible"/> to <see langword="false"/> to hide.
 ///     </para>
 /// </remarks>
-public abstract class PopoverBaseImpl : View, IPopover
+public abstract class PopoverImpl : View, IPopoverView
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="PopoverBaseImpl"/> class.
+    ///     Initializes a new instance of the <see cref="PopoverImpl"/> class.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -66,10 +66,10 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///         </item>
     ///     </list>
     /// </remarks>
-    protected PopoverBaseImpl ()
+    protected PopoverImpl ()
     {
 #if DEBUG
-        Id = "popoverBaseImpl";
+        Id = "popoverImpl";
 #endif
         CanFocus = true;
         Width = Dim.Fill ();
@@ -144,6 +144,46 @@ public abstract class PopoverBaseImpl : View, IPopover
     }
 
     /// <summary>
+    ///     Gets or sets the anchor positioning function. When the popover is shown, this function
+    ///     is called to determine the anchor rectangle for positioning.
+    /// </summary>
+    public Func<Rectangle?>? Anchor { get; set; }
+
+    /// <summary>
+    ///     Makes the popover visible. Base implementation performs layout and delegates to <see cref="ApplicationPopover.Show"/>.
+    ///     Derived classes typically override to add positioning logic before calling base.
+    /// </summary>
+    /// <param name="idealScreenPosition">
+    ///     The ideal screen position for the popover. If <see langword="null"/>, uses the current mouse position.
+    /// </param>
+    /// <param name="anchor">
+    ///     The anchor rectangle to position relative to. If <see langword="null"/>, uses the <see cref="Anchor"/> property.
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         Base implementation:
+    ///     </para>
+    ///     <list type="number">
+    ///         <item>Returns if already <see cref="View.Visible"/></item>
+    ///         <item>Calls <see cref="View.Layout()"/></item>
+    ///         <item>Calls <see cref="ApplicationPopover.Show"/> to make visible</item>
+    ///     </list>
+    ///     <para>
+    ///         Derived classes should override to insert positioning logic between steps 2 and 3.
+    ///     </para>
+    /// </remarks>
+    public virtual void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
+    {
+        if (Visible)
+        {
+            return;
+        }
+
+        Layout ();
+        App!.Popovers?.Show (this);
+    }
+
+    /// <summary>
     ///     Attempts to retrieve the <see cref="Target"/> view. Returns <see langword="false"/> if the target has been
     ///     collected or was never set.
     /// </summary>
@@ -206,6 +246,21 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
 
         return ret;
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="View.Visible"/> property has changed. Hides the popover via <see cref="ApplicationPopover"/>
+    ///     when becoming invisible.
+    /// </summary>
+    protected override void OnVisibleChanged ()
+    {
+        base.OnVisibleChanged ();
+
+        // When becoming invisible, notify ApplicationPopover
+        if (!Visible)
+        {
+            App?.Popovers?.Hide (this);
+        }
     }
 
     /// <summary>

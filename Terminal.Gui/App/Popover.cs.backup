@@ -32,6 +32,7 @@ namespace Terminal.Gui.App;
 ///     <list type="bullet">
 ///         <item>Generic content view hosting with automatic initialization</item>
 ///         <item>Result extraction via <see cref="ResultExtractor"/> or <see cref="IValue{TResult}"/></item>
+///         <item>CWP-based <see cref="IsOpen"/> property synchronized with <see cref="View.Visible"/></item>
 ///         <item>Anchor-based positioning via <see cref="Anchor"/> function</item>
 ///         <item>Target view weak reference for command bubbling</item>
 ///         <item>Automatic command bridging from content view</item>
@@ -49,9 +50,10 @@ namespace Terminal.Gui.App;
 ///         popover.MakeVisible ();
 ///     </code>
 /// </remarks>
-public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : View, new ()
+public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView : View, new ()
 {
     private CommandBridge? _contentCommandBridge;
+    private bool _isOpen;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Popover{TView, TResult}"/> class.
@@ -133,6 +135,69 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether the popover is open (visible).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is synchronized with <see cref="View.Visible"/>. Setting <c>IsOpen = true</c>
+    ///         calls <see cref="MakeVisible"/> to show the popover. Setting <c>IsOpen = false</c> sets
+    ///         <see cref="View.Visible"/> to <see langword="false"/>.
+    ///     </para>
+    ///     <para>
+    ///         The change can be cancelled via the <see cref="IsOpenChanging"/> event.
+    ///     </para>
+    /// </remarks>
+    public bool IsOpen
+    {
+        get => _isOpen;
+        set =>
+            CWPPropertyHelper.ChangeProperty (this,
+                                              ref _isOpen,
+                                              value,
+                                              OnIsOpenChanging,
+                                              IsOpenChanging,
+                                              newValue =>
+                                              {
+                                                  switch (newValue)
+                                                  {
+                                                      // Synchronize with Visible
+                                                      case true when !Visible: MakeVisible (); break;
+
+                                                      case false when Visible: Visible = false; break;
+                                                  }
+                                              },
+                                              OnIsOpenChanged,
+                                              IsOpenChanged,
+                                              out _);
+    }
+
+    /// <summary>
+    ///     Raised when <see cref="IsOpen"/> is about to change.
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<bool>>? IsOpenChanging;
+
+    /// <summary>
+    ///     Raised when <see cref="IsOpen"/> has changed.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<bool>>? IsOpenChanged;
+
+    /// <summary>
+    ///     Gets or sets a function that computes the anchor rectangle for positioning the popover.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The anchor rectangle defines the area relative to which the popover should be positioned.
+    ///         If <see langword="null"/>, the popover will be positioned at the mouse cursor or a default location.
+    ///     </para>
+    ///     <para>
+    ///         The function is called by <see cref="MakeVisible"/> to determine the ideal position.
+    ///         Returning <see langword="null"/> from the function uses default positioning logic.
+    ///     </para>
+    /// </remarks>
+    public Func<Rectangle?>? Anchor { get; set; }
+
+    /// <summary>
     ///     Gets or sets the function that extracts the result from the content view.
     /// </summary>
     /// <remarks>
@@ -181,15 +246,15 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     public event EventHandler<ValueChangedEventArgs<TResult?>>? ResultChanged;
 
     /// <summary>
-    ///     Makes the popover visible and positions it based on <see cref="PopoverImpl.Anchor"/> or <paramref name="idealScreenPosition"/>.
+    ///     Makes the popover visible and positions it based on <see cref="Anchor"/> or <paramref name="idealScreenPosition"/>.
     /// </summary>
     /// <param name="idealScreenPosition">
     ///     The ideal screen-relative position for the popover. If <see langword="null"/>, positioning is determined
-    ///     by <see cref="PopoverImpl.Anchor"/> or the current mouse position.
+    ///     by <see cref="Anchor"/> or the current mouse position.
     /// </param>
     /// <param name="anchor">
-    ///     Optional anchor rectangle to override <see cref="PopoverImpl.Anchor"/> property for this call.
-    ///     If <see langword="null"/>, uses the <see cref="PopoverImpl.Anchor"/> property.
+    ///     Optional anchor rectangle to override <see cref="Anchor"/> property for this call.
+    ///     If <see langword="null"/>, uses the <see cref="Anchor"/> property.
     /// </param>
     /// <remarks>
     ///     <para>
@@ -205,7 +270,7 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     ///     </para>
     /// </remarks>
     /// <exception cref="InvalidOperationException">Thrown if the popover has not been registered.</exception>
-    public override void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
+    public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         if (Visible)
         {
@@ -285,29 +350,46 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     When becoming visible, the content view is shown.
-    ///     When becoming hidden, the content view is hidden and <see cref="Result"/> is extracted.
+    ///     When becoming visible, the content view is shown and <see cref="IsOpen"/> is set to <see langword="true"/>.
+    ///     When becoming hidden, the content view is hidden, <see cref="Result"/> is extracted, and <see cref="IsOpen"/>
+    ///     is set to <see langword="false"/>.
     /// </remarks>
     protected override void OnVisibleChanged ()
     {
+        base.OnVisibleChanged ();
+
         if (Visible)
         {
-            if (ContentView is { })
+            ContentView?.Visible = true;
+
+            // Update IsOpen without triggering doWork (to avoid recursion)
+            if (_isOpen)
             {
-                ContentView.Visible = true;
+                return;
             }
+            _isOpen = true;
+            OnIsOpenChanged (new ValueChangedEventArgs<bool> (false, true));
+            IsOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (false, true));
         }
         else
         {
-            if (ContentView is { })
-            {
-                ContentView.Visible = false;
-            }
+            ContentView?.Visible = false;
 
+            // Extract result before updating IsOpen
             ExtractResult ();
-        }
 
-        base.OnVisibleChanged (); // PopoverImpl handles Hide
+            // Specific to Popover
+            App?.Popovers?.Hide (this);
+
+            // Update IsOpen without triggering doWork (to avoid recursion)
+            if (!_isOpen)
+            {
+                return;
+            }
+            _isOpen = false;
+            OnIsOpenChanged (new ValueChangedEventArgs<bool> (true, false));
+            IsOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (true, false));
+        }
     }
 
     /// <summary>
@@ -329,6 +411,19 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
             Result = iValue.Value;
         }
     }
+
+    /// <summary>
+    ///     Called when <see cref="IsOpen"/> is about to change. Override to customize behavior.
+    /// </summary>
+    /// <param name="args">The event arguments containing current and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise, <see langword="false"/>.</returns>
+    protected virtual bool OnIsOpenChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>
+    ///     Called when <see cref="IsOpen"/> has changed. Override to perform custom actions.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnIsOpenChanged (ValueChangedEventArgs<bool> args) { }
 
     /// <summary>
     ///     Called when the ContentView becomes invisible, to hide the Popover.
