@@ -9,7 +9,7 @@ public class ApplicationPopoverTests
     public void Register_AddsPopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
 
         // Act
@@ -23,7 +23,7 @@ public class ApplicationPopoverTests
     public void DeRegister_RemovesPopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
         popoverManager.Register (popover);
 
@@ -54,7 +54,7 @@ public class ApplicationPopoverTests
     public void Hide_ClearsActivePopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
         popoverManager.Register (popover);
         popoverManager.Show (popover);
@@ -225,7 +225,7 @@ public class ApplicationPopoverTests
         Assert.Equal (initialVisibleState, popover2.Visible);
     }
 
-    public class PopoverTestClass : View, IPopover
+    public class PopoverTestClass : View, IPopoverView
     {
         public List<Key> HandledKeys { get; } = [];
         public int NewCommandInvokeCount { get; private set; }
@@ -283,5 +283,17 @@ public class ApplicationPopoverTests
 
         /// <inheritdoc/>
         public IRunnable? Owner { get; set; }
+
+        /// <inheritdoc/>
+        public Func<Rectangle?>? Anchor { get; set; }
+
+        /// <inheritdoc/>
+        public WeakReference<View>? Target { get; set; }
+
+        /// <inheritdoc/>
+        public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
+        {
+            Visible = true;
+        }
     }
 }
