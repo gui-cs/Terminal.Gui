@@ -15,7 +15,7 @@ public class Popovers : Scenario
     private ListView? _popoverListView;
     private EventLog? _eventLog;
     private readonly ObservableCollection<string> _registeredPopovers = [];
-    private readonly Dictionary<string, IPopover> _popoverInstances = [];
+    private readonly Dictionary<string, IPopoverView> _popoverInstances = [];
 
     public override void Main ()
     {
@@ -115,7 +115,7 @@ public class Popovers : Scenario
 
         string popoverKey = _registeredPopovers [selectedIndex];
 
-        if (!_popoverInstances.TryGetValue (popoverKey, out IPopover? popover))
+        if (!_popoverInstances.TryGetValue (popoverKey, out IPopoverView? popover))
         {
             return;
         }
@@ -124,8 +124,11 @@ public class Popovers : Scenario
 
         try
         {
-                
-
+            // Show the popover centered
+            Rectangle screen = _app!.Screen;
+            Point center = new (screen.Width / 2, screen.Height / 2);
+            popover.MakeVisible (center);
+            _eventLog?.Log ($"Showed popover: {popoverKey}");
         }
         catch (Exception ex)
         {
@@ -146,7 +149,7 @@ public class Popovers : Scenario
             Type popoverType = typeof (Popover<,>).MakeGenericType (contentView.GetType (), resultType);
             object? popoverObj = Activator.CreateInstance (popoverType, contentView);
 
-            if (popoverObj is not IPopover popover)
+            if (popoverObj is not IPopoverView popover)
             {
                 _eventLog?.Log ($"Failed to create popover for {viewTypeName}");
 
