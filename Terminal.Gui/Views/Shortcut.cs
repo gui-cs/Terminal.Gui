@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>

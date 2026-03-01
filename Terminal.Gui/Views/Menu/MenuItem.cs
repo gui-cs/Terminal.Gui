@@ -98,14 +98,10 @@ public class MenuItem : Shortcut, IValue
     }
 
     /// <inheritdoc/>
-    public object? GetValue () => Title;
+    public object GetValue () => Title;
 
     /// <inheritdoc/>
-    event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
-    {
-        add { }
-        remove { }
-    }
+    event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped { add { } remove { } }
 
     /// <inheritdoc/>
     protected override bool OnMouseEnter (CancelEventArgs eventArgs)
