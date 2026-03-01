@@ -122,7 +122,7 @@ public sealed class ApplicationPopover : IDisposable
         {
             return popover;
         }
-        popover.Owner ??= App?.TopRunnableView as IRunnable;
+        popover.Owner ??= App?.TopRunnable;
 
         if (popover is View popoverView)
         {
