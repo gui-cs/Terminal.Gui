@@ -180,7 +180,7 @@ public class Popovers : Scenario
 
     private void OnPopoverIsOpenChanged (object? sender, ValueChangedEventArgs<bool> e)
     {
-        _eventLog?.Log($"{typeName}: IsOpen changed from {e.OldValue} to {e.NewValue}");
+       // _eventLog?.Log($"{typeName}: IsOpen changed from {e.OldValue} to {e.NewValue}");
     }
 
     private Type? GetIValueResultType (View view)
