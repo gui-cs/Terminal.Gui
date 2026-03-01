@@ -25,6 +25,11 @@ public sealed class LoggingBackend : ITraceBackend
             message += $" - {entry.Message}";
         }
 
+        if (entry.Data is not null)
+        {
+            message += $" - {entry.Data}";
+        }
+
         // ReSharper disable once ExplicitCallerInfoArgument
         Logging.Trace (message, entry.Method, $"{entry.Category}:{entry.Phase}");
     }
