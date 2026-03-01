@@ -983,7 +983,7 @@ public class OptionSelectorTests
         CheckBox option2 = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
         option2.SetFocus ();
 
-        object? capturedValue = null;
+        object capturedValue = null;
         int activatedCount = 0;
 
         optionSelector.Activated += (_, args) =>
@@ -1045,7 +1045,7 @@ public class OptionSelectorTests
         option2.HasFocus = true;
         Assert.True (option2.HasFocus);
 
-        object? capturedValue = null;
+        object capturedValue = null;
         int ancestorActivatedCount = 0;
 
         ancestor.Activated += (_, args) =>

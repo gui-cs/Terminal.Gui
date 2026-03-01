@@ -245,7 +245,7 @@ public class PopoverTests
         Button target = new ();
 
         // Act
-        popover.Target = new WeakReference<View?> (target);
+        popover.Target = new WeakReference<View> (target);
 
         // Assert
         Assert.NotNull (popover.Target);

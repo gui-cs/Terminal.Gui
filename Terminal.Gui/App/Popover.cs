@@ -136,20 +136,6 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets a weak reference to the target view that initiated this popover.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This property enables command bubbling from the popover back to the originating view.
-    ///         The weak reference ensures the popover doesn't prevent garbage collection of the target.
-    ///     </para>
-    ///     <para>
-    ///         Typically set by the view that creates and shows the popover (e.g., a ComboBox or context menu trigger).
-    ///     </para>
-    /// </remarks>
-    public WeakReference<View?>? Target { get; set; }
-
-    /// <summary>
     ///     Gets or sets a value indicating whether the popover is open (visible).
     /// </summary>
     /// <remarks>
