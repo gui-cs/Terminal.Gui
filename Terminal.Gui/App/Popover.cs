@@ -1,3 +1,4 @@
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -55,6 +56,8 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     private TView? _contentView;
     private bool _isOpen;
     private TResult? _result;
+    private CommandBridge? _targetCommandBridge;
+    private WeakReference<View?>? _target;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Popover{TView, TResult}"/> class.
@@ -132,6 +135,54 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
             // Bridge Activate from ContentView → Popover across the non-containment boundary.
             _contentCommandBridge?.Dispose ();
             _contentCommandBridge = CommandBridge.Connect (this, _contentView, Command.Activate);
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets a weak reference to the target view that initiated this popover.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When set, creates a <see cref="CommandBridge"/> from the popover to the target view for
+    ///         <see cref="Command.Activate"/>, and subscribes to the target's <see cref="View.HasFocusChanged"/>
+    ///         to auto-close the popover when the target loses focus.
+    ///     </para>
+    ///     <para>
+    ///         The weak reference ensures the popover doesn't prevent garbage collection of the target.
+    ///     </para>
+    ///     <para>
+    ///         Typically set by the view that creates and shows the popover (e.g., a MenuBarItem or ComboBox).
+    ///     </para>
+    /// </remarks>
+    public WeakReference<View?>? Target
+    {
+        get => _target;
+        set
+        {
+            if (_target == value)
+            {
+                return;
+            }
+
+            // Unsubscribe from old target
+            if (_target?.TryGetTarget (out View? oldTarget) == true && oldTarget is { })
+            {
+                Trace.Command (this, "TargetCleanup", $"Old={oldTarget.ToIdentifyingString ()}");
+                oldTarget.HasFocusChanged -= OnTargetHasFocusChanged;
+            }
+
+            _targetCommandBridge?.Dispose ();
+            _targetCommandBridge = null;
+
+            _target = value;
+
+            // Subscribe to new target
+            if (_target?.TryGetTarget (out View? newTarget) == true && newTarget is { })
+            {
+                Trace.Command (this, "TargetSet", $"New={newTarget.ToIdentifyingString ()}");
+                newTarget.HasFocusChanged += OnTargetHasFocusChanged;
+                _targetCommandBridge = CommandBridge.Connect (newTarget, this, Command.Activate);
+            }
         }
     }
 
@@ -267,23 +318,30 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     /// </param>
     /// <remarks>
     ///     <para>
-    ///         IMPORTANT: The popover must be registered with <see cref="Application.Popover"/> before calling this
-    ///         method. Call <see cref="ApplicationPopover.Register"/> first.
-    ///     </para>
-    ///     <para>
-    ///         This method internally calls <see cref="ApplicationPopover.Show"/>, which will throw
-    ///         <see cref="InvalidOperationException"/> if the popover is not registered.
+    ///         If the popover has not been registered with <see cref="Application.Popover"/>, this method
+    ///         will auto-register it before showing.
     ///     </para>
     ///     <para>
     ///         The actual position may be adjusted to ensure the popover fits fully on screen.
     ///     </para>
     /// </remarks>
-    /// <exception cref="InvalidOperationException">Thrown if the popover has not been registered.</exception>
-    public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
+    public virtual void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         if (Visible)
         {
             return;
+        }
+
+        // Inherit App from Target if not already set
+        if (App is null && Target?.TryGetTarget (out View? targetView) == true && targetView?.App is { } targetApp)
+        {
+            App = targetApp;
+        }
+
+        // Auto-register if needed
+        if (App is { Popovers: { } popovers } && !popovers.IsRegistered (this))
+        {
+            popovers.Register (this);
         }
 
         // Ensure the Popover is sized correctly in case this is the first time we are being made visible
@@ -291,7 +349,7 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
 
         SetPosition (idealScreenPosition, anchor);
 
-        App!.Popovers?.Show (this);
+        App?.Popovers?.Show (this);
     }
 
     /// <summary>
@@ -308,7 +366,7 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     ///     This method only sets the position; it does not make the popover visible. Use <see cref="MakeVisible"/> to
     ///     both position and show the popover.
     /// </remarks>
-    public void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
+    public virtual void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         // Try anchor parameter, then Anchor property, then mouse position
         Rectangle? effectiveAnchor = anchor ?? Anchor?.Invoke ();
@@ -438,6 +496,17 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
     protected virtual void OnIsOpenChanged (ValueChangedEventArgs<bool> args) { }
 
     /// <summary>
+    ///     Called when the target view's focus state changes. Auto-closes the popover when target loses focus.
+    /// </summary>
+    private void OnTargetHasFocusChanged (object? sender, EventArgs e)
+    {
+        if (sender is View { HasFocus: false })
+        {
+            IsOpen = false;
+        }
+    }
+
+    /// <summary>
     ///     Called when the ContentView becomes invisible, to hide the Popover.
     /// </summary>
     private void ContentViewOnVisibleChanged (object? sender, EventArgs e)
@@ -482,6 +551,16 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
             {
                 contentView.VisibleChanged -= ContentViewOnVisibleChanged;
             }
+
+            // Clean up Target subscriptions and bridge
+            if (_target?.TryGetTarget (out View? targetView) == true && targetView is { })
+            {
+                targetView.HasFocusChanged -= OnTargetHasFocusChanged;
+            }
+
+            _targetCommandBridge?.Dispose ();
+            _targetCommandBridge = null;
+            _target = null;
 
             _contentCommandBridge?.Dispose ();
             _contentCommandBridge = null;

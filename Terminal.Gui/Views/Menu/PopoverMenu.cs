@@ -287,16 +287,24 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     ///     the first <see cref="MenuItem"/> (if possible).
     /// </summary>
     /// <param name="idealScreenPosition">
-    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
-    ///     used.
+    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, uses <paramref name="anchor"/>,
+    ///     <see cref="Popover{TView, TResult}.Anchor"/> property, or the current mouse position.
     /// </param>
-    /// <param name="anchor">Anchor rectangle (not used by PopoverMenu, which uses menu-specific positioning).</param>
+    /// <param name="anchor">Optional anchor rectangle. If <see langword="null"/>, uses the <see cref="Popover{TView, TResult}.Anchor"/> property.</param>
     /// <remarks>
     ///     This method only sets the position; it does not make the popover visible. Use <see cref="Popover{TView, TResult}.MakeVisible"/> to
     ///     both position and show the popover.
     /// </remarks>
-    public new void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
+    public override void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
+        // Try anchor parameter, then Anchor property, then mouse position
+        Rectangle? effectiveAnchor = anchor ?? Anchor?.Invoke ();
+
+        if (effectiveAnchor is { } && idealScreenPosition is null)
+        {
+            idealScreenPosition = new Point (effectiveAnchor.Value.X, effectiveAnchor.Value.Y + effectiveAnchor.Value.Height);
+        }
+
         idealScreenPosition ??= App?.Mouse.LastMousePosition;
 
         if (idealScreenPosition is null || Root is null)
@@ -328,10 +336,9 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     {
         Trace.Command (this, "Entry", $"Visible={Visible}");
 
-        // IMPORTANT: ShowMenu/HideMenu must run BEFORE base.OnVisibleChanged because
-        // Popover<TView, TResult>.OnVisibleChanged sets ContentView.Visible which would
-        // cause ShowMenu/HideMenu to exit early (they check Visible as a guard).
-        // ShowMenu also sets Enabled = true, which is required for focus.
+        // IMPORTANT: ShowMenu/HideMenu MUST be called BEFORE base.OnVisibleChanged()
+        // because the base Popover class sets ContentView.Visible, and ShowMenu
+        // needs to run before that to properly initialize focus.
         if (Visible)
         {
             Root?.ShowMenu ();
