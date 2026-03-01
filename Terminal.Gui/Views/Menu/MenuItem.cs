@@ -103,8 +103,37 @@ public class MenuItem : Shortcut, IValue
     /// <inheritdoc/>
     event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
     {
-        add { }
-        remove { }
+        add
+        {
+            // Forward Title changes to ValueChangedUntyped
+            if (value is { })
+            {
+                TitleChanged += OnTitleChangedForValueChanged;
+                _valueChangedUntypedHandlers += value;
+            }
+        }
+        remove
+        {
+            if (value is { })
+            {
+                _valueChangedUntypedHandlers -= value;
+
+                if (_valueChangedUntypedHandlers is null)
+                {
+                    TitleChanged -= OnTitleChangedForValueChanged;
+                }
+            }
+        }
+    }
+
+    private EventHandler<ValueChangedEventArgs<object?>>? _valueChangedUntypedHandlers;
+    private string? _lastTitle;
+
+    private void OnTitleChangedForValueChanged (object? sender, EventArgs<string> e)
+    {
+        string? oldTitle = _lastTitle;
+        _lastTitle = e.Value;
+        _valueChangedUntypedHandlers?.Invoke (this, new ValueChangedEventArgs<object?> (oldTitle, e.Value));
     }
 
     /// <inheritdoc/>

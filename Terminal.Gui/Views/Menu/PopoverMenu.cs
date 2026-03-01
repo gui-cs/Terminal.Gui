@@ -339,9 +339,6 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
         else
         {
             Root?.HideMenu ();
-
-            // Specific to PopoverMenu
-            App?.Popovers?.Hide (this);
         }
 
         base.OnVisibleChanged ();
@@ -370,7 +367,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
                 return;
             }
 
-            // Unsubscribe from old Root's events
+            // Unsubscribe from old Root's events and remove/dispose submenus
             if (ContentView is { } oldRoot)
             {
                 oldRoot.HideMenu ();
@@ -381,6 +378,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
                 foreach (Menu menu in oldMenus)
                 {
                     menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
+                    Remove (menu);
+                    menu.Dispose ();
                 }
             }
 
