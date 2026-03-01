@@ -37,19 +37,18 @@ public class NetOutput : OutputBase, IOutput
     {
         try
         {
-            Size size = new (Console.WindowWidth, Console.WindowHeight);
-
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
             {
                 return new Size (80, 25);
             }
+            Size size = new (Console.WindowWidth, Console.WindowHeight);
 
             return size.IsEmpty ? new Size (80, 25) : size;
         }
         catch (IOException)
         {
             // Not connected to a terminal; return a default size
-            return new (80, 25);
+            return new Size (80, 25);
         }
     }
 
