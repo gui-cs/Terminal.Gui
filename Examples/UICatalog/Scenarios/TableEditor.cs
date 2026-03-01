@@ -253,7 +253,7 @@ public class TableEditor : Scenario
 
         appWindow.Add (_tableView);
 
-        _tableView!.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{_tableView!.SelectedRow},{_tableView!.SelectedColumn}"; };
+        _tableView!.SelectedCellChanged += (_, _) => { selectedCellLabel.Text = $"{_tableView!.SelectedRow},{_tableView!.SelectedColumn}"; };
         _tableView!.CellActivated += EditCurrentCell;
         _tableView!.KeyDown += TableViewKeyPress;
 
@@ -284,7 +284,7 @@ public class TableEditor : Scenario
         };
 
         // if user clicks the mouse in TableView
-        _tableView!.Activating += (s, e) =>
+        _tableView!.Activating += (_, e) =>
                                   {
                                       if (_currentTable == null)
                                       {
@@ -299,18 +299,20 @@ public class TableEditor : Scenario
 
                                       _tableView!.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                      if (clickedCol != null)
+                                      if (clickedCol == null)
                                       {
-                                          if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
-                                          {
-                                              // left click in a header
-                                              SortColumn (clickedCol.Value);
-                                          }
-                                          else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
-                                          {
-                                              // right click in a header
-                                              ShowHeaderContextMenu (clickedCol.Value, mouse);
-                                          }
+                                          return;
+                                      }
+
+                                      if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                      {
+                                          // left click in a header
+                                          SortColumn (clickedCol.Value);
+                                      }
+                                      else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
+                                      {
+                                          // right click in a header
+                                          ShowHeaderContextMenu (clickedCol.Value, mouse);
                                       }
                                   };
 
@@ -324,29 +326,6 @@ public class TableEditor : Scenario
     {
         // Store checkbox references for the toggle methods to access
         Dictionary<string, CheckBox> checkboxes = new ();
-
-        MenuItem CreateCheckBoxMenuItem (string key, string title, bool initialState, Action<bool> onToggle)
-        {
-            CheckBox checkBox = new ()
-            {
-                Title = title,
-                Value = initialState ? CheckState.Checked : CheckState.UnChecked
-            };
-
-            checkBox.ValueChanged += (s, e) => onToggle (checkBox.Value == CheckState.Checked);
-
-            MenuItem item = new () { CommandView = checkBox };
-
-            item.Accepting += (s, e) =>
-                              {
-                                  checkBox.AdvanceCheckState ();
-                                  e.Handled = true;
-                              };
-
-            checkboxes [key] = checkBox;
-
-            return item;
-        }
 
         MenuBarItem viewMenuBarItem = new MenuBarItem ("_View",
                                                        [
@@ -446,30 +425,53 @@ public class TableEditor : Scenario
                                                                                        _tableView!.Style.SmoothHorizontalScrolling = state;
                                                                                        _tableView!.Update ();
                                                                                    }),
-                                                           CreateCheckBoxMenuItem ("ScrollBarsAuto",
-                                                                                   "_ScrollBarsAuto",
-                                                                                   _tableView!.ViewportSettings.HasFlag(ViewportSettingsFlags.HasScrollBars),
-                                                                                   state =>
-                                                                                   {
-                                                                                       if (state)
-                                                                                       {
-                                                                                           _tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
-                                                                                       }
-                                                                                       else
-                                                                                       {
-                                                                                           _tableView.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
-                                                                                       }
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("ScrollBarsVisible",
-                                                                                   "_ScrollBarsVisible",
-                                                                                   _tableView!.HorizontalScrollBar.Visible || _tableView.VerticalScrollBar.Visible,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.HorizontalScrollBar.Visible = state;
-                                                                                       _tableView!.VerticalScrollBar.Visible = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
+                                                           new Line (),
+                                                           CreateOptionSelectorMenuItem ("_ScrollBarVisibilityMode",
+                                                                                         ScrollBarVisibilityMode.None,
+                                                                                         state =>
+                                                                                         {
+                                                                                             switch (state)
+                                                                                             {
+                                                                                                 case ScrollBarVisibilityMode.Auto:
+                                                                                                 case ScrollBarVisibilityMode.Always:
+
+                                                                                                     if (!_tableView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars))
+                                                                                                     {
+                                                                                                         _tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+                                                                                                     }
+                                                                                                     break;
+                                                                                                 case ScrollBarVisibilityMode.Manual:
+                                                                                                 case ScrollBarVisibilityMode.None:
+
+                                                                                                     if (_tableView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars))
+                                                                                                     {
+                                                                                                         _tableView.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
+                                                                                                     }
+                                                                                                     break;
+                                                                                             }
+
+                                                                                             switch (state)
+                                                                                             {
+                                                                                                 case ScrollBarVisibilityMode.Manual:
+                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
+                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
+                                                                                                     break;
+                                                                                                 case ScrollBarVisibilityMode.Auto:
+                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
+                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
+                                                                                                     break;
+                                                                                                 case ScrollBarVisibilityMode.Always:
+                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Always;
+                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Always;
+                                                                                                     break;
+                                                                                                 case ScrollBarVisibilityMode.None:
+                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
+                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
+                                                                                                     break;
+                                                                                             }
+                                                                                             _tableView!.Update ();
+                                                                                         }),
+                                                           new Line (),
                                                            CreateCheckBoxMenuItem ("UseAllRowsForContentCalculation",
                                                                                    "_UseAllRowsForContentCalculation",
                                                                                    _tableView!.UseAllRowsForContentCalculation,
@@ -556,7 +558,7 @@ public class TableEditor : Scenario
                                                                                    {
                                                                                        if (state)
                                                                                        {
-                                                                                           _tableView!.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingScheme : null; };
+                                                                                           _tableView!.Style.RowColorGetter = a => a.RowIndex % 2 == 0 ? _alternatingScheme : null;
                                                                                        }
                                                                                        else
                                                                                        {
@@ -576,14 +578,53 @@ public class TableEditor : Scenario
                                                            new MenuItem { Title = "_ClearColumnStyles", Action = ClearColumnStyles },
                                                            new MenuItem { Title = "Sho_w All Columns", Action = ShowAllColumns }
                                                        ]);
-        viewMenuBarItem.PopoverMenuOpenChanged += (sender, args) =>
-                                                  {
-                                                      checkboxes ["ScrollBarsVisible"].Value = _tableView!.HorizontalScrollBar.Visible || _tableView!.VerticalScrollBar.Visible
-                                                                              ? CheckState.Checked
-                                                                              : CheckState.UnChecked;
-                                                  } ;
 
         return viewMenuBarItem;
+
+        MenuItem CreateCheckBoxMenuItem (string key, string title, bool initialState, Action<bool> onToggle)
+        {
+            CheckBox checkBox = new ()
+            {
+                Title = title,
+                Value = initialState ? CheckState.Checked : CheckState.UnChecked
+            };
+
+            checkBox.ValueChanged += (_, _) => onToggle (checkBox.Value == CheckState.Checked);
+
+            MenuItem item = new () { CommandView = checkBox };
+
+            item.Accepting += (_, e) =>
+                              {
+                                  checkBox.AdvanceCheckState ();
+                                  e.Handled = true;
+                              };
+
+            checkboxes [key] = checkBox;
+
+            return item;
+        }
+
+        MenuItem CreateOptionSelectorMenuItem<T> (string title, T initialState, Action<T> onActivate) where T : struct, Enum
+        {
+            OptionSelector<T> optionSelector = new ()
+            {
+                Title = title,
+                Labels = Enum.GetValues<T> ().Select (v => v.ToString ()).ToArray (),
+                Value = initialState
+            };
+
+            optionSelector.ValueChanged += (_, e) => onActivate (e.Value!.Value);
+
+            MenuItem item = new () { CommandView = optionSelector, HelpText = title };
+
+            item.Accepting += (s, e) =>
+                              {
+                                  (s as View)?.App?.Mouse.UngrabMouse ();
+                                  e.Handled = true;
+                              };
+
+            return item;
+        }
     }
 
     protected override void Dispose (bool disposing)
@@ -643,14 +684,7 @@ public class TableEditor : Scenario
         return dt;
     }
 
-    private string RuneToString (object o)
-    {
-        if(Rune.TryCreate((uint)o, out var rune))
-        {
-            return rune.ToString();
-        }
-        return " ";
-    }
+    private string RuneToString (object o) => Rune.TryCreate ((uint)o, out Rune rune) ? rune.ToString () : " ";
 
     private void CheckOrUncheckFile (FileSystemInfo info, bool check)
     {
@@ -691,7 +725,6 @@ public class TableEditor : Scenario
         string title = o is uint u ? GetUnicodeCategory (u) + $"(0x{o:X4})" : "Enter new value";
 
         var oldValue = _currentTable.Rows [e.Row] [tableCol].ToString ();
-        var okPressed = false;
 
         var ok = new Button { Text = Strings.btnOk };
         var cancel = new Button { Text = Strings.btnCancel };
@@ -703,22 +736,24 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         _app?.Run (d);
-        okPressed = d.Result == 1;
+        bool okPressed = d.Result == 1;
         d.Dispose ();
 
-        if (okPressed)
+        if (!okPressed)
         {
-            try
-            {
-                _currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.ErrorQuery ((sender as View)?.App!, "Failed to set text", ex.Message, "Ok");
-            }
-
-            _tableView!.Update ();
+            return;
         }
+
+        try
+        {
+            _currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.ErrorQuery ((sender as View)?.App!, "Failed to set text", ex.Message, "Ok");
+        }
+
+        _tableView!.Update ();
     }
 
     private IEnumerable<FileSystemInfo> GetChildren (FileSystemInfo arg)
@@ -764,10 +799,10 @@ public class TableEditor : Scenario
 
     private string GetHumanReadableFileSize (long value, CultureInfo culture)
     {
-        const long ByteConversion = 1024;
+        const long BYTE_CONVERSION = 1024;
 
-        string [] SizeSuffixes =
-        {
+        string [] sizeSuffixes =
+        [
             "bytes",
             "KB",
             "MB",
@@ -777,28 +812,25 @@ public class TableEditor : Scenario
             "EB",
             "ZB",
             "YB"
-        };
+        ];
 
-        if (value < 0)
+        switch (value)
         {
-            return "-" + GetHumanReadableFileSize (-value, culture);
+            case < 0: return "-" + GetHumanReadableFileSize (-value, culture);
+
+            case 0: return "0.0 bytes";
         }
 
-        if (value == 0)
-        {
-            return "0.0 bytes";
-        }
-
-        var mag = (int)Math.Log (value, ByteConversion);
+        var mag = (int)Math.Log (value, BYTE_CONVERSION);
         double adjustedSize = value / Math.Pow (1000, mag);
 
-        return string.Format (culture.NumberFormat, "{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
+        return string.Format (culture.NumberFormat, "{0:n2} {1}", adjustedSize, sizeSuffixes [mag]);
     }
 
     private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
     {
         // work out new sort order
-        string sort = _currentTable!.DefaultView.Sort;
+        string? sort = _currentTable?.DefaultView.Sort;
         string colName = _tableView!.Table.ColumnNames [clickedCol];
 
         if (sort?.EndsWith ("ASC") ?? false)
@@ -887,7 +919,6 @@ public class TableEditor : Scenario
             return;
         }
 
-        var accepted = false;
         var d = new Dialog { Title = prompt, Buttons = [new Button { Title = Strings.btnCancel }, new Button { Title = Strings.btnOk }] };
 
         ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Value);
@@ -899,22 +930,24 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         _tableView.App?.Run (d);
-        accepted = d.Result == 1;
+        bool accepted = d.Result == 1;
         d.Dispose ();
 
-        if (accepted)
+        if (!accepted)
         {
-            try
-            {
-                setter (style, int.Parse (tf.Text));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.ErrorQuery (_tableView.App!, "Failed to set", ex.Message, "Ok");
-            }
-
-            _tableView!.Update ();
+            return;
         }
+
+        try
+        {
+            setter (style, int.Parse (tf.Text));
+        }
+        catch (Exception ex)
+        {
+            MessageBox.ErrorQuery (_tableView.App!, "Failed to set", ex.Message, "Ok");
+        }
+
+        _tableView!.Update ();
     }
 
     private void SetDemoTableStyles ()
@@ -1056,7 +1089,7 @@ public class TableEditor : Scenario
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
         string colName = _tableView!.Table.ColumnNames [clickedCol];
 
-        PopoverMenu? contextMenu = new ([
+        PopoverMenu contextMenu = new ([
                                             new MenuItem ($"Hide {TrimArrows (colName)}", "", () => HideColumn (clickedCol)),
                                             new MenuItem ($"Sort {StripArrows (sort)}", "", () => SortColumn (clickedCol, sort, isAsc))
                                         ]);
@@ -1064,7 +1097,7 @@ public class TableEditor : Scenario
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
         e.View?.App!.Popovers?.Register (contextMenu);
-        contextMenu?.MakeVisible (new Point (e.ScreenPosition.X + 1, e.ScreenPosition.Y + 1));
+        contextMenu.MakeVisible (new Point (e.ScreenPosition.X + 1, e.ScreenPosition.Y + 1));
     }
 
     private void SortColumn (int clickedCol)
@@ -1123,28 +1156,30 @@ public class TableEditor : Scenario
             return;
         }
 
-        if (e.KeyCode == KeyCode.Delete)
+        if (e.KeyCode != KeyCode.Delete)
         {
-            if (_tableView!.FullRowSelect)
-            {
-                // Delete button deletes all rows when in full row mode
-                foreach (int toRemove in _tableView!.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
-                {
-                    _currentTable.Rows.RemoveAt (toRemove);
-                }
-            }
-            else
-            {
-                // otherwise set all selected cells to null
-                foreach (Point pt in _tableView!.GetAllSelectedCells ())
-                {
-                    _currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
-                }
-            }
-
-            _tableView!.Update ();
-            e.Handled = true;
+            return;
         }
+
+        if (_tableView!.FullRowSelect)
+        {
+            // Delete button deletes all rows when in full row mode
+            foreach (int toRemove in _tableView!.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
+            {
+                _currentTable.Rows.RemoveAt (toRemove);
+            }
+        }
+        else
+        {
+            // otherwise set all selected cells to null
+            foreach (Point pt in _tableView!.GetAllSelectedCells ())
+            {
+                _currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
+            }
+        }
+
+        _tableView!.Update ();
+        e.Handled = true;
     }
 
     private void ToggleCheckboxes (bool radio)
@@ -1193,8 +1228,8 @@ public class TableEditor : Scenario
 
     public class UnicodeRange (uint start, uint end, string category)
     {
-        public readonly string Category = category;
-        public readonly uint End = end;
-        public readonly uint Start = start;
+        public string Category { get; } = category;
+        public uint End { get; } = end;
+        public uint Start { get; } = start;
     }
 }
