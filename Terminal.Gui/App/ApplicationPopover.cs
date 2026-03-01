@@ -3,7 +3,7 @@ using Terminal.Gui.Tracing;
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Helper class for support of <see cref="IPopover"/> views for <see cref="IApplication"/>. Held by
+///     Helper class for support of <see cref="IPopoverView"/> views for <see cref="IApplication"/>. Held by
 ///     <see cref="IApplication.Popovers"/>
 /// </summary>
 public sealed class ApplicationPopover : IDisposable
@@ -13,18 +13,18 @@ public sealed class ApplicationPopover : IDisposable
     /// </summary>
     public ApplicationPopover () { }
 
-    private readonly List<IPopover> _popovers = [];
+    private readonly List<IPopoverView> _popovers = [];
 
-    private IPopover? _activePopover;
+    private IPopoverView? _activePopover;
 
     /// <inheritdoc/>
     public void Dispose ()
     {
-        foreach (IPopover popover in _popovers)
+        foreach (IPopoverView popover in _popovers)
         {
-            if (popover is View view)
+            if (popover is IDisposable disposable)
             {
-                view.Dispose ();
+                disposable.Dispose ();
             }
         }
 
@@ -38,6 +38,16 @@ public sealed class ApplicationPopover : IDisposable
     public IApplication? App { get; set; }
 
     /// <summary>
+    ///     Raised when a popover is registered via <see cref="Register"/>.
+    /// </summary>
+    public event EventHandler<EventArgs<IPopoverView>>? PopoverRegistered;
+
+    /// <summary>
+    ///     Raised when a popover is de-registered via <see cref="DeRegister"/>.
+    /// </summary>
+    public event EventHandler<EventArgs<IPopoverView>>? PopoverDeRegistered;
+
+    /// <summary>
     ///     De-registers <paramref name="popover"/> with the application. Use this to remove the popover and it's
     ///     keyboard bindings from the application.
     /// </summary>
@@ -48,7 +58,7 @@ public sealed class ApplicationPopover : IDisposable
     /// </remarks>
     /// <param name="popover"></param>
     /// <returns></returns>
-    public bool DeRegister (IPopover? popover)
+    public bool DeRegister (IPopoverView? popover)
     {
         if (popover is null || !IsRegistered (popover))
         {
@@ -62,6 +72,8 @@ public sealed class ApplicationPopover : IDisposable
 
         _popovers.Remove (popover);
 
+        PopoverDeRegistered?.Invoke (this, new EventArgs<IPopoverView> (popover));
+
         return true;
     }
 
@@ -72,25 +84,30 @@ public sealed class ApplicationPopover : IDisposable
     ///     Note, the active pop over does not necessarily to be registered with the application.
     /// </remarks>
     /// <returns></returns>
-    public IPopover? GetActivePopover () => _activePopover;
+    public IPopoverView? GetActivePopover () => _activePopover;
 
     /// <summary>
     ///     Causes the specified popover to be hidden.
-    ///     If the popover is derived from <see cref="PopoverBaseImpl"/>, this is the same as setting
-    ///     <see cref="View.Visible"/> to <see langword="false"/>.
+    ///     If the popover is derived from <see cref="PopoverImpl"/>, this is the same as setting
+    ///     <see cref="IPopoverView.Visible"/> to <see langword="false"/>.
     /// </summary>
     /// <param name="popover"></param>
-    public void Hide (IPopover? popover)
+    public void Hide (IPopoverView? popover)
     {
-        if (_activePopover is not View popoverView || popoverView != popover)
+        if (_activePopover != popover)
         {
             return;
         }
 
         // If there's an existing popover, hide it.
         _activePopover = null;
-        popoverView.Visible = false;
-        popoverView.App?.TopRunnableView?.SetNeedsDraw ();
+        popover.Visible = false;
+
+        // Need View cast for TopRunnableView access
+        if (popover is View popoverView)
+        {
+            popoverView.App?.TopRunnableView?.SetNeedsDraw ();
+        }
     }
 
     /// <summary>
@@ -98,12 +115,12 @@ public sealed class ApplicationPopover : IDisposable
     /// </summary>
     /// <param name="popover"></param>
     /// <returns></returns>
-    public bool IsRegistered (IPopover? popover) => popover is { } && _popovers.Contains (popover);
+    public bool IsRegistered (IPopoverView? popover) => popover is { } && _popovers.Contains (popover);
 
     /// <summary>
     ///     Gets the list of popovers registered with the application.
     /// </summary>
-    public IReadOnlyCollection<IPopover> Popovers => _popovers.AsReadOnly ();
+    public IReadOnlyCollection<IPopoverView> Popovers => _popovers.AsReadOnly ();
 
     /// <summary>
     ///     Registers <paramref name="popover"/> with the application.
@@ -116,7 +133,7 @@ public sealed class ApplicationPopover : IDisposable
     /// </remarks>
     /// <param name="popover"></param>
     /// <returns><paramref name="popover"/>, after it has been registered.</returns>
-    public IPopover? Register (IPopover? popover)
+    public IPopoverView? Register (IPopoverView? popover)
     {
         if (popover is null || IsRegistered (popover))
         {
@@ -137,22 +154,24 @@ public sealed class ApplicationPopover : IDisposable
 
         _popovers.Add (popover);
 
+        PopoverRegistered?.Invoke (this, new EventArgs<IPopoverView> (popover));
+
         return popover;
     }
 
     /// <summary>
-    ///     Shows <paramref name="popover"/>. IPopover implementations should use OnVisibleChanaged/VisibleChanged to be
+    ///     Shows <paramref name="popover"/>. IPopoverView implementations should use OnVisibleChanaged/VisibleChanged to be
     ///     notified when the user has done something to cause the popover to be hidden.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         This API calls <see cref="Register"/>. To disable the popover from processing keyboard events,
     ///         either call <see cref="DeRegister"/> to
-    ///         remove the popover from the application or set <see cref="View.Enabled"/> to <see langword="false"/>.
+    ///         remove the popover from the application or set <see cref="IPopoverView.Enabled"/> to <see langword="false"/>.
     ///     </para>
     /// </remarks>
     /// <param name="popover"></param>
-    public void Show (IPopover? popover)
+    public void Show (IPopoverView? popover)
     {
         if (!IsRegistered (popover))
         {
@@ -160,38 +179,41 @@ public sealed class ApplicationPopover : IDisposable
         }
 
         // If there's an existing popover, hide it.
-        if (_activePopover is View popoverView)
+        if (_activePopover is { })
         {
-            popoverView.App = App;
-            popoverView.Visible = false;
+            _activePopover.Visible = false;
             _activePopover = null;
         }
 
-        if (popover is not View newPopover)
+        if (popover is null)
         {
             return;
         }
 
-        if (!(newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
-              && newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)))
+        // Validation requires View cast (ViewportSettings, KeyBindings, BeginInit/EndInit)
+        if (popover is View newPopover)
         {
-            throw new InvalidOperationException ("Popovers must have ViewportSettings.Transparent and ViewportSettings.TransparentMouse set.");
+            if (!(newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+                  && newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)))
+            {
+                throw new InvalidOperationException ("Popovers must have ViewportSettings.Transparent and ViewportSettings.TransparentMouse set.");
+            }
+
+            if (newPopover.KeyBindings.GetFirstFromCommands (Command.Quit) is null)
+            {
+                throw new InvalidOperationException ("Popovers must have a key binding for Command.Quit.");
+            }
+
+            if (!newPopover.IsInitialized)
+            {
+                newPopover.BeginInit ();
+                newPopover.EndInit ();
+            }
         }
 
-        if (newPopover.KeyBindings.GetFirstFromCommands (Command.Quit) is null)
-        {
-            throw new InvalidOperationException ("Popovers must have a key binding for Command.Quit.");
-        }
-
-        if (!newPopover.IsInitialized)
-        {
-            newPopover.BeginInit ();
-            newPopover.EndInit ();
-        }
-
-        _activePopover = newPopover as IPopover;
-        newPopover.Enabled = true;
-        newPopover.Visible = true;
+        _activePopover = popover;
+        popover.Enabled = true;
+        popover.Visible = true;
     }
 
     /// <summary>
@@ -205,6 +227,7 @@ public sealed class ApplicationPopover : IDisposable
         Trace.Keyboard ("Popovers", key, "Entry");
 
         // Do active first - Active gets all key down events.
+        // Need View cast for keyboard dispatch - this is the app→view keyboard bridge
         var activePopover = GetActivePopover () as View;
 
         if (activePopover is { Visible: true })
@@ -219,8 +242,9 @@ public sealed class ApplicationPopover : IDisposable
         // Inactive only get hotkeys
         bool? hotKeyHandled = null;
 
-        foreach (IPopover popover in _popovers.ToList ())
+        foreach (IPopoverView popover in _popovers.ToList ())
         {
+            // Need View cast for keyboard dispatch
             if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnableView))
             {
                 continue;
