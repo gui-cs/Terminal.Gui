@@ -355,14 +355,21 @@ public interface ICommandContext
     WeakReference<View>? Source { get; }        // Weak ref to the originating view
     ICommandBinding? Binding { get; }           // The binding that triggered the command
     CommandRouting Routing { get; }             // Direct, BubblingUp, DispatchingDown, or Bridged
+    IReadOnlyList<object?> Values { get; }     // Values accumulated as the command propagated
+    object? Value { get; }                      // Most recently appended value (Values[^1])
 }
 ```
 
-<xref:Terminal.Gui.Input.CommandContext> is an immutable record struct. Use `WithCommand()` or `WithRouting()` to create modified copies.
+<xref:Terminal.Gui.Input.CommandContext> is an immutable record struct. Use `WithCommand()`, `WithRouting()`, or `WithValue()` to create modified copies.
+
+- **`Values`** — An append-only chain of values accumulated as the command propagates up the view hierarchy. Each <xref:Terminal.Gui.ViewBase.IValue>-implementing view appends its value. Ordered from innermost (originator) to outermost.
+- **`Value`** — Convenience accessor for `Values[^1]` (the most recently appended value), or `null` if `Values` is empty.
+
+See the [Value Propagation](command.md#value-propagation) section in the Command Deep Dive for details.
 
 > [!NOTE]
 > `Source` is a `WeakReference<View>` to prevent memory leaks during command propagation.
-> Use `ctx.Source?.TryGetTarget (out View? view)` to safely access the source view.
+> Use `ctx.TryGetSource (out View? view)` or `ctx.Source?.TryGetTarget (out View? view)` to safely access the source view.
 
 ### Binding Types and Pattern Matching
 

@@ -34,6 +34,7 @@ public readonly record struct CommandContext : ICommandContext
         Command = command;
         Binding = binding;
         Source = source;
+        Values = [];
     }
 
     /// <inheritdoc/>
@@ -47,6 +48,16 @@ public readonly record struct CommandContext : ICommandContext
 
     /// <inheritdoc/>
     public CommandRouting Routing { get; init; }
+
+    /// <inheritdoc/>
+    public IReadOnlyList<object?> Values
+    {
+        get => field ?? [];
+        init;
+    } = [];
+
+    /// <inheritdoc/>
+    public object? Value => Values is { Count: > 0 } ? Values [^1] : null;
 
     /// <summary>
     ///     Creates a new context with a different command, preserving all other fields.
@@ -62,6 +73,32 @@ public readonly record struct CommandContext : ICommandContext
     /// <returns>A new <see cref="CommandContext"/> with the specified routing.</returns>
     public CommandContext WithRouting (CommandRouting routing) => this with { Routing = routing };
 
+    /// <summary>
+    ///     Creates a new context with the specified value appended to the <see cref="Values"/> chain.
+    ///     The new value becomes the last element, making it the new <see cref="Value"/>.
+    /// </summary>
+    /// <remarks>
+    ///     The spread expression <c>[..Values, value]</c> copies the entire list on each call,
+    ///     giving O(N²) total allocations for N appends. This is acceptable for typical UI hierarchies
+    ///     (3–5 levels deep). If extreme depths are ever needed, consider an immutable linked list or builder.
+    /// </remarks>
+    /// <param name="value">The value to append.</param>
+    /// <returns>A new <see cref="CommandContext"/> with the value appended to <see cref="Values"/>.</returns>
+    public CommandContext WithValue (object? value) => this with { Values = [..Values, value] };
+
     /// <inheritdoc/>
-    public override string ToString () => $"{(Routing == CommandRouting.BubblingUp ? Glyphs.UpArrow : Routing == CommandRouting.DispatchingDown ? Glyphs.DownArrow : "")}{Command} ({(Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "")}{(Binding is { } ? $", Binding={Binding}" : "")})";
+    public override string ToString ()
+    {
+        string routing = Routing == CommandRouting.BubblingUp
+                             ? Glyphs.UpArrow.ToString ()
+                             : Routing == CommandRouting.DispatchingDown
+                                 ? Glyphs.DownArrow.ToString ()
+                                 : "";
+        string source = Source is { } ? $"Source={Source.ToIdentifyingString ()}" : "";
+        string binding = Binding is { } ? $", Binding={Binding}" : "";
+        string value = Values is { Count: > 0 } ? $", Value={Value}" : "";
+        string values = Values is { Count: > 1 } ? $", Values=[{string.Join (", ", Values)}]" : "";
+
+        return $"{routing}{Command} ({source}{binding}{value}{values})";
+    }
 }

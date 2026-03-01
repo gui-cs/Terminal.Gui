@@ -169,8 +169,6 @@ public class MenuBarItem : MenuItem, IDesignable
     /// <exception cref="InvalidOperationException"></exception>
     public new Menu? SubMenu { get => null; set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead."); }
 
-    private CommandBridge? _popoverBridge;
-
     /// <summary>
     ///     The Popover Menu that will be displayed when this item is selected.
     /// </summary>
@@ -187,8 +185,7 @@ public class MenuBarItem : MenuItem, IDesignable
             if (field is { })
             {
                 field.VisibleChanged -= OnPopoverVisibleChanged;
-                _popoverBridge?.Dispose ();
-                _popoverBridge = null;
+                field.Target = null;
             }
 
             field = value;
@@ -206,8 +203,8 @@ public class MenuBarItem : MenuItem, IDesignable
             PopoverMenuOpen = field.Visible;
             field.VisibleChanged += OnPopoverVisibleChanged;
 
-            // Bridge Activate from PopoverMenu → MenuBarItem across the non-containment boundary.
-            _popoverBridge = CommandBridge.Connect (this, field, Command.Activate);
+            // Bridge Activate/Accept from PopoverMenu → MenuBarItem via PopoverBaseImpl.Target.
+            field.Target = new WeakReference<View> (this);
 
             return;
 
