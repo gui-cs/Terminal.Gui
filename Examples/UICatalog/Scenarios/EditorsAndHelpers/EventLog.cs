@@ -144,6 +144,11 @@ public class EventLog : ListView
             sb.Append ($", Source={context.Source.ToIdentifyingString ()}");
         }
 
+        if (context.Value is { })
+        {
+            sb.Append ($", Value={context.Value}");
+        }
+
         return sb.ToString ();
     }
 

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.Tests;
@@ -55,19 +56,43 @@ public static class TestLogging
     /// </example>
     public static IDisposable Verbose (ITestOutputHelper output) => BindTo (output, LogLevel.Trace);
 
+    /// <summary>
+    ///     Binds Terminal.Gui logging to xUnit output with verbose logging (Trace and above)
+    ///     and enables the specified trace categories.
+    ///     Use this when debugging a specific test and you want to see trace output.
+    /// </summary>
+    /// <param name="output">The xUnit test output helper.</param>
+    /// <param name="traceCategories">The trace categories to enable.</param>
+    /// <returns>An <see cref="IDisposable"/> scope that restores previous state.</returns>
+    /// <example>
+    ///     <code>
+    ///     using (TestLogging.Verbose(_output, TraceCategory.Command | TraceCategory.Mouse))
+    ///     {
+    ///         // All log levels appear in test output, Command and Mouse tracing enabled
+    ///         CheckBox checkbox = new () { Id = "test" };
+    ///         checkbox.InvokeCommand (Command.Activate);
+    ///     }
+    ///     </code>
+    /// </example>
+    public static IDisposable Verbose (ITestOutputHelper output, TraceCategory traceCategories) =>
+        new CompositeDisposable (BindTo (output, LogLevel.Trace), Trace.PushScope (traceCategories));
+
+    private sealed class CompositeDisposable (IDisposable first, IDisposable second) : IDisposable
+    {
+        public void Dispose ()
+        {
+            second.Dispose ();
+            first.Dispose ();
+        }
+    }
+
     private sealed class TestOutputLogger (ITestOutputHelper output, LogLevel minLevel) : ILogger
     {
         public IDisposable? BeginScope<TState> (TState state) where TState : notnull => null;
 
         public bool IsEnabled (LogLevel logLevel) => logLevel >= minLevel;
 
-        public void Log<TState> (
-            LogLevel logLevel,
-            EventId eventId,
-            TState state,
-            Exception? exception,
-            Func<TState, Exception?, string> formatter
-        )
+        public void Log<TState> (LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled (logLevel))
             {
@@ -75,15 +100,15 @@ public static class TestLogging
             }
 
             string levelTag = logLevel switch
-            {
-                LogLevel.Trace => "TRC",
-                LogLevel.Debug => "DBG",
-                LogLevel.Information => "INF",
-                LogLevel.Warning => "WRN",
-                LogLevel.Error => "ERR",
-                LogLevel.Critical => "CRT",
-                _ => "???"
-            };
+                              {
+                                  LogLevel.Trace => "TRC",
+                                  LogLevel.Debug => "DBG",
+                                  LogLevel.Information => "INF",
+                                  LogLevel.Warning => "WRN",
+                                  LogLevel.Error => "ERR",
+                                  LogLevel.Critical => "CRT",
+                                  _ => "???"
+                              };
 
             try
             {
