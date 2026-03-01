@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -142,6 +144,27 @@ public abstract class PopoverBaseImpl : View, IPopover
     }
 
     /// <summary>
+    ///     Attempts to retrieve the <see cref="Target"/> view. Returns <see langword="false"/> if the target has been
+    ///     collected or was never set.
+    /// </summary>
+    /// <param name="target">
+    ///     When this method returns <see langword="true"/>, contains the target <see cref="View"/>; otherwise,
+    ///     <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if the target view is still alive; otherwise, <see langword="false"/>.</returns>
+    public bool TryGetTarget ([NotNullWhen (true)] out View? target)
+    {
+        if (Target?.TryGetTarget (out target) == true)
+        {
+            return true;
+        }
+
+        target = null;
+
+        return false;
+    }
+
+    /// <summary>
     ///     Called when the <see cref="View.Visible"/> property is changing. Handles layout and focus management.
     /// </summary>
     /// <returns>
@@ -183,6 +206,19 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
 
         return ret;
+    }
+
+    /// <summary>
+    ///     Returns a string representation of the popover, including its type, visibility, owner, and target.
+    /// </summary>
+    /// <returns>A formatted string with popover state information.</returns>
+    public override string ToString ()
+    {
+        string owner = Owner is { } ? $"Owner={Owner}" : "Owner=null";
+        string target = TryGetTarget (out View? t) ? $", Target={t.ToIdentifyingString ()}" : "";
+        string visible = Visible ? "Visible" : "Hidden";
+
+        return $"{GetType ().Name}({Id}) {visible} ({owner}{target})";
     }
 
     /// <inheritdoc/>
