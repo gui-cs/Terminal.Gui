@@ -28,7 +28,7 @@ namespace Terminal.Gui.Views;
 ///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
 ///     </para>
 /// </remarks>
-public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
+public class PopoverMenu : Popover<Menu, MenuItem>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.
@@ -41,7 +41,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="menuItems">The views to use as menu items. Null elements become separator lines.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling
+    ///     <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<View?>? menuItems) : this (new Menu (menuItems?.Select (item => item ?? new Line ()))) { }
 
@@ -50,7 +51,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="menuItems">The menu items to display in the popover.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling
+    ///     <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems)) { }
 
@@ -59,7 +61,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="root">The root menu that contains the top-level menu items.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling
+    ///     <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (Menu? root) : base (root)
     {
@@ -290,9 +293,13 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     ///     The ideal screen-relative position for the menu. If <see langword="null"/>, uses <paramref name="anchor"/>,
     ///     <see cref="Popover{TView, TResult}.Anchor"/> property, or the current mouse position.
     /// </param>
-    /// <param name="anchor">Optional anchor rectangle. If <see langword="null"/>, uses the <see cref="Popover{TView, TResult}.Anchor"/> property.</param>
+    /// <param name="anchor">
+    ///     Optional anchor rectangle. If <see langword="null"/>, uses the
+    ///     <see cref="Popover{TView, TResult}.Anchor"/> property.
+    /// </param>
     /// <remarks>
-    ///     This method only sets the position; it does not make the popover visible. Use <see cref="Popover{TView, TResult}.MakeVisible"/> to
+    ///     This method only sets the position; it does not make the popover visible. Use
+    ///     <see cref="Popover{TView, TResult}.MakeVisible"/> to
     ///     both position and show the popover.
     /// </remarks>
     public override void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)

@@ -39,7 +39,7 @@ public class MenuBars : Scenario
             Title = "MenuBar Host",
             X = 0,
             Y = 0,
-            Width = Dim.Fill ()! - Dim.Width (_eventLog),
+            Width = Dim.Fill () - Dim.Width (_eventLog),
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Dotted
         };
@@ -52,16 +52,16 @@ public class MenuBars : Scenario
                                 {
                                     _eventLog.SetViewToLog (menuBarHostView.MenuBar);
 
-                                    foreach (MenuItem menuItem in menuBarHostView?.MenuBar?.GetMenuItemsWith (v => true) ?? [])
+                                    foreach (MenuItem menuItem in menuBarHostView.MenuBar?.GetMenuItemsWith (v => true) ?? [])
                                     {
                                         _eventLog.SetViewToLog (menuItem);
                                         _eventLog.SetViewToLog (menuItem.CommandView);
                                         menuItem.Action += () => _eventLog.Log ($"{menuItem.ToIdentifyingString ()} Action!");
                                     }
 
-                                    _eventLog.SetViewToLog (menuBarHostView?.BottomMenuBar);
+                                    _eventLog.SetViewToLog (menuBarHostView.BottomMenuBar);
 
-                                    foreach (MenuItem menuItem in menuBarHostView?.BottomMenuBar?.GetMenuItemsWith (v => true) ?? [])
+                                    foreach (MenuItem menuItem in menuBarHostView.BottomMenuBar?.GetMenuItemsWith (v => true) ?? [])
                                     {
                                         _eventLog.SetViewToLog (menuItem);
                                         _eventLog.SetViewToLog (menuItem.CommandView);
@@ -205,21 +205,21 @@ public class MenuBars : Scenario
             editModeStatusCb.ValueChanged += (_, _) => { editModeMenuItemCb?.Value = editModeStatusCb.Value; };
 
             MenuBar?.Activated += (_, args) =>
-                                 {
-                                     // Traditional way - extracting MenuItem from Source
-                                     if (args?.Value?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem mi)
-                                     {
-                                         lastActivatedText.Text = mi.Title!;
-                                     }
+                                  {
+                                      // Traditional way - extracting MenuItem from Source
+                                      if (args.Value?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem mi)
+                                      {
+                                          lastActivatedText.Text = mi.Title;
+                                      }
 
-                                     // New way - using ctx.Value which contains the Menu's activated MenuItem
-                                     // Note: Value comes from the PopoverMenu (which implements IValue<MenuItem?>)
-                                     // and is automatically populated in the context when the command is invoked
-                                     if (args?.Value?.Value is MenuItem menuItem)
-                                     {
-                                         lastActivatedValueText.Text = $"{menuItem.Title} (from Menu.Value)";
-                                     }
-                                 };
+                                      // New way - using ctx.Value which contains the Menu's activated MenuItem
+                                      // Note: Value comes from the PopoverMenu (which implements IValue<MenuItem?>)
+                                      // and is automatically populated in the context when the command is invoked
+                                      if (args.Value?.Value is MenuItem menuItem)
+                                      {
+                                          lastActivatedValueText.Text = $"{menuItem.Title} (from Menu.Value)";
+                                      }
+                                  };
 
             AddCommand (Command.Edit,
                         ctx =>

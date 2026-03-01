@@ -195,13 +195,7 @@ public class MenuBarItem : MenuItem, IDesignable
     public bool PopoverMenuOpen
     {
         get => PopoverMenu?.IsOpen ?? false;
-        set
-        {
-            if (PopoverMenu is { })
-            {
-                PopoverMenu.IsOpen = value;
-            }
-        }
+        set => PopoverMenu?.IsOpen = value;
     }
 
     /// <summary>
@@ -226,7 +220,7 @@ public class MenuBarItem : MenuItem, IDesignable
 
         // If the user presses the hotkey for a menu item that is already open,
         // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
-        if (SuperView is MenuBar { } menuBar)
+        if (SuperView is MenuBar menuBar)
         {
             menuBar.HideActiveItem ();
         }
