@@ -20,7 +20,8 @@ Application.Popover (static accessor)
     └── ApplicationPopover (manager)
             └── IPopover (interface contract)
                     └── PopoverBaseImpl (abstract base)
-                            └── PopoverMenu (concrete implementation)
+                            └── Popover<TView, TResult> (generic content host)
+                                    └── PopoverMenu : Popover<Menu, MenuItem> (concrete implementation)
 ```
 
 ### <xref:Terminal.Gui.App.IPopover> — The Contract
@@ -36,6 +37,19 @@ The <xref:Terminal.Gui.App.IPopover> interface defines the minimal contract: a s
 - **Dismiss key** — Binds `Application.QuitKey` to `Command.Quit`
 - **Focus management** — Restores focus to the previously-focused view when hidden
 - **Layout on show** — Lays out the popover to fit the screen when becoming visible
+- **Target** — Weak reference to a target view with automatic `CommandBridge` for command routing
+
+### `Popover<TView, TResult>` — The Generic Content Host
+
+`Popover<TView, TResult>` extends `PopoverBaseImpl` to host a typed content view and optionally extract a result when the popover closes. This layer provides:
+
+- **ContentView** — A typed `TView` that is added as a SubView, with a `CommandBridge` that routes `Command.Activate` from the content view to the popover
+- **Result extraction** — Via `ResultExtractor` function or automatic `IValue<TResult>` extraction
+- **IsOpen** — CWP-based property synchronized with `Visible`, with `IsOpenChanging`/`IsOpenChanged` events
+- **Anchor** — Function-based positioning anchor for `MakeVisible` / `SetPosition`
+- **MakeVisible / SetPosition** — Methods for showing and positioning the popover
+
+Custom popovers that host a specific view type should extend `Popover<TView, TResult>` rather than `PopoverBaseImpl` directly.
 
 ### <xref:Terminal.Gui.App.ApplicationPopover> — The Manager
 
@@ -77,7 +91,32 @@ contextMenu.MakeVisible (new Point (10, 5)); // Specific location
 
 ### Creating a Custom Popover
 
-To create a custom popover, inherit from `PopoverBaseImpl`:
+For popovers that host a specific view type, extend `Popover<TView, TResult>`:
+
+```csharp
+public class MyListPopover : Popover<ListView, string?>
+{
+    public MyListPopover ()
+    {
+        // ContentView is automatically created (new ListView())
+        // and added as a SubView with command bridging
+
+        // Configure the content view
+        ContentView!.SetSource (["Option 1", "Option 2", "Option 3"]);
+
+        // Set up result extraction
+        ResultExtractor = lv => lv.Source?.ToList ()?.ElementAtOrDefault (lv.SelectedItem) as string;
+    }
+}
+
+// Usage:
+MyListPopover myPopover = new ();
+Application.Popover?.Register (myPopover);
+myPopover.MakeVisible (new Point (10, 5));
+// After closing, check myPopover.Result for the selected item
+```
+
+For simpler popovers that don't need typed content hosting, inherit from `PopoverBaseImpl`:
 
 ```csharp
 public class MyCustomPopover : PopoverBaseImpl
@@ -197,13 +236,15 @@ The popover lifecycle is driven entirely by the `Visible` property — there is 
 
 **Becoming visible (`Visible` changes to `true`):**
 1. `PopoverBaseImpl.OnVisibleChanging()` calls `Layout(App.Screen.Size)` to size the popover to the screen
-2. `PopoverMenu.OnVisibleChanged()` adds the root <xref:Terminal.Gui.Views.Menu> as a SubView
-3. The popover receives focus
+2. `PopoverMenu.OnVisibleChanged()` calls `Root.ShowMenu()` (which sets `Menu.Visible = true` and `Menu.Enabled = true`)
+3. `Popover<TView, TResult>.OnVisibleChanged()` sets `ContentView.Visible = true` and updates `IsOpen`
+4. The popover receives focus
 
 **Becoming hidden (`Visible` changes to `false`):**
 1. `PopoverBaseImpl.OnVisibleChanging()` restores focus to the previously-focused view in the `TopRunnableView`
-2. `PopoverMenu.OnVisibleChanged()` removes the root menu SubView and calls `ApplicationPopover.Hide()`
-3. `ApplicationPopover.Hide()` clears the active popover reference and triggers a redraw
+2. `PopoverMenu.OnVisibleChanged()` calls `Root.HideMenu()` and `ApplicationPopover.Hide()`
+3. `Popover<TView, TResult>.OnVisibleChanged()` sets `ContentView.Visible = false`, extracts `Result`, and updates `IsOpen`
+4. `ApplicationPopover.Hide()` clears the active popover reference and triggers a redraw
 
 This pattern means setting `Visible = false` is equivalent to calling `Hide()` — both produce the same result.
 
@@ -301,12 +342,15 @@ The menu automatically adjusts position to ensure it remains fully visible on sc
 
 ### PopoverMenu
 
-<xref:Terminal.Gui.Views.PopoverMenu> is a sophisticated cascading menu implementation used for:
+<xref:Terminal.Gui.Views.PopoverMenu> extends `Popover<Menu, MenuItem>` and is a sophisticated cascading menu implementation used for:
 - Context menus
 - <xref:Terminal.Gui.Views.MenuBar> drop-down menus
 - Custom menu scenarios
 
 **Key Features:**
+- Extends `Popover<Menu, MenuItem>`, inheriting `ContentView`, `MakeVisible`, `SetPosition`, `IsOpen`, `Result`, and `Anchor`
+- `Root` property aliases `ContentView` — the hosted <xref:Terminal.Gui.Views.Menu> instance
+- Two `CommandBridge` instances route commands across containment boundaries: Content bridge (Menu → PopoverMenu) and Target bridge (PopoverMenu → host/MenuBarItem)
 - Cascading submenus with automatic positioning
 - Keyboard navigation (arrow keys, hotkeys)
 - Automatic key binding discovery from Commands — menu items that specify a <xref:Terminal.Gui.Input.Command> automatically display the correct keyboard shortcut
@@ -438,8 +482,9 @@ Application.Popover?.Register (commandPalette);
 ## API Reference
 
 - <xref:Terminal.Gui.App.IPopover> - Interface for popover views
-- `PopoverBaseImpl` - Abstract base class for custom popovers
-- <xref:Terminal.Gui.Views.PopoverMenu> - Cascading menu implementation
+- `PopoverBaseImpl` - Abstract base class providing standard popover behavior
+- `Popover<TView, TResult>` - Generic base class for popovers hosting typed content views with result extraction
+- <xref:Terminal.Gui.Views.PopoverMenu> - Cascading menu implementation (`Popover<Menu, MenuItem>`)
 - <xref:Terminal.Gui.App.ApplicationPopover> - Popover manager (accessed via `Application.Popover`)
 
 ## See Also

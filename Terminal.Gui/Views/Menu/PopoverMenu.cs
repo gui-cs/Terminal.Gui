@@ -9,7 +9,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         <b>IMPORTANT:</b> Must be registered with <see cref="Application.Popover"/> via
-///         <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/> or
+///         <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/> or
 ///         <see cref="ApplicationPopover.Show"/>.
 ///     </para>
 ///     <para>
@@ -28,7 +28,7 @@ namespace Terminal.Gui.Views;
 ///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
 ///     </para>
 /// </remarks>
-public class PopoverMenu : PopoverBaseImpl, IDesignable
+public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.
@@ -41,7 +41,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </summary>
     /// <param name="menuItems">The views to use as menu items. Null elements become separator lines.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<View?>? menuItems) : this (new Menu (menuItems?.Select (item => item ?? new Line ()))) { }
 
@@ -50,7 +50,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </summary>
     /// <param name="menuItems">The menu items to display in the popover.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems)) { }
 
@@ -59,20 +59,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </summary>
     /// <param name="root">The root menu that contains the top-level menu items.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
-    public PopoverMenu (Menu? root)
+    public PopoverMenu (Menu? root) : base (root)
     {
-        // Do this to support debugging traces where Title gets set
-        base.HotKeySpecifier = (Rune)'\xffff';
-
-        Border?.Settings &= ~BorderSettings.Title;
-
         Key = DefaultKey;
-
-        base.Visible = false;
-
-        Root = root;
 
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -291,43 +282,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
 
     /// <summary>
-    ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the
-    ///     menu will be adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over
-    ///     the first cell of the first <see cref="MenuItem"/>.
-    /// </summary>
-    /// <param name="idealScreenPosition">
-    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
-    ///     used.
-    /// </param>
-    /// <remarks>
-    ///     <para>
-    ///         IMPORTANT: The popover must be registered with <see cref="Application.Popover"/> before calling this
-    ///         method.
-    ///         Call <see cref="ApplicationPopover.Register"/> first.
-    ///     </para>
-    ///     <para>
-    ///         This method internally calls <see cref="ApplicationPopover.Show"/>, which will throw
-    ///         <see cref="InvalidOperationException"/> if the popover is not registered.
-    ///     </para>
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">Thrown if the popover has not been registered.</exception>
-    public void MakeVisible (Point? idealScreenPosition = null)
-    {
-        if (Visible)
-        {
-            return;
-        }
-
-        // Ensure the Popover is sized correctly in case this is the first time we are being made visible
-        Layout ();
-
-        SetPosition (idealScreenPosition);
-
-        // Specific to PopoverMenu
-        App!.Popovers?.Show (this);
-    }
-
-    /// <summary>
     ///     Sets the position of the popover menu at <paramref name="idealScreenPosition"/>. The actual position will be
     ///     adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over the first cell of
     ///     the first <see cref="MenuItem"/> (if possible).
@@ -336,11 +290,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
     ///     used.
     /// </param>
+    /// <param name="anchor">Anchor rectangle (not used by PopoverMenu, which uses menu-specific positioning).</param>
     /// <remarks>
-    ///     This method only sets the position; it does not make the popover visible. Use <see cref="MakeVisible"/> to
+    ///     This method only sets the position; it does not make the popover visible. Use <see cref="Popover{TView, TResult}.MakeVisible"/> to
     ///     both position and show the popover.
     /// </remarks>
-    public void SetPosition (Point? idealScreenPosition = null)
+    public new void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         idealScreenPosition ??= App?.Mouse.LastMousePosition;
 
@@ -372,8 +327,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     protected override void OnVisibleChanged ()
     {
         Trace.Command (this, "Entry", $"Visible={Visible}");
-        base.OnVisibleChanged ();
 
+        // IMPORTANT: ShowMenu/HideMenu must run BEFORE base.OnVisibleChanged because
+        // Popover<TView, TResult>.OnVisibleChanged sets ContentView.Visible which would
+        // cause ShowMenu/HideMenu to exit early (they check Visible as a guard).
+        // ShowMenu also sets Enabled = true, which is required for focus.
         if (Visible)
         {
             Root?.ShowMenu ();
@@ -385,9 +343,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             // Specific to PopoverMenu
             App?.Popovers?.Hide (this);
         }
-    }
 
-    private CommandBridge? _rootCommandBridge;
+        base.OnVisibleChanged ();
+    }
 
     /// <summary>
     ///     Gets or sets the <see cref="Menu"/> that is the root of the popover menu hierarchy. The root menu is added
@@ -404,21 +362,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// </remarks>
     public Menu? Root
     {
-        get => SubViews.OfType<Menu> ().FirstOrDefault ();
+        get => ContentView;
         set
         {
-            if (SubViews.OfType<Menu> ().FirstOrDefault () == value)
+            if (ContentView == value)
             {
                 return;
             }
 
-#if DEBUG
-            Id = $"{value?.Id}PopoverMenu";
-#endif
-            Trace.Command (this, "RootSetter", $"OldRoot={Root?.ToIdentifyingString ()} NewRoot={value?.ToIdentifyingString ()}");
-
-            // Unsubscribe from old Root's VisibleChanged
-            if (Root is { } oldRoot)
+            // Unsubscribe from old Root's events
+            if (ContentView is { } oldRoot)
             {
                 oldRoot.HideMenu ();
                 oldRoot.VisibleChanged -= RootOnVisibleChanged;
@@ -428,25 +381,18 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                 foreach (Menu menu in oldMenus)
                 {
                     menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
-                    Remove (menu);
-                    menu.Dispose ();
                 }
             }
 
-            value?.App = App;
-            Add (value);
+            // Set ContentView (which handles Add/Remove and CommandBridge)
+            ContentView = value;
 
-            // Bridge Activate from Root → PopoverMenu across the non-containment boundary.
-            if (Root is null)
+            // Subscribe to new Root's events
+            if (ContentView is { })
             {
-                return;
+                // When Root is hidden (e.g. via HideMenu), hide the PopoverMenu too
+                ContentView.VisibleChanged += RootOnVisibleChanged;
             }
-
-            // When Root is hidden (e.g. via HideMenu), hide the PopoverMenu too
-            Root.VisibleChanged += RootOnVisibleChanged;
-
-            Trace.Command (this, "BridgeCreate", $"Bridging Activate from {Root.ToIdentifyingString ()}");
-            _rootCommandBridge = CommandBridge.Connect (this, Root, Command.Activate);
         }
     }
 
@@ -652,7 +598,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     ///     This method creates a default set of menu items (Cut, Copy, Paste, Select All, Quit) for design-time use.
     ///     It is primarily used for demonstration and testing purposes.
     /// </remarks>
-    public bool EnableForDesign<TContext> (ref TContext targetView) where TContext : notnull
+    public override bool EnableForDesign<TContext> (ref TContext targetView)
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
@@ -697,9 +643,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
                 // No need to Remove/Dispose subviews as that's done by View
             }
-
-            _rootCommandBridge?.Dispose ();
-            _rootCommandBridge = null;
         }
 
         base.Dispose (disposing);
