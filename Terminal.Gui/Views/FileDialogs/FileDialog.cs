@@ -176,7 +176,8 @@ public class FileDialog : Dialog, IDesignable
         Style.TreeStyle = _treeView.Style;
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
-
+        _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
+        
         _tableViewContainer.Add (_tableView);
 
         _tableView.Style.ShowHorizontalHeaderOverline = true;
@@ -184,7 +185,6 @@ public class FileDialog : Dialog, IDesignable
         _tableView.Style.ShowVerticalHeaderLines = true;
         _tableView.Style.AlwaysShowHeaders = true;
         _tableView.Style.ShowHorizontalHeaderUnderline = true;
-        _tableView.Style.ShowHorizontalScrollIndicators = true;
 
         _history = new FileDialogHistory (this);
 
@@ -454,6 +454,7 @@ public class FileDialog : Dialog, IDesignable
         _treeRoots = Style.TreeRootGetter ();
         Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
 
+        
         _treeView.AddObjects (_treeRoots.Keys);
 
         // if filtering on file type is configured then create the ComboBox and establish
@@ -1091,7 +1092,10 @@ public class FileDialog : Dialog, IDesignable
                 _history.ClearForward ();
             }
 
-            _tableView.RowOffset = 0;
+            if (_tableView.Viewport.Y != 0)
+            {
+                _tableView.Viewport = _tableView.Viewport with {Y = 0};
+            }
             _tableView.SelectedRow = 0;
 
             SetNeedsDraw ();

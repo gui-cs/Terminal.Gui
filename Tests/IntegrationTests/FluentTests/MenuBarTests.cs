@@ -517,7 +517,7 @@ public class MenuBarTests : TestsAllDrivers
 
         c = c.Then (_ =>
                     {
-                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => optionSelector!.GetCheckBoxValue (cb) == (int)Schemes.Error);
                         Assert.NotNull (errorCheckBox);
                         Point pos = errorCheckBox!.FrameToScreen ().Location;
                         errorScreenX = pos.X+1;
@@ -600,7 +600,7 @@ public class MenuBarTests : TestsAllDrivers
 
         c = c.Then (_ =>
                     {
-                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == (int)Schemes.Error);
+                        errorCheckBox = optionSelector!.SubViews.OfType<CheckBox> ().FirstOrDefault (cb => optionSelector!.GetCheckBoxValue (cb) == (int)Schemes.Error);
                         Assert.NotNull (errorCheckBox);
                         Point pos = errorCheckBox!.FrameToScreen ().Location;
                         errorScreenX = pos.X+1;

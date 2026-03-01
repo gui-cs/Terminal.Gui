@@ -14,7 +14,7 @@ internal class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
     public StringComparison Comparer { get; set; } = StringComparison.InvariantCultureIgnoreCase;
 
     /// <inheritdoc/>
-    public bool IsMatch (string search, object? value) { return value?.ToString ()?.StartsWith (search, Comparer) ?? false; }
+    public virtual bool IsMatch (string search, object? value) { return value?.ToString ()?.StartsWith (search, Comparer) ?? false; }
 
     /// <summary>
     ///     Returns true if <paramref name="key"/> is key searchable key (e.g. letters, numbers, etc) that are valid to pass
