@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menu"/>. Has title, an
 ///     associated help text, and an action to execute on activation.
 /// </summary>
-public class MenuItem : Shortcut
+public class MenuItem : Shortcut, IValue
 {
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>.
@@ -95,6 +95,16 @@ public class MenuItem : Shortcut
             // so commands can't bubble naturally; the bridge relays completion events.
             _subMenuBridge = CommandBridge.Connect (this, field, Command.Activate, Command.Accept);
         }
+    }
+
+    /// <inheritdoc/>
+    public object? GetValue () => Title;
+
+    /// <inheritdoc/>
+    event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
+    {
+        add { }
+        remove { }
     }
 
     /// <inheritdoc/>
