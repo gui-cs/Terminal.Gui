@@ -956,4 +956,117 @@ public class OptionSelectorTests
         Assert.Equal (0, optionSelector.Value); // Should be Option1
         Assert.True (optionSelector.SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) == 1);
     }
+
+    #region Value Propagation via Activated Event (CWP Bug Tests)
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     Proves the CWP ordering bug: <see cref="OptionSelector.OnActivated"/> calls
+    ///     <c>base.OnActivated</c> (which fires <see cref="View.Activated"/>) BEFORE
+    ///     <c>ApplyActivation</c> updates <see cref="SelectorBase.Value"/>.
+    ///     The <see cref="ICommandContext.Value"/> carried by <see cref="View.Activated"/> must be
+    ///     the <see cref="OptionSelector"/>'s semantic <see cref="int"/>? index,
+    ///     not the dispatched <see cref="CheckBox"/>'s <see cref="CheckState"/>.
+    /// </summary>
+    [Fact]
+    public void Activated_Event_Value_Is_OptionSelector_Int_Not_CheckState ()
+    {
+        // Arrange: OptionSelector with two options; second option focused for dispatch.
+        OptionSelector optionSelector = new ();
+        optionSelector.Labels = ["Option1", "Option2"];
+        optionSelector.SetFocus ();
+        optionSelector.Layout ();
+
+        Assert.Equal (0, optionSelector.Value); // Option1 selected
+
+        // Focus Option2 so InvokeCommand dispatches Activate to it.
+        CheckBox option2 = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
+        option2.SetFocus ();
+
+        object? capturedValue = null;
+        int activatedCount = 0;
+
+        optionSelector.Activated += (_, args) =>
+        {
+            activatedCount++;
+            capturedValue = args.Value?.Value;
+        };
+
+        // Act: Activate on the selector dispatches down to the focused CheckBox (Option2).
+        optionSelector.InvokeCommand (Command.Activate);
+
+        // Assert: OptionSelector.Value changed to 1 (Option2 selected).
+        Assert.Equal (1, optionSelector.Value);
+        Assert.Equal (1, activatedCount);
+
+        // The value arriving at Activated must be the OptionSelector's int? (1),
+        // NOT the dispatched CheckBox's CheckState (CheckState.Checked).
+        Assert.Null (capturedValue as CheckState?);    // Must NOT be a CheckState
+        Assert.Equal ((int?)1, capturedValue as int?); // Must be the OptionSelector's index
+
+        optionSelector.Dispose ();
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     Proves that an ancestor subscribing to <see cref="View.Activated"/> via
+    ///     <see cref="View.CommandsToBubbleUp"/> receives the <see cref="OptionSelector"/>'s
+    ///     semantic <see cref="int"/>? value — not the inner <see cref="CheckBox"/>'s
+    ///     <see cref="CheckState"/> — through the <c>BubbleActivatedUp</c> path.
+    ///     Uses <see cref="Application"/> context so focus propagates correctly through
+    ///     the hierarchy and the dispatch goes to the focused CheckBox, not the Cycle path.
+    /// </summary>
+    [Fact]
+    public void Activated_Event_Ancestor_Receives_OptionSelector_Value_Via_BubbleActivatedUp ()
+    {
+        // Arrange: Application context ensures SetFocus works through nested hierarchy.
+        VirtualTimeProvider time = new ();
+
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        // ancestor opts in to Activate bubbling and contains the OptionSelector.
+        // CanFocus = true is required so the focus chain can propagate through ancestor.
+        View ancestor = new () { Id = "ancestor", CanFocus = true };
+        ancestor.CommandsToBubbleUp = [Command.Activate];
+
+        OptionSelector optionSelector = new ();
+        optionSelector.Labels = ["Option1", "Option2"];
+        ancestor.Add (optionSelector);
+
+        (runnable as View)!.Add (ancestor);
+        app.Begin (runnable);
+
+        Assert.Equal (0, optionSelector.Value); // Option1 selected
+
+        // Focus Option2 so Activate dispatches to it.
+        CheckBox option2 = optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2");
+        option2.HasFocus = true;
+        Assert.True (option2.HasFocus);
+
+        object? capturedValue = null;
+        int ancestorActivatedCount = 0;
+
+        ancestor.Activated += (_, args) =>
+        {
+            ancestorActivatedCount++;
+            capturedValue = args.Value?.Value;
+        };
+
+        // Act: Activate dispatches down to Option2, then BubbleActivatedUp reaches ancestor.
+        optionSelector.InvokeCommand (Command.Activate);
+
+        // Assert: OptionSelector.Value changed; ancestor received Activated exactly once.
+        Assert.Equal (1, optionSelector.Value);
+        Assert.Equal (1, ancestorActivatedCount);
+
+        // The ancestor must receive the OptionSelector's int? (1), NOT a CheckState.
+        Assert.Null (capturedValue as CheckState?);    // Must NOT be a CheckState
+        Assert.Equal ((int?)1, capturedValue as int?); // Must be the OptionSelector's index
+
+        ancestor.Dispose ();
+    }
+
+    #endregion
 }

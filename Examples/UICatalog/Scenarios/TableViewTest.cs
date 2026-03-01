@@ -129,7 +129,7 @@ public class TableViewTest : Scenario
             ("MinAcceptableWidth (limit col 6 = 15)", () => tableView.Style.ColumnStyles[6].MinAcceptableWidth < TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH, b => tableView.Style.ColumnStyles[6].MinAcceptableWidth = b ? 15 : TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH),
         ];
 
-        View? priorView = null;
+        View priorView = null;
 
         foreach ((string text, Func<bool> iv, Action<bool> hndlr) tuple in options)
         {

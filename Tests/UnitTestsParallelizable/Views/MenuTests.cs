@@ -1,6 +1,10 @@
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
+
 namespace ViewsTests;
 
-public class MenuTests
+public class MenuTests (ITestOutputHelper output)
 {
     // Claude - Opus 4.6
     [Fact]
@@ -2121,4 +2125,479 @@ public class MenuTests
     }
 
     #endregion Menu OnSelectedMenuItemChanged SubMenu Display
+
+    #region IValue<MenuItem?> Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ImplementsIValue ()
+    {
+        Menu menu = new ();
+
+        Assert.IsAssignableFrom<IValue<MenuItem?>> (menu);
+        Assert.IsAssignableFrom<IValue> (menu);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_DefaultsToNull ()
+    {
+        Menu menu = new ();
+
+        Assert.Null (menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_CanBeSetProgrammatically ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.Value = item;
+
+        Assert.Equal (item, menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_SetToSameValue_NoEventsRaised ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+        menu.Value = item;
+
+        var valueChangingCount = 0;
+        var valueChangedCount = 0;
+
+        menu.ValueChanging += (_, _) => valueChangingCount++;
+        menu.ValueChanged += (_, _) => valueChangedCount++;
+
+        menu.Value = item; // Set to same value
+
+        Assert.Equal (0, valueChangingCount);
+        Assert.Equal (0, valueChangedCount);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ValueChanging_CanBeCancelled ()
+    {
+        Menu menu = new ();
+        MenuItem item1 = new () { Title = "Item1" };
+        MenuItem item2 = new () { Title = "Item2" };
+        menu.Add (item1, item2);
+
+        menu.Value = item1;
+
+        menu.ValueChanging += (_, args) =>
+                              {
+                                  if (args.NewValue == item2)
+                                  {
+                                      args.Handled = true;
+                                  }
+                              };
+
+        menu.Value = item2; // Should be cancelled
+
+        Assert.Equal (item1, menu.Value); // Still item1
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ValueChanged_RaisedWhenValueChanges ()
+    {
+        Menu menu = new ();
+        MenuItem item1 = new () { Title = "Item1" };
+        MenuItem item2 = new () { Title = "Item2" };
+        menu.Add (item1, item2);
+
+        MenuItem? oldValue = null;
+        MenuItem? newValue = null;
+        var changedCount = 0;
+
+        menu.ValueChanged += (_, args) =>
+                             {
+                                 oldValue = args.OldValue;
+                                 newValue = args.NewValue;
+                                 changedCount++;
+                             };
+
+        menu.Value = item1;
+        Assert.Equal (1, changedCount);
+        Assert.Null (oldValue);
+        Assert.Equal (item1, newValue);
+
+        menu.Value = item2;
+        Assert.Equal (2, changedCount);
+        Assert.Equal (item1, oldValue);
+        Assert.Equal (item2, newValue);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_ValueChangedUntyped_RaisedWhenValueChanges ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        object? capturedValue = null;
+        var untypedCount = 0;
+
+        menu.ValueChangedUntyped += (_, args) =>
+                                    {
+                                        capturedValue = args.NewValue;
+                                        untypedCount++;
+                                    };
+
+        menu.Value = item;
+
+        Assert.Equal (1, untypedCount);
+        Assert.Equal (item, capturedValue);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_SetOnAccepting_FromMenuItem ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.BeginInit ();
+        menu.EndInit ();
+
+        // Simulate MenuItem Accept bubbling up
+        item.InvokeCommand (Command.Accept);
+
+        Assert.Equal (item, menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_Value_SetFromMenuItemAccept ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.BeginInit ();
+        menu.EndInit ();
+
+        // Simulate MenuItem Accept bubbling up
+        item.InvokeCommand (Command.Accept);
+
+        // Menu.Value should be set to the accepted MenuItem
+        Assert.Equal (item, menu.Value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_InvokeCommand_PopulatesContextValueWithMenuItem ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            Menu menu = new ();
+            MenuItem item = new () { Title = "Item1" };
+            menu.Add (item);
+
+            menu.BeginInit ();
+            menu.EndInit ();
+
+            // Set Menu.Value first
+            menu.Value = item;
+
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
+
+            menu.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
+
+            // When Menu itself invokes a command, ctx.Value should be populated from Menu.GetValue()
+            menu.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal (item, capturedContext!.Value);
+
+            menu.Dispose ();
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Menu_GetValue_ReturnsCurrentValue ()
+    {
+        Menu menu = new ();
+        MenuItem item = new () { Title = "Item1" };
+        menu.Add (item);
+
+        menu.Value = item;
+
+        IValue iValue = menu;
+        object? value = iValue.GetValue ();
+
+        Assert.Equal (item, value);
+
+        menu.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_BubblingUp_SetsValue_FromMenuItem ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        Runnable runnable = new ();
+
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "TestItem" };
+        menu.Add (menuItem);
+        runnable.Add (menu);
+
+        app.Begin (runnable);
+
+        // Activate the MenuItem — its Activate command bubbles up to Menu
+        menuItem.InvokeCommand (Command.Activate);
+
+        // Menu.Value should have been set by OnActivating's BubblingUp path
+        Assert.Same (menuItem, menu.Value);
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_BubblingUp_DoesNotSetValue_ForNonMenuItem ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        Runnable runnable = new ();
+
+        Menu menu = new ();
+        MenuItem menuItem = new () { Title = "TestItem" };
+        menu.Add (menuItem);
+        runnable.Add (menu);
+
+        app.Begin (runnable);
+
+        // Value should remain null when no MenuItem activation has occurred
+        Assert.Null (menu.Value);
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_BubblingUp_ContextValue_Contains_Title ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            VirtualTimeProvider time = new ();
+            using IApplication app = Application.Create (time);
+            app.Init (DriverRegistry.Names.ANSI);
+            Runnable runnable = new ();
+
+            Menu menu = new ();
+            MenuItem menuItem = new () { Title = "TestItem" };
+            menu.Add (menuItem);
+            runnable.Add (menu);
+
+            app.Begin (runnable);
+
+            object? capturedValue = null;
+            var activatedCount = 0;
+
+            menu.Activated += (_, args) =>
+                              {
+                                  activatedCount++;
+                                  capturedValue = args?.Value?.Value;
+                              };
+
+            // Activate the MenuItem — ctx.Value should contain the Title from MenuItem.GetValue()
+            menuItem.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, activatedCount);
+            Assert.Equal ("TestItem", capturedValue);
+
+            runnable.Dispose ();
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Menu_OnActivating_Dispatch_InvokesOnFocusedMenuItem ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            VirtualTimeProvider time = new ();
+            using IApplication app = Application.Create (time);
+            app.Init (DriverRegistry.Names.ANSI);
+            Runnable runnable = new ();
+
+            Menu menu = new ();
+            MenuItem menuItem1 = new () { Title = "Item1", CanFocus = true };
+            MenuItem menuItem2 = new () { Title = "Item2", CanFocus = true };
+            menu.Add (menuItem1, menuItem2);
+            runnable.Add (menu);
+
+            app.Begin (runnable);
+
+            // Focus item2
+            menuItem2.SetFocus ();
+            Assert.True (menuItem2.HasFocus);
+
+            var item2ActivatedCount = 0;
+
+            menuItem2.Activated += (_, _) => item2ActivatedCount++;
+
+            // Invoke Activate on the Menu directly — should dispatch to the focused MenuItem
+            menu.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, item2ActivatedCount);
+
+            runnable.Dispose ();
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void OptionSelector_CommandView_Activated_Bubbles_Through_Full_Chain ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            ListBackend traceBackend = new ();
+            Trace.Backend = traceBackend;
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            try
+            {
+                VirtualTimeProvider time = new ();
+                using IApplication app = Application.Create (time);
+                app.Init (DriverRegistry.Names.ANSI);
+                IRunnable runnable = new Runnable ();
+
+                View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate], Width = Dim.Fill (), Height = Dim.Fill () };
+                Menu menu = new () { Id = "menu" };
+                superView.Add (menu);
+
+                OptionSelector selector = new () { Id = "schemeOptionSelector", Labels = ["Opt1", "Opt2"] };
+                MenuItem menuItem = new () { Title = "Scheme", CommandView = selector };
+                menu.Add (menuItem);
+
+                ((View)runnable).Add (superView);
+                app.Begin (runnable);
+
+                // Track Activated events at each level
+                var menuItemActivatedCount = 0;
+                ICommandContext? menuItemActivatedCtx = null;
+
+                menuItem.Activated += (_, args) =>
+                                      {
+                                          menuItemActivatedCount++;
+                                          menuItemActivatedCtx = args.Value;
+                                      };
+
+                var menuActivatedCount = 0;
+                ICommandContext? menuActivatedCtx = null;
+
+                menu.Activated += (_, args) =>
+                                  {
+                                      menuActivatedCount++;
+                                      menuActivatedCtx = args.Value;
+                                  };
+
+                var superViewActivatedCount = 0;
+                ICommandContext? superViewActivatedCtx = null;
+
+                superView.Activated += (_, args) =>
+                                       {
+                                           superViewActivatedCount++;
+                                           superViewActivatedCtx = args.Value;
+                                       };
+
+                traceBackend.Clear ();
+
+                // Click on an inner CheckBox of the OptionSelector (simulates real user interaction)
+                CheckBox innerCb = selector.SubViews.OfType<CheckBox> ().ElementAt (1); // click Opt2
+                Point screenPos = innerCb.FrameToScreen ().Location;
+                app.InjectSequence (InputInjectionExtensions.LeftButtonClick (screenPos));
+
+                // Build trace dump for assertion messages
+                string traceDump = string.Join ("\n",
+                                                traceBackend.Entries.Where (e => e.Category == TraceCategory.Command)
+                                                            .Select (e =>
+                                                                     {
+                                                                         string dataStr = e.Data switch
+                                                                                          {
+                                                                                              ICommandContext ctx => $"Cmd={
+                                                                                                  ctx.Command
+                                                                                              } Routing={
+                                                                                                  ctx.Routing
+                                                                                              } Value={
+                                                                                                  ctx.Value
+                                                                                              }",
+                                                                                              (Command cmd, CommandRouting routing) => $"Cmd={
+                                                                                                  cmd
+                                                                                              } Routing={
+                                                                                                  routing
+                                                                                              }",
+                                                                                              _ => e.Data?.ToString () ?? ""
+                                                                                          };
+
+                                                                         return $"  [{e.Phase}] {e.Id} ({e.Method}) {e.Message} [{dataStr}]";
+                                                                     }));
+
+                // MenuItem.Activated should fire via BubbleActivatedUp after ConsumeDispatch
+                Assert.Equal (1, menuItemActivatedCount);
+
+                // Menu.Activated should fire via BubbleActivatedUp (full chain propagation)
+                Assert.Equal (1, menuActivatedCount);
+
+                // SuperView.Activated should also fire via BubbleActivatedUp
+                Assert.Equal (1, superViewActivatedCount);
+
+                ((View)runnable).Dispose ();
+            }
+            finally
+            {
+                Trace.EnabledCategories = TraceCategory.None;
+                Trace.Backend = new NullBackend ();
+            }
+        }
+    }
+
+    #endregion
 }
