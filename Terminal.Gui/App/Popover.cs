@@ -333,7 +333,7 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable
         }
 
         // Inherit App from Target if not already set
-        if (App is null && Target?.TryGetTarget (out View? targetView) == true && targetView?.App is { } targetApp)
+        if (App is null && Target?.TryGetTarget (out View? targetView) == true && targetView!.App is { } targetApp)
         {
             App = targetApp;
         }
