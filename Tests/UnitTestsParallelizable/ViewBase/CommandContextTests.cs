@@ -116,8 +116,11 @@ public class CommandContextTests
     [Fact]
     public void PatternMatching_MouseBinding_WithMouseEvent_Works ()
     {
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
-        mouseBinding.MouseEvent = new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (10, 20) };
+        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked)
+        {
+            Source = new WeakReference<View> (new View { Id = "mouseSource" }),
+            MouseEvent = new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (10, 20) }
+        };
 
         ICommandContext ctx = new CommandContext { Command = Command.Activate, Source = new WeakReference<View> (new View ()), Binding = mouseBinding };
 
@@ -186,7 +189,7 @@ public class CommandContextTests
         {
             View? kbSource = null;
             Assert.True (kb.Source?.TryGetTarget (out kbSource) == true);
-            Assert.Equal ("bindingSource", kbSource?.Id);
+            Assert.Equal ("bindingSource", kbSource.Id);
         }
         else
         {
@@ -213,7 +216,7 @@ public class CommandContextTests
         {
             View? mbSource = null;
             Assert.True (mb.Source?.TryGetTarget (out mbSource) == true);
-            Assert.Equal ("bindingSource", mbSource?.Id);
+            Assert.Equal ("bindingSource", mbSource.Id);
         }
         else
         {
@@ -250,7 +253,8 @@ public class CommandContextTests
     [Fact]
     public void CommandEventArgs_Context_WithMouseBinding_Works ()
     {
-        MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
+        MouseBinding mouseBinding =
+            new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new WeakReference<View> (new View { Id = "mouseSource" }) };
 
         CommandContext ctx = new () { Command = Command.Activate, Source = new WeakReference<View> (new View { Id = "invoker" }), Binding = mouseBinding };
 
@@ -332,7 +336,7 @@ public class CommandContextTests
         {
             View? sv = null;
             Assert.True (ib.Source?.TryGetTarget (out sv) == true);
-            Assert.Equal ("programmatic", sv?.Id);
+            Assert.Equal ("programmatic", sv.Id);
             Assert.Equal ("data", ib.Data);
         }
         else
@@ -417,7 +421,7 @@ public class CommandContextTests
     }
 
     #endregion
-    
+
     #region WeakReference Behavior Tests
 
     [Fact]
@@ -427,11 +431,11 @@ public class CommandContextTests
         CommandContext ctx = new () { Command = Command.Accept, Source = new WeakReference<View> (sourceView) };
 
         View? retrievedView = null;
-        var success = ctx.Source?.TryGetTarget (out retrievedView);
+        bool? success = ctx.Source?.TryGetTarget (out retrievedView);
 
         Assert.True (success);
         Assert.NotNull (retrievedView);
-        Assert.Equal ("weakRefTest", retrievedView?.Id);
+        Assert.Equal ("weakRefTest", retrievedView.Id);
     }
 
     // Claude - Opus 4.6
@@ -470,10 +474,7 @@ public class CommandContextTests
 
         CommandContext ctx = new ()
         {
-            Command = Command.Accept,
-            Source = new WeakReference<View> (sourceView),
-            Binding = binding,
-            Routing = CommandRouting.BubblingUp
+            Command = Command.Accept, Source = new WeakReference<View> (sourceView), Binding = binding, Routing = CommandRouting.BubblingUp
         };
 
         CommandContext updated = ctx.WithCommand (Command.Activate);
@@ -492,11 +493,7 @@ public class CommandContextTests
     [Fact]
     public void WithRouting_CreatesNewContext_PreservesOtherFields ()
     {
-        CommandContext ctx = new ()
-        {
-            Command = Command.Accept,
-            Routing = CommandRouting.Direct
-        };
+        CommandContext ctx = new () { Command = Command.Accept, Routing = CommandRouting.Direct };
 
         CommandContext updated = ctx.WithRouting (CommandRouting.DispatchingDown);
 
@@ -545,6 +542,140 @@ public class CommandContextTests
 
         // WeakReferences are reference types, so different instances are not equal
         Assert.NotEqual (ctx1, ctx2);
+    }
+
+    #endregion
+
+    #region Value Property Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_DefaultValue_IsNull ()
+    {
+        CommandContext ctx = new ();
+
+        Assert.Null (ctx.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_Value_CanBeSet ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["test value"] };
+
+        Assert.Equal ("test value", ctx.Value);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_WithValue_CreatesNewContext_PreservesOtherFields ()
+    {
+        View sourceView = new () { Id = "source" };
+        KeyBinding binding = new ([Command.Accept]) { Key = Key.Enter };
+
+        CommandContext ctx = new ()
+        {
+            Command = Command.Accept, Source = new WeakReference<View> (sourceView), Binding = binding, Routing = CommandRouting.BubblingUp
+        };
+
+        CommandContext updated = ctx.WithValue ("new value");
+
+        // Original unchanged
+        Assert.Null (ctx.Value);
+
+        // Updated has new value appended, everything else preserved
+        Assert.Equal ("new value", updated.Value);
+        Assert.Single (updated.Values);
+        Assert.Equal (Command.Accept, updated.Command);
+        Assert.Equal (ctx.Source, updated.Source);
+        Assert.Equal (ctx.Binding, updated.Binding);
+        Assert.Equal (CommandRouting.BubblingUp, updated.Routing);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_WithValue_Appends_Not_Replaces ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["initial value"] };
+
+        CommandContext updated = ctx.WithValue ("second value");
+
+        Assert.Equal ("initial value", ctx.Value);
+        Assert.Equal ("second value", updated.Value);
+        Assert.Equal (2, updated.Values.Count);
+        Assert.Equal ("initial value", updated.Values [0]);
+        Assert.Equal ("second value", updated.Values [1]);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_WithValue_CanAppendNull ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["initial value"] };
+
+        CommandContext updated = ctx.WithValue (null);
+
+        Assert.Equal ("initial value", ctx.Value);
+        Assert.Null (updated.Value);
+        Assert.Equal (2, updated.Values.Count);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_ToString_IncludesValue_WhenNonNull ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["test value"] };
+
+        var result = ctx.ToString ();
+
+        Assert.Contains ("Value=test value", result);
+        Assert.Contains ("Accept", result);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandContext_ToString_OmitsValue_WhenNull ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept };
+
+        var result = ctx.ToString ();
+
+        Assert.DoesNotContain ("Value=", result);
+        Assert.Contains ("Accept", result);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ICommandContext_Value_IsAccessible ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = [42] };
+
+        ICommandContext iCtx = ctx;
+
+        Assert.Equal (42, iCtx.Value);
+    }
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void CommandContext_Values_Empty_By_Default ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept };
+
+        Assert.Empty (ctx.Values);
+        Assert.Null (ctx.Value);
+    }
+
+    // Claude - Sonnet 4.6
+    [Fact]
+    public void CommandContext_Values_Chain_Returns_Last_As_Value ()
+    {
+        CommandContext ctx = new () { Command = Command.Accept, Values = ["first", "second", "third"] };
+
+        Assert.Equal ("third", ctx.Value);
+        Assert.Equal (3, ctx.Values.Count);
+        Assert.Equal ("first", ctx.Values [0]);
+        Assert.Equal ("second", ctx.Values [1]);
+        Assert.Equal ("third", ctx.Values [2]);
     }
 
     #endregion

@@ -68,6 +68,4 @@ public interface IPopover
     ///     </para>
     /// </remarks>
     IRunnable? Owner { get; set; }
-
-    // TODO: Add WeakReference<View?>? Target {get; set;} - The view that commands will get bubbled up to
 }

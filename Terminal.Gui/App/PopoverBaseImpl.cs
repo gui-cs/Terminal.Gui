@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -14,7 +13,10 @@ namespace Terminal.Gui.App;
 ///         Derived classes must:
 ///     </para>
 ///     <list type="bullet">
-///         <item>Set <see cref="View.ViewportSettings"/> to include <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
+///         <item>
+///             Set <see cref="View.ViewportSettings"/> to include <see cref="ViewportSettingsFlags.Transparent"/> and
+///             <see cref="ViewportSettingsFlags.TransparentMouse"/>.
+///         </item>
 ///         <item>Add a key binding for <see cref="Command.Quit"/> (typically bound to <see cref="Application.QuitKey"/>).</item>
 ///     </list>
 ///     <para>
@@ -22,7 +24,10 @@ namespace Terminal.Gui.App;
 ///         This base class provides:
 ///     </para>
 ///     <list type="bullet">
-///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
+///         <item>
+///             Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/>
+///             = <see cref="Dim.Fill()"/>).
+///         </item>
 ///         <item>Transparent viewport settings for proper mouse event handling.</item>
 ///         <item>Automatic layout when becoming visible.</item>
 ///         <item>Focus restoration when hidden.</item>
@@ -44,10 +49,19 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///         Sets up default popover behavior:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
+    ///         <item>
+    ///             Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> =
+    ///             <see cref="Dim.Fill()"/>).
+    ///         </item>
     ///         <item>Sets <see cref="View.CanFocus"/> to <see langword="true"/>.</item>
-    ///         <item>Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
-    ///         <item>Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when invoked.</item>
+    ///         <item>
+    ///             Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and
+    ///             <see cref="ViewportSettingsFlags.TransparentMouse"/>.
+    ///         </item>
+    ///         <item>
+    ///             Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when
+    ///             invoked.
+    ///         </item>
     ///     </list>
     /// </remarks>
     protected PopoverBaseImpl ()
@@ -98,6 +112,35 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
     }
 
+    private CommandBridge? _targetBridge;
+
+    /// <summary>
+    ///     Gets or sets the target <see cref="View"/> of this popover as a weak reference. This is typically the view that
+    ///     triggered the popover to be shown.
+    ///     Commands that bubble from Views within the Popover will be bridged to this target view, allowing them to be handled
+    ///     as if they originated from the target.
+    ///     This is useful for scenarios where the View that triggered the popover is not part of the popover's view hierarchy,
+    ///     but still wants commands to be handled in the context of that view.
+    /// </summary>
+    public WeakReference<View>? Target
+    {
+        get;
+        set
+        {
+            // Tear down old bridge
+            _targetBridge?.Dispose ();
+            _targetBridge = null;
+
+            field = value;
+
+            // Create bridge: when this popover fires Activated/Accepted, bridge to Target
+            if (value?.TryGetTarget (out View? targetView) == true)
+            {
+                _targetBridge = CommandBridge.Connect (targetView, this, Command.Activate, Command.Accept);
+            }
+        }
+    }
+
     /// <summary>
     ///     Called when the <see cref="View.Visible"/> property is changing. Handles layout and focus management.
     /// </summary>
@@ -140,5 +183,17 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
 
         return ret;
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            _targetBridge?.Dispose ();
+            _targetBridge = null;
+        }
+
+        base.Dispose (disposing);
     }
 }
