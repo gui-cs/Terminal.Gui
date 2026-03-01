@@ -57,12 +57,12 @@ public partial class TextView
 
         if (isRow)
         {
-            Viewport = Viewport with { Y = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0) };
+            Viewport = Viewport with { Y = Math.Max (idx > _model.Count - 1 - Viewport.Height ? _model.Count - Viewport.Height : idx, 0) };
         }
         else if (!_wordWrap)
         {
             int maxlength = _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
-            Viewport = Viewport with { X = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0) };
+            Viewport = Viewport with { X = Math.Max (idx > maxlength - Viewport.Width ? maxlength - Viewport.Width + 1 : idx, 0) };
         }
 
         PositionCursor ();

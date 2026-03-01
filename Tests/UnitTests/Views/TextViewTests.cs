@@ -407,12 +407,22 @@ public partial class TextViewTests
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.True (tv.Cursor.IsVisible);
 
+        var viewportX = 3; // 12+1(cursor)-10(width)
+
         for (var i = 0; i < 12; i++)
         {
             // Scroll right, hiding the insertion point
             tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledRight });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (Math.Min (i + 1, 11), tv.Viewport.X);
+
+            if (i >= viewportX)
+            {
+                Assert.Equal (viewportX, tv.Viewport.X);
+            }
+            else
+            {
+                Assert.Equal (Math.Min (i + 1, 11), tv.Viewport.X);
+            }
             Assert.False (tv.Cursor.IsVisible);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
@@ -422,9 +432,18 @@ public partial class TextViewTests
             // Scroll left, eventually showing insertion point
             tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledLeft });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i - 1, tv.Viewport.X);
 
-            if (i - 1 == 0)
+            if (viewportX > 0)
+            {
+                viewportX -= 1;
+                Assert.Equal (viewportX, tv.Viewport.X);
+            }
+            else
+            {
+                Assert.Equal (0, tv.Viewport.X);
+            }
+
+            if (viewportX == 0)
             {
                 Assert.True (tv.Cursor.IsVisible);
                 Assert.True (Application.Driver!.GetCursor ().IsVisible);
@@ -473,11 +492,22 @@ public partial class TextViewTests
 
         Assert.Equal (0, tv.Viewport.Y);
 
+        var viewportY = 3; // 13-10(width)
+        Assert.Equal (13, tv.Lines);
+
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledDown });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i + 1, tv.Viewport.Y);
+
+            if (i >= viewportY)
+            {
+                Assert.Equal (viewportY, tv.Viewport.Y);
+            }
+            else
+            {
+                Assert.Equal (i + 1, tv.Viewport.Y);
+            }
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
 
@@ -485,9 +515,18 @@ public partial class TextViewTests
         {
             tv.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledUp });
             Application.Navigation.UpdateCursor ();
-            Assert.Equal (i - 1, tv.Viewport.Y);
 
-            if (i - 1 == 0)
+            if (viewportY > 0)
+            {
+                viewportY -= 1;
+                Assert.Equal (viewportY, tv.Viewport.Y);
+            }
+            else
+            {
+                Assert.Equal (0, tv.Viewport.Y);
+            }
+
+            if (viewportY == 0)
             {
                 Assert.True (Application.Driver!.GetCursor ().IsVisible);
             }
