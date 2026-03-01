@@ -1881,8 +1881,8 @@ public class MenuBarTests
     {
         ListBackend traceBackend = new ();
         Trace.Backend = traceBackend;
-        Trace.CommandEnabled = true;
-        Trace.KeyboardEnabled = true;
+        Trace.EnabledCategories |= TraceCategory.Command;
+        Trace.EnabledCategories |= TraceCategory.Keyboard;
 
         try
         {
@@ -1954,8 +1954,7 @@ public class MenuBarTests
         }
         finally
         {
-            Trace.CommandEnabled = false;
-            Trace.KeyboardEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
