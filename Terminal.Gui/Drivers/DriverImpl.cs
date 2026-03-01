@@ -265,6 +265,7 @@ internal class DriverImpl : IDriver
     {
         _outputBuffer.ClearContents ();
         ClearedContents?.Invoke (this, EventArgs.Empty);
+        CurrentUrl = null;
     }
 
     /// <inheritdoc/>

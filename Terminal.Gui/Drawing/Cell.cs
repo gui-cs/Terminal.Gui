@@ -5,7 +5,7 @@ namespace Terminal.Gui.Drawing;
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
 ///     <see cref="IDriver"/>).
 /// </summary>
-public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, string Grapheme = "", string? Url = null)
+public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, string Grapheme = "")
 {
     /// <summary>The attributes to use when drawing the Glyph.</summary>
     public Attribute? Attribute { get; set; } = Attribute;
@@ -15,12 +15,6 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, st
     ///     last time it was drawn.
     /// </summary>
     public bool IsDirty { get; set; } = IsDirty;
-
-    /// <summary>
-    ///     Gets or sets the URL associated with this cell for OSC 8 hyperlink support.
-    ///     When set, the cell will be rendered as a clickable hyperlink in terminals that support OSC 8.
-    /// </summary>
-    public string? Url { get; set; } = Url;
 
     private string _grapheme = Grapheme;
 

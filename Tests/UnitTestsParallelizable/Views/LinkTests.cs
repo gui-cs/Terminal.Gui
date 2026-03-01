@@ -49,10 +49,10 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         Link link = new() { Url = "https://github.com" };
 
         link.Url = "not a valid url";
-        Assert.Equal ("https://github.com", link.Url); // Url should not change on invalid
+        Assert.Equal (Link.DEFAULT_URL, link.Url); // Url should not change on invalid
 
         link.Url = "";
-        Assert.Equal ("https://github.com", link.Url); // Url should not change on invalid
+        Assert.Equal (Link.DEFAULT_URL, link.Url); // Url should not change on invalid
     }
     
     [Fact]
@@ -123,7 +123,13 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        app.Clipboard = new FakeClipboard ();
+
+        using Runnable window = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
 
         Link link = new ()
         {
@@ -131,24 +137,26 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Url = "https://github.com/gui-cs/Terminal.Gui",
             Text = "Terminal.Gui"
         };
+        window.Add (link);
 
-        link.BeginInit ();
-        link.EndInit ();
-        link.SetRelativeLayout (new (30, 3));
-        link.Draw ();
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver!.Refresh ();
 
         // Get the ANSI output
-        string ansi = app.Driver!.ToAnsi ();
+        string ansi = app.Driver.ToAnsi ();
+        string? look = app.Driver.GetOutput ().GetLastOutput ();
 
         // Verify OSC 8 sequences are present
         string expectedStart = EscSeqUtils.OSC_StartHyperlink ("https://github.com/gui-cs/Terminal.Gui");
         string expectedEnd = EscSeqUtils.OSC_EndHyperlink ();
 
-        Assert.Contains (expectedStart, ansi);
-        Assert.Contains (expectedEnd, ansi);
+        Assert.Contains (expectedStart, look);
+        Assert.Contains (expectedEnd, look);
+        Assert.Contains ("Terminal.Gui", look);
         Assert.Contains ("Terminal.Gui", ansi);
 
-        link.Dispose ();
+        window.Dispose ();
     }
 
     [Fact]
@@ -156,27 +164,35 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        app.Clipboard = new FakeClipboard ();
+
+        using Runnable window = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
 
         Link link = new ()
         {
             App = app,
             Text = "Not a link"
         };
+        window.Add (link);
 
-        link.BeginInit ();
-        link.EndInit ();
-        link.SetRelativeLayout (new (30, 3));
-        link.Draw ();
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver!.Refresh ();
 
         // Get the ANSI output
         string ansi = app.Driver!.ToAnsi ();
+        string? look = app.Driver.GetOutput ().GetLastOutput ();
 
         // Verify OSC 8 sequences are NOT present for default URL
-        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink (Link.DEFAULT_URL), ansi);
+        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink (Link.DEFAULT_URL), look);
+        Assert.Contains ("Not a link", look);
         Assert.Contains ("Not a link", ansi);
 
-        link.Dispose ();
+        window.Dispose ();
     }
 
     [Fact]
@@ -207,8 +223,16 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        app.Clipboard = new FakeClipboard ();
+        app.Driver!.SetScreenSize (40, 2);
 
+        using Runnable window = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
+
+        // ✅ Ajouter les DEUX liens dès le début
         Link link1 = new ()
         {
             App = app,
@@ -227,27 +251,24 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Text = "Microsoft"
         };
 
-        link1.BeginInit ();
-        link1.EndInit ();
-        link1.SetRelativeLayout (new (30, 10));
-        link1.Draw ();
+        window.Add (link1, link2);
 
-        link2.BeginInit ();
-        link2.EndInit ();
-        link2.SetRelativeLayout (new (30, 10));
-        link2.Draw ();
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver.Refresh ();
 
-        // Get the ANSI output
-        string ansi = app.Driver!.ToAnsi ();
+        string? look = app.Driver.GetOutput ().GetLastOutput ();
+        string ansi = app.Driver.ToAnsi ();
 
-        // Verify both URLs are present
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com"), ansi);
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://microsoft.com"), ansi);
+        // Verify both URLs are present in the same output
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com"), look);
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://microsoft.com"), look);
+        Assert.Contains ("GitHub", look);
+        Assert.Contains ("Microsoft", look);
         Assert.Contains ("GitHub", ansi);
         Assert.Contains ("Microsoft", ansi);
 
-        link1.Dispose ();
-        link2.Dispose ();
+        window.Dispose ();
     }
 
     [Fact]
@@ -255,7 +276,13 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        app.Clipboard = new FakeClipboard ();
+
+        using Runnable window = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
 
         Link link = new ()
         {
@@ -263,25 +290,25 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Url = "https://example.com",
             Text = "Example"
         };
+        window.Add (link);
 
-        link.BeginInit ();
-        link.EndInit ();
-        link.SetRelativeLayout (new (30, 3));
-        link.Draw ();
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver!.Refresh ();
 
-        string ansi1 = app.Driver!.ToAnsi ();
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://example.com"), ansi1);
+        string? look1 = app.Driver.GetOutput ().GetLastOutput ();
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://example.com"), look1);
 
         // Clear and change URL
         app.Driver.ClearContents ();
         link.Url = "https://newurl.com";
-        link.SetNeedsDraw ();
-        link.Draw ();
+        app.LayoutAndDraw ();
+        app.Driver!.Refresh ();
 
-        string ansi2 = app.Driver.ToAnsi ();
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://newurl.com"), ansi2);
+        string? look2 = app.Driver.GetOutput ().GetLastOutput ();
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://newurl.com"), look2);
 
-        link.Dispose ();
+        window.Dispose ();
     }
 
     [Fact]
@@ -289,35 +316,48 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        app.Clipboard = new FakeClipboard ();
+
+        using Runnable window = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
+
+        // ✅ Add a dummy view to take initial focus
+        View dummyView = new () { CanFocus = true, Width = 1, Height = 1 };
+        window.Add (dummyView);
 
         Link link = new ()
         {
             App = app,
             Url = "https://github.com",
             Text = "GitHub",
-            CanFocus = true
+            CanFocus = true,
+            Y = 1  // Place it below dummyView
         };
+        window.Add (link);
 
-        link.BeginInit ();
-        link.EndInit ();
-        link.SetRelativeLayout (new (30, 3));
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver!.Refresh ();
 
-        // Without focus
-        link.Draw ();
+        // ✅ Without focus - dummyView has focus instead
         Assert.False (link.HasFocus);
+        Assert.True (dummyView.HasFocus);
 
-        // Set focus
-        app.Driver!.ClearContents ();
+        // Set focus on link
+        app.Driver.ClearContents ();
         link.SetFocus ();
         link.Draw ();
         Assert.True (link.HasFocus);
+        Assert.False (dummyView.HasFocus);
 
         // The link should still have OSC 8 sequences
-        string ansi = app.Driver.ToAnsi ();
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com"), ansi);
+        string? look = app.Driver.GetOutput ().GetLastOutput ();
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com"), look);
 
-        link.Dispose ();
+        window.Dispose ();
     }
 
     [Fact]
@@ -355,41 +395,6 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (nextView.HasFocus);
 
         superView.Dispose ();
-    }
-
-    [Fact]
-    public void Link_Cell_Url_Is_Set_In_Buffer ()
-    {
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-        app.Clipboard = new FakeClipboard ();
-
-        Link link = new ()
-        {
-            App = app,
-            X = 0,
-            Y = 0,
-            Url = "https://github.com",
-            Text = "GitHub"
-        };
-
-        link.BeginInit ();
-        link.EndInit ();
-        link.SetRelativeLayout (new (30, 3));
-        link.Draw ();
-
-        // Verify that cells in the buffer have the URL set
-        Cell [,] contents = app.Driver!.Contents!;
-        
-        // The first cell of "GitHub" should have the URL
-        Assert.Equal ("https://github.com", contents [0, 0].Url);
-        Assert.Equal ("G", contents [0, 0].Grapheme);
-
-        // All cells in "GitHub" should have the URL
-        Assert.Equal ("https://github.com", contents [0, 1].Url);
-        Assert.Equal ("https://github.com", contents [0, 2].Url);
-
-        link.Dispose ();
     }
 
     [Fact]

@@ -122,6 +122,15 @@ public interface IOutputBuffer
     string? CurrentUrl { get; set; }
 
     /// <summary>
+    ///     Gets the URL associated with the cell at the specified position.
+    ///     Returns <see langword="null"/> if no URL is associated with the cell.
+    /// </summary>
+    /// <param name="col">The column position.</param>
+    /// <param name="row">The row position.</param>
+    /// <returns>The URL associated with the cell, or <see langword="null"/> if none exists.</returns>
+    string? GetCellUrl (int col, int row);
+
+    /// <summary>
     ///     Changes the size of the buffer to the given size
     /// </summary>
     /// <param name="cols"></param>

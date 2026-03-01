@@ -119,6 +119,29 @@ public abstract class OutputBase
                         lastCol = col;
                     }
 
+                    // Handle URL hyperlink state changes
+                    if (!IsLegacyConsole)
+                    {
+                        string? cellUrl = buffer.GetCellUrl (col, row);
+
+                        if (cellUrl != _lastUrl)
+                        {
+                            // If we were in a hyperlink, end it
+                            if (_lastUrl is { })
+                            {
+                                outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                            }
+
+                            // If starting a new hyperlink, begin it
+                            if (!string.IsNullOrEmpty (cellUrl))
+                            {
+                                outputStringBuilder.Append (EscSeqUtils.OSC_StartHyperlink (cellUrl));
+                            }
+
+                            _lastUrl = cellUrl;
+                        }
+                    }
+
                     // Append dirty cell as ANSI and mark clean
                     Cell cell = buffer.Contents [row, col];
                     buffer.Contents [row, col].IsDirty = false;
@@ -310,24 +333,6 @@ public abstract class OutputBase
     protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol, ref int outputWidth)
     {
         Attribute? attribute = cell.Attribute;
-
-        // Handle URL hyperlink state changes
-        if (!IsLegacyConsole && cell.Url != _lastUrl)
-        {
-            // If we were in a hyperlink, end it
-            if (_lastUrl is { })
-            {
-                output.Append (EscSeqUtils.OSC_EndHyperlink ());
-            }
-
-            // If starting a new hyperlink, begin it
-            if (!string.IsNullOrEmpty (cell.Url))
-            {
-                output.Append (EscSeqUtils.OSC_StartHyperlink (cell.Url));
-            }
-
-            _lastUrl = cell.Url;
-        }
 
         // Add ANSI escape sequence for attribute change
         if (attribute.HasValue && attribute.Value != lastAttr)

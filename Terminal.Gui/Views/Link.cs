@@ -32,9 +32,9 @@ public class Link : View, IDesignable
     /// Represents the default URL used when no specific URL is provided.
     /// </summary>
     /// <remarks>
-    /// This constant can be used to initialize browsers or web components to a blank page or neutral state.
+    /// An empty string indicates that no URL is associated with the link.
     /// </remarks>
-    public const string DEFAULT_URL = "about:blank";
+    public const string DEFAULT_URL = "";
 
     private string _url = DEFAULT_URL;
 
@@ -132,8 +132,8 @@ public class Link : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingText (DrawContext? context)
     {
-        // Set the URL for cells that will be drawn
-        if (!string.IsNullOrEmpty (Url) && Url != DEFAULT_URL && Driver is { })
+        // Set the URL for cells that will be drawn (only if URL is not empty)
+        if (!string.IsNullOrEmpty (Url) && Driver is { })
         {
             Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
 
@@ -176,8 +176,13 @@ public class Link : View, IDesignable
 
     private void SetUrl(string value)
     {
-        // Do dot crach on invalid URLs
-        if (Uri.TryCreate(value, UriKind.Absolute, out _) && _url != value)
+        // Do not crash on invalid URLs, instead default to a blank page
+        if (!Uri.TryCreate (value, UriKind.Absolute, out _))
+        {
+            value = DEFAULT_URL;
+        }
+
+        if (_url != value)
         {
             string oldValue = _url;
 
@@ -203,6 +208,9 @@ public class Link : View, IDesignable
             ValueChangedEventArgs<string> changedArgs = new (oldValue, value);
             OnUrlChanged (changedArgs);
             UrlChanged?.Invoke (this, changedArgs);
+
+            // Mark as needing redraw since URL changed
+            SetNeedsDraw ();
         }
     }
 }
