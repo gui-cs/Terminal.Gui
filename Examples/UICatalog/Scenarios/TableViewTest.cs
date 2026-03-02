@@ -37,8 +37,6 @@ public class TableViewTest : Scenario
             Title = "Options",
         };
 
-        View.Diagnostics = ViewDiagnosticFlags.DrawIndicator;
-
         var offsetLabel = new Label ()
         {
             X = 0, Y = Pos.Bottom (optionsView),
