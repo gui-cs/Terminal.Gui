@@ -326,7 +326,7 @@ public class ApplicationPopoverTests
         }
     }
 
-    public class PopoverTestClass : PopoverBaseImpl
+    public class PopoverTestClass : PopoverImpl
     {
         public List<Key> HandledKeys { get; } = [];
         public int NewCommandInvokeCount { get; private set; }

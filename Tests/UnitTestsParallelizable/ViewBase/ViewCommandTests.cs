@@ -1879,7 +1879,18 @@ public class ViewCommandTests (ITestOutputHelper output)
     // Test view that implements IValue<object?>
     private class TestValueView : View, IValue<object?>
     {
-        public object? Value { get; set; }
+        public object? Value
+        {
+            get;
+            set
+            {
+                object? old = field;
+                ValueChanging?.Invoke (this, new ValueChangingEventArgs<object?> (old, value));
+                field = value;
+                ValueChanged?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+                ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+            }
+        }
 
         public event EventHandler<ValueChangingEventArgs<object?>>? ValueChanging;
         public event EventHandler<ValueChangedEventArgs<object?>>? ValueChanged;
@@ -1907,6 +1918,7 @@ public class ViewCommandTests (ITestOutputHelper output)
                 }
 
                 int old = field;
+                ValueChanging?.Invoke (this, new ValueChangingEventArgs<int> (old, value));
                 field = value;
                 ValueChanged?.Invoke (this, new ValueChangedEventArgs<int> (old, value));
                 ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
@@ -2117,7 +2129,18 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         public CompositeValueView () => CommandsToBubbleUp = [Command.Activate];
 
-        public int? Value { get; set; }
+        public int? Value
+        {
+            get;
+            set
+            {
+                int? old = field;
+                ValueChanging?.Invoke (this, new ValueChangingEventArgs<int?> (old, value));
+                field = value;
+                ValueChanged?.Invoke (this, new ValueChangedEventArgs<int?> (old, value));
+                _valueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+            }
+        }
 
         /// <inheritdoc/>
         protected override bool ConsumeDispatch => true;

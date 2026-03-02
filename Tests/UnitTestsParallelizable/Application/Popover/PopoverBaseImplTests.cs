@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 namespace ApplicationTests.Popover;
 
 [Collection ("Application Tests")]
-public class PopoverBaseImplTests (ITestOutputHelper output)
+public class PopoverImplTests (ITestOutputHelper output)
 {
     // Minimal concrete implementation for testing
-    private class TestPopover : PopoverBaseImpl
+    private class TestPopover : PopoverImpl
     { }
 
     [Fact]
@@ -16,7 +16,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         var popover = new TestPopover ();
 #if DEBUG
-        Assert.Equal ("popoverBaseImpl", popover.Id);
+        Assert.Equal ("popoverImpl", popover.Id);
 #endif
         Assert.True (popover.CanFocus);
         Assert.Equal (Dim.Fill (), popover.Width);

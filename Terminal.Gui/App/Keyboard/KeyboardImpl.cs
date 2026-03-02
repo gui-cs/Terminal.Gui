@@ -158,7 +158,9 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             return true;
         }
 
-        if (App?.Popovers?.DispatchKeyDown (key) is true)
+        IPopoverView? activePopover = App?.Popovers?.GetActivePopover ();
+
+        if (activePopover is { } && App?.Popovers?.DispatchKeyDownToActivePopover (key) is true)
         {
             return true;
         }
@@ -187,6 +189,11 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             {
                 return true;
             }
+        }
+
+        if (App?.Popovers?.DispatchKeyDownToInactivePopovers (key, activePopover) is true)
+        {
+            return true;
         }
 
         bool? commandHandled = InvokeCommandsBoundToKey (key);
@@ -218,7 +225,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                     return null;
                 }
 
-                handled = binding.Target?.InvokeCommands (binding.Commands, binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+                handled = binding.Target?.InvokeCommands (binding.Commands,
+                                                          binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
             }
             else
             {
