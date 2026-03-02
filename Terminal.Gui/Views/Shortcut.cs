@@ -292,7 +292,6 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     <list type="bullet">
     ///         <item>Source guard (skip if source is already within CommandView)</item>
     ///         <item>Programmatic guard (skip if no binding)</item>
-    ///         <item>Deferred completion (Shortcut.Activated fires after CommandView.Activated)</item>
     ///     </list>
     /// </summary>
     protected override View GetDispatchTarget (ICommandContext? ctx) => CommandView;
@@ -301,20 +300,8 @@ public class Shortcut : View, IOrientation, IDesignable
     // (e.g., CheckBox.OnActivated calls AdvanceCheckState).
 
     /// <inheritdoc/>
-    protected override bool OnActivating (CommandEventArgs args)
-    {
-        // Reset the deferred-completion flag at the start of each activation cycle.
-        // Without this, a programmatic InvokeCommand (no binding → dispatch skipped) leaves the
-        // flag stuck at true, causing the next CommandView_Activated callback to skip RaiseActivated.
-        _activatedFiredThisCycle = false;
-
-        return base.OnActivating (args);
-    }
-
-    /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
-        _activatedFiredThisCycle = true;
         base.OnActivated (ctx);
 
         Action?.Invoke ();
@@ -460,7 +447,6 @@ public class Shortcut : View, IOrientation, IDesignable
             ArgumentNullException.ThrowIfNull (value);
 
             // Clean up old
-            _commandView.Activated -= CommandView_Activated;
             _commandView.GettingAttributeForRole -= SubViewOnGettingAttributeForRole;
             Remove (_commandView);
             _commandView.Dispose ();
@@ -475,7 +461,6 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 #endif
             _commandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
-            _commandView.Activated += CommandView_Activated;
 
             // If the CommandView has a hotkey, we use that. Otherwise, we use '_' to indicate the hotkey is in the Title.
             if (_commandView.HotKey != Key.Empty)
@@ -586,35 +571,6 @@ public class Shortcut : View, IOrientation, IDesignable
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
-
-    // Tracks whether Shortcut.RaiseActivated already fired during the current activation
-    // cycle (from DefaultActivateHandler's direct path). Prevents double-firing when
-    // CommandView.Activated would also trigger it.
-    private bool _activatedFiredThisCycle;
-
-    /// <summary>
-    ///     Deferred completion: when CommandView.Activated fires (e.g., CheckBox toggled),
-    ///     fire RaiseActivated on the Shortcut so Action and InvokeOnTargetOrApp run
-    ///     AFTER the CommandView has finished its own activation.
-    /// </summary>
-    private void CommandView_Activated (object? sender, EventArgs<ICommandContext?> e)
-    {
-        if (!_activatedFiredThisCycle)
-        {
-            RaiseActivated (e.Value);
-
-            // When CommandView received a BubblingUp command and consumed it (ConsumeDispatch=true,
-            // e.g., OptionSelector/FlagSelector), Activating was blocked from propagating further
-            // up the hierarchy. Propagate Activated (not Activating) to SuperView so it is notified
-            // that the composite completed its state change (e.g., Menu.Activated → PopoverMenu closes).
-            if (e.Value?.Routing == CommandRouting.BubblingUp && SuperView is { })
-            {
-                SuperView.RaiseActivated (e.Value);
-            }
-        }
-
-        _activatedFiredThisCycle = false;
-    }
 
     /// <summary>
     ///     Gets or sets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on
@@ -887,7 +843,6 @@ public class Shortcut : View, IOrientation, IDesignable
         if (disposing)
         {
             TitleChanged -= Shortcut_TitleChanged;
-            CommandView.Activated -= CommandView_Activated;
 
             if (CommandView.SuperView is null)
             {

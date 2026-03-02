@@ -200,10 +200,10 @@ public class FlagSelectorTests
 
         flagSelector.Value = SelectorStyles.ShowNoneFlag;
 
-        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
+        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == Convert.ToInt32 (SelectorStyles.ShowNoneFlag));
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == Convert.ToInt32 (SelectorStyles.ShowValue));
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == Convert.ToInt32 (SelectorStyles.ShowValue));
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
@@ -397,10 +397,10 @@ public class FlagSelectorTests
         flagSelector.Labels = flags.Values.ToList ();
         flagSelector.Value = 1;
 
-        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 1);
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
-        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+        checkBox = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 2);
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
     }
 
@@ -531,13 +531,13 @@ public class FlagSelectorTests
         Assert.Equal (1, selector.Value);
 
         // Toggle checkbox to add Flag 2
-        CheckBox flag2Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+        CheckBox flag2Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 2);
         flag2Checkbox.Value = CheckState.Checked;
 
         Assert.Equal (1 | 2, selector.Value);
 
         // Toggle checkbox to remove Flag 1
-        CheckBox flag1Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox flag1Checkbox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 1);
         flag1Checkbox.Value = CheckState.UnChecked;
 
         Assert.Equal (2, selector.Value);
@@ -558,7 +558,7 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, noneCheckBox.Value);
 
         // All other flags should be unchecked
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.UnChecked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.UnChecked));
     }
 
     [Fact]
@@ -590,7 +590,7 @@ public class FlagSelectorTests
         noneCheckBox.Value = CheckState.Checked;
 
         Assert.Equal (0, selector.Value);
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.UnChecked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.UnChecked));
     }
 
     [Fact]
@@ -607,7 +607,7 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, noneCheckBox.Value);
 
         // Toggle a flag
-        CheckBox flag1CheckBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 1);
+        CheckBox flag1CheckBox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 1);
         flag1CheckBox.Value = CheckState.Checked;
 
         Assert.Equal (1, selector.Value);
@@ -636,7 +636,7 @@ public class FlagSelectorTests
         selector.Labels = ["None", "Flag1", "Flag2"];
 
         // Should only have one "None" checkbox
-        Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => (int)cb.Data! == 0));
+        Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => selector.GetCheckBoxValue (cb) == 0));
     }
 
     [Fact]
@@ -691,7 +691,7 @@ public class FlagSelectorTests
         // This should not cause recursion or errors
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => (int)cb.Data! == 2);
+                                                     CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 2);
                                                      checkBox.Value = CheckState.Checked; // This triggers UpdateChecked internally
                                                  });
 
@@ -749,7 +749,120 @@ public class FlagSelectorTests
         selector.Value = SelectorStyles.All;
 
         // All non-None flags should be checked
-        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => (int)cb.Data! != 0).All (cb => cb.Value == CheckState.Checked));
+        Assert.True (selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 0).All (cb => cb.Value == CheckState.Checked));
+    }
+
+    #endregion
+
+    #region Value Propagation via Activated Event (CWP Bug Tests)
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     Proves the CWP ordering bug: <see cref="FlagSelector.OnActivated"/> calls
+    ///     <c>base.OnActivated</c> (which fires <see cref="View.Activated"/>) BEFORE the bitmask
+    ///     in <see cref="SelectorBase.Value"/> is updated.
+    ///     The <see cref="ICommandContext.Value"/> must carry the <see cref="FlagSelector"/>'s
+    ///     semantic bitmask <see cref="int"/>?, not the dispatched <see cref="CheckBox"/>'s
+    ///     <see cref="CheckState"/>.
+    /// </summary>
+    [Fact]
+    public void Activated_Event_Value_Is_FlagSelector_Bitmask_Not_CheckState ()
+    {
+        // Arrange: FlagSelector with three bit flags; initial Value = 1 (only Bit1 set).
+        FlagSelector flagSelector = new ();
+        flagSelector.Values = [1, 2, 4];
+        flagSelector.Labels = ["Bit1", "Bit2", "Bit4"];
+        flagSelector.SetFocus ();
+        flagSelector.Layout ();
+
+        Assert.Equal (1, flagSelector.Value); // Only Bit1 set
+
+        // Focus Bit2 (value=2, currently UnChecked) so Activate dispatches to it.
+        CheckBox bit2 = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 2);
+        bit2.SetFocus ();
+
+        object? capturedValue = null;
+        int activatedCount = 0;
+
+        flagSelector.Activated += (_, args) =>
+        {
+            activatedCount++;
+            capturedValue = args.Value?.Value;
+        };
+
+        // Act: Activate on the selector dispatches down to focused Bit2, toggling it Checked.
+        flagSelector.InvokeCommand (Command.Activate);
+
+        // Assert: FlagSelector.Value is now 1|2 = 3 (Bit1 and Bit2 both set).
+        Assert.Equal (3, flagSelector.Value);
+        Assert.Equal (1, activatedCount);
+
+        // The value arriving at Activated must be the FlagSelector's bitmask int? (3),
+        // NOT the dispatched CheckBox's CheckState (CheckState.Checked).
+        Assert.Null (capturedValue as CheckState?);    // Must NOT be a CheckState
+        Assert.Equal ((int?)3, capturedValue as int?); // Must be the FlagSelector's bitmask
+
+        flagSelector.Dispose ();
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     Proves that an ancestor subscribing to <see cref="View.Activated"/> via
+    ///     <see cref="View.CommandsToBubbleUp"/> receives the <see cref="FlagSelector"/>'s
+    ///     bitmask <see cref="int"/>? — not the inner <see cref="CheckBox"/>'s
+    ///     <see cref="CheckState"/> — through the <c>BubbleActivatedUp</c> path.
+    /// </summary>
+    [Fact]
+    public void Activated_Event_Ancestor_Receives_FlagSelector_Value_Via_BubbleActivatedUp ()
+    {
+        // Arrange: Application context ensures SetFocus works through nested hierarchy.
+        VirtualTimeProvider time = new ();
+
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        // ancestor opts in to Activate bubbling and contains the FlagSelector.
+        // CanFocus = true is required so the focus chain can propagate through ancestor.
+        View ancestor = new () { Id = "ancestor", CanFocus = true };
+        ancestor.CommandsToBubbleUp = [Command.Activate];
+
+        FlagSelector flagSelector = new ();
+        flagSelector.Values = [1, 2, 4];
+        flagSelector.Labels = ["Bit1", "Bit2", "Bit4"];
+        ancestor.Add (flagSelector);
+
+        (runnable as View)!.Add (ancestor);
+        app.Begin (runnable);
+
+        Assert.Equal (1, flagSelector.Value); // Only Bit1 set
+
+        // Focus Bit2 (value=2, currently UnChecked) so Activate dispatches to it.
+        CheckBox bit2 = flagSelector.SubViews.OfType<CheckBox> ().First (cb => flagSelector.GetCheckBoxValue (cb) == 2);
+        bit2.HasFocus = true;
+        Assert.True (bit2.HasFocus);
+
+        object? capturedValue = null;
+        int ancestorActivatedCount = 0;
+
+        ancestor.Activated += (_, args) =>
+        {
+            ancestorActivatedCount++;
+            capturedValue = args.Value?.Value;
+        };
+
+        // Act: Activate dispatches to Bit2, then BubbleActivatedUp reaches ancestor.
+        flagSelector.InvokeCommand (Command.Activate);
+
+        // Assert: FlagSelector.Value updated; ancestor received Activated exactly once.
+        Assert.Equal (3, flagSelector.Value);
+        Assert.Equal (1, ancestorActivatedCount);
+
+        // The ancestor must receive the FlagSelector's bitmask int? (3), NOT a CheckState.
+        Assert.Null (capturedValue as CheckState?);    // Must NOT be a CheckState
+        Assert.Equal ((int?)3, capturedValue as int?); // Must be the FlagSelector's bitmask
+
+        ancestor.Dispose ();
     }
 
     #endregion
