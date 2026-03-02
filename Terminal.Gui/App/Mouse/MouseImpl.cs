@@ -54,7 +54,6 @@ internal class MouseImpl : IMouse, IDisposable
         }
 
         // The position of the mouse is the same as the screen position at the application level.
-        //Debug.Assert (mouse.Position == mouse.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
         List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
@@ -82,8 +81,8 @@ internal class MouseImpl : IMouse, IDisposable
 
         // Dismiss the Popover if the user presses mouse outside of it
         if (mouseEvent.IsPressed
-            && App?.Popovers?.GetActivePopover () as View is { Visible: true } visiblePopover
-            && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, true) is false)
+            && App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover
+            && !View.IsInHierarchy (visiblePopover as View, deepestViewUnderMouse, true))
         {
             Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Hide Visible Popover");
 

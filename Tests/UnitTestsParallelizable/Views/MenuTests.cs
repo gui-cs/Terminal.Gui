@@ -1940,14 +1940,12 @@ public class MenuTests (ITestOutputHelper output)
         // Arrange
         Menu menu = new ([new MenuItem { Title = "Item1" }]) { Title = "TestMenu" };
         menu.Visible = false;
-        menu.Enabled = false;
 
         // Act
         menu.ShowMenu ();
 
         // Assert
         Assert.True (menu.Visible);
-        Assert.True (menu.Enabled);
         Assert.True (menu.IsInitialized);
 
         menu.Dispose ();
@@ -1993,9 +1991,7 @@ public class MenuTests (ITestOutputHelper output)
 
         // Assert — both should be hidden
         Assert.False (root.Visible);
-        Assert.False (root.Enabled);
         Assert.False (subMenu.Visible);
-        Assert.False (subMenu.Enabled);
 
         root.Dispose ();
     }

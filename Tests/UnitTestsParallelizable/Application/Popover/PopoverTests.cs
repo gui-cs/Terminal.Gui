@@ -71,7 +71,7 @@ public class PopoverTests
     }
 
     [Fact]
-    public void IsOpen_Set_True_CallsMakeVisible ()
+    public void Visible_Set_True_ShowsPopover ()
     {
         // Arrange
         ApplicationImpl app = new ();
@@ -86,11 +86,10 @@ public class PopoverTests
 
         // Assert
         Assert.True (popover.Visible);
-        Assert.True (popover.Visible);
     }
 
     [Fact]
-    public void IsOpen_Set_False_HidesPopover ()
+    public void Visible_Set_False_HidesPopover ()
     {
         // Arrange
         ApplicationImpl app = new ();
@@ -105,7 +104,6 @@ public class PopoverTests
         popover.Visible = false;
 
         // Assert
-        Assert.False (popover.Visible);
         Assert.False (popover.Visible);
     }
 
@@ -130,11 +128,10 @@ public class PopoverTests
 
         // Assert
         Assert.False (popover.Visible);
-        Assert.False (popover.Visible);
     }
 
     [Fact]
-    public void VisibleChanged_Fires_WhenIsOpenChanges ()
+    public void VisibleChanged_Fires_WhenVisibleChanges ()
     {
         // Arrange
         ApplicationImpl app = new ();
@@ -303,7 +300,7 @@ public class PopoverTests
     }
 
     [Fact]
-    public void Visible_SynchronizesWithIsOpen ()
+    public void Visible_MakeVisible_Synchronizes ()
     {
         // Arrange
         ApplicationImpl app = new ();
@@ -313,7 +310,7 @@ public class PopoverTests
         Popover<Label, string> popover = new () { App = app };
         popoverManager.Register (popover);
 
-        // Act & Assert - Setting Visible should update IsOpen
+        // Act & Assert - MakeVisible should set Visible to true
         popover.MakeVisible ();
         Assert.True (popover.Visible);
 

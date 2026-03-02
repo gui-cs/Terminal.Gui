@@ -174,10 +174,7 @@ public class Runnable : View, IRunnable
         }
         else
         {
-            if (App?.Popovers?.GetActivePopover () is PopoverImpl { Visible: true } activePopover)
-            {
-                activePopover.Visible = false;
-            }
+            App?.Popovers?.Hide ();
         }
 
         // CWP Phase 3: Post-notification (work already done by Application)

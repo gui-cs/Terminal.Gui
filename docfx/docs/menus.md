@@ -46,7 +46,7 @@ View
 │   └── Menu                    // Vertical Bar for MenuItems
 │       └── MenuBar             // Horizontal Menu for MenuBarItems
 │
-└── PopoverBaseImpl             // Base for popover views
+└── PopoverImpl             // Base for popover views
     └── Popover<TView, TResult> // Generic popover with content view + result extraction
         └── PopoverMenu         // Cascading menu popover (Popover<Menu, MenuItem>)
 ```
@@ -255,12 +255,12 @@ contextMenu.MakeVisible (new Point (10, 5));
 ```
 
 Key features:
-- Inherits from `Popover<Menu, MenuItem>`, which provides `ContentView`, `MakeVisible`, `SetPosition`, `IsOpen`, `Target`, `Anchor`, `Result`, and `ResultExtractor`
+- Inherits from `Popover<Menu, MenuItem>`, which provides `ContentView`, `MakeVisible`, `SetPosition`, `Target`, `Anchor`, `Result`, and `ResultExtractor`
 - `Root` property aliases `ContentView` and holds the top-level <xref:Terminal.Gui.Views.Menu>
 - `Key` property for activation (default: `Shift+F10`)
 - <xref:Terminal.Gui.Input.MouseFlags> property defines mouse button to show menu (default: right-click)
 - **Must be registered** with `Application.Popover` before calling `MakeVisible`
-- `Target` (inherited from `PopoverBaseImpl`) establishes a `CommandBridge` so that commands from the menu hierarchy bridge to the target view
+- `Target` (inherited from `PopoverImpl`) establishes a `CommandBridge` so that commands from the menu hierarchy bridge to the target view
 - Auto-positions to ensure visibility on screen via overridden `SetPosition` and `GetAdjustedPosition`
 - SubMenu show/hide is handled by `Menu.OnSelectedMenuItemChanged()`; PopoverMenu's subscriber only adjusts positioning for screen boundaries via `GetMostVisibleLocationForSubMenu()`
 - Registers custom command handlers for `Command.Right` (enter submenu), `Command.Left` (leave submenu), and `Command.Quit` (close menu)
@@ -415,7 +415,7 @@ The `_isSwitchingItem` guard prevents premature deactivation during the brief in
 2. `Popover<TView, TResult>.SetPosition()` calculates a visible location on screen (PopoverMenu overrides with `new SetPosition` for menu-specific positioning)
 3. `Application.Popover.Show()` is invoked, setting `Visible = true`
 4. `PopoverMenu.OnVisibleChanged()` runs — calls `Root.ShowMenu()` (setting `Visible = true` and `Enabled = true` on the root Menu) **before** `base.OnVisibleChanged()` to ensure the Menu is enabled for focus
-5. `Popover<TView, TResult>.OnVisibleChanged()` syncs `ContentView.Visible` and `IsOpen`
+5. `Popover<TView, TResult>.OnVisibleChanged()` syncs `ContentView.Visible`
 6. First <xref:Terminal.Gui.Views.MenuItem> receives focus
 
 **Prerequisite:** The <xref:Terminal.Gui.Views.PopoverMenu> must be registered with `Application.Popover` before `MakeVisible` is called. For <xref:Terminal.Gui.Views.MenuBarItem>, registration happens automatically in `EndInit`. For standalone context menus, call `Application.Popover?.Register (contextMenu)` explicitly.

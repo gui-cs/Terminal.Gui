@@ -76,7 +76,7 @@ public class Popovers : Scenario
         _popoverTargetFrame.Accepted += (sender, args) =>
                                         {
                                             _resultTextField!.Text = args.Context?.Value?.ToString () ?? Glyphs.Null.ToString ();
-                                            _app.Popovers?.Hide (_app.Popovers.GetActivePopover ());
+                                            _app.Popovers?.Hide ();
                                         };
 
         _activateButton = new Button { Title = "_Make Visible (Enter)" };
