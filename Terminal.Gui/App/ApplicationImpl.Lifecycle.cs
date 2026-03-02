@@ -251,7 +251,7 @@ internal partial class ApplicationImpl
         }
 
         // === 2. Close and dispose popover ===
-        if (Popovers?.GetActivePopover () is View popover)
+        if (Popovers?.GetActivePopover () is { } popover)
         {
             // This forcefully closes the popover; invoking Command.Quit would be more graceful
             // but since this is shutdown, doing this is ok.

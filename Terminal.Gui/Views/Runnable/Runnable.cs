@@ -174,7 +174,7 @@ public class Runnable : View, IRunnable
         }
         else
         {
-            if (App?.Popovers?.GetActivePopover () is PopoverBaseImpl { Visible: true } activePopover)
+            if (App?.Popovers?.GetActivePopover () is PopoverImpl { Visible: true } activePopover)
             {
                 activePopover.Visible = false;
             }

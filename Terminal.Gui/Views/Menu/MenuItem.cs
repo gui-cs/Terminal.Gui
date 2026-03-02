@@ -98,10 +98,43 @@ public class MenuItem : Shortcut, IValue
     }
 
     /// <inheritdoc/>
-    public object GetValue () => Title;
+    public object? GetValue () => Title;
 
     /// <inheritdoc/>
-    event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped { add { } remove { } }
+    event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
+    {
+        add
+        {
+            // Forward Title changes to ValueChangedUntyped
+            if (value is { })
+            {
+                TitleChanged += OnTitleChangedForValueChanged;
+                _valueChangedUntypedHandlers += value;
+            }
+        }
+        remove
+        {
+            if (value is { })
+            {
+                _valueChangedUntypedHandlers -= value;
+
+                if (_valueChangedUntypedHandlers is null)
+                {
+                    TitleChanged -= OnTitleChangedForValueChanged;
+                }
+            }
+        }
+    }
+
+    private EventHandler<ValueChangedEventArgs<object?>>? _valueChangedUntypedHandlers;
+    private string? _lastTitle;
+
+    private void OnTitleChangedForValueChanged (object? sender, EventArgs<string> e)
+    {
+        string? oldTitle = _lastTitle;
+        _lastTitle = e.Value;
+        _valueChangedUntypedHandlers?.Invoke (this, new ValueChangedEventArgs<object?> (oldTitle, e.Value));
+    }
 
     /// <inheritdoc/>
     protected override bool OnMouseEnter (CancelEventArgs eventArgs)

@@ -71,49 +71,29 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
 
+        //KeyBindings.Add (Key.CursorDown, Command.Down);
+
         AddCommand (Command.Left, MoveLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        //KeyBindings.Add (Key.CursorUp, Command.Up);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
 
-        // PopoverBaseImpl sets a key binding for Quit, so we
-        // don't need to do it here.
-        AddCommand (Command.Quit, Quit);
-
         return;
-
-        bool? Quit (ICommandContext? ctx)
-        {
-            if (!Visible)
-            {
-                // If we're not visible, the command is not for us
-                return false;
-            }
-
-            // This ensures the quit command gets propagated to the owner of the popover.
-            // This is important for MenuBarItems to ensure the MenuBar loses focus when
-            // the user presses QuitKey to cause the menu to close.
-            // Note, we override OnAccepting, which will set Visible to false
-            bool? ret = RaiseAccepting (ctx);
-
-            if (!Visible || ret is true)
-            {
-                return Visible;
-            }
-            Visible = false;
-
-            return true;
-
-            // If we are Visible, returning true will stop the QuitKey from propagating
-            // If we are not Visible, returning false will allow the QuitKey to propagate
-        }
 
         bool? MoveLeft (ICommandContext? ctx)
         {
             if (Focused == Root)
             {
-                return false;
+                if (!TryGetTarget (out View? targetView))
+                {
+                    return true;
+                }
+
+                // HACK: If our owner is a MenuBarItem, we want to allow left key to propagate to the MenuBar so it can move focus to the previous MenuBarItem.
+                return targetView is not MenuBarItem;
             }
 
             if (MostFocused is not MenuItem { SuperView: Menu focusedMenu })
@@ -129,7 +109,13 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         {
             if (MostFocused is not MenuItem { SubMenu.Visible: true } focused)
             {
-                return false;
+                if (!TryGetTarget (out View? targetView))
+                {
+                    return true;
+                }
+
+                // HACK: If our owner is a MenuBarItem, we want to allow right key to propagate to the MenuBar so it can move focus to the next MenuBarItem.
+                return targetView is not MenuBarItem;
             }
             focused.SubMenu.SetFocus ();
 
@@ -284,56 +270,6 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     /// </summary>
     public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
 
-    /// <summary>
-    ///     Sets the position of the popover menu at <paramref name="idealScreenPosition"/>. The actual position will be
-    ///     adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over the first cell of
-    ///     the first <see cref="MenuItem"/> (if possible).
-    /// </summary>
-    /// <param name="idealScreenPosition">
-    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, uses <paramref name="anchor"/>,
-    ///     <see cref="Popover{TView, TResult}.Anchor"/> property, or the current mouse position.
-    /// </param>
-    /// <param name="anchor">
-    ///     Optional anchor rectangle. If <see langword="null"/>, uses the
-    ///     <see cref="Popover{TView, TResult}.Anchor"/> property.
-    /// </param>
-    /// <remarks>
-    ///     This method only sets the position; it does not make the popover visible. Use
-    ///     <see cref="Popover{TView, TResult}.MakeVisible"/> to
-    ///     both position and show the popover.
-    /// </remarks>
-    public override void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
-    {
-        // Try anchor parameter, then Anchor property, then mouse position
-        Rectangle? effectiveAnchor = anchor ?? Anchor?.Invoke ();
-
-        if (effectiveAnchor is { } && idealScreenPosition is null)
-        {
-            idealScreenPosition = new Point (effectiveAnchor.Value.X, effectiveAnchor.Value.Y + effectiveAnchor.Value.Height);
-        }
-
-        idealScreenPosition ??= App?.Mouse.LastMousePosition;
-
-        if (idealScreenPosition is null || Root is null)
-        {
-            return;
-        }
-
-        Point pos = idealScreenPosition.Value;
-
-        if (!Root.IsInitialized)
-        {
-            Root.App ??= App;
-            Root.BeginInit ();
-            Root.EndInit ();
-        }
-
-        pos = GetMostVisibleLocationForSubMenu (Root, pos);
-
-        Root.X = pos.X;
-        Root.Y = pos.Y;
-    }
-
     /// <inheritdoc/>
     /// <remarks>
     ///     When becoming visible, the root menu is shown. When becoming hidden, the root menu is hidden
@@ -343,9 +279,10 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     {
         Trace.Command (this, "Entry", $"Visible={Visible}");
 
-        // IMPORTANT: ShowMenu/HideMenu MUST be called BEFORE base.OnVisibleChanged()
-        // because the base Popover class sets ContentView.Visible, and ShowMenu
-        // needs to run before that to properly initialize focus.
+        // IMPORTANT: ShowMenu/HideMenu must run BEFORE base.OnVisibleChanged because
+        // Popover<TView, TResult>.OnVisibleChanged sets ContentView.Visible which would
+        // cause ShowMenu/HideMenu to exit early (they check Visible as a guard).
+        // ShowMenu also sets Enabled = true, which is required for focus.
         if (Visible)
         {
             Root?.ShowMenu ();
@@ -353,9 +290,6 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         else
         {
             Root?.HideMenu ();
-
-            // Specific to PopoverMenu
-            App?.Popovers?.Hide (this);
         }
 
         base.OnVisibleChanged ();
@@ -384,7 +318,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>
                 return;
             }
 
-            // Unsubscribe from old Root's events
+            // Unsubscribe from old Root's events and remove/dispose submenus
             if (ContentView is { } oldRoot)
             {
                 oldRoot.HideMenu ();
@@ -395,6 +329,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>
                 foreach (Menu menu in oldMenus)
                 {
                     menu.SelectedMenuItemChanged -= MenuOnSelectedMenuItemChanged;
+                    Remove (menu);
+                    menu.Dispose ();
                 }
             }
 
@@ -439,7 +375,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>
             menu.Visible = false;
 
             // Disable so keys are ignored
-            menu.Enabled = false;
+            //menu.Enabled = false;
 
             // Activate/Activated are handled via CommandBridge (Root → PopoverMenu).
             // SubMenu activations propagate up through MenuItem SubMenu bridges to Root.

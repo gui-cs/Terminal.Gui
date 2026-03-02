@@ -16,7 +16,7 @@ public class PopoverTests
         // Assert
         Assert.NotNull (popover.ContentView);
         Assert.IsType<Label> (popover.ContentView);
-        Assert.False (popover.IsOpen);
+        Assert.False (popover.Visible);
         Assert.Null (popover.Result);
         Assert.Null (popover.ResultExtractor);
         Assert.Null (popover.Anchor);
@@ -82,10 +82,10 @@ public class PopoverTests
         popoverManager.Register (popover);
 
         // Act
-        popover.IsOpen = true;
+        popover.Visible = true;
 
         // Assert
-        Assert.True (popover.IsOpen);
+        Assert.True (popover.Visible);
         Assert.True (popover.Visible);
     }
 
@@ -99,18 +99,18 @@ public class PopoverTests
 
         Popover<Label, string> popover = new () { App = app };
         popoverManager.Register (popover);
-        popover.IsOpen = true;
+        popover.Visible = true;
 
         // Act
-        popover.IsOpen = false;
+        popover.Visible = false;
 
         // Assert
-        Assert.False (popover.IsOpen);
+        Assert.False (popover.Visible);
         Assert.False (popover.Visible);
     }
 
     [Fact]
-    public void IsOpenChanging_CanCancel ()
+    public void VisibleChanging_CanCancel ()
     {
         // Arrange
         ApplicationImpl app = new ();
@@ -120,21 +120,21 @@ public class PopoverTests
         Popover<Label, string> popover = new () { App = app };
         popoverManager.Register (popover);
 
-        popover.IsOpenChanging += (_, e) =>
+        popover.VisibleChanging += (_, e) =>
                                   {
-                                      e.Handled = true; // Cancel the change
+                                      e.Cancel = true; // Cancel the change
                                   };
 
         // Act
-        popover.IsOpen = true;
+        popover.Visible = true;
 
         // Assert
-        Assert.False (popover.IsOpen);
+        Assert.False (popover.Visible);
         Assert.False (popover.Visible);
     }
 
     [Fact]
-    public void IsOpenChanged_Fires_WhenIsOpenChanges ()
+    public void VisibleChanged_Fires_WhenIsOpenChanges ()
     {
         // Arrange
         ApplicationImpl app = new ();
@@ -145,20 +145,18 @@ public class PopoverTests
         popoverManager.Register (popover);
 
         var isOpenChangedFired = false;
-        bool? newValue = null;
 
-        popover.IsOpenChanged += (_, e) =>
+        popover.VisibleChanged += (_, e) =>
                                  {
                                      isOpenChangedFired = true;
-                                     newValue = e.NewValue;
                                  };
 
         // Act
-        popover.IsOpen = true;
+        popover.Visible = true;
 
         // Assert
         Assert.True (isOpenChangedFired);
-        Assert.True (newValue);
+        Assert.True (popover.Visible);
     }
 
     [Fact]
@@ -317,10 +315,10 @@ public class PopoverTests
 
         // Act & Assert - Setting Visible should update IsOpen
         popover.MakeVisible ();
-        Assert.True (popover.IsOpen);
+        Assert.True (popover.Visible);
 
         popover.Visible = false;
-        Assert.False (popover.IsOpen);
+        Assert.False (popover.Visible);
     }
 
     [Fact]

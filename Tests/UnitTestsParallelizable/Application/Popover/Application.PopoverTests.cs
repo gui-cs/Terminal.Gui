@@ -9,7 +9,7 @@ public class ApplicationPopoverTests
     public void Register_AddsPopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
 
         // Act
@@ -23,7 +23,7 @@ public class ApplicationPopoverTests
     public void DeRegister_RemovesPopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
         popoverManager.Register (popover);
 
@@ -54,7 +54,7 @@ public class ApplicationPopoverTests
     public void Hide_ClearsActivePopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
         popoverManager.Register (popover);
         popoverManager.Show (popover);
@@ -104,8 +104,34 @@ public class ApplicationPopoverTests
     public void DispatchKeyDown_InactivePopoverGetsHotKey ()
     {
         // Arrange
-        var activePopover = new PopoverTestClass { Id = "activePopover" };
-        var inactivePopover = new PopoverTestClass { Id = "inactivePopover" };
+        // Arrange
+        ApplicationImpl app = new ();
+        ApplicationPopover popoverManager = new () { App = app };
+        app.Popovers = popoverManager;
+
+        var activePopover = new PopoverTestClass { Id = "activePopover", HandleNewCommand = false };
+        var inactivePopover = new PopoverTestClass { Id = "inactivePopover", HandleNewCommand = true };
+
+        popoverManager.Register (activePopover);
+        popoverManager.Show (activePopover);
+        popoverManager.Register (inactivePopover);
+
+        // Act
+        app.Keyboard.RaiseKeyDownEvent (Key.N.WithCtrl);
+
+        // Assert
+        Assert.Equal (1, activePopover.NewCommandInvokeCount);
+        Assert.Equal (1, inactivePopover.NewCommandInvokeCount);
+        Assert.Contains (Key.N.WithCtrl, activePopover.HandledKeys);
+        Assert.NotEmpty (inactivePopover.HandledKeys);
+    }
+
+    [Fact]
+    public void DispatchKeyDown_InactivePopoverDoesNotGetHotKey_If_Active_Handles ()
+    {
+        // Arrange
+        var activePopover = new PopoverTestClass { Id = "activePopover", HandleNewCommand = true };
+        var inactivePopover = new PopoverTestClass { Id = "inactivePopover", HandleNewCommand = false };
 
         var popoverManager = new ApplicationPopover ();
 
@@ -118,13 +144,12 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.Equal (1, activePopover.NewCommandInvokeCount);
-        Assert.Equal (1, inactivePopover.NewCommandInvokeCount);
-        Assert.Contains (Key.N.WithCtrl, activePopover.HandledKeys);
-        Assert.NotEmpty (inactivePopover.HandledKeys);
+        Assert.Equal (0, inactivePopover.NewCommandInvokeCount);
+        Assert.Empty (inactivePopover.HandledKeys);
     }
 
     [Fact]
-    public void DispatchKeyDown_InactivePopoverDoesGetKey ()
+    public void DispatchKeyDown_InactivePopoverDoesNotGetKeyDown ()
     {
         // Arrange
         var activePopover = new PopoverTestClass ();
@@ -140,7 +165,7 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.Contains (Key.A, activePopover.HandledKeys);
-        Assert.NotEmpty (inactivePopover.HandledKeys);
+        Assert.Empty (inactivePopover.HandledKeys);
     }
 
     // Claude - Opus 4.5
@@ -225,10 +250,13 @@ public class ApplicationPopoverTests
         Assert.Equal (initialVisibleState, popover2.Visible);
     }
 
-    public class PopoverTestClass : View, IPopover
+    public class PopoverTestClass : View, IPopoverView
     {
         public List<Key> HandledKeys { get; } = [];
+
         public int NewCommandInvokeCount { get; private set; }
+
+        public bool HandleNewCommand { get; set; }
 
         /// <summary>
         ///     Optional callback invoked during OnKeyDown. Can be used to test
@@ -264,7 +292,7 @@ public class ApplicationPopoverTests
             {
                 NewCommandInvokeCount++;
 
-                return false;
+                return HandleNewCommand;
             }
         }
 
@@ -283,5 +311,14 @@ public class ApplicationPopoverTests
 
         /// <inheritdoc/>
         public IRunnable? Owner { get; set; }
+
+        /// <inheritdoc/>
+        public Func<Rectangle?>? Anchor { get; set; }
+
+        /// <inheritdoc/>
+        public WeakReference<View>? Target { get; set; }
+
+        /// <inheritdoc/>
+        public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null) => Visible = true;
     }
 }

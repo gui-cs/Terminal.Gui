@@ -164,7 +164,7 @@ public class MenuBarItem : MenuItem, IDesignable
 
             if (field is { })
             {
-                field.IsOpenChanged -= OnPopoverMenuIsOpenChanged;
+                field.VisibleChanged -= OnPopoverMenuVisibleChanged;
                 field.Target = null;
             }
 
@@ -178,33 +178,52 @@ public class MenuBarItem : MenuItem, IDesignable
             Trace.Command (this, "PopoverMenuSet", $"PopoverMenu={field.ToIdentifyingString ()}");
 
             // Set Target for base class bridge + focus tracking
-            field.Target = new WeakReference<View?> (this);
+            field.Target = new WeakReference<View> (this);
 
             // Set Anchor for positioning below MenuBarItem
             field.Anchor = () => FrameToScreen ();
 
-            // Relay IsOpenChanged to PopoverMenuOpenChanged for consumers (e.g. MenuBar)
-            field.IsOpenChanged += OnPopoverMenuIsOpenChanged;
+            // Relay VisibleChanged to PopoverMenuOpenChanged for consumers (e.g. MenuBar)
+            field.VisibleChanged += OnPopoverMenuVisibleChanged;
         }
     }
 
     /// <summary>
     ///     Gets or sets whether the PopoverMenu is open and visible or not.
-    ///     Delegates to <see cref="PopoverMenu"/>.<see cref="Popover{TView, TResult}.IsOpen"/>.
+    ///     Delegates to <see cref="PopoverMenu"/>.<see cref="View.Visible"/>.
     /// </summary>
     public bool PopoverMenuOpen
     {
-        get => PopoverMenu?.IsOpen ?? false;
-        set => PopoverMenu?.IsOpen = value;
+        get => PopoverMenu?.Visible ?? false;
+        set
+        {
+            if (PopoverMenu is null)
+            {
+                return;
+            }
+
+            if (value)
+            {
+                PopoverMenu.MakeVisible ();
+            }
+            else
+            {
+                PopoverMenu.Visible = false;
+            }
+        }
     }
 
     /// <summary>
     ///     Raised when <see cref="PopoverMenuOpen"/> has changed. Relayed from
-    ///     <see cref="Popover{TView, TResult}.IsOpenChanged"/>.
+    ///     <see cref="View.VisibleChanged"/>.
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<bool>>? PopoverMenuOpenChanged;
 
-    private void OnPopoverMenuIsOpenChanged (object? sender, ValueChangedEventArgs<bool> e) => PopoverMenuOpenChanged?.Invoke (this, e);
+    private void OnPopoverMenuVisibleChanged (object? sender, EventArgs e)
+    {
+        bool isOpen = PopoverMenu?.Visible ?? false;
+        PopoverMenuOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (!isOpen, isOpen));
+    }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)

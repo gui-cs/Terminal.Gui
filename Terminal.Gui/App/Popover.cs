@@ -1,5 +1,3 @@
-using Terminal.Gui.Tracing;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -20,6 +18,10 @@ namespace Terminal.Gui.App;
 /// </typeparam>
 /// <remarks>
 ///     <para>
+///         This class extracts the generic popover-hosting logic from <see cref="PopoverMenu"/> to enable
+///         reusable popover behavior for any view type.
+///     </para>
+///     <para>
 ///         <b>IMPORTANT:</b> Must be registered with <see cref="Application.Popover"/> via
 ///         <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/> or
 ///         <see cref="ApplicationPopover.Show"/>.
@@ -30,8 +32,7 @@ namespace Terminal.Gui.App;
 ///     <list type="bullet">
 ///         <item>Generic content view hosting with automatic initialization</item>
 ///         <item>Result extraction via <see cref="ResultExtractor"/> or <see cref="IValue{TResult}"/></item>
-///         <item>CWP-based <see cref="IsOpen"/> property synchronized with <see cref="View.Visible"/></item>
-///         <item>Anchor-based positioning via <see cref="Anchor"/> function</item>
+///         <item>Anchor-based positioning via <see cref="IPopoverView.Anchor"/> function</item>
 ///         <item>Target view weak reference for command bubbling</item>
 ///         <item>Automatic command bridging from content view</item>
 ///     </list>
@@ -48,12 +49,9 @@ namespace Terminal.Gui.App;
 ///         popover.MakeVisible ();
 ///     </code>
 /// </remarks>
-public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView : View, new ()
+public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : View, new ()
 {
     private CommandBridge? _contentCommandBridge;
-    private bool _isOpen;
-    private CommandBridge? _targetCommandBridge;
-    private WeakReference<View?>? _target;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Popover{TView, TResult}"/> class.
@@ -130,126 +128,9 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView 
 
             // Bridge Activate from ContentView → Popover across the non-containment boundary.
             _contentCommandBridge?.Dispose ();
-            _contentCommandBridge = CommandBridge.Connect (this, field, Command.Activate);
+            _contentCommandBridge = CommandBridge.Connect (this, field, [Command.Activate, Command.Accept]);
         }
     }
-
-    /// <summary>
-    ///     Gets or sets a weak reference to the target view that initiated this popover.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When set, creates a <see cref="CommandBridge"/> from the popover to the target view for
-    ///         <see cref="Command.Activate"/>, and subscribes to the target's <see cref="View.HasFocusChanged"/>
-    ///         to auto-close the popover when the target loses focus.
-    ///     </para>
-    ///     <para>
-    ///         The weak reference ensures the popover doesn't prevent garbage collection of the target.
-    ///     </para>
-    ///     <para>
-    ///         Typically set by the view that creates and shows the popover (e.g., a MenuBarItem or ComboBox).
-    ///     </para>
-    /// </remarks>
-    public WeakReference<View?>? Target
-    {
-        get => _target;
-        set
-        {
-            if (_target == value)
-            {
-                return;
-            }
-
-            // Unsubscribe from old target
-            if (_target?.TryGetTarget (out View? oldTarget) == true)
-            {
-                Trace.Command (this, "TargetCleanup", $"Old={oldTarget.ToIdentifyingString ()}");
-                oldTarget.HasFocusChanged -= OnTargetHasFocusChanged;
-            }
-
-            _targetCommandBridge?.Dispose ();
-            _targetCommandBridge = null;
-
-            _target = value;
-
-            // Subscribe to new target
-            if (_target?.TryGetTarget (out View? newTarget) != true)
-            {
-                return;
-            }
-            Trace.Command (this, "TargetSet", $"New={newTarget.ToIdentifyingString ()}");
-            newTarget.HasFocusChanged += OnTargetHasFocusChanged;
-            _targetCommandBridge = CommandBridge.Connect (newTarget, this, Command.Activate);
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether the popover is open (visible).
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This property is synchronized with <see cref="View.Visible"/>. Setting <c>IsOpen = true</c>
-    ///         calls <see cref="MakeVisible"/> to show the popover. Setting <c>IsOpen = false</c> sets
-    ///         <see cref="View.Visible"/> to <see langword="false"/>.
-    ///     </para>
-    ///     <para>
-    ///         The change can be cancelled via the <see cref="IsOpenChanging"/> event.
-    ///     </para>
-    /// </remarks>
-    public bool IsOpen
-    {
-        get => _isOpen;
-        set
-        {
-            if (!CWPPropertyHelper.ChangeProperty (this,
-                                                   ref _isOpen,
-                                                   value,
-                                                   OnIsOpenChanging,
-                                                   IsOpenChanging,
-                                                   newValue =>
-                                                   {
-                                                       // Synchronize with Visible
-                                                       if (newValue && !Visible)
-                                                       {
-                                                           MakeVisible ();
-                                                       }
-                                                       else if (!newValue && Visible)
-                                                       {
-                                                           Visible = false;
-                                                       }
-                                                   },
-                                                   OnIsOpenChanged,
-                                                   IsOpenChanged,
-                                                   out _))
-            { }
-        }
-    }
-
-    /// <summary>
-    ///     Raised when <see cref="IsOpen"/> is about to change.
-    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
-    /// </summary>
-    public event EventHandler<ValueChangingEventArgs<bool>>? IsOpenChanging;
-
-    /// <summary>
-    ///     Raised when <see cref="IsOpen"/> has changed.
-    /// </summary>
-    public event EventHandler<ValueChangedEventArgs<bool>>? IsOpenChanged;
-
-    /// <summary>
-    ///     Gets or sets a function that computes the anchor rectangle for positioning the popover.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The anchor rectangle defines the area relative to which the popover should be positioned.
-    ///         If <see langword="null"/>, the popover will be positioned at the mouse cursor or a default location.
-    ///     </para>
-    ///     <para>
-    ///         The function is called by <see cref="MakeVisible"/> to determine the ideal position.
-    ///         Returning <see langword="null"/> from the function uses default positioning logic.
-    ///     </para>
-    /// </remarks>
-    public Func<Rectangle?>? Anchor { get; set; }
 
     /// <summary>
     ///     Gets or sets the function that extracts the result from the content view.
@@ -300,42 +181,35 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView 
     public event EventHandler<ValueChangedEventArgs<TResult?>>? ResultChanged;
 
     /// <summary>
-    ///     Makes the popover visible and positions it based on <see cref="Anchor"/> or <paramref name="idealScreenPosition"/>.
+    ///     Makes the popover visible and positions it based on <see cref="IPopoverView.Anchor"/> or <paramref name="idealScreenPosition"/>.
     /// </summary>
     /// <param name="idealScreenPosition">
     ///     The ideal screen-relative position for the popover. If <see langword="null"/>, positioning is determined
-    ///     by <see cref="Anchor"/> or the current mouse position.
+    ///     by <see cref="IPopoverView.Anchor"/> or the current mouse position.
     /// </param>
     /// <param name="anchor">
-    ///     Optional anchor rectangle to override <see cref="Anchor"/> property for this call.
-    ///     If <see langword="null"/>, uses the <see cref="Anchor"/> property.
+    ///     Optional anchor rectangle to override <see cref="IPopoverView.Anchor"/> property for this call.
+    ///     If <see langword="null"/>, uses the <see cref="IPopoverView.Anchor"/> property.
     /// </param>
     /// <remarks>
     ///     <para>
-    ///         If the popover has not been registered with <see cref="Application.Popover"/>, this method
-    ///         will auto-register it before showing.
+    ///         IMPORTANT: The popover must be registered with <see cref="Application.Popover"/> before calling this
+    ///         method. Call <see cref="ApplicationPopover.Register"/> first.
+    ///     </para>
+    ///     <para>
+    ///         This method internally calls <see cref="ApplicationPopover.Show"/>, which will throw
+    ///         <see cref="InvalidOperationException"/> if the popover is not registered.
     ///     </para>
     ///     <para>
     ///         The actual position may be adjusted to ensure the popover fits fully on screen.
     ///     </para>
     /// </remarks>
-    public virtual void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
+    /// <exception cref="InvalidOperationException">Thrown if the popover has not been registered.</exception>
+    public override void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         if (Visible)
         {
             return;
-        }
-
-        // Inherit App from Target if not already set
-        if (App is null && Target?.TryGetTarget (out View? targetView) == true && targetView.App is { } targetApp)
-        {
-            App = targetApp;
-        }
-
-        // Auto-register if needed
-        if (App is { Popovers: { } popovers } && !popovers.IsRegistered (this))
-        {
-            popovers.Register (this);
         }
 
         // Ensure the Popover is sized correctly in case this is the first time we are being made visible
@@ -355,13 +229,13 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView 
     ///     position.
     /// </param>
     /// <param name="anchor">
-    ///     Optional anchor rectangle. If <see langword="null"/>, uses the <see cref="Anchor"/> property.
+    ///     Optional anchor rectangle. If <see langword="null"/>, uses the <see cref="IPopoverView.Anchor"/> property.
     /// </param>
     /// <remarks>
     ///     This method only sets the position; it does not make the popover visible. Use <see cref="MakeVisible"/> to
     ///     both position and show the popover.
     /// </remarks>
-    public virtual void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
+    public void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         // Try anchor parameter, then Anchor property, then mouse position
         Rectangle? effectiveAnchor = anchor ?? Anchor?.Invoke ();
@@ -411,46 +285,23 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView 
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     When becoming visible, the content view is shown and <see cref="IsOpen"/> is set to <see langword="true"/>.
-    ///     When becoming hidden, the content view is hidden, <see cref="Result"/> is extracted, and <see cref="IsOpen"/>
-    ///     is set to <see langword="false"/>.
+    ///     When becoming visible, the content view is shown.
+    ///     When becoming hidden, the content view is hidden and <see cref="Result"/> is extracted.
     /// </remarks>
     protected override void OnVisibleChanged ()
     {
-        base.OnVisibleChanged ();
-
         if (Visible)
         {
             ContentView?.Visible = true;
-
-            // Update IsOpen without triggering doWork (to avoid recursion)
-            if (_isOpen)
-            {
-                return;
-            }
-            _isOpen = true;
-            OnIsOpenChanged (new ValueChangedEventArgs<bool> (false, true));
-            IsOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (false, true));
         }
         else
         {
             ContentView?.Visible = false;
 
-            // Extract result before updating IsOpen
             ExtractResult ();
-
-            // Specific to Popover
-            App?.Popovers?.Hide (this);
-
-            // Update IsOpen without triggering doWork (to avoid recursion)
-            if (!_isOpen)
-            {
-                return;
-            }
-            _isOpen = false;
-            OnIsOpenChanged (new ValueChangedEventArgs<bool> (true, false));
-            IsOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (true, false));
         }
+
+        base.OnVisibleChanged (); // PopoverImpl handles Hide
     }
 
     /// <summary>
@@ -470,30 +321,6 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView 
         else if (ContentView is IValue<TResult> iValue)
         {
             Result = iValue.Value;
-        }
-    }
-
-    /// <summary>
-    ///     Called when <see cref="IsOpen"/> is about to change. Override to customize behavior.
-    /// </summary>
-    /// <param name="args">The event arguments containing current and new values.</param>
-    /// <returns><see langword="true"/> to cancel the change; otherwise, <see langword="false"/>.</returns>
-    protected virtual bool OnIsOpenChanging (ValueChangingEventArgs<bool> args) => false;
-
-    /// <summary>
-    ///     Called when <see cref="IsOpen"/> has changed. Override to perform custom actions.
-    /// </summary>
-    /// <param name="args">The event arguments containing old and new values.</param>
-    protected virtual void OnIsOpenChanged (ValueChangedEventArgs<bool> args) { }
-
-    /// <summary>
-    ///     Called when the target view's focus state changes. Auto-closes the popover when target loses focus.
-    /// </summary>
-    private void OnTargetHasFocusChanged (object? sender, EventArgs e)
-    {
-        if (sender is View { HasFocus: false })
-        {
-            IsOpen = false;
         }
     }
 
@@ -542,16 +369,6 @@ public class Popover<TView, TResult> : PopoverBaseImpl, IDesignable where TView 
             {
                 contentView.VisibleChanged -= ContentViewOnVisibleChanged;
             }
-
-            // Clean up Target subscriptions and bridge
-            if (_target?.TryGetTarget (out View? targetView) == true)
-            {
-                targetView.HasFocusChanged -= OnTargetHasFocusChanged;
-            }
-
-            _targetCommandBridge?.Dispose ();
-            _targetCommandBridge = null;
-            _target = null;
 
             _contentCommandBridge?.Dispose ();
             _contentCommandBridge = null;
