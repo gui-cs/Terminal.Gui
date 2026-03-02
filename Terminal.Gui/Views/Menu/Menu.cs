@@ -283,7 +283,6 @@ public class Menu : Bar, IValue<MenuItem?>
         // IMPORTANT: This must be done after adding the menu to the SuperView or Add will try
         // to set focus to it.
         Visible = true;
-        Enabled = true;
     }
 
     private bool _isHiding;
@@ -312,7 +311,6 @@ public class Menu : Bar, IValue<MenuItem?>
             }
 
             Visible = false;
-            Enabled = false;
 
             ClearFocus ();
         }
