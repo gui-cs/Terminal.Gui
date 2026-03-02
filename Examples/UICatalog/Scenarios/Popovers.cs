@@ -12,10 +12,8 @@ public class Popovers : Scenario
     private IApplication? _app;
     private Dictionary<string, Type>? _viewClasses;
     private ListView? _viewListView;
-    private ListView? _popoverListView;
     private EventLog? _eventLog;
-    private readonly ObservableCollection<string> _registeredPopovers = [];
-    private readonly Dictionary<string, IPopoverView> _popoverInstances = [];
+    private readonly Dictionary<int, IPopoverView> _popoverInstances = [];
 
     public override void Main ()
     {
@@ -34,40 +32,28 @@ public class Popovers : Scenario
                        .Select (t => new KeyValuePair<string, Type> (GetFormattedTypeName (t), t))
                        .ToDictionary (t => t.Key, t => t.Value);
 
-        // Left: View list
+        // Left: View list with marks — space toggles mark (register/deregister), enter shows marked popover
         _viewListView = new ListView
         {
-            Title = "_Views",
+            Title = "_Views (space=register, enter=show)",
             X = 0,
             Y = 0,
-            Width = Dim.Percent (33),
+            Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            ShowMarks = false,
+            ShowMarks = true,
+            MarkMultiple = true,
             SelectedItem = 0,
             BorderStyle = LineStyle.Single,
-            Source = new ListWrapper<string> (new ObservableCollection<string> (_viewClasses.Keys.ToList ())),
+            Source = new ListWrapper<string> (new ObservableCollection<string> (_viewClasses.Keys)),
         };
+        _viewListView.Activated += ViewListView_Activated;
         _viewListView.Accepting += ViewListView_Accepting;
 
-        // Middle: Registered popovers list
-        _popoverListView = new ListView
-        {
-            Title = "_Popovers (click to show)",
-            X = Pos.Right (_viewListView),
-            Y = 0,
-            Width = Dim.Percent (33),
-            Height = Dim.Fill (),
-            ShowMarks = false,
-            BorderStyle = LineStyle.Dotted,
-            Source = new ListWrapper<string> (_registeredPopovers),
-        };
-        _popoverListView.Accepting += PopoverListView_Accepting;
-
         // Right: Event log
-        _eventLog = new EventLog { X = Pos.Right (_popoverListView), Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        _eventLog = new EventLog { X = Pos.Right (_viewListView), Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         _eventLog.SetViewToLog (window);
-        window.Add (_viewListView, _popoverListView, _eventLog);
+        window.Add (_viewListView, _eventLog);
 
         _app.Run (window);
 
@@ -75,48 +61,31 @@ public class Popovers : Scenario
         _app = null;
     }
 
-    private void ViewListView_Accepting (object? sender, CommandEventArgs args)
+    /// <summary>
+    ///     Handles space key (Activated) — sync mark state to register/deregister the popover.
+    /// </summary>
+    private void ViewListView_Activated (object? sender, EventArgs<ICommandContext?> args)
     {
-        if (_viewListView?.SelectedItem is not { } selectedIndex)
-        {
-            return;
-        }
-
-        Type viewType = _viewClasses!.Values.ToArray () [selectedIndex];
-        args.Handled = true;
-
-        try
-        {
-            // Create the view instance
-            View? contentView = CreateViewInstance (viewType);
-
-            if (contentView is null)
-            {
-                _eventLog?.Log ($"Failed to create instance of {viewType.Name}");
-
-                return;
-            }
-
-            // Register the popover
-            RegisterPopover (contentView);
-        }
-        catch (Exception ex)
-        {
-            _eventLog?.Log ($"Error creating popover for {viewType.Name}: {ex.Message}");
-        }
+        SyncRegistrations ();
     }
 
-    private void PopoverListView_Accepting (object? sender, CommandEventArgs args)
+    /// <summary>
+    ///     Handles enter key (Accepting) — show the popover for the selected item if it's marked/registered.
+    /// </summary>
+    private void ViewListView_Accepting (object? sender, CommandEventArgs args)
     {
-        if (_popoverListView?.SelectedItem is not { } selectedIndex || selectedIndex >= _registeredPopovers.Count)
+        if (_viewListView?.SelectedItem is not { } selectedIndex || _viewClasses is null)
         {
             return;
         }
 
-        string popoverKey = _registeredPopovers [selectedIndex];
+        // Sync registrations first in case marks changed
+        SyncRegistrations ();
 
-        if (!_popoverInstances.TryGetValue (popoverKey, out IPopoverView? popover))
+        if (!_popoverInstances.TryGetValue (selectedIndex, out IPopoverView? popover))
         {
+            _eventLog?.Log ($"{_viewClasses.Keys.ElementAt (selectedIndex)} is not registered (mark it with space first)");
+
             return;
         }
 
@@ -124,71 +93,99 @@ public class Popovers : Scenario
 
         try
         {
-            // Show the popover centered
             Rectangle screen = _app!.Screen;
             Point center = new (screen.Width / 2, screen.Height / 2);
             popover.MakeVisible (center);
-            _eventLog?.Log ($"Showed popover: {popoverKey}");
+            _eventLog?.Log ($"Showed: {_viewClasses.Keys.ElementAt (selectedIndex)}");
         }
         catch (Exception ex)
         {
-            _eventLog?.Log ($"Error showing popover {popoverKey}: {ex.Message}");
+            _eventLog?.Log ($"Error showing popover: {ex.Message}");
         }
     }
 
-    private void RegisterPopover (View contentView)
+    /// <summary>
+    ///     Syncs mark state with popover registrations — marked items get registered, unmarked get deregistered.
+    /// </summary>
+    private void SyncRegistrations ()
     {
-        string viewTypeName = GetFormattedTypeName (contentView.GetType ());
+        if (_viewListView?.Source is null || _viewClasses is null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < _viewListView.Source.Count; i++)
+        {
+            bool isMarked = _viewListView.Source.IsMarked (i);
+            bool isRegistered = _popoverInstances.ContainsKey (i);
+
+            if (isMarked && !isRegistered)
+            {
+                // Register
+                Type viewType = _viewClasses.Values.ElementAt (i);
+
+                try
+                {
+                    View? contentView = CreateViewInstance (viewType);
+
+                    if (contentView is null)
+                    {
+                        _eventLog?.Log ($"Failed to create instance of {viewType.Name}");
+                        _viewListView.Source.SetMark (i, false);
+
+                        continue;
+                    }
+
+                    RegisterPopover (i, contentView);
+                }
+                catch (Exception ex)
+                {
+                    _eventLog?.Log ($"Error creating popover for {viewType.Name}: {ex.Message}");
+                    _viewListView.Source.SetMark (i, false);
+                }
+            }
+            else if (!isMarked && isRegistered)
+            {
+                // Deregister
+                IPopoverView popover = _popoverInstances [i];
+                _app?.Popovers?.DeRegister (popover);
+                _popoverInstances.Remove (i);
+                string key = _viewClasses.Keys.ElementAt (i);
+                _eventLog?.Log ($"Deregistered: {key}");
+            }
+        }
+    }
+
+    private void RegisterPopover (int index, View contentView)
+    {
+        string key = _viewClasses!.Keys.ElementAt (index);
 
         try
         {
-            // Determine TResult type from IValue<T> or use string
             Type? resultType = GetIValueResultType (contentView) ?? typeof (string);
 
-            // Create Popover<TView, TResult> using reflection
             Type popoverType = typeof (Popover<,>).MakeGenericType (contentView.GetType (), resultType);
             object? popoverObj = Activator.CreateInstance (popoverType, contentView);
 
             if (popoverObj is not IPopoverView popover)
             {
-                _eventLog?.Log ($"Failed to create popover for {viewTypeName}");
+                _eventLog?.Log ($"Failed to create popover for {key}");
 
                 return;
             }
 
-            // Set up result extraction if not using IValue
-            if (resultType == typeof (string))
-            {
-
-            }
-
-            // Register with ApplicationPopover
             _app?.Popovers?.Register (popover);
-
-            // Track the popover
-            var popoverKey = $"{viewTypeName} → {resultType.Name}";
-            _popoverInstances [popoverKey] = popover;
-            _registeredPopovers.Add (popoverKey);
-
-            _eventLog?.Log($"Registered: {popoverKey}");
-
-            // Subscribe to IsOpenChanged if it's a Popover<,>
-            //SubscribeToPopoverEvents (popoverObj, popoverKey);
+            _popoverInstances [index] = popover;
+            _eventLog?.Log ($"Registered: {key}");
         }
         catch (Exception ex)
         {
-            _eventLog?.Log($"Error registering popover for {viewTypeName}: {ex.Message}");
+            _eventLog?.Log ($"Error registering popover for {key}: {ex.Message}");
         }
-    }
-
-    private void OnPopoverIsOpenChanged (object? sender, ValueChangedEventArgs<bool> e)
-    {
-       // _eventLog?.Log($"{typeName}: IsOpen changed from {e.OldValue} to {e.NewValue}");
     }
 
     private Type? GetIValueResultType (View view)
     {
-        // Check if the view implements IValue<T>
         Type? iValueInterface = view.GetType ().GetInterfaces ().FirstOrDefault (i => i.IsGenericType && i.GetGenericTypeDefinition () == typeof (IValue<>));
 
         return iValueInterface?.GetGenericArguments () [0];
@@ -196,14 +193,12 @@ public class Popovers : Scenario
 
     private View? CreateViewInstance (Type viewType)
     {
-        // Try parameterless constructor
         ConstructorInfo? ctor = viewType.GetConstructor (Type.EmptyTypes);
 
         if (ctor is { })
         {
             var view = (View?)Activator.CreateInstance (viewType);
 
-            // Set some basic properties
             if (view is { })
             {
                 view.Width = Dim.Auto (DimAutoStyle.Content);
@@ -213,7 +208,6 @@ public class Popovers : Scenario
             return view;
         }
 
-        // Some views might need constraints satisfied
         if (viewType.IsGenericTypeDefinition)
         {
             Type [] typeParams = viewType.GetGenericArguments ();
