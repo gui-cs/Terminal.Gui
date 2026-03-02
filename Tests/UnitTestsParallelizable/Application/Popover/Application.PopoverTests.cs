@@ -77,7 +77,7 @@ public class ApplicationPopoverTests
         popoverManager.Show (popover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.A);
+        popoverManager.DispatchKeyDownToActivePopover (Key.A);
 
         // Assert
         Assert.Contains (KeyCode.A, popover.HandledKeys);
@@ -93,7 +93,7 @@ public class ApplicationPopoverTests
         popoverManager.Show (popover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.N.WithCtrl);
+        popoverManager.DispatchKeyDownToActivePopover (Key.N.WithCtrl);
 
         // Assert
         Assert.Equal (1, popover.NewCommandInvokeCount);
@@ -140,7 +140,7 @@ public class ApplicationPopoverTests
         popoverManager.Register (inactivePopover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.N.WithCtrl);
+        popoverManager.DispatchKeyDownToActivePopover (Key.N.WithCtrl);
 
         // Assert
         Assert.Equal (1, activePopover.NewCommandInvokeCount);
@@ -161,7 +161,7 @@ public class ApplicationPopoverTests
         popoverManager.Register (inactivePopover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.A);
+        popoverManager.DispatchKeyDownToActivePopover (Key.A);
 
         // Assert
         Assert.Contains (Key.A, activePopover.HandledKeys);
@@ -193,7 +193,7 @@ public class ApplicationPopoverTests
                                   };
 
         // Act & Assert — should not throw InvalidOperationException
-        Exception? ex = Record.Exception (() => popoverManager.DispatchKeyDown (Key.A));
+        Exception? ex = Record.Exception (() => popoverManager.DispatchKeyDownToActivePopover (Key.A));
         Assert.Null (ex);
     }
 

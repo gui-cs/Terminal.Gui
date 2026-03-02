@@ -20,6 +20,8 @@ public sealed class ApplicationPopover : IDisposable
     /// <inheritdoc/>
     public void Dispose ()
     {
+        Hide ();
+
         foreach (IPopoverView popover in _popovers)
         {
             if (popover is IDisposable disposable)
@@ -91,9 +93,11 @@ public sealed class ApplicationPopover : IDisposable
     ///     If the popover is derived from <see cref="PopoverImpl"/>, this is the same as setting
     ///     <see cref="IPopoverView.Visible"/> to <see langword="false"/>.
     /// </summary>
-    /// <param name="popover"></param>
-    public void Hide (IPopoverView? popover)
+    /// <param name="popover">If <see langword="null"/>, the active popover will be hidden.</param>
+    public void Hide (IPopoverView? popover = null)
     {
+        popover ??= GetActivePopover ();
+
         if (_activePopover != popover)
         {
             return;
@@ -220,60 +224,101 @@ public sealed class ApplicationPopover : IDisposable
     }
 
     /// <summary>
-    ///     Called when the user presses a key. Dispatches the key to the active popover, if any,
+    ///     INTERNAL: Called when the user presses a key. Dispatches the key to the active popover, if any,
     ///     otherwise to the popovers in the order they were registered. Inactive popovers only get hotkeys.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    internal bool DispatchKeyDown (Key key)
+    internal bool DispatchKeyDownToActivePopover (Key key)
     {
         Trace.Keyboard ("Popovers", key, "Entry");
 
         // Do active first - Active gets all key down events.
         // Need View cast for keyboard dispatch - this is the app→view keyboard bridge
-        var activePopover = GetActivePopover ();
+        IPopoverView? activePopover = GetActivePopover ();
 
-        if (activePopover is { Visible: true })
+        if (activePopover is not { Visible: true })
         {
-            var activePopoverView = activePopover as View;
+            return false;
+        }
+        var activePopoverView = activePopover as View;
 
-            if (activePopoverView!.NewKeyDownEvent (key))
-            {
-                return true;
-            }
-
-            if (activePopover.Target is { } && activePopover.Target.TryGetTarget (out View? targetView) && targetView is MenuBarItem)
-            {
-                // HACK: If our owner is a MenuBarItem, we want to allow nav keys to propagate to the MenuBar so it can move focus to the previous MenuBarItem.
-                return false;
-            }
-
-            bool? commandHandled = App?.Keyboard.InvokeCommandsBoundToKey (key);
-
-            if (commandHandled is true)
-            {
-                return true;
-            }
+        if (activePopoverView!.NewKeyDownEvent (key))
+        {
+            return true;
         }
 
-        return false;
+        if (activePopover.Target is { } && activePopover.Target.TryGetTarget (out View? targetView) && targetView is MenuBarItem)
+        {
+            // HACK: If our owner is a MenuBarItem, we want to allow nav keys to propagate to the MenuBar so it can move focus to the previous MenuBarItem.
+            return false;
+        }
+
+        // If the active popover didn't handle the key, try application-level hotkeys. This allows hotkeys to work even when a popover is open.
+        bool? commandHandled = App?.Keyboard.InvokeCommandsBoundToKey (key);
+
+        return commandHandled is true;
     }
 
     /// <summary>
-    ///     Hides a popover view if it supports the quit command and is currently visible. It checks for the command's
+    ///     INTERNAL: Hides a popover view if it supports the quit command and is currently visible. It checks for the
+    ///     command's
     ///     support before hiding.
     /// </summary>
     /// <param name="visiblePopover">
     ///     The view that is being checked and potentially hidden based on its visibility and command
     ///     support.
     /// </param>
-    internal static void HideWithQuitCommand (View visiblePopover)
+    internal static void HideWithQuitCommand (IPopoverView? visiblePopover)
     {
-        if (visiblePopover.Visible
-            && (!visiblePopover.GetSupportedCommands ().Contains (Command.Quit)
-                || (visiblePopover.InvokeCommand (Command.Quit) is true && visiblePopover.Visible)))
+        if (visiblePopover is not View visiblePopoverView)
         {
-            visiblePopover.Visible = false;
+            return;
         }
+
+        if (visiblePopoverView.Visible
+            && (!visiblePopoverView.GetSupportedCommands ().Contains (Command.Quit)
+                || (visiblePopoverView.InvokeCommand (Command.Quit) is true && visiblePopoverView.Visible)))
+        {
+            visiblePopoverView.Visible = false;
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Dispatches <paramref name="key"/> to inactive popovers. Inactive popovers only get hotkeys.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="activePopover">The popover that was active when <see cref="DispatchKeyDownToActivePopover"/> was called.</param>
+    /// <returns></returns>
+    internal bool DispatchKeyDownToInactivePopovers (Key key, IPopoverView? activePopover)
+    {
+        // Now try inactive Popovers. They only get hotkeys.
+
+        bool? hotKeyHandled = null;
+
+        foreach (IPopoverView popover in App?.Popovers?.Popovers.ToList () ?? [])
+        {
+            // Need View cast for keyboard dispatch
+            if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnableView))
+            {
+                continue;
+            }
+
+            Trace.Keyboard ("Popovers", key, "InactiveDispatch", $"Sending to {popoverView.ToIdentifyingString ()}");
+
+            popoverView.App ??= App;
+
+            // Inactive only get hotkeys
+            hotKeyHandled = popoverView.NewKeyDownEvent (key);
+
+            Trace.Keyboard ("Popovers", key, "InactiveResult", $"{popoverView.ToIdentifyingString ()} returned {hotKeyHandled}");
+
+            if (hotKeyHandled is true)
+            {
+                return true;
+            }
+        }
+
+        return hotKeyHandled is true;
     }
 }

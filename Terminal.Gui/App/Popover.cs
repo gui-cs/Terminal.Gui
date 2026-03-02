@@ -32,7 +32,7 @@ namespace Terminal.Gui.App;
 ///     <list type="bullet">
 ///         <item>Generic content view hosting with automatic initialization</item>
 ///         <item>Result extraction via <see cref="ResultExtractor"/> or <see cref="IValue{TResult}"/></item>
-///         <item>Anchor-based positioning via <see cref="Anchor"/> function</item>
+///         <item>Anchor-based positioning via <see cref="IPopoverView.Anchor"/> function</item>
 ///         <item>Target view weak reference for command bubbling</item>
 ///         <item>Automatic command bridging from content view</item>
 ///     </list>
@@ -181,15 +181,15 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     public event EventHandler<ValueChangedEventArgs<TResult?>>? ResultChanged;
 
     /// <summary>
-    ///     Makes the popover visible and positions it based on <see cref="PopoverImpl.Anchor"/> or <paramref name="idealScreenPosition"/>.
+    ///     Makes the popover visible and positions it based on <see cref="IPopoverView.Anchor"/> or <paramref name="idealScreenPosition"/>.
     /// </summary>
     /// <param name="idealScreenPosition">
     ///     The ideal screen-relative position for the popover. If <see langword="null"/>, positioning is determined
-    ///     by <see cref="PopoverImpl.Anchor"/> or the current mouse position.
+    ///     by <see cref="IPopoverView.Anchor"/> or the current mouse position.
     /// </param>
     /// <param name="anchor">
-    ///     Optional anchor rectangle to override <see cref="PopoverImpl.Anchor"/> property for this call.
-    ///     If <see langword="null"/>, uses the <see cref="PopoverImpl.Anchor"/> property.
+    ///     Optional anchor rectangle to override <see cref="IPopoverView.Anchor"/> property for this call.
+    ///     If <see langword="null"/>, uses the <see cref="IPopoverView.Anchor"/> property.
     /// </param>
     /// <remarks>
     ///     <para>
@@ -229,7 +229,7 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     ///     position.
     /// </param>
     /// <param name="anchor">
-    ///     Optional anchor rectangle. If <see langword="null"/>, uses the <see cref="Anchor"/> property.
+    ///     Optional anchor rectangle. If <see langword="null"/>, uses the <see cref="IPopoverView.Anchor"/> property.
     /// </param>
     /// <remarks>
     ///     This method only sets the position; it does not make the popover visible. Use <see cref="MakeVisible"/> to

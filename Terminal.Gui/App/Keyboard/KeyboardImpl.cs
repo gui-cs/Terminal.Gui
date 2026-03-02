@@ -158,7 +158,9 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             return true;
         }
 
-        if (App?.Popovers?.DispatchKeyDown (key) is true)
+        IPopoverView? activePopover = App?.Popovers?.GetActivePopover ();
+
+        if (activePopover is { } && App?.Popovers?.DispatchKeyDownToActivePopover (key) is true)
         {
             return true;
         }
@@ -189,34 +191,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             }
         }
 
-        // Now try inactive Popovers. They only get hotkeys.
-
-        bool? hotKeyHandled = null;
-        IPopoverView? activePopover = App?.Popovers?.GetActivePopover ();
-        foreach (IPopoverView popover in App?.Popovers?.Popovers?.ToList () ?? [])
-        {
-            // Need View cast for keyboard dispatch
-            if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnableView))
-            {
-                continue;
-            }
-
-            Trace.Keyboard ("Popovers", key, "InactiveDispatch", $"Sending to {popoverView.ToIdentifyingString ()}");
-
-            popoverView.App ??= App;
-
-            // Inactive only get hotkeys
-            hotKeyHandled = popoverView.NewKeyDownEvent (key);
-
-            Trace.Keyboard ("Popovers", key, "InactiveResult", $"{popoverView.ToIdentifyingString ()} returned {hotKeyHandled}");
-
-            if (hotKeyHandled is true)
-            {
-                return true;
-            }
-        }
-
-        if (hotKeyHandled is true)
+        if (App?.Popovers?.DispatchKeyDownToInactivePopovers (key, activePopover) is true)
         {
             return true;
         }
@@ -250,7 +225,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                     return null;
                 }
 
-                handled = binding.Target?.InvokeCommands (binding.Commands, binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+                handled = binding.Target?.InvokeCommands (binding.Commands,
+                                                          binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
             }
             else
             {
@@ -332,10 +308,10 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                         while (viewToArrange is { Arrangement: ViewArrangement.Fixed })
                         {
                             viewToArrange = viewToArrange switch
-                            {
-                                Adornment adornmentView => adornmentView.Parent,
-                                _ => viewToArrange.SuperView
-                            };
+                                            {
+                                                Adornment adornmentView => adornmentView.Parent,
+                                                _ => viewToArrange.SuperView
+                                            };
                         }
 
                         if (viewToArrange is { })
