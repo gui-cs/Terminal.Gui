@@ -28,7 +28,7 @@ namespace Terminal.Gui.Views;
 ///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
 ///     </para>
 /// </remarks>
-public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
+public class PopoverMenu : Popover<Menu, MenuItem>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class.
@@ -41,7 +41,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="menuItems">The views to use as menu items. Null elements become separator lines.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling
+    ///     <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<View?>? menuItems) : this (new Menu (menuItems?.Select (item => item ?? new Line ()))) { }
 
@@ -50,7 +51,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="menuItems">The menu items to display in the popover.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling
+    ///     <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems)) { }
 
@@ -59,7 +61,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     /// <param name="root">The root menu that contains the top-level menu items.</param>
     /// <remarks>
-    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/>.
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling
+    ///     <see cref="Popover{TView, TResult}.MakeVisible"/>.
     /// </remarks>
     public PopoverMenu (Menu? root) : base (root)
     {
@@ -68,49 +71,29 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
         AddCommand (Command.Right, MoveRight);
         KeyBindings.Add (Key.CursorRight, Command.Right);
 
+        //KeyBindings.Add (Key.CursorDown, Command.Down);
+
         AddCommand (Command.Left, MoveLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        //KeyBindings.Add (Key.CursorUp, Command.Up);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
 
-        // PopoverImpl sets a key binding for Quit, so we
-        // don't need to do it here.
-        AddCommand (Command.Quit, Quit);
-
         return;
-
-        bool? Quit (ICommandContext? ctx)
-        {
-            if (!Visible)
-            {
-                // If we're not visible, the command is not for us
-                return false;
-            }
-
-            // This ensures the quit command gets propagated to the owner of the popover.
-            // This is important for MenuBarItems to ensure the MenuBar loses focus when
-            // the user presses QuitKey to cause the menu to close.
-            // Note, we override OnAccepting, which will set Visible to false
-            bool? ret = RaiseAccepting (ctx);
-
-            if (!Visible || ret is true)
-            {
-                return Visible;
-            }
-            Visible = false;
-
-            return true;
-
-            // If we are Visible, returning true will stop the QuitKey from propagating
-            // If we are not Visible, returning false will allow the QuitKey to propagate
-        }
 
         bool? MoveLeft (ICommandContext? ctx)
         {
             if (Focused == Root)
             {
-                return false;
+                if (!TryGetTarget (out View? targetView))
+                {
+                    return true;
+                }
+
+                // HACK: If our owner is a MenuBarItem, we want to allow left key to propagate to the MenuBar so it can move focus to the previous MenuBarItem.
+                return targetView is not MenuBarItem;
             }
 
             if (MostFocused is not MenuItem { SuperView: Menu focusedMenu })
@@ -126,7 +109,13 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
         {
             if (MostFocused is not MenuItem { SubMenu.Visible: true } focused)
             {
-                return false;
+                if (!TryGetTarget (out View? targetView))
+                {
+                    return true;
+                }
+
+                // HACK: If our owner is a MenuBarItem, we want to allow right key to propagate to the MenuBar so it can move focus to the next MenuBarItem.
+                return targetView is not MenuBarItem;
             }
             focused.SubMenu.SetFocus ();
 
@@ -281,44 +270,6 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
     /// </summary>
     public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
 
-    /// <summary>
-    ///     Sets the position of the popover menu at <paramref name="idealScreenPosition"/>. The actual position will be
-    ///     adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over the first cell of
-    ///     the first <see cref="MenuItem"/> (if possible).
-    /// </summary>
-    /// <param name="idealScreenPosition">
-    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
-    ///     used.
-    /// </param>
-    /// <param name="anchor">Anchor rectangle (not used by PopoverMenu, which uses menu-specific positioning).</param>
-    /// <remarks>
-    ///     This method only sets the position; it does not make the popover visible. Use <see cref="Popover{TView, TResult}.MakeVisible"/> to
-    ///     both position and show the popover.
-    /// </remarks>
-    public new void SetPosition (Point? idealScreenPosition = null, Rectangle? anchor = null)
-    {
-        idealScreenPosition ??= App?.Mouse.LastMousePosition;
-
-        if (idealScreenPosition is null || Root is null)
-        {
-            return;
-        }
-
-        Point pos = idealScreenPosition.Value;
-
-        if (!Root.IsInitialized)
-        {
-            Root.App ??= App;
-            Root.BeginInit ();
-            Root.EndInit ();
-        }
-
-        pos = GetMostVisibleLocationForSubMenu (Root, pos);
-
-        Root.X = pos.X;
-        Root.Y = pos.Y;
-    }
-
     /// <inheritdoc/>
     /// <remarks>
     ///     When becoming visible, the root menu is shown. When becoming hidden, the root menu is hidden
@@ -424,7 +375,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>, IDesignable
             menu.Visible = false;
 
             // Disable so keys are ignored
-            menu.Enabled = false;
+            //menu.Enabled = false;
 
             // Activate/Activated are handled via CommandBridge (Root → PopoverMenu).
             // SubMenu activations propagate up through MenuItem SubMenu bridges to Root.

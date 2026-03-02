@@ -101,7 +101,7 @@ public sealed class ApplicationPopover : IDisposable
 
         // If there's an existing popover, hide it.
         _activePopover = null;
-        popover.Visible = false;
+        popover?.Visible = false;
 
         // Need View cast for TopRunnableView access
         if (popover is View popoverView)
@@ -143,12 +143,14 @@ public sealed class ApplicationPopover : IDisposable
 
         if (popover is View popoverView)
         {
-            popoverView.App = App;
-
-            if (!popoverView.IsInitialized)
+            if (popoverView.App is null)
             {
-                popoverView.BeginInit ();
-                popoverView.EndInit ();
+                popoverView.App = App;
+            }
+            else if (popoverView.App != App)
+            {
+                throw
+                    new InvalidOperationException ("Popover views must be associated with the same application instance as the one they are registered with.");
             }
         }
 
@@ -193,6 +195,13 @@ public sealed class ApplicationPopover : IDisposable
         // Validation requires View cast (ViewportSettings, KeyBindings, BeginInit/EndInit)
         if (popover is View newPopover)
         {
+            if (!newPopover.IsInitialized)
+            {
+                newPopover.App = App;
+                newPopover.BeginInit ();
+                newPopover.EndInit ();
+            }
+
             if (!(newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
                   && newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)))
             {
@@ -202,12 +211,6 @@ public sealed class ApplicationPopover : IDisposable
             if (newPopover.KeyBindings.GetFirstFromCommands (Command.Quit) is null)
             {
                 throw new InvalidOperationException ("Popovers must have a key binding for Command.Quit.");
-            }
-
-            if (!newPopover.IsInitialized)
-            {
-                newPopover.BeginInit ();
-                newPopover.EndInit ();
             }
         }
 
@@ -228,43 +231,32 @@ public sealed class ApplicationPopover : IDisposable
 
         // Do active first - Active gets all key down events.
         // Need View cast for keyboard dispatch - this is the app→view keyboard bridge
-        var activePopover = GetActivePopover () as View;
+        var activePopover = GetActivePopover ();
 
         if (activePopover is { Visible: true })
         {
-            if (activePopover.NewKeyDownEvent (key))
+            var activePopoverView = activePopover as View;
+
+            if (activePopoverView!.NewKeyDownEvent (key))
+            {
+                return true;
+            }
+
+            if (activePopover.Target is { } && activePopover.Target.TryGetTarget (out View? targetView) && targetView is MenuBarItem)
+            {
+                // HACK: If our owner is a MenuBarItem, we want to allow nav keys to propagate to the MenuBar so it can move focus to the previous MenuBarItem.
+                return false;
+            }
+
+            bool? commandHandled = App?.Keyboard.InvokeCommandsBoundToKey (key);
+
+            if (commandHandled is true)
             {
                 return true;
             }
         }
 
-        // If the active popover didn't handle the key, try the inactive ones.
-        // Inactive only get hotkeys
-        bool? hotKeyHandled = null;
-
-        foreach (IPopoverView popover in _popovers.ToList ())
-        {
-            // Need View cast for keyboard dispatch
-            if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnableView))
-            {
-                continue;
-            }
-
-            Trace.Keyboard ("Popovers", key, "InactiveDispatch", $"Sending to {popoverView.ToIdentifyingString ()}");
-
-            // hotKeyHandled = popoverView.InvokeCommandsBoundToHotKey (key);
-            popoverView.App ??= App;
-            hotKeyHandled = popoverView.NewKeyDownEvent (key);
-
-            Trace.Keyboard ("Popovers", key, "InactiveResult", $"{popoverView.ToIdentifyingString ()} returned {hotKeyHandled}");
-
-            if (hotKeyHandled is true)
-            {
-                return true;
-            }
-        }
-
-        return hotKeyHandled is true;
+        return false;
     }
 
     /// <summary>

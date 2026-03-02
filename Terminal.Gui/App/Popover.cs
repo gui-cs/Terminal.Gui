@@ -128,7 +128,7 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
 
             // Bridge Activate from ContentView → Popover across the non-containment boundary.
             _contentCommandBridge?.Dispose ();
-            _contentCommandBridge = CommandBridge.Connect (this, field, Command.Activate);
+            _contentCommandBridge = CommandBridge.Connect (this, field, [Command.Activate, Command.Accept]);
         }
     }
 
@@ -217,7 +217,7 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
 
         SetPosition (idealScreenPosition, anchor);
 
-        App!.Popovers?.Show (this);
+        App?.Popovers?.Show (this);
     }
 
     /// <summary>
@@ -292,17 +292,11 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     {
         if (Visible)
         {
-            if (ContentView is { })
-            {
-                ContentView.Visible = true;
-            }
+            ContentView?.Visible = true;
         }
         else
         {
-            if (ContentView is { })
-            {
-                ContentView.Visible = false;
-            }
+            ContentView?.Visible = false;
 
             ExtractResult ();
         }

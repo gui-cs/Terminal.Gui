@@ -29,11 +29,10 @@ public class PopoverMenus : Scenario
         _cultureInfos = Application.SupportedCultures;
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ();
-        appWindow.Title = GetQuitKeyAndName ();
-        appWindow.Arrangement = ViewArrangement.Fixed;
-        appWindow.SchemeName = "Runnable";
-        _appWindow = appWindow;
+        _appWindow = new Window ();
+        _appWindow.Title = GetQuitKeyAndName ();
+        _appWindow.Arrangement = ViewArrangement.Fixed;
+        _appWindow.SchemeName = "Runnable";
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so
@@ -67,7 +66,8 @@ public class PopoverMenus : Scenario
             {
                 Id = "eventLog",
                 X = Pos.AnchorEnd (),
-                Height = Dim.Fill (),
+                Y = 3,
+                Height = Dim.Fill (3),
                 SchemeName = "Runnable",
                 BorderStyle = LineStyle.Double,
                 Title = "E_vents",
@@ -350,7 +350,8 @@ public class PopoverMenus : Scenario
                                                },
                                                new Line (),
                                                new MenuItem { Title = Strings.cmdQuit, Action = () => app!.RequestStop () }
-                                           ]) { Key = _winContextMenuKey };
+                                           ])
+        { Key = _winContextMenuKey };
         app!.Popovers?.Register (_winContextMenu);
     }
 

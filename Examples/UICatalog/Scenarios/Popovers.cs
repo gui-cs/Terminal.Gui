@@ -12,7 +12,11 @@ public class Popovers : Scenario
     private IApplication? _app;
     private Dictionary<string, Type>? _viewClasses;
     private ListView? _viewListView;
+    private FrameView? _popoverTargetFrame;
     private EventLog? _eventLog;
+    private Button? _activateButton;
+    private TextField? _resultTextField;
+
     private readonly Dictionary<int, IPopoverView> _popoverInstances = [];
 
     public override void Main ()
@@ -23,8 +27,7 @@ public class Popovers : Scenario
 
         using Window window = new ();
         window.Title = GetQuitKeyAndName ();
-        window.Border!.LineStyle = LineStyle.Heavy;
-        window.Border!.Thickness = new Thickness (0);
+        window.BorderStyle = LineStyle.None;
 
         // Get all View classes
         _viewClasses = GetAllViewClasses ()
@@ -35,44 +38,85 @@ public class Popovers : Scenario
         // Left: View list with marks — space toggles mark (register/deregister), enter shows marked popover
         _viewListView = new ListView
         {
-            Title = "_Views (space=register, enter=show)",
-            X = 0,
-            Y = 0,
-            Width = Dim.Percent (50),
+            Title = "_Views (marked=registered)",
+            Width = 35,
             Height = Dim.Fill (),
             ShowMarks = true,
             MarkMultiple = true,
             SelectedItem = 0,
             BorderStyle = LineStyle.Single,
-            Source = new ListWrapper<string> (new ObservableCollection<string> (_viewClasses.Keys)),
+            Source = new ListWrapper<string> (new ObservableCollection<string> (_viewClasses.Keys))
         };
         _viewListView.Activated += ViewListView_Activated;
-        _viewListView.Accepting += ViewListView_Accepting;
+        _viewListView.Accepting += ShowPopover;
 
         // Right: Event log
-        _eventLog = new EventLog { X = Pos.Right (_viewListView), Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        _eventLog = new EventLog
+        {
+            Title = "_Event Log",
+            X = Pos.AnchorEnd (),
+            Width = Dim.Auto (maximumContentDim: 50),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Double,
+            Arrangement = ViewArrangement.LeftResizable
+        };
+
+        _popoverTargetFrame = new FrameView
+        {
+            X = Pos.Right (_viewListView),
+            Y = Pos.Top (_viewListView),
+            Width = Dim.Fill (_eventLog!),
+            Height = Dim.Height (_viewListView),
+            BorderStyle = LineStyle.Single,
+            CommandsToBubbleUp = [Command.Accept, Command.Activate]
+        };
+
+        _popoverTargetFrame.Activated += (sender, args) => { _resultTextField!.Text = args.Value?.Value?.ToString () ?? Glyphs.Null.ToString (); };
+
+        _popoverTargetFrame.Accepted += (sender, args) =>
+                                        {
+                                            _resultTextField!.Text = args.Context?.Value?.ToString () ?? Glyphs.Null.ToString ();
+                                            _app.Popovers?.Hide (_app.Popovers.GetActivePopover ());
+                                        };
+
+        _activateButton = new Button { Title = "_Make Visible (Enter)" };
+
+        _activateButton.Accepting += ShowPopover;
+
+        _resultTextField = new TextField
+        {
+            Y = Pos.Bottom (_activateButton),
+            Width = Dim.Fill (),
+            ReadOnly = true,
+            Title = "Result",
+            BorderStyle = LineStyle.Dotted
+        };
+        _popoverTargetFrame.Add (_activateButton, _resultTextField);
 
         _eventLog.SetViewToLog (window);
-        window.Add (_viewListView, _eventLog);
+        window.Add (_viewListView, _popoverTargetFrame, _eventLog);
 
         _app.Run (window);
 
-        _app.Dispose ();
+        foreach (IPopoverView popover in _popoverInstances.Values)
+        {
+            _app?.Popovers?.DeRegister (popover);
+            (popover as IDisposable)?.Dispose ();
+        }
+
+        _app?.Dispose ();
         _app = null;
     }
 
     /// <summary>
     ///     Handles space key (Activated) — sync mark state to register/deregister the popover.
     /// </summary>
-    private void ViewListView_Activated (object? sender, EventArgs<ICommandContext?> args)
-    {
-        SyncRegistrations ();
-    }
+    private void ViewListView_Activated (object? sender, EventArgs<ICommandContext?> args) => SyncRegistrations ();
 
     /// <summary>
     ///     Handles enter key (Accepting) — show the popover for the selected item if it's marked/registered.
     /// </summary>
-    private void ViewListView_Accepting (object? sender, CommandEventArgs args)
+    private void ShowPopover (object? sender, CommandEventArgs args)
     {
         if (_viewListView?.SelectedItem is not { } selectedIndex || _viewClasses is null)
         {
@@ -93,9 +137,9 @@ public class Popovers : Scenario
 
         try
         {
-            Rectangle screen = _app!.Screen;
-            Point center = new (screen.Width / 2, screen.Height / 2);
-            popover.MakeVisible (center);
+            Point idealPosition = _resultTextField!.FrameToScreen ().Location;
+            idealPosition.Y += _resultTextField!.Frame.Height;
+            popover.MakeVisible (idealPosition);
             _eventLog?.Log ($"Showed: {_viewClasses.Keys.ElementAt (selectedIndex)}");
         }
         catch (Exception ex)
@@ -126,17 +170,10 @@ public class Popovers : Scenario
 
                 try
                 {
-                    View? contentView = CreateViewInstance (viewType);
+                    IPopoverView? popoverView = CreatePopoverViewInstance (viewType);
 
-                    if (contentView is null)
-                    {
-                        _eventLog?.Log ($"Failed to create instance of {viewType.Name}");
-                        _viewListView.Source.SetMark (i, false);
-
-                        continue;
-                    }
-
-                    RegisterPopover (i, contentView);
+                    popoverView.Target = new WeakReference<View> (_popoverTargetFrame!);
+                    RegisterPopover (i, popoverView);
                 }
                 catch (Exception ex)
                 {
@@ -150,32 +187,39 @@ public class Popovers : Scenario
                 IPopoverView popover = _popoverInstances [i];
                 _app?.Popovers?.DeRegister (popover);
                 _popoverInstances.Remove (i);
+                (popover as IDisposable)?.Dispose ();
                 string key = _viewClasses.Keys.ElementAt (i);
                 _eventLog?.Log ($"Deregistered: {key}");
             }
         }
+
+        if (_viewListView.SelectedItem is not { } selectedIndex)
+        {
+            return;
+        }
+
+        if (!_popoverInstances.TryGetValue (selectedIndex, out IPopoverView? selectedPopoverView))
+        {
+            _popoverTargetFrame?.Title = "_Selected IPopoverView: `none`";
+
+            return;
+        }
+
+        _popoverTargetFrame?.Title = $"_Selected IPopoverView: `Popover<{GetFormattedTypeName (selectedPopoverView.GetType ())}, {GetFormattedTypeName (GetIValueResultType (selectedPopoverView.GetType ()) ?? typeof (string))}>`";
     }
 
-    private void RegisterPopover (int index, View contentView)
+    private void RegisterPopover (int index, IPopoverView popoverView)
     {
         string key = _viewClasses!.Keys.ElementAt (index);
 
         try
         {
-            Type? resultType = GetIValueResultType (contentView) ?? typeof (string);
+            View? contentView = (popoverView as View)?.SubViews.ElementAt (0);
 
-            Type popoverType = typeof (Popover<,>).MakeGenericType (contentView.GetType (), resultType);
-            object? popoverObj = Activator.CreateInstance (popoverType, contentView);
-
-            if (popoverObj is not IPopoverView popover)
-            {
-                _eventLog?.Log ($"Failed to create popover for {key}");
-
-                return;
-            }
-
-            _app?.Popovers?.Register (popover);
-            _popoverInstances [index] = popover;
+            _app?.Popovers?.Register (popoverView);
+            _popoverInstances [index] = popoverView;
+            _eventLog?.SetViewToLog (contentView);
+            _eventLog?.SetViewToLog (popoverView as View);
             _eventLog?.Log ($"Registered: {key}");
         }
         catch (Exception ex)
@@ -184,9 +228,25 @@ public class Popovers : Scenario
         }
     }
 
-    private Type? GetIValueResultType (View view)
+    private IPopoverView CreatePopoverViewInstance (Type viewType)
     {
-        Type? iValueInterface = view.GetType ().GetInterfaces ().FirstOrDefault (i => i.IsGenericType && i.GetGenericTypeDefinition () == typeof (IValue<>));
+        Type resultType = GetIValueResultType (viewType) ?? typeof (string);
+        Type popoverType = typeof (Popover<,>).MakeGenericType (viewType, resultType);
+
+        object? popoverObj = Activator.CreateInstance (popoverType,
+                                                       CreateViewInstance (viewType) ?? throw new InvalidOperationException ("Failed to create view instance"));
+
+        if (popoverObj is not IPopoverView popover)
+        {
+            throw new InvalidOperationException ($"Failed to create popover instance for {viewType.Name}");
+        }
+
+        return popover;
+    }
+
+    private Type? GetIValueResultType (Type viewType)
+    {
+        Type? iValueInterface = viewType.GetInterfaces ().FirstOrDefault (i => i.IsGenericType && i.GetGenericTypeDefinition () == typeof (IValue<>));
 
         return iValueInterface?.GetGenericArguments () [0];
     }
@@ -195,20 +255,19 @@ public class Popovers : Scenario
     {
         ConstructorInfo? ctor = viewType.GetConstructor (Type.EmptyTypes);
 
+        View? view = null;
+
         if (ctor is { })
         {
-            var view = (View?)Activator.CreateInstance (viewType);
+            view = (View?)Activator.CreateInstance (viewType);
 
-            if (view is { })
+            if (view is null)
             {
-                view.Width = Dim.Auto (DimAutoStyle.Content);
-                view.Height = Dim.Auto (DimAutoStyle.Content);
+                return view;
             }
-
-            return view;
         }
 
-        if (viewType.IsGenericTypeDefinition)
+        if (view is null && viewType.IsGenericTypeDefinition)
         {
             Type [] typeParams = viewType.GetGenericArguments ();
             Type [] constraintTypes = new Type [typeParams.Length];
@@ -221,10 +280,61 @@ public class Popovers : Scenario
 
             Type constructedType = viewType.MakeGenericType (constraintTypes);
 
-            return (View?)Activator.CreateInstance (constructedType);
+            view = (View?)Activator.CreateInstance (constructedType);
         }
 
-        return null;
+        view?.Initialized += (sender, _) =>
+                             {
+                                 if (sender is not View v)
+                                 {
+                                     return;
+                                 }
+
+                                 if (!v.Visible)
+                                 {
+                                     return;
+                                 }
+
+                                 ConfigurePopoverContentView (view);
+                             };
+
+        return view;
+    }
+
+    private const int MAX_VIEW_FRAME_HEIGHT = 30;
+
+    private void ConfigurePopoverContentView (View? view)
+    {
+        view!.BorderStyle = LineStyle.Dotted;
+        view.Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable;
+
+        if (view.Width == Dim.Absolute (0))
+        {
+            view.Width = Dim.Fill ();
+        }
+
+        if (view.Height == Dim.Absolute (0))
+        {
+            view.Height = MAX_VIEW_FRAME_HEIGHT - 2;
+        }
+
+        if (!view.Width.Has<DimAuto> (out _))
+        {
+            view.Width = Dim.Fill (0, 100);
+        }
+
+        if (!view.Height.Has<DimAuto> (out _))
+        {
+            view.Height = Dim.Auto (minimumContentDim: MAX_VIEW_FRAME_HEIGHT - 2,
+                                    maximumContentDim: MAX_VIEW_FRAME_HEIGHT - view.GetAdornmentsThickness ().Vertical);
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        view.Title = $"Popover<{GetFormattedTypeName (view.GetType ())}, {GetFormattedTypeName (GetIValueResultType (view.GetType ()) ?? typeof (string))}>";
     }
 
     private string GetFormattedTypeName (Type type)
@@ -234,7 +344,7 @@ public class Popovers : Scenario
             return type.Name;
         }
 
-        string baseName = type.Name.Substring (0, type.Name.IndexOf ('`'));
+        string baseName = type.Name [..type.Name.IndexOf ('`')];
         string args = string.Join (", ", type.GetGenericArguments ().Select (t => t.Name));
 
         return $"{baseName}<{args}>";
@@ -242,13 +352,13 @@ public class Popovers : Scenario
 
     private IEnumerable<Type> GetAllViewClasses ()
     {
-        IEnumerable<Type>? types = typeof (View).Assembly.GetTypes ()
-                                                .Where (t => t.IsPublic
-                                                             && !t.IsAbstract
-                                                             && t.IsSubclassOf (typeof (View))
-                                                             && !t.Name.Contains ("Adornment")
-                                                             && t != typeof (PopoverMenu)
-                                                             && !t.IsGenericType);
+        IEnumerable<Type> types = typeof (View).Assembly.GetTypes ()
+                                               .Where (t => t is { IsPublic: true, IsAbstract: false }
+                                                            && t.IsSubclassOf (typeof (View))
+                                                            && t != typeof (Adornment)
+                                                            && !t.IsSubclassOf (typeof (Adornment))
+                                                            && t != typeof (PopoverMenu)
+                                                            && !t.IsGenericType);
 
         return types;
     }

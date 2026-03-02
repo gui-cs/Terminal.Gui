@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
 ///     <see cref="MenuItem"/>.
 /// </summary>
-public class Menu : Bar, IDesignable, IValue<MenuItem?>
+public class Menu : Bar, IValue<MenuItem?>
 {
     /// <summary>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
