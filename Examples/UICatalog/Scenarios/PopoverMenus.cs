@@ -200,7 +200,7 @@ public class PopoverMenus : Scenario
             base.EndInit ();
 
             _popoverMenu = new PopoverMenu { Title = "ContextMenu", Id = "PopoverMenuHostContextMenu" };
-            _popoverMenu.Target = new WeakReference<View?> (this); // Bridge commands to this host
+            _popoverMenu.Target = new WeakReference<View> (this); // Bridge commands to this host
 
             Menu testContextMenu = new () { Id = "TestContextMenu" };
             _popoverMenu.Root = testContextMenu;
