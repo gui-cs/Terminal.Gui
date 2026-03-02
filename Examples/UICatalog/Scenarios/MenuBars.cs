@@ -206,20 +206,26 @@ public class MenuBars : Scenario
 
             MenuBar?.Activated += (_, args) =>
                                   {
-                                      // Traditional way - extracting MenuItem from Source
-                                      if (args.Value?.Source?.TryGetTarget (out View? sourceView) == true && sourceView is MenuItem mi)
+                                      if (args.Value?.TryGetSource (out View? ctxSource) is true)
                                       {
-                                          lastActivatedText.Text = mi.Title;
+                                          // Walk up the superview chain to find the MenuItem that was activated, if any, and log it.
+                                          while (ctxSource is not null && ctxSource is not MenuItem)
+                                          {
+                                              ctxSource = ctxSource.SuperView;
+                                          }
+                                          lastActivatedText.Text = $"{ctxSource.ToIdentifyingString ()}";
                                       }
-
-                                      // New way - using ctx.Value which contains the Menu's activated MenuItem
-                                      // Note: Value comes from the PopoverMenu (which implements IValue<MenuItem?>)
-                                      // and is automatically populated in the context when the command is invoked
-                                      if (args.Value?.Value is MenuItem menuItem)
+                                      else
                                       {
-                                          lastActivatedValueText.Text = $"{menuItem.Title} (from Menu.Value)";
+                                          lastActivatedText.Text = $"{Glyphs.Null}";
                                       }
+                                      lastActivatedValueText.Text = $"{args.Value?.Value ?? Glyphs.Null.ToString ()}";
                                   };
+
+            CommandNotBound += (sender, args) =>
+                                       {
+                                           lastCommandText.Text = $"{args.Context?.Command}";
+                                       };
 
             AddCommand (Command.Edit,
                         ctx =>
@@ -246,12 +252,9 @@ public class MenuBars : Scenario
             // Add a button to open the MenuBar
             Button openBtn = new () { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
 
-            openBtn.Accepting += (_, e) =>
+            openBtn.Accepted += (_, _) =>
                                  {
-                                     e.Handled = true;
-                                     string sourceTitle = e.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {sourceTitle}");
-                                     NewKeyDownEvent (MenuBar!.Key);
+                                     MenuBar?.InvokeCommand (Command.Activate);
                                  };
 
             Add (openBtn);
