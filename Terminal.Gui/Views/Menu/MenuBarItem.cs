@@ -177,7 +177,7 @@ public class MenuBarItem : MenuItem, IDesignable
 
             Trace.Command (this, "PopoverMenuSet", $"PopoverMenu={field.ToIdentifyingString ()}");
 
-            // Set Target for base class bridge + focus tracking
+            // Bridge Activate/Accept from PopoverMenu → MenuBarItem via PopoverImpl.Target.
             field.Target = new WeakReference<View> (this);
 
             // Set Anchor for positioning below MenuBarItem
