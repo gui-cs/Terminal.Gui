@@ -7,7 +7,7 @@ public static partial class Application // Popover handling
     [Obsolete ("The legacy static Application object is going away.")]
     public static ApplicationPopover? Popover
     {
-        get => ApplicationImpl.Instance.Popover;
-        internal set => ApplicationImpl.Instance.Popover = value;
+        get => ApplicationImpl.Instance.Popovers;
+        internal set => ApplicationImpl.Instance.Popovers = value;
     }
 }

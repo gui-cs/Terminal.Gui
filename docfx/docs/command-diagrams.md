@@ -1,101 +1,132 @@
-﻿### Level 1: Basic View Command Flow
+### Level 1: DefaultActivateHandler and DefaultAcceptHandler Flow
 
-This diagram shows the fundamental command invocation flow within a single view, demonstrating the Cancellable Work Pattern with pre-events (e.g., `Activating`, `Accepting`) and the command handler execution.
+This diagram shows the actual implementation of `DefaultActivateHandler` and `DefaultAcceptHandler`. Each handler resets dispatch state, calls <xref:Terminal.Gui.ViewBase.View.RaiseActivating*>/<xref:Terminal.Gui.ViewBase.View.RaiseAccepting*> (which runs the full Cancellable Work Pattern pipeline: `OnXxx` virtual → `Xxx` event → `TryDispatchToTarget` → <xref:Terminal.Gui.ViewBase.View.TryBubbleUp*>), then decides how to complete based on the result and routing mode.
 
 ```mermaid
 flowchart TD
-    input["User input (key/mouse)"] --> invoke["View.InvokeCommand(command)"]
-    invoke --> |Command.Activate| act_pre["OnActivating + Activating handlers"]
-    invoke --> |Command.Accept| acc_pre["OnAccepting + Accepting handlers"]
+    input_a["User input (Space / LeftButtonReleased)"] --> da["DefaultActivateHandler"]
+    da --> da_reset["Reset _lastDispatchOccurred = false"]
+    da_reset --> ra["RaiseActivating:<br/> OnActivating (virtual)<br/> → Activating event<br/> → TryDispatchToTarget<br/> → TryBubbleUp"]
 
-    act_pre --> |canceled| act_stop["Stop"]
-    act_pre --> |not canceled| act_handler["Execute command handler"]
-    act_handler --> act_done["Complete (returns bool?)"]
+    ra --> |handled: returns true| da_disp{"_lastDispatchOccurred?<br/>(consume-dispatch composite)"}
+    da_disp --> |yes| ra_act1["RaiseActivated<br/>(composite completion)"]
+    ra_act1 --> ret_t1["return true"]
+    da_disp --> |no| ret_t1
 
-    acc_pre --> |canceled| acc_stop["Stop"]
-    acc_pre --> |not canceled| acc_handler["Execute command handler"]
-    acc_handler --> acc_prop["Propagate to default button/superview if unhandled"]
-    acc_prop --> acc_done["Complete (returns bool?)"]
+    ra --> |not handled: returns false| da_bup{"Routing == BubblingUp?"}
+    da_bup --> |"yes, plain view (no dispatch target)"| ra_act2["RaiseActivated<br/>(two-phase notification)"]
+    ra_act2 --> ret_f["return false"]
+    da_bup --> |"yes, relay view (has dispatch target)"| ret_f
+    da_bup --> |"no (Direct)"| da_sf["SetFocus (if CanFocus)"]
+    da_sf --> ra_act3["RaiseActivated<br/>(if !_lastDispatchOccurred)"]
+    ra_act3 --> ret_t2["return true"]
+
+    input_b["User input (Enter)"] --> dac["DefaultAcceptHandler"]
+    dac --> dac_reset["Reset _lastDispatchOccurred = false"]
+    dac_reset --> racc["RaiseAccepting:<br/> OnAccepting (virtual)<br/> → Accepting event<br/> → TryDispatchToTarget<br/> → TryBubbleUp"]
+
+    racc --> |handled: returns true| dac_disp{"_lastDispatchOccurred<br/>or Bridged?"}
+    dac_disp --> |yes| racc_acc1["RaiseAccepted<br/>(composite/bridge completion)"]
+    racc_acc1 --> ret_ta1["return true"]
+    dac_disp --> |no| ret_ta1
+
+    racc --> |not handled: returns false| dac_def{"!acceptWillBubble<br/>AND DefaultAcceptView exists<br/>(not this, not source)?"}
+    dac_def --> |yes| dac_dd["DispatchDown to DefaultAcceptView<br/>(redirected = true)"]
+    dac_def --> |no| dac_bup{"BubblingUp AND<br/>has dispatch target?"}
+    dac_dd --> dac_bup
+    dac_bup --> |yes| racc_acc2["RaiseAccepted → return false"]
+    dac_bup --> |no| racc_acc3["RaiseAccepted"]
+    racc_acc3 --> ret_bool["return redirected<br/>or willBubble<br/>or BubblingUp<br/>or IAcceptTarget"]
 ```
 
 **Key Points:**
-- Commands follow the Cancellable Work Pattern: pre-event → virtual method → event → handler
-- `OnActivating`/`OnAccepting` or event handlers can cancel via `args.Cancel = true`
-- Command handlers return `bool?`: `null` (no handler), `false` (executed but unhandled), `true` (handled/canceled)
-- `Command.Activate` is handled locally (no propagation)
-- `Command.Accept` may propagate (see Level 2)
+- `DefaultActivateHandler` and `DefaultAcceptHandler` are the real entry points from key/mouse bindings. They orchestrate everything.
+- <xref:Terminal.Gui.ViewBase.View.RaiseActivating*>/<xref:Terminal.Gui.ViewBase.View.RaiseAccepting*> runs the full CWP pipeline: `OnXxx` virtual → `Xxx` event → `TryDispatchToTarget` → <xref:Terminal.Gui.ViewBase.View.TryBubbleUp*>. There is no separate "execute handler" step after the pre-event.
+- <xref:Terminal.Gui.ViewBase.View.OnActivating*>/<xref:Terminal.Gui.ViewBase.View.Activating> (or <xref:Terminal.Gui.ViewBase.View.OnAccepting*>/<xref:Terminal.Gui.ViewBase.View.Accepting>) can cancel by setting `args.Handled = true`, which short-circuits `TryDispatchToTarget` and <xref:Terminal.Gui.ViewBase.View.TryBubbleUp*>.
+- <xref:Terminal.Gui.Input.Command.Accept> skips <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> redirect when `acceptWillBubble = true` — the bubble path handles it, preventing double-accepted events.
+- Command handlers return `bool?`: `null` (no implementation), `false` (raised but not handled), `true` (handled/consumed).
 
-### Level 2: Accept Propagation with Button.IsDefault
+### Level 2: Accept Propagation with DefaultAcceptView
 
-This diagram shows how `Command.Accept` propagates through the view hierarchy, including the special case where a default button intercepts the command even when invoked from another view.
+This diagram shows how <xref:Terminal.Gui.Input.Command.Accept> propagates through the view hierarchy when a <xref:Terminal.Gui.Views.Dialog> contains an IsDefault <xref:Terminal.Gui.Views.Button>. Accept bubbles from <xref:Terminal.Gui.Views.TextField> to <xref:Terminal.Gui.Views.Dialog> via <xref:Terminal.Gui.ViewBase.View.TryBubbleUp*> (inside <xref:Terminal.Gui.ViewBase.View.RaiseAccepting*>), then `Dialog.DefaultAcceptHandler` redirects to the IsDefault <xref:Terminal.Gui.Views.Button> via `DispatchDown`.
 
 ```mermaid
 flowchart TD
-    input2["User input (Enter)"] --> tf_accept["TextField.InvokeCommand(Accept)"]
-    tf_accept --> tf_pre["TextField OnAccepting + Accepting"]
-    tf_pre --> |canceled| tf_stop["Stop"]
-    tf_pre --> |not canceled| tf_default_check["Find sibling IsDefault button"]
+    input2["User input (Enter on TextField)"] --> tf["TextField.DefaultAcceptHandler"]
+    tf --> tf_raise["RaiseAccepting:<br/> OnAccepting → Accepting<br/> → TryDispatchToTarget<br/> → TryBubbleUp"]
 
-    tf_default_check --> |found| call_default["Invoke default Button.Accept"]
-    call_default --> btn_pre["Button OnAccepting + Accepting"]
-    btn_pre --> btn_done["Handled → return true"]
-    btn_done --> tf_result1["Handled by default button"]
+    tf_raise --> |"TryBubbleUp: Dialog.CommandsToBubbleUp contains Accept"| dlg_invoke["Dialog.InvokeCommand<br/>(Accept, BubblingUp)"]
 
-    tf_default_check --> |not found/returned null| call_super["Propagate to SuperView (Dialog)"]
-    call_super --> dlg_pre["Dialog OnAccepting + Accepting"]
-    dlg_pre --> dlg_done["Handled/propagated result"]
+    tf_raise --> |"Accept will not bubble (fallback)"| tf_def{"TextField.DefaultAcceptView<br/>exists?"}
+    tf_def --> |yes| tf_dd["DispatchDown to<br/>TextField.DefaultAcceptView"]
+    tf_def --> |no| tf_accepted["TextField.RaiseAccepted"]
+
+    dlg_invoke --> dlg_handler["Dialog.DefaultAcceptHandler<br/>(Routing = BubblingUp)"]
+    dlg_handler --> dlg_raise["RaiseAccepting (BubblingUp):<br/>not handled → returns false"]
+    dlg_raise --> dlg_def{"Dialog.DefaultAcceptView<br/>= IsDefault Button?"}
+
+    dlg_def --> |yes| dlg_dd["DispatchDown(Button, ctx)<br/>(redirected = true)"]
+    dlg_dd --> btn["Button.DefaultAcceptHandler<br/>(Routing = DispatchingDown)"]
+    btn --> btn_raise["RaiseAccepting: handled<br/>(Button is IAcceptTarget)"]
+    btn_raise --> btn_accepted["Button.RaiseAccepted → return true"]
+    btn_accepted --> dlg_accepted["Dialog.RaiseAccepted<br/>(Dialog.Accepted event fires)"]
+    dlg_accepted --> dlg_return["Dialog returns true"]
+    dlg_return --> tf_return["TryBubbleUp returns true<br/>→ TextField.RaiseAccepting returns true<br/>→ TextField returns true"]
+
+    dlg_def --> |no| dlg_no_btn["Dialog.RaiseAccepted<br/>(no default button)"]
 ```
 
 **Key Points:**
-- `Command.Accept` checks for a sibling `Button` with `IsDefault = true` in the `SuperView`
-- If found and not the source view, the default button handles the command first
-- If unhandled or no default button, command propagates to `SuperView`
-- `SuperView` (e.g., `Dialog`) can handle accept to close or trigger actions
-- This enables Enter key to activate default buttons from any focused view
+- <xref:Terminal.Gui.Input.Command.Accept> bubbles to <xref:Terminal.Gui.Views.Dialog> via <xref:Terminal.Gui.ViewBase.View.TryBubbleUp*> called inside <xref:Terminal.Gui.Views.TextField>'s <xref:Terminal.Gui.ViewBase.View.RaiseAccepting*>, because <xref:Terminal.Gui.Views.Dialog>'s <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp> includes <xref:Terminal.Gui.Input.Command.Accept>.
+- `Dialog.DefaultAcceptHandler` receives the command with `Routing = BubblingUp` and checks <xref:Terminal.Gui.Views.Dialog>'s <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> to find and invoke the IsDefault <xref:Terminal.Gui.Views.Button>.
+- `DispatchDown` creates a new context with `Routing = DispatchingDown`, suppressing re-bubbling in the target and preventing infinite recursion.
+- `TextField.DefaultAcceptHandler` skips its own <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> redirect because `acceptWillBubble = true` — this prevents double-handling.
+- <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> is a property on each view that returns the first `IAcceptTarget { IsDefault: true }` SubView (typically a <xref:Terminal.Gui.Views.Button>). It is not inherited from the SuperView.
+- <xref:Terminal.Gui.Views.Button> returns `true` from `DefaultAcceptHandler` because it implements <xref:Terminal.Gui.IAcceptTarget>.
 
-### Level 3: Complete Flow with Shortcut, MenuBar, and Menu
+### Level 3: Complete Flow with MenuBarItem, Menu, and MenuItem
 
-This diagram illustrates the complete command flow in a complex hierarchical scenario involving `Shortcut`, `MenuBar`, `Menu`, and `MenuItem`, showing how commands route through multiple views and how `Accepted` events propagate back up the hierarchy.
+This diagram illustrates command flow in the menu system. <xref:Terminal.Gui.Views.MenuBarItem> (a top-level "File", "Edit" item in <xref:Terminal.Gui.Views.MenuBar>) extends <xref:Terminal.Gui.Views.MenuItem> : <xref:Terminal.Gui.Views.Shortcut>. <xref:Terminal.Gui.Views.MenuBar> extends <xref:Terminal.Gui.Views.Menu> : <xref:Terminal.Gui.Views.Bar>.
 
 ```mermaid
 flowchart TD
-    sc_header["=== Scenario 1: Shortcut Activation (Alt+F) ==="]
+    sc_header["=== Scenario 1: HotKey Activation (Alt+F) ==="]
     sc_header --> sc_input["Alt+F pressed"]
-    sc_input --> sc_find["Shortcut finds MenuBarItem"]
-    sc_find --> sc_hotkey["MenuBarItem.InvokeCommand(HotKey)"]
-    sc_hotkey --> sc_pre["OnHandlingHotKey + HandlingHotKey"]
-    sc_pre --> sc_focus["MenuBarItem sets focus"]
-    sc_focus --> sc_show["MenuBar shows popover for MenuBarItem"]
-    
+    sc_input --> sc_hotkey["MenuBarItem.InvokeCommand(HotKey)"]
+    sc_hotkey --> sc_pre["RaiseHandlingHotKey:<br/> OnHandlingHotKey<br/> → HandlingHotKey event<br/> → TryBubbleUp"]
+    sc_pre --> |"handled: canceled"| sc_cancel["return false<br/>(key not consumed — allows text input)"]
+    sc_pre --> |"not handled"| sc_hkcmd["RaiseHotKeyCommand"]
+    sc_hkcmd --> sc_activate["InvokeCommand(Activate)<br/>(MenuBarItem override: no SetFocus before this)"]
+    sc_activate --> sc_default_act["DefaultActivateHandler:<br/> RaiseActivating → SetFocus → RaiseActivated"]
+    sc_default_act --> sc_onactivated["MenuBarItem.OnActivated:<br/> toggles PopoverMenuOpen"]
+    sc_onactivated --> sc_show["PopoverMenu shown (PopoverMenuOpen = true)"]
+
     sc_show --> nav_header["=== Scenario 2: Menu Navigation (Arrow Keys) ==="]
-    nav_header --> nav_input["Arrow keys pressed"]
+    nav_header --> nav_input["Arrow key pressed inside Menu/PopoverMenu"]
     nav_input --> nav_activate["MenuItem.InvokeCommand(Activate)"]
-    nav_activate --> nav_pre["MenuItem OnActivating + Activating"]
-    nav_pre --> |canceled| nav_stop["Stop"]
-    nav_pre --> |not canceled| nav_focus["MenuItem sets focus"]
-    nav_focus --> nav_changed["Menu.SelectedMenuItemChanged raised"]
-    nav_changed --> nav_bar["MenuBar.OnSelectedMenuItemChanged"]
+    nav_activate --> nav_raise["RaiseActivating:<br/> OnActivating → Activating<br/> → TryDispatchToTarget<br/> → TryBubbleUp"]
+    nav_raise --> |"not handled (Direct)"| nav_focus["SetFocus (MenuItem gains focus)"]
+    nav_focus --> nav_activated["MenuItem.RaiseActivated"]
+    nav_activated --> nav_selected["Menu.SelectedMenuItem updated<br/>→ RaiseSelectedMenuItemChanged"]
+    nav_selected --> nav_bar["Menu.OnSelectedMenuItemChanged<br/>→ MenuBar.OnSelectedMenuItemChanged"]
     nav_bar --> nav_done["Update popover visibility if needed"]
-    
+
     nav_done --> acc_header["=== Scenario 3: Accept Menu Item (Enter) ==="]
-    acc_header --> acc_input["Enter pressed on MenuItem"]
-    acc_input --> acc_pre["MenuItem OnAccepting + Accepting"]
-    acc_pre --> |canceled| acc_stop["Stop"]
-    acc_pre --> |has action| acc_exec["Execute menu item action"]
+    acc_header --> acc_input["Enter pressed on focused MenuItem"]
+    acc_input --> acc_raise["MenuItem.RaiseAccepting:<br/> OnAccepting → Accepting<br/> → TryDispatchToTarget → TryBubbleUp"]
+    acc_raise --> |"handled: action invoked"| acc_exec["MenuItem action executed<br/>(via OnAccepting in MenuItem)"]
     acc_exec --> acc_accepted["MenuItem.RaiseAccepted"]
-    acc_accepted --> acc_menu["Menu.OnAccepted propagates"]
-    acc_menu --> acc_bar["MenuBar.OnAccepted"]
+    acc_accepted --> acc_bubble["Accepted propagates via<br/>CommandBridge or CommandsToBubbleUp"]
+    acc_bubble --> acc_bar["MenuBar/Menu.OnAccepted"]
     acc_bar --> acc_close["MenuBar hides popover, deactivates"]
-    
-    acc_pre --> |has submenu| acc_sub["Propagate to parent Menu.Accept"]
-    acc_sub --> acc_popover["Show submenu popover"]
-    acc_popover --> acc_submenu_done["Submenu displayed"]
+
+    acc_raise --> |"has SubMenu"| acc_sub["SubMenu shown<br/>(MenuItem.OnAccepting opens SubMenu)"]
 ```
 
 **Key Points:**
-- **Scenario 1 (HotKey)**: Shortcut activates menu bar item via `Command.HotKey`, which sets focus and triggers MenuBar to show the popover
-- **Scenario 2 (Activate)**: Arrow keys navigate menu items via `Command.Activate`, which is handled locally but raises `SelectedMenuItemChanged` for MenuBar coordination
-- **Scenario 3 (Accept)**: Enter key executes menu items via `Command.Accept`, followed by `Accepted` event propagating up (MenuItem → Menu → MenuBar) to close menus
-- `Command.Activate` doesn't propagate but uses view-specific event (`SelectedMenuItemChanged`) for hierarchical coordination
-- `Accepted` is a post-event (not part of Cancellable Work Pattern pre-event phase) that signals action completion
-- MenuBar uses `SelectedMenuItemChanged` to manage popover visibility, demonstrating current workaround for lack of generic `Activate` propagation
+- **Scenario 1 (HotKey)**: <xref:Terminal.Gui.Views.MenuBarItem> overrides <xref:Terminal.Gui.Input.Command.HotKey> to skip <xref:Terminal.Gui.ViewBase.View.SetFocus> before `InvokeCommand(Activate)`. This prevents <xref:Terminal.Gui.Views.Menu.OnSelectedMenuItemChanged*> firing prematurely when switching `MenuBarItems` via HotKey. <xref:Terminal.Gui.ViewBase.View.SetFocus> occurs inside `DefaultActivateHandler` as part of Activate processing, not in the HotKey handler directly.
+- **Scenario 2 (Activate)**: Arrow keys navigate menu items via <xref:Terminal.Gui.Input.Command.Activate>. `DefaultActivateHandler`'s Direct path calls <xref:Terminal.Gui.ViewBase.View.SetFocus>, which triggers `Menu.RaiseSelectedMenuItemChanged`. <xref:Terminal.Gui.Views.MenuBar.OnSelectedMenuItemChanged*> manages popover visibility during navigation.
+- **Scenario 3 (Accept)**: Enter executes the menu item. <xref:Terminal.Gui.Views.MenuItem>'s <xref:Terminal.Gui.ViewBase.View.OnAccepting*> invokes the item's action. <xref:Terminal.Gui.ViewBase.View.Accepted> propagates via <xref:Terminal.Gui.Input.CommandBridge> (for non-containment boundaries) or <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp> (for containment), eventually reaching <xref:Terminal.Gui.Views.MenuBar> which closes the popover.
+- <xref:Terminal.Gui.Views.MenuBarItem> holds a <xref:Terminal.Gui.Views.PopoverMenu> (not a `SubMenu`). <xref:Terminal.Gui.Views.MenuItem> holds a `SubMenu` (a nested <xref:Terminal.Gui.Views.Menu>).
+- <xref:Terminal.Gui.Input.CommandBridge> connects non-containment boundaries (e.g., <xref:Terminal.Gui.Views.PopoverMenu> ↔ <xref:Terminal.Gui.Views.MenuBarItem>) so <xref:Terminal.Gui.ViewBase.View.Accepted>/<xref:Terminal.Gui.ViewBase.View.Activated> from the remote view re-enters the owner's full command pipeline with `Routing = Bridged`.
+- <xref:Terminal.Gui.Views.MenuBar> uses consume dispatch (<xref:Terminal.Gui.ViewBase.View.ConsumeDispatch> = true, <xref:Terminal.Gui.ViewBase.View.GetDispatchTarget*> → `Focused`) — inner activations are consumed and do not propagate to <xref:Terminal.Gui.Views.MenuBar>'s SuperView.

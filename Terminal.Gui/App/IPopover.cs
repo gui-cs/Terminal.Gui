@@ -67,5 +67,5 @@ public interface IPopover
     ///         <see cref="IApplication.TopRunnableView"/> if not already set.
     ///     </para>
     /// </remarks>
-    IRunnable? Current { get; set; }
+    IRunnable? Owner { get; set; }
 }

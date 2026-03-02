@@ -336,9 +336,9 @@ public class Notepad : Scenario
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        if (sender is TabView tabView && tabView.App?.Popover is not null)
+        if (sender is TabView tabView && tabView.App?.Popovers is not null)
         {
-            tabView.App.Popover.Register (contextMenu);
+            tabView.App.Popovers.Register (contextMenu);
         }
 
         contextMenu.MakeVisible (e.MouseEvent.ScreenPosition);

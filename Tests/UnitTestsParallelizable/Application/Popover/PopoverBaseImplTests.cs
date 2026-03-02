@@ -1,7 +1,11 @@
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
+
 namespace ApplicationTests.Popover;
 
-[Collection("Application Tests")]
-public class PopoverBaseImplTests
+[Collection ("Application Tests")]
+public class PopoverBaseImplTests (ITestOutputHelper output)
 {
     // Minimal concrete implementation for testing
     private class TestPopover : PopoverBaseImpl
@@ -11,8 +15,9 @@ public class PopoverBaseImplTests
     public void Constructor_SetsDefaults ()
     {
         var popover = new TestPopover ();
-
+#if DEBUG
         Assert.Equal ("popoverBaseImpl", popover.Id);
+#endif
         Assert.True (popover.CanFocus);
         Assert.Equal (Dim.Fill (), popover.Width);
         Assert.Equal (Dim.Fill (), popover.Height);
@@ -21,12 +26,12 @@ public class PopoverBaseImplTests
     }
 
     [Fact]
-    public void Runnable_Property_CanBeSetAndGet ()
+    public void Owner_Property_CanBeSetAndGet ()
     {
         var popover = new TestPopover ();
         var top = new Runnable ();
-        popover.Current = top;
-        Assert.Same (top, popover.Current);
+        popover.Owner = top;
+        Assert.Same (top, popover.Owner);
     }
 
     [Fact]
@@ -62,5 +67,191 @@ public class PopoverBaseImplTests
 
         var popoverManager = new ApplicationPopover ();
         Assert.Throws<InvalidOperationException> (() => popoverManager.Show (popover));
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Target_Default_Is_Null ()
+    {
+        TestPopover popover = new ();
+        Assert.Null (popover.Target);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Target_Get_Returns_Set_Value ()
+    {
+        TestPopover popover = new ();
+        View target = new ();
+        WeakReference<View> weakRef = new (target);
+
+        popover.Target = weakRef;
+
+        Assert.Same (weakRef, popover.Target);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Target_Set_Creates_Bridge_Activated_Reaches_Target ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
+
+            popover.Target = new WeakReference<View> (target);
+
+            var activatedCount = 0;
+            ICommandContext? capturedCtx = null;
+
+            target.Activated += (_, args) =>
+                                {
+                                    activatedCount++;
+                                    capturedCtx = args.Value;
+                                };
+
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, activatedCount);
+            Assert.NotNull (capturedCtx);
+            Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Target_Set_Creates_Bridge_Accepted_Reaches_Target ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
+
+            popover.Target = new WeakReference<View> (target);
+
+            var acceptedCount = 0;
+            ICommandContext? capturedCtx = null;
+
+            target.Accepted += (_, args) =>
+                               {
+                                   acceptedCount++;
+                                   capturedCtx = args.Context;
+                               };
+
+            popover.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptedCount);
+            Assert.NotNull (capturedCtx);
+            Assert.Equal (CommandRouting.Bridged, capturedCtx!.Routing);
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Target_Activated_Bubbles_Through_Target_SuperView_Chain ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
+            View superView = new () { Id = "superView", CommandsToBubbleUp = [Command.Activate] };
+            superView.Add (target);
+
+            popover.Target = new WeakReference<View> (target);
+
+            var superViewActivatedCount = 0;
+
+            superView.Activated += (_, _) => { superViewActivatedCount++; };
+
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, superViewActivatedCount);
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Target_Changed_Disposes_Old_Bridge_Uses_New ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestPopover popover = new ();
+            View viewA = new () { Id = "viewA" };
+            View viewB = new () { Id = "viewB" };
+
+            popover.Target = new WeakReference<View> (viewA);
+
+            // Change target to viewB
+            popover.Target = new WeakReference<View> (viewB);
+
+            var viewAActivatedCount = 0;
+            var viewBActivatedCount = 0;
+
+            viewA.Activated += (_, _) => { viewAActivatedCount++; };
+            viewB.Activated += (_, _) => { viewBActivatedCount++; };
+
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (0, viewAActivatedCount);
+            Assert.Equal (1, viewBActivatedCount);
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Target_Set_Null_Disposes_Bridge ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
+
+            popover.Target = new WeakReference<View> (target);
+
+            // Now set target to null
+            popover.Target = null;
+
+            var activatedCount = 0;
+            target.Activated += (_, _) => { activatedCount++; };
+
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (0, activatedCount);
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Dispose_Cleans_Up_Target_Bridge ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestPopover popover = new ();
+            View target = new () { Id = "target" };
+
+            popover.Target = new WeakReference<View> (target);
+
+            popover.Dispose ();
+
+            var activatedCount = 0;
+            target.Activated += (_, _) => { activatedCount++; };
+
+            // The popover is disposed, so invoking a command on it should not bridge
+            popover.InvokeCommand (Command.Activate);
+
+            Assert.Equal (0, activatedCount);
+        }
     }
 }

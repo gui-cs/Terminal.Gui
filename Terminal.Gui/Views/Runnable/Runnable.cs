@@ -172,6 +172,13 @@ public class Runnable : View, IRunnable
             SetFocus ();
             App?.Navigation?.SetFocused (Focused);
         }
+        else
+        {
+            if (App?.Popovers?.GetActivePopover () is PopoverBaseImpl { Visible: true } activePopover)
+            {
+                activePopover.Visible = false;
+            }
+        }
 
         // CWP Phase 3: Post-notification (work already done by Application)
         OnIsModalChanged (newIsModal);

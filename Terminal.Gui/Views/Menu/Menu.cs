@@ -1,11 +1,19 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
 ///     <see cref="MenuItem"/>.
 /// </summary>
-public class Menu : Bar
+public class Menu : Bar, IDesignable, IValue<MenuItem?>
 {
+    /// <summary>
+    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+
     /// <inheritdoc/>
     public Menu () : this ([]) { }
 
@@ -23,12 +31,14 @@ public class Menu : Bar
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
-        if (Border is { })
-        {
-            Border.Settings &= ~BorderSettings.Title;
-        }
+        Border?.Settings &= ~BorderSettings.Title;
 
         BorderStyle = DefaultBorderStyle;
+
+        CommandsToBubbleUp = [Command.Accept, Command.Activate];
+
+        KeyBindings.Clear ();
+        MouseBindings.Clear ();
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
@@ -42,23 +52,61 @@ public class Menu : Bar
     }
 
     /// <summary>
-    ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
-
-    /// <summary>
     ///     Gets or sets the menu item that opened this menu as a sub-menu.
     /// </summary>
     public MenuItem? SuperMenuItem { get; set; }
 
     /// <inheritdoc/>
-    protected override void OnVisibleChanged ()
+    protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (Visible)
+        // When a MenuItem's Accept command bubbles up, capture it as our Value
+        // before calling base, which will bubble it further.
+        if (args.Context?.Routing == CommandRouting.BubblingUp
+            && args.Context.Source?.TryGetTarget (out View? source) == true
+            && source is MenuItem menuItem)
         {
-            SelectedMenuItem = SubViews.Where (mi => mi is MenuItem).ElementAtOrDefault (0) as MenuItem;
+            Value = menuItem;
         }
+
+        return base.OnAccepting (args);
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        Trace.Command (this, args.Context, "Entry", $"Routing={args.Context?.Routing} Cmd={args.Context?.Command}");
+
+        if (base.OnActivating (args) || args.Handled)
+        {
+            return true;
+        }
+
+        // When a MenuItem's activation bubbles up, capture it as our Value and let normal bubbling proceed.
+        // MenuItem now implements IValue (returning Title), so ctx.Value is already populated by the framework.
+        if (args.Context?.Routing == CommandRouting.BubblingUp)
+        {
+            if (args.Context.Source?.TryGetTarget (out View? source) == true
+                && source is MenuItem menuItem)
+            {
+                Value = menuItem;
+            }
+
+            return false;
+        }
+
+        // Dispatch Activate to the focused MenuItem. This enables callers to invoke
+        // menu.InvokeCommand(Activate) and have it reach the selected MenuItem and its CommandView.
+        if (Focused is not MenuItem focusedMenuItem)
+        {
+            return false;
+        }
+
+        KeyBinding binding = new ([Command.Activate]);
+        WeakReference<View> sourceRef = new (this);
+        CommandContext ctx = new (Command.Activate, sourceRef, binding);
+        focusedMenuItem.InvokeCommand (Command.Activate, ctx);
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -72,67 +120,19 @@ public class Menu : Bar
             {
                 menuItem.CanFocus = true;
 
-                AddCommand (menuItem.Command,
-                            ctx =>
-                            {
-                                RaiseAccepted (ctx);
-
-                                return true;
-                            });
-
-                menuItem.Accepted += MenuItemOnAccepted;
+                // Accept propagation is handled by CommandsToBubbleUp=[Accept] (line 36).
+                // An explicit Accepting subscription here caused double-fire of Accepted.
 
                 break;
-
-                void MenuItemOnAccepted (object? sender, CommandEventArgs e) =>
-
-                    // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
-                    RaiseAccepted (e.Context);
             }
 
             case Line line:
                 // Grow line so we get auto-join line
                 line.X = Pos.Func (_ => -Border!.Thickness.Left);
-                line.Width = Dim.Fill ()! + Dim.Func (_ => Border!.Thickness.Right);
+                line.Width = Dim.Fill () + Dim.Func (_ => Border!.Thickness.Right);
 
                 break;
         }
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args)
-    {
-        // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
-
-        // Logging.Debug ($"{Title} - {args.Context?.Source?.Title} Command: {args.Context?.Command}");
-
-        // TODO: Consider having PopoverMenu subscribe to Accepting instead of us overriding OnAccepting here
-        // TODO: Doing so would be better encapsulation and might allow us to remove the SuperMenuItem property.
-        if (SuperView is { })
-        {
-            // Logging.Debug ($"{Title} - SuperView is null");
-            //return false;
-        }
-
-        // Logging.Debug ($"{Title} - {args.Context}");
-
-        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
-        {
-            // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
-            // And causes just the menu to quit.
-            // Logging.Debug ($"{Title} - Returning true - Application.QuitKey/Command = Command.Quit");
-            return true;
-        }
-
-        // Because we may not have a SuperView (if we are in a PopoverMenu), we need to propagate
-        // Command.Accept to the SuperMenuItem if it exists.
-        if (SuperView is null && SuperMenuItem is { })
-        {
-            // Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
-            return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
-        }
-
-        return false;
     }
 
     /// <inheritdoc/>
@@ -140,44 +140,325 @@ public class Menu : Bar
     {
         base.OnFocusedChanged (previousFocused, focused);
 
-        SelectedMenuItem = focused as MenuItem;
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }
 
     /// <summary>
-    ///     Gets or set the currently selected menu item. This is a helper that
+    ///     Gets the currently selected menu item. This is a helper that
     ///     tracks <see cref="View.Focused"/>.
     /// </summary>
-    public MenuItem? SelectedMenuItem
-    {
-        get => Focused as MenuItem;
-        set
-        {
-            if (value == Focused)
-            { }
-
-            // Note we DO NOT set focus here; This property tracks Focused
-        }
-    }
+    public MenuItem? SelectedMenuItem => Focused as MenuItem;
 
     internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {
-        // Logging.Debug ($"{Title} ({selected?.Title})");
+        // Logging.Debug ($"{this.ToIdentifyingString ()} ({selected?.Title})");
+        Trace.Command (this, "Handler", $"{selected?.ToIdentifyingString ()}");
 
         OnSelectedMenuItemChanged (selected);
         SelectedMenuItemChanged?.Invoke (this, selected);
     }
 
     /// <summary>
-    ///     Called when the selected menu item has changed.
+    ///     Called when the selected menu item has changed. Handles hiding peer SubMenus
+    ///     and showing the selected item's SubMenu.
     /// </summary>
-    /// <param name="selected"></param>
-    protected virtual void OnSelectedMenuItemChanged (MenuItem? selected) { }
+    /// <param name="selected">The newly selected <see cref="MenuItem"/>, or <see langword="null"/> if none.</param>
+    protected virtual void OnSelectedMenuItemChanged (MenuItem? selected)
+    {
+        // Hide any visible peer SubMenus
+        foreach (MenuItem mi in SubViews.OfType<MenuItem> ().Where (mi => mi != selected && mi.SubMenu is { Visible: true }))
+        {
+            mi.SubMenu!.HideMenu ();
+        }
+
+        if (selected?.SubMenu is not { Visible: false })
+        {
+            return;
+        }
+
+        // If SubMenu has no SuperView yet, add it to our SuperView
+        if (selected.SubMenu.SuperView is null && SuperView is { })
+        {
+            SuperView.Add (selected.SubMenu);
+        }
+
+        selected.SubMenu.ShowMenu ();
+
+        // Generic positioning: right of this Menu, at the MenuItem's Y
+        if (selected.SubMenu.SuperView is null)
+        {
+            return;
+        }
+        Point screenPos = new (selected.FrameToScreen ().Right, selected.FrameToScreen ().Top);
+        Point localPos = selected.SubMenu.SuperView.ScreenToViewport (screenPos);
+        selected.SubMenu.X = localPos.X;
+        selected.SubMenu.Y = localPos.Y;
+    }
 
     /// <summary>
     ///     Raised when the selected menu item has changed.
     /// </summary>
     public event EventHandler<MenuItem?>? SelectedMenuItemChanged;
+
+    /// <summary>
+    ///     Gets all the submenus in this menu's hierarchy, including this menu.
+    /// </summary>
+    /// <returns>An enumerable collection of all <see cref="Menu"/> instances in the hierarchy.</returns>
+    /// <remarks>
+    ///     This method performs a depth-first traversal of the menu tree starting from <see langword="this"/>.
+    /// </remarks>
+    public IEnumerable<Menu> GetAllSubMenus ()
+    {
+        List<Menu> result = [];
+        Stack<Menu> stack = new ();
+        stack.Push (this);
+
+        while (stack.Count > 0)
+        {
+            Menu currentMenu = stack.Pop ();
+            result.Add (currentMenu);
+
+            foreach (View subView in currentMenu.SubViews)
+            {
+                if (subView is MenuItem { SubMenu: { } } menuItem)
+                {
+                    stack.Push (menuItem.SubMenu);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    ///     Gets menu items in this menu's hierarchy, optionally filtered by <paramref name="predicate"/>.
+    /// </summary>
+    /// <param name="predicate">
+    ///     If provided, only <see cref="MenuItem"/>s matching the predicate are returned.
+    ///     If <see langword="null"/>, all menu items are returned.
+    /// </param>
+    /// <returns>The matching <see cref="MenuItem"/> instances across all menus in the hierarchy.</returns>
+    /// <remarks>
+    ///     This method traverses all menus returned by <see cref="GetAllSubMenus"/> and collects their menu items.
+    /// </remarks>
+    public IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus (Func<MenuItem, bool>? predicate = null)
+    {
+        List<MenuItem> result = [];
+
+        foreach (Menu menu in GetAllSubMenus ())
+        {
+            foreach (View subView in menu.SubViews)
+            {
+                if (subView is MenuItem menuItem && (predicate is null || predicate (menuItem)))
+                {
+                    result.Add (menuItem);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    #region ShowMenu / HideMenu
+
+    /// <summary>
+    ///     Shows this menu by setting <see cref="View.Visible"/> and <see cref="View.Enabled"/> to <see langword="true"/>.
+    ///     If the menu has not been initialized, initialization is performed first.
+    /// </summary>
+    internal void ShowMenu ()
+    {
+        if (Visible)
+        {
+            return;
+        }
+
+        if (!IsInitialized)
+        {
+            BeginInit ();
+            EndInit ();
+        }
+
+        ClearFocus ();
+
+        // IMPORTANT: This must be done after adding the menu to the SuperView or Add will try
+        // to set focus to it.
+        Visible = true;
+        Enabled = true;
+    }
+
+    private bool _isHiding;
+
+    /// <summary>
+    ///     Hides this menu and any visible SubMenus by setting <see cref="View.Visible"/> and
+    ///     <see cref="View.Enabled"/> to <see langword="false"/>.
+    /// </summary>
+    internal void HideMenu ()
+    {
+        if (!Visible || _isHiding)
+        {
+            return;
+        }
+
+        _isHiding = true;
+
+        try
+        {
+            // If there's a visible SubMenu, hide it first (deepest first)
+            if (SubViews.FirstOrDefault (v => v is MenuItem { SubMenu.Visible: true }) is MenuItem visiblePeer)
+            {
+                _isHiding = false;
+                visiblePeer.SubMenu!.HideMenu ();
+                _isHiding = true;
+            }
+
+            Visible = false;
+            Enabled = false;
+
+            ClearFocus ();
+        }
+        finally
+        {
+            _isHiding = false;
+        }
+    }
+
+    #endregion ShowMenu / HideMenu
+
+    #region IValue<MenuItem?> Implementation
+
+    private MenuItem? _value;
+
+    /// <summary>
+    ///     Gets or sets the most recently activated <see cref="MenuItem"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is automatically set when a <see cref="MenuItem"/> within this menu raises
+    ///         the <see cref="View.Accepted"/> event (e.g., when the user presses Enter or double-clicks on a menu item).
+    ///     </para>
+    ///     <para>
+    ///         The value is captured before the <see cref="Command.Accept"/> command propagates up the hierarchy,
+    ///         enabling command handlers to access <see cref="ICommandContext.Value"/> to determine which
+    ///         menu item triggered the command.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property programmatically will raise <see cref="ValueChanging"/> and <see cref="ValueChanged"/>
+    ///         events following the Cancellable Work Pattern (CWP).
+    ///     </para>
+    /// </remarks>
+    public MenuItem? Value { get => _value; set => ChangeValue (value); }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<MenuItem?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<MenuItem?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<MenuItem?> args) => false;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<MenuItem?> args) { }
+
+    /// <summary>
+    ///     INTERNAL Sets Value.
+    /// </summary>
+    /// <param name="newValue">The new value.</param>
+    /// <returns>
+    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
+    ///     <see langword="null"/> if the state was not changed for some other reason.
+    /// </returns>
+    private bool? ChangeValue (MenuItem? newValue)
+    {
+        if (_value == newValue)
+        {
+            return null;
+        }
+
+        MenuItem? oldValue = _value;
+
+        ValueChangingEventArgs<MenuItem?> changingArgs = new (oldValue, newValue);
+
+        if (OnValueChanging (changingArgs) || changingArgs.Handled)
+        {
+            return true;
+        }
+
+        ValueChanging?.Invoke (this, changingArgs);
+
+        if (changingArgs.Handled)
+        {
+            return true;
+        }
+
+        _value = newValue;
+
+        ValueChangedEventArgs<MenuItem?> changedArgs = new (oldValue, _value);
+        OnValueChanged (changedArgs);
+        ValueChanged?.Invoke (this, changedArgs);
+
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
+
+        return false;
+    }
+
+    #endregion IValue<MenuItem?> Implementation
+
+    /// <inheritdoc/>
+    public override bool EnableForDesign ()
+    {
+        // Note: This menu is used by unit tests and the Menus scenario.
+        // If you modify it, you'll likely have to update unit tests.
+
+        Id = "enableForDesignMenu";
+
+        MenuItem formatItem = new ()
+        {
+            Title = "_Format",
+            Text = "Text formatting options",
+            SubMenu = new Menu ([
+                                    new MenuItem { Title = "_Bold", Text = "Bold text", Key = Key.B.WithCtrl },
+                                    new MenuItem { Title = "_Italic", Text = "Italic text", Key = Key.I.WithAlt },
+                                    new MenuItem { Title = "_Underline", Text = "Underline text", Key = Key.U.WithCtrl }
+                                ])
+        };
+
+        MenuItem viewItem = new ()
+        {
+            Title = "_View",
+            Text = "View options",
+            SubMenu = new Menu ([
+                                    new MenuItem { Title = "_Zoom In", Text = "Zoom in", Key = Key.D0.WithCtrl },
+                                    new MenuItem { Title = "Zoom _Out", Text = "Zoom out", Key = Key.D9.WithCtrl },
+                                    new Line (),
+                                    new MenuItem
+                                    {
+                                        Title = "_Layout",
+                                        Text = "Layout options",
+                                        SubMenu = new Menu ([
+                                                                new MenuItem { Title = "_Horizontal", Text = "Horizontal layout" },
+                                                                new MenuItem { Title = "_Vertical", Text = "Vertical layout" }
+                                                            ])
+                                    }
+                                ])
+        };
+
+        MenuItem aboutItem = new () { Title = "_About", Text = "About this demo" };
+
+        Add (formatItem, viewItem, new Line (), aboutItem);
+
+        return true;
+    }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

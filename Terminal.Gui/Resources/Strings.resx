@@ -117,27 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ctxSelectAll" xml:space="preserve">
-    <value>_Select All</value>
-  </data>
-  <data name="ctxDeleteAll" xml:space="preserve">
-    <value>_Delete All</value>
-  </data>
-  <data name="ctxCopy" xml:space="preserve">
-    <value>_Copy</value>
-  </data>
-  <data name="ctxCut" xml:space="preserve">
-    <value>Cu_t</value>
-  </data>
-  <data name="ctxPaste" xml:space="preserve">
-    <value>_Paste</value>
-  </data>
-  <data name="ctxUndo" xml:space="preserve">
-    <value>_Undo</value>
-  </data>
-  <data name="ctxRedo" xml:space="preserve">
-    <value>_Redo</value>
-  </data>
   <data name="fdDirectory" xml:space="preserve">
     <value>Directory</value>
   </data>
@@ -277,9 +256,6 @@
   <data name="dpTitle" xml:space="preserve">
     <value>Date Picker</value>
   </data>
-  <data name="ctxColors" xml:space="preserve">
-    <value>Co_lors</value>
-  </data>
   <data name="charMapCPInfoDlgTitle" xml:space="preserve">
     <value>Getting Codepoint Information</value>
   </data>
@@ -320,30 +296,27 @@
     <value>_Select all</value>
   </data>
   <data name="cmdNew" xml:space="preserve">
-    <value>_New file</value>
+    <value>_New</value>
   </data>
-  <data name="cmdOpen.Help" xml:space="preserve">
+  <data name="cmdOpen_Help" xml:space="preserve">
     <value>Open a file</value>
   </data>
-  <data name="cmdQuitHelp" xml:space="preserve">
-    <value />
+  <data name="cmdQuit_Help" xml:space="preserve">
+    <value>Exit the application</value>
   </data>
-  <data name="cmdSaveHelp" xml:space="preserve">
-    <value>Save</value>
-  </data>
-  <data name="cmdSaveAsHelp" xml:space="preserve">
+  <data name="cmdSaveAs_Help" xml:space="preserve">
     <value>Save file as</value>
   </data>
-  <data name="cmdCut.Help" xml:space="preserve">
+  <data name="cmdCut_Help" xml:space="preserve">
     <value>Cut to clipboard</value>
   </data>
-  <data name="cmdCopyHelp" xml:space="preserve">
+  <data name="cmdCopy_Help" xml:space="preserve">
     <value>Copy to clipboard</value>
   </data>
-  <data name="cmdSelectAllHelp" xml:space="preserve">
+  <data name="cmdSelectAll_Help" xml:space="preserve">
     <value>Select all</value>
   </data>
-  <data name="cmdNewHelp" xml:space="preserve">
+  <data name="cmdNew_Help" xml:space="preserve">
     <value>New file</value>
   </data>
   <data name="fdTree" xml:space="preserve">
@@ -353,7 +326,7 @@
   <data name="fdSearchCaption" xml:space="preserve">
     <value>_Find</value>
   </data>
-  <data name="cmdPasteHelp" xml:space="preserve">
+  <data name="cmdPaste_Help" xml:space="preserve">
     <value>Paste from clipboard</value>
   </data>
   <data name="cmdQuit" xml:space="preserve">
@@ -373,5 +346,35 @@
   </data>
   <data name="menuHelp" xml:space="preserve">
     <value>_Help</value>
+  </data>
+  <data name="cmdSave_Help" xml:space="preserve">
+    <value>Save file</value>
+  </data>
+  <data name="cmdUndo" xml:space="preserve">
+    <value>_Undo</value>
+  </data>
+  <data name="cmdUndo_Help" xml:space="preserve">
+    <value>Undo last action</value>
+  </data>
+  <data name="cmdRedo" xml:space="preserve">
+    <value>_Redo</value>
+  </data>
+  <data name="cmdRedo_Help" xml:space="preserve">
+    <value>Redo last action</value>
+  </data>
+  <data name="cmdDeleteAll" xml:space="preserve">
+    <value>_Delete All</value>
+  </data>
+  <data name="cmdDeleteAll_Help" xml:space="preserve">
+    <value>Delete all</value>
+  </data>
+  <data name="cmdEdit" xml:space="preserve">
+    <value>_Edit</value>
+  </data>
+  <data name="cmdEdit_Help" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="cmdClose_Help" xml:space="preserve">
+    <value>Close</value>
   </data>
 </root>

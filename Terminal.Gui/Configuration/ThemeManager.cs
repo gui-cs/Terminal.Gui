@@ -319,7 +319,6 @@ public static class ThemeManager
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
     internal static void OnThemeChanged (string previousThemeName, string newThemeName)
     {
-        //Logging.Debug ($"Themes.OnThemeChanged({previousThemeName}) -> {Theme}");
         EventArgs<string> args = new (newThemeName);
         ThemeChanged?.Invoke (null, args);
     }
