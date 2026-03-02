@@ -277,7 +277,6 @@ public partial class TextView : View, IDesignable
             Id = "textViewContextMenu"
 #endif
         };
-        ;
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 
