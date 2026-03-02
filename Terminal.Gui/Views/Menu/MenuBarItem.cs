@@ -203,7 +203,7 @@ public class MenuBarItem : MenuItem, IDesignable
             PopoverMenuOpen = field.Visible;
             field.VisibleChanged += OnPopoverVisibleChanged;
 
-            // Bridge Activate/Accept from PopoverMenu → MenuBarItem via PopoverBaseImpl.Target.
+            // Bridge Activate/Accept from PopoverMenu → MenuBarItem via PopoverImpl.Target.
             field.Target = new WeakReference<View> (this);
 
             return;

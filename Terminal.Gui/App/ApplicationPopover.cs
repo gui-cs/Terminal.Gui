@@ -241,9 +241,8 @@ public sealed class ApplicationPopover : IDisposable
         {
             return false;
         }
-        var activePopoverView = activePopover as View;
 
-        if (activePopoverView!.NewKeyDownEvent (key))
+        if (activePopover is View activePopoverView && activePopoverView.NewKeyDownEvent (key))
         {
             return true;
         }

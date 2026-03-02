@@ -18,19 +18,19 @@ The popover system follows a layered architecture with well-defined responsibili
 ```
 Application.Popover (static accessor)
     └── ApplicationPopover (manager)
-            └── IPopover (interface contract)
-                    └── PopoverBaseImpl (abstract base)
+            └── IPopoverView (interface contract)
+                    └── PopoverImpl (abstract base)
                             └── Popover<TView, TResult> (generic content host)
                                     └── PopoverMenu : Popover<Menu, MenuItem> (concrete implementation)
 ```
 
-### <xref:Terminal.Gui.App.IPopover> — The Contract
+### `IPopoverView` — The Contract
 
-The <xref:Terminal.Gui.App.IPopover> interface defines the minimal contract: a single `Current` property that associates the popover with a specific <xref:Terminal.Gui.App.IRunnable>. This association controls keyboard event scoping — if `Current` is `null`, the popover receives all keyboard events globally; if set, events only flow when the associated runnable is the active `TopRunnableView`.
+The `IPopoverView` interface defines the popover contract: visibility, enabled state, anchor positioning, target reference, and `MakeVisible` method. It extends `IPopover` which provides a `Current` property associating the popover with a specific <xref:Terminal.Gui.App.IRunnable>. This association controls keyboard event scoping — if `Current` is `null`, the popover receives all keyboard events globally; if set, events only flow when the associated runnable is the active `TopRunnableView`.
 
-### `PopoverBaseImpl` — The Foundation
+### `PopoverImpl` — The Foundation
 
-`PopoverBaseImpl` provides the standard popover behavior that all concrete popovers inherit. It configures:
+`PopoverImpl` provides the standard popover behavior that all concrete popovers inherit. It configures:
 
 - **Full-screen sizing** — `Width = Dim.Fill()`, `Height = Dim.Fill()`
 - **Transparency** — `ViewportSettings.Transparent | ViewportSettings.TransparentMouse`
@@ -41,15 +41,15 @@ The <xref:Terminal.Gui.App.IPopover> interface defines the minimal contract: a s
 
 ### `Popover<TView, TResult>` — The Generic Content Host
 
-`Popover<TView, TResult>` extends `PopoverBaseImpl` to host a typed content view and optionally extract a result when the popover closes. This layer provides:
+`Popover<TView, TResult>` extends `PopoverImpl` to host a typed content view and optionally extract a result when the popover closes. This layer provides:
 
 - **ContentView** — A typed `TView` that is added as a SubView, with a `CommandBridge` that routes `Command.Activate` from the content view to the popover
 - **Result extraction** — Via `ResultExtractor` function or automatic `IValue<TResult>` extraction
-- **IsOpen** — CWP-based property synchronized with `Visible`, with `IsOpenChanging`/`IsOpenChanged` events
+- **Visible** — Uses standard `View.Visible` with `VisibleChanging`/`VisibleChanged` CWP events for lifecycle management
 - **Anchor** — Function-based positioning anchor for `MakeVisible` / `SetPosition`
 - **MakeVisible / SetPosition** — Methods for showing and positioning the popover
 
-Custom popovers that host a specific view type should extend `Popover<TView, TResult>` rather than `PopoverBaseImpl` directly.
+Custom popovers that host a specific view type should extend `Popover<TView, TResult>` rather than `PopoverImpl` directly.
 
 ### <xref:Terminal.Gui.App.ApplicationPopover> — The Manager
 
@@ -116,14 +116,14 @@ myPopover.MakeVisible (new Point (10, 5));
 // After closing, check myPopover.Result for the selected item
 ```
 
-For simpler popovers that don't need typed content hosting, inherit from `PopoverBaseImpl`:
+For simpler popovers that don't need typed content hosting, inherit from `PopoverImpl`:
 
 ```csharp
-public class MyCustomPopover : PopoverBaseImpl
+public class MyCustomPopover : PopoverImpl
 {
     public MyCustomPopover ()
     {
-        // PopoverBaseImpl already sets up required defaults:
+        // PopoverImpl already sets up required defaults:
         // - ViewportSettings with Transparent and TransparentMouse flags
         // - Command.Quit binding to hide the popover
         // - Width/Height set to Dim.Fill()
@@ -148,14 +148,14 @@ Application.Popover?.Show (myPopover);
 
 A View qualifies as a popover if it:
 
-1. **Implements <xref:Terminal.Gui.App.IPopover>* — Provides the `Current` property for runnable association
+1. **Implements `IPopoverView`** — Provides visibility, anchor, target, and `MakeVisible` operations
 2. **Is Focusable** — `CanFocus = true` to receive keyboard input
 3. **Is Transparent** — `ViewportSettings` includes both:
    - `ViewportSettings.Transparent` — Allows content beneath to show through
    - `ViewportSettings.TransparentMouse` — Mouse clicks outside SubViews pass through
 4. **Handles Quit** — Binds `Application.QuitKey` to `Command.Quit` and sets `Visible = false`
 
-`PopoverBaseImpl` provides all these requirements by default.
+`PopoverImpl` provides all these requirements by default.
 
 ## Registration and Lifecycle
 
@@ -235,15 +235,15 @@ popover.Dispose ();
 The popover lifecycle is driven entirely by the `Visible` property — there is no separate "Open/Close" API. When visibility changes, a cascade of events occurs:
 
 **Becoming visible (`Visible` changes to `true`):**
-1. `PopoverBaseImpl.OnVisibleChanging()` calls `Layout(App.Screen.Size)` to size the popover to the screen
+1. `PopoverImpl.OnVisibleChanging()` calls `Layout(App.Screen.Size)` to size the popover to the screen
 2. `PopoverMenu.OnVisibleChanged()` calls `Root.ShowMenu()` (which sets `Menu.Visible = true` and `Menu.Enabled = true`)
-3. `Popover<TView, TResult>.OnVisibleChanged()` sets `ContentView.Visible = true` and updates `IsOpen`
+3. `Popover<TView, TResult>.OnVisibleChanged()` sets `ContentView.Visible = true`
 4. The popover receives focus
 
 **Becoming hidden (`Visible` changes to `false`):**
-1. `PopoverBaseImpl.OnVisibleChanging()` restores focus to the previously-focused view in the `TopRunnableView`
+1. `PopoverImpl.OnVisibleChanging()` restores focus to the previously-focused view in the `TopRunnableView`
 2. `PopoverMenu.OnVisibleChanged()` calls `Root.HideMenu()` and `ApplicationPopover.Hide()`
-3. `Popover<TView, TResult>.OnVisibleChanged()` sets `ContentView.Visible = false`, extracts `Result`, and updates `IsOpen`
+3. `Popover<TView, TResult>.OnVisibleChanged()` sets `ContentView.Visible = false` and extracts `Result`
 4. `ApplicationPopover.Hide()` clears the active popover reference and triggers a redraw
 
 This pattern means setting `Visible = false` is equivalent to calling `Hide()` — both produce the same result.
@@ -304,14 +304,14 @@ myPopover.Current = myWindow; // Only active when myWindow is the top runnable
 
 ### Default Layout
 
-`PopoverBaseImpl` sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()` (see <xref:Terminal.Gui.ViewBase.Dim>), making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
+`PopoverImpl` sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()` (see <xref:Terminal.Gui.ViewBase.Dim>), making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
 
 ### Custom Sizing
 
 Override `Width` and `Height` to customize size:
 
 ```csharp
-public class MyPopover : PopoverBaseImpl
+public class MyPopover : PopoverImpl
 {
     public MyPopover ()
     {
@@ -348,7 +348,7 @@ The menu automatically adjusts position to ensure it remains fully visible on sc
 - Custom menu scenarios
 
 **Key Features:**
-- Extends `Popover<Menu, MenuItem>`, inheriting `ContentView`, `MakeVisible`, `SetPosition`, `IsOpen`, `Result`, and `Anchor`
+- Extends `Popover<Menu, MenuItem>`, inheriting `ContentView`, `MakeVisible`, `SetPosition`, `Result`, and `Anchor`
 - `Root` property aliases `ContentView` — the hosted <xref:Terminal.Gui.Views.Menu> instance
 - Two `CommandBridge` instances route commands across containment boundaries: Content bridge (Menu → PopoverMenu) and Target bridge (PopoverMenu → host/MenuBarItem)
 - Cascading submenus with automatic positioning
@@ -440,7 +440,7 @@ myView.MouseClick += (s, e) =>
 ### Autocomplete Popup
 
 ```csharp
-public class AutocompletePopover : PopoverBaseImpl
+public class AutocompletePopover : PopoverImpl
 {
     private ListView _listView;
 
@@ -481,8 +481,8 @@ Application.Popover?.Register (commandPalette);
 
 ## API Reference
 
-- <xref:Terminal.Gui.App.IPopover> - Interface for popover views
-- `PopoverBaseImpl` - Abstract base class providing standard popover behavior
+- `IPopoverView` - Interface for popover views (extends `IPopover`)
+- `PopoverImpl` - Abstract base class providing standard popover behavior (implements `IPopoverView`)
 - `Popover<TView, TResult>` - Generic base class for popovers hosting typed content views with result extraction
 - <xref:Terminal.Gui.Views.PopoverMenu> - Cascading menu implementation (`Popover<Menu, MenuItem>`)
 - <xref:Terminal.Gui.App.ApplicationPopover> - Popover manager (accessed via `Application.Popover`)

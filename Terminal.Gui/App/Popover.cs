@@ -217,7 +217,12 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
 
         SetPosition (idealScreenPosition, anchor);
 
-        App?.Popovers?.Show (this);
+        if (App?.Popovers is not { } popovers)
+        {
+            throw new InvalidOperationException ("Popover must be registered with Application.Popover before calling MakeVisible.");
+        }
+
+        popovers.Show (this);
     }
 
     /// <summary>
