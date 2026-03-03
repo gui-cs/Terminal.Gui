@@ -298,7 +298,7 @@ public sealed class ApplicationPopover : IDisposable
         foreach (IPopoverView popover in App?.Popovers?.Popovers.ToList () ?? [])
         {
             // Need View cast for keyboard dispatch
-            if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnableView))
+            if (popover == activePopover || popover is not View popoverView || (popover.Owner is { } && popover.Owner != App?.TopRunnable))
             {
                 continue;
             }
