@@ -122,9 +122,9 @@ public partial class TextView : View, IDesignable
         {
             App?.Popovers?.Register (ContextMenu);
 
-            if (ContextMenu?.Key is { })
+            if (ContextMenu?.Key is { } key && !KeyBindings.TryGet (key, out _))
             {
-                KeyBindings.Add (ContextMenu.Key, Command.Context);
+                KeyBindings.Add (key, Command.Context);
             }
         }
 
@@ -277,7 +277,6 @@ public partial class TextView : View, IDesignable
             Id = "textViewContextMenu"
 #endif
         };
-        ;
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 

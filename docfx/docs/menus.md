@@ -188,9 +188,9 @@ MenuBarItem fileMenuBarItem = new ("_File", [
 **Important:** <xref:Terminal.Gui.Views.MenuBarItem> uses <xref:Terminal.Gui.Views.PopoverMenu> instead of `SubMenu`. Attempting to set `SubMenu` will throw `InvalidOperationException`.
 
 Key features:
-- `PopoverMenu` property holds the dropdown menu
-- `PopoverMenuOpen` tracks whether the popover is visible (CWP property with `PopoverMenuOpenChanging`/`PopoverMenuOpenChanged` events)
-- When `PopoverMenu` is set, a `CommandBridge` connects the PopoverMenu back to this MenuBarItem, bridging <xref:Terminal.Gui.Input.Command.Activate> commands across the non-containment boundary
+- `PopoverMenu` property holds the dropdown menu and sets `Target`/`Anchor` on the popover for command bridging and positioning
+- `PopoverMenuOpen` delegates to `PopoverMenu.IsOpen` and raises `PopoverMenuOpenChanged` (relayed from `PopoverMenu.IsOpenChanged`)
+- When `PopoverMenu` is set, the base `Popover<TView, TResult>.Target` property creates a `CommandBridge` connecting the PopoverMenu back to this MenuBarItem, bridging <xref:Terminal.Gui.Input.Command.Activate> commands across the non-containment boundary
 - Overrides `OnActivating` to toggle `PopoverMenuOpen`, with a guard that ignores `Bridged` commands (which are notifications from PopoverMenu internals, not toggle requests)
 - Has a custom <xref:Terminal.Gui.ViewBase.View.HotKey> handler that skips [SetFocus()](xref:Terminal.Gui.ViewBase.View.SetFocus*) before invoking <xref:Terminal.Gui.Input.Command.Activate>, preventing premature popover opening during MenuBarItem switching
 

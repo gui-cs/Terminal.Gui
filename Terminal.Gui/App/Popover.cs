@@ -22,9 +22,9 @@ namespace Terminal.Gui.App;
 ///         reusable popover behavior for any view type.
 ///     </para>
 ///     <para>
-///         <b>IMPORTANT:</b> Must be registered with <see cref="Application.Popover"/> via
-///         <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/> or
-///         <see cref="ApplicationPopover.Show"/>.
+///         <b>Registration:</b> Popovers are automatically registered with <see cref="Application.Popover"/> when
+///         <see cref="MakeVisible"/> is called. Manual registration via <see cref="ApplicationPopover.Register"/>
+///         is not required.
 ///     </para>
 ///     <para>
 ///         <b>Key Features:</b>
@@ -181,7 +181,8 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     public event EventHandler<ValueChangedEventArgs<TResult?>>? ResultChanged;
 
     /// <summary>
-    ///     Makes the popover visible and positions it based on <see cref="IPopoverView.Anchor"/> or <paramref name="idealScreenPosition"/>.
+    ///     Makes the popover visible and positions it based on <see cref="IPopoverView.Anchor"/> or
+    ///     <paramref name="idealScreenPosition"/>.
     /// </summary>
     /// <param name="idealScreenPosition">
     ///     The ideal screen-relative position for the popover. If <see langword="null"/>, positioning is determined
@@ -193,23 +194,25 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     /// </param>
     /// <remarks>
     ///     <para>
-    ///         IMPORTANT: The popover must be registered with <see cref="Application.Popover"/> before calling this
-    ///         method. Call <see cref="ApplicationPopover.Register"/> first.
-    ///     </para>
-    ///     <para>
-    ///         This method internally calls <see cref="ApplicationPopover.Show"/>, which will throw
-    ///         <see cref="InvalidOperationException"/> if the popover is not registered.
+    ///         If <see cref="View.App"/> is <see langword="null"/>, this method inherits it from
+    ///         <see cref="PopoverImpl.Target"/>. If the popover is not yet registered with
+    ///         <see cref="ApplicationPopover"/>, it is auto-registered before showing.
     ///     </para>
     ///     <para>
     ///         The actual position may be adjusted to ensure the popover fits fully on screen.
     ///     </para>
     /// </remarks>
-    /// <exception cref="InvalidOperationException">Thrown if the popover has not been registered.</exception>
     public override void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
         if (Visible)
         {
             return;
+        }
+
+        // Inherit App from Target if not already set
+        if (App is null && TryGetTarget (out View? targetView))
+        {
+            App = targetView.App;
         }
 
         // Ensure the Popover is sized correctly in case this is the first time we are being made visible
@@ -219,7 +222,13 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
 
         if (App?.Popovers is not { } popovers)
         {
-            throw new InvalidOperationException ("Popover must be registered with Application.Popover before calling MakeVisible.");
+            return;
+        }
+
+        // Auto-register if not yet registered
+        if (!popovers.IsRegistered (this))
+        {
+            popovers.Register (this);
         }
 
         popovers.Show (this);

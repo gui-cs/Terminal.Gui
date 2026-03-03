@@ -82,7 +82,8 @@ internal class MouseImpl : IMouse, IDisposable
         // Dismiss the Popover if the user presses mouse outside of it
         if (mouseEvent.IsPressed
             && App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover
-            && !View.IsInHierarchy (visiblePopover as View, deepestViewUnderMouse, true))
+            && visiblePopover is View popoverView
+            && !View.IsInHierarchy (popoverView, deepestViewUnderMouse, true))
         {
             Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Hide Visible Popover");
 
