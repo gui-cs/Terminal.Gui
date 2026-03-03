@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -11,13 +13,15 @@ namespace Terminal.Gui.Views;
 ///     <list type="bullet">
 ///         <item>
 ///             <description>
-///                 <b>ReadOnly mode</b> (<see cref="TextField.ReadOnly"/> = <see langword="true"/>): Acts like a traditional
+///                 <b>ReadOnly mode</b> (<see cref="TextField.ReadOnly"/> = <see langword="true"/>): Acts like a
+///                 traditional
 ///                 dropdown where clicking anywhere opens the list. The text field is not editable.
 ///             </description>
 ///         </item>
 ///         <item>
 ///             <description>
-///                 <b>Editable mode</b> (<see cref="TextField.ReadOnly"/> = <see langword="false"/>): Acts like a combo box
+///                 <b>Editable mode</b> (<see cref="TextField.ReadOnly"/> = <see langword="false"/>): Acts like a combo
+///                 box
 ///                 where the user can type text or select from the list.
 ///             </description>
 ///         </item>
@@ -26,11 +30,21 @@ namespace Terminal.Gui.Views;
 ///         <b>Key Features:</b>
 ///     </para>
 ///     <list type="bullet">
-///         <item><description>Toggle dropdown with button click, F4, or Alt+Down</description></item>
-///         <item><description>Pre-selects matching item in list when opening</description></item>
-///         <item><description>Returns focus to text field when closed</description></item>
-///         <item><description>Supports <see cref="IValue{T}"/> interface for data binding</description></item>
-///         <item><description>Auto-registers popover on first use</description></item>
+///         <item>
+///             <description>Toggle dropdown with button click, F4, or Alt+Down</description>
+///         </item>
+///         <item>
+///             <description>Pre-selects matching item in list when opening</description>
+///         </item>
+///         <item>
+///             <description>Returns focus to text field when closed</description>
+///         </item>
+///         <item>
+///             <description>Supports <see cref="IValue{T}"/> interface for data binding</description>
+///         </item>
+///         <item>
+///             <description>Auto-registers popover on first use</description>
+///         </item>
 ///     </list>
 ///     <para>
 ///         <b>Usage Example:</b>
@@ -62,52 +76,51 @@ public class DropDownList : TextField
         {
             Text = Glyphs.DownArrow.ToString (),
             X = Pos.AnchorEnd (),
-            Width = 3,
-            Height = 1,
             CanFocus = false,
             TabStop = TabBehavior.NoStop,
             NoPadding = true,
-            NoDecorations = true
+            NoDecorations = true,
+            ShadowStyle = ShadowStyle.None,
         };
 
 #if DEBUG
         _toggleButton.Id = "dropDownListToggleButton";
 #endif
 
-        _toggleButton.Accepting += ToggleButton_Accepting;
+        _toggleButton.Accepted += (s, e) => ToggleDropDown (); // Toggle dropdown on button click
 
         // Create ListView for popover
         ListView listView = new ()
         {
             Width = Dim.Auto (DimAutoStyle.Content),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1, maximumContentDim: 10),
-            CanFocus = true
+            Height = Dim.Auto (DimAutoStyle.Content, 1, 10)
         };
 
         // Create popover
-        _listPopover = new Popover<ListView, string?> (listView)
-        {
-            Anchor = GetAnchor
-        };
+        _listPopover = new Popover<ListView, string?> (listView) { Anchor = GetAnchor };
+
+        // Use the TextField's scheme for the ListView to ensure consistent styling
+        _listPopover.ContentView?.SchemeName = SchemeName;
+
+        _listPopover.VisibleChanging += (s, e) =>
+                                        {
+                                            _toggleButton.Enabled = !e.NewValue; // Disable toggle button when popover is visible to prevent re-entrancy
+                                        };
+
 
 #if DEBUG
         _listPopover.Id = "dropDownListPopover";
 #endif
 
-        // Configure result extraction
-        _listPopover.ResultExtractor = ExtractResult;
-
-        // Subscribe to result changes
-        _listPopover.ResultChanged += ListPopover_ResultChanged;
-
         // Configure commands to bubble up
         _listPopover.CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
         // Add toggle button to Padding
+        Padding?.Thickness = Padding.Thickness with { Right = 1 }; // Add some spacing on the right for the button
         Padding!.Add (_toggleButton);
 
         // Adjust TextField width to account for toggle button
-        Width = Dim.Fill ();
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _listPopover.ContentView?.MaxItemLength ?? 0));
 
         // Add keyboard bindings
         KeyBindings.Add (Key.F4, Command.Toggle);
@@ -115,32 +128,88 @@ public class DropDownList : TextField
 
         // Add command handler for toggle
         AddCommand (Command.Toggle, ToggleDropDown);
-
-        // Subscribe to focus events for auto-registration
-        HasFocusChanged += DropDownList_HasFocusChanged;
-
-        Initialized += DropDownList_Initialized;
     }
 
-    private void DropDownList_Initialized (object? sender, EventArgs e)
+    /// <inheritdoc />
+    public override void EndInit ()
     {
         // Set target for command bridging
-        if (_listPopover is { })
-        {
-            _listPopover.Target = new WeakReference<View> (this);
-        }
+        _listPopover?.Target = new WeakReference<View> (this);
+
+        base.EndInit ();
     }
 
-    private void DropDownList_HasFocusChanged (object? sender, HasFocusEventArgs e)
+    /// <inheritdoc />
+    protected override bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
     {
-        // Auto-register popover when DropDownList gains focus
-        if (e.NewValue && _listPopover is { } && App?.Popovers is { })
+        if (base.OnHasFocusChanging (currentHasFocus, newHasFocus, currentFocused, newFocused))
         {
-            if (!App.Popovers.IsRegistered (_listPopover))
-            {
-                App.Popovers.Register (_listPopover);
-            }
+            return true;
         }
+
+        if (newHasFocus)
+        {
+            App?.Popovers?.Register (_listPopover);
+
+            return false;
+        }
+
+        App?.Popovers?.DeRegister (_listPopover);
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        // If activation came from the ListView, update text
+        if (_listPopover?.ContentView is { } contentView
+            && ctx?.Source?.TryGetTarget (out View? sourceView) == true
+            && sourceView == contentView)
+        {
+            _listPopover.Visible = false; // Hide popover after selection
+
+            Text = ExtractResult (contentView) ?? Text; // Update text with selected value, or keep existing if null
+        }
+
+        base.OnActivated (ctx);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAccepted (ICommandContext? ctx)
+    {
+        base.OnAccepted (ctx);
+
+        // If accept came from the ListView, update text
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true)
+        {
+            if (sourceView == _listPopover?.ContentView)
+            {
+                _listPopover.Visible = false; // Hide popover after selection
+
+                if (_listPopover?.ContentView?.SelectedItem is not { } selectedIndex || _listPopover?.ContentView.Source is null)
+                {
+                    return;
+                }
+
+                IList? items = _listPopover?.ContentView?.Source.ToList ();
+
+                if (items is null || selectedIndex < 0 || selectedIndex >= items.Count)
+                {
+                    return;
+                }
+
+                Text = items [selectedIndex]?.ToString () ?? string.Empty;
+            }
+
+            if (sourceView == _toggleButton)
+            {
+                ToggleDropDown ();
+            }
+
+        }
+
+
     }
 
     /// <summary>
@@ -181,7 +250,7 @@ public class DropDownList : TextField
             return null;
         }
 
-        System.Collections.IList? items = listView.Source.ToList ();
+        IList? items = listView.Source.ToList ();
 
         if (items is null || selectedIndex < 0 || selectedIndex >= items.Count)
         {
@@ -200,15 +269,6 @@ public class DropDownList : TextField
         {
             Text = e.NewValue;
         }
-    }
-
-    /// <summary>
-    ///     Handles accepting event from the toggle button.
-    /// </summary>
-    private void ToggleButton_Accepting (object? sender, CommandEventArgs e)
-    {
-        ToggleDropDown ();
-        e.Handled = true;
     }
 
     /// <summary>
@@ -246,7 +306,7 @@ public class DropDownList : TextField
         // Pre-select matching item
         if (!string.IsNullOrEmpty (Text) && listView.Source is { })
         {
-            System.Collections.IList? items = listView.Source.ToList ();
+            IList? items = listView.Source.ToList ();
 
             if (items is { })
             {
@@ -272,55 +332,19 @@ public class DropDownList : TextField
         _listPopover.MakeVisible ();
     }
 
-    /// <inheritdoc/>
-    protected override void OnActivated (ICommandContext? ctx)
-    {
-        // If activation came from the ListView, update text
-        if (_listPopover?.ContentView is { } contentView && 
-            ctx?.Source?.TryGetTarget (out View? sourceView) == true &&
-            sourceView == contentView && 
-            _listPopover.Result is { })
-        {
-            Text = _listPopover.Result;
-        }
-
-        base.OnActivated (ctx);
-    }
-
-    /// <inheritdoc/>
-    protected override void OnAccepted (ICommandContext? ctx)
-    {
-        // Accept from either button or list should close the dropdown
-        if (_listPopover is { Visible: true })
-        {
-            App?.Popovers?.Hide (_listPopover);
-        }
-
-        base.OnAccepted (ctx);
-    }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
         {
-            if (_toggleButton is { })
-            {
-                _toggleButton.Accepting -= ToggleButton_Accepting;
-                _toggleButton.Dispose ();
-                _toggleButton = null;
-            }
-
             if (_listPopover is { })
             {
-                _listPopover.ResultChanged -= ListPopover_ResultChanged;
+                //_listPopover.ResultChanged -= ListPopover_ResultChanged;
                 App?.Popovers?.DeRegister (_listPopover);
                 _listPopover.Dispose ();
                 _listPopover = null;
             }
-
-            HasFocusChanged -= DropDownList_HasFocusChanged;
-            Initialized -= DropDownList_Initialized;
         }
 
         base.Dispose (disposing);

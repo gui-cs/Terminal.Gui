@@ -43,7 +43,8 @@ public class DropDownListExample : Scenario
         };
 
         // Sample data
-        ObservableCollection<string> countries = [
+        ObservableCollection<string> countries =
+        [
             "Argentina",
             "Brazil",
             "Canada",
@@ -56,7 +57,8 @@ public class DropDownListExample : Scenario
             "Japan"
         ];
 
-        ObservableCollection<string> colors = [
+        ObservableCollection<string> colors =
+        [
             "Red",
             "Green",
             "Blue",
@@ -70,84 +72,51 @@ public class DropDownListExample : Scenario
         ];
 
         // ReadOnly Mode Example
-        Label readOnlyLabel = new ()
-        {
-            X = 1,
-            Y = 1,
-            Text = "ReadOnly Mode (default):"
-        };
+        Label readOnlyLabel = new () { X = 1, Y = 1, Text = "ReadOnly Mode (default):" };
 
         DropDownList readOnlyDropDown = new ()
         {
             X = 1,
             Y = Pos.Bottom (readOnlyLabel),
-            Width = 30,
             Title = "Select Country",
             Source = new ListWrapper<string> (countries),
             ReadOnly = true,
             Text = "Canada"
         };
 
-        readOnlyDropDown.ValueChanged += (s, e) =>
-        {
-            _eventLog?.Log ($"ReadOnly: ValueChanged - OldValue: '{e.OldValue}', NewValue: '{e.NewValue}'");
-        };
+        readOnlyDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"ReadOnly: ValueChanged - OldValue: '{e.OldValue}', NewValue: '{e.NewValue}'"); };
 
         readOnlyDropDown.ValueChanging += (s, e) =>
-        {
-            _eventLog?.Log ($"ReadOnly: ValueChanging - CurrentValue: '{e.CurrentValue}', NewValue: '{e.NewValue}'");
-        };
+                                          {
+                                              _eventLog?.Log ($"ReadOnly: ValueChanging - CurrentValue: '{e.CurrentValue}', NewValue: '{e.NewValue}'");
+                                          };
 
-        Label readOnlyHelpLabel = new ()
-        {
-            X = 1,
-            Y = Pos.Bottom (readOnlyDropDown) + 1,
-            Text = "Click anywhere or press F4 or Alt+Down to open"
-        };
+        Label readOnlyHelpLabel = new () { X = 1, Y = Pos.Bottom (readOnlyDropDown) + 1, Text = "Click anywhere or press F4 or Alt+Down to open" };
 
         // Editable Mode Example
-        Label editableLabel = new ()
-        {
-            X = 1,
-            Y = Pos.Bottom (readOnlyHelpLabel) + 1,
-            Text = "Editable Mode:"
-        };
+        Label editableLabel = new () { X = 1, Y = Pos.Bottom (readOnlyHelpLabel) + 1, Text = "Editable Mode:" };
 
         DropDownList editableDropDown = new ()
         {
             X = 1,
             Y = Pos.Bottom (editableLabel),
-            Width = 30,
             Title = "Select or Type Color",
             Source = new ListWrapper<string> (colors),
             ReadOnly = false,
             Text = "Blue"
         };
 
-        editableDropDown.ValueChanged += (s, e) =>
-        {
-            _eventLog?.Log ($"Editable: ValueChanged - OldValue: '{e.OldValue}', NewValue: '{e.NewValue}'");
-        };
+        editableDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"Editable: ValueChanged - OldValue: '{e.OldValue}', NewValue: '{e.NewValue}'"); };
 
         editableDropDown.ValueChanging += (s, e) =>
-        {
-            _eventLog?.Log ($"Editable: ValueChanging - CurrentValue: '{e.CurrentValue}', NewValue: '{e.NewValue}'");
-        };
+                                          {
+                                              _eventLog?.Log ($"Editable: ValueChanging - CurrentValue: '{e.CurrentValue}', NewValue: '{e.NewValue}'");
+                                          };
 
-        Label editableHelpLabel = new ()
-        {
-            X = 1,
-            Y = Pos.Bottom (editableDropDown) + 1,
-            Text = "Type text or press F4 to open dropdown"
-        };
+        Label editableHelpLabel = new () { X = 1, Y = Pos.Bottom (editableDropDown) + 1, Text = "Type text or press F4 to open dropdown" };
 
         // Different positions example
-        Label positionLabel = new ()
-        {
-            X = 1,
-            Y = Pos.Bottom (editableHelpLabel) + 1,
-            Text = "Different Positions:"
-        };
+        Label positionLabel = new () { X = 1, Y = Pos.Bottom (editableHelpLabel) + 1, Text = "Different Positions:" };
 
         DropDownList topLeftDropDown = new ()
         {
@@ -160,10 +129,7 @@ public class DropDownListExample : Scenario
             Text = "Argentina"
         };
 
-        topLeftDropDown.ValueChanged += (s, e) =>
-        {
-            _eventLog?.Log ($"TopLeft: Selected '{e.NewValue}'");
-        };
+        topLeftDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"TopLeft: Selected '{e.NewValue}'"); };
 
         DropDownList topRightDropDown = new ()
         {
@@ -176,10 +142,7 @@ public class DropDownListExample : Scenario
             Text = "Red"
         };
 
-        topRightDropDown.ValueChanged += (s, e) =>
-        {
-            _eventLog?.Log ($"TopRight: Selected '{e.NewValue}'");
-        };
+        topRightDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"TopRight: Selected '{e.NewValue}'"); };
 
         DropDownList bottomLeftDropDown = new ()
         {
@@ -192,10 +155,7 @@ public class DropDownListExample : Scenario
             Text = "Japan"
         };
 
-        bottomLeftDropDown.ValueChanged += (s, e) =>
-        {
-            _eventLog?.Log ($"BottomLeft: Selected '{e.NewValue}'");
-        };
+        bottomLeftDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"BottomLeft: Selected '{e.NewValue}'"); };
 
         DropDownList bottomRightDropDown = new ()
         {
@@ -208,13 +168,9 @@ public class DropDownListExample : Scenario
             Text = "White"
         };
 
-        bottomRightDropDown.ValueChanged += (s, e) =>
-        {
-            _eventLog?.Log ($"BottomRight: Selected '{e.NewValue}'");
-        };
+        bottomRightDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"BottomRight: Selected '{e.NewValue}'"); };
 
-        contentFrame.Add (
-                          readOnlyLabel,
+        contentFrame.Add (readOnlyLabel,
                           readOnlyDropDown,
                           readOnlyHelpLabel,
                           editableLabel,
@@ -224,8 +180,7 @@ public class DropDownListExample : Scenario
                           topLeftDropDown,
                           topRightDropDown,
                           bottomLeftDropDown,
-                          bottomRightDropDown
-                         );
+                          bottomRightDropDown);
 
         _eventLog.SetViewToLog (window);
         window.Add (contentFrame, _eventLog);
