@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace TerminalGuiFluentTesting;
 
-public partial class TestContext
+public partial class FluentTestContext
 {
     /// <summary>
     ///     Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
@@ -12,7 +12,7 @@ public partial class TestContext
     /// </summary>
     /// <param name="contextMenu"></param>
     /// <returns></returns>
-    public TestContext WithContextMenu (PopoverMenu? contextMenu)
+    public FluentTestContext WithContextMenu (PopoverMenu? contextMenu)
     {
         if (contextMenu?.App is null)
         {

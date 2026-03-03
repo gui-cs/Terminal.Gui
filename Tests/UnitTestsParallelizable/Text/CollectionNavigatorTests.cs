@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using Moq;
-using Xunit.Abstractions;
 
 namespace TextTests;
 

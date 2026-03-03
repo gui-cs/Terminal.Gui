@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 

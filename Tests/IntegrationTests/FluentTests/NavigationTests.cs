@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using TerminalGuiFluentTesting;
-using Xunit.Abstractions;
 
 namespace IntegrationTests;
 
@@ -18,54 +17,54 @@ public class NavigationTests (ITestOutputHelper outputHelper) : TestsAllDrivers
         var v5 = new View { Id = "v5", CanFocus = true };
         var v6 = new View { Id = "v6", CanFocus = true };
 
-        using TestContext c = With.A<Window> (50, 20, "ansi", _out)
-                                  .Then (app =>
-                                         {
-                                             var w1 = new Window { Id = "w1" };
-                                             w1.Add (v1, v2);
-                                             var w2 = new Window { Id = "w2" };
-                                             w2.Add (v3, v4);
-                                             var w3 = new Window { Id = "w3" };
-                                             w3.Add (v5, v6);
-                                             app?.TopRunnableView!.Add (w1, w2, w3);
-                                         })
-                                  .WaitUntil (() => v5.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v1.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v3.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v1.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v5.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v3.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v5.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v1.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v3.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v1.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v5.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v3.HasFocus)
-                                  .KeyDown (Key.Tab)
-                                  .WaitUntil (() => v4.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v5.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v1.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v5.HasFocus)
-                                  .KeyDown (Key.Tab)
-                                  .WaitUntil (() => v6.HasFocus)
-                                  .KeyDown (Key.F6.WithShift)
-                                  .WaitUntil (() => v4.HasFocus)
-                                  .KeyDown (Key.F6)
-                                  .WaitUntil (() => v6.HasFocus);
+        using FluentTestContext c = With.A<Window> (50, 20, "ansi", _out)
+                                        .Then (app =>
+                                               {
+                                                   var w1 = new Window { Id = "w1" };
+                                                   w1.Add (v1, v2);
+                                                   var w2 = new Window { Id = "w2" };
+                                                   w2.Add (v3, v4);
+                                                   var w3 = new Window { Id = "w3" };
+                                                   w3.Add (v5, v6);
+                                                   app?.TopRunnableView!.Add (w1, w2, w3);
+                                               })
+                                        .WaitUntil (() => v5.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v1.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v3.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v1.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v5.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v3.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v5.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v1.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v3.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v1.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v5.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v3.HasFocus)
+                                        .KeyDown (Key.Tab)
+                                        .WaitUntil (() => v4.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v5.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v1.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v5.HasFocus)
+                                        .KeyDown (Key.Tab)
+                                        .WaitUntil (() => v6.HasFocus)
+                                        .KeyDown (Key.F6.WithShift)
+                                        .WaitUntil (() => v4.HasFocus)
+                                        .KeyDown (Key.F6)
+                                        .WaitUntil (() => v6.HasFocus);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);

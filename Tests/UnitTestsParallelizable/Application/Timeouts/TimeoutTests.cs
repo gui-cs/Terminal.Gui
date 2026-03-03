@@ -1,4 +1,3 @@
-using Xunit.Abstractions;
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
 

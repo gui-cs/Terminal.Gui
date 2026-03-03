@@ -121,7 +121,7 @@ public class TheGenerator : IIncrementalGenerator
                            {
                                try
                                {
-                                   Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
+                                   Xunit.Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
                                }
                                catch(Exception ex)
                                {
@@ -136,7 +136,7 @@ public class TheGenerator : IIncrementalGenerator
                            }
                            """;
 
-            sb.AppendLine (method);
+            sb.AppendLine (method.Replace ("*", ""));
         }
 
         sb.AppendLine (tail);
@@ -156,7 +156,7 @@ public class TheGenerator : IIncrementalGenerator
 
         // Create the "this TestContext context" parameter
         ParameterSyntax contextParam = SyntaxFactory.Parameter (SyntaxFactory.Identifier ("context"))
-                                                    .WithType (SyntaxFactory.ParseTypeName ("TestContext"))
+                                                    .WithType (SyntaxFactory.ParseTypeName ("FluentTestContext"))
                                                     .AddModifiers (SyntaxFactory.Token (SyntaxKind.ThisKeyword)); // Add the "this" keyword
 
         // Extract the parameter names (expected and actual)
@@ -182,8 +182,8 @@ public class TheGenerator : IIncrementalGenerator
 
         parameters.Insert (0, contextParam); // Insert 'context' as the first parameter
 
-        // Change the return type to TestContext
-        TypeSyntax returnType = SyntaxFactory.ParseTypeName ("TestContext");
+        // Change the return type to FluentTestContext
+        TypeSyntax returnType = SyntaxFactory.ParseTypeName ("FluentTestContext");
 
         // Change the method name to AssertEqual
         SyntaxToken newMethodName = SyntaxFactory.Identifier ($"Assert{methodName}");

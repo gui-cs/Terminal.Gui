@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Terminal.Gui.Tests;
-using Xunit.Abstractions;
 
 namespace ApplicationTests;
 

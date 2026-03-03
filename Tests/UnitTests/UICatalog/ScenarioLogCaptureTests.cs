@@ -3,7 +3,6 @@
 // Claude - Opus 4.5
 using Microsoft.Extensions.Logging;
 using UICatalog;
-using Xunit.Abstractions;
 
 namespace UnitTests.UICatalog;
 

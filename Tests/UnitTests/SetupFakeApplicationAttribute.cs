@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Diagnostics;
 using System.Reflection;
-using Xunit.Sdk;
+using Xunit.v3;
 
 namespace UnitTests;
 
@@ -14,17 +14,17 @@ public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
 {
     private IDisposable? _appDispose;
 
-    public override void Before (MethodInfo methodUnderTest)
+    public override void Before (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
         var appFactory = new FakeApplicationFactory ();
         _appDispose = appFactory.SetupFakeApplication ();
 
-        base.Before (methodUnderTest);
+        base.Before (methodUnderTest, test);
     }
 
-    public override void After (MethodInfo methodUnderTest)
+    public override void After (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
 
@@ -35,7 +35,7 @@ public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
         // TODO: Uncomment after investigation.
         //ApplicationImpl.SetInstance (null);
 
-        base.After (methodUnderTest);
+        base.After (methodUnderTest, test);
     }
 
     /// <summary>

@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
-using Xunit.Abstractions;
 
 namespace ApplicationTests;
 

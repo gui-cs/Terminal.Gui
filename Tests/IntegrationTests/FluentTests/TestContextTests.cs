@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
-using Xunit.Abstractions;
 
 namespace IntegrationTests;
 
@@ -16,7 +15,7 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void Constructor_Sets_Application_Screen (string d)
     {
-        using var context = new TestContext (d, _out, TimeSpan.FromSeconds (10));
+        using var context = new FluentTestContext (d, _out, TimeSpan.FromSeconds (10));
 
         Assert.NotEqual (Rectangle.Empty, context.App?.Screen);
     }
@@ -30,19 +29,19 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
             Width = Dim.Fill ()
         };
 
-        using TestContext c = With.A<Window> (40, 10, d)
-                                  .Add (lbl)
-                                  .AssertEqual (38, lbl.Frame.Width) // Window has 2 border
-                                  .ResizeConsole (20, 20)
-                                  .WaitIteration ()
-                                  .AssertEqual (18, lbl.Frame.Width);
+        using FluentTestContext c = With.A<Window> (40, 10, d)
+                                        .Add (lbl)
+                                        .AssertEqual (38, lbl.Frame.Width) // Window has 2 border
+                                        .ResizeConsole (20, 20)
+                                        .WaitIteration ()
+                                        .AssertEqual (18, lbl.Frame.Width);
     }
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void With_New_A_Runs (string d)
     {
-        using TestContext context = With.A<Window> (40, 10, d, _out);
+        using FluentTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (context.App!.TopRunnable!.IsRunning);
         Assert.NotEqual (Rectangle.Empty, context.App!.Screen);
     }
@@ -51,15 +50,15 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void AnsiScreenShot_Renders_Ansi_Stream (string d)
     {
-        using TestContext context = With.A<Window> (10, 3, d, _out)
-                                        .Then (app =>
-                                               {
-                                                   app.TopRunnableView!.BorderStyle = LineStyle.None;
-                                                   app.TopRunnableView!.Border!.Thickness = Thickness.Empty;
-                                                   app.TopRunnableView.Text = "hello";
-                                               })
-                                        .ScreenShot ("ScreenShot", _out)
-                                        .AnsiScreenShot ("AnsiScreenShot", _out)
+        using FluentTestContext context = With.A<Window> (10, 3, d, _out)
+                                              .Then (app =>
+                                                     {
+                                                         app.TopRunnableView!.BorderStyle = LineStyle.None;
+                                                         app.TopRunnableView!.Border!.Thickness = Thickness.Empty;
+                                                         app.TopRunnableView.Text = "hello";
+                                                     })
+                                              .ScreenShot ("ScreenShot", _out)
+                                              .AnsiScreenShot ("AnsiScreenShot", _out)
             ;
     }
 
@@ -67,7 +66,7 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void With_Starts_Stops_Without_Error (string d)
     {
-        using TestContext context = With.A<Window> (40, 10, d, _out);
+        using FluentTestContext context = With.A<Window> (40, 10, d, _out);
 
         // No actual assertions are needed — if no exceptions are thrown, it's working
     }
@@ -76,7 +75,7 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void With_Without_Stop_Still_Cleans_Up (string d)
     {
-        TestContext? context;
+        FluentTestContext? context;
 
         using (context = With.A<Window> (40, 10, d, _out))
         {
@@ -91,19 +90,19 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     public void AssertCursorPos_Works (string d)
     {
         // Simulates typing abcd into a TextField with width 3 (wide enough to render 2 characters only)
-        using TestContext c = With.A<Window> (100, 20, d, _out)
-                                  .Add (
-                                        new ()
-                                        {
-                                            Height = 1,
-                                            Width = 1,
-                                            CanFocus = true
-                                        })
-                                  .Then (app =>
-                                         {
-                                             app!.TopRunnableView!.SubViews.ElementAt (0).Cursor = new () { Style = CursorStyle.BlinkingBar, Position = new Point (1, 1) };
-                                         })
-                                  .AssertCursorPosition (new (1, 1)) // Initial cursor position (because Window has border)
+        using FluentTestContext c = With.A<Window> (100, 20, d, _out)
+                                        .Add (
+                                              new ()
+                                              {
+                                                  Height = 1,
+                                                  Width = 1,
+                                                  CanFocus = true
+                                              })
+                                        .Then (app =>
+                                               {
+                                                   app!.TopRunnableView!.SubViews.ElementAt (0).Cursor = new () { Style = CursorStyle.BlinkingBar, Position = new Point (1, 1) };
+                                               })
+                                        .AssertCursorPosition (new (1, 1)) // Initial cursor position (because Window has border)
             ;
     }
 }

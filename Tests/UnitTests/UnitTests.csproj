@@ -40,7 +40,7 @@
 		<PackageReference Include="Moq" />
 		<PackageReference Include="ReportGenerator" />
 		<PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
-		<PackageReference Include="xunit" />
+		<PackageReference Include="xunit.v3" />
 		<PackageReference Include="Xunit.Combinatorial" />
 		<PackageReference Include="xunit.runner.visualstudio">
 			<PrivateAssets>all</PrivateAssets>

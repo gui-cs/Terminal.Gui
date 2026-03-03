@@ -1,16 +1,10 @@
-using UnitTests;
-using Xunit.Abstractions;
-
 namespace UnitTests.ViewBaseTests;
 
 public class ViewTests
 {
     private readonly ITestOutputHelper _output;
 
-    public ViewTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    public ViewTests (ITestOutputHelper output) => _output = output;
 
     // Generic lifetime (IDisposable) tests
     [Fact]

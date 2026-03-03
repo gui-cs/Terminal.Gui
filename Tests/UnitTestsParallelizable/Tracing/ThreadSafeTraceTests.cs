@@ -2,7 +2,6 @@
 
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
-using Xunit.Abstractions;
 #pragma warning disable xUnit1031
 
 namespace ApplicationTests;

@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace ViewBaseTests.Layout;
+﻿namespace ViewBaseTests.Layout;
 
 public class TopologicalSortTests (ITestOutputHelper output)
 {

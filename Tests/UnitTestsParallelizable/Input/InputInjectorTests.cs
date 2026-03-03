@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using DriverTests.Input;
-using Xunit.Abstractions;
 
 namespace InputTests;
 
