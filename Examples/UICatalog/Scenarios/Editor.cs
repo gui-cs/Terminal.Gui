@@ -107,7 +107,7 @@ public class Editor : Scenario
             Title = "ForceMinimumPosTo_Zero", Value = _forceMinimumPosToZero ? CheckState.Checked : CheckState.UnChecked
         };
 
-        _miForceMinimumPosToZeroCheckBox.ValueChanging += (s, e) =>
+        _miForceMinimumPosToZeroCheckBox.ValueChanged += (s, e) =>
                                                           {
                                                               _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
 
@@ -143,8 +143,7 @@ public class Editor : Scenario
                                        {
                                            if (!e.Value)
                                            {
-                                               // BUGBUG: This should restore the original culture info
-                                               Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
+                                               Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
                                            }
                                        };
 
@@ -304,7 +303,7 @@ public class Editor : Scenario
 
             allCheckBoxes.Add (checkBox);
 
-            checkBox.ValueChanging += (s, e) =>
+            checkBox.ValueChanged += (s, e) =>
                                       {
                                           if (e.NewValue == CheckState.Checked)
                                           {
@@ -744,14 +743,14 @@ public class Editor : Scenario
         {
             X = 0, Y = Pos.Top (txtToFind) + 2, Value = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.ValueChanging += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
+        ckbMatchCase.ValueChanged += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchCase);
 
         CheckBox ckbMatchWholeWord = new ()
         {
             X = 0, Y = Pos.Top (ckbMatchCase) + 1, Value = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.ValueChanging += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
+        ckbMatchWholeWord.ValueChanged += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchWholeWord);
 
         return d;
@@ -824,14 +823,14 @@ public class Editor : Scenario
         {
             X = 0, Y = Pos.Top (txtToFind) + 2, Value = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
         };
-        ckbMatchCase.ValueChanging += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
+        ckbMatchCase.ValueChanged += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchCase);
 
         CheckBox ckbMatchWholeWord = new ()
         {
             X = 0, Y = Pos.Top (ckbMatchCase) + 1, Value = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
         };
-        ckbMatchWholeWord.ValueChanging += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
+        ckbMatchWholeWord.ValueChanged += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
         d.Add (ckbMatchWholeWord);
 
         return d;
