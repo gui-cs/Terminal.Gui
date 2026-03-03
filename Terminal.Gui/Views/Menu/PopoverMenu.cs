@@ -282,7 +282,6 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         // IMPORTANT: ShowMenu/HideMenu must run BEFORE base.OnVisibleChanged because
         // Popover<TView, TResult>.OnVisibleChanged sets ContentView.Visible which would
         // cause ShowMenu/HideMenu to exit early (they check Visible as a guard).
-        // ShowMenu also sets Enabled = true, which is required for focus.
         if (Visible)
         {
             Root?.ShowMenu ();
