@@ -123,28 +123,9 @@ public class MenuBarItem : MenuItem, IDesignable
             return false;
         }
 
-        if (PopoverMenuOpen)
-        {
-            Trace.Command (this, args.Context, "Closing", "PopoverMenuOpen -> false");
-            PopoverMenuOpen = false;
-        }
-        else
-        {
-            Trace.Command (this, args.Context, "Opening", "PopoverMenuOpen -> true");
-            RegisterPopover ();
-
-            PopoverMenuOpen = true;
-        }
+        PopoverMenuOpen = !PopoverMenuOpen;
 
         return false;
-    }
-
-    private void RegisterPopover ()
-    {
-        if (App is { Popovers: { } } && !App.Popovers.IsRegistered (PopoverMenu))
-        {
-            App.Popovers.Register (PopoverMenu);
-        }
     }
 
     /// <inheritdoc/>
@@ -152,15 +133,14 @@ public class MenuBarItem : MenuItem, IDesignable
     {
         base.EndInit ();
 
-        if (PopoverMenu?.IsInitialized is true)
+        if (PopoverMenu is null || PopoverMenu.IsInitialized)
         {
             return;
         }
 
-        PopoverMenu?.App = App;
-        PopoverMenu?.BeginInit ();
-        PopoverMenu?.EndInit ();
-        RegisterPopover ();
+        PopoverMenu.App ??= App;
+        PopoverMenu.BeginInit ();
+        PopoverMenu.EndInit ();
     }
 
     /// <summary>
@@ -184,7 +164,7 @@ public class MenuBarItem : MenuItem, IDesignable
 
             if (field is { })
             {
-                field.VisibleChanged -= OnPopoverVisibleChanged;
+                field.VisibleChanged -= OnPopoverMenuVisibleChanged;
                 field.Target = null;
             }
 
@@ -194,82 +174,56 @@ public class MenuBarItem : MenuItem, IDesignable
             {
                 return;
             }
-#if DEBUG
-            Id = $"{Id}.{field.Id}";
-#endif
 
             Trace.Command (this, "PopoverMenuSet", $"PopoverMenu={field.ToIdentifyingString ()}");
-            RegisterPopover ();
-            PopoverMenuOpen = field.Visible;
-            field.VisibleChanged += OnPopoverVisibleChanged;
 
-            // Bridge Activate/Accept from PopoverMenu → MenuBarItem via PopoverBaseImpl.Target.
+            // Bridge Activate/Accept from PopoverMenu → MenuBarItem via PopoverImpl.Target.
             field.Target = new WeakReference<View> (this);
 
-            return;
+            // Set Anchor for positioning below MenuBarItem
+            field.Anchor = () => FrameToScreen ();
 
-            void OnPopoverVisibleChanged (object? sender, EventArgs args) => PopoverMenuOpen = field?.Visible ?? false;
+            // Relay VisibleChanged to PopoverMenuOpenChanged for consumers (e.g. MenuBar)
+            field.VisibleChanged += OnPopoverMenuVisibleChanged;
         }
     }
 
     /// <summary>
-    ///     Gets whether the PopoverMenu is open and visible or not.
+    ///     Gets or sets whether the PopoverMenu is open and visible or not.
+    ///     Delegates to <see cref="PopoverMenu"/>.<see cref="View.Visible"/>.
     /// </summary>
     public bool PopoverMenuOpen
     {
-        get;
+        get => PopoverMenu?.Visible ?? false;
         set
         {
-            if (field == value)
+            if (PopoverMenu is null)
             {
                 return;
             }
 
-            CWPPropertyHelper.ChangeProperty (this,
-                                              ref field,
-                                              value,
-                                              OnPopoverMenuOpenChanging,
-                                              PopoverMenuOpenChanging,
-                                              newValue =>
-                                              {
-                                                  field = newValue;
-
-                                                  if (field)
-                                                  {
-                                                      // MakeVisible requires the Application's popover infrastructure.
-                                                      // Guard against calls when App is not available (e.g., in design mode
-                                                      // or unit tests without Application.Init).
-                                                      if (PopoverMenu is { } && IsInitialized)
-                                                      {
-                                                          PopoverMenu.MakeVisible (new Point (FrameToScreen ().X, FrameToScreen ().Bottom));
-                                                      }
-                                                  }
-                                                  else
-                                                  {
-                                                      PopoverMenu?.Visible = false;
-                                                  }
-                                              },
-                                              OnPopoverMenuOpenChanged,
-                                              PopoverMenuOpenChanged,
-                                              out _);
+            if (value)
+            {
+                PopoverMenu.MakeVisible ();
+            }
+            else
+            {
+                PopoverMenu.Visible = false;
+            }
         }
     }
 
     /// <summary>
-    /// </summary>
-    protected virtual bool OnPopoverMenuOpenChanging (ValueChangingEventArgs<bool> args) => false;
-
-    /// <summary>
-    /// </summary>
-    public event EventHandler<ValueChangingEventArgs<bool>>? PopoverMenuOpenChanging;
-
-    /// <summary>
-    /// </summary>
-    protected virtual void OnPopoverMenuOpenChanged (ValueChangedEventArgs<bool> args) { }
-
-    /// <summary>
+    ///     Raised when <see cref="PopoverMenuOpen"/> has changed. Relayed from
+    ///     <see cref="View.VisibleChanged"/>.
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<bool>>? PopoverMenuOpenChanged;
+
+    private void OnPopoverMenuVisibleChanged (object? sender, EventArgs e)
+    {
+        bool isOpen = PopoverMenu?.Visible ?? false;
+        PopoverMenuOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (!isOpen, isOpen));
+    }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)
@@ -285,25 +239,12 @@ public class MenuBarItem : MenuItem, IDesignable
 
         // If the user presses the hotkey for a menu item that is already open,
         // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
-        if (SuperView is MenuBar { } menuBar)
+        if (SuperView is MenuBar menuBar)
         {
             menuBar.HideActiveItem ();
         }
 
         return true;
-    }
-
-    /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
-    {
-        Trace.Command (this, "Entry", $"newHasFocus={newHasFocus}");
-
-        if (newHasFocus)
-        {
-            return;
-        }
-
-        PopoverMenuOpen = false;
     }
 
     /// <inheritdoc/>
@@ -321,11 +262,6 @@ public class MenuBarItem : MenuItem, IDesignable
     {
         if (disposing)
         {
-            if (App is { Popovers: { } } && !App.Popovers.IsRegistered (PopoverMenu))
-            {
-                App.Popovers.DeRegister (PopoverMenu);
-            }
-
             PopoverMenu?.Dispose ();
             PopoverMenu = null;
         }

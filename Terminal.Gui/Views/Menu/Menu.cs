@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
 ///     <see cref="MenuItem"/>.
 /// </summary>
-public class Menu : Bar, IDesignable, IValue<MenuItem?>
+public class Menu : Bar, IValue<MenuItem?>
 {
     /// <summary>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
@@ -61,9 +61,7 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
     {
         // When a MenuItem's Accept command bubbles up, capture it as our Value
         // before calling base, which will bubble it further.
-        if (args.Context?.Routing == CommandRouting.BubblingUp
-            && args.Context.Source?.TryGetTarget (out View? source) == true
-            && source is MenuItem menuItem)
+        if (args.Context?.Routing == CommandRouting.BubblingUp && args.Context.Source?.TryGetTarget (out View? source) == true && source is MenuItem menuItem)
         {
             Value = menuItem;
         }
@@ -85,8 +83,7 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
         // MenuItem now implements IValue (returning Title), so ctx.Value is already populated by the framework.
         if (args.Context?.Routing == CommandRouting.BubblingUp)
         {
-            if (args.Context.Source?.TryGetTarget (out View? source) == true
-                && source is MenuItem menuItem)
+            if (args.Context.Source?.TryGetTarget (out View? source) == true && source is MenuItem menuItem)
             {
                 Value = menuItem;
             }
@@ -283,7 +280,6 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
         // IMPORTANT: This must be done after adding the menu to the SuperView or Add will try
         // to set focus to it.
         Visible = true;
-        Enabled = true;
     }
 
     private bool _isHiding;
@@ -312,7 +308,6 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
             }
 
             Visible = false;
-            Enabled = false;
 
             ClearFocus ();
         }
@@ -378,11 +373,11 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
     ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
     ///     <see langword="null"/> if the state was not changed for some other reason.
     /// </returns>
-    private bool? ChangeValue (MenuItem? newValue)
+    private void ChangeValue (MenuItem? newValue)
     {
         if (_value == newValue)
         {
-            return null;
+            return;
         }
 
         MenuItem? oldValue = _value;
@@ -391,14 +386,14 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
 
         if (OnValueChanging (changingArgs) || changingArgs.Handled)
         {
-            return true;
+            return;
         }
 
         ValueChanging?.Invoke (this, changingArgs);
 
         if (changingArgs.Handled)
         {
-            return true;
+            return;
         }
 
         _value = newValue;
@@ -408,8 +403,6 @@ public class Menu : Bar, IDesignable, IValue<MenuItem?>
         ValueChanged?.Invoke (this, changedArgs);
 
         ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
-
-        return false;
     }
 
     #endregion IValue<MenuItem?> Implementation

@@ -241,14 +241,7 @@ public partial class TextField
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
-        if (keyboard)
-        {
-            ContextMenu?.MakeVisible (ViewportToScreen (new Point (_insertionPoint - ScrollOffset, 1)));
-        }
-        else
-        {
-            ContextMenu?.MakeVisible ();
-        }
+        ContextMenu?.MakeVisible (ViewportToScreen (new Point (_insertionPoint - ScrollOffset, 1)));
 
         return true;
     }

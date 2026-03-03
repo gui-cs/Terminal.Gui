@@ -227,8 +227,7 @@ public class DatePicker : View, IValue<DateTime>
             _table!.Columns.Add (abbreviatedDayName);
         }
 
-        // TODO: Get rid of the +7 which is hackish
-        _calendar.Width = _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7;
+        _calendar.Width = Dim.Auto (minimumContentDim: _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth));
     }
 
     private static string GetBackButtonText () => Glyphs.LeftArrow + Glyphs.LeftArrow.ToString ();
@@ -265,7 +264,7 @@ public class DatePicker : View, IValue<DateTime>
             Y = Pos.Bottom (_dateLabel),
             Height = 11,
             Style = new TableStyle { ShowHeaders = true, ShowHorizontalBottomline = true, ShowVerticalCellLines = true, ExpandLastColumn = true },
-            MultiSelect = false
+            MultiSelect = false,
         };
 
         _dateField = new DateField (DateTime.Now)
