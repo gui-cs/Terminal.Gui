@@ -263,7 +263,7 @@ public class DatePicker : View, IValue<DateTime>
             X = 0,
             Y = Pos.Bottom (_dateLabel),
             Height = 11,
-            Style = new TableStyle { ShowHeaders = true, ShowHorizontalBottomline = true, ShowVerticalCellLines = true, ExpandLastColumn = true },
+            Style = new TableStyle { ShowHeaders = true, ShowHorizontalBottomLine = true, ShowVerticalCellLines = true, ExpandLastColumn = true },
             MultiSelect = false,
         };
 

@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -34,28 +33,28 @@ public partial class TableView
         switch (me.Flags)
         {
             case MouseFlags.WheeledDown:
-                Viewport = Viewport with {Y = Viewport.Y + 1};
+                Viewport = Viewport with { Y = Viewport.Y + 1 };
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
                 return true;
 
             case MouseFlags.WheeledUp:
-                Viewport = Viewport with {Y = Viewport.Y - 1};
+                Viewport = Viewport with { Y = Viewport.Y - 1 };
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
                 return true;
 
             case MouseFlags.WheeledRight:
-                Viewport = Viewport with {X = Viewport.X + 1};
+                Viewport = Viewport with { X = Viewport.X + 1 };
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
                 return true;
 
             case MouseFlags.WheeledLeft:
-                Viewport = Viewport with { X = Viewport.X - 1};
+                Viewport = Viewport with { X = Viewport.X - 1 };
                 EnsureValidScrollOffsets ();
 
                 //SetNeedsDraw ();
@@ -84,7 +83,7 @@ public partial class TableView
             }
         }
 
-        // Double clicking a cell activates
+        // Double-clicking a cell activates
         if (me.Flags != MouseFlags.LeftButtonDoubleClicked)
         {
             return me.Handled;
@@ -92,11 +91,6 @@ public partial class TableView
 
         Point? clickedCell = ScreenToCell (boundsX, boundsY);
 
-        if (clickedCell is not { })
-        {
-            return me.Handled;
-        }
-
-        return OnCellActivated (new CellActivatedEventArgs (Table, clickedCell.Value.X, clickedCell.Value.Y));
+        return clickedCell is not { } ? me.Handled : OnCellActivated (new CellActivatedEventArgs (Table!, clickedCell.Value.X, clickedCell.Value.Y));
     }
 }

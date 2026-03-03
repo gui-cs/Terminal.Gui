@@ -58,7 +58,7 @@ public class TableViewTests
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the rightmost column
-        tableView.SelectedColumn = tableView.Table.Columns - 2;
+        tableView.SelectedColumn = tableView.Table!.Columns - 2;
 
         // First press should move us to the rightmost column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
@@ -81,7 +81,7 @@ public class TableViewTests
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the bottommost row
-        tableView.SelectedRow = tableView.Table.Rows - 2;
+        tableView.SelectedRow = tableView.Table!.Rows - 2;
 
         // First press should move us to the bottommost row without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
