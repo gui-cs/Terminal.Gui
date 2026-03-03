@@ -1,5 +1,4 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Defines rendering options that affect how the table is displayed.
@@ -8,15 +7,18 @@
 public class TableStyle
 {
     /// <summary>When scrolling down always lock the column headers in place as the first row of the table</summary>
-    public bool AlwaysShowHeaders { get; set; } = false;
+    public bool AlwaysShowHeaders { get; set; }
 
     /// <summary>
     ///     Gets or sets a flag indicating whether to force <see cref="Scheme.Normal"/> use when rendering vertical
     ///     cell lines (even when <see cref="TableView.FullRowSelect"/> is on).
     /// </summary>
-    public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
+    public bool AlwaysUseNormalColorForVerticalCellLines { get; set; }
 
-    /// <summary>Collection of columns for which you want special rendering (e.g. custom column lengths, text justification, etc.)</summary>
+    /// <summary>
+    ///     Collection of columns for which you want special rendering (e.g. custom column lengths, text justification,
+    ///     etc.)
+    /// </summary>
     public Dictionary<int, ColumnStyle> ColumnStyles { get; set; } = new ();
 
     /// <summary>
@@ -30,16 +32,16 @@ public class TableStyle
 
     /// <summary>
     ///     True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>. This gives
-    ///     the appearance of a cursor for when the <see cref="IDriver"/> doesn't otherwise show this
+    ///     the appearance of a cursor for when the <see cref="IDriver"/> doesnt otherwise show this
     /// </summary>
-    public bool InvertSelectedCellFirstCharacter { get; set; } = false;
+    public bool InvertSelectedCellFirstCharacter { get; set; }
 
     /// <summary>
     ///     Delegate for coloring specific rows in a different color.  For cell color
     ///     <see cref="ColumnStyle.ColorGetter"/>
     /// </summary>
     /// <value></value>
-    public RowColorGetterDelegate RowColorGetter { get; set; }
+    public RowColorGetterDelegate? RowColorGetter { get; set; }
 
     /// <summary>
     ///     Gets or sets a flag indicating whether to render headers of a <see cref="TableView"/>. Defaults to
@@ -55,7 +57,7 @@ public class TableStyle
     ///     Gets or sets a flag indicating whether there should be a horizontal line after all the data in the table.
     ///     Defaults to <see langword="false"/>.
     /// </summary>
-    public bool ShowHorizontalBottomline { get; set; } = false;
+    public bool ShowHorizontalBottomLine { get; set; }
 
     /// <summary>True to render a solid line above the headers</summary>
     public bool ShowHorizontalHeaderOverline { get; set; } = true;
@@ -89,7 +91,7 @@ public class TableStyle
     /// </summary>
     /// <param name="col"></param>
     /// <returns></returns>
-    public ColumnStyle GetColumnStyleIfAny (int col) { return ColumnStyles.TryGetValue (col, out ColumnStyle result) ? result : null; }
+    public ColumnStyle? GetColumnStyleIfAny (int col) => ColumnStyles.GetValueOrDefault (col);
 
     /// <summary>
     ///     Returns an existing <see cref="ColumnStyle"/> for the given <paramref name="col"/> or creates a new one with

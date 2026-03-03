@@ -102,7 +102,7 @@ public sealed class UICatalogRunnable : Runnable
 
             if (_scenarioList is { })
             {
-                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
+                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
             }
 
             UICatalog.LogCapture.HasErrors = false;
@@ -493,7 +493,7 @@ public sealed class UICatalogRunnable : Runnable
         scenarioList.Style.ShowHeaders = false;
         scenarioList.Style.ShowHorizontalHeaderOverline = false;
         scenarioList.Style.ShowHorizontalHeaderUnderline = false;
-        scenarioList.Style.ShowHorizontalBottomline = false;
+        scenarioList.Style.ShowHorizontalBottomLine = false;
         scenarioList.Style.ShowVerticalCellLines = false;
         scenarioList.Style.ShowVerticalHeaderLines = false;
 
@@ -540,7 +540,7 @@ public sealed class UICatalogRunnable : Runnable
         _cachedScenarioIndex = _scenarioList!.SelectedRow;
 
         // Set the Result to the selected scenario name
-        Result = (string)_scenarioList.Table [_scenarioList.SelectedRow, 0];
+        Result = (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0];
         Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
         App?.RequestStop ();
     }

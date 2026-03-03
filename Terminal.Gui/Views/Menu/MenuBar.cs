@@ -12,7 +12,7 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         <see cref="MenuBar"/> extends <see cref="Menu"/> with horizontal orientation and specializes it for
 ///         <see cref="MenuBarItem"/> items. By default, it is positioned at <c>Y = 0</c> with
-///         <c>Width = <see cref="Dim"/>.<see cref="Dim.Fill"/>()</c>, spanning the full width of its
+///         <c>Width = <see cref="Dim"/>.<see cref="Dim.Fill()"/>()</c>, spanning the full width of its
 ///         <see cref="View.SuperView"/>.
 ///     </para>
 ///     <para>
