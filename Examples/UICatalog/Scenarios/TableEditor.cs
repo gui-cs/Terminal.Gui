@@ -327,267 +327,285 @@ public class TableEditor : Scenario
         // Store checkbox references for the toggle methods to access
         Dictionary<string, CheckBox> checkboxes = new ();
 
-        MenuBarItem viewMenuBarItem = new MenuBarItem ("_View",
-                                                       [
-                                                           CreateCheckBoxMenuItem ("ShowHeaders",
-                                                                                   "_ShowHeaders",
-                                                                                   _tableView!.Style.ShowHeaders,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowHeaders = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("AlwaysShowHeaders",
-                                                                                   "_AlwaysShowHeaders",
-                                                                                   _tableView!.Style.AlwaysShowHeaders,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.AlwaysShowHeaders = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("HeaderOverline",
-                                                                                   "_HeaderOverLine",
-                                                                                   _tableView!.Style.ShowHorizontalHeaderOverline,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowHorizontalHeaderOverline = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("HeaderMidline",
-                                                                                   "_HeaderMidLine",
-                                                                                   _tableView!.Style.ShowVerticalHeaderLines,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowVerticalHeaderLines = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("HeaderUnderline",
-                                                                                   "_HeaderUnderLine",
-                                                                                   _tableView!.Style.ShowHorizontalHeaderUnderline,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowHorizontalHeaderUnderline = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("Bottomline",
-                                                                                   "_BottomLine",
-                                                                                   _tableView!.Style.ShowHorizontalBottomline,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowHorizontalBottomline = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("FullRowSelect",
-                                                                                   "_FullRowSelect",
-                                                                                   _tableView!.FullRowSelect,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.FullRowSelect = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("CellLines",
-                                                                                   "_CellLines",
-                                                                                   _tableView!.Style.ShowVerticalCellLines,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowVerticalCellLines = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("VerticalHeaderLines",
-                                                                                   "_VerticalHeaderLines",
-                                                                                   _tableView!.Style.ShowVerticalHeaderLines,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ShowVerticalHeaderLines = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("ExpandLastColumn",
-                                                                                   "_ExpandLastColumn",
-                                                                                   _tableView!.Style.ExpandLastColumn,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.ExpandLastColumn = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("AlwaysUseNormalColorForVerticalCellLines",
-                                                                                   "_AlwaysUseNormalColorForVerticalCellLines",
-                                                                                   _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("SmoothScrolling",
-                                                                                   "_SmoothHorizontalScrolling",
-                                                                                   _tableView!.Style.SmoothHorizontalScrolling,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.SmoothHorizontalScrolling = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           new Line (),
-                                                           CreateOptionSelectorMenuItem ("_ScrollBarVisibilityMode",
-                                                                                         ScrollBarVisibilityMode.None,
-                                                                                         state =>
-                                                                                         {
-                                                                                             switch (state)
+        var viewMenuBarItem = new MenuBarItem ("_View",
+                                               [
+                                                   CreateCheckBoxMenuItem ("ShowHeaders",
+                                                                           "_ShowHeaders",
+                                                                           _tableView!.Style.ShowHeaders,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ShowHeaders = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("AlwaysShowHeaders",
+                                                                           "_AlwaysShowHeaders",
+                                                                           _tableView!.Style.AlwaysShowHeaders,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.AlwaysShowHeaders = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("HeaderOverline",
+                                                                           "_HeaderOverLine",
+                                                                           _tableView!.Style.ShowHorizontalHeaderOverline,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ShowHorizontalHeaderOverline = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("HeaderMidline",
+                                                                           "_HeaderMidLine",
+                                                                           _tableView!.Style.ShowVerticalHeaderLines,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ShowVerticalHeaderLines = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("HeaderUnderline",
+                                                                           "_HeaderUnderLine",
+                                                                           _tableView!.Style.ShowHorizontalHeaderUnderline,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ShowHorizontalHeaderUnderline = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("Bottomline",
+                                                                           "_BottomLine",
+                                                                           _tableView!.Style.ShowHorizontalBottomLine,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ShowHorizontalBottomLine = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("FullRowSelect",
+                                                                           "_FullRowSelect",
+                                                                           _tableView!.FullRowSelect,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.FullRowSelect = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("CellLines",
+                                                                           "_CellLines",
+                                                                           _tableView!.Style.ShowVerticalCellLines,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ShowVerticalCellLines = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("VerticalHeaderLines",
+                                                                           "_VerticalHeaderLines",
+                                                                           _tableView!.Style.ShowVerticalHeaderLines,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ShowVerticalHeaderLines = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("ExpandLastColumn",
+                                                                           "_ExpandLastColumn",
+                                                                           _tableView!.Style.ExpandLastColumn,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.ExpandLastColumn = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("AlwaysUseNormalColorForVerticalCellLines",
+                                                                           "_AlwaysUseNormalColorForVerticalCellLines",
+                                                                           _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("SmoothScrolling",
+                                                                           "_SmoothHorizontalScrolling",
+                                                                           _tableView!.Style.SmoothHorizontalScrolling,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.SmoothHorizontalScrolling = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   new Line (),
+                                                   CreateOptionSelectorMenuItem ("_ScrollBarVisibilityMode",
+                                                                                 ScrollBarVisibilityMode.None,
+                                                                                 state =>
+                                                                                 {
+                                                                                     switch (state)
+                                                                                     {
+                                                                                         case ScrollBarVisibilityMode.Auto:
+                                                                                         case ScrollBarVisibilityMode.Always:
+
+                                                                                             if (!_tableView.ViewportSettings.HasFlag (ViewportSettingsFlags
+                                                                                                     .HasScrollBars))
                                                                                              {
-                                                                                                 case ScrollBarVisibilityMode.Auto:
-                                                                                                 case ScrollBarVisibilityMode.Always:
-
-                                                                                                     if (!_tableView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars))
-                                                                                                     {
-                                                                                                         _tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
-                                                                                                     }
-                                                                                                     break;
-                                                                                                 case ScrollBarVisibilityMode.Manual:
-                                                                                                 case ScrollBarVisibilityMode.None:
-
-                                                                                                     if (_tableView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars))
-                                                                                                     {
-                                                                                                         _tableView.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
-                                                                                                     }
-                                                                                                     break;
+                                                                                                 _tableView.ViewportSettings |=
+                                                                                                     ViewportSettingsFlags.HasScrollBars;
                                                                                              }
 
-                                                                                             switch (state)
+                                                                                             break;
+
+                                                                                         case ScrollBarVisibilityMode.Manual:
+                                                                                         case ScrollBarVisibilityMode.None:
+
+                                                                                             if (_tableView.ViewportSettings.HasFlag (ViewportSettingsFlags
+                                                                                                     .HasScrollBars))
                                                                                              {
-                                                                                                 case ScrollBarVisibilityMode.Manual:
-                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
-                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Manual;
-                                                                                                     break;
-                                                                                                 case ScrollBarVisibilityMode.Auto:
-                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
-                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Auto;
-                                                                                                     break;
-                                                                                                 case ScrollBarVisibilityMode.Always:
-                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Always;
-                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.Always;
-                                                                                                     break;
-                                                                                                 case ScrollBarVisibilityMode.None:
-                                                                                                     _tableView!.HorizontalScrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
-                                                                                                     _tableView!.VerticalScrollBar.VisibilityMode = ScrollBarVisibilityMode.None;
-                                                                                                     break;
+                                                                                                 _tableView.ViewportSettings &=
+                                                                                                     ~ViewportSettingsFlags.HasScrollBars;
                                                                                              }
-                                                                                             _tableView!.Update ();
-                                                                                         }),
-                                                           new Line (),
-                                                           CreateCheckBoxMenuItem ("UseAllRowsForContentCalculation",
-                                                                                   "_UseAllRowsForContentCalculation",
-                                                                                   _tableView!.UseAllRowsForContentCalculation,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.UseAllRowsForContentCalculation = state;
-                                                                                       _tableView!.Update ();
-                                                                                   }),
-                                                           new MenuItem
-                                                           {
-                                                               Title = "_AllLines",
-                                                               Action = () =>
-                                                                        {
-                                                                            _tableView!.Style.ShowHorizontalHeaderOverline = true;
-                                                                            _tableView!.Style.ShowVerticalHeaderLines = true;
-                                                                            _tableView!.Style.ShowHorizontalHeaderUnderline = true;
-                                                                            _tableView!.Style.ShowVerticalCellLines = true;
 
-                                                                            checkboxes ["HeaderOverline"].Value = CheckState.Checked;
-                                                                            checkboxes ["HeaderMidline"].Value = CheckState.Checked;
-                                                                            checkboxes ["HeaderUnderline"].Value = CheckState.Checked;
-                                                                            checkboxes ["CellLines"].Value = CheckState.Checked;
+                                                                                             break;
+                                                                                     }
 
-                                                                            _tableView!.Update ();
-                                                                        }
-                                                           },
-                                                           new MenuItem
-                                                           {
-                                                               Title = "_NoLines",
-                                                               Action = () =>
-                                                                        {
-                                                                            _tableView!.Style.ShowHorizontalHeaderOverline = false;
-                                                                            _tableView!.Style.ShowVerticalHeaderLines = false;
-                                                                            _tableView!.Style.ShowHorizontalHeaderUnderline = false;
-                                                                            _tableView!.Style.ShowVerticalCellLines = false;
+                                                                                     switch (state)
+                                                                                     {
+                                                                                         case ScrollBarVisibilityMode.Manual:
+                                                                                             _tableView!.HorizontalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.Manual;
 
-                                                                            checkboxes ["HeaderOverline"].Value = CheckState.UnChecked;
-                                                                            checkboxes ["HeaderMidline"].Value = CheckState.UnChecked;
-                                                                            checkboxes ["HeaderUnderline"].Value = CheckState.UnChecked;
-                                                                            checkboxes ["CellLines"].Value = CheckState.UnChecked;
+                                                                                             _tableView!.VerticalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.Manual;
 
-                                                                            _tableView!.Update ();
-                                                                        }
-                                                           },
-                                                           CreateCheckBoxMenuItem (
-                                                                                   "Checkboxes",
-                                                                                   "_Checkboxes",
-                                                                                   false,
-                                                                                   state =>
-                                                                                   {
-                                                                                       if (state)
-                                                                                       {
-                                                                                           ToggleCheckboxes (false);
-                                                                                           checkboxes ["Radioboxes"].Value = CheckState.UnChecked;
-                                                                                       }
-                                                                                       else if (HasCheckboxes ())
-                                                                                       {
-                                                                                           ToggleCheckboxes (false);
-                                                                                       }
-                                                                                   }
-                                                                                  ),
-                                                           CreateCheckBoxMenuItem (
-                                                                                   "Radioboxes",
-                                                                                   "_Radioboxes",
-                                                                                   false,
-                                                                                   state =>
-                                                                                   {
-                                                                                       if (state)
-                                                                                       {
-                                                                                           ToggleCheckboxes (true);
-                                                                                           checkboxes ["Checkboxes"].Value = CheckState.UnChecked;
-                                                                                       }
-                                                                                       else if (HasCheckboxes ())
-                                                                                       {
-                                                                                           ToggleCheckboxes (true);
-                                                                                       }
-                                                                                   }
-                                                                                  ),
-                                                           CreateCheckBoxMenuItem (
-                                                                                   "AlternatingColors",
-                                                                                   "Alternating Colors",
-                                                                                   false,
-                                                                                   state =>
-                                                                                   {
-                                                                                       if (state)
-                                                                                       {
-                                                                                           _tableView!.Style.RowColorGetter = a => a.RowIndex % 2 == 0 ? _alternatingScheme : null;
-                                                                                       }
-                                                                                       else
-                                                                                       {
-                                                                                           _tableView!.Style.RowColorGetter = null;
-                                                                                       }
+                                                                                             break;
 
-                                                                                       _tableView!.SetNeedsDraw ();
-                                                                                   }),
-                                                           CreateCheckBoxMenuItem ("Cursor",
-                                                                                   "Invert Selected Cell First Character",
-                                                                                   _tableView!.Style.InvertSelectedCellFirstCharacter,
-                                                                                   state =>
-                                                                                   {
-                                                                                       _tableView!.Style.InvertSelectedCellFirstCharacter = state;
-                                                                                       _tableView!.SetNeedsDraw ();
-                                                                                   }),
-                                                           new MenuItem { Title = "_ClearColumnStyles", Action = ClearColumnStyles },
-                                                           new MenuItem { Title = "Sho_w All Columns", Action = ShowAllColumns }
-                                                       ]);
+                                                                                         case ScrollBarVisibilityMode.Auto:
+                                                                                             _tableView!.HorizontalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.Auto;
+
+                                                                                             _tableView!.VerticalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.Auto;
+
+                                                                                             break;
+
+                                                                                         case ScrollBarVisibilityMode.Always:
+                                                                                             _tableView!.HorizontalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.Always;
+
+                                                                                             _tableView!.VerticalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.Always;
+
+                                                                                             break;
+
+                                                                                         case ScrollBarVisibilityMode.None:
+                                                                                             _tableView!.HorizontalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.None;
+
+                                                                                             _tableView!.VerticalScrollBar.VisibilityMode =
+                                                                                                 ScrollBarVisibilityMode.None;
+
+                                                                                             break;
+                                                                                     }
+                                                                                     _tableView!.Update ();
+                                                                                 }),
+                                                   new Line (),
+                                                   CreateCheckBoxMenuItem ("UseAllRowsForContentCalculation",
+                                                                           "_UseAllRowsForContentCalculation",
+                                                                           _tableView!.UseAllRowsForContentCalculation,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.UseAllRowsForContentCalculation = state;
+                                                                               _tableView!.Update ();
+                                                                           }),
+                                                   new MenuItem
+                                                   {
+                                                       Title = "_AllLines",
+                                                       Action = () =>
+                                                                {
+                                                                    _tableView!.Style.ShowHorizontalHeaderOverline = true;
+                                                                    _tableView!.Style.ShowVerticalHeaderLines = true;
+                                                                    _tableView!.Style.ShowHorizontalHeaderUnderline = true;
+                                                                    _tableView!.Style.ShowVerticalCellLines = true;
+
+                                                                    checkboxes ["HeaderOverline"].Value = CheckState.Checked;
+                                                                    checkboxes ["HeaderMidline"].Value = CheckState.Checked;
+                                                                    checkboxes ["HeaderUnderline"].Value = CheckState.Checked;
+                                                                    checkboxes ["CellLines"].Value = CheckState.Checked;
+
+                                                                    _tableView!.Update ();
+                                                                }
+                                                   },
+                                                   new MenuItem
+                                                   {
+                                                       Title = "_NoLines",
+                                                       Action = () =>
+                                                                {
+                                                                    _tableView!.Style.ShowHorizontalHeaderOverline = false;
+                                                                    _tableView!.Style.ShowVerticalHeaderLines = false;
+                                                                    _tableView!.Style.ShowHorizontalHeaderUnderline = false;
+                                                                    _tableView!.Style.ShowVerticalCellLines = false;
+
+                                                                    checkboxes ["HeaderOverline"].Value = CheckState.UnChecked;
+                                                                    checkboxes ["HeaderMidline"].Value = CheckState.UnChecked;
+                                                                    checkboxes ["HeaderUnderline"].Value = CheckState.UnChecked;
+                                                                    checkboxes ["CellLines"].Value = CheckState.UnChecked;
+
+                                                                    _tableView!.Update ();
+                                                                }
+                                                   },
+                                                   CreateCheckBoxMenuItem ("Checkboxes",
+                                                                           "_Checkboxes",
+                                                                           false,
+                                                                           state =>
+                                                                           {
+                                                                               if (state)
+                                                                               {
+                                                                                   ToggleCheckboxes (false);
+                                                                                   checkboxes ["Radioboxes"].Value = CheckState.UnChecked;
+                                                                               }
+                                                                               else if (HasCheckboxes ())
+                                                                               {
+                                                                                   ToggleCheckboxes (false);
+                                                                               }
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("Radioboxes",
+                                                                           "_Radioboxes",
+                                                                           false,
+                                                                           state =>
+                                                                           {
+                                                                               if (state)
+                                                                               {
+                                                                                   ToggleCheckboxes (true);
+                                                                                   checkboxes ["Checkboxes"].Value = CheckState.UnChecked;
+                                                                               }
+                                                                               else if (HasCheckboxes ())
+                                                                               {
+                                                                                   ToggleCheckboxes (true);
+                                                                               }
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("AlternatingColors",
+                                                                           "Alternating Colors",
+                                                                           false,
+                                                                           state =>
+                                                                           {
+                                                                               if (state)
+                                                                               {
+                                                                                   _tableView!.Style.RowColorGetter =
+                                                                                       a => a.RowIndex % 2 == 0 ? _alternatingScheme : null;
+                                                                               }
+                                                                               else
+                                                                               {
+                                                                                   _tableView!.Style.RowColorGetter = null;
+                                                                               }
+
+                                                                               _tableView!.SetNeedsDraw ();
+                                                                           }),
+                                                   CreateCheckBoxMenuItem ("Cursor",
+                                                                           "Invert Selected Cell First Character",
+                                                                           _tableView!.Style.InvertSelectedCellFirstCharacter,
+                                                                           state =>
+                                                                           {
+                                                                               _tableView!.Style.InvertSelectedCellFirstCharacter = state;
+                                                                               _tableView!.SetNeedsDraw ();
+                                                                           }),
+                                                   new MenuItem { Title = "_ClearColumnStyles", Action = ClearColumnStyles },
+                                                   new MenuItem { Title = "Sho_w All Columns", Action = ShowAllColumns }
+                                               ]);
 
         return viewMenuBarItem;
 
         MenuItem CreateCheckBoxMenuItem (string key, string title, bool initialState, Action<bool> onToggle)
         {
-            CheckBox checkBox = new ()
-            {
-                Title = title,
-                Value = initialState ? CheckState.Checked : CheckState.UnChecked
-            };
+            CheckBox checkBox = new () { Title = title, Value = initialState ? CheckState.Checked : CheckState.UnChecked };
 
             checkBox.ValueChanged += (_, _) => onToggle (checkBox.Value == CheckState.Checked);
 
@@ -608,9 +626,7 @@ public class TableEditor : Scenario
         {
             OptionSelector<T> optionSelector = new ()
             {
-                Title = title,
-                Labels = Enum.GetValues<T> ().Select (v => v.ToString ()).ToArray (),
-                Value = initialState
+                Title = title, Labels = Enum.GetValues<T> ().Select (v => v.ToString ()).ToArray (), Value = initialState
             };
 
             optionSelector.ValueChanged += (_, e) => onActivate (e.Value!.Value);
@@ -729,7 +745,7 @@ public class TableEditor : Scenario
         var ok = new Button { Text = Strings.btnOk };
         var cancel = new Button { Text = Strings.btnCancel };
         var d = new Dialog { Title = title, Buttons = [cancel, ok] };
-        var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table.ColumnNames [e.Col] };
+        var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table!.ColumnNames [e.Col] };
         var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, 50) };
 
         d.Add (lbl, tf);
@@ -831,7 +847,7 @@ public class TableEditor : Scenario
     {
         // work out new sort order
         string? sort = _currentTable?.DefaultView.Sort;
-        string colName = _tableView!.Table.ColumnNames [clickedCol];
+        string colName = _tableView!.Table!.ColumnNames [clickedCol];
 
         if (sort?.EndsWith ("ASC") ?? false)
         {
@@ -882,6 +898,7 @@ public class TableEditor : Scenario
                                                       });
 
         bool isWindows = OperatingSystem.IsWindows ();
+
         try
         {
             foreach (DriveInfo di in DriveInfo.GetDrives ())
@@ -923,7 +940,7 @@ public class TableEditor : Scenario
 
         ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Value);
 
-        var lbl = new Label { X = 0, Y = 0, Text = $"{_tableView!.Table.ColumnNames [col.Value]}: " };
+        var lbl = new Label { X = 0, Y = 0, Text = $"{_tableView!.Table!.ColumnNames [col.Value]}: " };
         var tf = new TextField { Text = getter (style).ToString (), X = Pos.Right (lbl), Y = 0, Width = 20 };
 
         d.Add (lbl, tf);
@@ -959,7 +976,7 @@ public class TableEditor : Scenario
 
         var dateFormatStyle = new ColumnStyle
         {
-            Alignment = Alignment.End, RepresentationGetter = v => v is DateTime d ? d.ToString ("yyyy-MM-dd") : v.ToString ()
+            Alignment = Alignment.End, RepresentationGetter = v => v is DateTime d ? d.ToString ("yyyy-MM-dd") : v.ToString () ?? string.Empty
         };
 
         var negativeRight = new ColumnStyle
@@ -1019,7 +1036,7 @@ public class TableEditor : Scenario
 
     private void SetMinAcceptableWidthToOne ()
     {
-        for (var i = 0; i < _tableView!.Table.Columns; i++)
+        for (var i = 0; i < _tableView!.Table!.Columns; i++)
         {
             ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (i);
             style.MinAcceptableWidth = 1;
@@ -1087,12 +1104,12 @@ public class TableEditor : Scenario
         }
 
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
-        string colName = _tableView!.Table.ColumnNames [clickedCol];
+        string colName = _tableView!.Table!.ColumnNames [clickedCol];
 
         PopoverMenu contextMenu = new ([
-                                            new MenuItem ($"Hide {TrimArrows (colName)}", "", () => HideColumn (clickedCol)),
-                                            new MenuItem ($"Sort {StripArrows (sort)}", "", () => SortColumn (clickedCol, sort, isAsc))
-                                        ]);
+                                           new MenuItem ($"Hide {TrimArrows (colName)}", "", () => HideColumn (clickedCol)),
+                                           new MenuItem ($"Sort {StripArrows (sort)}", "", () => SortColumn (clickedCol, sort, isAsc))
+                                       ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
@@ -1208,7 +1225,7 @@ public class TableEditor : Scenario
         }
         else
         {
-            source = new CheckBoxTableSourceWrapperByIndex (_tableView, _tableView!.Table) { UseRadioButtons = radio };
+            source = new CheckBoxTableSourceWrapperByIndex (_tableView, _tableView!.Table!) { UseRadioButtons = radio };
         }
 
         _tableView!.Table = source;
