@@ -3,9 +3,48 @@ using Terminal.Gui.Tracing;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
-///     <see cref="MenuItem"/>.
+///     A vertically-oriented <see cref="Bar"/> that contains <see cref="MenuItem"/> items, supporting cascading
+///     sub-menus, selection tracking, and the <see cref="IValue{T}"/> pattern.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="Menu"/> extends <see cref="Bar"/> with vertical orientation and specializes it for
+///         <see cref="MenuItem"/> items. It supports <see cref="Line"/> separators between items and uses the
+///         <see cref="SchemeManager.SchemesToSchemeName">Schemes.Menu</see> color scheme by default.
+///     </para>
+///     <para>
+///         <b>Selection Tracking:</b> The <see cref="SelectedMenuItem"/> property tracks the currently focused
+///         <see cref="MenuItem"/>. The <see cref="SelectedMenuItemChanged"/> event fires when the selection changes.
+///         <see cref="OnSelectedMenuItemChanged"/> automatically hides peer SubMenus and shows the selected item's
+///         <see cref="MenuItem.SubMenu"/> with positioning relative to the parent <see cref="Menu"/>.
+///     </para>
+///     <para>
+///         <b>Command Propagation:</b> Sets <see cref="View.CommandsToBubbleUp"/> to
+///         [<see cref="Command.Accept"/>, <see cref="Command.Activate"/>], enabling commands from
+///         <see cref="MenuItem"/> items to propagate up through the menu hierarchy (e.g., through
+///         <see cref="PopoverMenu"/> and back to a <see cref="MenuBarItem"/>). Overrides
+///         <see cref="View.OnActivating"/> to dispatch <see cref="Command.Activate"/> to the focused
+///         <see cref="MenuItem"/>.
+///     </para>
+///     <para>
+///         <b>IValue Support:</b> Implements <see cref="IValue{T}"/> where <c>T</c> is <see cref="MenuItem"/>.
+///         The <see cref="Value"/> property is automatically set when a <see cref="MenuItem"/> is activated or
+///         accepted, enabling callers to determine which item triggered the command.
+///     </para>
+///     <para>
+///         <b>Hierarchy Traversal:</b> Use <see cref="GetAllSubMenus"/> for depth-first traversal of the
+///         SubMenu hierarchy, and <see cref="GetMenuItemsOfAllSubMenus"/> to collect all <see cref="MenuItem"/>s
+///         across the hierarchy with an optional predicate filter.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         details on the <see cref="Shortcut"/> base class and command routing patterns.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         full menu system architecture, class hierarchy, command routing, and usage examples.
+///     </para>
+/// </remarks>
 public class Menu : Bar, IValue<MenuItem?>
 {
     /// <summary>

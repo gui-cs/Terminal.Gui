@@ -838,12 +838,12 @@ public class FileDialog : Dialog, IDesignable
         {
             isAsc = false;
 
-            return string.Format (Strings.fdCtxSortDesc, _tableView.Table.ColumnNames [clickedCol]);
+            return string.Format (Strings.fdCtxSortDesc, _tableView.Table!.ColumnNames [clickedCol]);
         }
 
         isAsc = true;
 
-        return string.Format (Strings.fdCtxSortAsc, _tableView.Table.ColumnNames [clickedCol]);
+        return string.Format (Strings.fdCtxSortAsc, _tableView.Table!.ColumnNames [clickedCol]);
     }
 
     private string GetUpButtonText () => Style.UseUnicodeCharacters ? "◭" : "▲";
@@ -1154,7 +1154,7 @@ public class FileDialog : Dialog, IDesignable
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
         PopoverMenu? contextMenu = new ([
-                                            new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table.ColumnNames [clickedCol])),
+                                            new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
                                                           string.Empty,
                                                           () => HideColumn (clickedCol)),
                                             new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
