@@ -108,8 +108,17 @@ public class MenuItem : Shortcut, IValue
             // Forward Title changes to ValueChangedUntyped
             if (value is { })
             {
-                TitleChanged += OnTitleChangedForValueChanged;
+                bool hadHandlers = _valueChangedUntypedHandlers is not null;
+
                 _valueChangedUntypedHandlers += value;
+
+                // Wire up the bridge only when the first handler is added
+                if (!hadHandlers)
+                {
+                    // Initialize last known title so OldValue is correct on first change
+                    _lastTitle = Title;
+                    TitleChanged += OnTitleChangedForValueChanged;
+                }
             }
         }
         remove
