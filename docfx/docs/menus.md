@@ -538,7 +538,8 @@ MenuBar menuBar = new ([
 ### CheckBox in Menu
 
 ```csharp
-CheckBox wordWrapCheckBox = new () { Title = "_Word Wrap" };
+// Set CommandView.CanFocus = false to ensure the MenuItem receives activation for the CheckBox
+CheckBox wordWrapCheckBox = new () { Title = "_Word Wrap", CanFocus = false };
 wordWrapCheckBox.CheckedStateChanging += (_, e) =>
 {
     editor.WordWrap = e.NewValue == CheckState.Checked;
