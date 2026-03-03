@@ -485,7 +485,7 @@ Application.Popover?.Register (commandPalette);
 - `PopoverImpl` - Abstract base class providing standard popover behavior (implements `IPopoverView`)
 - `Popover<TView, TResult>` - Generic base class for popovers hosting typed content views with result extraction
 - <xref:Terminal.Gui.Views.PopoverMenu> - Cascading menu implementation (`Popover<Menu, MenuItem>`)
-- <xref:Terminal.Gui.Views.EditDropDown> - Dropdown/combo-box control (`TextField` with `Popover<ListView, string?>`)
+- <xref:Terminal.Gui.Views.DropDownList> - Dropdown/combo-box control (`TextField` with `Popover<ListView, string?>`)
 - <xref:Terminal.Gui.App.ApplicationPopover> - Popover manager (accessed via `Application.Popover`)
 
 ## See Also

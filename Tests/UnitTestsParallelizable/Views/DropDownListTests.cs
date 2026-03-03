@@ -2,14 +2,14 @@ using System.Collections.ObjectModel;
 
 namespace ViewsTests;
 
-public class EditDropDownTests
+public class DropDownListTests
 {
     // Claude - Opus 4.5
 
     [Fact]
     public void Constructor_InitializesDefaults ()
     {
-        EditDropDown dropdown = new ();
+        DropDownList dropdown = new ();
 
         Assert.NotNull (dropdown);
         Assert.True (dropdown.ReadOnly);
@@ -19,7 +19,7 @@ public class EditDropDownTests
     [Fact]
     public void Source_GetSet ()
     {
-        EditDropDown dropdown = new ();
+        DropDownList dropdown = new ();
         ObservableCollection<string> items = ["Item1", "Item2", "Item3"];
         ListWrapper<string> source = new (items);
 
@@ -35,7 +35,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2"]))
         };
@@ -58,10 +58,10 @@ public class EditDropDownTests
         IEnumerable<IPopoverView> popovers = app.Popovers.Popovers;
         // TextField creates a context menu, so we have 2 popovers
         Assert.Equal (2, popovers.Count ());
-        // Find the EditDropDown popover (not the context menu)
-        IPopoverView? editDropDownPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "editDropDownPopover");
-        Assert.NotNull (editDropDownPopover);
-        Assert.True (editDropDownPopover.Visible);
+        // Find the DropDownList popover (not the context menu)
+        IPopoverView? dropDownListPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "dropDownListPopover");
+        Assert.NotNull (dropDownListPopover);
+        Assert.True (dropDownListPopover.Visible);
 
         app.Dispose ();
     }
@@ -73,7 +73,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2"]))
         };
@@ -90,10 +90,10 @@ public class EditDropDownTests
         IEnumerable<IPopoverView> popovers = app.Popovers.Popovers;
         // TextField creates a context menu, so we have 2 popovers
         Assert.Equal (2, popovers.Count ());
-        // Find the EditDropDown popover (not the context menu)
-        IPopoverView? editDropDownPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "editDropDownPopover");
-        Assert.NotNull (editDropDownPopover);
-        Assert.True (editDropDownPopover.Visible);
+        // Find the DropDownList popover (not the context menu)
+        IPopoverView? dropDownListPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "dropDownListPopover");
+        Assert.NotNull (dropDownListPopover);
+        Assert.True (dropDownListPopover.Visible);
 
         app.Dispose ();
     }
@@ -105,7 +105,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2"]))
         };
@@ -122,10 +122,10 @@ public class EditDropDownTests
         IEnumerable<IPopoverView> popovers = app.Popovers.Popovers;
         // TextField creates a context menu, so we have 2 popovers
         Assert.Equal (2, popovers.Count ());
-        // Find the EditDropDown popover (not the context menu)
-        IPopoverView? editDropDownPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "editDropDownPopover");
-        Assert.NotNull (editDropDownPopover);
-        Assert.True (editDropDownPopover.Visible);
+        // Find the DropDownList popover (not the context menu)
+        IPopoverView? dropDownListPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "dropDownListPopover");
+        Assert.NotNull (dropDownListPopover);
+        Assert.True (dropDownListPopover.Visible);
 
         app.Dispose ();
     }
@@ -133,7 +133,7 @@ public class EditDropDownTests
     [Fact]
     public void ReadOnlyMode_PreventsTextEditing ()
     {
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             ReadOnly = true,
             Text = "Initial"
@@ -152,7 +152,7 @@ public class EditDropDownTests
     [Fact]
     public void EditableMode_AllowsTextEditing ()
     {
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             ReadOnly = false,
             Text = "Initial"
@@ -175,7 +175,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2", "Item3"])),
             ReadOnly = true
@@ -213,7 +213,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2", "Item3"])),
             ReadOnly = true,
@@ -252,7 +252,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2", "Item3"])),
             ReadOnly = true,
@@ -286,7 +286,7 @@ public class EditDropDownTests
         app.Popovers = popoverManager;
 
         ObservableCollection<string> items = ["Item1", "Item2", "Item3"];
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (items),
             ReadOnly = true,
@@ -301,7 +301,7 @@ public class EditDropDownTests
         dropdown.NewKeyDownEvent (Key.F4);
 
         // Get the popover's ListView (filter out the context menu)
-        IPopoverView? popover = app.Popovers?.Popovers.FirstOrDefault (p => (p as View)?.Id == "editDropDownPopover");
+        IPopoverView? popover = app.Popovers?.Popovers.FirstOrDefault (p => (p as View)?.Id == "dropDownListPopover");
         Assert.NotNull (popover);
 
         // Access the ListView (popover is Popover<ListView, string?>)
@@ -321,7 +321,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2"]))
         };
@@ -336,15 +336,15 @@ public class EditDropDownTests
         IEnumerable<IPopoverView> popovers = app.Popovers!.Popovers;
         // TextField creates a context menu, so we have 2 popovers
         Assert.Equal (2, popovers.Count ());
-        // Find the EditDropDown popover (not the context menu)
-        IPopoverView? editDropDownPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "editDropDownPopover");
-        Assert.NotNull (editDropDownPopover);
-        Assert.True (editDropDownPopover.Visible);
+        // Find the DropDownList popover (not the context menu)
+        IPopoverView? dropDownListPopover = popovers.FirstOrDefault (p => (p as View)?.Id == "dropDownListPopover");
+        Assert.NotNull (dropDownListPopover);
+        Assert.True (dropDownListPopover.Visible);
 
         // Close with F4 again
         dropdown.NewKeyDownEvent (Key.F4);
 
-        Assert.False (editDropDownPopover.Visible);
+        Assert.False (dropDownListPopover.Visible);
 
         app.Dispose ();
     }
@@ -356,7 +356,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2"]))
         };
@@ -367,10 +367,10 @@ public class EditDropDownTests
         // Initially, no popovers registered (not focused yet)
         Assert.Empty (app.Popovers!.Popovers);
 
-        // Set focus - should auto-register both context menu and EditDropDown popover
+        // Set focus - should auto-register both context menu and DropDownList popover
         dropdown.SetFocus ();
 
-        // Now both context menu and EditDropDown popover are registered
+        // Now both context menu and DropDownList popover are registered
         Assert.Equal (2, app.Popovers.Popovers.Count ());
 
         app.Dispose ();
@@ -383,7 +383,7 @@ public class EditDropDownTests
         ApplicationPopover popoverManager = new () { App = app };
         app.Popovers = popoverManager;
 
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2"]))
         };
@@ -395,10 +395,10 @@ public class EditDropDownTests
         // Open dropdown
         dropdown.NewKeyDownEvent (Key.F4);
 
-        // Both context menu and EditDropDown popover are registered
+        // Both context menu and DropDownList popover are registered
         Assert.Equal (2, app.Popovers!.Popovers.Count ());
 
-        // Dispose dropdown - should deregister EditDropDown popover and context menu
+        // Dispose dropdown - should deregister DropDownList popover and context menu
         dropdown.Dispose ();
 
         // Both popovers should be deregistered when dropdown is disposed
@@ -410,7 +410,7 @@ public class EditDropDownTests
     [Fact]
     public void IValue_InterfaceWorks ()
     {
-        EditDropDown dropdown = new ()
+        DropDownList dropdown = new ()
         {
             Text = "Initial"
         };

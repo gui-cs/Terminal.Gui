@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("EditDropDown", "Demonstrates the EditDropDown control.")]
+[ScenarioMetadata ("DropDownList", "Demonstrates the DropDownList control.")]
 [ScenarioCategory ("Controls")]
-public class EditDropDownExample : Scenario
+public class DropDownListExample : Scenario
 {
     private IApplication? _app;
     private EventLog? _eventLog;
@@ -39,7 +39,7 @@ public class EditDropDownExample : Scenario
             Width = Dim.Fill (_eventLog!),
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Single,
-            Title = "EditDropDown Examples"
+            Title = "DropDownList Examples"
         };
 
         // Sample data
@@ -77,7 +77,7 @@ public class EditDropDownExample : Scenario
             Text = "ReadOnly Mode (default):"
         };
 
-        EditDropDown readOnlyDropDown = new ()
+        DropDownList readOnlyDropDown = new ()
         {
             X = 1,
             Y = Pos.Bottom (readOnlyLabel),
@@ -113,7 +113,7 @@ public class EditDropDownExample : Scenario
             Text = "Editable Mode:"
         };
 
-        EditDropDown editableDropDown = new ()
+        DropDownList editableDropDown = new ()
         {
             X = 1,
             Y = Pos.Bottom (editableLabel),
@@ -149,7 +149,7 @@ public class EditDropDownExample : Scenario
             Text = "Different Positions:"
         };
 
-        EditDropDown topLeftDropDown = new ()
+        DropDownList topLeftDropDown = new ()
         {
             X = 1,
             Y = Pos.Bottom (positionLabel),
@@ -165,7 +165,7 @@ public class EditDropDownExample : Scenario
             _eventLog?.Log ($"TopLeft: Selected '{e.NewValue}'");
         };
 
-        EditDropDown topRightDropDown = new ()
+        DropDownList topRightDropDown = new ()
         {
             X = Pos.Right (topLeftDropDown) + 2,
             Y = Pos.Top (topLeftDropDown),
@@ -181,7 +181,7 @@ public class EditDropDownExample : Scenario
             _eventLog?.Log ($"TopRight: Selected '{e.NewValue}'");
         };
 
-        EditDropDown bottomLeftDropDown = new ()
+        DropDownList bottomLeftDropDown = new ()
         {
             X = 1,
             Y = Pos.AnchorEnd (2),
@@ -197,7 +197,7 @@ public class EditDropDownExample : Scenario
             _eventLog?.Log ($"BottomLeft: Selected '{e.NewValue}'");
         };
 
-        EditDropDown bottomRightDropDown = new ()
+        DropDownList bottomRightDropDown = new ()
         {
             X = Pos.Right (bottomLeftDropDown) + 2,
             Y = Pos.Top (bottomLeftDropDown),

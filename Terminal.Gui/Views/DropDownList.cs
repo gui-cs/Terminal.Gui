@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="EditDropDown"/> provides a modern dropdown control that can operate in two modes:
+///         <see cref="DropDownList"/> provides a modern dropdown control that can operate in two modes:
 ///     </para>
 ///     <list type="bullet">
 ///         <item>
@@ -36,7 +36,7 @@ namespace Terminal.Gui.Views;
 ///         <b>Usage Example:</b>
 ///     </para>
 ///     <code>
-///         var dropdown = new EditDropDown
+///         var dropdown = new DropDownList
 ///         {
 ///             Source = new ListWrapper&lt;string&gt; (["Option 1", "Option 2", "Option 3"]),
 ///             ReadOnly = true,
@@ -45,15 +45,15 @@ namespace Terminal.Gui.Views;
 ///         dropdown.ValueChanged += (s, e) => MessageBox.Query ("Selected", dropdown.Text, "Ok");
 ///     </code>
 /// </remarks>
-public class EditDropDown : TextField
+public class DropDownList : TextField
 {
     private Button? _toggleButton;
     private Popover<ListView, string?>? _listPopover;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="EditDropDown"/> class.
+    ///     Initializes a new instance of the <see cref="DropDownList"/> class.
     /// </summary>
-    public EditDropDown ()
+    public DropDownList ()
     {
         ReadOnly = true; // Default to readonly mode
 
@@ -71,7 +71,7 @@ public class EditDropDown : TextField
         };
 
 #if DEBUG
-        _toggleButton.Id = "editDropDownToggleButton";
+        _toggleButton.Id = "dropDownListToggleButton";
 #endif
 
         _toggleButton.Accepting += ToggleButton_Accepting;
@@ -91,7 +91,7 @@ public class EditDropDown : TextField
         };
 
 #if DEBUG
-        _listPopover.Id = "editDropDownPopover";
+        _listPopover.Id = "dropDownListPopover";
 #endif
 
         // Configure result extraction
@@ -117,12 +117,12 @@ public class EditDropDown : TextField
         AddCommand (Command.Toggle, ToggleDropDown);
 
         // Subscribe to focus events for auto-registration
-        HasFocusChanged += EditDropDown_HasFocusChanged;
+        HasFocusChanged += DropDownList_HasFocusChanged;
 
-        Initialized += EditDropDown_Initialized;
+        Initialized += DropDownList_Initialized;
     }
 
-    private void EditDropDown_Initialized (object? sender, EventArgs e)
+    private void DropDownList_Initialized (object? sender, EventArgs e)
     {
         // Set target for command bridging
         if (_listPopover is { })
@@ -131,9 +131,9 @@ public class EditDropDown : TextField
         }
     }
 
-    private void EditDropDown_HasFocusChanged (object? sender, HasFocusEventArgs e)
+    private void DropDownList_HasFocusChanged (object? sender, HasFocusEventArgs e)
     {
-        // Auto-register popover when EditDropDown gains focus
+        // Auto-register popover when DropDownList gains focus
         if (e.NewValue && _listPopover is { } && App?.Popovers is { })
         {
             if (!App.Popovers.IsRegistered (_listPopover))
@@ -162,7 +162,7 @@ public class EditDropDown : TextField
     }
 
     /// <summary>
-    ///     Provides the anchor rectangle for positioning the popover below the EditDropDown.
+    ///     Provides the anchor rectangle for positioning the popover below the DropDownList.
     /// </summary>
     private Rectangle? GetAnchor ()
     {
@@ -319,8 +319,8 @@ public class EditDropDown : TextField
                 _listPopover = null;
             }
 
-            HasFocusChanged -= EditDropDown_HasFocusChanged;
-            Initialized -= EditDropDown_Initialized;
+            HasFocusChanged -= DropDownList_HasFocusChanged;
+            Initialized -= DropDownList_Initialized;
         }
 
         base.Dispose (disposing);
