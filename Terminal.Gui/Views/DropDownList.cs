@@ -91,7 +91,28 @@ public class DropDownList : TextField
         _toggleButton.Accepted += (_, _) => ToggleDropDown (); // Toggle dropdown on button click
 
         // Create ListView for popover
-        ListView listView = new () { Width = Dim.Auto (DimAutoStyle.Content), Height = Dim.Auto (DimAutoStyle.Content, 1, 10) };
+        ListView listView = new ()
+        {
+            Width = Dim.Auto (DimAutoStyle.Content),
+            Height = Dim.Auto (DimAutoStyle.Content,
+                               1,
+                               Dim.Func (_ =>
+                                         {
+                                             int screenHeight = Driver?.Screen.Height ?? 0;
+                                             Rectangle frame = FrameToScreen ();
+                                             int spaceBelow = screenHeight - frame.Bottom;
+                                             int spaceAbove = frame.Top;
+
+                                             // Use the larger of the two directions since GetAdjustedPosition
+                                             // will flip the popover above when it doesn't fit below.
+                                             int available = Math.Max (spaceBelow, spaceAbove);
+
+                                             return Math.Min (Source?.Count ?? 0, Math.Max (1, available));
+                                         }))
+
+            // BUGBUG: There is something wrong with scrollbars w/in a Popover
+            // ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+        };
 
         // Create popover
         _listPopover = new Popover<ListView, string?> (listView) { Anchor = GetAnchor };

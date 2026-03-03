@@ -45,30 +45,36 @@ public class DropDownListExample : Scenario
         // Sample data
         ObservableCollection<string> countries =
         [
-            "Argentina",
-            "Brazil",
+            "United States",
             "Canada",
-            "Denmark",
-            "Egypt",
-            "France",
+            "Mexico",
+            "Brazil",
+            "Argentina",
+            "United Kingdom",
             "Germany",
-            "Hungary",
+            "France",
+            "Italy",
+            "Spain",
+            "Russia",
+            "China",
+            "Japan",
             "India",
-            "Japan"
+            "Australia",
+            "South Africa",
+            "Egypt",
+            "Nigeria",
+            "Kenya",
+            "Morocco"
         ];
 
-        ObservableCollection<string> colors =
+        ObservableCollection<string> colors = new (ColorStrings.GetStandardColorNames ());
+
+        ObservableCollection<string> longGermanWords =
         [
-            "Red",
-            "Green",
-            "Blue",
-            "Yellow",
-            "Orange",
-            "Purple",
-            "Pink",
-            "Brown",
-            "Black",
-            "White"
+            "Donaudampfschifffahrtsgesellschaftskapitän",
+            "Rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz",
+            "Rechtsschutzversicherungsgesellschaft",
+            "Grundstücksverkehrsgenehmigungszuständigkeitsübertragungsverordnung"
         ];
 
         // ReadOnly Mode Example
@@ -76,12 +82,12 @@ public class DropDownListExample : Scenario
 
         DropDownList readOnlyDropDown = new ()
         {
-            X = Pos.Right(readOnlyLabel) + 1,
+            X = Pos.Right (readOnlyLabel) + 1,
             Y = Pos.Top (readOnlyLabel),
-            Title = "Select Country",
-            Source = new ListWrapper<string> (countries),
+            Title = "Select Color",
+            Source = new ListWrapper<string> (colors),
             ReadOnly = true,
-            Text = "Canada"
+            Text = "Red"
         };
 
         readOnlyDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"ReadOnly: ValueChanged - OldValue: '{e.OldValue}', NewValue: '{e.NewValue}'"); };
@@ -112,32 +118,32 @@ public class DropDownListExample : Scenario
                                           };
 
         // Different positions example
-        Label positionLabel = new () { X = 1, Y = Pos.Bottom (editableDropDown) + 1, Text = "Different Positions (with Borders):" };
+        Label positionLabel = new () { X = 1, Y = Pos.Bottom (editableDropDown) + 1, Text = "Different Positions (with Borders and Resizable right sides):" };
 
         DropDownList topLeftDropDown = new ()
         {
             X = 1,
             Y = Pos.Bottom (positionLabel),
-            Width = 25,
             Title = "Top-Left",
             Source = new ListWrapper<string> (countries),
             ReadOnly = true,
             Text = "Argentina",
-            BorderStyle = LineStyle.Dotted
+            BorderStyle = LineStyle.Dotted,
+            Arrangement = ViewArrangement.RightResizable
         };
 
         topLeftDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"TopLeft: Selected '{e.NewValue}'"); };
 
         DropDownList topRightDropDown = new ()
         {
-            X = Pos.Right (topLeftDropDown) + 2,
+            X = Pos.AnchorEnd (),
             Y = Pos.Top (topLeftDropDown),
-            Width = 25,
             Title = "Top-Right",
-            Source = new ListWrapper<string> (colors),
+            Source = new ListWrapper<string> (longGermanWords),
             ReadOnly = true,
-            Text = "Red",
-            BorderStyle = LineStyle.Dotted
+            Text = "Rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz",
+            BorderStyle = LineStyle.Dotted,
+            Arrangement = ViewArrangement.RightResizable
         };
 
         topRightDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"TopRight: Selected '{e.NewValue}'"); };
@@ -145,25 +151,27 @@ public class DropDownListExample : Scenario
         DropDownList bottomLeftDropDown = new ()
         {
             X = 1,
-            Y = Pos.AnchorEnd (2),
-            Width = 25,
+            Y = Pos.AnchorEnd (),
             Title = "Bottom-Left",
             Source = new ListWrapper<string> (countries),
             ReadOnly = true,
-            Text = "Japan"
+            Text = "Japan",
+            BorderStyle = LineStyle.Dotted,
+            Arrangement = ViewArrangement.RightResizable
         };
 
         bottomLeftDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"BottomLeft: Selected '{e.NewValue}'"); };
 
         DropDownList bottomRightDropDown = new ()
         {
-            X = Pos.Right (bottomLeftDropDown) + 2,
+            X = Pos.AnchorEnd (),
             Y = Pos.Top (bottomLeftDropDown),
-            Width = 25,
             Title = "Bottom-Right",
-            Source = new ListWrapper<string> (colors),
+            Source = new ListWrapper<string> (longGermanWords),
             ReadOnly = true,
-            Text = "White"
+            Text = "Grundstücksverkehrsgenehmigungszuständigkeitsübertragungsverordnung",
+            BorderStyle = LineStyle.Dotted,
+            Arrangement = ViewArrangement.RightResizable
         };
 
         bottomRightDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"BottomRight: Selected '{e.NewValue}'"); };

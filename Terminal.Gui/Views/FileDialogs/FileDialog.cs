@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 
@@ -37,11 +38,7 @@ public class FileDialog : Dialog, IDesignable
     private readonly TextField _tbFind;
     private readonly TextField _tbPath;
     private readonly TreeView<IFileSystemInfo> _treeView;
-#if MENU_V1
-    private MenuBarItem? _allowedTypeMenu;
-    private MenuBar? _allowedTypeMenuBar;
-    private MenuItem []? _allowedTypeMenuItems;
-#endif
+    private DropDownList _typeFilterDropDown;
     private int _currentSortColumn;
     private bool _currentSortIsAsc = true;
     private bool _disposed;
@@ -143,7 +140,7 @@ public class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (margin: 30, to: _tableViewContainer!),
+            Width = Dim.Fill (30, _tableViewContainer!),
             Height = Dim.Height (_tableViewContainer),
             Visible = false
         };
@@ -177,7 +174,7 @@ public class FileDialog : Dialog, IDesignable
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
         _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
-        
+
         _tableViewContainer.Add (_tableView);
 
         _tableView.Style.ShowHorizontalHeaderOverline = true;
@@ -454,53 +451,22 @@ public class FileDialog : Dialog, IDesignable
         _treeRoots = Style.TreeRootGetter ();
         Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
 
-        
         _treeView.AddObjects (_treeRoots.Keys);
 
-        // if filtering on file type is configured then create the ComboBox and establish
+        // if filtering on file type is configured then create the DropDownList and establish
         // initial filtering by extension(s)
         if (AllowedTypes.Any ())
         {
             CurrentFilter = AllowedTypes [0];
 
-            // Fiddle factor
-            int width = AllowedTypes.Max (a => a.ToString ()!.Length) + 6;
-
-#if MENU_V1
-            _allowedTypeMenu = new (
-                                    "<placeholder>",
-                                    _allowedTypeMenuItems = AllowedTypes.Select (
-                                                                                 (a, i) => new MenuItem (
-                                                                                                         a.ToString (),
-                                                                                                         null,
-                                                                                                         () => { AllowedTypeMenuClicked (i); })
-                                                                                )
-                                                                        .ToArray ()
-                                   );
-
-            _allowedTypeMenuBar = new ()
+            _typeFilterDropDown = new DropDownList
             {
-                Width = width,
+                X = Pos.AnchorEnd (),
                 Y = 1,
-                X = Pos.AnchorEnd (width),
-
-                // TODO: Does not work, if this worked then we could tab to it instead
-                // of having to hit F9
-                CanFocus = true,
-                TabStop = TabBehavior.TabStop,
-                Menus = [_allowedTypeMenu]
+                Source = new ListWrapper<string> (new ObservableCollection<string> (AllowedTypes.Select (a => a.ToString ()!).ToList ())),
+                Value = AllowedTypes [0].ToString () ?? string.Empty
             };
-            AllowedTypeMenuClicked (0);
-
-            // TODO: Using v1's menu bar here is a hack. Need to upgrade this.
-            _allowedTypeMenuBar.DrawingContent += (s, e) =>
-                                                  {
-                                                      _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
-                                                      AddRune (Glyphs.DownArrow);
-                                                  };
-
-            Add (_allowedTypeMenuBar);
-#endif
+            Add (_typeFilterDropDown);
         }
 
         // if no path has been provided
@@ -1094,7 +1060,7 @@ public class FileDialog : Dialog, IDesignable
 
             if (_tableView.Viewport.Y != 0)
             {
-                _tableView.Viewport = _tableView.Viewport with {Y = 0};
+                _tableView.Viewport = _tableView.Viewport with { Y = 0 };
             }
             _tableView.SelectedRow = 0;
 
@@ -1392,7 +1358,7 @@ public class FileDialog : Dialog, IDesignable
         if (visible)
         {
             // When visible, the table view's left edge is a splitter next to the tree
-            _treeView.Width = Dim.Fill (to: _tableViewContainer);
+            _treeView.Width = Dim.Fill (_tableViewContainer);
             _tableViewContainer.X = 30;
             _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
             _tableViewContainer.Border!.Thickness = new Thickness (1, 0, 0, 0);
@@ -1526,7 +1492,7 @@ public class FileDialog : Dialog, IDesignable
                     UpdateChildrenToFound ();
                 }
 
-                Parent.App?.Invoke ((_) => { Parent._spinnerView.Visible = false; });
+                Parent.App?.Invoke (_ => { Parent._spinnerView.Visible = false; });
             }
         }
 
@@ -1537,8 +1503,7 @@ public class FileDialog : Dialog, IDesignable
                 Children = _found.ToArray ();
             }
 
-            Parent.App?.Invoke (
-                                (_) =>
+            Parent.App?.Invoke (_ =>
                                 {
                                     Parent._tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (Parent._tbPath.Text,
                                                                                          Parent._tbPath.InsertionPoint,

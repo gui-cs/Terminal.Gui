@@ -137,7 +137,7 @@ A sinple color picker that supports the legacy 16 ANSI colors
 </pre>
 
 
-## [ComboBox](xref:Terminal.Gui.Views.ComboBox)
+## [DropDownList](xref:Terminal.Gui.Views.DropDownList)
 
 Provides a drop-down list of items the user can select from.
 

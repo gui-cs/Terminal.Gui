@@ -202,7 +202,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <remarks>
     ///     Values are clamped to the valid range [0, Count - Viewport.Height].
     /// </remarks>
-    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
+    [Obsolete ("Used only internally by DropDownList which will be replaced soon. Do not use.")]
     public int TopItem
     {
         get => Viewport.Y;
@@ -221,7 +221,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
-    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
+    [Obsolete ("Used only internally by DropDownList which will be replaced soon. Do not use.")]
     internal int LeftItem
     {
         get => Viewport.X;
