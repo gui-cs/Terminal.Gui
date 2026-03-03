@@ -38,8 +38,8 @@ public class DropDownListExample : Scenario
             Y = 0,
             Width = Dim.Fill (_eventLog!),
             Height = Dim.Fill (),
-            BorderStyle = LineStyle.Single,
-            Title = "DropDownList Examples"
+            BorderStyle = LineStyle.None,
+            Title = "DropDownList Examples - press F4 to open focused dropdown"
         };
 
         // Sample data
@@ -76,8 +76,8 @@ public class DropDownListExample : Scenario
 
         DropDownList readOnlyDropDown = new ()
         {
-            X = 1,
-            Y = Pos.Bottom (readOnlyLabel),
+            X = Pos.Right(readOnlyLabel) + 1,
+            Y = Pos.Top (readOnlyLabel),
             Title = "Select Country",
             Source = new ListWrapper<string> (countries),
             ReadOnly = true,
@@ -91,15 +91,13 @@ public class DropDownListExample : Scenario
                                               _eventLog?.Log ($"ReadOnly: ValueChanging - CurrentValue: '{e.CurrentValue}', NewValue: '{e.NewValue}'");
                                           };
 
-        Label readOnlyHelpLabel = new () { X = 1, Y = Pos.Bottom (readOnlyDropDown) + 1, Text = "Click anywhere or press F4 or Alt+Down to open" };
-
         // Editable Mode Example
-        Label editableLabel = new () { X = 1, Y = Pos.Bottom (readOnlyHelpLabel) + 1, Text = "Editable Mode:" };
+        Label editableLabel = new () { X = 1, Y = Pos.Bottom (readOnlyDropDown) + 1, Text = "Editable Mode:" };
 
         DropDownList editableDropDown = new ()
         {
-            X = 1,
-            Y = Pos.Bottom (editableLabel),
+            X = Pos.Right (editableLabel) + 1,
+            Y = Pos.Top (editableLabel),
             Title = "Select or Type Color",
             Source = new ListWrapper<string> (colors),
             ReadOnly = false,
@@ -113,10 +111,8 @@ public class DropDownListExample : Scenario
                                               _eventLog?.Log ($"Editable: ValueChanging - CurrentValue: '{e.CurrentValue}', NewValue: '{e.NewValue}'");
                                           };
 
-        Label editableHelpLabel = new () { X = 1, Y = Pos.Bottom (editableDropDown) + 1, Text = "Type text or press F4 to open dropdown" };
-
         // Different positions example
-        Label positionLabel = new () { X = 1, Y = Pos.Bottom (editableHelpLabel) + 1, Text = "Different Positions:" };
+        Label positionLabel = new () { X = 1, Y = Pos.Bottom (editableDropDown) + 1, Text = "Different Positions (with Borders):" };
 
         DropDownList topLeftDropDown = new ()
         {
@@ -126,7 +122,8 @@ public class DropDownListExample : Scenario
             Title = "Top-Left",
             Source = new ListWrapper<string> (countries),
             ReadOnly = true,
-            Text = "Argentina"
+            Text = "Argentina",
+            BorderStyle = LineStyle.Dotted
         };
 
         topLeftDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"TopLeft: Selected '{e.NewValue}'"); };
@@ -139,7 +136,8 @@ public class DropDownListExample : Scenario
             Title = "Top-Right",
             Source = new ListWrapper<string> (colors),
             ReadOnly = true,
-            Text = "Red"
+            Text = "Red",
+            BorderStyle = LineStyle.Dotted
         };
 
         topRightDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"TopRight: Selected '{e.NewValue}'"); };
@@ -170,12 +168,13 @@ public class DropDownListExample : Scenario
 
         bottomRightDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"BottomRight: Selected '{e.NewValue}'"); };
 
+        contentFrame.AssignHotKeys = true;
+        contentFrame.AssignHotKeysToSubViews ();
+
         contentFrame.Add (readOnlyLabel,
                           readOnlyDropDown,
-                          readOnlyHelpLabel,
                           editableLabel,
                           editableDropDown,
-                          editableHelpLabel,
                           positionLabel,
                           topLeftDropDown,
                           topRightDropDown,
@@ -183,6 +182,7 @@ public class DropDownListExample : Scenario
                           bottomRightDropDown);
 
         _eventLog.SetViewToLog (window);
+
         window.Add (contentFrame, _eventLog);
 
         _app.Run (window);

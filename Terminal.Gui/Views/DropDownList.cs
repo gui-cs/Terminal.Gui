@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;
 
@@ -61,7 +62,7 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class DropDownList : TextField
 {
-    private Button? _toggleButton;
+    private readonly Button? _toggleButton;
     private Popover<ListView, string?>? _listPopover;
 
     /// <summary>
@@ -80,33 +81,26 @@ public class DropDownList : TextField
             TabStop = TabBehavior.NoStop,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = ShadowStyle.None
         };
 
 #if DEBUG
         _toggleButton.Id = "dropDownListToggleButton";
 #endif
 
-        _toggleButton.Accepted += (s, e) => ToggleDropDown (); // Toggle dropdown on button click
+        _toggleButton.Accepted += (_, _) => ToggleDropDown (); // Toggle dropdown on button click
 
         // Create ListView for popover
-        ListView listView = new ()
-        {
-            Width = Dim.Auto (DimAutoStyle.Content),
-            Height = Dim.Auto (DimAutoStyle.Content, 1, 10)
-        };
+        ListView listView = new () { Width = Dim.Auto (DimAutoStyle.Content), Height = Dim.Auto (DimAutoStyle.Content, 1, 10) };
 
         // Create popover
         _listPopover = new Popover<ListView, string?> (listView) { Anchor = GetAnchor };
 
+        // Ensure the background of the listview is not None, so it stands out
+        Scheme scheme = GetScheme () with { Normal = GetScheme ().Normal with { Background = GetScheme ().Focus.Foreground } };
+
         // Use the TextField's scheme for the ListView to ensure consistent styling
-        _listPopover.ContentView?.SchemeName = SchemeName;
-
-        _listPopover.VisibleChanging += (s, e) =>
-                                        {
-                                            _toggleButton.Enabled = !e.NewValue; // Disable toggle button when popover is visible to prevent re-entrancy
-                                        };
-
+        _listPopover.ContentView?.SetScheme (scheme);
 
 #if DEBUG
         _listPopover.Id = "dropDownListPopover";
@@ -114,6 +108,8 @@ public class DropDownList : TextField
 
         // Configure commands to bubble up
         _listPopover.CommandsToBubbleUp = [Command.Activate, Command.Accept];
+
+        _listPopover.Anchor = GetAnchor;
 
         // Add toggle button to Padding
         Padding?.Thickness = Padding.Thickness with { Right = 1 }; // Add some spacing on the right for the button
@@ -128,9 +124,11 @@ public class DropDownList : TextField
 
         // Add command handler for toggle
         AddCommand (Command.Toggle, ToggleDropDown);
+
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         // Set target for command bridging
@@ -139,7 +137,7 @@ public class DropDownList : TextField
         base.EndInit ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
     {
         if (base.OnHasFocusChanging (currentHasFocus, newHasFocus, currentFocused, newFocused))
@@ -163,13 +161,32 @@ public class DropDownList : TextField
     protected override void OnActivated (ICommandContext? ctx)
     {
         // If activation came from the ListView, update text
-        if (_listPopover?.ContentView is { } contentView
-            && ctx?.Source?.TryGetTarget (out View? sourceView) == true
-            && sourceView == contentView)
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true)
         {
-            _listPopover.Visible = false; // Hide popover after selection
+            if (_listPopover?.ContentView is { } contentView && sourceView == contentView)
 
-            Text = ExtractResult (contentView) ?? Text; // Update text with selected value, or keep existing if null
+            {
+                _listPopover.Visible = false; // Hide popover after selection
+
+                if (_listPopover?.ContentView.SelectedItem is not { } selectedIndex || _listPopover?.ContentView.Source is null)
+                {
+                    return;
+                }
+
+                IList? items = _listPopover?.ContentView.Source.ToList ();
+
+                if (items is null || selectedIndex < 0 || selectedIndex >= items.Count)
+                {
+                    return;
+                }
+
+                Text = items [selectedIndex]?.ToString () ?? string.Empty;
+            }
+
+            if (sourceView == this && ReadOnly && _listPopover is not { Visible: true })
+            {
+                OpenDropDown (); // Open dropdown when activating the TextField in ReadOnly mode
+            }
         }
 
         base.OnActivated (ctx);
@@ -181,35 +198,64 @@ public class DropDownList : TextField
         base.OnAccepted (ctx);
 
         // If accept came from the ListView, update text
-        if (ctx?.Source?.TryGetTarget (out View? sourceView) == true)
+        if (ctx?.Source?.TryGetTarget (out View? sourceView) != true)
         {
-            if (sourceView == _listPopover?.ContentView)
-            {
-                _listPopover.Visible = false; // Hide popover after selection
-
-                if (_listPopover?.ContentView?.SelectedItem is not { } selectedIndex || _listPopover?.ContentView.Source is null)
-                {
-                    return;
-                }
-
-                IList? items = _listPopover?.ContentView?.Source.ToList ();
-
-                if (items is null || selectedIndex < 0 || selectedIndex >= items.Count)
-                {
-                    return;
-                }
-
-                Text = items [selectedIndex]?.ToString () ?? string.Empty;
-            }
-
-            if (sourceView == _toggleButton)
-            {
-                ToggleDropDown ();
-            }
-
+            return;
         }
 
+        if (sourceView == _listPopover?.ContentView)
+        {
+            _listPopover?.Visible = false; // Hide popover after selection
 
+            if (_listPopover?.ContentView?.SelectedItem is not { } selectedIndex || _listPopover?.ContentView.Source is null)
+            {
+                return;
+            }
+
+            IList? items = _listPopover?.ContentView?.Source.ToList ();
+
+            if (items is null || selectedIndex < 0 || selectedIndex >= items.Count)
+            {
+                return;
+            }
+
+            Text = items [selectedIndex]?.ToString () ?? string.Empty;
+        }
+
+        if (sourceView == _toggleButton)
+        {
+            ToggleDropDown ();
+        }
+    }
+
+    /// <summary>
+    ///     Overrides attribute retrieval to ensure that in ReadOnly mode, the control uses the Normal or Focus attributes
+    /// </summary>
+    /// <param name="role"></param>
+    /// <param name="currentAttribute"></param>
+    /// <returns></returns>
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        switch (role)
+        {
+            case VisualRole.ReadOnly when ReadOnly:
+
+            case VisualRole.Active when ReadOnly:
+            {
+                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+
+                return true;
+            }
+
+            case VisualRole.Editable when ReadOnly:
+            {
+                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+
+                break;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -218,58 +264,12 @@ public class DropDownList : TextField
     /// <remarks>
     ///     This property delegates to the <see cref="ListView.Source"/> property of the internal <see cref="ListView"/>.
     /// </remarks>
-    public IListDataSource? Source
-    {
-        get => _listPopover?.ContentView?.Source;
-        set
-        {
-            if (_listPopover?.ContentView is { })
-            {
-                _listPopover.ContentView.Source = value;
-            }
-        }
-    }
+    public IListDataSource? Source { get => _listPopover?.ContentView?.Source; set => _listPopover?.ContentView?.Source = value; }
 
     /// <summary>
     ///     Provides the anchor rectangle for positioning the popover below the DropDownList.
     /// </summary>
-    private Rectangle? GetAnchor ()
-    {
-        Rectangle frame = FrameToScreen ();
-
-        return new Rectangle (frame.X, frame.Y, frame.Width, frame.Height);
-    }
-
-    /// <summary>
-    ///     Extracts the selected string from the ListView.
-    /// </summary>
-    private string? ExtractResult (ListView listView)
-    {
-        if (listView.SelectedItem is not { } selectedIndex || listView.Source is null)
-        {
-            return null;
-        }
-
-        IList? items = listView.Source.ToList ();
-
-        if (items is null || selectedIndex < 0 || selectedIndex >= items.Count)
-        {
-            return null;
-        }
-
-        return items [selectedIndex]?.ToString ();
-    }
-
-    /// <summary>
-    ///     Handles result changes from the popover.
-    /// </summary>
-    private void ListPopover_ResultChanged (object? sender, ValueChangedEventArgs<string?> e)
-    {
-        if (e.NewValue is { })
-        {
-            Text = e.NewValue;
-        }
-    }
+    private Rectangle? GetAnchor () => ViewportToScreen ();
 
     /// <summary>
     ///     Toggles the dropdown list visibility.
@@ -312,12 +312,13 @@ public class DropDownList : TextField
             {
                 for (var i = 0; i < items.Count; i++)
                 {
-                    if (items [i]?.ToString () == Text)
+                    if (items [i]?.ToString () != Text)
                     {
-                        listView.SelectedItem = i;
-
-                        break;
+                        continue;
                     }
+                    listView.SelectedItem = i;
+
+                    break;
                 }
             }
         }
@@ -332,6 +333,32 @@ public class DropDownList : TextField
         _listPopover.MakeVisible ();
     }
 
+    /// <summary>
+    /// </summary>
+    /// <returns></returns>
+    public override bool EnableForDesign ()
+    {
+        // Sample data
+        ObservableCollection<string> countries =
+        [
+            "Argentina",
+            "Brazil",
+            "Canada",
+            "Denmark",
+            "Egypt",
+            "France",
+            "Germany",
+            "Hungary",
+            "India",
+            "Japan"
+        ];
+
+        Source = new ListWrapper<string> (countries);
+
+        Value = "Germany";
+
+        return true;
+    }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
@@ -340,7 +367,6 @@ public class DropDownList : TextField
         {
             if (_listPopover is { })
             {
-                //_listPopover.ResultChanged -= ListPopover_ResultChanged;
                 App?.Popovers?.DeRegister (_listPopover);
                 _listPopover.Dispose ();
                 _listPopover = null;
