@@ -3,9 +3,43 @@ using Terminal.Gui.Tracing;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBar"/>.
-///     MenuBarItems hold a <see cref="PopoverMenu"/> instead of a <see cref="SubMenu"/>.
+///     A <see cref="MenuItem"/>-derived item for use in a <see cref="MenuBar"/>. Each <see cref="MenuBarItem"/>
+///     holds a <see cref="PopoverMenu"/> (instead of a <see cref="MenuItem.SubMenu"/>) that is displayed as a
+///     drop-down menu when the item is selected.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="MenuBarItem"/> extends <see cref="MenuItem"/> but replaces the <see cref="MenuItem.SubMenu"/>
+///         mechanism with <see cref="PopoverMenu"/>. Attempting to set <see cref="SubMenu"/> will throw
+///         <see cref="InvalidOperationException"/>.
+///     </para>
+///     <para>
+///         <b>PopoverMenu Integration:</b> When <see cref="PopoverMenu"/> is set, the popover's
+///         <c>Target</c> is set to this <see cref="MenuBarItem"/> (creating a <c>CommandBridge</c>
+///         that bridges <see cref="Command.Activate"/> commands from the popover back to this item), and the
+///         popover's <c>Anchor</c> is set to position the drop-down below this <see cref="MenuBarItem"/>.
+///     </para>
+///     <para>
+///         <b>PopoverMenu Visibility:</b> Use <see cref="PopoverMenuOpen"/> to get or set whether the
+///         <see cref="PopoverMenu"/> is visible. The <see cref="PopoverMenuOpenChanged"/> event fires when
+///         visibility changes, relayed from <see cref="View.VisibleChanged"/>.
+///     </para>
+///     <para>
+///         <b>Activation:</b> Overrides <see cref="View.OnActivating"/> to toggle <see cref="PopoverMenuOpen"/>.
+///         Bridged commands (originating from within the <see cref="PopoverMenu"/>) are ignored to avoid
+///         unintended toggling. A custom <see cref="Command.HotKey"/> handler skips
+///         <see cref="View.SetFocus"/> before invoking <see cref="Command.Activate"/>, preventing premature
+///         popover opening when switching between <see cref="MenuBarItem"/>s via HotKey.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         details on the underlying command routing and BubbleDown pattern.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         full menu system architecture, class hierarchy, command routing, and usage examples.
+///     </para>
+/// </remarks>
 public class MenuBarItem : MenuItem, IDesignable
 {
     /// <summary>

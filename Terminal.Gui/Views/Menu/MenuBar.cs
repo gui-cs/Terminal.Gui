@@ -4,12 +4,49 @@ using Terminal.Gui.Tracing;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A horizontal list of <see cref="MenuBarItem"/>s. Each <see cref="MenuBarItem"/> can have a
-///     <see cref="PopoverMenu"/> that is shown when the <see cref="MenuBarItem"/> is selected.
+///     A horizontal <see cref="Menu"/> that contains <see cref="MenuBarItem"/> items. Each
+///     <see cref="MenuBarItem"/> owns a <see cref="PopoverMenu"/> that is displayed as a drop-down when
+///     the item is selected. Typically placed at the top of a window or view.
 /// </summary>
 /// <remarks>
-///     MenuBars may be hosted by any View and will, by default, be positioned the full width across the top of the View's
-///     Viewport.
+///     <para>
+///         <see cref="MenuBar"/> extends <see cref="Menu"/> with horizontal orientation and specializes it for
+///         <see cref="MenuBarItem"/> items. By default, it is positioned at <c>Y = 0</c> with
+///         <c>Width = <see cref="Dim"/>.<see cref="Dim.Fill"/>()</c>, spanning the full width of its
+///         <see cref="View.SuperView"/>.
+///     </para>
+///     <para>
+///         <b>Activation:</b> The <see cref="Key"/> property (default: <see cref="Key.F9"/>, configurable via
+///         <see cref="DefaultKey"/>) activates the <see cref="MenuBar"/>. When activated, the first
+///         <see cref="MenuBarItem"/> with a <see cref="PopoverMenu"/> is opened. Use <see cref="Active"/> to
+///         get or set whether the <see cref="MenuBar"/> is in its active state. When <see cref="Active"/> changes,
+///         it drives <see cref="View.CanFocus"/> and hides any open <see cref="PopoverMenu"/>s on deactivation.
+///     </para>
+///     <para>
+///         <b>Popover Browsing:</b> While a <see cref="PopoverMenu"/> is open, moving between
+///         <see cref="MenuBarItem"/>s (via arrow keys, mouse hover, or HotKeys) automatically switches the
+///         visible popover to the newly focused item. Use <see cref="IsOpen"/> to determine if any
+///         <see cref="PopoverMenu"/> is currently visible.
+///     </para>
+///     <para>
+///         <b>Command Dispatch:</b> Uses the consume-dispatch pattern (<c>ConsumeDispatch = true</c>,
+///         <c>GetDispatchTarget =&gt; Focused</c>), meaning the <see cref="MenuBar"/> owns activation state
+///         for its <see cref="MenuBarItem"/>s. Registers custom command handlers for
+///         <see cref="Command.HotKey"/>, <c>Command.Quit</c>, <c>Command.Right</c>, and <c>Command.Left</c>.
+///     </para>
+///     <para>
+///         <b>Navigation:</b> The <c>Left</c> and <c>Right</c> arrow keys move focus between
+///         <see cref="MenuBarItem"/>s. <see cref="Application.QuitKey"/> and <see cref="Key"/> close any open
+///         popover and deactivate the <see cref="MenuBar"/>.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         details on the <see cref="Shortcut"/> base class and command routing patterns.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         full menu system architecture, class hierarchy, command routing, and usage examples.
+///     </para>
 /// </remarks>
 public class MenuBar : Menu, IDesignable
 {
@@ -648,7 +685,6 @@ public class MenuBar : Menu, IDesignable
 
         menuBgColorCp.ValueChanged += (_, args) =>
                                       {
-                                          // BUGBUG: This is weird.
                                           SetScheme (GetScheme () with
                                           {
                                               Normal = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground,
