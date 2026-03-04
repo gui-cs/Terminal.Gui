@@ -4,12 +4,44 @@ using Terminal.Gui.Tracing;
 
 namespace ViewsTests;
 
+/// <summary>
+///     Tests for <see cref="MenuBarItem"/> with <see cref="MenuBarItem.UsePopoverMenu"/> = <see langword="false"/>
+///     (inline mode), verifying the behavior previously provided by the deleted InlineMenuBarItem class.
+/// </summary>
 public class InlineMenuBarItemTests
 {
     [Fact]
-    public void Constructor_Default_HasNoSubMenu ()
+    public void UsePopoverMenu_Default_IsTrue ()
     {
-        InlineMenuBarItem item = new ();
+        MenuBarItem item = new ();
+        Assert.True (item.UsePopoverMenu);
+
+        item.Dispose ();
+    }
+
+    [Fact]
+    public void UsePopoverMenu_False_AllowsSubMenu ()
+    {
+        // When UsePopoverMenu = false and menu items are provided, EndInit converts
+        // the PopoverMenu to a SubMenu.
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }, new MenuItem { Title = "Save" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
+
+        Assert.NotNull (item.SubMenu);
+        Assert.Null (item.PopoverMenu);
+        Assert.Equal (2, item.SubMenu!.SubViews.Count (v => v is MenuItem));
+
+        item.Dispose ();
+    }
+
+    [Fact]
+    public void Constructor_Default_InlineMode_HasNoSubMenu ()
+    {
+        MenuBarItem item = new () { UsePopoverMenu = false };
         Assert.Null (item.SubMenu);
         Assert.Null (item.TargetView);
 
@@ -17,42 +49,27 @@ public class InlineMenuBarItemTests
     }
 
     [Fact]
-    public void Constructor_WithText_SetsTitle ()
+    public void Constructor_WithText_InlineMode_SetsTitle ()
     {
-        InlineMenuBarItem item = new ("_File");
+        MenuBarItem item = new ("_File") { UsePopoverMenu = false };
         Assert.Equal ("_File", item.Title);
-        Assert.Null (item.SubMenu);
 
         item.Dispose ();
     }
 
     [Fact]
-    public void Constructor_WithMenuItems_CreatesSubMenu ()
+    public void SubMenuGlyph_InlineMode_IsSuppressed ()
     {
-        InlineMenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }, new MenuItem { Title = "Save" }]);
-        Assert.NotNull (item.SubMenu);
-        Assert.Equal (2, item.SubMenu!.SubViews.Count (v => v is MenuItem));
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
 
-        item.Dispose ();
-    }
-
-    [Fact]
-    public void Constructor_WithMenu_SetsSubMenu ()
-    {
-        Menu subMenu = new ([new MenuItem { Title = "Item1" }]);
-        InlineMenuBarItem item = new ("_Edit", subMenu);
-        Assert.Same (subMenu, item.SubMenu);
-
-        item.Dispose ();
-    }
-
-    [Fact]
-    public void SubMenuGlyph_IsDownArrow ()
-    {
-        InlineMenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]);
-
-        // SubMenuGlyph is protected, but it manifests through KeyView.Text when SubMenu is set
-        Assert.Equal ($"{Glyphs.DownArrow}", item.KeyView.Text);
+        // SubMenuGlyph returns default when UsePopoverMenu = false,
+        // causing KeyView.Text to be empty (glyph slot removed from layout)
+        Assert.Equal (string.Empty, item.KeyView.Text);
 
         item.Dispose ();
     }
@@ -70,7 +87,12 @@ public class InlineMenuBarItemTests
     [Fact]
     public void IMenuBarEntry_IsMenuOpen_DefaultFalse ()
     {
-        InlineMenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]);
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
         IMenuBarEntry entry = item;
 
         Assert.False (entry.IsMenuOpen);
@@ -81,11 +103,16 @@ public class InlineMenuBarItemTests
     [Fact]
     public void IMenuBarEntry_RootMenu_ReturnsSubMenu ()
     {
-        Menu subMenu = new ([new MenuItem { Title = "Item" }]);
-        InlineMenuBarItem item = new ("_Edit", subMenu);
+        MenuBarItem item = new ("_Edit", [new MenuItem { Title = "Item" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
         IMenuBarEntry entry = item;
 
-        Assert.Same (subMenu, entry.RootMenu);
+        Assert.NotNull (entry.RootMenu);
+        Assert.Same (item.SubMenu, entry.RootMenu);
 
         item.Dispose ();
     }
@@ -93,7 +120,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void IMenuBarEntry_RootMenu_NullWhenNoSubMenu ()
     {
-        InlineMenuBarItem item = new ();
+        MenuBarItem item = new () { UsePopoverMenu = false };
         IMenuBarEntry entry = item;
 
         Assert.Null (entry.RootMenu);
@@ -104,9 +131,12 @@ public class InlineMenuBarItemTests
     [Fact]
     public void IMenuBarEntry_IsMenuOpen_TogglesSubMenuVisibility ()
     {
-        InlineMenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]);
-        item.SubMenu!.BeginInit ();
-        item.SubMenu!.EndInit ();
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
         IMenuBarEntry entry = item;
 
         entry.IsMenuOpen = true;
@@ -121,9 +151,12 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuOpenChanged_FiresOnVisibilityChange ()
     {
-        InlineMenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]);
-        item.SubMenu!.BeginInit ();
-        item.SubMenu!.EndInit ();
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
         item.SubscribeToSubMenuVisibility ();
 
         var firedCount = 0;
@@ -147,21 +180,14 @@ public class InlineMenuBarItemTests
     }
 
     [Fact]
-    public void EnableForDesign_CreatesSubMenu ()
-    {
-        InlineMenuBarItem item = new ();
-        bool result = item.EnableForDesign ();
-
-        Assert.True (result);
-        Assert.NotNull (item.SubMenu);
-
-        item.Dispose ();
-    }
-
-    [Fact]
     public void Dispose_CleansUpSubMenu ()
     {
-        InlineMenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]);
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
         item.SubscribeToSubMenuVisibility ();
         item.Dispose ();
 
@@ -194,7 +220,10 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_Accepts_InlineMenuBarItem ()
     {
-        InlineMenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }]);
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }])
+        {
+            UsePopoverMenu = false
+        };
         MenuBarItem popoverItem = new ("_Popover", [new MenuItem { Title = "B" }]);
 
         MenuBar menuBar = new ([popoverItem, inlineItem]);
@@ -206,10 +235,10 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_IsOpen_IncludesInlineMenuBarItem ()
     {
-        InlineMenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }]);
-        inlineItem.SubMenu!.BeginInit ();
-        inlineItem.SubMenu!.EndInit ();
-        inlineItem.SubscribeToSubMenuVisibility ();
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }])
+        {
+            UsePopoverMenu = false
+        };
 
         MenuBar menuBar = new ([inlineItem]);
         menuBar.BeginInit ();
@@ -230,7 +259,10 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_GetMenuItemsWith_IncludesInlineItems ()
     {
-        InlineMenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "Target" }]);
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "Target" }])
+        {
+            UsePopoverMenu = false
+        };
 
         MenuBar menuBar = new ([inlineItem]);
         menuBar.BeginInit ();
@@ -245,7 +277,10 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_GetMenuItemsWith_MixedMode ()
     {
-        InlineMenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "InlineChild" }]);
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "InlineChild" }])
+        {
+            UsePopoverMenu = false
+        };
         MenuBarItem popoverItem = new ("_Popover", [new MenuItem { Title = "PopoverChild" }]);
 
         MenuBar menuBar = new ([popoverItem, inlineItem]);
@@ -261,9 +296,12 @@ public class InlineMenuBarItemTests
     [Fact]
     public void OnActivating_Toggles_IsMenuOpen ()
     {
-        InlineMenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]);
-        item.SubMenu!.BeginInit ();
-        item.SubMenu!.EndInit ();
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
+        {
+            UsePopoverMenu = false
+        };
+        item.BeginInit ();
+        item.EndInit ();
         IMenuBarEntry entry = item;
 
         // First activation should open
@@ -280,10 +318,10 @@ public class InlineMenuBarItemTests
     [Fact]
     public void HideItem_Works_WithIMenuBarEntry ()
     {
-        InlineMenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }]);
-        inlineItem.SubMenu!.BeginInit ();
-        inlineItem.SubMenu!.EndInit ();
-        inlineItem.SubscribeToSubMenuVisibility ();
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }])
+        {
+            UsePopoverMenu = false
+        };
 
         MenuBar menuBar = new ([inlineItem]);
         menuBar.BeginInit ();
@@ -302,226 +340,152 @@ public class InlineMenuBarItemTests
 
     // Claude - Opus 4.6
     [Fact]
-    public void Diagnostic_ClickToggle_TraceCapture ()
+    public void ClickToggle_OpensAndClosesInlineMenu ()
     {
-        ListBackend traceBackend = new ();
-        Trace.Backend = traceBackend;
-        Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Keyboard;
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
 
-        try
+        MenuBarItem inlineItem = new ("_Tools",
+                                      [
+                                          new MenuItem { Title = "_Compile", HelpText = "Build project" },
+                                          new MenuItem { Title = "_Run", HelpText = "Execute" }
+                                      ])
         {
-            VirtualTimeProvider time = new ();
-            using IApplication app = Application.Create (time);
-            app.Init (DriverRegistry.Names.ANSI);
-            IRunnable runnable = new Runnable ();
+            UsePopoverMenu = false
+        };
 
-            InlineMenuBarItem inlineItem = new ("_Tools",
-                                                [
-                                                    new MenuItem { Title = "_Compile", HelpText = "Build project" },
-                                                    new MenuItem { Title = "_Run", HelpText = "Execute" }
-                                                ]);
+        MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
+        ((View)runnable).Add (menuBar);
+        app.Begin (runnable);
 
-            MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
-            ((View)runnable).Add (menuBar);
-            app.Begin (runnable);
+        IMenuBarEntry entry = inlineItem;
 
-            IMenuBarEntry entry = inlineItem;
+        // --- First activation: open the menu ---
+        app.InjectKey (Key.F9);
 
-            // --- First activation: open the menu ---
-            traceBackend.Clear ();
-            app.InjectKey (Key.F9);
+        Assert.True (menuBar.Active, "MenuBar should be active after F9.");
+        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F9.");
 
-            string openTraces = FormatTraces (traceBackend);
+        // --- Second activation: close the menu ---
+        app.InjectKey (Key.F9);
 
-            Assert.True (menuBar.Active, $"MenuBar should be active after F9.\nTraces:\n{openTraces}");
-            Assert.True (entry.IsMenuOpen, $"InlineItem should be open after F9.\nTraces:\n{openTraces}");
-
-            // --- Second activation: close the menu ---
-            traceBackend.Clear ();
-            app.InjectKey (Key.F9);
-
-            string closeTraces = FormatTraces (traceBackend);
-
-            Assert.False (entry.IsMenuOpen, $"InlineItem should be closed after second F9.\nTraces:\n{closeTraces}");
-            Assert.False (menuBar.Active, $"MenuBar should be inactive after second F9.\nTraces:\n{closeTraces}");
-        }
-        finally
-        {
-            Trace.EnabledCategories = TraceCategory.None;
-            Trace.Backend = new NullBackend ();
-        }
+        Assert.False (entry.IsMenuOpen, "InlineItem should be closed after second F9.");
+        Assert.False (menuBar.Active, "MenuBar should be inactive after second F9.");
     }
 
     // Claude - Opus 4.6
     [Fact]
-    public void Diagnostic_ActivateToggle_InMenuBar_TraceCapture ()
+    public void ActivateToggle_InMenuBar ()
     {
-        ListBackend traceBackend = new ();
-        Trace.Backend = traceBackend;
-        Trace.EnabledCategories = TraceCategory.Command;
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
 
-        try
+        MenuBarItem inlineItem = new ("_Tools",
+                                      [
+                                          new MenuItem { Title = "_Compile" }
+                                      ])
         {
-            VirtualTimeProvider time = new ();
-            using IApplication app = Application.Create (time);
-            app.Init (DriverRegistry.Names.ANSI);
-            IRunnable runnable = new Runnable ();
+            UsePopoverMenu = false
+        };
 
-            InlineMenuBarItem inlineItem = new ("_Tools",
-                                                [
-                                                    new MenuItem { Title = "_Compile" }
-                                                ]);
+        MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
+        ((View)runnable).Add (menuBar);
+        app.Begin (runnable);
 
-            MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
-            ((View)runnable).Add (menuBar);
-            app.Begin (runnable);
+        IMenuBarEntry entry = inlineItem;
 
-            IMenuBarEntry entry = inlineItem;
+        // --- Open via direct Activate command ---
+        inlineItem.InvokeCommand (Command.Activate);
 
-            // --- Open via direct Activate command ---
-            traceBackend.Clear ();
-            inlineItem.InvokeCommand (Command.Activate);
+        Assert.True (entry.IsMenuOpen, "InlineItem should be open after Activate.");
 
-            string openTraces = FormatTraces (traceBackend);
+        // --- Close via direct Activate command ---
+        inlineItem.InvokeCommand (Command.Activate);
 
-            Assert.True (entry.IsMenuOpen, $"InlineItem should be open after Activate.\nTraces:\n{openTraces}");
-
-            // --- Close via direct Activate command ---
-            traceBackend.Clear ();
-            inlineItem.InvokeCommand (Command.Activate);
-
-            string closeTraces = FormatTraces (traceBackend);
-
-            Assert.False (entry.IsMenuOpen, $"InlineItem should be closed after second Activate.\nTraces:\n{closeTraces}");
-        }
-        finally
-        {
-            Trace.EnabledCategories = TraceCategory.None;
-            Trace.Backend = new NullBackend ();
-        }
+        Assert.False (entry.IsMenuOpen, "InlineItem should be closed after second Activate.");
     }
 
     // Claude - Opus 4.6
     [Fact]
-    public void Diagnostic_ArrowRight_PopoverToInline_TraceCapture ()
+    public void ArrowRight_PopoverToInline ()
     {
-        ListBackend traceBackend = new ();
-        Trace.Backend = traceBackend;
-        Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Keyboard;
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
 
-        try
+        MenuBarItem popoverItem = new ("_File",
+                                       [
+                                           new MenuItem { Title = "_New" },
+                                           new MenuItem { Title = "_Open" }
+                                       ]);
+
+        MenuBarItem inlineItem = new ("_Inline",
+                                      [
+                                          new MenuItem { Title = "_Alpha" },
+                                          new MenuItem { Title = "_Beta" }
+                                      ])
         {
-            VirtualTimeProvider time = new ();
-            using IApplication app = Application.Create (time);
-            app.Init (DriverRegistry.Names.ANSI);
-            IRunnable runnable = new Runnable ();
+            UsePopoverMenu = false
+        };
 
-            MenuBarItem popoverItem = new ("_File",
-                                           [
-                                               new MenuItem { Title = "_New" },
-                                               new MenuItem { Title = "_Open" }
-                                           ]);
+        MenuBar menuBar = new ([popoverItem, inlineItem]) { Id = "menuBar" };
+        ((View)runnable).Add (menuBar);
+        app.Begin (runnable);
 
-            InlineMenuBarItem inlineItem = new ("_Inline",
-                                                [
-                                                    new MenuItem { Title = "_Alpha" },
-                                                    new MenuItem { Title = "_Beta" }
-                                                ]);
+        IMenuBarEntry popoverEntry = popoverItem;
+        IMenuBarEntry inlineEntry = inlineItem;
 
-            MenuBar menuBar = new ([popoverItem, inlineItem]) { Id = "menuBar" };
-            ((View)runnable).Add (menuBar);
-            app.Begin (runnable);
+        // --- Open popover via F9 ---
+        app.InjectKey (Key.F9);
 
-            IMenuBarEntry popoverEntry = popoverItem;
-            IMenuBarEntry inlineEntry = inlineItem;
+        Assert.True (menuBar.Active, "MenuBar should be active after F9.");
+        Assert.True (popoverEntry.IsMenuOpen, "Popover should be open after F9.");
 
-            // --- Open popover via F9 ---
-            traceBackend.Clear ();
-            app.InjectKey (Key.F9);
+        // --- Arrow right to switch to inline entry ---
+        app.InjectKey (Key.CursorRight);
 
-            string openTraces = FormatTraces (traceBackend);
-            Assert.True (menuBar.Active, $"MenuBar should be active after F9.\nTraces:\n{openTraces}");
-            Assert.True (popoverEntry.IsMenuOpen, $"Popover should be open after F9.\nTraces:\n{openTraces}");
-
-            // --- Arrow right to switch to inline entry ---
-            traceBackend.Clear ();
-            app.InjectKey (Key.CursorRight);
-
-            string switchTraces = FormatTraces (traceBackend);
-            Assert.True (inlineEntry.IsMenuOpen, $"InlineItem should be open after Right.\nTraces:\n{switchTraces}");
-            Assert.False (popoverEntry.IsMenuOpen, $"Popover should be closed after Right.\nTraces:\n{switchTraces}");
-        }
-        finally
-        {
-            Trace.EnabledCategories = TraceCategory.None;
-            Trace.Backend = new NullBackend ();
-        }
+        Assert.True (inlineEntry.IsMenuOpen, "InlineItem should be open after Right.");
+        Assert.False (popoverEntry.IsMenuOpen, "Popover should be closed after Right.");
     }
 
     // Claude - Opus 4.6
     [Fact]
-    public void Diagnostic_EnterOnMenuItem_InInlineSubMenu_TraceCapture ()
+    public void EnterOnMenuItem_InInlineSubMenu ()
     {
-        ListBackend traceBackend = new ();
-        Trace.Backend = traceBackend;
-        Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Keyboard;
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
 
-        try
+        var actionFiredCount = 0;
+
+        MenuBarItem inlineItem = new ("_Actions",
+                                      [
+                                          new MenuItem { Title = "_Do Something", Action = () => actionFiredCount++ }
+                                      ])
         {
-            VirtualTimeProvider time = new ();
-            using IApplication app = Application.Create (time);
-            app.Init (DriverRegistry.Names.ANSI);
-            IRunnable runnable = new Runnable ();
+            UsePopoverMenu = false
+        };
 
-            var actionFiredCount = 0;
+        MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
+        ((View)runnable).Add (menuBar);
+        app.Begin (runnable);
 
-            InlineMenuBarItem inlineItem = new ("_Actions",
-                                                [
-                                                    new MenuItem { Title = "_Do Something", Action = () => actionFiredCount++ }
-                                                ]);
+        IMenuBarEntry entry = inlineItem;
 
-            MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
-            ((View)runnable).Add (menuBar);
-            app.Begin (runnable);
+        // --- Open via F9 ---
+        app.InjectKey (Key.F9);
 
-            IMenuBarEntry entry = inlineItem;
+        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F9.");
 
-            // --- Open via F9 ---
-            traceBackend.Clear ();
-            app.InjectKey (Key.F9);
+        // --- Press Enter on the focused MenuItem ---
+        app.InjectKey (Key.Enter);
 
-            string openTraces = FormatTraces (traceBackend);
-            Assert.True (entry.IsMenuOpen, $"InlineItem should be open after F9.\nTraces:\n{openTraces}");
-
-            // Check what has focus after opening
-            string focusInfo = $"MenuBar.Focused={menuBar.Focused?.ToIdentifyingString ()}, SubMenu.Focused={inlineItem.SubMenu?.Focused?.ToIdentifyingString ()}, SubMenu.Visible={inlineItem.SubMenu?.Visible}";
-
-            // --- Press Enter on the focused MenuItem ---
-            traceBackend.Clear ();
-            app.InjectKey (Key.Enter);
-
-            string enterTraces = FormatTraces (traceBackend);
-            Assert.True (actionFiredCount == 1, $"Action should have fired after Enter. Count={actionFiredCount}\nFocus before Enter: {focusInfo}\nTraces:\n{enterTraces}");
-        }
-        finally
-        {
-            Trace.EnabledCategories = TraceCategory.None;
-            Trace.Backend = new NullBackend ();
-        }
+        Assert.Equal (1, actionFiredCount);
     }
-
-    private static string FormatTraces (ListBackend backend) =>
-        string.Join ("\n",
-                     backend.Entries.Select (e =>
-                                             {
-                                                 string dataStr = e.Data switch
-                                                                  {
-                                                                      (Command cmd, CommandRouting routing) => $"Cmd={cmd} Routing={routing}",
-                                                                      Key key => $"Key={key}",
-                                                                      ICommandContext ctx => $"Cmd={ctx.Command} Routing={ctx.Routing}",
-                                                                      _ => e.Data?.ToString () ?? ""
-                                                                  };
-
-                                                 return $"  [{e.Category}:{e.Phase}] {e.Id} ({e.Method}) {e.Message} [{dataStr}]";
-                                             }));
 }

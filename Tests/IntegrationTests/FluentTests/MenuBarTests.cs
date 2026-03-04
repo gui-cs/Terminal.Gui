@@ -819,7 +819,8 @@ public class MenuBarTests : TestsAllDrivers
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Proves that <see cref="InlineMenuBarItem"/> works inside a <see cref="MenuBar"/>:
+    ///     Proves that <see cref="MenuBarItem"/> with <see cref="MenuBarItem.UsePopoverMenu"/> = <see langword="false"/>
+    ///     works inside a <see cref="MenuBar"/>:
     ///     the SubMenu opens inline (non-modal) below the menu bar item, positioned
     ///     correctly within the SuperView's viewport.  Also verifies mixed-mode operation
     ///     with a regular <see cref="MenuBarItem"/> in the same bar.
@@ -830,7 +831,7 @@ public class MenuBarTests : TestsAllDrivers
         var d = "ansi";
         MenuBar? menuBar = null;
         IApplication? app = null;
-        InlineMenuBarItem? inlineItem = null;
+        MenuBarItem? inlineItem = null;
         MenuBarItem? popoverItem = null;
 
         TestContext c = With.A<Window> (60, 20, d, _out)
@@ -845,13 +846,16 @@ public class MenuBarTests : TestsAllDrivers
                                                                           new MenuItem { Title = "_Open", HelpText = "Open file" }
                                                                       ]);
 
-                                       inlineItem = new InlineMenuBarItem ("_Inline",
-                                                                           [
-                                                                               new MenuItem { Title = "_Alpha", HelpText = "First item" },
-                                                                               new MenuItem { Title = "_Beta", HelpText = "Second item" },
-                                                                               new Line (),
-                                                                               new MenuItem { Title = "_Gamma", HelpText = "Third item" }
-                                                                           ]);
+                                       inlineItem = new MenuBarItem ("_Inline",
+                                                                     [
+                                                                         new MenuItem { Title = "_Alpha", HelpText = "First item" },
+                                                                         new MenuItem { Title = "_Beta", HelpText = "Second item" },
+                                                                         new Line (),
+                                                                         new MenuItem { Title = "_Gamma", HelpText = "Third item" }
+                                                                     ])
+                                       {
+                                           UsePopoverMenu = false
+                                       };
 
                                        menuBar = new MenuBar ([popoverItem, inlineItem]);
                                        app.TopRunnableView!.Add (menuBar);
@@ -875,7 +879,7 @@ public class MenuBarTests : TestsAllDrivers
              .AssertTrue (((IMenuBarEntry)inlineItem!).IsMenuOpen)
              .AssertFalse (((IMenuBarEntry)popoverItem).IsMenuOpen);
 
-        // Verify SubMenu is positioned below the InlineMenuBarItem, not to its right
+        // Verify SubMenu is positioned below the MenuBarItem, not to its right
         c = c.Then (_ =>
                     {
                         Assert.NotNull (inlineItem!.SubMenu);
@@ -887,7 +891,7 @@ public class MenuBarTests : TestsAllDrivers
                         Assert.True (subMenuTop >= menuBarBottom,
                                      $"SubMenu top ({subMenuTop}) should be at or below MenuBar bottom ({menuBarBottom})");
 
-                        // The SubMenu's screen X should align with the InlineMenuBarItem's left edge
+                        // The SubMenu's screen X should align with the MenuBarItem's left edge
                         int itemLeft = inlineItem.FrameToScreen ().Left;
                         int subMenuLeft = inlineItem.SubMenu.FrameToScreen ().Left;
                         Assert.Equal (itemLeft, subMenuLeft);
@@ -912,7 +916,7 @@ public class MenuBarTests : TestsAllDrivers
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Verifies that clicking directly on an <see cref="InlineMenuBarItem"/> toggles
+    ///     Verifies that clicking directly on an inline <see cref="MenuBarItem"/> toggles
     ///     its SubMenu open and closed.
     /// </summary>
     [Fact]
@@ -921,18 +925,21 @@ public class MenuBarTests : TestsAllDrivers
         var d = "ansi";
         MenuBar? menuBar = null;
         IApplication? app = null;
-        InlineMenuBarItem? inlineItem = null;
+        MenuBarItem? inlineItem = null;
 
         TestContext c = With.A<Window> (60, 20, d, _out)
                             .Then (a =>
                                    {
                                        app = a;
 
-                                       inlineItem = new InlineMenuBarItem ("_Tools",
-                                                                           [
-                                                                               new MenuItem { Title = "_Compile", HelpText = "Build project" },
-                                                                               new MenuItem { Title = "_Run", HelpText = "Execute" }
-                                                                           ]);
+                                       inlineItem = new MenuBarItem ("_Tools",
+                                                                     [
+                                                                         new MenuItem { Title = "_Compile", HelpText = "Build project" },
+                                                                         new MenuItem { Title = "_Run", HelpText = "Execute" }
+                                                                     ])
+                                       {
+                                           UsePopoverMenu = false
+                                       };
 
                                        menuBar = new MenuBar ([inlineItem]);
                                        app.TopRunnableView!.Add (menuBar);
@@ -941,7 +948,7 @@ public class MenuBarTests : TestsAllDrivers
         c = c.WaitIteration ()
              .ScreenShot ("Initial — Tools menu closed", _out);
 
-        // Click on the InlineMenuBarItem to open it
+        // Click on the MenuBarItem to open it
         var clickX = 0;
         var clickY = 0;
 
@@ -967,7 +974,7 @@ public class MenuBarTests : TestsAllDrivers
 
     // Claude - Opus 4.6
     /// <summary>
-    ///     Verifies that activating a <see cref="MenuItem"/> inside an <see cref="InlineMenuBarItem"/>'s
+    ///     Verifies that activating a <see cref="MenuItem"/> inside an inline <see cref="MenuBarItem"/>'s
     ///     SubMenu fires the item's <see cref="Shortcut.Action"/>.
     /// </summary>
     [Fact]
@@ -976,7 +983,7 @@ public class MenuBarTests : TestsAllDrivers
         var d = "ansi";
         MenuBar? menuBar = null;
         IApplication? app = null;
-        InlineMenuBarItem? inlineItem = null;
+        MenuBarItem? inlineItem = null;
         var actionFiredCount = 0;
 
         TestContext c = With.A<Window> (60, 20, d, _out)
@@ -984,10 +991,13 @@ public class MenuBarTests : TestsAllDrivers
                                    {
                                        app = a;
 
-                                       inlineItem = new InlineMenuBarItem ("_Actions",
-                                                                           [
-                                                                               new MenuItem { Title = "_Do Something", Action = () => actionFiredCount++ }
-                                                                           ]);
+                                       inlineItem = new MenuBarItem ("_Actions",
+                                                                     [
+                                                                         new MenuItem { Title = "_Do Something", Action = () => actionFiredCount++ }
+                                                                     ])
+                                       {
+                                           UsePopoverMenu = false
+                                       };
 
                                        menuBar = new MenuBar ([inlineItem]);
                                        app.TopRunnableView!.Add (menuBar);

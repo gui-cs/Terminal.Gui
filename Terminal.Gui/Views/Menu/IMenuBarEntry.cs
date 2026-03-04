@@ -1,9 +1,9 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Defines the contract shared by <see cref="MenuBarItem"/> and <see cref="InlineMenuBarItem"/>,
-///     enabling <see cref="MenuBar"/> to operate on either uniformly without knowing the
-///     concrete type or underlying menu mechanism (PopoverMenu vs. SubMenu).
+///     Defines the contract for menu bar entries, enabling <see cref="MenuBar"/> to operate
+///     uniformly regardless of whether the entry uses a <see cref="PopoverMenu"/> or an inline
+///     <see cref="Menu"/> (controlled by <see cref="MenuBarItem.UsePopoverMenu"/>).
 /// </summary>
 public interface IMenuBarEntry
 {

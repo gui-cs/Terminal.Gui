@@ -326,11 +326,14 @@ public class MenuBar : Menu, IDesignable
         {
             if (sv is MenuBarItem mbi)
             {
-                App?.Popovers?.Register (mbi.PopoverMenu);
-            }
-            else if (sv is InlineMenuBarItem inlineMbi)
-            {
-                inlineMbi.SubscribeToSubMenuVisibility ();
+                if (mbi.UsePopoverMenu)
+                {
+                    App?.Popovers?.Register (mbi.PopoverMenu);
+                }
+                else
+                {
+                    mbi.SubscribeToSubMenuVisibility ();
+                }
             }
         }
     }
@@ -495,7 +498,7 @@ public class MenuBar : Menu, IDesignable
     {
         if (!newHasFocus && !_isSwitchingItem)
         {
-            // Don't deactivate if focus moved to the SubMenu of one of our InlineMenuBarItems.
+            // Don't deactivate if focus moved to the SubMenu of one of our inline MenuBarItems.
             // The SubMenu is a sibling of the MenuBar (added to SuperView), so focus leaving
             // the MenuBar doesn't mean the user left the menu system.
             if (focusedView is { } && IsInlineSubMenu (focusedView))
@@ -509,13 +512,14 @@ public class MenuBar : Menu, IDesignable
 
     /// <summary>
     ///     Determines whether the specified view is (or is contained within) the SubMenu
-    ///     of one of this MenuBar's <see cref="InlineMenuBarItem"/>s.
+    ///     of one of this MenuBar's inline <see cref="MenuBarItem"/>s (those with
+    ///     <see cref="MenuBarItem.UsePopoverMenu"/> = <see langword="false"/>).
     /// </summary>
     private bool IsInlineSubMenu (View view)
     {
         foreach (View sv in SubViews)
         {
-            if (sv is InlineMenuBarItem { SubMenu: { } subMenu })
+            if (sv is MenuBarItem { UsePopoverMenu: false, SubMenu: { } subMenu })
             {
                 // Check if 'view' is the SubMenu or a descendant of it
                 View? current = view;
@@ -688,17 +692,16 @@ public class MenuBar : Menu, IDesignable
                 activeItem.IsMenuOpen = false;
             }
 
-            switch (entry)
+            if (entry is MenuBarItem mbi)
             {
-                case MenuBarItem mbi:
+                if (mbi.UsePopoverMenu)
+                {
                     ShowPopoverItem (mbi);
-
-                    break;
-
-                case InlineMenuBarItem inlineMbi:
-                    ShowInlineItem (inlineMbi);
-
-                    break;
+                }
+                else
+                {
+                    ShowInlineItem (mbi);
+                }
             }
         }
         finally
@@ -731,41 +734,42 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Shows the inline SubMenu for an <see cref="InlineMenuBarItem"/>.
+    ///     Shows the inline SubMenu for a <see cref="MenuBarItem"/> with
+    ///     <see cref="MenuBarItem.UsePopoverMenu"/> = <see langword="false"/>.
     /// </summary>
-    private void ShowInlineItem (InlineMenuBarItem inlineMbi)
+    private void ShowInlineItem (MenuBarItem menuBarItem)
     {
-        if (inlineMbi.SubMenu is { IsInitialized: false })
+        if (menuBarItem.SubMenu is { IsInitialized: false })
         {
-            inlineMbi.SubMenu.BeginInit ();
-            inlineMbi.SubMenu.EndInit ();
+            menuBarItem.SubMenu.BeginInit ();
+            menuBarItem.SubMenu.EndInit ();
         }
 
         Active = true;
-        inlineMbi.SetFocus ();
+        menuBarItem.SetFocus ();
 
-        if (inlineMbi.SubMenu is { })
+        if (menuBarItem.SubMenu is { })
         {
-            inlineMbi.SubMenu.SuperMenuItem = inlineMbi;
-            inlineMbi.SubMenu.SchemeName = SchemeName;
+            menuBarItem.SubMenu.SuperMenuItem = menuBarItem;
+            menuBarItem.SubMenu.SchemeName = SchemeName;
 
             // Add SubMenu to MenuBar's SuperView so it isn't clipped by the MenuBar's viewport
-            if (inlineMbi.SubMenu.SuperView is null && SuperView is { })
+            if (menuBarItem.SubMenu.SuperView is null && SuperView is { })
             {
-                SuperView.Add (inlineMbi.SubMenu);
+                SuperView.Add (menuBarItem.SubMenu);
             }
 
             // Position below the MenuBarItem
-            if (inlineMbi.SubMenu.SuperView is { })
+            if (menuBarItem.SubMenu.SuperView is { })
             {
-                Point screenPos = new (inlineMbi.FrameToScreen ().Left, inlineMbi.FrameToScreen ().Bottom);
-                Point localPos = inlineMbi.SubMenu.SuperView.ScreenToViewport (screenPos);
-                inlineMbi.SubMenu.X = localPos.X;
-                inlineMbi.SubMenu.Y = localPos.Y;
+                Point screenPos = new (menuBarItem.FrameToScreen ().Left, menuBarItem.FrameToScreen ().Bottom);
+                Point localPos = menuBarItem.SubMenu.SuperView.ScreenToViewport (screenPos);
+                menuBarItem.SubMenu.X = localPos.X;
+                menuBarItem.SubMenu.Y = localPos.Y;
             }
         }
 
-        IMenuBarEntry entry = inlineMbi;
+        IMenuBarEntry entry = menuBarItem;
         entry.IsMenuOpen = true;
     }
 
@@ -778,7 +782,7 @@ public class MenuBar : Menu, IDesignable
     {
         IMenuBarEntry? active = GetActiveItem ();
 
-        if (active is InlineMenuBarItem { SubMenu: { } subMenu })
+        if (active is MenuBarItem { UsePopoverMenu: false, SubMenu: { } subMenu })
         {
             subMenu.SetFocus ();
         }

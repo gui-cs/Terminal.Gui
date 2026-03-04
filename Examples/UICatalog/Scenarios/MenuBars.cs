@@ -259,27 +259,63 @@ public class MenuBars : Scenario
 
             Add (openBtn);
 
-            // --- Bottom MenuBar: demonstrates Y = Pos.AnchorEnd () ---
-            BottomMenuBar = new MenuBar { Title = "Bottom MenuBar", Y = Pos.AnchorEnd () };
+            // --- Bottom MenuBar: demonstrates Y = Pos.AnchorEnd () and UsePopoverMenu toggle ---
+            bool usePopover = true;
 
-            MenuItem statusItem = new () { Title = "_Status", Text = "Show status info" };
-            statusItem.Activated += (_, _) => MessageBox.Query (App!, "Status", "All systems operational.", Strings.btnOk);
+            void buildBottomMenuBar ()
+            {
+                if (BottomMenuBar is { })
+                {
+                    Remove (BottomMenuBar);
+                    BottomMenuBar.Dispose ();
+                }
 
-            MenuItem toolsSettingsItem = new () { Title = "Se_ttings...", Text = "Tool settings" };
-            toolsSettingsItem.Activated += (_, _) => MessageBox.Query (App!, "Settings", "This would be a settings dialog.", Strings.btnOk);
+                BottomMenuBar = new MenuBar { Title = "Bottom MenuBar", Y = Pos.AnchorEnd () };
 
-            BottomMenuBar.Add (new MenuBarItem ("_Status",
-                                                [statusItem, new Line (), new MenuItem { Title = "_Refresh", Text = "Refresh status", Key = Key.R.WithCtrl }]));
+                MenuItem statusItem = new () { Title = "_Status", Text = "Show status info" };
+                statusItem.Activated += (_, _) => MessageBox.Query (App!, "Status", "All systems operational.", Strings.btnOk);
 
-            BottomMenuBar.Add (new MenuBarItem ("_Tools",
-                                                [
-                                                    toolsSettingsItem,
-                                                    new Line (),
-                                                    new MenuItem { Title = "_Console", Text = "Open console" },
-                                                    new MenuItem { Title = "_Diagnostics", Text = "Run diagnostics" }
-                                                ]));
+                MenuItem toolsSettingsItem = new () { Title = "Se_ttings...", Text = "Tool settings" };
+                toolsSettingsItem.Activated += (_, _) => MessageBox.Query (App!, "Settings", "This would be a settings dialog.", Strings.btnOk);
 
-            Add (BottomMenuBar);
+                BottomMenuBar.Add (new MenuBarItem ("_Status",
+                                                    [statusItem, new Line (), new MenuItem { Title = "_Refresh", Text = "Refresh status", Key = Key.R.WithCtrl }])
+                {
+                    UsePopoverMenu = usePopover
+                });
+
+                BottomMenuBar.Add (new MenuBarItem ("_Tools",
+                                                    [
+                                                        toolsSettingsItem,
+                                                        new Line (),
+                                                        new MenuItem { Title = "_Console", Text = "Open console" },
+                                                        new MenuItem { Title = "_Diagnostics", Text = "Run diagnostics" }
+                                                    ])
+                {
+                    UsePopoverMenu = usePopover
+                });
+
+                Add (BottomMenuBar);
+            }
+
+            buildBottomMenuBar ();
+
+            // CheckBox to toggle UsePopoverMenu — rebuilds the bottom MenuBar
+            CheckBox usePopoverCb = new ()
+            {
+                Title = "Use _Popover Menus (Bottom Bar)",
+                X = Pos.Left (openBtn),
+                Y = Pos.Bottom (openBtn) + 1,
+                Value = CheckState.Checked
+            };
+
+            usePopoverCb.ValueChanged += (_, args) =>
+            {
+                usePopover = args.NewValue == CheckState.Checked;
+                buildBottomMenuBar ();
+            };
+
+            Add (usePopoverCb);
 
             autoSaveStatusCb.SetFocus ();
         }

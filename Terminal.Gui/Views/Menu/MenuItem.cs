@@ -129,7 +129,8 @@ public class MenuItem : Shortcut, IValue
             field!.App ??= App;
             field!.Visible = false;
 
-            KeyView.Text = $"{SubMenuGlyph}";
+            Rune glyph = SubMenuGlyph;
+            KeyView.Text = glyph == default ? string.Empty : $"{glyph}";
             field.SuperMenuItem = this;
 
             // Bridge Activate and Accept from SubMenu → this MenuItem across the
