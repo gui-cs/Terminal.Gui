@@ -40,7 +40,7 @@ namespace Terminal.Gui.Views;
 ///         full menu system architecture, class hierarchy, command routing, and usage examples.
 ///     </para>
 /// </remarks>
-public class MenuBarItem : MenuItem, IDesignable
+public class MenuBarItem : MenuItem, IMenuBarEntry, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="MenuBarItem"/>.
@@ -258,6 +258,27 @@ public class MenuBarItem : MenuItem, IDesignable
         bool isOpen = PopoverMenu?.Visible ?? false;
         PopoverMenuOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (!isOpen, isOpen));
     }
+
+    #region IMenuBarEntry
+
+    /// <inheritdoc/>
+    bool IMenuBarEntry.IsMenuOpen
+    {
+        get => PopoverMenuOpen;
+        set => PopoverMenuOpen = value;
+    }
+
+    /// <inheritdoc/>
+    event EventHandler<ValueChangedEventArgs<bool>>? IMenuBarEntry.MenuOpenChanged
+    {
+        add => PopoverMenuOpenChanged += value;
+        remove => PopoverMenuOpenChanged -= value;
+    }
+
+    /// <inheritdoc/>
+    Menu? IMenuBarEntry.RootMenu => PopoverMenu?.Root;
+
+    #endregion IMenuBarEntry
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)

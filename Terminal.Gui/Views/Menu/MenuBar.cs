@@ -54,7 +54,7 @@ public class MenuBar : Menu, IDesignable
     public MenuBar () : this ([]) { }
 
     /// <inheritdoc/>
-    public MenuBar (IEnumerable<MenuBarItem> menuBarItems) : base (menuBarItems)
+    public MenuBar (IEnumerable<MenuItem> menuBarItems) : base (menuBarItems)
     {
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
@@ -99,12 +99,14 @@ public class MenuBar : Menu, IDesignable
             // on the source MenuBarItem directly. This toggles its PopoverMenuOpen and
             // then bubbles Activate to OnActivating with BubblingUp routing, which
             // correctly identifies the source and shows the right popover.
-            if (ctx?.Routing != CommandRouting.BubblingUp || !ctx.TryGetSource (out View? source) || FindMenuBarItemForSource (source) is not { } sourceMbi)
+            if (ctx?.Routing != CommandRouting.BubblingUp || !ctx.TryGetSource (out View? source) || FindMenuBarEntryForSource (source) is not { } sourceEntry)
             {
                 return DefaultHotKeyHandler (ctx);
             }
-            Trace.Command (this, ctx, "BubblingUp", $"Activating {sourceMbi.ToIdentifyingString ()}");
-            sourceMbi.InvokeCommand (Command.Activate, ctx.Binding);
+
+            View sourceView = (View)sourceEntry;
+            Trace.Command (this, ctx, "BubblingUp", $"Activating {sourceView.ToIdentifyingString ()}");
+            sourceView.InvokeCommand (Command.Activate, ctx.Binding);
 
             return true;
 
@@ -130,19 +132,27 @@ public class MenuBar : Menu, IDesignable
             return true;
         }
 
-        bool? MoveLeft (ICommandContext? ctx) =>
-
+        bool? MoveLeft (ICommandContext? ctx)
+        {
             // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
             // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
             // _isSwitchingItem guard for the focus transfer it does.
-            AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+            bool? result = AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+            FocusInlineSubMenuIfNeeded ();
 
-        bool? MoveRight (ICommandContext? ctx) =>
+            return result;
+        }
 
+        bool? MoveRight (ICommandContext? ctx)
+        {
             // Don't set _isSwitchingItem here — OnSelectedMenuItemChanged needs to call
             // ShowItem on the newly focused MenuBarItem. ShowItem has its own internal
             // _isSwitchingItem guard for the focus transfer it does.
-            AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            bool? result = AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+            FocusInlineSubMenuIfNeeded ();
+
+            return result;
+        }
     }
 
     /// <inheritdoc/>
@@ -163,50 +173,53 @@ public class MenuBar : Menu, IDesignable
             return true; // Block activation when invisible or disabled
         }
 
-        // When a MenuBarItem's activation bubbles up, activate the MenuBar and show that item.
+        // When a menu bar entry's activation bubbles up, activate the MenuBar and show that item.
         if (args.Context?.Routing == CommandRouting.BubblingUp)
         {
-            if (!args.Context.TryGetSource (out View? source) || FindMenuBarItemForSource (source) is not { } sourceMbi)
+            if (!args.Context.TryGetSource (out View? source) || FindMenuBarEntryForSource (source) is not { } sourceEntry)
             {
-                Trace.Command (this, args.Context, "BubblingUp", "Source not found or not a MenuBarItem");
+                Trace.Command (this, args.Context, "BubblingUp", "Source not found or not an IMenuBarEntry");
 
                 return false;
             }
 
-            Trace.Command (this, args.Context, "BubblingUp", $"Source={sourceMbi.ToIdentifyingString ()} PopoverMenuOpen={sourceMbi.PopoverMenuOpen}");
+            View sourceView = (View)sourceEntry;
+            Trace.Command (this, args.Context, "BubblingUp", $"Source={sourceView.ToIdentifyingString ()} IsMenuOpen={sourceEntry.IsMenuOpen}");
 
-            if (sourceMbi.PopoverMenuOpen)
+            if (sourceEntry.IsMenuOpen)
             {
                 // Guard against intermediate focus traversal: setting Active=true
-                // causes CanFocus=true which can focus the first MenuBarItem transiently.
+                // causes CanFocus=true which can focus the first entry transiently.
                 // _isSwitchingItem prevents OnSelectedMenuItemChanged from auto-opening
                 // that intermediate item.
                 _isSwitchingItem = true;
 
                 try
                 {
-                    // MenuBarItem just opened its popover — ensure MenuBar is active
+                    // Entry just opened its menu — ensure MenuBar is active
                     if (!Active)
                     {
                         Active = true;
                     }
 
-                    ShowItem (sourceMbi);
+                    ShowEntry (sourceEntry);
                 }
                 finally
                 {
                     _isSwitchingItem = false;
                 }
+
+                FocusInlineSubMenuIfNeeded ();
             }
             else
             {
-                // MenuBarItem just closed its popover — deactivate MenuBar
+                // Entry just closed its menu — deactivate MenuBar
                 Active = false;
             }
 
             return true;
 
-            // Non-MenuBarItem SubView bubbling — let normal bubbling proceed.
+            // Non-entry SubView bubbling — let normal bubbling proceed.
         }
 
         if (Active)
@@ -218,17 +231,18 @@ public class MenuBar : Menu, IDesignable
             return true;
         }
 
-        if (SubViews.OfType<MenuBarItem> ().FirstOrDefault (mbi => mbi.PopoverMenu is { }) is not { } first)
+        if (SubViews.OfType<IMenuBarEntry> ().FirstOrDefault (e => e.RootMenu is { }) is not { } first)
         {
-            Trace.Command (this, args.Context, "NoItems", "No MenuBarItem with PopoverMenu found");
+            Trace.Command (this, args.Context, "NoItems", "No IMenuBarEntry with a menu found");
 
             return false;
         }
 
-        // Not yet active — activate and show the first MenuBarItem with a PopoverMenu.
-        Trace.Command (this, args.Context, "FallbackToFirst", $"Opening first={first.ToIdentifyingString ()}");
+        // Not yet active — activate and show the first entry with a menu.
+        Trace.Command (this, args.Context, "FallbackToFirst", $"Opening first={((View)first).ToIdentifyingString ()}");
         Active = true;
-        ShowItem (first);
+        ShowEntry (first);
+        FocusInlineSubMenuIfNeeded ();
 
         return true;
     }
@@ -264,6 +278,15 @@ public class MenuBar : Menu, IDesignable
             Trace.Command (this, "ActiveChanged", $"{field} -> {value}");
             field = value;
 
+            // When deactivating, clear browsing mode BEFORE changing CanFocus.
+            // CanFocus = false triggers focus leave → OnFocusedChanged → OnSelectedMenuItemChanged.
+            // If _popoverBrowsingMode is still true at that point, the handler would
+            // call ShowEntry and reopen the menu we just closed.
+            if (!field)
+            {
+                _popoverBrowsingMode = false;
+            }
+
             // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
             // it won't be to the MenuBar
             CanFocus = value;
@@ -272,7 +295,6 @@ public class MenuBar : Menu, IDesignable
             {
                 return;
             }
-            _popoverBrowsingMode = false;
 
             HideActiveItem ();
         }
@@ -300,9 +322,16 @@ public class MenuBar : Menu, IDesignable
         }
 
         // TODO: This needs to be done whenever a menuitem in any MenuBarItem changes
-        foreach (MenuBarItem? mbi in SubViews.Select (s => s as MenuBarItem))
+        foreach (View sv in SubViews)
         {
-            App?.Popovers?.Register (mbi?.PopoverMenu);
+            if (sv is MenuBarItem mbi)
+            {
+                App?.Popovers?.Register (mbi.PopoverMenu);
+            }
+            else if (sv is InlineMenuBarItem inlineMbi)
+            {
+                inlineMbi.SubscribeToSubMenuVisibility ();
+            }
         }
     }
 
@@ -315,11 +344,11 @@ public class MenuBar : Menu, IDesignable
     {
         List<MenuItem> menuItems = [];
 
-        foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
+        foreach (IMenuBarEntry entry in SubViews.OfType<IMenuBarEntry> ())
         {
-            if (mbi.PopoverMenu is { })
+            if (entry.RootMenu is { } rootMenu)
             {
-                menuItems.AddRange (mbi.PopoverMenu.Root?.GetMenuItemsOfAllSubMenus (predicate) ?? []);
+                menuItems.AddRange (rootMenu.GetMenuItemsOfAllSubMenus (predicate));
             }
         }
 
@@ -338,19 +367,19 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Hides popover menu associated with the specified menu bar item and updates the focus state.
+    ///     Hides the menu associated with the specified menu bar entry and updates the focus state.
     /// </summary>
-    /// <param name="activeItem"></param>
-    /// <returns><see langword="true"/> if the popover was hidden</returns>
-    public bool HideItem (MenuBarItem? activeItem)
+    /// <param name="activeItem">The <see cref="IMenuBarEntry"/> whose menu should be hidden.</param>
+    /// <returns><see langword="true"/> if the menu was hidden.</returns>
+    public bool HideItem (IMenuBarEntry? activeItem)
     {
-        if (activeItem is null || !activeItem.PopoverMenuOpen)
+        if (activeItem is null || !activeItem.IsMenuOpen)
         {
             return false;
         }
 
         // IMPORTANT: Set Visible false before setting Active to false (Active changes Can/HasFocus)
-        activeItem.PopoverMenuOpen = false;
+        activeItem.IsMenuOpen = false;
 
         Active = false;
         HasFocus = false;
@@ -359,24 +388,31 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Guards against deactivation during MenuBarItem switching (arrow keys, mouse hover, ShowItem).
-    ///     When switching items, the old popover may close before the new one opens, which would
-    ///     trigger deactivation via <see cref="OnMenuBarItemPopoverMenuOpenChanged"/>.
+    ///     Guards against deactivation during entry switching (arrow keys, mouse hover, ShowEntry)
+    ///     and against reentrant menu reopening during toggle-close.
+    ///     When switching items, the old menu may close before the new one opens, which would
+    ///     trigger deactivation via <see cref="OnEntryMenuOpenChanged"/>.
     ///     This flag prevents that false deactivation.
     /// </summary>
+    internal bool IsSwitchingItem
+    {
+        get => _isSwitchingItem;
+        set => _isSwitchingItem = value;
+    }
+
     private bool _isSwitchingItem;
 
     /// <summary>
-    ///     Tracks "popover browsing mode" — set when any popover opens, stays true during
-    ///     item switching (bridging the brief gap when old popover closes before new one opens).
+    ///     Tracks "browsing mode" — set when any entry's menu opens, stays true during
+    ///     item switching (bridging the brief gap when old menu closes before new one opens).
     ///     Reset only when <see cref="Active"/> goes false or <see cref="Command.Quit"/> is handled.
     /// </summary>
     private bool _popoverBrowsingMode;
 
     /// <summary>
-    ///     Gets whether any of the menu bar items have a visible <see cref="PopoverMenu"/>.
+    ///     Gets whether any of the menu bar entries have a visible menu.
     /// </summary>
-    public bool IsOpen () => SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen);
+    public bool IsOpen () => SubViews.OfType<IMenuBarEntry> ().Any (e => e.IsMenuOpen);
 
     /// <summary>
     ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F9"/> and
@@ -434,18 +470,18 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Finds the MenuBarItem that is an ancestor (or is itself) the source view, and is a direct SubView of this
-    ///     MenuBar.
+    ///     Finds the <see cref="IMenuBarEntry"/> that is an ancestor (or is itself) the source view, and is a direct
+    ///     SubView of this MenuBar.
     /// </summary>
-    private MenuBarItem? FindMenuBarItemForSource (View? source)
+    private IMenuBarEntry? FindMenuBarEntryForSource (View? source)
     {
         View? current = source;
 
         while (current is { })
         {
-            if (current is MenuBarItem mbi && mbi.SuperView == this)
+            if (current is IMenuBarEntry entry && current.SuperView == this)
             {
-                return mbi;
+                return entry;
             }
 
             current = current.SuperView;
@@ -457,10 +493,46 @@ public class MenuBar : Menu, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        if (!newHasFocus)
+        if (!newHasFocus && !_isSwitchingItem)
         {
+            // Don't deactivate if focus moved to the SubMenu of one of our InlineMenuBarItems.
+            // The SubMenu is a sibling of the MenuBar (added to SuperView), so focus leaving
+            // the MenuBar doesn't mean the user left the menu system.
+            if (focusedView is { } && IsInlineSubMenu (focusedView))
+            {
+                return;
+            }
+
             Active = false;
         }
+    }
+
+    /// <summary>
+    ///     Determines whether the specified view is (or is contained within) the SubMenu
+    ///     of one of this MenuBar's <see cref="InlineMenuBarItem"/>s.
+    /// </summary>
+    private bool IsInlineSubMenu (View view)
+    {
+        foreach (View sv in SubViews)
+        {
+            if (sv is InlineMenuBarItem { SubMenu: { } subMenu })
+            {
+                // Check if 'view' is the SubMenu or a descendant of it
+                View? current = view;
+
+                while (current is { })
+                {
+                    if (current == subMenu)
+                    {
+                        return true;
+                    }
+
+                    current = current.SuperView;
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>
@@ -492,13 +564,13 @@ public class MenuBar : Menu, IDesignable
     {
         Trace.Command (this, "Entry", $"Selected={selected?.ToIdentifyingString ()} BrowsingMode={_popoverBrowsingMode} IsSwitching={_isSwitchingItem}");
 
-        // When _isSwitchingItem is true, we're already inside a ShowItem call
+        // When _isSwitchingItem is true, we're already inside a ShowEntry call
         // (e.g., from a HotKey activation that bubbled up). Focus traversal may
-        // transiently pass through intermediate MenuBarItems. We must NOT auto-open
+        // transiently pass through intermediate entries. We must NOT auto-open
         // those items — only the target item should open.
-        if (!_isSwitchingItem && _popoverBrowsingMode && selected is MenuBarItem { PopoverMenuOpen: false } selectedMenuBarItem)
+        if (!_isSwitchingItem && _popoverBrowsingMode && selected is IMenuBarEntry { IsMenuOpen: false } selectedEntry)
         {
-            ShowItem (selectedMenuBarItem);
+            ShowEntry (selectedEntry);
         }
     }
 
@@ -507,10 +579,9 @@ public class MenuBar : Menu, IDesignable
     {
         base.OnSubViewAdded (view);
 
-        if (view is MenuBarItem mbi)
+        if (view is IMenuBarEntry entry)
         {
-            //mbi.Accepted += OnMenuBarItemAccepted;
-            mbi.PopoverMenuOpenChanged += OnMenuBarItemPopoverMenuOpenChanged;
+            entry.MenuOpenChanged += OnEntryMenuOpenChanged;
         }
     }
 
@@ -519,10 +590,9 @@ public class MenuBar : Menu, IDesignable
     {
         base.OnSubViewRemoved (view);
 
-        if (view is MenuBarItem mbi)
+        if (view is IMenuBarEntry entry)
         {
-            // mbi.Accepted -= OnMenuBarItemAccepted;
-            mbi.PopoverMenuOpenChanged -= OnMenuBarItemPopoverMenuOpenChanged;
+            entry.MenuOpenChanged -= OnEntryMenuOpenChanged;
         }
     }
 
@@ -539,11 +609,11 @@ public class MenuBar : Menu, IDesignable
         }
     }
 
-    private MenuBarItem? GetActiveItem () => SubViews.OfType<MenuBarItem> ().FirstOrDefault (sv => sv is { PopoverMenu.Visible: true });
+    private IMenuBarEntry? GetActiveItem () => SubViews.OfType<IMenuBarEntry> ().FirstOrDefault (e => e.IsMenuOpen);
 
     private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e) => BorderStyle = DefaultBorderStyle;
 
-    private void OnMenuBarItemPopoverMenuOpenChanged (object? sender, ValueChangedEventArgs<bool> e)
+    private void OnEntryMenuOpenChanged (object? sender, ValueChangedEventArgs<bool> e)
     {
         if (e.NewValue)
         {
@@ -552,33 +622,33 @@ public class MenuBar : Menu, IDesignable
             return;
         }
 
-        // A PopoverMenu just closed. If no others are open, and we're not in the middle of
-        // arrow-key navigation (where the old popover closes before the new one opens),
+        // A menu just closed. If no others are open, and we're not in the middle of
+        // arrow-key navigation (where the old menu closes before the new one opens),
         // deactivate the MenuBar entirely. HotKey switching (Alt+E while File is open)
-        // is safe because the new popover opens BEFORE the old one closes.
-        if (!_isSwitchingItem && !SubViews.OfType<MenuBarItem> ().Any (m => m.PopoverMenuOpen))
+        // is safe because the new menu opens BEFORE the old one closes.
+        if (!_isSwitchingItem && !SubViews.OfType<IMenuBarEntry> ().Any (e2 => e2.IsMenuOpen))
         {
-            // During mouse-hover switching, the old MBI's popover closes because
-            // MenuItem.OnMouseEnter → SetFocus() moved focus to the new MBI.  At this point
-            // the new MBI has _hasFocus=true but hasn't opened its popover yet (we're still
+            // During mouse-hover switching, the old entry's menu closes because
+            // MenuItem.OnMouseEnter → SetFocus() moved focus to the new entry.  At this point
+            // the new entry has _hasFocus=true but hasn't opened its menu yet (we're still
             // inside SetHasFocusTrue).  Deactivating now would set CanFocus=false and cascade
-            // focus loss back to the new MBI, violating SetHasFocusTrue's post-condition.
-            // Skip deactivation when a *different* MBI already has focus — ShowItem will run
+            // focus loss back to the new entry, violating SetHasFocusTrue's post-condition.
+            // Skip deactivation when a *different* entry already has focus — ShowEntry will run
             // via OnSelectedMenuItemChanged once the focus transfer completes.
-            bool anotherMbiHasFocus = SubViews.OfType<MenuBarItem> ().Any (m => m != sender && m.HasFocus);
+            bool anotherEntryHasFocus = SubViews.OfType<IMenuBarEntry> ().Any (e2 => (View)e2 != sender && ((View)e2).HasFocus);
 
-            if (anotherMbiHasFocus)
+            if (anotherEntryHasFocus)
             {
                 return;
             }
 
-            // If no MBI has focus at all, focus is leaving the MenuBar entirely. Don't call
+            // If no entry has focus at all, focus is leaving the MenuBar entirely. Don't call
             // Active = false here — it would set CanFocus = false → HasFocus = false reentrantly,
             // violating SetHasFocusFalse's invariant (Debug.Assert(_hasFocus) at line 908).
             // MenuBar.OnHasFocusChanged will deactivate once the focus traversal completes.
-            bool anyMbiHasFocus = SubViews.OfType<MenuBarItem> ().Any (m => m.HasFocus);
+            bool anyEntryHasFocus = SubViews.OfType<IMenuBarEntry> ().Any (e2 => ((View)e2).HasFocus);
 
-            if (!anyMbiHasFocus)
+            if (!anyEntryHasFocus)
             {
                 return;
             }
@@ -588,50 +658,129 @@ public class MenuBar : Menu, IDesignable
     }
 
     /// <summary>
-    ///     Shows the specified popover, but only if the menu bar is active.
+    ///     Shows the menu for the specified entry, but only if the menu bar is active.
     /// </summary>
-    /// <param name="menuBarItem"></param>
-    private void ShowItem (MenuBarItem? menuBarItem)
+    /// <param name="entry">The <see cref="IMenuBarEntry"/> whose menu should be shown.</param>
+    private void ShowEntry (IMenuBarEntry? entry)
     {
-        Trace.Command (this, "Entry", $"Item={menuBarItem?.ToIdentifyingString ()} Active={Active}");
+        View? entryView = entry as View;
+        Trace.Command (this, "Entry", $"Item={entryView?.ToIdentifyingString ()} Active={Active}");
 
-        if (!Active || !Visible)
+        if (!Active || !Visible || entry is null)
         {
             return;
         }
 
-        // Guard: when switching items, SetFocus() closes the old popover before the new one opens.
-        // Without this guard, OnMenuBarItemPopoverMenuOpenChanged would deactivate the MenuBar.
+        // Guard: when switching items, SetFocus() closes the old menu before the new one opens.
+        // Without this guard, OnEntryMenuOpenChanged would deactivate the MenuBar.
         _isSwitchingItem = true;
 
         try
         {
-            // TODO: We should init the PopoverMenu in a smarter way
-            if (menuBarItem?.PopoverMenu is { IsInitialized: false })
+            // Close any currently-open entry that is NOT the target.
+            // ShowPopoverItem's SetFocus() naturally closes another popover, but when
+            // switching from a popover to an InlineMenuBarItem (or vice-versa), the old
+            // entry's menu won't close automatically.
+            IMenuBarEntry? activeItem = GetActiveItem ();
+
+            if (activeItem is { } && activeItem != entry)
             {
-                menuBarItem.PopoverMenu.BeginInit ();
-                menuBarItem.PopoverMenu.EndInit ();
+                activeItem.IsMenuOpen = false;
             }
 
-            if (menuBarItem is null)
+            switch (entry)
             {
-                return;
+                case MenuBarItem mbi:
+                    ShowPopoverItem (mbi);
+
+                    break;
+
+                case InlineMenuBarItem inlineMbi:
+                    ShowInlineItem (inlineMbi);
+
+                    break;
             }
-
-            Active = true;
-            menuBarItem.SetFocus ();
-
-            if (menuBarItem.PopoverMenu?.Root is { })
-            {
-                menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
-                menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
-            }
-
-            menuBarItem.PopoverMenuOpen = true;
         }
         finally
         {
             _isSwitchingItem = false;
+        }
+    }
+
+    /// <summary>
+    ///     Shows the PopoverMenu for a <see cref="MenuBarItem"/>.
+    /// </summary>
+    private void ShowPopoverItem (MenuBarItem menuBarItem)
+    {
+        if (menuBarItem.PopoverMenu is { IsInitialized: false })
+        {
+            menuBarItem.PopoverMenu.BeginInit ();
+            menuBarItem.PopoverMenu.EndInit ();
+        }
+
+        Active = true;
+        menuBarItem.SetFocus ();
+
+        if (menuBarItem.PopoverMenu?.Root is { })
+        {
+            menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
+            menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
+        }
+
+        menuBarItem.PopoverMenuOpen = true;
+    }
+
+    /// <summary>
+    ///     Shows the inline SubMenu for an <see cref="InlineMenuBarItem"/>.
+    /// </summary>
+    private void ShowInlineItem (InlineMenuBarItem inlineMbi)
+    {
+        if (inlineMbi.SubMenu is { IsInitialized: false })
+        {
+            inlineMbi.SubMenu.BeginInit ();
+            inlineMbi.SubMenu.EndInit ();
+        }
+
+        Active = true;
+        inlineMbi.SetFocus ();
+
+        if (inlineMbi.SubMenu is { })
+        {
+            inlineMbi.SubMenu.SuperMenuItem = inlineMbi;
+            inlineMbi.SubMenu.SchemeName = SchemeName;
+
+            // Add SubMenu to MenuBar's SuperView so it isn't clipped by the MenuBar's viewport
+            if (inlineMbi.SubMenu.SuperView is null && SuperView is { })
+            {
+                SuperView.Add (inlineMbi.SubMenu);
+            }
+
+            // Position below the MenuBarItem
+            if (inlineMbi.SubMenu.SuperView is { })
+            {
+                Point screenPos = new (inlineMbi.FrameToScreen ().Left, inlineMbi.FrameToScreen ().Bottom);
+                Point localPos = inlineMbi.SubMenu.SuperView.ScreenToViewport (screenPos);
+                inlineMbi.SubMenu.X = localPos.X;
+                inlineMbi.SubMenu.Y = localPos.Y;
+            }
+        }
+
+        IMenuBarEntry entry = inlineMbi;
+        entry.IsMenuOpen = true;
+    }
+
+    /// <summary>
+    ///     Focuses the SubMenu of an InlineMenuBarItem after it has been opened. Called after
+    ///     <see cref="ShowEntry"/> completes (outside the <see cref="_isSwitchingItem"/> guard)
+    ///     so that <see cref="AdvanceFocus"/> can finish before focus leaves the MenuBar.
+    /// </summary>
+    private void FocusInlineSubMenuIfNeeded ()
+    {
+        IMenuBarEntry? active = GetActiveItem ();
+
+        if (active is InlineMenuBarItem { SubMenu: { } subMenu })
+        {
+            subMenu.SetFocus ();
         }
     }
 

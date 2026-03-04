@@ -93,6 +93,13 @@ public class MenuItem : Shortcut, IValue
     public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText) =>
         SubMenu = subMenu;
 
+    /// <summary>
+    ///     Gets the glyph displayed in <see cref="Shortcut.KeyView"/> when a <see cref="SubMenu"/> is set.
+    ///     The default is <see cref="Glyphs.RightArrow"/> (►). Override to change the indicator
+    ///     (e.g., <see cref="Glyphs.DownArrow"/> for a drop-down menu bar entry).
+    /// </summary>
+    protected virtual Rune SubMenuGlyph => Glyphs.RightArrow;
+
     private CommandBridge? _subMenuBridge;
 
     /// <summary>
@@ -122,8 +129,7 @@ public class MenuItem : Shortcut, IValue
             field!.App ??= App;
             field!.Visible = false;
 
-            // TODO: This is a temporary hack - add a flag or something instead
-            KeyView.Text = $"{Glyphs.RightArrow}";
+            KeyView.Text = $"{SubMenuGlyph}";
             field.SuperMenuItem = this;
 
             // Bridge Activate and Accept from SubMenu → this MenuItem across the
