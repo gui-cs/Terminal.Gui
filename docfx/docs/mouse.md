@@ -476,6 +476,8 @@ if (mouse.IsPressed &&
 }
 ```
 
+**Re-show Guard:** When a popover is dismissed, `MouseImpl` records the dismissed popover in `DismissedByMousePress` and wraps the recursive `RaiseMouseEvent` call with an `_isDismissRecursing` flag. `ApplicationPopover.Show` checks this guard and silently returns if the caller is trying to re-show the same popover that was just dismissed. This prevents views beneath the popover (e.g., a `DropDownList` toggle button or a `MenuBarItem`) from re-opening the popover during the recursed press event or during the subsequent release/click events in the same mouse interaction cycle (press → release → click). The guard is cleared when the next fresh press event arrives or when the click cycle completes.
+
 #### 4.3: Mouse Grab Handling
 ```csharp
 // If a view has grabbed the mouse, route events exclusively to that view
