@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
@@ -1681,7 +1682,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void InvokeCommand_WithIValueSource_PopulatesValue ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -1707,7 +1708,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void InvokeCommand_WithoutIValueSource_ValueIsNull ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -1733,7 +1734,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void InvokeCommand_WithBinding_PopulatesValueFromIValue ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -1761,7 +1762,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void InvokeCommand_IValueReturnsNull_ValueIsNull ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -1787,7 +1788,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void CommandBridge_PreservesValue_OnAccept ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -1818,7 +1819,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void CommandBridge_PreservesValue_OnActivate ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -1849,7 +1850,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void CommandBridge_NullValue_PropagatesCorrectly ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -1970,7 +1971,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void OnActivated_Fires_Once_When_Originator_Is_DispatchTarget ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2179,7 +2180,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Values_ConsumeDispatch_Composite_Appends_Own_Value ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2221,7 +2222,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Values_BubbleActivatedUp_Carries_Composite_Value_To_Ancestor ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2255,7 +2256,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Values_Chain_Accumulates_From_Source_Through_Composites ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2285,7 +2286,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Values_Bridge_Preserves_Full_Chain ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2328,7 +2329,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Values_NonIValue_View_Has_Empty_Values ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
