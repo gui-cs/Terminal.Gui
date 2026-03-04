@@ -46,9 +46,12 @@ namespace Terminal.Gui.App;
 ///     </para>
 ///     <para>
 ///         <b>Creating Custom Popovers:</b><br/>
-///         Inherit from <see cref="PopoverBaseImpl"/> and add your own content and logic.
+///         Inherit from <see cref="PopoverImpl"/> and add your own content and logic.
+///         For a more complete interface that exposes View-level operations without requiring casts,
+///         see <see cref="IPopoverView"/>.
 ///     </para>
 /// </remarks>
+/// <seealso cref="IPopoverView"/>
 public interface IPopover
 {
     /// <summary>
@@ -68,6 +71,4 @@ public interface IPopover
     ///     </para>
     /// </remarks>
     IRunnable? Owner { get; set; }
-
-    // TODO: Add WeakReference<View?>? Target {get; set;} - The view that commands will get bubbled up to
 }

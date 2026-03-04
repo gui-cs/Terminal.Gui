@@ -3,10 +3,46 @@ using System.ComponentModel;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Shortcut"/>-derived object to be used as a menu item in a <see cref="Menu"/>. Has title, an
-///     associated help text, and an action to execute on activation.
+///     A <see cref="Shortcut"/>-derived item for use in a <see cref="Menu"/>. Displays a command, help text, and
+///     key binding and supports nested <see cref="SubMenu"/>s for cascading menu hierarchies.
 /// </summary>
-public class MenuItem : Shortcut
+/// <remarks>
+///     <para>
+///         <see cref="MenuItem"/> extends <see cref="Shortcut"/> to add support for hierarchical menus.
+///         Like <see cref="Shortcut"/>, it displays a <see cref="Shortcut.CommandView"/> (command text),
+///         <see cref="Shortcut.HelpView"/> (help text), and <see cref="Shortcut.KeyView"/> (key binding).
+///         When the user activates a <see cref="MenuItem"/>, the associated <see cref="Shortcut.Action"/> is invoked.
+///     </para>
+///     <para>
+///         <b>SubMenu Support:</b> Set the <see cref="SubMenu"/> property to a <see cref="Menu"/> to create
+///         cascading (nested) menus. When a <see cref="SubMenu"/> is set, a right-arrow glyph is displayed in the
+///         <see cref="Shortcut.KeyView"/> and a <c>CommandBridge</c> connects the SubMenu back to this
+///         <see cref="MenuItem"/>, bridging <see cref="Command.Activate"/> and <see cref="Command.Accept"/>
+///         commands across the non-containment boundary.
+///     </para>
+///     <para>
+///         <b>Command Binding:</b> A <see cref="MenuItem"/> can be bound to a <see cref="Command"/> on a
+///         <see cref="Shortcut.TargetView"/>. The key that <see cref="Shortcut.TargetView"/> has bound to the
+///         command will be used as the <see cref="Shortcut.Key"/>.
+///     </para>
+///     <para>
+///         <b>Mouse Behavior:</b> When the mouse enters a <see cref="MenuItem"/>, it automatically receives focus,
+///         enabling hover-to-select behavior within menus.
+///     </para>
+///     <para>
+///         <see cref="MenuItem"/> implements <see cref="IValue"/>, exposing <see cref="View.Title"/> as its value.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         details on command routing, the BubbleDown pattern, and how <see cref="Shortcut"/> coordinates commands
+///         between itself and its <see cref="Shortcut.CommandView"/>.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         full menu system architecture, class hierarchy, command routing, and usage examples.
+///     </para>
+/// </remarks>
+public class MenuItem : Shortcut, IValue
 {
     /// <summary>
     ///     Creates a new instance of <see cref="MenuItem"/>.
@@ -95,6 +131,54 @@ public class MenuItem : Shortcut
             // so commands can't bubble naturally; the bridge relays completion events.
             _subMenuBridge = CommandBridge.Connect (this, field, Command.Activate, Command.Accept);
         }
+    }
+
+    /// <inheritdoc/>
+    public object? GetValue () => Title;
+
+    /// <inheritdoc/>
+    event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
+    {
+        add
+        {
+            // Forward Title changes to ValueChangedUntyped
+            if (value is { })
+            {
+                bool hadHandlers = _valueChangedUntypedHandlers is not null;
+
+                _valueChangedUntypedHandlers += value;
+
+                // Wire up the bridge only when the first handler is added
+                if (!hadHandlers)
+                {
+                    // Initialize last known title so OldValue is correct on first change
+                    _lastTitle = Title;
+                    TitleChanged += OnTitleChangedForValueChanged;
+                }
+            }
+        }
+        remove
+        {
+            if (value is { })
+            {
+                _valueChangedUntypedHandlers -= value;
+
+                if (_valueChangedUntypedHandlers is null)
+                {
+                    TitleChanged -= OnTitleChangedForValueChanged;
+                }
+            }
+        }
+    }
+
+    private EventHandler<ValueChangedEventArgs<object?>>? _valueChangedUntypedHandlers;
+    private string? _lastTitle;
+
+    private void OnTitleChangedForValueChanged (object? sender, EventArgs<string> e)
+    {
+        string? oldTitle = _lastTitle;
+        _lastTitle = e.Value;
+        _valueChangedUntypedHandlers?.Invoke (this, new ValueChangedEventArgs<object?> (oldTitle, e.Value));
     }
 
     /// <inheritdoc/>

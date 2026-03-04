@@ -41,6 +41,29 @@ public class Menus : Scenario
             BorderStyle = LineStyle.Dotted
         };
         runnable.Add (menuHostView);
+        runnable.CommandsToBubbleUp = [Command.Activate];
+
+        menuHostView.Activated += (_, args) =>
+                                  {
+                                      // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
+                                      if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "menuItemBorders" })
+                                      {
+                                          menuHostView.BorderStyle = args.Value?.Value as CheckState? == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+
+                                          return;
+                                      }
+
+                                      if (args.Value?.TryGetSource (out source) is not true
+                                          || source?.SuperView is not OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
+                                      {
+                                          return;
+                                      }
+
+                                      if (schemeOptionSelector.Value is { } scheme)
+                                      {
+                                          menuHostView.SchemeName = scheme.ToString ();
+                                      }
+                                  };
 
         _eventLog.SetViewToLog (runnable);
         _eventLog.SetViewToLog (menuHostView);
@@ -73,13 +96,8 @@ public class Menus : Scenario
         {
             CanFocus = true;
             BorderStyle = LineStyle.Dashed;
+            CommandsToBubbleUp = [Command.Activate, Command.Accept];
         }
-
-        /// <inheritdoc/>
-        protected override void OnAccepted (ICommandContext? ctx) => base.OnAccepted (ctx);
-
-        /// <inheritdoc/>
-        protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
 
         /// <inheritdoc/>
         public override void EndInit ()
@@ -105,7 +123,7 @@ public class Menus : Scenario
             Label testMenuLabel = new () { Title = "Menu with MenuItems:", X = 1, Y = Pos.Bottom (lastCommandLabel) + 1 };
             Add (testMenuLabel);
 
-            Menu testMenu = new () { Y = Pos.Bottom (testMenuLabel), Id = "TestMenu" };
+            Menu testMenu = new () { Y = Pos.Bottom (testMenuLabel), Id = "testMenu" };
             ConfigureTestMenu (testMenu);
             Add (testMenu);
 
@@ -113,7 +131,7 @@ public class Menus : Scenario
             Label subMenuLabel = new () { Title = "MenuItem with SubMenu:", X = 1, Y = Pos.Bottom (testMenu) + 1 };
             Add (subMenuLabel);
 
-            Menu subMenuDemo = new () { Y = Pos.Bottom (subMenuLabel) };
+            Menu subMenuDemo = new () { Id = "subMenuDemo", Y = Pos.Bottom (subMenuLabel) };
             subMenuDemo.EnableForDesign ();
             Add (subMenuDemo);
 
@@ -128,14 +146,30 @@ public class Menus : Scenario
 
         private void ConfigureTestMenu (Menu menu)
         {
-            MenuItem menuItem1 = new () { Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
-            menuItem1.Activated += (_, _) => MessageBox.Query (App!, "This is a MessageBox", "This is a message box message", Strings.btnOk);
+            MenuItem menuItem1 = new () { Id = "menuItem1", Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
+
+            menuItem1.Activated += (s, _) =>
+                                   {
+                                       if (s is not MenuItem mi)
+
+                                       {
+                                           return;
+                                       }
+
+                                       MessageBox.Query (App!,
+                                                         "This is a MessageBox",
+                                                         $"This is a message box message from {mi.Title} (Value = {mi.GetValue ()})",
+                                                         Strings.btnOk);
+                                   };
 
             Line line = new ();
 
-            MenuItem menuItemBorders = new () { Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
-            menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
+            MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
+            menuItemBorders.CommandView = new CheckBox { Id = "menuItemBorders", Title = menuItemBorders.Title, CanFocus = false };
 
+            // Use Action to set the menu's BorderStyle to Double when the Borders menu item is checked, and None when it is unchecked
+            // Note: above we set the MenuHostView to listen for Activate commands and toggle its BorderStyle when the Borders menu item is toggled,
+            // this is just to demonstrate that we can also handle this directly in the MenuItem's Action as well
             menuItemBorders.Action += () =>
                                       {
                                           if (menuItemBorders.CommandView is CheckBox cb)
@@ -144,13 +178,19 @@ public class Menus : Scenario
                                           }
                                       };
 
-            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-            menuItemBorders.Accepting += (_, args) => args.Handled = true;
+            OptionSelector<Schemes> schemeOptionSelector = new () { Id = "schemeOptionSelector", Title = "Scheme", CanFocus = true };
 
-            OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+            MenuItem menuItemScheme = new ()
+            {
+                Id = "menuItemScheme",
+                Title = "Scheme",
+                Text = "Scheme",
+                Key = Key.S.WithCtrl,
+                CommandView = schemeOptionSelector
+            };
 
-            MenuItem menuItemScheme = new () { Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
-
+            // Set the Menu's SchemeName to the selected scheme in the OptionSelector
+            // Note: above we set the Scheme of the MenuHostView illustrating the commands bubble up
             schemeOptionSelector.ValueChanged += (_, args) =>
                                                  {
                                                      if (args.Value is { } scheme)

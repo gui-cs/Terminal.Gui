@@ -5,10 +5,10 @@ using System.Globalization;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ContextMenus", "Illustrates PopoverMenu as a context menu")]
+[ScenarioMetadata ("PopoverMenus", "Illustrates PopoverMenu as a context menu")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Menus")]
-public class ContextMenus : Scenario
+public class PopoverMenus : Scenario
 {
     private PopoverMenu? _winContextMenu;
     private TextField? _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
@@ -16,6 +16,7 @@ public class ContextMenus : Scenario
     private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
 
     private Window? _appWindow;
+    private EventLog? _eventLog;
 
     public override void Main ()
     {
@@ -28,8 +29,10 @@ public class ContextMenus : Scenario
         _cultureInfos = Application.SupportedCultures;
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new () { Title = GetQuitKeyAndName (), Arrangement = ViewArrangement.Fixed, SchemeName = "Runnable" };
-        _appWindow = appWindow;
+        _appWindow = new Window ();
+        _appWindow.Title = GetQuitKeyAndName ();
+        _appWindow.Arrangement = ViewArrangement.Fixed;
+        _appWindow.SchemeName = "Runnable";
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so
@@ -58,6 +61,18 @@ public class ContextMenus : Scenario
             const int WIDTH = 20;
 
             CreateWinContextMenu ((sender as Window)!.App);
+
+            _eventLog = new EventLog
+            {
+                Id = "eventLog",
+                X = Pos.AnchorEnd (),
+                Y = 3,
+                Height = Dim.Fill (3),
+                SchemeName = "Runnable",
+                BorderStyle = LineStyle.Double,
+                Title = "E_vents",
+                Arrangement = ViewArrangement.LeftResizable
+            };
 
             Label label = new () { X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenuKey}' to open the Window context menu." };
             _appWindow.Add (label);
@@ -109,12 +124,37 @@ public class ContextMenus : Scenario
             {
                 X = Pos.Center (),
                 Y = Pos.Bottom (_tfMiddle!) + 1,
-                Width = 50,
+                Width = Dim.Fill () - Dim.Width (_eventLog),
                 Height = 10,
                 Title = $"PopoverMenu Host - Right-click or {PopoverMenu.DefaultKey}",
                 BorderStyle = LineStyle.Dashed
             };
+
+            _appWindow.CommandsToBubbleUp = [Command.Activate];
+
+            _appWindow.Activated += (_, args) =>
+                                    {
+                                        // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
+                                        if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
+                                        {
+                                            _appWindow.BorderStyle = args.Value?.Value as CheckState? == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+
+                                            return;
+                                        }
+
+                                        // Use ICommandContext.Values to get the Scheme (this assumes the only View down the _appWindow hierarchy that has
+                                        // an IValue type of Schemes is the schemesOptionSelector).
+                                        if (args.Value?.Values.FirstOrDefault (v => v is Schemes) is Schemes scheme)
+                                        {
+                                            _appWindow.SchemeName = scheme.ToString ();
+                                        }
+                                    };
+
+            _eventLog.SetViewToLog (_appWindow);
+            _eventLog.SetViewToLog (popoverMenuHost);
+
             _appWindow.Add (popoverMenuHost);
+            _appWindow.Add (_eventLog);
         }
     }
 
@@ -136,25 +176,31 @@ public class ContextMenus : Scenario
             CommandsToBubbleUp = [Command.Activate];
         }
 
-        /// <inheritdoc/>
-        protected override void OnActivated (ICommandContext? ctx)
-        {
-            base.OnActivated (ctx);
+        // This is commented out intentionally; this whole piece of code is just here to demonstrate
+        // the limitation described below.
+        ///// <inheritdoc/>
+        //protected override bool OnActivating (CommandEventArgs args)
+        //{
+        //    // Known limitation: Cancellation across a CommandBridge cannot prevent the remote view's
+        //    // state change. The bridge fires from the post-event (Activated), so the checkbox's
+        //    // OnActivated (which toggles the state) has already executed by the time this handler
+        //    // runs. The framework emits a "BridgedCancellation" trace warning when this is detected.
+        //    // See plans/bridge-activating-cancellation-bug.md for full analysis.
 
-            MenuItem? menuItem = _popoverMenu?.Root?.GetMenuItemsOfAllSubMenus (item => item.Id == "menuItemBorders").FirstOrDefault ();
+        //    if (args.Context.TryGetSource (out View? source) is true && source is CheckBox { Id: "bordersCheckbox" })
+        //    {
+        //        return true;
+        //    }
 
-            if (menuItem?.CommandView is CheckBox bordersCheckBox)
-            {
-                BorderStyle = bordersCheckBox.Value == CheckState.Checked ? LineStyle.Double : LineStyle.None;
-            }
-        }
+        //    return base.OnActivating (args);
+        //}
 
-        /// <inheritdoc/>
         public override void EndInit ()
         {
             base.EndInit ();
 
             _popoverMenu = new PopoverMenu { Title = "ContextMenu", Id = "PopoverMenuHostContextMenu" };
+            _popoverMenu.Target = new WeakReference<View> (this); // Bridge commands to this host
 
             Menu testContextMenu = new () { Id = "TestContextMenu" };
             _popoverMenu.Root = testContextMenu;
@@ -194,7 +240,7 @@ public class ContextMenus : Scenario
             Line line = new ();
 
             MenuItem menuItemBorders = new () { Id = "menuItemBorders", Title = "_Borders", Text = "Borders", Key = Key.D4.WithAlt };
-            menuItemBorders.CommandView = new CheckBox { Title = menuItemBorders.Title, CanFocus = false };
+            menuItemBorders.CommandView = new CheckBox { Id = "bordersCheckbox", Title = menuItemBorders.Title, CanFocus = false };
 
             menuItemBorders.Action += () =>
                                       {
@@ -204,10 +250,7 @@ public class ContextMenus : Scenario
                                           }
                                       };
 
-            // This ensures the checkbox state toggles when the hotkey of Title is pressed.
-            menuItemBorders.Accepting += (_, args) => args.Handled = true;
-
-            OptionSelector<Schemes> schemeOptionSelector = new () { Title = "Scheme", CanFocus = true };
+            OptionSelector<Schemes> schemeOptionSelector = new () { Id = "schemeOptionSelector", Title = "Scheme", CanFocus = true };
 
             MenuItem menuItemScheme = new ()
             {
@@ -307,7 +350,8 @@ public class ContextMenus : Scenario
                                                },
                                                new Line (),
                                                new MenuItem { Title = Strings.cmdQuit, Action = () => app!.RequestStop () }
-                                           ]) { Key = _winContextMenuKey };
+                                           ])
+        { Key = _winContextMenuKey };
         app!.Popovers?.Register (_winContextMenu);
     }
 

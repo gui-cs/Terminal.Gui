@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Input;
 
 /// <summary>
@@ -86,14 +88,15 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Tracing.Trace.Command (owner, e.Context, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
+        Trace.Command (owner, e.Context, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {
             Command = Command.Accept,
             Source = e.Context?.Source,
             Binding = e.Context?.Binding,
-            Routing = CommandRouting.Bridged
+            Routing = CommandRouting.Bridged,
+            Values = e.Context?.Values ?? []
         };
 
         owner.InvokeCommand (Command.Accept, bridgedCtx);
@@ -106,14 +109,15 @@ public class CommandBridge : IDisposable
             return;
         }
 
-        Tracing.Trace.Command (owner, e.Value, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
+        Trace.Command (owner, e.Value, "Bridge", $"{_remote.ToIdentifyingString ()}->{_owner.ToIdentifyingString ()}");
 
         CommandContext bridgedCtx = new ()
         {
             Command = Command.Activate,
             Source = e.Value?.Source,
             Binding = e.Value?.Binding,
-            Routing = CommandRouting.Bridged
+            Routing = CommandRouting.Bridged,
+            Values = e.Value?.Values ?? []
         };
 
         owner.InvokeCommand (Command.Activate, bridgedCtx);

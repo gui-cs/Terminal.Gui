@@ -145,7 +145,7 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
+        if (checkbox.Value == CheckState.Checked && GetCheckBoxValue (checkbox) == 0 && Value == 0)
         {
             // None flag was already checked; prevent changing again
             args.Handled = true;
@@ -163,18 +163,18 @@ public class FlagSelector : SelectorBase, IDesignable
 
         if (checkBox.Value == CheckState.Checked)
         {
-            if ((int)checkBox.Data! == 0)
+            if (GetCheckBoxValue (checkBox) == 0)
             {
                 newValue = 0;
             }
             else
             {
-                newValue |= (int)checkBox.Data!;
+                newValue |= GetCheckBoxValue (checkBox);
             }
         }
         else
         {
-            newValue &= ~(int)checkBox.Data!;
+            newValue &= ~GetCheckBoxValue (checkBox);
         }
 
         Value = newValue;
@@ -223,9 +223,9 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         _updatingChecked = true;
 
-        // Uncheck ONLY the None checkbox (Data == 0)
+        // Uncheck ONLY the None checkbox (value == 0)
 
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! == 0))
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => GetCheckBoxValue (sv) == 0))
         {
             cb.Value = CheckState.UnChecked;
         }
@@ -236,9 +236,9 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         _updatingChecked = true;
 
-        // Uncheck all NON-None checkboxes (Data != 0)
+        // Uncheck all NON-None checkboxes (value != 0)
 
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? null!) != 0))
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => GetCheckBoxValue (sv) != 0))
         {
             cb.Value = CheckState.UnChecked;
         }
@@ -252,7 +252,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            var flag = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            int flag = GetCheckBoxValue (cb);
 
             // If this flag is set in Value, check the checkbox. Otherwise, uncheck it.
             if (flag == 0)
@@ -285,7 +285,7 @@ public class FlagSelector : SelectorBase, IDesignable
         // If the values include 0 and ShowNoneFlag is not specified, remove the zero-value check box
         if (!Styles.HasFlag (SelectorStyles.ShowNoneFlag))
         {
-            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
+            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => GetCheckBoxValue (cb) == 0);
 
             if (noneCheckBox is { })
             {

@@ -143,7 +143,7 @@ public class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (margin: 30, to: _tableViewContainer!),
+            Width = Dim.Fill (30, _tableViewContainer!),
             Height = Dim.Height (_tableViewContainer),
             Visible = false
         };
@@ -176,6 +176,7 @@ public class FileDialog : Dialog, IDesignable
         Style.TreeStyle = _treeView.Style;
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
+        _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
 
         _tableViewContainer.Add (_tableView);
 
@@ -184,7 +185,6 @@ public class FileDialog : Dialog, IDesignable
         _tableView.Style.ShowVerticalHeaderLines = true;
         _tableView.Style.AlwaysShowHeaders = true;
         _tableView.Style.ShowHorizontalHeaderUnderline = true;
-        _tableView.Style.ShowHorizontalScrollIndicators = true;
 
         _history = new FileDialogHistory (this);
 
@@ -871,12 +871,12 @@ public class FileDialog : Dialog, IDesignable
         {
             isAsc = false;
 
-            return string.Format (Strings.fdCtxSortDesc, _tableView.Table.ColumnNames [clickedCol]);
+            return string.Format (Strings.fdCtxSortDesc, _tableView.Table!.ColumnNames [clickedCol]);
         }
 
         isAsc = true;
 
-        return string.Format (Strings.fdCtxSortAsc, _tableView.Table.ColumnNames [clickedCol]);
+        return string.Format (Strings.fdCtxSortAsc, _tableView.Table!.ColumnNames [clickedCol]);
     }
 
     private string GetUpButtonText () => Style.UseUnicodeCharacters ? "◭" : "▲";
@@ -1091,7 +1091,10 @@ public class FileDialog : Dialog, IDesignable
                 _history.ClearForward ();
             }
 
-            _tableView.RowOffset = 0;
+            if (_tableView.Viewport.Y != 0)
+            {
+                _tableView.Viewport = _tableView.Viewport with { Y = 0 };
+            }
             _tableView.SelectedRow = 0;
 
             SetNeedsDraw ();
@@ -1184,7 +1187,7 @@ public class FileDialog : Dialog, IDesignable
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
         PopoverMenu? contextMenu = new ([
-                                            new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table.ColumnNames [clickedCol])),
+                                            new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
                                                           string.Empty,
                                                           () => HideColumn (clickedCol)),
                                             new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
@@ -1388,7 +1391,7 @@ public class FileDialog : Dialog, IDesignable
         if (visible)
         {
             // When visible, the table view's left edge is a splitter next to the tree
-            _treeView.Width = Dim.Fill (to: _tableViewContainer);
+            _treeView.Width = Dim.Fill (_tableViewContainer);
             _tableViewContainer.X = 30;
             _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
             _tableViewContainer.Border!.Thickness = new Thickness (1, 0, 0, 0);
@@ -1522,7 +1525,7 @@ public class FileDialog : Dialog, IDesignable
                     UpdateChildrenToFound ();
                 }
 
-                Parent.App?.Invoke ((_) => { Parent._spinnerView.Visible = false; });
+                Parent.App?.Invoke (_ => { Parent._spinnerView.Visible = false; });
             }
         }
 
@@ -1533,8 +1536,7 @@ public class FileDialog : Dialog, IDesignable
                 Children = _found.ToArray ();
             }
 
-            Parent.App?.Invoke (
-                                (_) =>
+            Parent.App?.Invoke (_ =>
                                 {
                                     Parent._tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (Parent._tbPath.Text,
                                                                                          Parent._tbPath.InsertionPoint,

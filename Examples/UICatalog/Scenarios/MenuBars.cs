@@ -39,7 +39,7 @@ public class MenuBars : Scenario
             Title = "MenuBar Host",
             X = 0,
             Y = 0,
-            Width = Dim.Fill ()! - Dim.Width (_eventLog),
+            Width = Dim.Fill () - Dim.Width (_eventLog),
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Dotted
         };
@@ -52,16 +52,16 @@ public class MenuBars : Scenario
                                 {
                                     _eventLog.SetViewToLog (menuBarHostView.MenuBar);
 
-                                    foreach (MenuItem menuItem in menuBarHostView?.MenuBar?.GetMenuItemsWith (v => true) ?? [])
+                                    foreach (MenuItem menuItem in menuBarHostView.MenuBar?.GetMenuItemsWith (v => true) ?? [])
                                     {
                                         _eventLog.SetViewToLog (menuItem);
                                         _eventLog.SetViewToLog (menuItem.CommandView);
                                         menuItem.Action += () => _eventLog.Log ($"{menuItem.ToIdentifyingString ()} Action!");
                                     }
 
-                                    _eventLog.SetViewToLog (menuBarHostView?.BottomMenuBar);
+                                    _eventLog.SetViewToLog (menuBarHostView.BottomMenuBar);
 
-                                    foreach (MenuItem menuItem in menuBarHostView?.BottomMenuBar?.GetMenuItemsWith (v => true) ?? [])
+                                    foreach (MenuItem menuItem in menuBarHostView.BottomMenuBar?.GetMenuItemsWith (v => true) ?? [])
                                     {
                                         _eventLog.SetViewToLog (menuItem);
                                         _eventLog.SetViewToLog (menuItem.CommandView);
@@ -121,14 +121,27 @@ public class MenuBars : Scenario
             MenuBar?.EnableForDesign (ref host);
             Add (MenuBar);
 
-            Label lastAcceptedLabel = new () { Title = "Last Accepted:", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastCommandLabel) };
+            Label lastActivatedLabel = new () { Title = "Last Activated:", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastCommandLabel) };
 
-            View lastAcceptedText = new ()
+            View lastActivatedText = new ()
             {
-                X = Pos.Right (lastAcceptedLabel) + 1, Y = Pos.Top (lastAcceptedLabel), Height = Dim.Auto (), Width = Dim.Auto ()
+                X = Pos.Right (lastActivatedLabel) + 1, Y = Pos.Top (lastActivatedLabel), Height = Dim.Auto (), Width = Dim.Auto ()
             };
 
-            Add (lastAcceptedLabel, lastAcceptedText);
+            Add (lastActivatedLabel, lastActivatedText);
+
+            // Demonstrate ctx.Value containing the accepted MenuItem
+            Label lastActivatedValueLabel = new ()
+            {
+                Title = "Last Activated (from ctx.Value):", X = Pos.Left (lastCommandLabel), Y = Pos.Bottom (lastActivatedLabel)
+            };
+
+            View lastActivatedValueText = new ()
+            {
+                X = Pos.Right (lastActivatedValueLabel) + 1, Y = Pos.Top (lastActivatedValueLabel), Height = Dim.Auto (), Width = Dim.Auto ()
+            };
+
+            Add (lastActivatedValueLabel, lastActivatedValueText);
 
             // MenuItem: AutoSave - Demos simple CommandView state tracking
             // In MenuBar.EnableForDesign, the auto save MenuItem does not specify a Command. But does
@@ -140,7 +153,7 @@ public class MenuBars : Scenario
 
             CheckBox autoSaveStatusCb = new ()
             {
-                Title = "AutoSave Status (MenuItem Binding to F10)", X = Pos.Left (lastAcceptedLabel), Y = Pos.Bottom (lastAcceptedLabel)
+                Title = "AutoSave Status (MenuItem Binding to F10)", X = Pos.Left (lastActivatedValueLabel), Y = Pos.Bottom (lastActivatedValueLabel)
             };
 
             autoSaveStatusCb.ValueChanged += (_, _) => { autoSaveMenuItemCb.Value = autoSaveStatusCb.Value; };
@@ -191,15 +204,28 @@ public class MenuBars : Scenario
 
             editModeStatusCb.ValueChanged += (_, _) => { editModeMenuItemCb?.Value = editModeStatusCb.Value; };
 
-            MenuBar?.Accepted += (_, args) =>
-                                 {
-                                     if (args.Context?.Source?.TryGetTarget (out View? sourceView) != true || sourceView is not MenuItem mi)
-                                     {
-                                         return;
-                                     }
+            MenuBar?.Activated += (_, args) =>
+                                  {
+                                      if (args.Value?.TryGetSource (out View? ctxSource) is true)
+                                      {
+                                          // Walk up the superview chain to find the MenuItem that was activated, if any, and log it.
+                                          while (ctxSource is not null && ctxSource is not MenuItem)
+                                          {
+                                              ctxSource = ctxSource.SuperView;
+                                          }
+                                          lastActivatedText.Text = $"{ctxSource.ToIdentifyingString ()}";
+                                      }
+                                      else
+                                      {
+                                          lastActivatedText.Text = $"{Glyphs.Null}";
+                                      }
+                                      lastActivatedValueText.Text = $"{args.Value?.Value ?? Glyphs.Null.ToString ()}";
+                                  };
 
-                                     lastAcceptedText.Text = sourceView.Title!;
-                                 };
+            CommandNotBound += (sender, args) =>
+                                       {
+                                           lastCommandText.Text = $"{args.Context?.Command}";
+                                       };
 
             AddCommand (Command.Edit,
                         ctx =>
@@ -226,12 +252,9 @@ public class MenuBars : Scenario
             // Add a button to open the MenuBar
             Button openBtn = new () { X = Pos.Center (), Y = 4, Text = "_Open Menu", IsDefault = true };
 
-            openBtn.Accepting += (_, e) =>
+            openBtn.Accepted += (_, _) =>
                                  {
-                                     e.Handled = true;
-                                     string sourceTitle = e.Context?.Source?.TryGetTarget (out View? sourceView) == true ? sourceView.Title : "null";
-                                     Logging.Trace ($"openBtn.Accepting - Sending F9. {sourceTitle}");
-                                     NewKeyDownEvent (MenuBar!.Key);
+                                     MenuBar?.InvokeCommand (Command.Activate);
                                  };
 
             Add (openBtn);

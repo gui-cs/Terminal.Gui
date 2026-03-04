@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel;
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class MenuItemTests
+public class MenuItemTests (ITestOutputHelper output)
 {
     /// <summary>Test view that exposes AddCommand publicly for testing.</summary>
     private class TestTargetView : View
@@ -480,4 +483,80 @@ public class MenuItemTests
     }
 
     #endregion SubMenu Command Propagation
+
+    #region IValue Implementation
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_Implements_IValue ()
+    {
+        MenuItem menuItem = new () { Title = "TestItem" };
+
+        Assert.IsAssignableFrom<IValue> (menuItem);
+
+        menuItem.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_GetValue_Returns_Title ()
+    {
+        MenuItem menuItem = new () { Title = "MyTitle" };
+
+        IValue iValue = menuItem;
+        object? value = iValue.GetValue ();
+
+        Assert.Equal ("MyTitle", value);
+
+        menuItem.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_GetValue_Returns_Updated_Title ()
+    {
+        MenuItem menuItem = new () { Title = "Original" };
+
+        IValue iValue = menuItem;
+        Assert.Equal ("Original", iValue.GetValue ());
+
+        menuItem.Title = "Updated";
+        Assert.Equal ("Updated", iValue.GetValue ());
+
+        menuItem.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MenuItem_InvokeCommand_Activate_ContextValue_Contains_Title ()
+    {
+        using (TestLogging.Verbose (output))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            MenuItem menuItem = new () { Title = "TestItem" };
+
+            menuItem.BeginInit ();
+            menuItem.EndInit ();
+
+            ICommandContext? capturedContext = null;
+            var activatingCount = 0;
+
+            menuItem.Activating += (_, args) =>
+                                   {
+                                       activatingCount++;
+                                       capturedContext = args.Context;
+                                   };
+
+            menuItem.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, activatingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal ("TestItem", capturedContext!.Value);
+
+            menuItem.Dispose ();
+        }
+    }
+
+    #endregion IValue Implementation
 }
