@@ -8,7 +8,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <b>IMPORTANT:</b> Must be registered with <see cref="Application.Popover"/> via
+///         <b>IMPORTANT:</b> Must be registered with <see cref="Application.Popovers"/> via
 ///         <see cref="ApplicationPopover.Register"/> before calling <see cref="Popover{TView, TResult}.MakeVisible"/> or
 ///         <see cref="ApplicationPopover.Show"/>.
 ///     </para>
@@ -80,6 +80,13 @@ public class PopoverMenu : Popover<Menu, MenuItem>
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
+
+#if DEBUG
+        if (string.IsNullOrEmpty (root?.Id))
+        {
+            root?.Id = $"popoverMenuRoot_{Id}";
+        }
+#endif
 
         return;
 
@@ -236,7 +243,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     /// </summary>
     /// <remarks>
     ///     This key binding works as a global hotkey when the popover is registered with
-    ///     <see cref="Application.Popover"/>. The default value can be configured via the <see cref="DefaultKey"/>
+    ///     <see cref="Application.Popovers"/>. The default value can be configured via the <see cref="DefaultKey"/>
     ///     configuraiton property.
     /// </remarks>
     public Key Key

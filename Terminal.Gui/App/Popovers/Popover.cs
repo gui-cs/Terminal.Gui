@@ -22,7 +22,7 @@ namespace Terminal.Gui.App;
 ///         reusable popover behavior for any view type.
 ///     </para>
 ///     <para>
-///         <b>Registration:</b> Popovers are automatically registered with <see cref="Application.Popover"/> when
+///         <b>Registration:</b> Popovers are automatically registered with <see cref="Application.Popovers"/> when
 ///         <see cref="MakeVisible"/> is called. Manual registration via <see cref="ApplicationPopover.Register"/>
 ///         is not required.
 ///     </para>
@@ -73,6 +73,13 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
         Border?.Settings &= ~BorderSettings.Title;
 
         base.Visible = false;
+
+#if DEBUG
+        if (string.IsNullOrEmpty (contentView?.Id))
+        {
+            contentView?.Id = $"popoverContentView_{Id}";
+        }
+#endif
 
         ContentView = contentView;
     }
@@ -128,7 +135,7 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
 
             // Bridge Activate from ContentView → Popover across the non-containment boundary.
             _contentCommandBridge?.Dispose ();
-            _contentCommandBridge = CommandBridge.Connect (this, field, [Command.Activate, Command.Accept]);
+            _contentCommandBridge = CommandBridge.Connect (this, field, Command.Activate, Command.Accept);
         }
     }
 
@@ -404,10 +411,9 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     {
         if (disposing)
         {
-            if (ContentView is { } contentView)
-            {
-                contentView.VisibleChanged -= ContentViewOnVisibleChanged;
-            }
+            ContentView?.VisibleChanged -= ContentViewOnVisibleChanged;
+            ContentView?.Dispose ();
+            ContentView = null;
 
             _contentCommandBridge?.Dispose ();
             _contentCommandBridge = null;

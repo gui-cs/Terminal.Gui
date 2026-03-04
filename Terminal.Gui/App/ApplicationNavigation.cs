@@ -11,7 +11,7 @@ public class ApplicationNavigation
     /// </summary>
     public ApplicationNavigation ()
     {
-        // TODO: Move navigation key bindings here from KeyboardImpl
+        // TODO: Move navigation key bindings here from ApplicationKeyboard
     }
 
     /// <summary>
