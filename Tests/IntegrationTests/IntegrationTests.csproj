@@ -26,7 +26,6 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="xunit.v3" />
-        <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
