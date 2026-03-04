@@ -6,7 +6,7 @@ namespace Terminal.Gui.Input;
 ///     When a <see cref="Command"/> is invoked via <see cref="View.InvokeCommand(Command)"/>
 ///     a context object is passed to Command handlers as an <see cref="ICommandContext"/> reference.
 /// </summary>
-/// <seealso cref="View.AddCommand(Command)"/>
+/// <seealso cref="View.AddCommand()"/>
 /// <seealso cref="View.InvokeCommand(Command)"/>
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 public interface ICommandContext

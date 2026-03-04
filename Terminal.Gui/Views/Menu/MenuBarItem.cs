@@ -4,14 +4,21 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A <see cref="MenuItem"/>-derived item for use in a <see cref="MenuBar"/>. Each <see cref="MenuBarItem"/>
-///     holds a <see cref="PopoverMenu"/> (instead of a <see cref="MenuItem.SubMenu"/>) that is displayed as a
-///     drop-down menu when the item is selected.
+///     holds either a <see cref="PopoverMenu"/> (modal, default) or an inline <see cref="MenuItem.SubMenu"/>
+///     (non-modal) that is displayed as a drop-down menu when the item is selected. The behavior is controlled
+///     by the <see cref="UsePopoverMenu"/> property.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="MenuBarItem"/> extends <see cref="MenuItem"/> but replaces the <see cref="MenuItem.SubMenu"/>
-///         mechanism with <see cref="PopoverMenu"/>. Attempting to set <see cref="SubMenu"/> will throw
-///         <see cref="InvalidOperationException"/>.
+///         When <see cref="UsePopoverMenu"/> is <see langword="true"/> (default), <see cref="MenuBarItem"/>
+///         uses a <see cref="PopoverMenu"/> — a modal, overlay-rendered drop-down registered with the
+///         Application popover system.
+///     </para>
+///     <para>
+///         When <see cref="UsePopoverMenu"/> is <see langword="false"/>, <see cref="MenuBarItem"/> uses the
+///         inherited <see cref="MenuItem.SubMenu"/> mechanism — a non-modal, inline drop-down rendered as a
+///         sibling view of the <see cref="MenuBar"/>. This mode is designed for scenarios that need non-modal
+///         menus — for example, the Terminal.Gui Designer (TGD).
 ///     </para>
 ///     <para>
 ///         <b>PopoverMenu Integration:</b> When <see cref="PopoverMenu"/> is set, the popover's
@@ -25,11 +32,11 @@ namespace Terminal.Gui.Views;
 ///         visibility changes, relayed from <see cref="View.VisibleChanged"/>.
 ///     </para>
 ///     <para>
-///         <b>Activation:</b> Overrides <see cref="View.OnActivating"/> to toggle <see cref="PopoverMenuOpen"/>.
-///         Bridged commands (originating from within the <see cref="PopoverMenu"/>) are ignored to avoid
+///         <b>Activation:</b> Overrides <see cref="View.OnActivating"/> to toggle the menu open/closed.
+///         Bridged commands (originating from within the menu) are ignored to avoid
 ///         unintended toggling. A custom <see cref="Command.HotKey"/> handler skips
 ///         <see cref="View.SetFocus"/> before invoking <see cref="Command.Activate"/>, preventing premature
-///         popover opening when switching between <see cref="MenuBarItem"/>s via HotKey.
+///         menu opening when switching between <see cref="MenuBarItem"/>s via HotKey.
 ///     </para>
 ///     <para>
 ///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
@@ -40,7 +47,7 @@ namespace Terminal.Gui.Views;
 ///         full menu system architecture, class hierarchy, command routing, and usage examples.
 ///     </para>
 /// </remarks>
-public class MenuBarItem : MenuItem, IDesignable
+public class MenuBarItem : MenuItem, IMenuBarEntry, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="MenuBarItem"/>.
@@ -139,7 +146,8 @@ public class MenuBarItem : MenuItem, IDesignable
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
-        Trace.Command (this, args.Context, "Entry", $"PopoverMenuOpen={PopoverMenuOpen} Routing={args.Context?.Routing}");
+        IMenuBarEntry entry = this;
+        Trace.Command (this, args.Context, "Entry", $"IsMenuOpen={entry.IsMenuOpen} Routing={args.Context?.Routing}");
 
         if (base.OnActivating (args))
         {
@@ -148,8 +156,8 @@ public class MenuBarItem : MenuItem, IDesignable
             return true;
         }
 
-        // Bridged commands come FROM the PopoverMenu (e.g., a MenuItem was activated inside it).
-        // This is a notification — do not toggle the PopoverMenu open/closed.
+        // Bridged commands come FROM the menu (e.g., a MenuItem was activated inside it).
+        // This is a notification — do not toggle the menu open/closed.
         if (args.Context?.Routing == CommandRouting.Bridged)
         {
             Trace.Command (this, args.Context, "Bridged", "Ignoring bridged command — no toggle");
@@ -157,7 +165,34 @@ public class MenuBarItem : MenuItem, IDesignable
             return false;
         }
 
-        PopoverMenuOpen = !PopoverMenuOpen;
+        if (UsePopoverMenu)
+        {
+            PopoverMenuOpen = !PopoverMenuOpen;
+        }
+        else
+        {
+            // When closing the inline menu, guard against reentrant reopening:
+            // HideMenu() → Visible=false → focus returns to MenuBar → OnFocusedChanged →
+            // OnSelectedMenuItemChanged sees _popoverBrowsingMode=true + IsMenuOpen=false → ShowEntry.
+            // Setting IsSwitchingItem prevents OnSelectedMenuItemChanged from auto-opening.
+            if (entry.IsMenuOpen && SuperView is MenuBar menuBar)
+            {
+                menuBar.IsSwitchingItem = true;
+
+                try
+                {
+                    entry.IsMenuOpen = false;
+                }
+                finally
+                {
+                    menuBar.IsSwitchingItem = false;
+                }
+            }
+            else
+            {
+                entry.IsMenuOpen = !entry.IsMenuOpen;
+            }
+        }
 
         return false;
     }
@@ -166,6 +201,54 @@ public class MenuBarItem : MenuItem, IDesignable
     public override void EndInit ()
     {
         base.EndInit ();
+
+        if (!UsePopoverMenu)
+        {
+            // Convert PopoverMenu → SubMenu for inline mode.
+            // The constructor may have created a PopoverMenu (since UsePopoverMenu is init-only
+            // and set after construction). Extract menu items from its Root and create a new
+            // SubMenu. We cannot reuse the Root directly because Popover.ContentView.set disposes
+            // the old content view when detached.
+            if (PopoverMenu?.Root is { } rootMenu && SubMenu is null)
+            {
+                // Collect all SubViews from the Root before PopoverMenu disposes them
+                List<View> menuItems = [.. rootMenu.SubViews];
+
+                // Remove items from Root so they aren't disposed with it
+                rootMenu.RemoveAll ();
+
+                // PopoverMenu.OnSubViewAdded adds cascading SubMenu Menus as direct SubViews
+                // of PopoverMenu for positioning (and due to reentrancy in OnSubViewAdded,
+                // deep cascading menus may be added multiple times). RemoveAll detaches them
+                // all before Dispose can cascade View.Dispose into those SubMenus.
+                PopoverMenu.RemoveAll ();
+
+                // Now safely dispose the PopoverMenu (no SubViews left to cascade into)
+                PopoverMenu.Dispose ();
+                PopoverMenu = null;
+
+                // Create a new Menu from the extracted items
+                Menu inlineMenu = new (menuItems)
+                {
+#if DEBUG
+                    Id = $"InlineMenu ({Id})"
+#endif
+                };
+
+                SubMenu = inlineMenu;
+            }
+
+            if (SubMenu is { IsInitialized: false })
+            {
+                SubMenu.App ??= App;
+                SubMenu.BeginInit ();
+                SubMenu.EndInit ();
+            }
+
+            SetupSubMenuNavigation ();
+
+            return;
+        }
 
         if (PopoverMenu is null || PopoverMenu.IsInitialized)
         {
@@ -178,10 +261,14 @@ public class MenuBarItem : MenuItem, IDesignable
     }
 
     /// <summary>
-    ///     Do not use this property. MenuBarItem does not support SubMenu. Use <see cref="PopoverMenu"/> instead.
+    ///     Gets whether this entry uses a modal <see cref="PopoverMenu"/> (<see langword="true"/>, default)
+    ///     or an inline <see cref="MenuItem.SubMenu"/> (<see langword="false"/>) for its dropdown.
+    ///     This property must be set at construction time and cannot be changed after initialization.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
-    public new Menu? SubMenu { get => null; set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead."); }
+    public bool UsePopoverMenu { get; init; } = true;
+
+    /// <inheritdoc/>
+    protected override Rune SubMenuGlyph => UsePopoverMenu ? Glyphs.RightArrow : default;
 
     /// <summary>
     ///     The Popover Menu that will be displayed when this item is selected.
@@ -257,19 +344,68 @@ public class MenuBarItem : MenuItem, IDesignable
     {
         bool isOpen = PopoverMenu?.Visible ?? false;
         PopoverMenuOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (!isOpen, isOpen));
+        MenuOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (!isOpen, isOpen));
     }
+
+    #region IMenuBarEntry
+
+    /// <inheritdoc/>
+    bool IMenuBarEntry.IsMenuOpen
+    {
+        get => UsePopoverMenu ? PopoverMenuOpen : SubMenu?.Visible ?? false;
+        set
+        {
+            if (UsePopoverMenu)
+            {
+                PopoverMenuOpen = value;
+            }
+            else if (SubMenu is { })
+            {
+                if (value)
+                {
+                    SubMenu.ShowMenu ();
+                }
+                else
+                {
+                    SubMenu.HideMenu ();
+                }
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    event EventHandler<ValueChangedEventArgs<bool>>? IMenuBarEntry.MenuOpenChanged
+    {
+        add => MenuOpenChanged += value;
+        remove => MenuOpenChanged -= value;
+    }
+
+    /// <inheritdoc/>
+    Menu? IMenuBarEntry.RootMenu => UsePopoverMenu ? PopoverMenu?.Root : SubMenu;
+
+    #endregion IMenuBarEntry
+
+    /// <summary>
+    ///     Raised when the menu open state has changed. In popover mode, this relays
+    ///     <see cref="PopoverMenuOpenChanged"/>. In inline mode, this relays SubMenu visibility changes.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<bool>>? MenuOpenChanged;
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)
     {
-        Trace.Keyboard (this, key, "Entry", $"PopoverMenuVisible={PopoverMenu is { Visible: true }}");
+        bool isMenuVisible = UsePopoverMenu
+                                 ? PopoverMenu is { Visible: true }
+                                 : SubMenu is { Visible: true };
 
-        if (PopoverMenu is not { Visible: true } || !HotKeyBindings.TryGet (key, out _))
+        Trace.Keyboard (this, key, "Entry", $"MenuVisible={isMenuVisible}");
+
+        if (!isMenuVisible || !HotKeyBindings.TryGet (key, out _))
         {
             return false;
         }
 
-        Trace.Keyboard (this, key, "HotKeyMatch", "Popover visible + HotKey match — hiding");
+        Trace.Keyboard (this, key, "HotKeyMatch", "Menu visible + HotKey match — hiding");
 
         // If the user presses the hotkey for a menu item that is already open,
         // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
@@ -280,6 +416,81 @@ public class MenuBarItem : MenuItem, IDesignable
 
         return true;
     }
+
+    #region Inline SubMenu Support
+
+    private bool _subMenuNavigationSetup;
+
+    /// <summary>
+    ///     Subscribes to the SubMenu's <see cref="View.KeyDown"/> event to forward
+    ///     Left/Right arrow keys to the parent <see cref="MenuBar"/> for entry switching,
+    ///     and Escape for closing the menu.
+    /// </summary>
+    private void SetupSubMenuNavigation ()
+    {
+        if (SubMenu is null || _subMenuNavigationSetup)
+        {
+            return;
+        }
+
+        _subMenuNavigationSetup = true;
+
+        SubMenu.KeyDown += OnSubMenuKeyDown;
+    }
+
+    private void OnSubMenuKeyDown (object? sender, Key e)
+    {
+        if (SuperView is not MenuBar menuBar)
+        {
+            return;
+        }
+
+        if (e == Key.CursorRight)
+        {
+            e.Handled = true;
+            menuBar.InvokeCommand (Command.Right);
+        }
+        else if (e == Key.CursorLeft)
+        {
+            e.Handled = true;
+            menuBar.InvokeCommand (Command.Left);
+        }
+        else if (e == Application.QuitKey)
+        {
+            e.Handled = true;
+            menuBar.HideActiveItem ();
+        }
+    }
+
+    /// <summary>
+    ///     Subscribes to SubMenu visibility changes to relay them through <see cref="MenuOpenChanged"/>.
+    /// </summary>
+    internal void SubscribeToSubMenuVisibility ()
+    {
+        if (SubMenu is { })
+        {
+            SubMenu.VisibleChanged += OnSubMenuVisibleChanged;
+        }
+    }
+
+    /// <summary>
+    ///     Unsubscribes from SubMenu visibility changes.
+    /// </summary>
+    internal void UnsubscribeFromSubMenuVisibility ()
+    {
+        if (SubMenu is { })
+        {
+            SubMenu.VisibleChanged -= OnSubMenuVisibleChanged;
+        }
+    }
+
+    private void OnSubMenuVisibleChanged (object? sender, EventArgs e)
+    {
+        bool isOpen = SubMenu?.Visible ?? false;
+        MenuOpenChanged?.Invoke (this, new ValueChangedEventArgs<bool> (!isOpen, isOpen));
+    }
+
+    #endregion Inline SubMenu Support
 
     /// <inheritdoc/>
     public new bool EnableForDesign ()
@@ -296,8 +507,22 @@ public class MenuBarItem : MenuItem, IDesignable
     {
         if (disposing)
         {
-            PopoverMenu?.Dispose ();
-            PopoverMenu = null;
+            if (UsePopoverMenu)
+            {
+                PopoverMenu?.Dispose ();
+                PopoverMenu = null;
+            }
+            else
+            {
+                UnsubscribeFromSubMenuVisibility ();
+
+                if (SubMenu is { })
+                {
+                    SubMenu.KeyDown -= OnSubMenuKeyDown;
+                    SubMenu.Dispose ();
+                    SubMenu = null;
+                }
+            }
         }
 
         base.Dispose (disposing);

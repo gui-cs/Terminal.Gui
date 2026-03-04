@@ -1,7 +1,7 @@
 namespace ApplicationTests.MouseTests;
 
 /// <summary>
-///     Tests for the <see cref="IMouse"/> interface and <see cref="MouseImpl"/> implementation.
+///     Tests for the <see cref="IMouse"/> interface and <see cref="ApplicationMouse"/> implementation.
 ///     These tests demonstrate the decoupled mouse handling that enables parallel test execution.
 /// </summary>
 [Collection("Application Tests")]
@@ -11,7 +11,7 @@ public class MouseTests
     public void Mouse_Instance_CreatedSuccessfully ()
     {
         // Arrange & Act
-        MouseImpl mouse = new ();
+        ApplicationMouse mouse = new ();
 
         // Assert
         Assert.NotNull (mouse);
@@ -23,7 +23,7 @@ public class MouseTests
     public void Mouse_LastMousePosition_CanBeSetAndRetrieved ()
     {
         // Arrange
-        MouseImpl mouse = new ();
+        ApplicationMouse mouse = new ();
         Point expectedPosition = new (10, 20);
 
         // Act
@@ -38,7 +38,7 @@ public class MouseTests
     public void Mouse_IsMouseDisabled_CanBeSetAndRetrieved ()
     {
         // Arrange
-        MouseImpl mouse = new ();
+        ApplicationMouse mouse = new ();
 
         // Act
         mouse.IsMouseDisabled = true;
@@ -51,7 +51,7 @@ public class MouseTests
     public void Mouse_CachedViewsUnderMouse_InitializedEmpty ()
     {
         // Arrange
-        MouseImpl mouse = new ();
+        ApplicationMouse mouse = new ();
 
         // Assert
         Assert.NotNull (mouse.CachedViewsUnderMouse);
@@ -62,7 +62,7 @@ public class MouseTests
     public void Mouse_ResetState_ClearsEventAndCachedViews ()
     {
         // Arrange
-        MouseImpl mouseImpl = new ();
+        ApplicationMouse mouseImpl = new ();
         var eventFired = false;
         mouseImpl.MouseEvent += (sender, args) => eventFired = true;
         mouseImpl.CachedViewsUnderMouse.Add (new View ());
@@ -83,7 +83,7 @@ public class MouseTests
     public void Mouse_RaiseMouseEvent_DoesNotUpdateLastPositionWhenNotInitialized ()
     {
         // Arrange
-        MouseImpl mouseImpl = new ();
+        ApplicationMouse mouseImpl = new ();
         Mouse mouse = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act - Application is not initialized, so LastMousePosition should not be set
@@ -99,7 +99,7 @@ public class MouseTests
     public void Mouse_MouseEvent_CanBeSubscribedAndUnsubscribed ()
     {
         // Arrange
-        MouseImpl mouseImpl = new ();
+        ApplicationMouse mouseImpl = new ();
         var eventCount = 0;
         EventHandler<Mouse> handler = (sender, args) => eventCount++;
 

@@ -8,9 +8,6 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     A scrollable map of the Unicode codepoints.
 /// </summary>
-/// <remarks>
-///     See <see href="../docs/CharacterMap.md"/> for details.
-/// </remarks>
 public class CharMap : View, IDesignable, IValue<Rune>
 {
     /// <summary>

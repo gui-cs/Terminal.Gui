@@ -108,10 +108,9 @@ public class DropDownList : TextField
                                              int available = Math.Max (spaceBelow, spaceAbove);
 
                                              return Math.Min (Source?.Count ?? 0, Math.Max (1, available));
-                                         }))
+                                         })),
 
-            // BUGBUG: There is something wrong with scrollbars w/in a Popover
-            // ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
         };
 
         // Create popover
