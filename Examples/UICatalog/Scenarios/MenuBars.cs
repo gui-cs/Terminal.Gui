@@ -266,6 +266,24 @@ public class MenuBars : Scenario
             {
                 if (BottomMenuBar is { })
                 {
+                    // Close any open menus and move focus away before removing,
+                    // otherwise View.Remove asserts that the view has no focus.
+                    BottomMenuBar.HideActiveItem ();
+
+                    if (BottomMenuBar.HasFocus)
+                    {
+                        BottomMenuBar.HasFocus = false;
+                    }
+
+                    // Remove any inline SubMenus that were added to our SuperView
+                    foreach (View sv in BottomMenuBar.SubViews)
+                    {
+                        if (sv is MenuBarItem { UsePopoverMenu: false, SubMenu: { SuperView: { } } subMenu })
+                        {
+                            subMenu.SuperView.Remove (subMenu);
+                        }
+                    }
+
                     Remove (BottomMenuBar);
                     BottomMenuBar.Dispose ();
                 }
