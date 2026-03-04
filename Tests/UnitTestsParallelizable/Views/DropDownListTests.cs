@@ -688,5 +688,5 @@ public class DropDownListTests
 
     // Helper to find the DropDownList popover (excludes the context menu popover)
     private static IPopoverView? FindDropDownPopover (IApplication app) =>
-        app.Popovers?.Popovers.FirstOrDefault (p => (p as View)?.Id == "dropDownListPopover");
+        app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
 }
