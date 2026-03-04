@@ -10,6 +10,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
+		<UseAppHost>true</UseAppHost>
 		<IsPackable>false</IsPackable>
 		<UseDataCollector />
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>

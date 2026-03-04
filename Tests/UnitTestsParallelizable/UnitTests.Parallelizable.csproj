@@ -10,6 +10,7 @@
   </PropertyGroup>
   <PropertyGroup>
 	  <OutputType>Exe</OutputType>
+	  <UseAppHost>true</UseAppHost>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <UseDataCollector />

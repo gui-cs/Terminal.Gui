@@ -2,6 +2,7 @@
 
     <PropertyGroup>
 	      <OutputType>Exe</OutputType>
+	      <UseAppHost>true</UseAppHost>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
