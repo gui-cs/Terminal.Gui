@@ -448,8 +448,7 @@ public class ScreenTests (ITestOutputHelper output)
         // Act - Access Screen property from multiple threads
         for (var i = 0; i < 10; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      try
                                      {
@@ -463,11 +462,12 @@ public class ScreenTests (ITestOutputHelper output)
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert - No exceptions should occur

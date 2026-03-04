@@ -166,8 +166,7 @@ public class TimeoutTests
 
                       app.Invoke (() =>
                                   {
-                                      app.AddTimeout (
-                                                      TimeSpan.FromMilliseconds (100),
+                                      app.AddTimeout (TimeSpan.FromMilliseconds (100),
                                                       () =>
                                                       {
                                                           timeoutFired = true;
@@ -175,12 +174,10 @@ public class TimeoutTests
                                                           app.RequestStop ();
 
                                                           return false;
-                                                      }
-                                                     );
-                                  }
-                                 );
-                  }
-                 );
+                                                      });
+                                  });
+                  },
+                  TestContext.Current.CancellationToken);
 
         // Use iteration counter for safety instead of time
         var iterations = 0;
@@ -191,7 +188,7 @@ public class TimeoutTests
             app.Run<Runnable> ();
 
             // Defensive: wait with timeout
-            Assert.True (taskCompleted.Wait (TimeSpan.FromSeconds (5)), "Timeout from background thread should have completed");
+            Assert.True (taskCompleted.Wait (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken), "Timeout from background thread should have completed");
             Assert.True (timeoutFired);
         }
         finally
@@ -799,21 +796,18 @@ public class TimeoutTests
                           app.Invoke (() =>
                                       {
                                           // Add timeout with immediate execution
-                                          app.AddTimeout (
-                                                          TimeSpan.Zero,
+                                          app.AddTimeout (TimeSpan.Zero,
                                                           () =>
                                                           {
                                                               Interlocked.Increment (ref addedCount);
 
                                                               return false;
-                                                          }
-                                                         );
+                                                          });
 
                                           tasksCompleted.Signal ();
-                                      }
-                                     );
-                      }
-                     );
+                                      });
+                      },
+                      TestContext.Current.CancellationToken);
         }
 
         // Use iteration counter to stop when all tasks complete
