@@ -464,22 +464,11 @@ public class PopoverMouseDismissTests
         Runnable top = new () { App = app };
 
         // Activator view at top-left corner
-        var activator = new ActivatorView
-        {
-            X = 0,
-            Y = 0,
-            Width = 10,
-            Height = 3
-        };
+        var activator = new ActivatorView { X = 0, Y = 0, Width = 10, Height = 3 };
 
         // Popover fills the screen (transparent overlay), but its only non-transparent
         // child is at X=20 — well away from the activator at X=0.
-        var popover = new ApplicationPopoverTests.PopoverTestClass
-        {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        var popover = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
 
         View popoverContent = new ()
         {
@@ -496,11 +485,7 @@ public class PopoverMouseDismissTests
         SessionToken? token = app.Begin (top);
 
         // --- First press: activator shows the popover ---
-        app.Mouse.RaiseMouseEvent (new Mouse
-        {
-            ScreenPosition = new Point (1, 1),
-            Flags = MouseFlags.LeftButtonPressed
-        });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 1), Flags = MouseFlags.LeftButtonPressed });
 
         Assert.True (popover.Visible, "Popover should be visible after first activation");
         Assert.Equal (1, activator.ActivateCount);
@@ -509,11 +494,7 @@ public class PopoverMouseDismissTests
         // Because the activator is NOT in the popover hierarchy, the dismiss logic fires.
         // Then RaiseMouseEvent recurses, the event reaches the activator, and Activate tries to re-show.
         // The DismissedByMousePress guard in ApplicationPopover.Show suppresses the re-show.
-        app.Mouse.RaiseMouseEvent (new Mouse
-        {
-            ScreenPosition = new Point (1, 1),
-            Flags = MouseFlags.LeftButtonPressed
-        });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 1), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert — the popover was dismissed and the guard prevented re-show
         Assert.Equal (2, activator.ActivateCount);
@@ -537,20 +518,9 @@ public class PopoverMouseDismissTests
 
         Runnable top = new () { App = app };
 
-        var activator = new ActivatorView
-        {
-            X = 0,
-            Y = 0,
-            Width = 10,
-            Height = 3
-        };
+        var activator = new ActivatorView { X = 0, Y = 0, Width = 10, Height = 3 };
 
-        var popover = new ApplicationPopoverTests.PopoverTestClass
-        {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        var popover = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
 
         View popoverContent = new ()
         {
@@ -589,6 +559,7 @@ public class PopoverMouseDismissTests
     ///     This simulates a press-and-hold drag scenario (e.g., dragging a scrollbar
     ///     slider or selecting text) where the mouse leaves the popover bounds.
     /// </summary>
+
     // Claude - Opus 4.6
     [Fact]
     public void MousePressInsidePopover_ThenDragOutside_DoesNotDismissPopover ()
@@ -602,13 +573,7 @@ public class PopoverMouseDismissTests
         SessionToken? token = app.Begin (top);
 
         // Create a popover with a mouse-grabbing SubView
-        var popover = new ApplicationPopoverTests.PopoverTestClass
-        {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            GrabsMouseOnPress = true
-        };
+        var popover = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill (), GrabsMouseOnPress = true };
 
         app.Popovers!.Register (popover);
         app.Popovers.Show (popover);
@@ -656,23 +621,29 @@ public class PopoverMouseDismissTests
         Runnable top = new () { App = app };
 
         // First popover (will be dismissed)
-        var popover1 = new ApplicationPopoverTests.PopoverTestClass
+        var popover1 = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        View content1 = new ()
         {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            X = 30,
+            Y = 0,
+            Width = 10,
+            Height = 5,
+            CanFocus = true
         };
-        View content1 = new () { X = 30, Y = 0, Width = 10, Height = 5, CanFocus = true };
         popover1.Add (content1);
 
         // Second popover (will be opened by activator)
-        var popover2 = new ApplicationPopoverTests.PopoverTestClass
+        var popover2 = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        View content2 = new ()
         {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            X = 30,
+            Y = 0,
+            Width = 10,
+            Height = 5,
+            CanFocus = true
         };
-        View content2 = new () { X = 30, Y = 0, Width = 10, Height = 5, CanFocus = true };
         popover2.Add (content2);
 
         // Activator always opens popover2
