@@ -119,9 +119,9 @@ public class PopoverTests
         popoverManager.Register (popover);
 
         popover.VisibleChanging += (_, e) =>
-                                  {
-                                      e.Cancel = true; // Cancel the change
-                                  };
+                                   {
+                                       e.Cancel = true; // Cancel the change
+                                   };
 
         // Act
         popover.Visible = true;
@@ -143,10 +143,7 @@ public class PopoverTests
 
         var isOpenChangedFired = false;
 
-        popover.VisibleChanged += (_, e) =>
-                                 {
-                                     isOpenChangedFired = true;
-                                 };
+        popover.VisibleChanged += (_, e) => { isOpenChangedFired = true; };
 
         // Act
         popover.Visible = true;
@@ -331,5 +328,89 @@ public class PopoverTests
         // Assert
         Assert.True (result);
         Assert.NotNull (popover.ContentView);
+    }
+
+    // GitHub Copilot
+
+    [Fact]
+    public void SetPosition_FitsBelow_PositionUnchanged ()
+    {
+        // Arrange - screen is 2048x2048 by default (no driver)
+        ApplicationImpl app = new ();
+        Label label = new () { Width = 20, Height = 10 };
+        Popover<Label, string> popover = new (label) { App = app };
+
+        // Act - position at (50, 50), plenty of room below
+        popover.SetPosition (new Point (50, 50));
+
+        // Assert
+        Assert.Equal (50, (popover.ContentView!.X as PosAbsolute)!.Position);
+        Assert.Equal (50, (popover.ContentView!.Y as PosAbsolute)!.Position);
+    }
+
+    [Fact]
+    public void SetPosition_DoesNotFitBelow_FlipsAbove ()
+    {
+        // Arrange - screen is 2048x2048 by default (no driver)
+        ApplicationImpl app = new ();
+        Label label = new () { Width = 20, Height = 10 };
+        Popover<Label, string> popover = new (label) { App = app };
+
+        // Act - position at Y = 2045, only 3 rows of space below but view needs 10
+        popover.SetPosition (new Point (50, 2045));
+
+        // Assert - should flip: bottom 1 row above ideal Y → ny = 2045 - 10 - 1 = 2034
+        Assert.Equal (50, (popover.ContentView!.X as PosAbsolute)!.Position);
+        Assert.Equal (2034, (popover.ContentView!.Y as PosAbsolute)!.Position);
+    }
+
+    [Fact]
+    public void SetPosition_OverflowsRight_ClampsHorizontally ()
+    {
+        // Arrange - screen is 2048x2048 by default (no driver)
+        ApplicationImpl app = new ();
+        Label label = new () { Width = 20, Height = 10 };
+        Popover<Label, string> popover = new (label) { App = app };
+
+        // Act - position at X = 2040, only 8 cols of space but view needs 20
+        popover.SetPosition (new Point (2040, 50));
+
+        // Assert - should clamp: nx = 2048 - 20 = 2028
+        Assert.Equal (2028, (popover.ContentView!.X as PosAbsolute)!.Position);
+        Assert.Equal (50, (popover.ContentView!.Y as PosAbsolute)!.Position);
+    }
+
+    [Fact]
+    public void SetPosition_OverflowsBothEdges_ClampsHorizontallyAndFlipsAbove ()
+    {
+        // Arrange - screen is 2048x2048 by default (no driver)
+        ApplicationImpl app = new ();
+        Label label = new () { Width = 20, Height = 10 };
+        Popover<Label, string> popover = new (label) { App = app };
+
+        // Act - position at bottom-right corner
+        popover.SetPosition (new Point (2040, 2045));
+
+        // Assert - horizontal: 2048 - 20 = 2028, vertical: 2045 - 10 - 1 = 2034
+        Assert.Equal (2028, (popover.ContentView!.X as PosAbsolute)!.Position);
+        Assert.Equal (2034, (popover.ContentView!.Y as PosAbsolute)!.Position);
+    }
+
+    [Fact]
+    public void SetPosition_FlipAboveWouldGoNegative_ClampsToZero ()
+    {
+        // Arrange - screen is 2048x2048 by default (no driver)
+        ApplicationImpl app = new ();
+
+        // View taller than the screen to force a negative flip
+        Label label = new () { Width = 20, Height = 2048 };
+        Popover<Label, string> popover = new (label) { App = app };
+
+        // Act - position at Y = 5, doesn't fit below (needs 2048 rows), flip would be 5 - 2048 - 1 = negative
+        popover.SetPosition (new Point (50, 5));
+
+        // Assert - should clamp to 0
+        Assert.Equal (50, (popover.ContentView!.X as PosAbsolute)!.Position);
+        Assert.Equal (0, (popover.ContentView!.Y as PosAbsolute)!.Position);
     }
 }
