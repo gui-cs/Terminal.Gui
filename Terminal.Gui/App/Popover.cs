@@ -292,7 +292,32 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     /// </remarks>
     protected virtual Point GetAdjustedPosition (View view, Point idealLocation)
     {
-        GetLocationEnsuringFullVisibility (view, idealLocation.X, idealLocation.Y, out int nx, out int ny);
+        int screenWidth = App?.Screen.Width ?? 0;
+        int screenHeight = App?.Screen.Height ?? 0;
+
+        int viewWidth = view.Frame.Width;
+        int viewHeight = view.Frame.Height;
+
+        // Clamp horizontally: prefer idealLocation.X, but shift left if it would overflow
+        int nx = idealLocation.X;
+
+        if (nx + viewWidth > screenWidth)
+        {
+            nx = Math.Max (screenWidth - viewWidth, 0);
+        }
+
+        nx = Math.Max (nx, 0);
+
+        // Vertically: prefer below idealLocation
+        int ny = idealLocation.Y;
+
+        if (ny + viewHeight > screenHeight)
+        {
+            // Doesn't fit below — position so bottom is 1 row above the ideal Y
+            ny = idealLocation.Y - viewHeight - 1;
+        }
+
+        ny = Math.Max (ny, 0);
 
         return new Point (nx, ny);
     }

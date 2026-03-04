@@ -528,7 +528,7 @@ public partial class View
         Point viewportOffset = GetViewportOffsetFromFrame ();
         screen.Offset (viewportOffset.X, viewportOffset.Y);
 
-        return screen;
+        return screen with { Size = Viewport.Size };
     }
 
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>

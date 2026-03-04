@@ -569,10 +569,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     /// <summary>
-    ///     When this view loses focus, this property is set to the subview that had focus before the view lost focus. This
-    ///     allows
-    ///     the view to restore focus to the same subview when it regains focus. This is used by <see cref="RestoreFocus"/> and
-    /// </summary>
     public View? PreviouslyFocused { get; private set; }
 
     /// <summary>

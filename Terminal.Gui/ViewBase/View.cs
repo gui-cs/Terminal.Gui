@@ -380,7 +380,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
                     App.Mouse.UngrabMouse ();
                 }
 
-                // BUGBUG: Ideally we'd reset _previouslyFocused to the first focusable subview
+                // BUGBUG: Ideally we'd reset PreviouslyFocused to the first focusable subview
                 PreviouslyFocused = SubViews.FirstOrDefault (v => v.CanFocus);
 
                 if (HasFocus)
