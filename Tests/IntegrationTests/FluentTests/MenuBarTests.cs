@@ -833,7 +833,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBarItem? inlineItem = null;
         MenuBarItem? popoverItem = null;
 
-        TestContext c = With.A<Window> (60, 20, d, _out)
+        AppTestHelper c = With.A<Window> (60, 20, d, _out)
                             .Then (a =>
                                    {
                                        app = a;
@@ -926,7 +926,7 @@ public class MenuBarTests : TestsAllDrivers
         IApplication? app = null;
         MenuBarItem? inlineItem = null;
 
-        TestContext c = With.A<Window> (60, 20, d, _out)
+        AppTestHelper c = With.A<Window> (60, 20, d, _out)
                             .Then (a =>
                                    {
                                        app = a;
@@ -985,7 +985,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBarItem? inlineItem = null;
         var actionFiredCount = 0;
 
-        TestContext c = With.A<Window> (60, 20, d, _out)
+        AppTestHelper c = With.A<Window> (60, 20, d, _out)
                             .Then (a =>
                                    {
                                        app = a;
