@@ -214,10 +214,16 @@ public class MenuBarItem : MenuItem, IMenuBarEntry, IDesignable
                 // Collect all SubViews from the Root before PopoverMenu disposes them
                 List<View> menuItems = [.. rootMenu.SubViews];
 
-                // Remove them from Root so they aren't disposed with it
+                // Remove items from Root so they aren't disposed with it
                 rootMenu.RemoveAll ();
 
-                // Now safely dispose the PopoverMenu (and its Root)
+                // PopoverMenu.OnSubViewAdded adds cascading SubMenu Menus as direct SubViews
+                // of PopoverMenu for positioning (and due to re-entrancy in OnSubViewAdded,
+                // deep cascading menus may be added multiple times). RemoveAll detaches them
+                // all before Dispose can cascade View.Dispose into those SubMenus.
+                PopoverMenu.RemoveAll ();
+
+                // Now safely dispose the PopoverMenu (no SubViews left to cascade into)
                 PopoverMenu.Dispose ();
                 PopoverMenu = null;
 

@@ -259,81 +259,27 @@ public class MenuBars : Scenario
 
             Add (openBtn);
 
-            // --- Bottom MenuBar: demonstrates Y = Pos.AnchorEnd () and UsePopoverMenu toggle ---
-            bool usePopover = true;
+            // --- Bottom MenuBar: demonstrates Y = Pos.AnchorEnd () ---
+            BottomMenuBar = new MenuBar { Title = "Bottom MenuBar", Y = Pos.AnchorEnd () };
 
-            void buildBottomMenuBar ()
-            {
-                if (BottomMenuBar is { })
-                {
-                    // Close any open menus and move focus away before removing,
-                    // otherwise View.Remove asserts that the view has no focus.
-                    BottomMenuBar.HideActiveItem ();
+            MenuItem statusItem = new () { Title = "_Status", Text = "Show status info" };
+            statusItem.Activated += (_, _) => MessageBox.Query (App!, "Status", "All systems operational.", Strings.btnOk);
 
-                    if (BottomMenuBar.HasFocus)
-                    {
-                        BottomMenuBar.HasFocus = false;
-                    }
+            MenuItem toolsSettingsItem = new () { Title = "Se_ttings...", Text = "Tool settings" };
+            toolsSettingsItem.Activated += (_, _) => MessageBox.Query (App!, "Settings", "This would be a settings dialog.", Strings.btnOk);
 
-                    // Remove any inline SubMenus that were added to our SuperView
-                    foreach (View sv in BottomMenuBar.SubViews)
-                    {
-                        if (sv is MenuBarItem { UsePopoverMenu: false, SubMenu: { SuperView: { } } subMenu })
-                        {
-                            subMenu.SuperView.Remove (subMenu);
-                        }
-                    }
+            BottomMenuBar.Add (new MenuBarItem ("_Status",
+                                                [statusItem, new Line (), new MenuItem { Title = "_Refresh", Text = "Refresh status", Key = Key.R.WithCtrl }]));
 
-                    Remove (BottomMenuBar);
-                    BottomMenuBar.Dispose ();
-                }
+            BottomMenuBar.Add (new MenuBarItem ("_Tools",
+                                                [
+                                                    toolsSettingsItem,
+                                                    new Line (),
+                                                    new MenuItem { Title = "_Console", Text = "Open console" },
+                                                    new MenuItem { Title = "_Diagnostics", Text = "Run diagnostics" }
+                                                ]));
 
-                BottomMenuBar = new MenuBar { Title = "Bottom MenuBar", Y = Pos.AnchorEnd () };
-
-                MenuItem statusItem = new () { Title = "_Status", Text = "Show status info" };
-                statusItem.Activated += (_, _) => MessageBox.Query (App!, "Status", "All systems operational.", Strings.btnOk);
-
-                MenuItem toolsSettingsItem = new () { Title = "Se_ttings...", Text = "Tool settings" };
-                toolsSettingsItem.Activated += (_, _) => MessageBox.Query (App!, "Settings", "This would be a settings dialog.", Strings.btnOk);
-
-                BottomMenuBar.Add (new MenuBarItem ("_Status",
-                                                    [statusItem, new Line (), new MenuItem { Title = "_Refresh", Text = "Refresh status", Key = Key.R.WithCtrl }])
-                {
-                    UsePopoverMenu = usePopover
-                });
-
-                BottomMenuBar.Add (new MenuBarItem ("_Tools",
-                                                    [
-                                                        toolsSettingsItem,
-                                                        new Line (),
-                                                        new MenuItem { Title = "_Console", Text = "Open console" },
-                                                        new MenuItem { Title = "_Diagnostics", Text = "Run diagnostics" }
-                                                    ])
-                {
-                    UsePopoverMenu = usePopover
-                });
-
-                Add (BottomMenuBar);
-            }
-
-            buildBottomMenuBar ();
-
-            // CheckBox to toggle UsePopoverMenu — rebuilds the bottom MenuBar
-            CheckBox usePopoverCb = new ()
-            {
-                Title = "Use _Popover Menus (Bottom Bar)",
-                X = Pos.Left (openBtn),
-                Y = Pos.Bottom (openBtn) + 1,
-                Value = CheckState.Checked
-            };
-
-            usePopoverCb.ValueChanged += (_, args) =>
-            {
-                usePopover = args.NewValue == CheckState.Checked;
-                buildBottomMenuBar ();
-            };
-
-            Add (usePopoverCb);
+            Add (BottomMenuBar);
 
             autoSaveStatusCb.SetFocus ();
         }
