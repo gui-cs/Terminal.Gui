@@ -462,6 +462,9 @@ public class Menu : Bar, IValue<MenuItem?>
                                     new MenuItem { Title = "_Italic", Text = "Italic text", Key = Key.I.WithAlt },
                                     new MenuItem { Title = "_Underline", Text = "Underline text", Key = Key.U.WithCtrl }
                                 ])
+            {
+                Id = "FormatingSubMenu"
+            }
         };
 
         MenuItem viewItem = new ()
@@ -480,8 +483,14 @@ public class Menu : Bar, IValue<MenuItem?>
                                                                 new MenuItem { Title = "_Horizontal", Text = "Horizontal layout" },
                                                                 new MenuItem { Title = "_Vertical", Text = "Vertical layout" }
                                                             ])
+                                        {
+                                            Id = "LayoutSubMenu"
+                                        }
                                     }
                                 ])
+            {
+                Id = "ViewSubMenu"
+            }
         };
 
         MenuItem aboutItem = new () { Title = "_About", Text = "About this demo" };

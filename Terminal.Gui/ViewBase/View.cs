@@ -51,7 +51,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
-    public override string ToString () => $"{GetType ().Name}({Id}){Frame}";
+    public override string ToString () => $"{GetType ().Name}({this.ToIdentifyingString ()}){Frame}";
 
     /// <summary>
     ///     Pretty prints the View with more debug information.
@@ -59,9 +59,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <returns></returns>
     public virtual string ToDebugString ()
     {
-        string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{this.ToIdentifyingString ()}";
+        string identifyingText = this.ToIdentifyingString ();
 
-        return $"{GetType ().Name}({identifyingText}) SuperView={(SuperView is { } ? SuperView.ToDebugString () : "null")}";
+        return $"{GetType ().Name}({identifyingText}) SuperView={(SuperView is { } ? SuperView.ToIdentifyingString () : "null")}";
     }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>

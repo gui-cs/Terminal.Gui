@@ -218,7 +218,7 @@ public class MenuBarItem : MenuItem, IMenuBarEntry, IDesignable
                 rootMenu.RemoveAll ();
 
                 // PopoverMenu.OnSubViewAdded adds cascading SubMenu Menus as direct SubViews
-                // of PopoverMenu for positioning (and due to re-entrancy in OnSubViewAdded,
+                // of PopoverMenu for positioning (and due to reentrancy in OnSubViewAdded,
                 // deep cascading menus may be added multiple times). RemoveAll detaches them
                 // all before Dispose can cascade View.Dispose into those SubMenus.
                 PopoverMenu.RemoveAll ();
@@ -231,14 +231,14 @@ public class MenuBarItem : MenuItem, IMenuBarEntry, IDesignable
                 Menu inlineMenu = new (menuItems)
                 {
 #if DEBUG
-                    Id = $"InlineMenu ({Title})"
+                    Id = $"InlineMenu ({Id})"
 #endif
                 };
 
                 SubMenu = inlineMenu;
             }
 
-            if (SubMenu is { } && !SubMenu.IsInitialized)
+            if (SubMenu is { IsInitialized: false })
             {
                 SubMenu.App ??= App;
                 SubMenu.BeginInit ();
@@ -519,6 +519,8 @@ public class MenuBarItem : MenuItem, IMenuBarEntry, IDesignable
                 if (SubMenu is { })
                 {
                     SubMenu.KeyDown -= OnSubMenuKeyDown;
+                    SubMenu.Dispose ();
+                    SubMenu = null;
                 }
             }
         }

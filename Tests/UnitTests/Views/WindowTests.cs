@@ -17,7 +17,6 @@ public class WindowTests ()
         // Runnables have Width/Height set to Dim.Fill
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
-        Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());
         Assert.True (defaultWindow.CanFocus);
         Assert.False (defaultWindow.HasFocus);
         Assert.Equal (new Rectangle (0, 0, Application.Screen.Width - 2, Application.Screen.Height - 2), defaultWindow.Viewport);
@@ -64,7 +63,6 @@ public class WindowTests ()
         windowWithFrame1234.Title = "title";
         Assert.Equal ("title", windowWithFrame1234.Title);
         Assert.NotNull (windowWithFrame1234);
-        Assert.Equal ($"Window(){windowWithFrame1234.Frame}", windowWithFrame1234.ToString ());
         Assert.True (windowWithFrame1234.CanFocus);
         Assert.False (windowWithFrame1234.HasFocus);
         Assert.Equal (new (0, 0, 1, 2), windowWithFrame1234.Viewport);

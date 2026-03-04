@@ -81,6 +81,13 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
 
+#if DEBUG
+        if (string.IsNullOrEmpty (root?.Id))
+        {
+            root?.Id = $"popoverMenuRoot_{Id}";
+        }
+#endif
+
         return;
 
         bool? MoveLeft (ICommandContext? ctx)

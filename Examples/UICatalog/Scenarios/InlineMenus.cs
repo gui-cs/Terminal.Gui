@@ -77,10 +77,6 @@ public class InlineMenus : Scenario
     /// </summary>
     public class InlineMenuHost : View
     {
-        internal MenuBar? InlineMenuBar { get; private set; }
-
-        internal MenuBar? MixedMenuBar { get; private set; }
-
         public InlineMenuHost ()
         {
             CanFocus = true;
@@ -104,7 +100,7 @@ public class InlineMenus : Scenario
             Add (descLabel);
 
             // ─── Top MenuBar: all-inline with cascading submenus ───
-            InlineMenuBar = new MenuBar { Title = "Inline MenuBar" };
+            InlineMenuBar = new MenuBar { Id = "InlineMenuBar", Title = "Inline MenuBar" };
 
             InlineMenuBar.Add (new MenuBarItem (Strings.menuFile,
                                                 [
@@ -132,6 +128,9 @@ public class InlineMenus : Scenario
                                                                                                                 Strings.btnCancel)
                                                                                 }
                                                                             ])
+                                                        {
+                                                            Id = "FileOptionsMenu",
+                                                        }
                                                     },
                                                     new Line (),
                                                     new MenuItem
@@ -150,11 +149,16 @@ public class InlineMenus : Scenario
                                                                                                         ])
                                                                                 }
                                                                             ])
+                                                        {
+                                                            Id = "PreferencesMenu"
+                                                        }
+
                                                     },
                                                     new Line (),
                                                     new MenuItem { Title = "_Quit", Key = Application.QuitKey }
                                                 ])
             {
+                Id = "FileMenu",
                 UsePopoverMenu = false
             });
 
@@ -175,9 +179,13 @@ public class InlineMenus : Scenario
                                                                                 new Line (),
                                                                                 new MenuItem { Title = "_Go to Line...", HelpText = "Jump to line number", Key = Key.G.WithCtrl }
                                                                             ])
+                                                            {
+                                                                Id = "FindReplaceMenu"
+                                                            }
                                                     }
                                                 ])
             {
+                Id = "EditMenu",
                 UsePopoverMenu = false
             });
 
@@ -195,6 +203,7 @@ public class InlineMenus : Scenario
                                                     }
                                                 ])
             {
+                Id = "HelpMenu",
                 UsePopoverMenu = false
             });
 
@@ -231,7 +240,7 @@ public class InlineMenus : Scenario
                                        };
 
             // ─── Bottom MenuBar: mixed popover + inline ───
-            MixedMenuBar = new MenuBar { Title = "Mixed MenuBar", Y = Pos.AnchorEnd () };
+            MixedMenuBar = new MenuBar { Id = "MixedMenuBar", Title = "Mixed MenuBar", Y = Pos.AnchorEnd () };
 
             // This MenuBarItem uses the default popover mode
             MixedMenuBar.Add (new MenuBarItem ("_Status (Popover)",
@@ -246,8 +255,15 @@ public class InlineMenus : Scenario
                                                                                new MenuItem { Title = "_System Info", HelpText = "OS and runtime info" },
                                                                                new MenuItem { Title = "_Memory Usage", HelpText = "Memory stats" }
                                                                            ])
+                                                       {
+                                                           Id = "StatusDetailsMenu",
+                                                       }
                                                    }
-                                               ]));
+                                               ])
+            {
+                UsePopoverMenu = false,
+                Id = "StatusMenu",
+            });
 
             // This MenuBarItem uses inline mode with cascading submenus
             MixedMenuBar.Add (new MenuBarItem ("_Tools (Inline)",
@@ -268,10 +284,14 @@ public class InlineMenus : Scenario
                                                                                new MenuItem { Title = "_Network Test", HelpText = "Test network connectivity" },
                                                                                new MenuItem { Title = "_Disk Check", HelpText = "Verify disk health" }
                                                                            ])
+                                                       {
+                                                           Id = "DiagnosticsMenu",
+                                                       }
                                                    }
                                                ])
             {
-                UsePopoverMenu = false
+                UsePopoverMenu = false,
+                Id = "ToolsMenu",
             });
 
             Add (MixedMenuBar);
@@ -289,5 +309,9 @@ public class InlineMenus : Scenario
                                           }
                                       };
         }
+
+        internal MenuBar? InlineMenuBar { get; private set; }
+
+        internal MenuBar? MixedMenuBar { get; private set; }
     }
 }
