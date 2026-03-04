@@ -6,7 +6,6 @@
       <Nullable>enable</Nullable>
 
       <IsPackable>false</IsPackable>
-      <IsTestProject>true</IsTestProject>
 	    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
 	    <DebugType>portable</DebugType>
 	    <ImplicitUsings>enable</ImplicitUsings>

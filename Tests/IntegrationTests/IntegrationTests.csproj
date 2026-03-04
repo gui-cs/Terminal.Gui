@@ -5,14 +5,11 @@
 	      <UseAppHost>true</UseAppHost>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <IsTestProject>true</IsTestProject>
         <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
         <DebugType>portable</DebugType>
         <ImplicitUsings>enable</ImplicitUsings>
         <NoLogo>true</NoLogo>
         <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-	      <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
-	      <IncludeTestHostReference>false</IncludeTestHostReference>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <DefineDebug>true</DefineDebug>
