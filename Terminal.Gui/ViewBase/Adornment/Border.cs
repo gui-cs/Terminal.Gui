@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>The Border for a <see cref="View"/>. Accessed via <see cref="View.Border"/></summary>
@@ -17,12 +15,12 @@ namespace Terminal.Gui.ViewBase;
 ///             │        │
 ///             └────────┘
 ///             // If Thickness.Top is 2:
-///              ┌────┐
+///             ┌────┐
 ///             ┌┤1234├──┐
 ///             │        │
 ///             └────────┘
 ///             If Thickness.Top is 3:
-///              ┌────┐
+///             ┌────┐
 ///             ┌┤1234├──┐
 ///             │└────┘  │
 ///             │        │
@@ -30,7 +28,8 @@ namespace Terminal.Gui.ViewBase;
 ///         </example>
 ///     </para>
 ///     <para>
-///         The Border provides keyboard and mouse support for moving and resizing the View. See <see cref="ViewArrangement"/>.
+///         The Border provides keyboard and mouse support for moving and resizing the View. See
+///         <see cref="ViewArrangement"/>.
 ///     </para>
 /// </remarks>
 public partial class Border : Adornment
@@ -49,6 +48,7 @@ public partial class Border : Adornment
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
         ThicknessChanged += OnThicknessChanged;
+        Settings = BorderSettings.Title;
     }
 
     // TODO: Move DrawIndicator out of Border and into View
@@ -64,20 +64,22 @@ public partial class Border : Adornment
     {
         if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && Thickness != Thickness.Empty)
         {
-            if (DrawIndicator is null)
+            if (DrawIndicator is { })
             {
-                DrawIndicator = new ()
-                {
-#if DEBUG
-                    Id = "DrawIndicator",
-#endif
-                    X = 1,
-                    Style = new SpinnerStyle.Dots2 (),
-                    SpinDelay = 0,
-                    Visible = false
-                };
-                Add (DrawIndicator);
+                return;
             }
+
+            DrawIndicator = new ()
+            {
+#if DEBUG
+                Id = "DrawIndicator",
+#endif
+                X = 1,
+                Style = new SpinnerStyle.Dots2 (),
+                SpinDelay = 0,
+                Visible = false
+            };
+            Add (DrawIndicator);
         }
         else if (DrawIndicator is { })
         {
@@ -89,11 +91,12 @@ public partial class Border : Adornment
 
     internal void AdvanceDrawIndicator ()
     {
-        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && DrawIndicator is { })
+        if (!View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) || DrawIndicator is null)
         {
-            DrawIndicator.AdvanceAnimation (false);
-            DrawIndicator.Render ();
+            return;
         }
+        DrawIndicator.AdvanceAnimation (false);
+        DrawIndicator.Render ();
     }
 
 #if SUBVIEW_BASED_BORDER
@@ -117,7 +120,7 @@ public partial class Border : Adornment
 
         ShowHideDrawIndicator ();
 
-        MouseHighlightStates |= (Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None);
+        MouseHighlightStates |= Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None;
 
 #if SUBVIEW_BASED_BORDER
         if (Parent is { })
@@ -167,28 +170,10 @@ public partial class Border : Adornment
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
 
-        return new (
-                    screenRect.X + Math.Max (0, Thickness.Left - 1),
+        return new (screenRect.X + Math.Max (0, Thickness.Left - 1),
                     screenRect.Y + Math.Max (0, Thickness.Top - 1),
-                    Math.Max (
-                              0,
-                              screenRect.Width
-                              - Math.Max (
-                                          0,
-                                          Math.Max (0, Thickness.Left - 1)
-                                          + Math.Max (0, Thickness.Right - 1)
-                                         )
-                             ),
-                    Math.Max (
-                              0,
-                              screenRect.Height
-                              - Math.Max (
-                                          0,
-                                          Math.Max (0, Thickness.Top - 1)
-                                          + Math.Max (0, Thickness.Bottom - 1)
-                                         )
-                             )
-                   );
+                    Math.Max (0, screenRect.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
+                    Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
     }
 
     // TODO: Make LineStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
@@ -211,31 +196,29 @@ public partial class Border : Adornment
             // TODO: all this.
             return Parent?.SuperView?.BorderStyle ?? LineStyle.None;
         }
+
         // BUGBUG: Setting LineStyle should SetNeedsDraw
         set => _lineStyle = value;
     }
-
-    private BorderSettings _settings = BorderSettings.Title;
 
     /// <summary>
     ///     Gets or sets the settings for the border.
     /// </summary>
     public BorderSettings Settings
     {
-        get => _settings;
+        get;
         set
         {
-            if (value == _settings)
+            if (value == field)
             {
                 return;
             }
 
-            _settings = value;
+            field = value;
 
             Parent?.SetNeedsDraw ();
         }
     }
-
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
@@ -259,24 +242,16 @@ public partial class Border : Adornment
         int titleY = borderBounds.Y;
         var titleBarsLength = 0; // the little vertical thingies
 
-        int maxTitleWidth = Math.Max (
-                                      0,
-                                      Math.Min (
-                                                Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0,
-                                                Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
-                                               )
-                                     );
+        int maxTitleWidth = Math.Max (0,
+                                      Math.Min (Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0,
+                                                Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)));
 
-        if (Parent is { })
-        {
-            Parent.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
-        }
+        Parent?.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
 
         LineStyle lineStyle = LineStyle;
-
 
         if (Settings.FastHasFlags (BorderSettings.Title))
         {
@@ -320,219 +295,176 @@ public partial class Border : Adornment
         {
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
-            Parent.TitleTextFormatter.Draw (driver: Driver, screen: titleRect, normalColor: GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal), hotColor: GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+            Parent.TitleTextFormatter.Draw (Driver,
+                                            titleRect,
+                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
+                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
             Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
-        if (canDrawBorder && LineStyle != LineStyle.None)
+        if (!canDrawBorder || LineStyle == LineStyle.None)
         {
-            LineCanvas? lc = Parent?.LineCanvas;
+            return true;
+        }
+        LineCanvas? lc = Parent?.LineCanvas;
 
-            bool drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height >= 1;
-            bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
-            bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1 && Frame.Height > 1;
-            bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+        bool drawTop = Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
+        bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+        bool drawBottom = Thickness.Bottom > 0 && Frame is { Width: > 1, Height: > 1 };
+        bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 
-            //Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
+        //Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
 
-            Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
+        Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
-            if (MouseState.HasFlag (MouseState.Pressed))
+        if (MouseState.HasFlag (MouseState.Pressed))
+        {
+            normalAttribute = GetAttributeForRole (VisualRole.Highlight);
+        }
+
+        SetAttribute (normalAttribute);
+
+        if (drawTop)
+        {
+            // ╔╡Title╞═════╗
+            // ╔╡╞═════╗
+            if (borderBounds.Width < 4 || !Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Parent?.Title))
             {
-                normalAttribute = GetAttributeForRole (VisualRole.Highlight);
-            }
-
-            SetAttribute (normalAttribute);
-
-            if (drawTop)
-            {
-                // ╔╡Title╞═════╗
-                // ╔╡╞═════╗
-                if (borderBounds.Width < 4 || !Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Parent?.Title))
-                {
-                    // ╔╡╞╗ should be ╔══╗
-                    lc?.AddLine (
-                                 new (borderBounds.Location.X, titleY),
-                                 borderBounds.Width,
-                                 Orientation.Horizontal,
-                                 lineStyle,
-                                 normalAttribute
-                                );
-                }
-                else
-                {
-                    // ┌────┐
-                    //┌┘View└
-                    //│
-                    if (Thickness.Top == 2)
-                    {
-                        lc?.AddLine (
-                                     new (borderBounds.X + 1, topTitleLineY),
-                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                     Orientation.Horizontal,
-                                     lineStyle,
-                                     normalAttribute
-                                    );
-                    }
-
-                    // ┌────┐
-                    //┌┘View└
-                    //│
-                    if (borderBounds.Width >= 4 && Thickness.Top > 2)
-                    {
-                        lc?.AddLine (
-                                     new (borderBounds.X + 1, topTitleLineY),
-                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                     Orientation.Horizontal,
-                                     lineStyle,
-                                     normalAttribute
-                                    );
-
-                        lc?.AddLine (
-                                     new (borderBounds.X + 1, topTitleLineY + 2),
-                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                     Orientation.Horizontal,
-                                     lineStyle,
-                                     normalAttribute
-                                    );
-                    }
-
-                    // ╔╡Title╞═════╗
-                    // Add a short horiz line for ╔╡
-                    lc?.AddLine (
-                                 new (borderBounds.Location.X, titleY),
-                                 2,
-                                 Orientation.Horizontal,
-                                 lineStyle,
-                                 normalAttribute
-                                );
-
-                    // Add a vert line for ╔╡
-                    lc?.AddLine (
-                                 new (borderBounds.X + 1, topTitleLineY),
-                                 titleBarsLength,
-                                 Orientation.Vertical,
-                                 LineStyle.Single,
-                                 normalAttribute
-                                );
-
-                    // Add a vert line for ╞
-                    lc?.AddLine (
-                                 new (
-                                      borderBounds.X
-                                      + 1
-                                      + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
-                                      - 1,
-                                      topTitleLineY
-                                     ),
-                                 titleBarsLength,
-                                 Orientation.Vertical,
-                                 LineStyle.Single,
-                                 normalAttribute
-                                );
-
-                    // Add the right hand line for ╞═════╗
-                    lc?.AddLine (
-                                 new (
-                                      borderBounds.X
-                                      + 1
-                                      + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2)
-                                      - 1,
-                                      titleY
-                                     ),
-                                 borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                 Orientation.Horizontal,
-                                 lineStyle,
-                                 normalAttribute
-                                );
-                }
-            }
-
-#if !SUBVIEW_BASED_BORDER
-
-            if (drawLeft)
-            {
-                lc?.AddLine (
-                             new (borderBounds.Location.X, titleY),
-                             sideLineLength,
-                             Orientation.Vertical,
-                             lineStyle,
-                             normalAttribute
-                            );
-            }
-#endif
-
-            if (drawBottom)
-            {
-                lc?.AddLine (
-                             new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
-                             borderBounds.Width,
-                             Orientation.Horizontal,
-                             lineStyle,
-                             normalAttribute
-                            );
-            }
-
-            if (drawRight)
-            {
-                lc?.AddLine (
-                             new (borderBounds.X + borderBounds.Width - 1, titleY),
-                             sideLineLength,
-                             Orientation.Vertical,
-                             lineStyle,
-                             normalAttribute
-                            );
-            }
-
-            // SetAttribute (prevAttr);
-
-            // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
-            if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
-            {
-                // Top
-                var hruler = new Ruler { Length = screenBounds.Width, Orientation = Orientation.Horizontal };
-
-                if (drawTop)
-                {
-                    hruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y));
-                }
-
-                // Redraw title 
-                if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
-                {
-                    Parent!.TitleTextFormatter.Draw (driver: Driver, screen: new (borderBounds.X + 2, titleY, maxTitleWidth, 1), normalColor: Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal), hotColor: Parent.HasFocus ? Parent.GetAttributeForRole (VisualRole.Focus) : Parent.GetAttributeForRole (VisualRole.Normal));
-                }
-
-                //Left
-                var vruler = new Ruler { Length = screenBounds.Height - 2, Orientation = Orientation.Vertical };
-
-                if (drawLeft)
-                {
-                    vruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y + 1), start: 1);
-                }
-
-                // Bottom
-                if (drawBottom)
-                {
-                    hruler.Draw (driver: Driver, location: new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
-                }
-
-                // Right
-                if (drawRight)
-                {
-                    vruler.Draw (driver: Driver, location: new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), start: 1);
-                }
-            }
-
-            // TODO: This should not be done on each draw?
-            if (Settings.FastHasFlags (BorderSettings.Gradient))
-            {
-                SetupGradientLineCanvas (lc!, screenBounds);
+                // ╔╡╞╗ should be ╔══╗
+                lc?.AddLine (new (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
             }
             else
             {
-                lc!.Fill = null;
+                // ┌────┐
+                //┌┘View└
+                //│
+                if (Thickness.Top == 2)
+                {
+                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY),
+                                 Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                 Orientation.Horizontal,
+                                 lineStyle,
+                                 normalAttribute);
+                }
+
+                // ┌────┐
+                //┌┘View└
+                //│
+                if (borderBounds.Width >= 4 && Thickness.Top > 2)
+                {
+                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY),
+                                 Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                 Orientation.Horizontal,
+                                 lineStyle,
+                                 normalAttribute);
+
+                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY + 2),
+                                 Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                 Orientation.Horizontal,
+                                 lineStyle,
+                                 normalAttribute);
+                }
+
+                // ╔╡Title╞═════╗
+                // Add a short horiz line for ╔╡
+                lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, lineStyle, normalAttribute);
+
+                // Add a vert line for ╔╡
+                lc?.AddLine (new (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
+
+                // Add a vert line for ╞
+                lc?.AddLine (new (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
+                             titleBarsLength,
+                             Orientation.Vertical,
+                             LineStyle.Single,
+                             normalAttribute);
+
+                // Add the right hand line for ╞═════╗
+                lc?.AddLine (new (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
+                             borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                             Orientation.Horizontal,
+                             lineStyle,
+                             normalAttribute);
             }
+        }
+
+#if !SUBVIEW_BASED_BORDER
+
+        if (drawLeft)
+        {
+            lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+        }
+#endif
+
+        if (drawBottom)
+        {
+            lc?.AddLine (new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
+                         borderBounds.Width,
+                         Orientation.Horizontal,
+                         lineStyle,
+                         normalAttribute);
+        }
+
+        if (drawRight)
+        {
+            lc?.AddLine (new (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+        }
+
+        // SetAttribute (prevAttr);
+
+        // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
+        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
+        {
+            // Top
+            var hRuler = new Ruler { Length = screenBounds.Width, Orientation = Orientation.Horizontal };
+
+            if (drawTop)
+            {
+                hRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y));
+            }
+
+            // Redraw title
+            if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
+            {
+                Parent!.TitleTextFormatter.Draw (Driver,
+                                                 new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                                                 Parent.HasFocus
+                                                     ? Parent.GetAttributeForRole (VisualRole.Focus)
+                                                     : Parent.GetAttributeForRole (VisualRole.Normal),
+                                                 Parent.HasFocus
+                                                     ? Parent.GetAttributeForRole (VisualRole.Focus)
+                                                     : Parent.GetAttributeForRole (VisualRole.Normal));
+            }
+
+            //Left
+            var vRuler = new Ruler { Length = screenBounds.Height - 2, Orientation = Orientation.Vertical };
+
+            if (drawLeft)
+            {
+                vRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y + 1), 1);
+            }
+
+            // Bottom
+            if (drawBottom)
+            {
+                hRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+            }
+
+            // Right
+            if (drawRight)
+            {
+                vRuler.Draw (Driver, new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+            }
+        }
+
+        // TODO: This should not be done on each draw?
+        if (Settings.FastHasFlags (BorderSettings.Gradient))
+        {
+            SetupGradientLineCanvas (lc!, screenBounds);
+        }
+        else
+        {
+            lc!.Fill = null;
         }
 
         return true;
@@ -571,5 +503,4 @@ public partial class Border : Adornment
         // If we pass only a single value then it will assume equal steps between all pairs
         steps = [15];
     }
-
 }

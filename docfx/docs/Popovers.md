@@ -389,13 +389,13 @@ This creates the expected behavior where clicking outside a menu or dialog close
 
 ### Dismiss-and-Re-show Prevention
 
-When a popover is dismissed by a mouse press outside its SubViews, `MouseImpl.RaiseMouseEvent` recurses so the click event can reach views beneath the popover. This enables the "click a different button while a context menu is open" scenario — the menu closes and the button activates in a single click.
+When a popover is dismissed by a mouse press outside its SubViews, `ApplicationMouse.RaiseMouseEvent` recurses so the click event can reach views beneath the popover. This enables the "click a different button while a context menu is open" scenario — the menu closes and the button activates in a single click.
 
-However, if the view beneath the popover is the **same view that opened it** (e.g., a `DropDownList` toggle button or a `MenuBarItem`), the recursed event would re-activate the view and re-show the popover. To prevent this, `MouseImpl` records which popover was just dismissed (`DismissedByMousePress`) and `ApplicationPopover.Show` checks this guard — silently returning if the caller is trying to re-show the same popover. The guard spans the entire mouse interaction cycle (press → release → click) because `Button` and other views with `ShouldAutoGrab` start an auto-grab on the pressed event and invoke commands on the subsequent clicked event. The guard is cleared when:
+However, if the view beneath the popover is the **same view that opened it** (e.g., a `DropDownList` toggle button or a `MenuBarItem`), the recursed event would re-activate the view and re-show the popover. To prevent this, `ApplicationMouse` records which popover was just dismissed (`DismissedByMousePress`) and `ApplicationPopover.Show` checks this guard — silently returning if the caller is trying to re-show the same popover. The guard spans the entire mouse interaction cycle (press → release → click) because `Button` and other views with `ShouldAutoGrab` start an auto-grab on the pressed event and invoke commands on the subsequent clicked event. The guard is cleared when:
 
 - A new, unrelated press event arrives (enabling the popover to be toggled open again on the next click)
 - The click cycle completes (`IsSingleDoubleOrTripleClicked`)
-- `MouseImpl.ResetState` is called
+- `ApplicationMouse.ResetState` is called
 
 This means views that open popovers on activation do **not** need their own re-show prevention logic — the framework handles it automatically.
 

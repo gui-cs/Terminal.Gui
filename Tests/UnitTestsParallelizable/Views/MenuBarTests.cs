@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
@@ -2038,7 +2039,7 @@ public class MenuBarTests (ITestOutputHelper output)
     [Fact]
     public void MenuBar_Activated_ContextValue_ContainsMenuItem ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2146,7 +2147,7 @@ public class MenuBarTests (ITestOutputHelper output)
     [Fact]
     public void MenuBar_Activated_ContextValue_WithFocusedMenuItem ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 

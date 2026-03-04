@@ -10,13 +10,13 @@ namespace Terminal.Gui.App;
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
-internal class MouseImpl : IMouse, IDisposable
+internal class ApplicationMouse : IMouse, IDisposable
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseImpl"/> class and subscribes to Application configuration
+    ///     Initializes a new instance of the <see cref="ApplicationMouse"/> class and subscribes to Application configuration
     ///     property events.
     /// </summary>
-    public MouseImpl () =>
+    public ApplicationMouse () =>
 
         // Subscribe to Application static property change events
         Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
@@ -108,7 +108,8 @@ internal class MouseImpl : IMouse, IDisposable
         // Dismiss the Popover if the user presses mouse outside of it
         if (mouseEvent.IsPressed
             && App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover and View popoverView
-            && !View.IsInHierarchy (popoverView, deepestViewUnderMouse, true))
+            && !View.IsInHierarchy (popoverView, deepestViewUnderMouse, true)
+            && !IsGrabbedByViewInHierarchy (popoverView))
         {
             Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Hide Visible Popover");
 
@@ -230,6 +231,16 @@ internal class MouseImpl : IMouse, IDisposable
         {
             _dismissedByMousePress = null;
         }
+    }
+
+    /// <summary>
+    ///     Returns <see langword="true"/> when the mouse is currently grabbed by a view
+    ///     that belongs to <paramref name="hierarchyRoot"/>'s view hierarchy.
+    /// </summary>
+    private bool IsGrabbedByViewInHierarchy (View hierarchyRoot)
+    {
+        return _mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true
+               && View.IsInHierarchy (hierarchyRoot, grabbed, true);
     }
 
     /// <inheritdoc/>

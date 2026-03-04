@@ -93,6 +93,13 @@ public class MenuItem : Shortcut, IValue
     public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText) =>
         SubMenu = subMenu;
 
+    /// <summary>
+    ///     Gets the glyph displayed in <see cref="Shortcut.KeyView"/> when a <see cref="SubMenu"/> is set.
+    ///     The default is <see cref="Glyphs.RightArrow"/> (►). Override to change the indicator
+    ///     (e.g., <see cref="Glyphs.DownArrow"/> for a drop-down menu bar entry).
+    /// </summary>
+    protected virtual Rune SubMenuGlyph => Glyphs.RightArrow;
+
     private CommandBridge? _subMenuBridge;
 
     /// <summary>
@@ -119,11 +126,15 @@ public class MenuItem : Shortcut, IValue
                 return;
             }
 
+#if DEBUG
+            field.Id = $"{Id}_SubMenu";
+#endif
+
             field!.App ??= App;
             field!.Visible = false;
 
-            // TODO: This is a temporary hack - add a flag or something instead
-            KeyView.Text = $"{Glyphs.RightArrow}";
+            Rune glyph = SubMenuGlyph;
+            KeyView.Text = glyph == default (Rune) ? string.Empty : $"{glyph}";
             field.SuperMenuItem = this;
 
             // Bridge Activate and Accept from SubMenu → this MenuItem across the
@@ -134,7 +145,7 @@ public class MenuItem : Shortcut, IValue
     }
 
     /// <inheritdoc/>
-    public object? GetValue () => Title;
+    public object GetValue () => Title;
 
     /// <inheritdoc/>
     event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
@@ -142,31 +153,35 @@ public class MenuItem : Shortcut, IValue
         add
         {
             // Forward Title changes to ValueChangedUntyped
-            if (value is { })
+            if (value is null)
             {
-                bool hadHandlers = _valueChangedUntypedHandlers is not null;
-
-                _valueChangedUntypedHandlers += value;
-
-                // Wire up the bridge only when the first handler is added
-                if (!hadHandlers)
-                {
-                    // Initialize last known title so OldValue is correct on first change
-                    _lastTitle = Title;
-                    TitleChanged += OnTitleChangedForValueChanged;
-                }
+                return;
             }
+            bool hadHandlers = _valueChangedUntypedHandlers is { };
+
+            _valueChangedUntypedHandlers += value;
+
+            // Wire up the bridge only when the first handler is added
+            if (hadHandlers)
+            {
+                return;
+            }
+
+            // Initialize last known title so OldValue is correct on first change
+            _lastTitle = Title;
+            TitleChanged += OnTitleChangedForValueChanged;
         }
         remove
         {
-            if (value is { })
+            if (value is null)
             {
-                _valueChangedUntypedHandlers -= value;
+                return;
+            }
+            _valueChangedUntypedHandlers -= value;
 
-                if (_valueChangedUntypedHandlers is null)
-                {
-                    TitleChanged -= OnTitleChangedForValueChanged;
-                }
+            if (_valueChangedUntypedHandlers is null)
+            {
+                TitleChanged -= OnTitleChangedForValueChanged;
             }
         }
     }

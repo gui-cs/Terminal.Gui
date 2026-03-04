@@ -1,7 +1,7 @@
 namespace ApplicationTests.Popover;
 
 /// <summary>
-///     Tests for the popover dismiss-on-click-outside logic in <see cref="MouseImpl.RaiseMouseEvent"/>.
+///     Tests for the popover dismiss-on-click-outside logic in <see cref="ApplicationMouse.RaiseMouseEvent"/>.
 ///     <para>
 ///         The selected code under test:
 ///         <code>
@@ -274,7 +274,7 @@ public class PopoverMouseDismissTests
 
         var viewReceivedMouseEvent = false;
 
-        viewBelowPopover.MouseEvent += (s, e) =>
+        viewBelowPopover.MouseEvent += (_, e) =>
                                        {
                                            viewReceivedMouseEvent = true;
                                            e.Handled = true;
@@ -382,7 +382,7 @@ public class PopoverMouseDismissTests
         Assert.True (popover.Visible);
 
         // Handle the event at the application level before popover dismiss logic runs
-        app.Mouse.MouseEvent += (s, e) => e.Handled = true;
+        app.Mouse.MouseEvent += (_, e) => e.Handled = true;
 
         // Act
         app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
@@ -443,11 +443,11 @@ public class PopoverMouseDismissTests
     ///             Second press on the activator (while popover is visible):
     ///             <list type="bullet">
     ///                 <item>Dismiss logic fires — popover is hidden via <see cref="ApplicationPopover.HideWithQuitCommand"/>.</item>
-    ///                 <item><see cref="MouseImpl.RaiseMouseEvent"/> recurses.</item>
+    ///                 <item><see cref="ApplicationMouse.RaiseMouseEvent"/> recurses.</item>
     ///                 <item>The recursed event reaches the activator, invoking <see cref="Command.Activate"/>.</item>
     ///                 <item>
     ///                     <see cref="ActivatorView.OnActivated"/> calls <see cref="ApplicationPopover.Show"/> but the
-    ///                     <see cref="MouseImpl.DismissedByMousePress"/> guard suppresses the re-show.
+    ///                     <see cref="ApplicationMouse.DismissedByMousePress"/> guard suppresses the re-show.
     ///                 </item>
     ///             </list>
     ///         </item>
@@ -464,22 +464,11 @@ public class PopoverMouseDismissTests
         Runnable top = new () { App = app };
 
         // Activator view at top-left corner
-        var activator = new ActivatorView
-        {
-            X = 0,
-            Y = 0,
-            Width = 10,
-            Height = 3
-        };
+        var activator = new ActivatorView { X = 0, Y = 0, Width = 10, Height = 3 };
 
         // Popover fills the screen (transparent overlay), but its only non-transparent
         // child is at X=20 — well away from the activator at X=0.
-        var popover = new ApplicationPopoverTests.PopoverTestClass
-        {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        var popover = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
 
         View popoverContent = new ()
         {
@@ -496,11 +485,7 @@ public class PopoverMouseDismissTests
         SessionToken? token = app.Begin (top);
 
         // --- First press: activator shows the popover ---
-        app.Mouse.RaiseMouseEvent (new Mouse
-        {
-            ScreenPosition = new Point (1, 1),
-            Flags = MouseFlags.LeftButtonPressed
-        });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 1), Flags = MouseFlags.LeftButtonPressed });
 
         Assert.True (popover.Visible, "Popover should be visible after first activation");
         Assert.Equal (1, activator.ActivateCount);
@@ -509,11 +494,7 @@ public class PopoverMouseDismissTests
         // Because the activator is NOT in the popover hierarchy, the dismiss logic fires.
         // Then RaiseMouseEvent recurses, the event reaches the activator, and Activate tries to re-show.
         // The DismissedByMousePress guard in ApplicationPopover.Show suppresses the re-show.
-        app.Mouse.RaiseMouseEvent (new Mouse
-        {
-            ScreenPosition = new Point (1, 1),
-            Flags = MouseFlags.LeftButtonPressed
-        });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 1), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert — the popover was dismissed and the guard prevented re-show
         Assert.Equal (2, activator.ActivateCount);
@@ -525,7 +506,7 @@ public class PopoverMouseDismissTests
 
     /// <summary>
     ///     After dismiss-by-click, a subsequent fresh mouse press should allow the popover to be shown again.
-    ///     The <see cref="MouseImpl.DismissedByMousePress"/> guard is cleared on the next new press event.
+    ///     The <see cref="ApplicationMouse.DismissedByMousePress"/> guard is cleared on the next new press event.
     /// </summary>
     [Fact]
     public void MousePress_AfterDismissCycle_AllowsReshowOnNextPress ()
@@ -537,20 +518,9 @@ public class PopoverMouseDismissTests
 
         Runnable top = new () { App = app };
 
-        var activator = new ActivatorView
-        {
-            X = 0,
-            Y = 0,
-            Width = 10,
-            Height = 3
-        };
+        var activator = new ActivatorView { X = 0, Y = 0, Width = 10, Height = 3 };
 
-        var popover = new ApplicationPopoverTests.PopoverTestClass
-        {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        var popover = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
 
         View popoverContent = new ()
         {
@@ -584,6 +554,59 @@ public class PopoverMouseDismissTests
     }
 
     /// <summary>
+    ///     When a SubView inside the popover grabs the mouse on press, dragging outside
+    ///     the popover (while the button is still held) should NOT dismiss the popover.
+    ///     This simulates a press-and-hold drag scenario (e.g., dragging a scrollbar
+    ///     slider or selecting text) where the mouse leaves the popover bounds.
+    /// </summary>
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void MousePressInsidePopover_ThenDragOutside_DoesNotDismissPopover ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+        SessionToken? token = app.Begin (top);
+
+        // Create a popover with a mouse-grabbing SubView
+        var popover = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill (), GrabsMouseOnPress = true };
+
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+        popover.Layout (new Size (80, 25));
+
+        Assert.True (popover.Visible, "Popover should be visible after Show");
+        Assert.NotNull (popover.MouseGrabbingSubView);
+
+        // Act Step 1 - Press inside the mouse-grabbing SubView (which is at 0,0 size 10x10)
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
+
+        // The SubView should have grabbed the mouse
+        Assert.True (app.Mouse.IsGrabbed (popover.MouseGrabbingSubView!), "Mouse should be grabbed by the SubView after press");
+        Assert.True (popover.Visible, "Popover should still be visible after press inside SubView");
+
+        // Act Step 2 - Drag outside the popover's SubView while button is still held
+        // Point (50, 20) is outside the mouse-grabbing SubView (10x10) but the mouse is grabbed
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (50, 20), Flags = MouseFlags.LeftButtonPressed });
+
+        // Assert - Popover should NOT be dismissed because mouse was grabbed by a view in the popover hierarchy
+        Assert.True (popover.Visible, "Popover should remain visible when mouse is grabbed and dragged outside");
+
+        // Act Step 3 - Release the mouse outside
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (50, 20), Flags = MouseFlags.LeftButtonReleased });
+
+        // Popover should still be visible after release (release doesn't dismiss)
+        Assert.True (popover.Visible, "Popover should remain visible after mouse release");
+
+        app.End (token!);
+        top.Dispose ();
+    }
+
+    /// <summary>
     ///     The dismiss guard only suppresses the SAME popover. Clicking outside one popover
     ///     and having the view beneath open a DIFFERENT popover should work.
     /// </summary>
@@ -598,23 +621,29 @@ public class PopoverMouseDismissTests
         Runnable top = new () { App = app };
 
         // First popover (will be dismissed)
-        var popover1 = new ApplicationPopoverTests.PopoverTestClass
+        var popover1 = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        View content1 = new ()
         {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            X = 30,
+            Y = 0,
+            Width = 10,
+            Height = 5,
+            CanFocus = true
         };
-        View content1 = new () { X = 30, Y = 0, Width = 10, Height = 5, CanFocus = true };
         popover1.Add (content1);
 
         // Second popover (will be opened by activator)
-        var popover2 = new ApplicationPopoverTests.PopoverTestClass
+        var popover2 = new ApplicationPopoverTests.PopoverTestClass { App = app, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        View content2 = new ()
         {
-            App = app,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            X = 30,
+            Y = 0,
+            Width = 10,
+            Height = 5,
+            CanFocus = true
         };
-        View content2 = new () { X = 30, Y = 0, Width = 10, Height = 5, CanFocus = true };
         popover2.Add (content2);
 
         // Activator always opens popover2

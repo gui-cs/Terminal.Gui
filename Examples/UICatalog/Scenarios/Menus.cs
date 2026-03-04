@@ -127,6 +127,35 @@ public class Menus : Scenario
             ConfigureTestMenu (testMenu);
             Add (testMenu);
 
+            Button addAboveButton = new () { X = Pos.Right (testMenu) + 1, Y = Pos.Top (testMenu), Title = "_Add a MenuItem above selected" };
+
+            addAboveButton.Accepting += (_, args) =>
+                                        {
+                                            testMenu.AddAt (testMenu.SubViews.ToArray ().IndexOf (testMenu.SelectedMenuItem),
+                                                            new MenuItem { Title = "_Above", HelpText = "I was added above", Key = Key.A.WithCtrl });
+                                            args.Handled = true;
+                                        };
+            Add (addAboveButton);
+
+            Button addBelowButton = new () { X = Pos.Right (testMenu) + 1, Y = Pos.Bottom (addAboveButton), Title = "Add a MenuItem _below selected" };
+
+            addBelowButton.Accepting += (_, args) =>
+                                        {
+                                            testMenu.AddAt (testMenu.SubViews.ToArray ().IndexOf (testMenu.SelectedMenuItem) + 1,
+                                                            new MenuItem { Title = "_Below", HelpText = "I was added below", Key = Key.B.WithCtrl });
+                                            args.Handled = true;
+                                        };
+            Add (addBelowButton);
+
+            Button removeButton = new () { X = Pos.Right (testMenu) + 1, Y = Pos.Bottom (addBelowButton), Title = "_Remove the selected MenuItem" };
+
+            removeButton.Accepting += (_, args) =>
+                                      {
+                                          testMenu.Remove (testMenu.SelectedMenuItem)?.Dispose ();
+                                          args.Handled = true;
+                                      };
+            Add (removeButton);
+
             // --- SubMenu Demo: demonstrates MenuItem.SubMenu for nested menus ---
             Label subMenuLabel = new () { Title = "MenuItem with SubMenu:", X = 1, Y = Pos.Bottom (testMenu) + 1 };
             Add (subMenuLabel);

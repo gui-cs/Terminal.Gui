@@ -50,16 +50,16 @@ public class DimTests
     public void DimHeight_SetsValue ()
     {
         var testVal = Rectangle.Empty;
-        var testValview = new View { Frame = testVal };
-        Dim dim = Height (testValview);
-        Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
-        testValview.Dispose ();
+        var testValView = new View { Frame = testVal };
+        Dim dim = Height (testValView);
+        Assert.Equal (0, dim.GetAnchor (0));
+        testValView.Dispose ();
 
         testVal = new (1, 2, 3, 4);
-        testValview = new () { Frame = testVal };
-        dim = Height (testValview);
-        Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
-        testValview.Dispose ();
+        testValView = new () { Frame = testVal };
+        dim = Height (testValView);
+        Assert.Equal (4, dim.GetAnchor (0));
+        testValView.Dispose ();
     }
 
     [Fact]
@@ -232,13 +232,13 @@ public class DimTests
         var testVal = Rectangle.Empty;
         var testValView = new View { Frame = testVal };
         Dim dim = Width (testValView);
-        Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
+        Assert.Equal (0, dim.GetAnchor (0));
         testValView.Dispose ();
 
         testVal = new (1, 2, 3, 4);
         testValView = new () { Frame = testVal };
         dim = Width (testValView);
-        Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
+        Assert.Equal (3, dim.GetAnchor (0));
         testValView.Dispose ();
     }
 }
