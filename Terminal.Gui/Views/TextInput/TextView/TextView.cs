@@ -117,6 +117,17 @@ public partial class TextView : View, IDesignable
         UpdateScrollBars ();
         UpdateContentSize ();
         PositionCursor ();
+
+        if (HasFocus)
+        {
+            App?.Popovers?.Register (ContextMenu);
+
+            if (ContextMenu?.Key is { } key && !KeyBindings.TryGet (key, out _))
+            {
+                KeyBindings.Add (key, Command.Context);
+            }
+        }
+
         base.EndInit ();
     }
 
@@ -125,6 +136,7 @@ public partial class TextView : View, IDesignable
     {
         base.OnSubViewsLaidOut (args);
         WrapTextModel ();
+
         // Don't call AdjustViewport() here - it resets viewport to cursor position,
         // undoing any user scrolling via scrollbar. AdjustViewport() is called when
         // cursor actually moves (InsertionPoint setter, movement commands, etc.)
@@ -162,6 +174,7 @@ public partial class TextView : View, IDesignable
         if (newHasFocus)
         {
             PositionCursor ();
+
             App?.Popovers?.Register (ContextMenu);
 
             if (ContextMenu?.Key is { })
@@ -263,7 +276,7 @@ public partial class TextView : View, IDesignable
 #if DEBUG
             Id = "textViewContextMenu"
 #endif
-        }; ;
+        };
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 

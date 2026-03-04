@@ -1,5 +1,3 @@
-#nullable disable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -12,7 +10,7 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public abstract class CheckBoxTableSourceWrapperBase : ITableSource
 {
-    private readonly TableView tableView;
+    private readonly TableView _tableView;
 
     /// <summary>
     ///     Creates a new instance of the class presenting the data in <paramref name="toWrap"/> plus an additional
@@ -26,12 +24,12 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     public CheckBoxTableSourceWrapperBase (TableView tableView, ITableSource toWrap)
     {
         Wrapping = toWrap;
-        this.tableView = tableView;
+        _tableView = tableView;
 
-        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
 
-        tableView.Activating += TableView_Activating;
-        tableView.CellToggled += TableView_CellToggled;
+        _tableView.Activating += TableView_Activating;
+        _tableView.CellToggled += TableView_CellToggled;
     }
 
     /// <summary>
@@ -124,11 +122,11 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     /// <param name="range"></param>
     protected abstract void ToggleRows (int [] range);
 
-    private void TableView_CellToggled (object sender, CellToggledEventArgs e)
+    private void TableView_CellToggled (object? sender, CellToggledEventArgs e)
     {
         // Suppress default toggle behavior when using checkboxes
         // and instead handle ourselves
-        int [] range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray ();
+        int [] range = _tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray ();
 
         if (UseRadioButtons)
         {
@@ -149,10 +147,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         }
 
         e.Cancel = true;
-        tableView.SetNeedsDraw ();
+        _tableView.SetNeedsDraw ();
     }
 
-#nullable enable
     private void TableView_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
@@ -167,9 +164,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             return;
         }
 
-        Point? hit = tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? headerIfAny);
+        Point? hit = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? headerIfAny);
 
-        if (headerIfAny.HasValue && headerIfAny.Value == 0)
+        if (headerIfAny is 0)
         {
             // clicking in header with radio buttons does nothing
             if (UseRadioButtons)
@@ -180,9 +177,9 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             // otherwise it ticks all rows
             ToggleAllRows ();
             e.Handled = true;
-            tableView.SetNeedsDraw ();
+            _tableView.SetNeedsDraw ();
         }
-        else if (hit.HasValue && hit.Value.X == 0)
+        else if (hit is { X: 0 })
         {
             if (UseRadioButtons)
             {
@@ -195,7 +192,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             }
 
             e.Handled = true;
-            tableView.SetNeedsDraw ();
+            _tableView.SetNeedsDraw ();
         }
     }
 }

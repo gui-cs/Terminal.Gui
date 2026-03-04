@@ -1,5 +1,3 @@
-#nullable disable
-﻿
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -13,22 +11,20 @@ public class ColumnStyle
     ///     Defines a delegate for returning custom alignment per cell based on cell values. When specified this will
     ///     override <see cref="Alignment"/>
     /// </summary>
-    public Func<object, Alignment> AlignmentGetter;
+    public Func<object, Alignment>? AlignmentGetter { get; set; }
 
     /// <summary>
     ///     Defines a delegate for returning a custom scheme per cell based on cell values. Return null for the
     ///     default
     /// </summary>
-    public CellColorGetterDelegate ColorGetter;
+    public CellColorGetterDelegate? ColorGetter { get; set; }
 
     /// <summary>
     ///     Defines a delegate for returning custom representations of cell values. If not set then
     ///     <see cref="object.ToString()"/> is used. Return values from your delegate may be truncated e.g. based on
     ///     <see cref="MaxWidth"/>
     /// </summary>
-    public Func<object, string> RepresentationGetter;
-
-    private bool _visible = true;
+    public Func<object, string>? RepresentationGetter { get; set; }
 
     /// <summary>
     ///     Defines the default alignment for all values rendered in this column. For custom alignment based on cell
@@ -37,7 +33,7 @@ public class ColumnStyle
     public Alignment Alignment { get; set; }
 
     /// <summary>Defines the format for values e.g. "yyyy-MM-dd" for dates</summary>
-    public string Format { get; set; }
+    public string? Format { get; set; }
 
     /// <summary>
     ///     Set the maximum width of the column in characters. This value will be ignored if more than the tables
@@ -59,16 +55,14 @@ public class ColumnStyle
     /// </summary>
     public int MinWidth { get; set; }
 
+    private bool _visible = true;
+
     /// <summary>
     ///     Gets or Sets a value indicating whether the column should be visible to the user. This affects both whether it
     ///     is rendered and whether it can be selected. Defaults to true.
     /// </summary>
     /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
-    public bool Visible
-    {
-        get => MaxWidth >= 0 && _visible;
-        set => _visible = value;
-    }
+    public bool Visible { get => MaxWidth >= 0 && _visible; set => _visible = value; }
 
     /// <summary>
     ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/
@@ -107,6 +101,6 @@ public class ColumnStyle
             return RepresentationGetter (value);
         }
 
-        return value?.ToString ();
+        return value.ToString () ?? string.Empty;
     }
 }

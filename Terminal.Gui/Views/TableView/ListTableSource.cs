@@ -1,5 +1,4 @@
-#nullable disable
-﻿using System.Collections;
+using System.Collections;
 using System.Data;
 
 namespace Terminal.Gui.Views;
@@ -18,10 +17,10 @@ public class ListTableSource : ITableSource
 
     private readonly TableView _tableView;
     private Rectangle _lastBounds;
-    private IList _lastList;
+    private IList? _lastList;
     private int _lastMaxCellWidth;
     private int _lastMinCellWidth;
-    private ListColumnStyle _lastStyle;
+    private ListColumnStyle? _lastStyle;
 
     /// <summary>
     ///     Creates a new columned list table instance based on the data in <paramref name="list"/> and dimensions from
@@ -69,10 +68,10 @@ public class ListTableSource : ITableSource
 
             if (idx < 0 || idx >= Count)
             {
-                return null;
+                return null!;
             }
 
-            return List [idx];
+            return List [idx]!;
         }
     }
 
@@ -125,7 +124,7 @@ public class ListTableSource : ITableSource
     /// <returns></returns>
     private int CalculateMaxLength ()
     {
-        if (List is null || Count == 0)
+        if (Count == 0)
         {
             return 0;
         }
@@ -142,7 +141,7 @@ public class ListTableSource : ITableSource
             }
             else
             {
-                l = t.ToString ().Length;
+                l = t.ToString ()?.Length ?? 0;
             }
 
             if (l > maxLength)
@@ -178,7 +177,7 @@ public class ListTableSource : ITableSource
         return table;
     }
 
-    private void TableView_DrawContent (object sender, DrawEventArgs e)
+    private void TableView_DrawContent (object? sender, DrawEventArgs e)
     {
         if (!_tableView.Viewport.Equals (_lastBounds)
             || _tableView.MaxCellWidth != _lastMaxCellWidth

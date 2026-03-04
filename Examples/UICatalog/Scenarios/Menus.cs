@@ -43,23 +43,25 @@ public class Menus : Scenario
         runnable.Add (menuHostView);
         runnable.CommandsToBubbleUp = [Command.Activate];
 
-        menuHostView.Activated += (s, args) =>
+        menuHostView.Activated += (_, args) =>
                                   {
                                       // If the Activate command is from the Borders menu item, toggle the border style on the MenuHostView
-                                      if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "menuItemBorders" } bordersCheckbox)
+                                      if (args.Value?.TryGetSource (out View? source) is true && source is CheckBox { Id: "menuItemBorders" })
                                       {
-                                          menuHostView.BorderStyle = (args.Value?.Value as CheckState?) == CheckState.Checked ? LineStyle.Double : LineStyle.None;
+                                          menuHostView.BorderStyle = args.Value?.Value as CheckState? == CheckState.Checked ? LineStyle.Double : LineStyle.None;
 
                                           return;
                                       }
 
-                                      if (args.Value?.TryGetSource (out source) is true
-                                          && source?.SuperView is OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
+                                      if (args.Value?.TryGetSource (out source) is not true
+                                          || source?.SuperView is not OptionSelector<Schemes> { Id: "schemeOptionSelector" } schemeOptionSelector)
                                       {
-                                          if (schemeOptionSelector.Value is { } scheme)
-                                          {
-                                              menuHostView.SchemeName = scheme.ToString ();
-                                          }
+                                          return;
+                                      }
+
+                                      if (schemeOptionSelector.Value is { } scheme)
+                                      {
+                                          menuHostView.SchemeName = scheme.ToString ();
                                       }
                                   };
 
@@ -96,12 +98,6 @@ public class Menus : Scenario
             BorderStyle = LineStyle.Dashed;
             CommandsToBubbleUp = [Command.Activate, Command.Accept];
         }
-
-        /// <inheritdoc/>
-        protected override void OnAccepted (ICommandContext? ctx) => base.OnAccepted (ctx);
-
-        /// <inheritdoc/>
-        protected override void OnActivated (ICommandContext? ctx) => base.OnActivated (ctx);
 
         /// <inheritdoc/>
         public override void EndInit ()
@@ -152,7 +148,7 @@ public class Menus : Scenario
         {
             MenuItem menuItem1 = new () { Id = "menuItem1", Title = "Z_igzag", Key = Key.I.WithCtrl, Text = "Gonna zig zag" };
 
-            menuItem1.Activated += (s, args) =>
+            menuItem1.Activated += (s, _) =>
                                    {
                                        if (s is not MenuItem mi)
 
@@ -184,7 +180,14 @@ public class Menus : Scenario
 
             OptionSelector<Schemes> schemeOptionSelector = new () { Id = "schemeOptionSelector", Title = "Scheme", CanFocus = true };
 
-            MenuItem menuItemScheme = new () { Id = "menuItemScheme", Title = "Scheme", Text = "Scheme", Key = Key.S.WithCtrl, CommandView = schemeOptionSelector };
+            MenuItem menuItemScheme = new ()
+            {
+                Id = "menuItemScheme",
+                Title = "Scheme",
+                Text = "Scheme",
+                Key = Key.S.WithCtrl,
+                CommandView = schemeOptionSelector
+            };
 
             // Set the Menu's SchemeName to the selected scheme in the OptionSelector
             // Note: above we set the Scheme of the MenuHostView illustrating the commands bubble up
