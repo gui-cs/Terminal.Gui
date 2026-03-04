@@ -234,7 +234,7 @@ public interface ICommandContext
 }
 ```
 
-- **`Values`** — Append-only chain of values accumulated as the command propagates. Each <xref:Terminal.Gui.IValue>-implementing view appends its value via `WithValue()`. Ordered innermost (originator) to outermost.
+- **`Values`** — Append-only chain of values accumulated as the command propagates. Each <xref:Terminal.Gui.ViewBase.IValue>-implementing view appends its value via `WithValue()`. Ordered innermost (originator) to outermost.
 - **`Value`** — Convenience accessor returning `Values[^1]` (the most recently appended value), or `null` if empty.
 
 <xref:Terminal.Gui.Input.CommandContext> is an immutable record struct. Use `WithCommand()`, `WithRouting()`, or `WithValue()` to create modified copies.
@@ -429,7 +429,7 @@ Creates a <xref:Terminal.Gui.Input.CommandContext> with `Routing = CommandRoutin
 2. **Return value**: `DefaultAcceptHandler` returns `true` for <xref:Terminal.Gui.IAcceptTarget> views
 3. **Redirect**: Non-default <xref:Terminal.Gui.IAcceptTarget> sources bubble up when a <xref:Terminal.Gui.ViewBase.View.DefaultAcceptView> exists
 
-## <xref:Terminal.Gui.Input.CommandBridge>
+## CommandBridge
 
 <xref:Terminal.Gui.Input.CommandBridge> routes commands across non-containment boundaries (e.g., MenuItem.SubMenu ↔ parentMenuItem, MenuBarItem ↔ PopoverMenu). The bridge subscribes to the remote view's <xref:Terminal.Gui.ViewBase.View.Accepted>/<xref:Terminal.Gui.ViewBase.View.Activated> events and re-enters the full command pipeline on the owner via <xref:Terminal.Gui.ViewBase.View.InvokeCommand*>:
 
@@ -499,7 +499,7 @@ To build a composite view that owns its SubViews' state (like <xref:Terminal.Gui
 
 1. Override <xref:Terminal.Gui.ViewBase.View.GetDispatchTarget*> to return the SubView that should receive commands.
 2. Override <xref:Terminal.Gui.ViewBase.View.ConsumeDispatch> to return `true` — the composite handles the command; inner activations don't propagate.
-3. Implement <xref:Terminal.Gui.IValue> (or <xref:Terminal.Gui.IValue`1>) to expose the composite's semantic value.
+3. Implement <xref:Terminal.Gui.ViewBase.IValue`1> (or <xref:Terminal.Gui.ViewBase.IValue`1>) to expose the composite's semantic value.
 4. Apply state changes in <xref:Terminal.Gui.ViewBase.View.OnActivated*>.
 
 ```csharp
