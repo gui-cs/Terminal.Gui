@@ -11,18 +11,14 @@ public partial class ListView
         }
 
         var current = Attribute.Default;
-        Move (0, 0);
-        Rectangle f = Viewport;
         int item = Viewport.Y;
-        bool focused = HasFocus;
         int col = ShowMarks ? 2 : 0;
-        int start = Viewport.X;
+        Move (0, 0);
 
-        for (var row = 0; row < f.Height; row++, item++)
+        for (var row = 0; row < Viewport.Height; row++, item++)
         {
             bool isSelected = item == SelectedItem;
-            bool isMarked = Source!.IsMarked (item);
-            bool hasFocus = focused;
+            bool isMarked = item < Source?.Count && Source?.IsMarked (item) is true;
 
             // Determine visual role based on the 4 combinations of ShowMarks and MarkMultiple
             VisualRole role;
@@ -33,7 +29,7 @@ public partial class ListView
                 // Combination 1: Standard selection mode (no marking)
                 // Mark glyphs: None (MarkWidth = 0)
                 // Visual roles: SelectedItem uses Focus (focused) or Active (not focused)
-                role = isSelected ? hasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
+                role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
             }
             else if (!ShowMarks && MarkMultiple)
             {
@@ -42,12 +38,12 @@ public partial class ListView
                 // Visual roles use Highlight for marked items; compose TextStyle when marked+selected+focused
                 if (isSelected && isMarked)
                 {
-                    role = hasFocus ? VisualRole.Focus : VisualRole.Highlight;
-                    applyHighlightStyle = hasFocus; // Apply Highlight's TextStyle to Focus
+                    role = HasFocus ? VisualRole.Focus : VisualRole.Highlight;
+                    applyHighlightStyle = HasFocus; // Apply Highlight's TextStyle to Focus
                 }
                 else if (isSelected)
                 {
-                    role = hasFocus ? VisualRole.Focus : VisualRole.Normal;
+                    role = HasFocus ? VisualRole.Focus : VisualRole.Normal;
                 }
                 else if (isMarked)
                 {
@@ -63,14 +59,14 @@ public partial class ListView
                 // Combination 3: Radio button style
                 // Mark glyphs: Radio-button style (◉ marked, ○ unmarked)
                 // Visual roles: Standard selection (mark glyphs provide visual indication)
-                role = isSelected ? hasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
+                role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
             }
-            else // ShowMarks == true && MarkMultiple == true
+            else
             {
                 // Combination 4: Checkbox style
                 // Mark glyphs: Checkbox style (☒ marked, ☐ unmarked)
                 // Visual roles: Standard selection (mark glyphs provide visual indication)
-                role = isSelected ? hasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
+                role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
             }
 
             Attribute newAttribute = GetAttributeForRole (role);
@@ -92,7 +88,7 @@ public partial class ListView
 
             if (Source is null || item >= Source.Count)
             {
-                for (var c = 0; c < f.Width; c++)
+                for (var c = 0; c < Viewport.Width; c++)
                 {
                     AddRune ((Rune)' ');
                 }
@@ -142,7 +138,7 @@ public partial class ListView
                 }
 
                 int contentCol = col > 0 ? col : markWidth;
-                Source.Render (this, isSelected, item, contentCol, row, f.Width - contentCol, start);
+                Source.Render (this, isSelected, item, contentCol, row, Viewport.Width - contentCol, Viewport.X);
             }
         }
 
