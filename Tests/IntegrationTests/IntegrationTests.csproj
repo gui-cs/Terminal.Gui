@@ -11,7 +11,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <NoLogo>true</NoLogo>
         <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-	      <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	      <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
+	      <IncludeTestHostReference>false</IncludeTestHostReference>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <DefineDebug>true</DefineDebug>
