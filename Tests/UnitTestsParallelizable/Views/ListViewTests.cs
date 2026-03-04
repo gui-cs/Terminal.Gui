@@ -2670,4 +2670,116 @@ Five ",
     }
 
     #endregion
+
+    #region Out-of-range guard tests
+
+    // Claude - Opus 4.6
+    // Verifies that ListView.OnDrawingContent does not call IsMarked with out-of-range indices
+    // when the Viewport is taller than the number of items in the source.
+    [Fact]
+    public void Draw_DoesNotCall_IsMarked_OutOfRange ()
+    {
+        ObservableCollection<string> source = ["one", "two"];
+
+        // Track all indices passed to IsMarked
+        List<int> isMarkedCalls = [];
+        Mock<IListDataSource> mockSource = new (MockBehavior.Strict);
+        mockSource.Setup (s => s.Count).Returns (source.Count);
+
+        mockSource.Setup (s => s.IsMarked (It.IsAny<int> ()))
+                  .Returns ((int item) =>
+                            {
+                                isMarkedCalls.Add (item);
+                                Assert.True (item >= 0 && item < source.Count, $"IsMarked called with out-of-range index {item}");
+
+                                return false;
+                            });
+
+        mockSource.Setup (s => s.Render (It.IsAny<ListView> (), It.IsAny<bool> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> ()));
+        mockSource.Setup (s => s.RenderMark (It.IsAny<ListView> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<bool> (), It.IsAny<bool> ())).Returns (false);
+        mockSource.Setup (s => s.MaxItemLength).Returns (5);
+        mockSource.Setup (s => s.ToList ()).Returns (source);
+        mockSource.Setup (s => s.SuspendCollectionChangedEvent).Returns (false);
+        mockSource.As<IDisposable> ().Setup (d => d.Dispose ());
+
+        // Viewport height (10) is much larger than item count (2)
+        ListView lv = new () { Width = 20, Height = 10, Source = mockSource.Object };
+        lv.Layout ();
+        lv.Draw ();
+
+        // Verify IsMarked was only called with valid indices
+        Assert.All (isMarkedCalls, i => Assert.InRange (i, 0, source.Count - 1));
+    }
+
+    // Claude - Opus 4.6
+    // Verifies that ListView.OnDrawingContent does not call Render with out-of-range indices
+    // when the Viewport is taller than the number of items in the source.
+    [Fact]
+    public void Draw_DoesNotCall_Render_OutOfRange ()
+    {
+        ObservableCollection<string> source = ["one", "two"];
+
+        List<int> renderCalls = [];
+        Mock<IListDataSource> mockSource = new (MockBehavior.Strict);
+        mockSource.Setup (s => s.Count).Returns (source.Count);
+        mockSource.Setup (s => s.IsMarked (It.IsAny<int> ())).Returns (false);
+
+        mockSource.Setup (s => s.Render (It.IsAny<ListView> (), It.IsAny<bool> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> ()))
+                  .Callback ((ListView _, bool _, int item, int _, int _, int _, int _) =>
+                             {
+                                 renderCalls.Add (item);
+                                 Assert.True (item >= 0 && item < source.Count, $"Render called with out-of-range index {item}");
+                             });
+
+        mockSource.Setup (s => s.RenderMark (It.IsAny<ListView> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<bool> (), It.IsAny<bool> ())).Returns (false);
+        mockSource.Setup (s => s.MaxItemLength).Returns (5);
+        mockSource.Setup (s => s.ToList ()).Returns (source);
+        mockSource.Setup (s => s.SuspendCollectionChangedEvent).Returns (false);
+        mockSource.As<IDisposable> ().Setup (d => d.Dispose ());
+
+        ListView lv = new () { Width = 20, Height = 10, Source = mockSource.Object };
+        lv.Layout ();
+        lv.Draw ();
+
+        // Verify Render was only called with valid indices
+        Assert.All (renderCalls, i => Assert.InRange (i, 0, source.Count - 1));
+    }
+
+    // Claude - Opus 4.6
+    // Verifies that ListView.OnDrawingContent does not call SetMark with out-of-range indices
+    // when the Viewport is taller than the number of items in the source.
+    [Fact]
+    public void Draw_DoesNotCall_SetMark_OutOfRange ()
+    {
+        ObservableCollection<string> source = ["one", "two"];
+
+        List<int> setMarkCalls = [];
+        Mock<IListDataSource> mockSource = new (MockBehavior.Strict);
+        mockSource.Setup (s => s.Count).Returns (source.Count);
+        mockSource.Setup (s => s.IsMarked (It.IsAny<int> ())).Returns (false);
+
+        mockSource.Setup (s => s.Render (It.IsAny<ListView> (), It.IsAny<bool> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<int> ()));
+        mockSource.Setup (s => s.RenderMark (It.IsAny<ListView> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<bool> (), It.IsAny<bool> ())).Returns (false);
+
+        mockSource.Setup (s => s.SetMark (It.IsAny<int> (), It.IsAny<bool> ()))
+                  .Callback ((int item, bool _) =>
+                             {
+                                 setMarkCalls.Add (item);
+                                 Assert.True (item >= 0 && item < source.Count, $"SetMark called with out-of-range index {item}");
+                             });
+
+        mockSource.Setup (s => s.MaxItemLength).Returns (5);
+        mockSource.Setup (s => s.ToList ()).Returns (source);
+        mockSource.Setup (s => s.SuspendCollectionChangedEvent).Returns (false);
+        mockSource.As<IDisposable> ().Setup (d => d.Dispose ());
+
+        ListView lv = new () { Width = 20, Height = 10, ShowMarks = true, Source = mockSource.Object };
+        lv.Layout ();
+        lv.Draw ();
+
+        // SetMark should not have been called at all during Draw, but if it was, only with valid indices
+        Assert.All (setMarkCalls, i => Assert.InRange (i, 0, source.Count - 1));
+    }
+
+    #endregion
 }
