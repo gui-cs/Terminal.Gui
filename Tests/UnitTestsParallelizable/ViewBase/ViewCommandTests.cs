@@ -2419,8 +2419,10 @@ public class ViewCommandTests (ITestOutputHelper output)
         Assert.Equal (1, toggleView.Value); // State change already happened
         Assert.Equal (1, valueAtAncestorActivating); // Was already 1 when ancestor saw it
 
+#if DEBUG
         // Verify the BridgedCancellation trace warning was emitted.
         Assert.Contains (traceBackend.Entries, e => e.Phase == "BridgedCancellation" && e.Message!.Contains ("OnActivated"));
+#endif
     }
 
     // Claude - Opus 4.6
@@ -2541,7 +2543,9 @@ public class ViewCommandTests (ITestOutputHelper output)
         Assert.Equal (1, valueAtAncestorAccepting); // Was already 1 when ancestor saw it
 
         // Verify the BridgedCancellation trace warning was emitted.
+#if DEBUG
         Assert.Contains (traceBackend.Entries, e => e.Phase == "BridgedCancellation" && e.Message!.Contains ("OnAccepted"));
+#endif
     }
 
     // Claude - Opus 4.6
