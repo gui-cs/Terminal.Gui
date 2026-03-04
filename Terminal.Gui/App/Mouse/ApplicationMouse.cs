@@ -10,13 +10,13 @@ namespace Terminal.Gui.App;
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
-internal class MouseImpl : IMouse, IDisposable
+internal class ApplicationMouse : IMouse, IDisposable
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseImpl"/> class and subscribes to Application configuration
+    ///     Initializes a new instance of the <see cref="ApplicationMouse"/> class and subscribes to Application configuration
     ///     property events.
     /// </summary>
-    public MouseImpl () =>
+    public ApplicationMouse () =>
 
         // Subscribe to Application static property change events
         Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;

@@ -1,7 +1,7 @@
 namespace ApplicationTests.Popover;
 
 /// <summary>
-///     Tests for the popover dismiss-on-click-outside logic in <see cref="MouseImpl.RaiseMouseEvent"/>.
+///     Tests for the popover dismiss-on-click-outside logic in <see cref="ApplicationMouse.RaiseMouseEvent"/>.
 ///     <para>
 ///         The selected code under test:
 ///         <code>
@@ -443,11 +443,11 @@ public class PopoverMouseDismissTests
     ///             Second press on the activator (while popover is visible):
     ///             <list type="bullet">
     ///                 <item>Dismiss logic fires — popover is hidden via <see cref="ApplicationPopover.HideWithQuitCommand"/>.</item>
-    ///                 <item><see cref="MouseImpl.RaiseMouseEvent"/> recurses.</item>
+    ///                 <item><see cref="ApplicationMouse.RaiseMouseEvent"/> recurses.</item>
     ///                 <item>The recursed event reaches the activator, invoking <see cref="Command.Activate"/>.</item>
     ///                 <item>
     ///                     <see cref="ActivatorView.OnActivated"/> calls <see cref="ApplicationPopover.Show"/> but the
-    ///                     <see cref="MouseImpl.DismissedByMousePress"/> guard suppresses the re-show.
+    ///                     <see cref="ApplicationMouse.DismissedByMousePress"/> guard suppresses the re-show.
     ///                 </item>
     ///             </list>
     ///         </item>
@@ -506,7 +506,7 @@ public class PopoverMouseDismissTests
 
     /// <summary>
     ///     After dismiss-by-click, a subsequent fresh mouse press should allow the popover to be shown again.
-    ///     The <see cref="MouseImpl.DismissedByMousePress"/> guard is cleared on the next new press event.
+    ///     The <see cref="ApplicationMouse.DismissedByMousePress"/> guard is cleared on the next new press event.
     /// </summary>
     [Fact]
     public void MousePress_AfterDismissCycle_AllowsReshowOnNextPress ()

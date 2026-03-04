@@ -27,13 +27,11 @@ public class PosViewTests
     [Fact]
     public void PosView_Side_SetsValue ()
     {
-        string side; // used in format string
         var testRect = Rectangle.Empty;
         var testInt = 0;
         Pos pos;
 
         // Pos.Left
-        side = "Left";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = Left (new ());
@@ -63,7 +61,6 @@ public class PosViewTests
         Assert.Equal (testRect.Left - testInt, pos.GetAnchor (0));
 
         // Pos.X
-        side = "Left";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = X (new ());
@@ -93,7 +90,6 @@ public class PosViewTests
         Assert.Equal (testRect.X - testInt, pos.GetAnchor (0));
 
         // Pos.Top
-        side = "Top";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = Top (new ());
@@ -123,7 +119,6 @@ public class PosViewTests
         Assert.Equal (testRect.Top - testInt, pos.GetAnchor (0));
 
         // Pos.Y
-        side = "Top";
         testInt = 0;
         testRect = Rectangle.Empty;
         pos = Y (new ());
@@ -153,7 +148,6 @@ public class PosViewTests
         Assert.Equal (testRect.Y - testInt, pos.GetAnchor (0));
 
         // Pos.Bottom
-        side = "Bottom";
         testRect = Rectangle.Empty;
         testInt = 0;
         pos = Bottom (new ());

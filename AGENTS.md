@@ -191,9 +191,9 @@ See `.claude/cookbook/` for common UI patterns:
 |App:{Application.Clipboard.cs,Application.cs,Application.Driver.cs,Application.Keyboard.cs,Application.Lifecycle.cs,Application.Mouse.cs,Application.Navigation.cs,Application.Popover.cs,Application.Run.cs,Application.Screen.cs,Application.TopRunnable.cs,ApplicationImpl.cs,ApplicationImpl.Driver.cs,ApplicationImpl.Lifecycle.cs,ApplicationImpl.Run.cs,ApplicationImpl.Screen.cs,ApplicationModelUsage.cs,ApplicationNavigation.cs,ApplicationPopover.cs,IApplication.cs,IPopover.cs,Logging.cs,NotInitializedException.cs,PopoverImpl.cs}
 |App/Clipboard:{Clipboard.cs,ClipboardBase.cs,ClipboardProcessRunner.cs,IClipboard.cs}
 |App/CWP:{CancelEventArgs.cs,CWPEventHelper.cs,CWPPropertyHelper.cs,CWPWorkflowHelper.cs,EventArgs.cs,ResultEventArgs.cs,ValueChangedEventArgs.cs,ValueChangingEventArgs.cs}
-|App/Keyboard:{IKeyboard.cs,KeyboardImpl.cs}
+|App/Keyboard:{IKeyboard.cs,ApplicationKeyboard.cs}
 |App/MainLoop:{ApplicationMainLoop.cs,IApplicationMainLoop.cs,IMainLoopCoordinator.cs,MainLoopCoordinator.cs,MainLoopSyncContext.cs}
-|App/Mouse:{IMouse.cs,IMouseGrabHandler.cs,MouseImpl.cs}
+|App/Mouse:{IMouse.cs,IMouseGrabHandler.cs,ApplicationMouse.cs}
 |App/Runnable:{IRunnable.cs,SessionToken.cs,SessionTokenEventArgs.cs}
 |App/Timeout:{ITimedEvents.cs,LogarithmicTimeout.cs,SmoothAcceleratingTimeout.cs,TimedEvents.cs,Timeout.cs,TimeoutEventArgs.cs}
 |App/Tracing:{ITraceBackend.cs,ListBackend.cs,LoggingBackend.cs,NullBackend.cs,Trace.cs,TraceCategory.cs,TraceEntry.cs}
