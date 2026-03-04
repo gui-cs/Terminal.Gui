@@ -152,7 +152,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     #region AddRemove
 
-    /// <summary>Adds a SubView (child) to this view.</summary>
+    /// <summary>
+    ///    Adds a SubView (child) to this view at the specified index in the <see cref="SubViews"/> list.
+    /// </summary>
     /// <remarks>
     ///     <para>
     ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property.
@@ -171,6 +173,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///         The <see cref="OnSuperViewChanged"/>/<see cref="SuperViewChanged"/> event will be raised on the added View.
     ///     </para>
     /// </remarks>
+    /// <param name="index">The index at which to insert the view.</param>
     /// <param name="view">The view to add.</param>
     /// <returns>The view that was added.</returns>
     /// <seealso cref="Remove(View)"/>
@@ -181,12 +184,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
-    public View? Add (View? view)
+    public View? AddAt (int index, View? view)
     {
         if (view is null)
         {
             return null;
         }
+
+        ArgumentOutOfRangeException.ThrowIfNegative (index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan (index, InternalSubViews.Count);
 
         //Debug.Assert (view.SuperView is null, $"{view} already has a SuperView: {view.SuperView}.");
         if (view.SuperView is { })
@@ -210,12 +216,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         // TODO: Make this thread safe
-        InternalSubViews.Add (view);
+        InternalSubViews.Insert (index, view);
 
         // Try to set the SuperView - this may be cancelled
         if (!view.SetSuperView (this))
         {
-            InternalSubViews.Remove (view);
+            InternalSubViews.RemoveAt (index);
 
             // The change was cancelled
             return null;
@@ -253,6 +259,37 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         return view;
     }
+
+    /// <summary>Adds a SubView (child) to this view as the last view in the <see cref="SubViews"/> list.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property.
+    ///     </para>
+    ///     <para>
+    ///         To check if a View has been added to this View, compare it's <see cref="SuperView"/> property to this View.
+    ///     </para>
+    ///     <para>
+    ///         SubViews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///         the lifecycle of the subviews to be transferred to this View.
+    ///     </para>
+    ///     <para>
+    ///         Calls/Raises the <see cref="OnSubViewAdded"/>/<see cref="SubViewAdded"/> event.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="OnSuperViewChanged"/>/<see cref="SuperViewChanged"/> event will be raised on the added View.
+    ///     </para>
+    /// </remarks>
+    /// <param name="view">The view to add.</param>
+    /// <returns>The view that was added.</returns>
+    /// <seealso cref="Remove(View)"/>
+    /// <seealso cref="RemoveAll"/>
+    /// <seealso cref="OnSubViewAdded"/>
+    /// <seealso cref="SubViewAdded"/>
+    /// <seealso cref="OnSuperViewChanging"/>
+    /// <seealso cref="SuperViewChanging"/>
+    /// <seealso cref="OnSuperViewChanged"/>
+    /// <seealso cref="SuperViewChanged"/>
+    public View? Add (View? view) => AddAt (InternalSubViews.Count, view);
 
     /// <summary>Adds the specified SubView (children) to the view.</summary>
     /// <param name="views">Array of one or more views (can be optional parameter).</param>
@@ -391,11 +428,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         InternalSubViews.Remove (view);
 
         // Clean up focus stuff
-        _previouslyFocused = null;
+        PreviouslyFocused = null;
 
-        if (previousSuperView is { } && previousSuperView._previouslyFocused == this)
+        if (previousSuperView is { } && previousSuperView.PreviouslyFocused == this)
         {
-            previousSuperView._previouslyFocused = null;
+            previousSuperView.PreviouslyFocused = null;
         }
 
         SetNeedsLayout ();
@@ -411,9 +448,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         view.CanFocus = couldFocus; // Restore to previous value
 
-        if (_previouslyFocused == view)
+        if (PreviouslyFocused == view)
         {
-            _previouslyFocused = null;
+            PreviouslyFocused = null;
         }
 
         RaiseSubViewRemoved (view);
