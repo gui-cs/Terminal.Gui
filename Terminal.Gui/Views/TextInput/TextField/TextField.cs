@@ -157,7 +157,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign ()
+    public virtual bool EnableForDesign ()
     {
         Text = "This is a test.";
         Title = "Caption";

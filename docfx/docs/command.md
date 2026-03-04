@@ -245,7 +245,7 @@ As a command flows through the view hierarchy, <xref:Terminal.Gui.Input.ICommand
 
 ### How Values Accumulate
 
-1. **Origin** — The originating view (e.g., <xref:Terminal.Gui.Views.CheckBox>) processes the command. Its value is not yet in the chain.
+1. **Origin** — The originating view (e.g., <xref:Terminal.Gui.Views.CheckBox>) processes the command. If the originating view implements <xref:Terminal.Gui.IValue>, its value is captured at the start of command invocation and placed in the initial `Values` chain.
 2. **Dispatch target refresh** — When a composite view dispatches to an inner target, `RefreshValue()` re-reads the target's `IValue.GetValue()` and appends it via `WithValue()`.
 3. **Composite post-mutation** — After `RaiseActivated`, a `ConsumeDispatch` composite (e.g., <xref:Terminal.Gui.Views.OptionSelector>) may have updated its own value. The framework appends the composite's post-mutation value so `ctx.Value` reflects the composite's semantic value.
 4. **Ancestor notification** — `BubbleActivatedUp` walks the SuperView chain, preserving `Values` at each hop. If an ancestor has a dispatch target that is the command source, its refreshed value is also appended.
@@ -630,7 +630,7 @@ When an inner <xref:Terminal.Gui.Views.CheckBox> activates (via click/space), th
 | **<xref:Terminal.Gui.Views.Wizard>** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **<xref:Terminal.Gui.Views.FileDialog>** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **<xref:Terminal.Gui.Views.DatePicker>** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
-| **<xref:Terminal.Gui.Views.ComboBox>** | Handled by SubViews | Handled by SubViews | <xref:Terminal.Gui.Input.Command.HotKey> | OnMouseEvent (toggle) | Handled by SubViews | Handled by SubViews | Handled by SubViews |
+| **<xref:Terminal.Gui.Views.DropDownList>** | Handled by SubViews | Handled by SubViews | <xref:Terminal.Gui.Input.Command.HotKey> | OnMouseEvent (toggle) | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **<xref:Terminal.Gui.Views.Shortcut>** | <xref:Terminal.Gui.Input.Command.Activate> (dispatch to CommandView) | <xref:Terminal.Gui.Input.Command.Accept> (dispatch to CommandView) | <xref:Terminal.Gui.Input.Command.HotKey> → <xref:Terminal.Gui.Input.Command.Activate> | Not bound | <xref:Terminal.Gui.Input.Command.Activate> | Not bound | Not bound |
 | **<xref:Terminal.Gui.Views.MenuItem>** | Inherited from Shortcut | Inherited from Shortcut | <xref:Terminal.Gui.Input.Command.HotKey> → <xref:Terminal.Gui.Input.Command.Activate> | Not bound | <xref:Terminal.Gui.Input.Command.Activate> | Not bound | Not bound |
 | **<xref:Terminal.Gui.Views.Menu>** / **<xref:Terminal.Gui.Views.Bar>** | <xref:Terminal.Gui.Input.Command.Activate> (dispatches to focused MenuItem) | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts | Handled by MenuItems/Shortcuts |

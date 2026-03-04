@@ -1,17 +1,52 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a horizontally or vertically oriented container for <see cref="Shortcut"/>s to be used as a menu, toolbar,
-///     or status
-///     bar.
+///     A container for <see cref="Shortcut"/> items that arranges them horizontally or vertically.
+///     Serves as the base class for <see cref="Menu"/>, <see cref="MenuBar"/>, and <see cref="StatusBar"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Any <see cref="View"/> can be added to a <see cref="Bar"/>. However, the <see cref="Bar"/> is designed to work
-///         with
-///         <see cref="Shortcut"/> objects. The <see cref="Shortcut"/> class provides a way to display a command, help, and
-///         key and
-///         align them in a specific order.
+///         Any <see cref="View"/> can be added to a <see cref="Bar"/>. However, <see cref="Bar"/> is designed to work
+///         with <see cref="Shortcut"/> objects, which display a command, help text, and key binding aligned
+///         in a consistent order.
+///     </para>
+///     <para>
+///         <b>Orientation:</b> The <see cref="Orientation"/> property controls the layout direction.
+///         In <see cref="Orientation.Horizontal"/> mode, items are arranged left-to-right.
+///         In <see cref="Orientation.Vertical"/> mode, items are stacked top-to-bottom and the
+///         <see cref="Shortcut.MinimumKeyTextSize"/> of each item is aligned to the widest key text
+///         across all items.
+///     </para>
+///     <para>
+///         <b>Auto-Sizing:</b> <see cref="Bar"/> defaults to <see cref="Dim"/>.<see cref="Dim.Auto"/>()
+///         for both <see cref="View.Width"/> and <see cref="View.Height"/>, sizing itself based on its content.
+///     </para>
+///     <para>
+///         <b>Command Propagation:</b> Sets <see cref="View.CommandsToBubbleUp"/> to
+///         [<see cref="Command.Accept"/>, <see cref="Command.Activate"/>], enabling commands from
+///         <see cref="Shortcut"/> items to bubble up through the <see cref="Bar"/> to parent views.
+///     </para>
+///     <para>
+///         <b>Separators:</b> <see cref="Line"/> views can be added between <see cref="Shortcut"/> items
+///         to create visual separators. Lines are automatically oriented to match the <see cref="Bar"/>'s
+///         <see cref="Orientation"/>.
+///     </para>
+///     <para>
+///         <b>Mouse Wheel:</b> Mouse wheel events advance focus between items, enabling scrolling
+///         through items in the <see cref="Bar"/>.
+///     </para>
+///     <para>
+///         <b>Alignment:</b> The <see cref="AlignmentModes"/> property controls how items are aligned
+///         within the <see cref="Bar"/>. The default is <see cref="ViewBase.AlignmentModes.StartToEnd"/>.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
+///         for details on the <see cref="Shortcut"/> items contained by <see cref="Bar"/>.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
+///         how <see cref="Bar"/> fits into the menu system class hierarchy as the base of
+///         <see cref="Menu"/> and <see cref="MenuBar"/>.
 ///     </para>
 /// </remarks>
 public class Bar : View, IOrientation, IDesignable

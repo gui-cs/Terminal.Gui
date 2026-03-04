@@ -148,7 +148,7 @@ public class Runner
         resultsTableView.Style.ShowHeaders = true;
         resultsTableView.Style.ShowHorizontalHeaderOverline = false;
         resultsTableView.Style.ShowHorizontalHeaderUnderline = true;
-        resultsTableView.Style.ShowHorizontalBottomline = false;
+        resultsTableView.Style.ShowHorizontalBottomLine = false;
         resultsTableView.Style.ShowVerticalCellLines = true;
         resultsTableView.Style.ShowVerticalHeaderLines = true;
 

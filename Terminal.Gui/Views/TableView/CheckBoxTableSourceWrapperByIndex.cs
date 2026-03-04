@@ -1,5 +1,4 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>Implementation of <see cref="CheckBoxTableSourceWrapperBase"/> which records toggled rows by their row number.</summary>
 public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase
@@ -14,10 +13,10 @@ public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase
     public HashSet<int> CheckedRows { get; private set; } = new ();
 
     /// <inheritdoc/>
-    protected override void ClearAllToggles () { CheckedRows.Clear (); }
+    protected override void ClearAllToggles () => CheckedRows.Clear ();
 
     /// <inheritdoc/>
-    protected override bool IsChecked (int row) { return CheckedRows.Contains (row); }
+    protected override bool IsChecked (int row) => CheckedRows.Contains (row);
 
     /// <inheritdoc/>
     protected override void ToggleAllRows ()
@@ -37,13 +36,9 @@ public class CheckBoxTableSourceWrapperByIndex : CheckBoxTableSourceWrapperBase
     /// <inheritdoc/>
     protected override void ToggleRow (int row)
     {
-        if (CheckedRows.Contains (row))
+        if (!CheckedRows.Add (row))
         {
             CheckedRows.Remove (row);
-        }
-        else
-        {
-            CheckedRows.Add (row);
         }
     }
 

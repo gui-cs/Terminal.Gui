@@ -188,7 +188,7 @@ See `.claude/cookbook/` for common UI patterns:
 [Terminal.Gui Source Index]|root: ./Terminal.Gui
 |IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning. Read files when needed.
 |.:{ModuleInitializers.cs}
-|App:{Application.Clipboard.cs,Application.cs,Application.Driver.cs,Application.Keyboard.cs,Application.Lifecycle.cs,Application.Mouse.cs,Application.Navigation.cs,Application.Popover.cs,Application.Run.cs,Application.Screen.cs,Application.TopRunnable.cs,ApplicationImpl.cs,ApplicationImpl.Driver.cs,ApplicationImpl.Lifecycle.cs,ApplicationImpl.Run.cs,ApplicationImpl.Screen.cs,ApplicationModelUsage.cs,ApplicationNavigation.cs,ApplicationPopover.cs,IApplication.cs,IPopover.cs,Logging.cs,NotInitializedException.cs,PopoverBaseImpl.cs}
+|App:{Application.Clipboard.cs,Application.cs,Application.Driver.cs,Application.Keyboard.cs,Application.Lifecycle.cs,Application.Mouse.cs,Application.Navigation.cs,Application.Popover.cs,Application.Run.cs,Application.Screen.cs,Application.TopRunnable.cs,ApplicationImpl.cs,ApplicationImpl.Driver.cs,ApplicationImpl.Lifecycle.cs,ApplicationImpl.Run.cs,ApplicationImpl.Screen.cs,ApplicationModelUsage.cs,ApplicationNavigation.cs,ApplicationPopover.cs,IApplication.cs,IPopover.cs,Logging.cs,NotInitializedException.cs,PopoverImpl.cs}
 |App/Clipboard:{Clipboard.cs,ClipboardBase.cs,ClipboardProcessRunner.cs,IClipboard.cs}
 |App/CWP:{CancelEventArgs.cs,CWPEventHelper.cs,CWPPropertyHelper.cs,CWPWorkflowHelper.cs,EventArgs.cs,ResultEventArgs.cs,ValueChangedEventArgs.cs,ValueChangingEventArgs.cs}
 |App/Keyboard:{IKeyboard.cs,KeyboardImpl.cs}
@@ -231,7 +231,7 @@ See `.claude/cookbook/` for common UI patterns:
 |ViewBase/Mouse:{IMouseHoldRepeater.cs,MouseHoldRepeaterImpl.cs,MouseState.cs,View.Mouse.cs}
 |ViewBase/Navigation:{AdvanceFocusEventArgs.cs,FocusEventArgs.cs,NavigationDirection.cs,TabBehavior.cs}
 |ViewBase/Orientation:{IOrientation.cs,Orientation.cs,OrientationHelper.cs}
-|Views:{Bar.cs,Button.cs,CheckBox.cs,CheckState.cs,ComboBox.cs,DatePicker.cs,Dialog.cs,DialogTResult.cs,FrameView.cs,HexView.cs,HexViewEventArgs.cs,Label.cs,Line.cs,MessageBox.cs,NumericUpDown.cs,ProgressBar.cs,Prompt.cs,PromptExtensions.cs,ReadOnlyCollectionExtensions.cs,Shortcut.cs,StatusBar.cs,Window.cs}
+|Views:{Bar.cs,Button.cs,CheckBox.cs,CheckState.cs,DropDownList.cs,DatePicker.cs,Dialog.cs,DialogTResult.cs,FrameView.cs,HexView.cs,HexViewEventArgs.cs,Label.cs,Line.cs,MessageBox.cs,NumericUpDown.cs,ProgressBar.cs,Prompt.cs,PromptExtensions.cs,ReadOnlyCollectionExtensions.cs,Shortcut.cs,StatusBar.cs,Window.cs}
 |Views/Autocomplete:{AppendAutocomplete.cs,AutocompleteBase.cs,AutocompleteContext.cs,AutocompleteFilepathContext.cs,IAutocomplete.cs,ISuggestionGenerator.cs,PopupAutocomplete.cs,PopupAutocomplete.PopUp.cs,SingleWordSuggestionGenerator.cs,Suggestion.cs}
 |Views/CharMap:{CharMap.cs,UcdApiClient.cs,UnicodeRange.cs}
 |Views/CollectionNavigation:{CollectionNavigator.cs,CollectionNavigatorBase.cs,DefaultCollectionNavigatorMatcher.cs,ICollectionNavigator.cs,ICollectionNavigatorMatcher.cs,IListCollectionNavigator.cs,TableCollectionNavigator.cs}
@@ -308,7 +308,7 @@ See `.claude/cookbook/` for common UI patterns:
 |TextField|Class|Single-line input,Text,Secret
 |TextView|Class|Multi-line editor,Text,ReadOnly
 |CheckBox|Class|CheckedState,AllowCheckStateNone
-|ComboBox|Class|Dropdown,Source,SelectedItem
+|DropDownList|Class|Dropdown,Source,SelectedItem
 |ProgressBar|Class|Fraction,BidirectionalMarquee
 |ScrollBar|Class|Position,Size,Orientation
 |NumericUpDown<T>|Class|Value,Increment,Min,Max
