@@ -9,6 +9,7 @@
     <InformationalVersion>2.0</InformationalVersion>
   </PropertyGroup>
   <PropertyGroup>
+	  <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <UseDataCollector />
