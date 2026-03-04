@@ -24,49 +24,57 @@ public partial class ListView
             VisualRole role;
             var applyHighlightStyle = false;
 
-            if (!ShowMarks && !MarkMultiple)
+            switch (ShowMarks)
             {
-                // Combination 1: Standard selection mode (no marking)
-                // Mark glyphs: None (MarkWidth = 0)
-                // Visual roles: SelectedItem uses Focus (focused) or Active (not focused)
-                role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
-            }
-            else if (!ShowMarks && MarkMultiple)
-            {
-                // Combination 2: Hidden marks with visual role indicators
-                // Mark glyphs: None (MarkWidth = 0) - marks exist internally
-                // Visual roles use Highlight for marked items; compose TextStyle when marked+selected+focused
-                if (isSelected && isMarked)
+                case false when !MarkMultiple:
+                    // Combination 1: Standard selection mode (no marking)
+                    // Mark glyphs: None (MarkWidth = 0)
+                    // Visual roles: SelectedItem uses Focus (focused) or Active (not focused)
+                    role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
+
+                    break;
+
+                case false when MarkMultiple:
                 {
-                    role = HasFocus ? VisualRole.Focus : VisualRole.Highlight;
-                    applyHighlightStyle = HasFocus; // Apply Highlight's TextStyle to Focus
+                    switch (isSelected)
+                    {
+                        // Combination 2: Hidden marks with visual role indicators
+                        // Mark glyphs: None (MarkWidth = 0) - marks exist internally
+                        // Visual roles use Highlight for marked items; compose TextStyle when marked+selected+focused
+                        case true when isMarked:
+                            role = HasFocus ? VisualRole.Focus : VisualRole.Highlight;
+                            applyHighlightStyle = HasFocus; // Apply Highlight's TextStyle to Focus
+
+                            break;
+
+                        case true: role = HasFocus ? VisualRole.Focus : VisualRole.Normal; break;
+
+                        default:
+                        {
+                            role = isMarked ? VisualRole.Highlight : VisualRole.Normal;
+
+                            break;
+                        }
+                    }
+
+                    break;
                 }
-                else if (isSelected)
-                {
-                    role = HasFocus ? VisualRole.Focus : VisualRole.Normal;
-                }
-                else if (isMarked)
-                {
-                    role = VisualRole.Highlight;
-                }
-                else
-                {
-                    role = VisualRole.Normal;
-                }
-            }
-            else if (ShowMarks && !MarkMultiple)
-            {
-                // Combination 3: Radio button style
-                // Mark glyphs: Radio-button style (◉ marked, ○ unmarked)
-                // Visual roles: Standard selection (mark glyphs provide visual indication)
-                role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
-            }
-            else
-            {
-                // Combination 4: Checkbox style
-                // Mark glyphs: Checkbox style (☒ marked, ☐ unmarked)
-                // Visual roles: Standard selection (mark glyphs provide visual indication)
-                role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
+
+                case true when !MarkMultiple:
+                    // Combination 3: Radio button style
+                    // Mark glyphs: Radio-button style (◉ marked, ○ unmarked)
+                    // Visual roles: Standard selection (mark glyphs provide visual indication)
+                    role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
+
+                    break;
+
+                default:
+                    // Combination 4: Checkbox style
+                    // Mark glyphs: Checkbox style (☒ marked, ☐ unmarked)
+                    // Visual roles: Standard selection (mark glyphs provide visual indication)
+                    role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
+
+                    break;
             }
 
             Attribute newAttribute = GetAttributeForRole (role);
@@ -155,5 +163,4 @@ public partial class ListView
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs>? RowRender;
-
 }
