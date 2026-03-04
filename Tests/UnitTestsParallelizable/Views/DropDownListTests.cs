@@ -305,7 +305,8 @@ public class DropDownListTests
         Assert.NotNull (popover);
 
         // Access the ListView (popover is Popover<ListView, string?>)
-        var listView = (popover as dynamic)?.ContentView as ListView;
+        var listViewPopover = Assert.IsType<Popover<ListView, string?>> (popover);
+        var listView = listViewPopover.ContentView;
         Assert.NotNull (listView);
 
         // Check that Item2 (index 1) is selected
