@@ -22,7 +22,7 @@ namespace Terminal.Gui.App;
 ///         reusable popover behavior for any view type.
 ///     </para>
 ///     <para>
-///         <b>Registration:</b> Popovers are automatically registered with <see cref="Application.Popover"/> when
+///         <b>Registration:</b> Popovers are automatically registered with <see cref="Application.Popovers"/> when
 ///         <see cref="MakeVisible"/> is called. Manual registration via <see cref="ApplicationPopover.Register"/>
 ///         is not required.
 ///     </para>

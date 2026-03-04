@@ -10,7 +10,7 @@ namespace Terminal.Gui.App;
 ///         such as menus, tooltips, or dialogs.
 ///     </para>
 ///     <para>
-///         <b>IMPORTANT:</b> Popovers must be registered with <see cref="Application.Popover"/> using
+///         <b>IMPORTANT:</b> Popovers must be registered with <see cref="Application.Popovers"/> using
 ///         <see cref="ApplicationPopover.Register"/> before they can be shown with <see cref="ApplicationPopover.Show"/>.
 ///     </para>
 ///     <para>
