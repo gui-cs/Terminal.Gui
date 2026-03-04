@@ -17,7 +17,7 @@ public class NavigationTests (ITestOutputHelper outputHelper) : TestsAllDrivers
         var v5 = new View { Id = "v5", CanFocus = true };
         var v6 = new View { Id = "v6", CanFocus = true };
 
-        using FluentTestContext c = With.A<Window> (50, 20, "ansi", _out)
+        using AppTestHelper c = With.A<Window> (50, 20, "ansi", _out)
                                         .Then (app =>
                                                {
                                                    var w1 = new Window { Id = "w1" };

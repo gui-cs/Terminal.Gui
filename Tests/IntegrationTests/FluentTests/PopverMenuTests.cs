@@ -21,7 +21,7 @@ public class PopoverMenuTests : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void EnableForDesign_CreatesMenuItems (string d)
     {
-        using FluentTestContext c = With.A<Window> (80, 25, d)
+        using AppTestHelper c = With.A<Window> (80, 25, d)
                                         .Then (app =>
                                                {
                                                    PopoverMenu popoverMenu = new ();
@@ -55,7 +55,7 @@ public class PopoverMenuTests : TestsAllDrivers
         {
             IApplication? app = null;
 
-            using FluentTestContext c = With.A<Window> (50, 20, d)
+            using AppTestHelper c = With.A<Window> (50, 20, d)
                                             .Then (a =>
                                                    {
                                                        app = a;
@@ -98,7 +98,7 @@ public class PopoverMenuTests : TestsAllDrivers
     {
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d)
+        using AppTestHelper c = With.A<Window> (50, 20, d)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -143,7 +143,7 @@ public class PopoverMenuTests : TestsAllDrivers
     {
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d)
+        using AppTestHelper c = With.A<Window> (50, 20, d)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -189,7 +189,7 @@ public class PopoverMenuTests : TestsAllDrivers
     {
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d)
+        using AppTestHelper c = With.A<Window> (50, 20, d)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -246,7 +246,7 @@ public class PopoverMenuTests : TestsAllDrivers
 
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d)
+        using AppTestHelper c = With.A<Window> (50, 20, d)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -279,7 +279,7 @@ public class PopoverMenuTests : TestsAllDrivers
 
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d)
+        using AppTestHelper c = With.A<Window> (50, 20, d)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -312,7 +312,7 @@ public class PopoverMenuTests : TestsAllDrivers
 
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d)
+        using AppTestHelper c = With.A<Window> (50, 20, d)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -336,7 +336,7 @@ public class PopoverMenuTests : TestsAllDrivers
 
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper c = With.A<Window> (40, 10, d, _out)
                                         .Then (a => app = a)
                                         .WithContextMenu (new PopoverMenu (menuItems) { App = app })
                                         .ScreenShot ("Before open menu", _out)
@@ -384,7 +384,7 @@ public class PopoverMenuTests : TestsAllDrivers
 
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (40, 10, d)
+        using AppTestHelper c = With.A<Window> (40, 10, d)
                                         .Then (a => app = a)
                                         .WithContextMenu (new PopoverMenu (menuItems) { App = app })
                                         .ScreenShot ("Before open menu", _out)

@@ -57,7 +57,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
                                   .ScreenShot ("Save dialog", _out)
                                   .KeyDown (Application.QuitKey)
                                   .AssertTrue (sd!.Canceled);
@@ -69,7 +69,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
                                   .Focus<Button> (b => b.Text == Strings.btnCancel)
                                   .AssertTrue (sd!.Canceled)
@@ -82,7 +82,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
                                   .LeftClick<Button> (b => b.Text == Strings.btnCancel)
                                   .AssertTrue (sd!.Canceled);
@@ -94,7 +94,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
                                   .ScreenShot ("Save dialog", _out)
                                   .KeyDown (Key.C.WithAlt)
                                   .AssertTrue (sd!.Canceled);
@@ -107,7 +107,7 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
                                   .LeftClick<Button> (b => b.Text == Strings.cmdSave)
                                   .AssertFalse (sd!.Canceled)
@@ -121,7 +121,7 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
                                   .KeyDown (Key.S.WithAlt)
                                   .AssertFalse (sd!.Canceled)
@@ -135,7 +135,7 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
                                   .Focus<Button> (b => b.Text == Strings.cmdSave)
                                   .KeyDown (Key.Enter)
@@ -155,7 +155,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
                                   .AssertTrue (sd!.Canceled)
                                   .Focus<Button> (b => b.Text == "►_Tree")
@@ -170,7 +170,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
                                   .AssertTrue (sd!.Canceled)
                                   .LeftClick<Button> (b => b.Text == "►_Tree")
@@ -191,7 +191,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
                                   .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
                                   .ScreenShot ("Save dialog", _out)
                                   .AssertTrue (sd!.Canceled)
@@ -234,7 +234,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
                                   .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
                                   .ScreenShot ("Save dialog", _out)
                                   .AssertTrue (sd!.Canceled)
@@ -293,7 +293,7 @@ public class FileDialogTests : TestsAllDrivers
     {
         SaveDialog? sd = null;
 
-        using FluentTestContext c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
+        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
                                   .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = preserve)
                                   .ScreenShot ("Save dialog", _out)
                                   .AssertTrue (sd!.Canceled)

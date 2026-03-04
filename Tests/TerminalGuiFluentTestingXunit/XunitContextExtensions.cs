@@ -12,22 +12,22 @@ public static partial class XunitContextExtensions
     /// <summary>
     /// Asserts that the last set cursor position matches <paramref name="expected"/>
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="helper"></param>
     /// <param name="expected"></param>
     /// <returns></returns>
-    public static FluentTestContext AssertCursorPosition (this FluentTestContext context, Point expected)
+    public static AppTestHelper AssertCursorPosition (this AppTestHelper helper, Point expected)
     {
         try
         {
-            Assert.Equal (expected, context.GetCursorPosition ());
+            Assert.Equal (expected, helper.GetCursorPosition ());
         }
         catch (Exception)
         {
-            context.HardStop ();
+            helper.HardStop ();
 
             throw;
         }
 
-        return context;
+        return helper;
     }
 }

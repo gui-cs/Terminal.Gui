@@ -2,7 +2,7 @@
 
 namespace TerminalGuiFluentTesting;
 
-public partial class FluentTestContext
+public partial class AppTestHelper
 {
     /// <summary>
     ///     Adds the given <paramref name="v"/> to the current top level view
@@ -10,7 +10,7 @@ public partial class FluentTestContext
     /// </summary>
     /// <param name="v"></param>
     /// <returns></returns>
-    public FluentTestContext Add (View v)
+    public AppTestHelper Add (View v)
     {
         WaitIteration ((app) =>
                        {

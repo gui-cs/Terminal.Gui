@@ -2,7 +2,7 @@
 
 namespace TerminalGuiFluentTesting;
 
-public partial class FluentTestContext
+public partial class AppTestHelper
 {
     /// <summary>
     ///     Sets the input focus to the given <see cref="View"/>.
@@ -13,7 +13,7 @@ public partial class FluentTestContext
     /// <param name="toFocus"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public FluentTestContext Focus (View toFocus)
+    public AppTestHelper Focus (View toFocus)
     {
         toFocus.FocusDeepest (NavigationDirection.Forward, TabBehavior.TabStop);
 
@@ -37,7 +37,7 @@ public partial class FluentTestContext
     /// </param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public FluentTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
+    public AppTestHelper Focus<T> (Func<T, bool>? evaluator = null) where T : View
     {
         evaluator ??= _ => true;
         View? t = App?.TopRunnableView;

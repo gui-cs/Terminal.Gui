@@ -13,7 +13,7 @@ public class TextFieldTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     public void TextField_Cursor_AtEnd_WhenTyping (string d)
     {
         // Simulates typing abcd into a TextField with width 3 (wide enough to render 2 characters only)
-        using FluentTestContext c = With.A<Window> (100, 20, d,  _out)
+        using AppTestHelper c = With.A<Window> (100, 20, d,  _out)
                                         .Add (new TextField { Width = 3 })
                                         .Focus<TextField> ()
                                         .AssertCursorPosition (new (1, 1)) // Initial cursor position (because Window has border)

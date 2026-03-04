@@ -4,7 +4,7 @@ using TerminalGuiFluentTestingXunit;
 namespace IntegrationTests;
 
 /// <summary>
-///     Integration tests for TestContext keyboard event handling (InjectKeyEvent).
+///     Integration tests for AppTestHelper keyboard event handling (InjectKeyEvent).
 /// </summary>
 public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
@@ -14,7 +14,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
     [MemberData (nameof (GetAllDriverNames))]
     public void QuitKey_ViaApplication_Stops (string d)
     {
-        using FluentTestContext context = With.A<Window> (40, 10, d)
+        using AppTestHelper helper = With.A<Window> (40, 10, d)
                                               .Then ((app) =>
                                                      {
                                                          app?.Keyboard.RaiseKeyDownEvent (Application.QuitKey);
@@ -26,12 +26,12 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
     [MemberData (nameof (GetAllDriverNames))]
     public void QuitKey_ViaStops (string d)
     {
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out);
-        Assert.True (context.App?.TopRunnable!.IsRunning);
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out);
+        Assert.True (helper.App?.TopRunnable!.IsRunning);
 
-        IRunnable? top = context.App?.TopRunnable;
-        context.KeyDown (Application.QuitKey);
-        context.App?.Dispose ();
+        IRunnable? top = helper.App?.TopRunnable;
+        helper.KeyDown (Application.QuitKey);
+        helper.App?.Dispose ();
 
         Assert.False (top!.IsRunning);
     }
@@ -44,7 +44,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keyReceived = true;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view)
                                               .Then ((_) => view.SetFocus ())
                                               .ResizeConsole (50, 20)
@@ -59,7 +59,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
     {
         var textField = new TextField { Text = "TEST", Width = 20 };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (textField)
                                               .Focus (textField)
                                               .Then ((_) => textField.MoveEnd ())
@@ -78,7 +78,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         var button = new Button { Text = "Click Me" };
         button.Accepting += (s, e) => clickedCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (textField)
                                               .Add (button)
                                               .Then ((_) => textField.SetFocus ())
@@ -108,7 +108,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
             receivedKey = e;
         };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view)
                                               .Then ((_) => view.SetFocus ())
                                               .KeyDown (Key.A);
@@ -126,7 +126,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view)
                                               .Then ((_) => view.SetFocus ())
                                               .KeyDown (Key.F1)
@@ -148,7 +148,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view)
                                               .Then ((_) => view.SetFocus ())
                                               .KeyDown (Key.A)
@@ -168,7 +168,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         var view1 = new View { Id = "view1", CanFocus = true };
         var view2 = new View { Id = "view2", CanFocus = true };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view1)
                                               .Add (view2)
                                               .Then ((_) => view1.SetFocus ())
@@ -188,7 +188,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
     {
         var textField = new TextField { Width = 20 };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (textField)
                                               .Then ((_) => textField.SetFocus ())
                                               .KeyDown (Key.D1)
@@ -208,14 +208,14 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view)
                                               .Then ((_) => view.SetFocus ());
 
         // Send 10 keys rapidly
         for (var i = 0; i < 10; i++)
         {
-            context.KeyDown ((Key)(Key.A.KeyCode + (uint)i));
+            helper.KeyDown ((Key)(Key.A.KeyCode + (uint)i));
         }
 
         Assert.Equal (10, keysReceived.Count);
@@ -235,7 +235,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view)
                                               .Then ((_) => view.SetFocus ())
                                               .KeyDown (Key.Enter)
@@ -264,7 +264,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         listView.SetSource (["Item1", "Item2", "Item3", "Item4", "Item5"]);
         listView.SelectedItem = 0;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (listView)
                                               .Then ((_) => listView.SetFocus ())
                                               .AssertEqual (0, listView.SelectedItem)
@@ -291,7 +291,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
             receivedKey = e;
         };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (view)
                                               .Then ((_) => view.SetFocus ())
                                               .KeyDown (Key.A.WithCtrl);
@@ -307,7 +307,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
     {
         var textField = new TextField { Width = 20 };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d,  _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d,  _out)
                                               .Add (textField)
                                               .KeyDown (Key.H.WithShift)
                                               .KeyDown (Key.E)

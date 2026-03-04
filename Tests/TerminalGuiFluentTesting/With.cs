@@ -14,7 +14,7 @@ public static class With
     /// <param name="driverName"></param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static FluentTestContext A<T> (int width, int height, string driverName, TextWriter? logWriter = null) where T : IRunnable, new()
+    public static AppTestHelper A<T> (int width, int height, string driverName, TextWriter? logWriter = null) where T : IRunnable, new()
     {
         return new (() => new T ()
         {
@@ -32,7 +32,7 @@ public static class With
     /// <param name="driverName"></param>
     /// <param name="logWriter"></param>
     /// <returns></returns>
-    public static FluentTestContext A (Func<IRunnable> runnableFactory, int width, int height, string driverName, TextWriter? logWriter = null)
+    public static AppTestHelper A (Func<IRunnable> runnableFactory, int width, int height, string driverName, TextWriter? logWriter = null)
     {
         return new (runnableFactory, width, height, driverName, logWriter, Timeout);
     }

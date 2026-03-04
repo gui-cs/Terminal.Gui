@@ -12,7 +12,7 @@ namespace TerminalGuiFluentTesting;
 ///     Fluent API context for testing a Terminal.Gui application. Create
 ///     an instance using <see cref="With"/> static class.
 /// </summary>
-public partial class FluentTestContext : IDisposable
+public partial class AppTestHelper : IDisposable
 {
     // ===== Threading & Synchronization =====
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
@@ -60,7 +60,7 @@ public partial class FluentTestContext : IDisposable
     ///     Constructor for tests that only need Application.Init without running the main loop.
     ///     Uses the driver's default screen size instead of forcing a specific size.
     /// </summary>
-    public FluentTestContext (string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    public AppTestHelper (string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
         _driverName = driverName;
         _logWriter = logWriter;
@@ -110,7 +110,7 @@ public partial class FluentTestContext : IDisposable
     /// <summary>
     ///     Constructor for tests that need to run the application with Application.Run.
     /// </summary>
-    internal FluentTestContext (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    internal AppTestHelper (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
         _driverName = driverName;
         _logWriter = logWriter;
@@ -283,7 +283,7 @@ public partial class FluentTestContext : IDisposable
     /// </summary>
     /// <param name="doAction"></param>
     /// <returns></returns>
-    public FluentTestContext Then (Action<IApplication> doAction)
+    public AppTestHelper Then (Action<IApplication> doAction)
     {
         try
         {
@@ -307,7 +307,7 @@ public partial class FluentTestContext : IDisposable
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    public FluentTestContext WaitIteration (Action<IApplication>? action = null)
+    public AppTestHelper WaitIteration (Action<IApplication>? action = null)
     {
         // If application has already exited don't wait!
         if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _ansiInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
@@ -355,9 +355,9 @@ public partial class FluentTestContext : IDisposable
         return this;
     }
 
-    public FluentTestContext WaitUntil (Func<bool> condition)
+    public AppTestHelper WaitUntil (Func<bool> condition)
     {
-        FluentTestContext? c = null;
+        AppTestHelper? c = null;
         var sw = Stopwatch.StartNew ();
 
         //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
@@ -397,9 +397,9 @@ public partial class FluentTestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public FluentTestContext ResizeConsole (int width, int height) => WaitIteration (app => { app.Driver!.SetScreenSize (width, height); });
+    public AppTestHelper ResizeConsole (int width, int height) => WaitIteration (app => { app.Driver!.SetScreenSize (width, height); });
 
-    public FluentTestContext ScreenShot (string title, TextWriter? writer) =>
+    public AppTestHelper ScreenShot (string title, TextWriter? writer) =>
 
         //Logging.Trace ($"{this.ToIdentifyingString ()}");
         WaitIteration (app =>
@@ -410,7 +410,7 @@ public partial class FluentTestContext : IDisposable
                            writer?.WriteLine (text);
                        });
 
-    public FluentTestContext AnsiScreenShot (string title, TextWriter? writer) =>
+    public AppTestHelper AnsiScreenShot (string title, TextWriter? writer) =>
 
         //Logging.Trace ($"{this.ToIdentifyingString ()}");
         WaitIteration (app =>
@@ -424,7 +424,7 @@ public partial class FluentTestContext : IDisposable
     /// <summary>
     ///     Stops the application and waits for the background thread to exit.
     /// </summary>
-    public FluentTestContext Stop ()
+    public AppTestHelper Stop ()
     {
         Logging.Trace ($"Stopping application for driver: {_driverName}");
 
@@ -513,7 +513,7 @@ public partial class FluentTestContext : IDisposable
     /// </summary>
     /// <param name="writer"></param>
     /// <returns></returns>
-    public FluentTestContext WriteOutLogs (TextWriter? writer)
+    public AppTestHelper WriteOutLogs (TextWriter? writer)
     {
         if (writer is null)
         {
@@ -554,7 +554,7 @@ public partial class FluentTestContext : IDisposable
     /// </summary>
     public void Dispose ()
     {
-        //Logging.Trace ($"Disposing TestContext");
+        //Logging.Trace ($"Disposing AppTestHelper");
         Stop ();
 
         var shouldThrow = false;

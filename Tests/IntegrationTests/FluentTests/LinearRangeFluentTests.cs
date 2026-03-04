@@ -10,7 +10,7 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
     [MemberData (nameof (GetAllDriverNames))]
     public void LinearRange_CanCreateAndRender (string d)
     {
-        using FluentTestContext c = With.A<Window> (30, 10, d, _out)
+        using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (
                                               new LinearRange<int> ([0, 10, 20, 30, 40, 50])
                                               {
@@ -28,7 +28,7 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
     [MemberData (nameof (GetAllDriverNames))]
     public void LinearRange_CanNavigateWithArrowKeys (string d)
     {
-        using FluentTestContext c = With.A<Window> (30, 10, d, _out)
+        using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (
                                               new LinearRange<int> ([0, 10, 20, 30])
                                               {
@@ -80,7 +80,7 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
         // Change the type before adding to window
         linearRange.Type = LinearRangeType.Range;
 
-        using FluentTestContext c = With.A<Window> (30, 10, d, _out)
+        using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (linearRange)
                                         .Focus<LinearRange<int>> ()
                                         .WaitIteration ()
@@ -96,7 +96,7 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
     [MemberData (nameof (GetAllDriverNames))]
     public void LinearRange_RangeType_CanSelectRange (string d)
     {
-        using FluentTestContext c = With.A<Window> (30, 10, d, _out)
+        using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (
                                               new LinearRange<int> ([0, 10, 20, 30, 40])
                                               {
@@ -123,7 +123,7 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
     [MemberData (nameof (GetAllDriverNames))]
     public void LinearRange_VerticalOrientation_Renders (string d)
     {
-        using FluentTestContext c = With.A<Window> (10, 15, d, _out)
+        using AppTestHelper c = With.A<Window> (10, 15, d, _out)
                                         .Add (
                                               new LinearRange<int> ([0, 10, 20, 30])
                                               {

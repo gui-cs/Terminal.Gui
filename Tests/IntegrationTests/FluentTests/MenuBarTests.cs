@@ -22,7 +22,7 @@ public class MenuBarTests : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void Initializes_WithNoItems (string d)
     {
-        using FluentTestContext c = With.A<Window> (80, 25, d, _out)
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
                                         .Then (_ =>
                                                {
                                                    // Create a menu bar with no items
@@ -40,7 +40,7 @@ public class MenuBarTests : TestsAllDrivers
     {
         MenuBarItem [] menuItems = [];
 
-        using FluentTestContext c = With.A<Window> (80, 25, d, _out)
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
                                         .Then (_ =>
                                                {
                                                    // Create items for the menu bar
@@ -69,7 +69,7 @@ public class MenuBarTests : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void AddsItems_WithMenusProperty (string d)
     {
-        using FluentTestContext c = With.A<Window> (80, 25, d, _out)
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
                                         .Then (_ =>
                                                {
                                                    var menuBar = new MenuBar ();
@@ -85,7 +85,7 @@ public class MenuBarTests : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void ChangesKey_RaisesEvent (string d)
     {
-        using FluentTestContext c = With.A<Window> (80, 25, d, _out)
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
                                         .Then (_ =>
                                                {
                                                    var menuBar = new MenuBar ();
@@ -121,7 +121,7 @@ public class MenuBarTests : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void EnableForDesign_CreatesMenuItems (string d)
     {
-        using FluentTestContext c = With.A<Window> (80, 25, d, _out)
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
                                         .Then (app =>
                                                {
                                                    var menuBar = new MenuBar ();
@@ -156,7 +156,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d, _out)
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -195,7 +195,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d, _out)
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -226,7 +226,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d, _out)
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
                                         .Add (new View { CanFocus = true, Id = "focusableView" })
                                         .Then (a =>
                                                {
@@ -258,7 +258,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d, _out)
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -288,7 +288,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using FluentTestContext c = With.A<Window> (50, 20, d, _out)
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
                                         .Then (a =>
                                                {
                                                    app = a;
@@ -335,7 +335,7 @@ public class MenuBarTests : TestsAllDrivers
         var shortcut3ActivatedCount = 0;
         Shortcut? shortcut2 = null;
 
-        FluentTestContext c = With.A<Window> (80, 30, d, _out)
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
                                   .Then (a =>
                                          {
                                              app = a;
@@ -411,7 +411,7 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        FluentTestContext c = With.A<Window> (80, 30, d, _out)
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
                                   .Then (a =>
                                          {
                                              app = a;
@@ -488,7 +488,7 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        FluentTestContext c = With.A<Window> (80, 30, d, _out)
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
                                   .Then (a =>
                                          {
                                              app = a;
@@ -553,7 +553,7 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        FluentTestContext c = With.A<Window> (80, 30, d, _out)
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
                                   .Then (a =>
                                          {
                                              app = a;
@@ -631,7 +631,7 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        FluentTestContext c = With.A<Window> (80, 30, d, _out)
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
                                   .Then (a =>
                                          {
                                              app = a;
@@ -698,7 +698,7 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        FluentTestContext c = With.A<Window> (80, 30, d, _out)
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
                                   .Then (a =>
                                          {
                                              app = a;
@@ -771,7 +771,7 @@ public class MenuBarTests : TestsAllDrivers
                                 }
                             };
 
-        using FluentTestContext c = With.A<Window> (50, 20, d, _out)
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
                                         .Then (a =>
                                                {
                                                    var menuBar = new MenuBar ();
@@ -801,7 +801,7 @@ public class MenuBarTests : TestsAllDrivers
                                 }
                             };
 
-        using FluentTestContext c = With.A<Window> (50, 20, d, _out)
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
                                         .Then (a =>
                                                {
                                                    var menuBar = new MenuBar ();

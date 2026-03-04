@@ -5,7 +5,7 @@ using TerminalGuiFluentTestingXunit;
 namespace IntegrationTests;
 
 /// <summary>
-///     Integration tests for TestContext mouse event handling (LeftClick, RightClick).
+///     Integration tests for AppTestHelper mouse event handling (LeftClick, RightClick).
 /// </summary>
 public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
@@ -20,7 +20,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         Button button = new () { X = 5, Y = 5, Text = "Click Me" };
         button.Accepting += (_, _) => clickedCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (button)
                                               .LeftClick (6, 6) // Click inside button (accounting for Window's border)
                                               .AssertEqual (1, clickedCount);
@@ -35,7 +35,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         Button button = new () { X = 5, Y = 5, Text = "Click Me" };
         button.Accepting += (_, _) => clickedCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out).Add (button).LeftClick<Button> (b => b.Text == "Click Me").AssertEqual (1, clickedCount);
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out).Add (button).LeftClick<Button> (b => b.Text == "Click Me").AssertEqual (1, clickedCount);
     }
 
     [Theory]
@@ -53,7 +53,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
                                receivedPosition = mouse.Position!.Value;
                            };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out).Add (view).LeftClick (15, 7).AssertTrue (mouseReceived);
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out).Add (view).LeftClick (15, 7).AssertTrue (mouseReceived);
     }
 
     [Theory]
@@ -65,7 +65,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         Button button = new () { X = 5, Y = 5, Text = "Click Me" };
         button.Accepting += (_, _) => clickCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (button)
                                               .LeftClick (6, 6)
                                               .LeftClick (6, 6)
@@ -89,7 +89,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
                                }
                            };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out).Add (view).RightClick (15, 7).AssertEqual (1, rightClickCount);
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out).Add (view).RightClick (15, 7).AssertEqual (1, rightClickCount);
     }
 
     [Theory]
@@ -116,7 +116,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
             CanFocus = true
         };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (view1)
                                               .Add (view2)
                                               .Then (_ => view1.SetFocus ())
@@ -135,7 +135,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         Button button = new () { X = 5, Y = 5, Text = "Click Me" };
         button.Accepting += (_, _) => clickCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (button)
                                               .LeftClick (6, 6) // Click button to focus it
                                               .AssertEqual (1, clickCount)
@@ -150,7 +150,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         TextField textField = new () { X = 5, Y = 5, Width = 20, Text = "Hello World" };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (textField)
                                               .LeftClick (11, 6) // Click in middle of text (accounting for border)
                                               .AssertTrue (textField.HasFocus);
@@ -173,15 +173,15 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
                                }
                            };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out).Add (view);
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out).Add (view);
 
         // Rapid fire 10 clicks
         for (var i = 0; i < 10; i++)
         {
-            context.LeftClick (15, 7);
+            helper.LeftClick (15, 7);
         }
 
-        context.AssertEqual (10, clickCount);
+        helper.AssertEqual (10, clickCount);
     }
 
     [Theory]
@@ -194,7 +194,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
 
         view.MouseEvent += (_, _) => clickCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (view)
                                               .LeftClick (5, 5) // Click outside view
                                               .AssertEqual (0, clickCount);
@@ -209,7 +209,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         Button button = new () { X = 5, Y = 5, Text = "Click Me", Enabled = false };
         button.Accepting += (_, _) => clickCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (button)
                                               .LeftClick (6, 6)
                                               .AssertEqual (0, clickCount); // Should not increment because button is disabled
@@ -224,7 +224,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         Button button = new () { X = 5, Y = 5, Text = "Click Me" };
         button.Accepting += (_, _) => clickCount++;
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out).Add (button).ResizeConsole (50, 20).LeftClick (6, 6).AssertEqual (1, clickCount);
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out).Add (button).ResizeConsole (50, 20).LeftClick (6, 6).AssertEqual (1, clickCount);
     }
 
     [Theory]
@@ -233,7 +233,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         CheckBox checkBox = new () { X = 5, Y = 5, Text = "Check Me" };
 
-        using FluentTestContext context = With.A<Window> (40, 10, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 10, d, _out)
                                               .Add (checkBox)
                                               .AssertEqual (CheckState.UnChecked, checkBox.Value)
                                               .LeftClick (6, 6) // Click checkbox
@@ -250,7 +250,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         listView.SetSource (["Item1", "Item2", "Item3", "Item4", "Item5"]);
         listView.SelectedItem = 0;
 
-        using FluentTestContext context = With.A<Window> (40, 20, d, _out)
+        using AppTestHelper helper = With.A<Window> (40, 20, d, _out)
                                               .Add (listView)
                                               .AssertEqual (0, listView.SelectedItem)
                                               .LeftClick (6, 7) // Click on Item2 (accounting for header/border)
