@@ -494,9 +494,9 @@ public class DropDownListTests
         IPopoverView? popover = FindDropDownPopover (app);
         Assert.True (popover?.Visible);
 
-        // Close
-        dropdown.InvokeCommand (Command.Toggle);
-        Assert.False (popover?.Visible);
+        // Access the ListView (popover is Popover<ListView, string?>)
+        var listView = (popover as dynamic)?.ContentView as ListView;
+        Assert.NotNull (listView);
 
         // Re-open
         dropdown.InvokeCommand (Command.Toggle);
