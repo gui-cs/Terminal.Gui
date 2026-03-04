@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Terminal.Gui.Tracing;
 using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
@@ -35,14 +36,10 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
-    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
-    public static extern bool PeekConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
-
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
-    [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool ReadConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+    #region Native Windows APIs that Should Not Be Needed
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint hConsoleInput, out uint lpcNumberOfEvents);
@@ -50,8 +47,18 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
 
-    [DllImport ("kernel32.dll")]
-    internal static extern uint GetConsoleCP ();
+    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
+    public static extern bool PeekConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+
+#if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
+    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
+    private static extern bool PeekConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+
+    [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool ReadConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+#endif
+
+    #endregion
 
     // Console mode flags
     private const int STD_INPUT_HANDLE = -10;
@@ -101,14 +108,14 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (InputHandle == nint.Zero || InputHandle == new nint (-1))
             {
-                Logging.Warning ("Failed to get Windows console input handle.");
+                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", "Failed to get Windows console input handle.");
 
                 return false;
             }
 
             if (!GetConsoleMode (InputHandle, out _originalConsoleMode))
             {
-                Logging.Warning ("Failed to get Windows console mode.");
+                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", "Failed to get Windows console mode.");
 
                 return false;
             }
@@ -123,7 +130,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (!SetConsoleMode (InputHandle, newMode))
             {
-                Logging.Warning ("Failed to set Windows VTS console mode.");
+                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", "Failed to set Windows VTS console mode.");
 
                 return false;
             }
@@ -131,13 +138,14 @@ internal sealed class WindowsVTInputHelper : IDisposable
             Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
             IsEnabled = true;
-            //Logging.Information ($"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
+
+            Trace.Lifecycle (nameof (AnsiInput), "Init", $"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to enable Windows VTS mode: {ex.Message}");
+            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", $"Failed to enable Windows VTS mode: {ex.Message}");
 
             return false;
         }
@@ -168,69 +176,87 @@ internal sealed class WindowsVTInputHelper : IDisposable
                 return false;
             }
 
-            // Prefer reading INPUT_RECORDs directly. This reliably exposes all
-            // key events (including control characters like Ctrl+Z) regardless
-            // of whether the console converts them into the character stream.
-            var toRead = (int)Math.Min (numberOfEvents, 64);
-            InputRecord [] records = new InputRecord [toRead];
-
-            if (!ReadConsoleInput (InputHandle, records, (uint)toRead, out uint eventsRead))
+#if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
+            // Workaround for Windows bug (since Win8): ReadFile unconditionally treats
+            // Ctrl+Z as EOF (returns 0 bytes) even when ENABLE_PROCESSED_INPUT is disabled.
+            // See https://github.com/microsoft/terminal/issues/4958
+            // We peek the input buffer and, if the front event is a Ctrl+Z key-down,
+            // consume it via ReadConsoleInput and synthesize the 0x1A byte ourselves.
+            if (TryHandleCtrlZ (buffer, out bytesRead))
             {
-                int err = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"ReadConsoleInput failed: {err}");
+                return bytesRead > 0;
+            }
+#endif
+
+            // Read the VT byte stream via ReadFile. With ENABLE_VIRTUAL_TERMINAL_INPUT
+            // enabled, the Windows console converts all input (keyboard, mouse, etc.)
+            // into ANSI escape sequences in this stream.
+            bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
+
+            if (!success)
+            {
+                int error = Marshal.GetLastWin32Error ();
+                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Read", $"ReadFile failed with error code: {error}");
 
                 return false;
             }
 
-            var pos = 0;
+            bytesRead = (int)numBytesRead;
 
-            for (var r = 0; r < eventsRead && pos < buffer.Length; r++)
-            {
-                if (records [r].EventType != EventType.Key)
-                {
-                    continue;
-                }
-
-                KeyEventRecord ke = records [r].KeyEvent;
-
-                // Only process key-down events
-                if (!ke.bKeyDown)
-                {
-                    continue;
-                }
-
-                // If the event provides a Unicode character (including control
-                // characters like U+001A), encode it to UTF-8 and append to the buffer.
-                if (ke.UnicodeChar != '\0')
-                {
-                    try
-                    {
-                        int written = Encoding.UTF8.GetBytes ([ke.UnicodeChar], 0, 1, buffer, pos);
-                        pos += written;
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.Warning ($"Encoding key char failed: {ex.Message}");
-                    }
-                }
-            }
-
-            if (pos > 0)
-            {
-                bytesRead = pos;
-
-                return true;
-            }
-
-            return false;
+            return bytesRead > 0;
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Error reading Windows console input: {ex.Message}");
+            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Read", $"Error reading Windows console input: {ex.Message}");
 
             return false;
         }
     }
+
+#if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
+    /// <summary>
+    ///     Checks whether the front event in the console input buffer is a Ctrl+Z key-down.
+    ///     If so, consumes it via <c>ReadConsoleInput</c> and writes <c>0x1A</c> (SUB) into the buffer.
+    /// </summary>
+    /// <remarks>
+    ///     This works around a Windows bug (since Windows 8) where <c>ReadFile</c> unconditionally
+    ///     treats Ctrl+Z as EOF and returns 0 bytes, even when <c>ENABLE_PROCESSED_INPUT</c> is disabled.
+    ///     See <see href="https://github.com/microsoft/terminal/issues/4958"/>.
+    /// </remarks>
+    /// <param name="buffer">Buffer to write the synthesized byte into.</param>
+    /// <param name="bytesRead">Set to 1 if Ctrl+Z was handled; 0 otherwise.</param>
+    /// <returns><c>true</c> if the front event was Ctrl+Z (handled or discarded); <c>false</c> if it was not Ctrl+Z.</returns>
+    private bool TryHandleCtrlZ (byte [] buffer, out int bytesRead)
+    {
+        bytesRead = 0;
+        InputRecord [] peekBuf = new InputRecord [1];
+
+        if (!PeekConsoleInput (InputHandle, peekBuf, 1, out uint peeked) || peeked == 0)
+        {
+            return false;
+        }
+
+        InputRecord rec = peekBuf [0];
+
+        if (rec.EventType != EventType.Key || rec.KeyEvent.UnicodeChar != '\x1A')
+        {
+            return false;
+        }
+
+        // It's a Ctrl+Z event. Consume it from the input buffer.
+        InputRecord [] consumeBuf = new InputRecord [1];
+        ReadConsoleInput (InputHandle, consumeBuf, 1, out _);
+
+        // Only synthesize the byte for key-down events.
+        if (rec.KeyEvent.bKeyDown)
+        {
+            buffer [0] = 0x1A;
+            bytesRead = 1;
+        }
+
+        return true;
+    }
+#endif
 
     /// <summary>
     ///     Restores the console to its original mode.
@@ -249,16 +275,17 @@ internal sealed class WindowsVTInputHelper : IDisposable
             if (!FlushConsoleInputBuffer (InputHandle))
             {
                 int error = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"FlushConsoleInputBuffer failed with error: {error}");
+                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Restore", $"FlushConsoleInputBuffer failed with error: {error}");
             }
 
             SetConsoleMode (InputHandle, _originalConsoleMode);
             IsEnabled = false;
+
             //Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to restore Windows console mode: {ex.Message}");
+            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Restore", $"Failed to restore Windows console mode: {ex.Message}");
         }
     }
 
@@ -296,7 +323,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
         catch (Exception ex)
         {
             // Optionally log the exception
-            Logging.Error (@$"Error in Peek: {ex.Message}");
+            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Peek", $"Error in Peek: {ex.Message}");
 
             return false;
         }

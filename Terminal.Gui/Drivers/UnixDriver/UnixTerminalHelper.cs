@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.Drivers;
 
@@ -102,7 +103,7 @@ internal static class UnixTerminalHelper
             // Check if we have a real console first
             if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
             {
-                Logging.Information ($"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (UnixTerminalHelper), "Suspend", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
 
                 return;
             }
@@ -129,7 +130,7 @@ internal static class UnixTerminalHelper
         }
         catch (Exception ex)
         {
-            Logging.Error ($"Error suspending terminal: {ex.Message}");
+            Trace.Lifecycle (nameof (UnixTerminalHelper), "Suspend", $"Error suspending terminal: {ex.Message}");
         }
         finally
         {

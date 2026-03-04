@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
@@ -62,7 +63,7 @@ public class AnsiOutput : OutputBase, IOutput
             // Check if we have a real console first
             if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
             {
-                Logging.Information ($"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiOutput), "Init", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
 
                 return;
             }
@@ -77,7 +78,7 @@ public class AnsiOutput : OutputBase, IOutput
                     _windowsVTOutput.Dispose ();
                     _windowsVTOutput = null;
 
-                    Logging.Information ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiOutput), "Init", "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }
@@ -90,7 +91,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 if (fdCopy == -1)
                 {
-                    Logging.Information ("Console output stream is not writable. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiOutput), "Init", "Console output stream is not writable. Running in degraded mode.");
 
                     return;
                 }
@@ -104,6 +105,7 @@ public class AnsiOutput : OutputBase, IOutput
             Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
             Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
             Write (EscSeqUtils.CSI_HideCursor);
+
             // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_EnableMouseEvents);
 
@@ -120,8 +122,7 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to initialize ANSIOutput: {ex.GetType ().Name}: {ex.Message}");
-            Logging.Warning ($"Stack trace: {ex.StackTrace}");
+            Trace.Lifecycle (nameof (AnsiOutput), "Init", $"Failed to initialize ANSIOutput: {ex.GetType ().Name}: {ex.Message}. Stack trace: {ex.StackTrace}");
             _platform = AnsiPlatform.Degraded;
         }
     }
@@ -230,7 +231,7 @@ public class AnsiOutput : OutputBase, IOutput
             }
             else
             {
-                if (_currentCursor!.Style != cursor.Style)
+                if (_currentCursor.Style != cursor.Style)
                 {
                     Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                 }
@@ -253,7 +254,7 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (_currentCursor!.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
+        if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
         }
@@ -288,19 +289,21 @@ public class AnsiOutput : OutputBase, IOutput
             // Example: "[8;25;80t"
             Match match = Regex.Match (response, @"\[(\d+);(\d+);(\d+)t$");
 
-            if (match is { Success: true, Groups.Count: 4 })
+            if (match is not { Success: true, Groups.Count: 4 })
             {
-                // Group 1 should be "8" (the response value)
-                // Group 2 is height, Group 3 is width
-                if (int.TryParse (match.Groups [2].Value, out int height) && int.TryParse (match.Groups [3].Value, out int width))
-                {
-                    _consoleSize = new Size (width, height);
-                }
+                return;
+            }
+
+            // Group 1 should be "8" (the response value)
+            // Group 2 is height, Group 3 is width
+            if (int.TryParse (match.Groups [2].Value, out int height) && int.TryParse (match.Groups [3].Value, out int width))
+            {
+                _consoleSize = new Size (width, height);
             }
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to parse size query response '{response}': {ex.Message}");
+            Trace.Lifecycle (nameof (AnsiOutput), "SizeQuery", $"Failed to parse size query response '{response}': {ex.Message}");
         }
     }
 
