@@ -36,6 +36,26 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public List<View?> CachedViewsUnderMouse { get; } = [];
 
+    /// <summary>
+    ///     The popover that was just dismissed by a mouse-press-outside event.
+    ///     Used to prevent re-entrant show of the same popover during the
+    ///     press → release → click cycle that triggered the dismiss.
+    /// </summary>
+    private IPopoverView? _dismissedByMousePress;
+
+    /// <summary>
+    ///     Tracks whether <see cref="RaiseMouseEvent"/> is currently executing within the
+    ///     dismiss recursion, to avoid clearing <see cref="_dismissedByMousePress"/> prematurely.
+    /// </summary>
+    private bool _isDismissRecursing;
+
+    /// <summary>
+    ///     Gets the popover that was just dismissed by a mouse-press-outside event, if any.
+    ///     Checked by <see cref="ApplicationPopover.Show"/> to suppress re-show during the
+    ///     same press → release → click cycle.
+    /// </summary>
+    internal IPopoverView? DismissedByMousePress => _dismissedByMousePress;
+
     /// <inheritdoc/>
     public event EventHandler<Mouse>? MouseEvent;
 
@@ -79,18 +99,30 @@ internal class MouseImpl : IMouse, IDisposable
             return;
         }
 
+        // Clear the dismissed-popover guard on a genuinely new press that isn't part of dismiss recursion.
+        if (mouseEvent.IsPressed && !_isDismissRecursing && _dismissedByMousePress is { })
+        {
+            _dismissedByMousePress = null;
+        }
+
         // Dismiss the Popover if the user presses mouse outside of it
         if (mouseEvent.IsPressed
-            && App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover
-            && visiblePopover is View popoverView
+            && App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover and View popoverView
             && !View.IsInHierarchy (popoverView, deepestViewUnderMouse, true))
         {
             Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Hide Visible Popover");
 
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
 
+            // Record the dismissed popover so ApplicationPopover.Show can suppress re-show
+            // during the remainder of this press → release → click cycle.
+            _dismissedByMousePress = visiblePopover;
+            _isDismissRecursing = true;
+
             // Recurse once so the event can be handled below the popover
             RaiseMouseEvent (mouseEvent);
+
+            _isDismissRecursing = false;
 
             return;
         }
@@ -191,6 +223,13 @@ internal class MouseImpl : IMouse, IDisposable
         }
 
         Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Exit");
+
+        // Clear the dismissed-popover guard after the click cycle completes.
+        // The Click event is the last event in a press → release → click cycle.
+        if (_dismissedByMousePress is { } && mouseEvent.IsSingleDoubleOrTripleClicked && !_isDismissRecursing)
+        {
+            _dismissedByMousePress = null;
+        }
     }
 
     /// <inheritdoc/>
@@ -452,6 +491,8 @@ internal class MouseImpl : IMouse, IDisposable
         CachedViewsUnderMouse.Clear ();
         MouseEvent = null;
         _mouseGrabViewRef = null;
+        _dismissedByMousePress = null;
+        _isDismissRecursing = false;
     }
 
     /// <inheritdoc/>

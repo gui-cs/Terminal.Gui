@@ -883,11 +883,10 @@ using Terminal.Gui.Configuration;
 ConfigurationManager.Enable(ConfigLocations.All);
 Application.Init();
 
-var themeSelector = new ComboBox
+var themeSelector = new OptionSelector<string>
 {
     X = 1,
     Y = 1,
-    Width = 20
 };
 themeSelector.SetSource(ThemeManager.GetThemeNames());
 themeSelector.SelectedItemChanged += (s, e) =>

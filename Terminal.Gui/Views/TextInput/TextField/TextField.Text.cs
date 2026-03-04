@@ -404,7 +404,7 @@ public partial class TextField
     {
         ProcessAutocomplete ();
 
-        if (!HasFocus)
+        if (!HasFocus || ReadOnly)
         {
             Cursor = Cursor with { Position = null };
 
