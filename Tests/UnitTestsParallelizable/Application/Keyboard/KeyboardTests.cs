@@ -478,11 +478,11 @@ public class KeyboardTests
     public void InvokeCommandsBoundToKey_Suspend_ReturnsNotNull ()
     {
         // Arrange
-        var keyboard = new KeyboardImpl ();
+        var keyboard = new ApplicationKeyboard ();
         Key key = Key.Z.WithCtrl;
 
         // Act
-        bool? result = keyboard.InvokeCommandsBoundToKey(key);
+        bool? result = keyboard.InvokeCommandsBoundToKey (key);
 
         // Assert
         Assert.True (result);
