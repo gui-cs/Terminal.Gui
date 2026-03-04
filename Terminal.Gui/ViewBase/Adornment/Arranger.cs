@@ -186,23 +186,12 @@ internal sealed class Arranger : IDisposable
 
     #region Button Management
 
-    private Button? _moveButton;
-    private Button? _allSizeButton;
-    private Button? _leftSizeButton;
-    private Button? _rightSizeButton;
-    private Button? _topSizeButton;
-    private Button? _bottomSizeButton;
-
-    // Stores the button type for each arrangement button (replaced use of Data property)
-    private readonly Dictionary<Button, ArrangeButtons> _buttonTypes = new ();
-
-    /// <summary>
-    ///     Gets the button type for a given button. For testing purposes.
-    /// </summary>
-    internal bool TryGetButtonType (Button button, out ArrangeButtons buttonType)
-    {
-        return _buttonTypes.TryGetValue (button, out buttonType);
-    }
+    private ArrangerButton? _moveButton;
+    private ArrangerButton? _allSizeButton;
+    private ArrangerButton? _leftSizeButton;
+    private ArrangerButton? _rightSizeButton;
+    private ArrangerButton? _topSizeButton;
+    private ArrangerButton? _bottomSizeButton;
 
     /// <summary>
     ///     Creates all the arrangement buttons based on parent's arrangement options.
@@ -213,64 +202,54 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.Movable))
         {
-            _moveButton = CreateArrangementButton (ArrangeButtons.Move, Glyphs.Move, 0, 0);
+            _moveButton = CreateArrangerButton (ArrangeButtons.Move, 0, 0);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.Resizable))
         {
-            _allSizeButton = CreateArrangementButton (ArrangeButtons.AllSize, Glyphs.SizeBottomRight, Pos.AnchorEnd (), Pos.AnchorEnd ());
+            _allSizeButton = CreateArrangerButton (ArrangeButtons.AllSize, Pos.AnchorEnd (), Pos.AnchorEnd ());
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
         {
-            _topSizeButton = CreateArrangementButton (ArrangeButtons.TopSize,
-                                                      Glyphs.SizeVertical,
-                                                      Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal,
-                                                      0);
+            _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize,
+                                                   Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal,
+                                                   0);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
-            _rightSizeButton = CreateArrangementButton (ArrangeButtons.RightSize,
-                                                        Glyphs.SizeHorizontal,
-                                                        Pos.AnchorEnd (),
-                                                        Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
+            _rightSizeButton = CreateArrangerButton (ArrangeButtons.RightSize,
+                                                     Pos.AnchorEnd (),
+                                                     Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            _leftSizeButton = CreateArrangementButton (ArrangeButtons.LeftSize,
-                                                       Glyphs.SizeHorizontal,
-                                                       0,
-                                                       Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
+            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize,
+                                                    0,
+                                                    Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
-            _bottomSizeButton = CreateArrangementButton (ArrangeButtons.BottomSize,
-                                                         Glyphs.SizeVertical,
-                                                         Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal / 2,
-                                                         Pos.AnchorEnd ());
+            _bottomSizeButton = CreateArrangerButton (ArrangeButtons.BottomSize,
+                                                      Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal / 2,
+                                                      Pos.AnchorEnd ());
         }
     }
 
     /// <summary>
     ///     Factory method to create a standardized arrangement button.
     /// </summary>
-    private Button CreateArrangementButton (ArrangeButtons buttonType, Rune glyph, Pos x, Pos y)
+    private ArrangerButton CreateArrangerButton (ArrangeButtons buttonType, Pos x, Pos y)
     {
-        Button button = new ()
+        ArrangerButton button = new ()
         {
+            ButtonType = buttonType,
 #if DEBUG
             Id = buttonType.ToString (),
 #endif
-            CanFocus = true,
-            Width = 1,
-            Height = 1,
-            NoDecorations = true,
-            NoPadding = true,
-            ShadowStyle = ShadowStyle.None,
-            Text = $"{glyph}",
             X = x,
             Y = y,
             Visible = false
@@ -280,9 +259,6 @@ internal sealed class Arranger : IDisposable
         button.KeyBindings.Remove (Key.Enter);
 
         _border.Add (button);
-
-        // Store button type in dictionary (replaced use of Data property)
-        _buttonTypes [button] = buttonType;
 
         return button;
     }
@@ -416,14 +392,13 @@ internal sealed class Arranger : IDisposable
     /// <summary>
     ///     Helper method to dispose and remove a button.
     /// </summary>
-    private void DisposeSizeButton (ref Button? button)
+    private void DisposeSizeButton (ref ArrangerButton? button)
     {
         if (button is null)
         {
             return;
         }
 
-        _buttonTypes.Remove (button);
         _border.Remove (button);
         button.Dispose ();
         button = null;
@@ -453,9 +428,9 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal ViewArrangement GetFocusedArrangement ()
     {
-        if (_border.Focused is Button focusedButton && _buttonTypes.TryGetValue (focusedButton, out ArrangeButtons button))
+        if (_border.Focused is ArrangerButton focusedButton)
         {
-            return GetArrangementForButton (button);
+            return GetArrangementForButton (focusedButton.ButtonType);
         }
 
         return ViewArrangement.Fixed;

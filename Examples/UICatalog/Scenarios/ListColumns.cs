@@ -72,7 +72,7 @@ public class ListColumns : Scenario
                 ShowHeaders = false,
                 ShowHorizontalHeaderOverline = false,
                 ShowHorizontalHeaderUnderline = false,
-                ShowHorizontalBottomline = false,
+                ShowHorizontalBottomLine = false,
                 ExpandLastColumn = false
             }
         };
@@ -129,7 +129,7 @@ public class ListColumns : Scenario
         _bottomLineCheckBox = new ()
         {
             Title = "_BottomLine",
-            Value = _listColView.Style.ShowHorizontalBottomline ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.ShowHorizontalBottomLine ? CheckState.Checked : CheckState.UnChecked
         };
         _bottomLineCheckBox.ValueChanged += (s, e) => ToggleBottomline ();
 
@@ -422,7 +422,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.ShowHorizontalBottomline = _bottomLineCheckBox.Value == CheckState.Checked;
+        _listColView.Style.ShowHorizontalBottomLine = _bottomLineCheckBox.Value == CheckState.Checked;
         _listColView.Update ();
     }
 

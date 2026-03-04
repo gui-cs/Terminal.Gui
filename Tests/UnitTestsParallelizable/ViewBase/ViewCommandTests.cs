@@ -1,6 +1,11 @@
+using Microsoft.Extensions.Logging;
+using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
+using Xunit.Abstractions;
+
 namespace ViewBaseTests.Commands;
 
-public class ViewCommandTests
+public class ViewCommandTests (ITestOutputHelper output)
 {
     #region OnAccept/Accept tests
 
@@ -113,9 +118,9 @@ public class ViewCommandTests
         View view = new ();
         var acceptedInvokedCount = 0;
 
-        view.Accepting += (sender, e) => { e.Handled = false; };
+        view.Accepting += (_, e) => { e.Handled = false; };
 
-        view.Accepted += (sender, e) => { acceptedInvokedCount++; };
+        view.Accepted += (_, _) => { acceptedInvokedCount++; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (1, acceptedInvokedCount);
@@ -127,9 +132,9 @@ public class ViewCommandTests
         View view = new ();
         var acceptedInvokedCount = 0;
 
-        view.Accepting += (sender, e) => { e.Handled = true; };
+        view.Accepting += (_, e) => { e.Handled = true; };
 
-        view.Accepted += (sender, e) => { acceptedInvokedCount++; };
+        view.Accepted += (_, _) => { acceptedInvokedCount++; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (0, acceptedInvokedCount);
@@ -141,11 +146,11 @@ public class ViewCommandTests
         View view = new ();
         var acceptedInvokedCount = 0;
 
-        view.Accepted += (sender, e) =>
+        view.Accepted += (_, e) =>
                          {
                              acceptedInvokedCount++;
 
-                             // Accepted event has Handled property but it doesn't affect flow
+                             // Accepted event has Handled property, but it doesn't affect flow
                              e.Handled = false;
                          };
 
@@ -158,7 +163,7 @@ public class ViewCommandTests
     {
         OnAcceptedTestView view = new ();
 
-        view.Accepting += (sender, e) => { e.Handled = false; };
+        view.Accepting += (_, e) => { e.Handled = false; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (1, view.OnAcceptedCallCount);
@@ -169,7 +174,7 @@ public class ViewCommandTests
     {
         OnAcceptedTestView view = new ();
 
-        view.Accepting += (sender, e) => { e.Handled = true; };
+        view.Accepting += (_, e) => { e.Handled = true; };
 
         view.InvokeCommand (Command.Accept);
         Assert.Equal (0, view.OnAcceptedCallCount);
@@ -294,7 +299,7 @@ public class ViewCommandTests
         var activatingInvoked = 0;
         view.Activating += ViewOnActivating;
 
-        bool? ret = view.InvokeCommand (Command.Activate);
+        view.InvokeCommand (Command.Activate);
         Assert.Equal (1, activatingInvoked);
 
         return;
@@ -1559,13 +1564,13 @@ public class ViewCommandTests
 
         AcceptTargetTestView defaultAcceptView = new () { IsDefault = true, Id = "defaultAcceptView", CanFocus = true };
         superView.Add (defaultAcceptView);
-        int defaultAcceptViewAcceptingCount = 0;
+        var defaultAcceptViewAcceptingCount = 0;
         defaultAcceptView.Accepting += (_, _) => defaultAcceptViewAcceptingCount++;
 
-        int superViewAcceptedCount = 0;
+        var superViewAcceptedCount = 0;
         superView.Accepted += (_, _) => superViewAcceptedCount++;
 
-        int superViewAcceptingCount = 0;
+        var superViewAcceptingCount = 0;
         superView.Accepting += (_, _) => superViewAcceptingCount++;
 
         // Act: Invoke Accept directly on the superView (not on a subview)
@@ -1574,9 +1579,10 @@ public class ViewCommandTests
         // Assert: The DefaultAcceptView's Accepting should have fired
         Assert.Equal (1, defaultAcceptViewAcceptingCount);
 
-        // Assert: The superView's Accepted should have fired after the DefaultAcceptView handled Accept
-        Assert.Equal (1, superViewAcceptedCount);
+        // Assert: The superView's Accepting should have fired
+        Assert.Equal (1, superViewAcceptingCount);
 
+        // Assert: The superView's Accepted should have fired after the DefaultAcceptView handled Accept
         Assert.Equal (1, superViewAcceptedCount);
     }
 
@@ -1669,4 +1675,956 @@ public class ViewCommandTests
             return HandleOnCommandNotBound;
         }
     }
+
+    #region IValue Integration Tests
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_WithIValueSource_PopulatesValue ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestValueView view = new () { Id = "valueView", Value = "test value" };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
+
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
+
+            view.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal ("test value", capturedContext!.Value);
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_WithoutIValueSource_ValueIsNull ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            View view = new () { Id = "plainView" };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
+
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
+
+            view.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Null (capturedContext!.Value);
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_WithBinding_PopulatesValueFromIValue ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestValueView view = new () { Id = "valueView", Value = 42 };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
+
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
+
+            KeyBinding binding = new ([Command.Accept]) { Key = Key.Enter };
+            view.InvokeCommand (Command.Accept, binding);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal (42, capturedContext!.Value);
+            Assert.NotNull (capturedContext.Binding);
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void InvokeCommand_IValueReturnsNull_ValueIsNull ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestValueView view = new () { Id = "nullValueView", Value = null };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
+
+            view.Accepting += (_, args) =>
+                              {
+                                  acceptingCount++;
+                                  capturedContext = args.Context;
+                              };
+
+            view.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Null (capturedContext!.Value);
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandBridge_PreservesValue_OnAccept ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            View owner = new () { Id = "owner" };
+            TestValueView remote = new () { Id = "remote", Value = "bridged value" };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
+
+            owner.Accepting += (_, args) =>
+                               {
+                                   acceptingCount++;
+                                   capturedContext = args.Context;
+                               };
+
+            using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
+
+            // Invoke Accept on remote
+            remote.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal ("bridged value", capturedContext!.Value);
+            Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandBridge_PreservesValue_OnActivate ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            View owner = new () { Id = "owner" };
+            TestValueView remote = new () { Id = "remote", Value = 123 };
+            ICommandContext? capturedContext = null;
+            var activatedCount = 0;
+
+            owner.Activated += (_, args) =>
+                               {
+                                   activatedCount++;
+                                   capturedContext = args.Value;
+                               };
+
+            using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Activate);
+
+            // Invoke Activate on remote
+            remote.InvokeCommand (Command.Activate);
+
+            Assert.Equal (1, activatedCount);
+            Assert.NotNull (capturedContext);
+            Assert.Equal (123, capturedContext!.Value);
+            Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void CommandBridge_NullValue_PropagatesCorrectly ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            View owner = new () { Id = "owner" };
+            TestValueView remote = new () { Id = "remote", Value = null };
+            ICommandContext? capturedContext = null;
+            var acceptingCount = 0;
+
+            owner.Accepting += (_, args) =>
+                               {
+                                   acceptingCount++;
+                                   capturedContext = args.Context;
+                               };
+
+            using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Accept);
+
+            // Invoke Accept on remote
+            remote.InvokeCommand (Command.Accept);
+
+            Assert.Equal (1, acceptingCount);
+            Assert.NotNull (capturedContext);
+            Assert.Null (capturedContext!.Value);
+            Assert.Equal (CommandRouting.Bridged, capturedContext.Routing);
+        }
+    }
+
+    // Test view that implements IValue<object?>
+    private class TestValueView : View, IValue<object?>
+    {
+        public object? Value
+        {
+            get;
+            set
+            {
+                object? old = field;
+                ValueChanging?.Invoke (this, new ValueChangingEventArgs<object?> (old, value));
+                field = value;
+                ValueChanged?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+                ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+            }
+        }
+
+        public event EventHandler<ValueChangingEventArgs<object?>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+    }
+
+    /// <summary>
+    ///     A view that implements <see cref="IValue{T}"/> and increments its value in
+    ///     <see cref="OnActivated"/>, similar to how <see cref="CheckBox"/> advances its
+    ///     <see cref="CheckState"/>. Used to test the command pipeline independently of CheckBox.
+    /// </summary>
+    private class ToggleView : View, IValue<int>
+    {
+        /// <summary>Gets the number of times <see cref="OnActivated"/> has been called.</summary>
+        public int ActivatedCount { get; private set; }
+
+        public int Value
+        {
+            get;
+            set
+            {
+                if (field == value)
+                {
+                    return;
+                }
+
+                int old = field;
+                ValueChanging?.Invoke (this, new ValueChangingEventArgs<int> (old, value));
+                field = value;
+                ValueChanged?.Invoke (this, new ValueChangedEventArgs<int> (old, value));
+                ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+            }
+        }
+
+        public event EventHandler<ValueChangingEventArgs<int>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
+
+        private event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+        event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
+        {
+            add => ValueChangedUntyped += value;
+            remove => ValueChangedUntyped -= value;
+        }
+
+        /// <inheritdoc/>
+        protected override void OnActivated (ICommandContext? commandContext)
+        {
+            base.OnActivated (commandContext);
+            ActivatedCount++;
+            Value++;
+        }
+    }
+
+    /// <summary>
+    ///     A minimal composite view that relays <see cref="Command.Activate"/> to a dispatch
+    ///     target (its first SubView), replicating the containment pattern of
+    ///     <see cref="Shortcut"/>/<see cref="MenuItem"/> without depending on those classes.
+    /// </summary>
+    private class RelayComposite : View
+    {
+        public RelayComposite () => CommandsToBubbleUp = [Command.Activate];
+
+        protected override View? GetDispatchTarget (ICommandContext? ctx) => SubViews.FirstOrDefault ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Proves the double-activation bug: when a view that mutates state in
+    ///     <see cref="View.OnActivated"/> is the dispatch target of a relay composite, and
+    ///     activation starts on the target itself (e.g., mouse click), the command bubbles up
+    ///     to the composite which dispatches back down. This causes
+    ///     <see cref="View.OnActivated"/> to fire twice: once from the inner DispatchDown,
+    ///     and again from the originator's own <c>RaiseActivated</c>. The state mutation
+    ///     (Value++) therefore happens twice instead of once.
+    /// </summary>
+    [Fact]
+    public void OnActivated_Fires_Once_When_Originator_Is_DispatchTarget ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            // Arrange: RelayComposite contains ToggleView as dispatch target
+            ToggleView toggleView = new () { Id = "toggleView" };
+
+            RelayComposite composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            var compositeActivatedCount = 0;
+
+            composite.Activated += (_, _) => compositeActivatedCount++;
+
+            Assert.Equal (0, toggleView.Value);
+            Assert.Equal (0, toggleView.ActivatedCount);
+
+            // Act: Invoke Activate on the dispatch target itself (simulates a mouse click).
+            // The binding is required so TryDispatchToTarget's relay guard passes.
+            KeyBinding binding = new ([Command.Activate], Key.Space, composite);
+            CommandContext ctx = new (Command.Activate, new WeakReference<View> (toggleView), binding);
+            toggleView.InvokeCommand (Command.Activate, ctx);
+
+            // Assert: OnActivated should fire exactly ONCE, so Value should be 1.
+            Assert.Equal (1, toggleView.ActivatedCount);
+            Assert.Equal (1, toggleView.Value);
+            Assert.Equal (1, compositeActivatedCount);
+        }
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When a ToggleView is the dispatch target of a RelayComposite, and a
+    ///     <see cref="CommandBridge"/> connects the composite's Activated event to a host view,
+    ///     the host should see the post-toggle value and exactly one Activated event.
+    ///     Direct invocation (no binding) — the toggle fires once, but the value in the bridged
+    ///     context is stale (captured before OnActivated mutated it).
+    ///     Replicates <c>Target_CheckBox_CommandView_Activate_Direct_Source_Reaches_Target_And_Value_Is_Correct</c>
+    ///     without depending on PopoverMenu, MenuItem, or CheckBox.
+    /// </summary>
+    [Fact]
+    public void Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_Direct ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: Host ← Bridge ← Composite → ToggleView (dispatch target)
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        RelayComposite composite = new () { Id = "composite" };
+        composite.Add (toggleView);
+
+        View host = new () { Id = "host" };
+
+        // Bridge: composite.Activated → host.InvokeCommand(Activate, Bridged)
+        using CommandBridge bridge = CommandBridge.Connect (host, composite, Command.Activate);
+
+        object? capturedValue = null;
+        var hostActivatedCount = 0;
+        var valueChangeCount = 0;
+
+        toggleView.ValueChanged += (_, _) => valueChangeCount++;
+
+        host.Activated += (_, args) =>
+                          {
+                              hostActivatedCount++;
+                              capturedValue = args.Value?.Value;
+                          };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Direct invocation on the toggle view (no binding).
+        toggleView.InvokeCommand (Command.Activate);
+
+        // Assert: The toggle should happen exactly once (no double-fire in the direct path).
+        Assert.Equal (1, toggleView.ActivatedCount);
+        Assert.Equal (1, toggleView.Value);
+        Assert.Equal (1, valueChangeCount);
+
+        // Assert: Host's Activated event should fire exactly once.
+        Assert.Equal (1, hostActivatedCount);
+
+        // The value at the host should be the post-toggle value (1).
+        // level doesn't re-read the dispatch target's value after the originator's
+        // OnActivated has mutated it.
+        Assert.Equal (1, capturedValue as int?);
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Same as <see cref="Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_Direct"/>
+    ///     but with a <see cref="KeyBinding"/> whose source is the composite (simulates key activation
+    ///     that bubbles from the toggle view up to the composite).
+    ///     The binding enables TryDispatchToTarget's relay guard, causing the composite to
+    ///     DispatchDown back to the toggle view — triggering the double-fire bug.
+    ///     Replicates <c>Target_CheckBox_CommandView_Activate_With_KeyBinding</c> without depending on
+    ///     PopoverMenu, MenuItem, or CheckBox.
+    /// </summary>
+    [Fact]
+    public void Bridge_Receives_Correct_Value_When_Originator_Is_DispatchTarget_WithBinding ()
+    {
+        using IDisposable verbose = TestLogging.Verbose (output);
+
+        Trace.EnabledCategories = TraceCategory.Command;
+
+        // Arrange: Host ← Bridge ← Composite → ToggleView (dispatch target)
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        RelayComposite composite = new () { Id = "composite" };
+        composite.Add (toggleView);
+
+        View host = new () { Id = "host" };
+
+        using CommandBridge bridge = CommandBridge.Connect (host, composite, Command.Activate);
+
+        object? capturedValue = null;
+        var hostActivatedCount = 0;
+        var valueChangeCount = 0;
+
+        toggleView.ValueChanged += (_, _) => valueChangeCount++;
+
+        host.Activated += (_, args) =>
+                          {
+                              hostActivatedCount++;
+                              capturedValue = args.Value?.Value;
+                          };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Invoke with a binding whose source is the composite.
+        KeyBinding binding = new ([Command.Activate], Key.Space, composite);
+        toggleView.InvokeCommand (Command.Activate, binding);
+
+        // Assert: OnActivated should fire exactly once, so Value should be 1.
+        Assert.Equal (1, toggleView.ActivatedCount);
+        Assert.Equal (1, toggleView.Value);
+        Assert.Equal (1, valueChangeCount);
+
+        // Assert: Host's Activated event should fire exactly once.
+        Assert.Equal (1, hostActivatedCount);
+
+        // The value at the host should be the post-toggle value (1).
+        Assert.Equal (1, capturedValue as int?);
+    }
+
+    #endregion
+
+    #region Values Chain Tests (Option B)
+
+    /// <summary>
+    ///     A ConsumeDispatch composite that implements <see cref="IValue{T}"/> and updates its own
+    ///     value in <see cref="OnActivated"/>. Replicates the OptionSelector/FlagSelector pattern
+    ///     without depending on those classes.
+    /// </summary>
+    private class CompositeValueView : View, IValue<int?>
+    {
+        public CompositeValueView () => CommandsToBubbleUp = [Command.Activate];
+
+        public int? Value
+        {
+            get;
+            set
+            {
+                int? old = field;
+                ValueChanging?.Invoke (this, new ValueChangingEventArgs<int?> (old, value));
+                field = value;
+                ValueChanged?.Invoke (this, new ValueChangedEventArgs<int?> (old, value));
+                _valueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (old, value));
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override bool ConsumeDispatch => true;
+
+        /// <inheritdoc/>
+        protected override View? GetDispatchTarget (ICommandContext? ctx) => SubViews.FirstOrDefault ();
+
+        /// <inheritdoc/>
+        protected override void OnActivated (ICommandContext? ctx)
+        {
+            base.OnActivated (ctx);
+
+            // Simulate what OptionSelector.ApplyActivation does: update own value after base fires.
+            Value = 42;
+        }
+
+        public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+        private event EventHandler<ValueChangedEventArgs<object?>>? _valueChangedUntyped;
+
+        event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
+        {
+            add => _valueChangedUntyped += value;
+            remove => _valueChangedUntyped -= value;
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     When a ConsumeDispatch composite implements <see cref="IValue"/>, <see cref="ICommandContext.Value"/>
+    ///     delivered to direct <see cref="View.Activated"/> subscribers must be the composite's
+    ///     post-mutation value (appended to <see cref="ICommandContext.Values"/>), not the
+    ///     dispatch target's raw value.
+    /// </summary>
+    [Fact]
+    public void Values_ConsumeDispatch_Composite_Appends_Own_Value ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            ToggleView toggleView = new () { Id = "toggleView" };
+            CompositeValueView composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            object? capturedValue = null;
+            IReadOnlyList<object?>? capturedValues = null;
+
+            composite.Activated += (_, args) =>
+                                   {
+                                       capturedValue = args.Value?.Value;
+                                       capturedValues = args.Value?.Values;
+                                   };
+
+            // Act: programmatic invocation dispatches to the focused ToggleView.
+            composite.InvokeCommand (Command.Activate);
+
+            // Assert: ctx.Value is the composite's int? (42), not CheckState/int from ToggleView.
+            Assert.Equal (42, capturedValue as int?);
+            Assert.NotNull (capturedValues);
+
+            // The chain should contain the composite's initial value, the dispatch target's
+            // value, and the composite's post-mutation value.
+            Assert.True (capturedValues!.Count >= 2);
+            Assert.Equal (42, capturedValues [^1] as int?);
+
+            composite.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     When a ConsumeDispatch composite implements <see cref="IValue"/>,
+    ///     ancestors receiving <see cref="View.Activated"/> via <see cref="View.CommandsToBubbleUp"/>
+    ///     must see the composite's post-mutation value in <see cref="ICommandContext.Value"/>.
+    /// </summary>
+    [Fact]
+    public void Values_BubbleActivatedUp_Carries_Composite_Value_To_Ancestor ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            ToggleView toggleView = new () { Id = "toggleView" };
+            CompositeValueView composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            View ancestor = new () { Id = "ancestor" };
+            ancestor.CommandsToBubbleUp = [Command.Activate];
+            ancestor.Add (composite);
+
+            object? ancestorCapturedValue = null;
+
+            ancestor.Activated += (_, args) => { ancestorCapturedValue = args.Value?.Value; };
+
+            // Act
+            composite.InvokeCommand (Command.Activate);
+
+            // Assert: ancestor sees the composite's value (42), not ToggleView's value.
+            Assert.Equal (42, ancestorCapturedValue as int?);
+
+            ancestor.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     <see cref="ICommandContext.Values"/> accumulates values as the command propagates.
+    ///     The initial value from the source is the first entry; subsequent composites append.
+    /// </summary>
+    [Fact]
+    public void Values_Chain_Accumulates_From_Source_Through_Composites ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            TestValueView sourceView = new () { Id = "source", Value = "initial" };
+
+            IReadOnlyList<object?>? capturedValues = null;
+
+            sourceView.Activated += (_, args) => { capturedValues = args.Value?.Values; };
+
+            // Act: simple activation on an IValue view
+            sourceView.InvokeCommand (Command.Activate);
+
+            // Assert: Values contains the source view's value
+            Assert.NotNull (capturedValues);
+            Assert.Contains ("initial", capturedValues!);
+
+            sourceView.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     When a <see cref="CommandBridge"/> bridges an Activated event,
+    ///     <see cref="ICommandContext.Values"/> is preserved across the bridge,
+    ///     including all accumulated values from the originating chain.
+    /// </summary>
+    [Fact]
+    public void Values_Bridge_Preserves_Full_Chain ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            ToggleView toggleView = new () { Id = "toggleView" };
+            CompositeValueView composite = new () { Id = "composite" };
+            composite.Add (toggleView);
+
+            View host = new () { Id = "host" };
+            using CommandBridge bridge = CommandBridge.Connect (host, composite, Command.Activate);
+
+            IReadOnlyList<object?>? hostCapturedValues = null;
+            object? hostCapturedValue = null;
+
+            host.Activated += (_, args) =>
+                              {
+                                  hostCapturedValues = args.Value?.Values;
+                                  hostCapturedValue = args.Value?.Value;
+                              };
+
+            // Act
+            composite.InvokeCommand (Command.Activate);
+
+            // Assert: Bridge carries the full Values chain, including composite's value
+            Assert.NotNull (hostCapturedValues);
+            Assert.True (hostCapturedValues!.Count >= 2);
+
+            // The last value should be the composite's value (42)
+            Assert.Equal (42, hostCapturedValue as int?);
+
+            host.Dispose ();
+            composite.Dispose ();
+        }
+    }
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     Non-IValue views do not add to the <see cref="ICommandContext.Values"/> chain.
+    ///     Only views implementing <see cref="IValue"/> contribute values.
+    /// </summary>
+    [Fact]
+    public void Values_NonIValue_View_Has_Empty_Values ()
+    {
+        using (TestLogging.BindTo (output, LogLevel.Warning))
+        {
+            Trace.EnabledCategories = TraceCategory.Command;
+
+            View plainView = new () { Id = "plainView" };
+
+            IReadOnlyList<object?>? capturedValues = null;
+
+            plainView.Activated += (_, args) => { capturedValues = args.Value?.Values; };
+
+            plainView.InvokeCommand (Command.Activate);
+
+            // Assert: No values accumulated for non-IValue view
+            Assert.NotNull (capturedValues);
+            Assert.Empty (capturedValues!);
+
+            plainView.Dispose ();
+        }
+    }
+
+    #endregion
+
+    #region Bridge Cancellation Bug (PopoverMenus.cs line 192)
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Replicates the BUGBUG at PopoverMenus.cs line 192: when a <see cref="CommandBridge"/>
+    ///     relays an <c>Activated</c> event to an owner, and the owner (or its ancestor) tries to
+    ///     cancel via <c>OnActivating</c>, the originator's state has already changed because the
+    ///     bridge fires from the post-event (<c>Activated</c>), not the pre-event (<c>Activating</c>).
+    ///     Also verifies that a <c>BridgedCancellation</c> trace warning is emitted.
+    ///
+    ///     Topology (uses only View base classes):
+    ///     <code>
+    ///     ancestor (Activating handler cancels for specific source)
+    ///       └── owner  ← Bridge ←  container (CommandsToBubbleUp=[Activate])
+    ///                                  └── toggleView (IValue, mutates in OnActivated)
+    ///     </code>
+    ///
+    ///     Expected: cancelling at the ancestor's Activating should prevent the state change.
+    ///     Actual:   toggleView.Value has already incremented by the time ancestor's Activating fires.
+    /// </summary>
+    [Fact]
+    public void Bridge_Ancestor_Cancel_OnActivating_Does_Not_Prevent_Originator_State_Change ()
+    {
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
+
+        // Arrange: toggleView inside container, bridged to owner, owner inside ancestor.
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        View container = new () { Id = "container" };
+        container.CommandsToBubbleUp = [Command.Activate];
+        container.Add (toggleView);
+
+        View owner = new () { Id = "owner" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Activate];
+        ancestor.Add (owner);
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, container, Command.Activate);
+
+        // Track the toggleView.Value at the moment ancestor's Activating fires.
+        int? valueAtAncestorActivating = null;
+        var ancestorActivatingFired = false;
+
+        ancestor.Activating += (_, args) =>
+                                {
+                                    ancestorActivatingFired = true;
+                                    valueAtAncestorActivating = toggleView.Value;
+
+                                    // Cancel — this should prevent further processing,
+                                    // but cannot undo the toggleView's state change.
+                                    args.Handled = true;
+                                };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Activate the toggleView directly (simulates a user click on the inner view).
+        toggleView.InvokeCommand (Command.Activate);
+
+        // Assert: The bridge should have caused ancestor.Activating to fire.
+        Assert.True (ancestorActivatingFired, "ancestor.Activating should have fired via bridge");
+
+        // BUGBUG: By the time ancestor's Activating handler fires, toggleView.Value
+        // has already been incremented. The cancellation is too late.
+        Assert.Equal (1, toggleView.Value); // State change already happened
+        Assert.Equal (1, valueAtAncestorActivating); // Was already 1 when ancestor saw it
+
+#if DEBUG
+        // Verify the BridgedCancellation trace warning was emitted.
+        Assert.Contains (traceBackend.Entries, e => e.Phase == "BridgedCancellation" && e.Message!.Contains ("OnActivated"));
+#endif
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Contrast test: in the normal (non-bridge) bubble-up path, cancelling at the ancestor's
+    ///     <c>OnActivating</c> DOES prevent the originator's state change, because <c>TryBubbleUp</c>
+    ///     calls <c>SuperView.InvokeCommand</c> during <c>RaiseActivating</c> (the pre-event phase).
+    ///     The originator's <c>OnActivated</c> only fires if <c>RaiseActivating</c> succeeds.
+    ///     No <c>BridgedCancellation</c> trace warning should appear.
+    ///
+    ///     Topology:
+    ///     <code>
+    ///     ancestor (Activating handler cancels)
+    ///       └── toggleView (IValue, mutates in OnActivated)
+    ///     </code>
+    ///
+    ///     This proves the asymmetry: direct containment bubbling supports cancellation;
+    ///     bridge-based bubbling does not.
+    /// </summary>
+    [Fact]
+    public void Direct_Ancestor_Cancel_OnActivating_Prevents_Originator_State_Change ()
+    {
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
+
+        // Arrange: toggleView inside ancestor (direct containment, no bridge).
+        ToggleView toggleView = new () { Id = "toggleView" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Activate];
+        ancestor.Add (toggleView);
+
+        int? valueAtAncestorActivating = null;
+        var ancestorActivatingFired = false;
+
+        ancestor.Activating += (_, args) =>
+                                {
+                                    ancestorActivatingFired = true;
+                                    valueAtAncestorActivating = toggleView.Value;
+
+                                    // Cancel — in the direct path, this DOES prevent
+                                    // the originator's OnActivated from firing.
+                                    args.Handled = true;
+                                };
+
+        Assert.Equal (0, toggleView.Value);
+
+        // Act: Activate the toggleView directly.
+        toggleView.InvokeCommand (Command.Activate);
+
+        // Assert: ancestor.Activating should have fired via TryBubbleUp.
+        Assert.True (ancestorActivatingFired, "ancestor.Activating should have fired via TryBubbleUp");
+
+        // In the direct containment path, cancellation at the ancestor DOES work:
+        // toggleView.OnActivated never fires, so Value remains 0.
+        Assert.Equal (0, toggleView.Value);
+        Assert.Equal (0, valueAtAncestorActivating);
+
+        // No BridgedCancellation warning — this is a direct containment path.
+        Assert.DoesNotContain (traceBackend.Entries, e => e.Phase == "BridgedCancellation");
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Accept-side analog of the bridge cancellation bug: when a <see cref="CommandBridge"/>
+    ///     relays an <c>Accepted</c> event to an owner, and the owner (or its ancestor) tries to
+    ///     cancel via <c>OnAccepting</c>, the originator's state has already changed because the
+    ///     bridge fires from the post-event (<c>Accepted</c>).
+    ///     Verifies that a <c>BridgedCancellation</c> trace warning is emitted.
+    ///
+    ///     Topology:
+    ///     <code>
+    ///     ancestor (Accepting handler cancels)
+    ///       └── owner  ← Bridge(Accept) ←  acceptToggleView (mutates in OnAccepted)
+    ///     </code>
+    /// </summary>
+    [Fact]
+    public void Bridge_Ancestor_Cancel_OnAccepting_Does_Not_Prevent_Originator_State_Change ()
+    {
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
+
+        // Arrange: acceptToggleView bridged to owner, owner inside ancestor.
+        AcceptToggleView acceptToggleView = new () { Id = "acceptToggleView" };
+
+        View owner = new () { Id = "owner" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Accept];
+        ancestor.Add (owner);
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, acceptToggleView, Command.Accept);
+
+        int? valueAtAncestorAccepting = null;
+        var ancestorAcceptingFired = false;
+
+        ancestor.Accepting += (_, args) =>
+                               {
+                                   ancestorAcceptingFired = true;
+                                   valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
+
+                                   // Cancel — this should prevent further processing,
+                                   // but cannot undo the acceptToggleView's state change.
+                                   args.Handled = true;
+                               };
+
+        Assert.Equal (0, acceptToggleView.AcceptedCount);
+
+        // Act: Accept on the remote view.
+        acceptToggleView.InvokeCommand (Command.Accept);
+
+        // Assert: The bridge should have caused ancestor.Accepting to fire.
+        Assert.True (ancestorAcceptingFired, "ancestor.Accepting should have fired via bridge");
+
+        // By the time ancestor's Accepting handler fires, acceptToggleView.OnAccepted
+        // has already been called. The cancellation is too late.
+        Assert.Equal (1, acceptToggleView.AcceptedCount); // State change already happened
+        Assert.Equal (1, valueAtAncestorAccepting); // Was already 1 when ancestor saw it
+
+        // Verify the BridgedCancellation trace warning was emitted.
+#if DEBUG
+        Assert.Contains (traceBackend.Entries, e => e.Phase == "BridgedCancellation" && e.Message!.Contains ("OnAccepted"));
+#endif
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Contrast test for Accept: in the normal (non-bridge) bubble-up path, cancelling at the
+    ///     ancestor's <c>OnAccepting</c> DOES prevent the originator's state change, because
+    ///     <c>TryBubbleUp</c> calls <c>SuperView.InvokeCommand</c> during <c>RaiseAccepting</c>
+    ///     (the pre-event phase). No <c>BridgedCancellation</c> trace warning should appear.
+    ///
+    ///     Topology:
+    ///     <code>
+    ///     ancestor (Accepting handler cancels)
+    ///       └── acceptToggleView (mutates in OnAccepted)
+    ///     </code>
+    /// </summary>
+    [Fact]
+    public void Direct_Ancestor_Cancel_OnAccepting_Prevents_Originator_State_Change ()
+    {
+        ListBackend traceBackend = new ();
+        using IDisposable scope = Trace.PushScope (TraceCategory.Command, traceBackend);
+
+        // Arrange: acceptToggleView inside ancestor (direct containment, no bridge).
+        AcceptToggleView acceptToggleView = new () { Id = "acceptToggleView" };
+
+        View ancestor = new () { Id = "ancestor" };
+        ancestor.CommandsToBubbleUp = [Command.Accept];
+        ancestor.Add (acceptToggleView);
+
+        int? valueAtAncestorAccepting = null;
+        var ancestorAcceptingFired = false;
+
+        ancestor.Accepting += (_, args) =>
+                               {
+                                   ancestorAcceptingFired = true;
+                                   valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
+
+                                   // Cancel — in the direct path, this DOES prevent
+                                   // the originator's OnAccepted from firing.
+                                   args.Handled = true;
+                               };
+
+        Assert.Equal (0, acceptToggleView.AcceptedCount);
+
+        // Act: Accept on the view directly.
+        acceptToggleView.InvokeCommand (Command.Accept);
+
+        // Assert: ancestor.Accepting should have fired via TryBubbleUp.
+        Assert.True (ancestorAcceptingFired, "ancestor.Accepting should have fired via TryBubbleUp");
+
+        // In the direct containment path, cancellation at the ancestor DOES work:
+        // acceptToggleView.OnAccepted never fires, so AcceptedCount remains 0.
+        Assert.Equal (0, acceptToggleView.AcceptedCount);
+        Assert.Equal (0, valueAtAncestorAccepting);
+
+        // No BridgedCancellation warning — this is a direct containment path.
+        Assert.DoesNotContain (traceBackend.Entries, e => e.Phase == "BridgedCancellation");
+    }
+
+    #endregion
+
+    #region Bridge Cancellation Test Helpers
+
+    /// <summary>
+    ///     A minimal view that tracks Accept-side state changes.
+    ///     Increments <see cref="AcceptedCount"/> in <see cref="OnAccepted"/> to
+    ///     provide a trackable state change for bridge cancellation tests.
+    /// </summary>
+    private class AcceptToggleView : View
+    {
+        /// <summary>Gets the number of times <see cref="OnAccepted"/> has been called.</summary>
+        public int AcceptedCount { get; private set; }
+
+        /// <inheritdoc/>
+        protected override void OnAccepted (ICommandContext? commandContext)
+        {
+            base.OnAccepted (commandContext);
+            AcceptedCount++;
+        }
+    }
+
+    #endregion
 }

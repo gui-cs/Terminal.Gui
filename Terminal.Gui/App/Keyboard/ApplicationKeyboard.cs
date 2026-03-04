@@ -14,12 +14,12 @@ namespace Terminal.Gui.App;
 ///         See <see cref="IKeyboard"/> for usage details.
 ///     </para>
 /// </summary>
-internal class KeyboardImpl : IKeyboard, IDisposable
+internal class ApplicationKeyboard : IKeyboard, IDisposable
 {
     /// <summary>
     ///     Initializes keyboard bindings and subscribes to Application configuration property events.
     /// </summary>
-    public KeyboardImpl ()
+    public ApplicationKeyboard ()
     {
         // DON'T access Application static properties here - they trigger ApplicationImpl.Instance
         // which sets ModelUsage to LegacyStatic, breaking parallel tests.
@@ -158,7 +158,9 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             return true;
         }
 
-        if (App?.Popovers?.DispatchKeyDown (key) is true)
+        IPopoverView? activePopover = App?.Popovers?.GetActivePopover ();
+
+        if (activePopover is { } && App?.Popovers?.DispatchKeyDownToActivePopover (key) is true)
         {
             return true;
         }
@@ -187,6 +189,11 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             {
                 return true;
             }
+        }
+
+        if (App?.Popovers?.DispatchKeyDownToInactivePopovers (key, activePopover) is true)
+        {
+            return true;
         }
 
         bool? commandHandled = InvokeCommandsBoundToKey (key);
@@ -218,7 +225,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
                     return null;
                 }
 
-                handled = binding.Target?.InvokeCommands (binding.Commands, binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+                handled = binding.Target?.InvokeCommands (binding.Commands,
+                                                          binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
             }
             else
             {

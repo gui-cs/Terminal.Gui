@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -8,8 +7,8 @@ namespace Terminal.Gui.Views;
 public partial class TableView
 {
     /// <summary>
-    /// calculates the current header height based on what is visible
-    /// This respects the viewport Y position and the AlwaysShowHeaders style
+    ///     calculates the current header height based on what is visible
+    ///     This respects the viewport Y position and the AlwaysShowHeaders style
     /// </summary>
     /// <returns>height</returns>
     protected int CurrentHeaderHeightVisible ()
@@ -23,18 +22,14 @@ public partial class TableView
         {
             return Math.Min (GetHeaderHeight (), Viewport.Height);
         }
-        else
-        {
-            return Math.Min (Math.Max (GetHeaderHeight () - Viewport.Y, 0), Viewport.Height);
-        }
+
+        return Math.Min (Math.Max (GetHeaderHeight () - Viewport.Y, 0), Viewport.Height);
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent (DrawContext context)
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Move (0, 0);
-        _scrollRightPoint = null;
-        _scrollLeftPoint = null;
 
         // What columns to render at what X offset in viewport
         ColumnToRender [] cellInfos = NonHiddenCellInfos ();
@@ -43,8 +38,8 @@ public partial class TableView
         // invalidate current row (prevents scrolling around leaving old characters in the frame
         AddStr (new string (' ', Viewport.Width));
         var line = 0;
-        int headerLinesHandled = 0;
-        var availableWidth = GetContentSize ().Width;
+        var headerLinesHandled = 0;
+        int availableWidth = GetContentSize ().Width;
 
         if (ShouldRenderHeaders ())
         {
@@ -55,15 +50,14 @@ public partial class TableView
                 └────────────────────┴──────────┴───────────┴──────────────┴─────────┘
             */
 
-            bool ShouldRenderNextHeaderLine ()
-            {
+            bool ShouldRenderNextHeaderLine () =>
+
                 //is the header line not scrolled or shall it always be shown? and do we have space to render it?
-                return (Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height;
-            }
+                (Viewport.Y <= headerLinesHandled || Style.AlwaysShowHeaders) && line < Viewport.Height;
 
             if (Style.ShowHorizontalHeaderOverline)
             {
-                if (ShouldRenderNextHeaderLine())
+                if (ShouldRenderNextHeaderLine ())
                 {
                     RenderHeaderOverline (line, availableWidth, cellInfos);
                     line++;
@@ -73,7 +67,7 @@ public partial class TableView
 
             if (Style.ShowHeaders)
             {
-                if (ShouldRenderNextHeaderLine())
+                if (ShouldRenderNextHeaderLine ())
                 {
                     RenderHeaderMidline (line, availableWidth, cellInfos);
                     line++;
@@ -83,7 +77,7 @@ public partial class TableView
 
             if (Style.ShowHorizontalHeaderUnderline)
             {
-                if (ShouldRenderNextHeaderLine())
+                if (ShouldRenderNextHeaderLine ())
                 {
                     RenderHeaderUnderline (line, availableWidth, cellInfos);
                     line++;
@@ -94,7 +88,7 @@ public partial class TableView
 
         int headerLinesConsumed = line;
 
-        var locRowOffset = Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - headerLinesHandled, 0);
+        int locRowOffset = Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - headerLinesHandled, 0);
 
         // render the cells
         for (; line < Viewport.Height; line++)
@@ -111,9 +105,9 @@ public partial class TableView
             }
 
             // No more data
-            if (rowToRender >= Table.Rows)
+            if (rowToRender >= Table!.Rows)
             {
-                if (rowToRender == Table.Rows && Style.ShowHorizontalBottomline)
+                if (rowToRender == Table.Rows && Style.ShowHorizontalBottomLine)
                 {
                     RenderBottomLine (line, availableWidth, cellInfos);
                 }
@@ -226,11 +220,10 @@ public partial class TableView
             RenderRune (0, row, Glyphs.VLine);
         }
 
-        for (var i = 0; i < columnsToRender.Length; i++)
+        foreach (ColumnToRender current in columnsToRender)
         {
-            ColumnToRender current = columnsToRender [i];
-            ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
-            string colName = _table.ColumnNames [current.Column];
+            ColumnStyle? colStyle = Style.GetColumnStyleIfAny (current.Column);
+            string colName = _table!.ColumnNames [current.Column];
             RenderSeparator (current.X - 1, row, true);
             Move (current.X - Viewport.X, row);
             AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
@@ -335,7 +328,7 @@ public partial class TableView
     private void RenderRow (int row, int rowToRender, ColumnToRender [] columnsToRender)
     {
         bool focused = HasFocus;
-        Scheme rowScheme = Style.RowColorGetter?.Invoke (new RowColorGetterArgs (Table, rowToRender)) ?? GetScheme ();
+        Scheme rowScheme = Style.RowColorGetter?.Invoke (new RowColorGetterArgs (Table!, rowToRender)) ?? GetScheme ();
 
         // start by clearing the entire line
         // not needed, see Attribute below:
@@ -356,20 +349,19 @@ public partial class TableView
         AddStr (new string (' ', Viewport.Width));
 
         // Render cells for each visible header for the current row
-        for (var i = 0; i < columnsToRender.Length; i++)
+        foreach (ColumnToRender current in columnsToRender)
         {
-            ColumnToRender current = columnsToRender [i];
-            ColumnStyle colStyle = Style.GetColumnStyleIfAny (current.Column);
+            ColumnStyle? colStyle = Style.GetColumnStyleIfAny (current.Column);
 
             // Set scheme based on whether the current cell is the selected one
             bool isSelectedCell = IsSelected (current.Column, rowToRender);
-            object val = Table [rowToRender, current.Column];
+            object val = Table! [rowToRender, current.Column];
 
             // Render the (possibly truncated) cell value
             string representation = GetRepresentation (val, colStyle);
 
             // to get the colour scheme
-            CellColorGetterDelegate schemeGetter = colStyle?.ColorGetter;
+            CellColorGetterDelegate? schemeGetter = colStyle?.ColorGetter;
             Scheme scheme;
 
             if (schemeGetter is { })
@@ -413,7 +405,7 @@ public partial class TableView
                 SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
             }
 
-            if (_style.AlwaysUseNormalColorForVerticalCellLines && _style.ShowVerticalCellLines)
+            if (_style is { AlwaysUseNormalColorForVerticalCellLines: true, ShowVerticalCellLines: true })
             {
                 SetAttribute (rowScheme.Normal);
             }
@@ -436,7 +428,7 @@ public partial class TableView
         // render start and end of line
         RenderRune (0, row, Glyphs.VLine);
 
-        var lastCol = columnsToRender.LastOrDefault ();
+        ColumnToRender? lastCol = columnsToRender.LastOrDefault ();
 
         if (lastCol != null)
         {
@@ -452,17 +444,18 @@ public partial class TableView
         }
 
         bool renderLines = isHeader ? _style.ShowVerticalHeaderLines : _style.ShowVerticalCellLines;
-        Rune symbol = renderLines ? Glyphs.VLine : (Rune) SeparatorSymbol;
+        Rune symbol = renderLines ? Glyphs.VLine : (Rune)SeparatorSymbol;
         RenderRune (col, row, symbol);
     }
 
     /// <summary>
-    /// This decides if we should render headers at all (no matter what the style settings are)
-    /// This may be a candidate to remove in future
-    /// (old implementation needed this logic to decide if the header is in current view (RowOffset))
+    ///     This decides if we should render headers at all (no matter what the style settings are)
+    ///     This may be a candidate to remove in future
+    ///     (old implementation needed this logic to decide if the header is in current view (RowOffset))
     /// </summary>
     /// <returns></returns>
-#warning a candidate to remove
+
+    // TODO: a candidate to remove
     private bool ShouldRenderHeaders ()
     {
         if (TableIsNullOrInvisible ())

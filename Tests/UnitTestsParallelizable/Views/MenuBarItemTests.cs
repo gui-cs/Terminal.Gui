@@ -119,6 +119,11 @@ public class MenuBarItemTests
         ((View)runnable).Add (hostView);
         app.Begin (runnable);
 
+        // Registration is now lazy — popover is not registered until it is opened
+        Assert.False (app.Popovers?.IsRegistered (menuBarItem.PopoverMenu));
+
+        // Open the popover → triggers auto-registration via MakeVisible
+        menuBarItem.InvokeCommand (Command.Activate);
         Assert.True (app.Popovers?.IsRegistered (menuBarItem.PopoverMenu));
     }
 
@@ -179,6 +184,12 @@ public class MenuBarItemTests
         Assert.False (app.Popovers?.IsRegistered (menuBarItem.PopoverMenu));
 
         menuBarItem.EnableForDesign ();
+
+        // Registration is now lazy — popover is not registered until it is opened
+        Assert.False (app.Popovers?.IsRegistered (menuBarItem.PopoverMenu));
+
+        // Open the popover → triggers auto-registration via MakeVisible
+        menuBarItem.InvokeCommand (Command.Activate);
         Assert.True (app.Popovers?.IsRegistered (menuBarItem.PopoverMenu));
     }
 }

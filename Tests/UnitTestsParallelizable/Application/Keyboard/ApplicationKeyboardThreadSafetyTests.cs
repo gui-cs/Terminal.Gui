@@ -4,16 +4,16 @@
 namespace ApplicationTests.Keyboard;
 
 /// <summary>
-///     Tests to verify that KeyboardImpl is thread-safe for concurrent access scenarios.
+///     Tests to verify that ApplicationKeyboard is thread-safe for concurrent access scenarios.
 /// </summary>
 [Collection("Application Tests")]
-public class KeyboardImplThreadSafetyTests
+public class ApplicationKeyboardThreadSafetyTests
 {
     [Fact]
     public void AddCommand_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var keyboard = new KeyboardImpl ();
+        var keyboard = new ApplicationKeyboard ();
         List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 50;
@@ -60,7 +60,7 @@ public class KeyboardImplThreadSafetyTests
         // Arrange
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        var keyboard = new KeyboardImpl { App = app };
+        var keyboard = new ApplicationKeyboard { App = app };
         keyboard.AddKeyBindings ();
         List<Exception> exceptions = [];
         var continueRunning = true;
@@ -112,7 +112,7 @@ public class KeyboardImplThreadSafetyTests
         // Arrange
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        var keyboard = new KeyboardImpl { App = app };
+        var keyboard = new ApplicationKeyboard { App = app };
         keyboard.AddKeyBindings ();
         List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
@@ -157,7 +157,7 @@ public class KeyboardImplThreadSafetyTests
         // Arrange
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        var keyboard = new KeyboardImpl { App = app };
+        var keyboard = new ApplicationKeyboard { App = app };
         keyboard.AddKeyBindings ();
         List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
@@ -199,7 +199,7 @@ public class KeyboardImplThreadSafetyTests
     public void KeyBindings_ConcurrentAdd_NoExceptions ()
     {
         // Arrange
-        var keyboard = new KeyboardImpl ();
+        var keyboard = new ApplicationKeyboard ();
 
         // Don't call AddKeyBindings here to avoid conflicts
         List<Exception> exceptions = [];
@@ -253,7 +253,7 @@ public class KeyboardImplThreadSafetyTests
     public void KeyDown_Events_ConcurrentSubscription_NoExceptions ()
     {
         // Arrange
-        var keyboard = new KeyboardImpl ();
+        var keyboard = new ApplicationKeyboard ();
         keyboard.AddKeyBindings ();
         List<Exception> exceptions = [];
         const int NUM_THREADS = 10;
@@ -299,7 +299,7 @@ public class KeyboardImplThreadSafetyTests
     public void KeyProperty_Setters_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var keyboard = new KeyboardImpl ();
+        var keyboard = new ApplicationKeyboard ();
 
         // Initialize once before concurrent access
         keyboard.AddKeyBindings ();
@@ -373,7 +373,7 @@ public class KeyboardImplThreadSafetyTests
         // Arrange
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        var keyboard = new KeyboardImpl { App = app };
+        var keyboard = new ApplicationKeyboard { App = app };
         keyboard.AddKeyBindings ();
         List<Exception> exceptions = [];
         const int OPERATIONS_PER_THREAD = 30;
@@ -477,7 +477,7 @@ public class KeyboardImplThreadSafetyTests
         // Arrange
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        var keyboard = new KeyboardImpl { App = app };
+        var keyboard = new ApplicationKeyboard { App = app };
         keyboard.AddKeyBindings ();
         List<Exception> exceptions = [];
         const int NUM_THREADS = 5;

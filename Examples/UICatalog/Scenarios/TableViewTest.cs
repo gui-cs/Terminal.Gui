@@ -37,8 +37,6 @@ public class TableViewTest : Scenario
             Title = "Options",
         };
 
-        View.Diagnostics = ViewDiagnosticFlags.DrawIndicator;
-
         var offsetLabel = new Label ()
         {
             X = 0, Y = Pos.Bottom (optionsView),
@@ -121,7 +119,7 @@ public class TableViewTest : Scenario
             ("ShowHorizontalHeaderUnderline", () => tableView.Style.ShowHorizontalHeaderUnderline, b => tableView.Style.ShowHorizontalHeaderUnderline = b),
             ("ShowVerticalCellLines", () => tableView.Style.ShowVerticalCellLines, b => tableView.Style.ShowVerticalCellLines = b),
             ("InvertSelectedCellFirstCharacter", () => tableView.Style.InvertSelectedCellFirstCharacter, b => tableView.Style.InvertSelectedCellFirstCharacter = b),
-            ("ShowHorizontalBottomline", () => tableView.Style.ShowHorizontalBottomline, b => tableView.Style.ShowHorizontalBottomline = b),
+            ("ShowHorizontalBottomline", () => tableView.Style.ShowHorizontalBottomLine, b => tableView.Style.ShowHorizontalBottomLine = b),
             ("ExpandLastColumn", () => tableView.Style.ExpandLastColumn, b => tableView.Style.ExpandLastColumn = b),
             ("FullRowSelect", () => tableView.FullRowSelect, b => tableView.FullRowSelect = b),
             ("SmoothHorizontalScrolling", () => tableView.Style.SmoothHorizontalScrolling, b => tableView.Style.SmoothHorizontalScrolling = b),
@@ -129,7 +127,7 @@ public class TableViewTest : Scenario
             ("MinAcceptableWidth (limit col 6 = 15)", () => tableView.Style.ColumnStyles[6].MinAcceptableWidth < TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH, b => tableView.Style.ColumnStyles[6].MinAcceptableWidth = b ? 15 : TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH),
         ];
 
-        View? priorView = null;
+        View priorView = null;
 
         foreach ((string text, Func<bool> iv, Action<bool> hndlr) tuple in options)
         {

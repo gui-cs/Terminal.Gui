@@ -22,7 +22,7 @@
 ### The Pipeline (TL;DR)
 
 ```
-ANSI Input ? AnsiMouseParser ? MouseInterpreter ? MouseImpl ? View ? Commands
+ANSI Input ? AnsiMouseParser ? MouseInterpreter ? ApplicationMouse ? View ? Commands
    (1-based)     (0-based screen)   (click synthesis)   (routing)  (viewport)  (Activate/Accept)
 ```
 
@@ -33,7 +33,7 @@ ANSI Input ? AnsiMouseParser ? MouseInterpreter ? MouseImpl ? View ? Commands
 | **ANSI** | User clicks | `ESC[<0;10;5M` | Hardware ? ANSI escape sequence |
 | **Parser** | ANSI string | `Mouse{Pressed, Screen(9,4)}` | 1-based ? 0-based, Button code ? MouseFlags |
 | **Interpreter** | Press/Release | `Mouse{Clicked, Screen(9,4)}` | Press+Release ? Clicked, Timing ? DoubleClicked |
-| **MouseImpl** | Screen coords | `Mouse{Clicked, Viewport(2,1)}` | Screen ? Viewport, Find view, Handle grab |
+| **ApplicationMouse** | Screen coords | `Mouse{Clicked, Viewport(2,1)}` | Screen ? Viewport, Find view, Handle grab |
 | **View** | Viewport coords | Command invocation | Clicked ? Command.Activate, MouseState updates |
 | **Commands** | Command | Event | Activate ? Activating, Accept ? Accepting |
 
@@ -448,9 +448,9 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, 'm'=release)
 
 **Output:** Stream of `Mouse` events including synthesized clicks
 
-### Stage 4: Application Routing (MouseImpl)
+### Stage 4: Application Routing (ApplicationMouse)
 
-**Location:** `Terminal.Gui/App/Mouse/MouseImpl.cs`
+**Location:** `Terminal.Gui/App/Mouse/ApplicationMouse.cs`
 
 **Entry:** `IMouse.RaiseMouseEvent(Mouse mouse)`
 
@@ -475,6 +475,8 @@ if (mouse.IsPressed &&
     RaiseMouseEvent(mouse); // Recurse to handle event below popover
 }
 ```
+
+**Re-show Guard:** When a popover is dismissed, `ApplicationMouse` records the dismissed popover in `DismissedByMousePress` and wraps the recursive `RaiseMouseEvent` call with an `_isDismissRecursing` flag. `ApplicationPopover.Show` checks this guard and silently returns if the caller is trying to re-show the same popover that was just dismissed. This prevents views beneath the popover (e.g., a `DropDownList` toggle button or a `MenuBarItem`) from re-opening the popover during the recursed press event or during the subsequent release/click events in the same mouse interaction cycle (press → release → click). The guard is cleared when the next fresh press event arrives or when the click cycle completes.
 
 #### 4.3: Mouse Grab Handling
 ```csharp
