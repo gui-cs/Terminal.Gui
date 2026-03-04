@@ -167,15 +167,13 @@ public static partial class Application
 
     /// <summary>
     ///     Maximum number of iterations of the main loop (and hence draws)
-    ///     to allow to occur per second. Defaults to <see cref="DefaultMaximumIterationsPerSecond"/> which is a 25ms sleep
-    ///     after iteration (factoring in how long iteration took to run).
+    ///     to allow to occur per second. Defaults to 25ms.
     ///     <remarks>
     ///         Note that not every iteration draws (see <see cref="View.NeedsDraw"/>).
     ///     </remarks>
     /// </summary>
 
-    // ReSharper disable once StaticMemberInitializerReferesToMemberBelow
-    public static ushort MaximumIterationsPerSecond { get; set; } = DefaultMaximumIterationsPerSecond;
+    public static ushort MaximumIterationsPerSecond { get; set; } = 25;
 
     /// <summary>
     ///     Gets the default maximum number of iterations per second for the main loop.
