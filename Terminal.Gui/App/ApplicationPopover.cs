@@ -185,10 +185,10 @@ public sealed class ApplicationPopover : IDisposable
         }
 
         // Prevent re-show of a popover that was just dismissed by a mouse-press-outside event.
-        // The dismiss logic in MouseImpl.RaiseMouseEvent sets DismissedByMousePress before recursing,
+        // The dismiss logic in ApplicationMouse.RaiseMouseEvent sets DismissedByMousePress before recursing,
         // and the guard spans the entire press → release → click cycle. This prevents views beneath
         // the popover from re-opening the same popover during the click that dismissed it.
-        if (popover is { } && App?.Mouse is MouseImpl { DismissedByMousePress: { } dismissed } && dismissed == popover)
+        if (popover is { } && App?.Mouse is ApplicationMouse { DismissedByMousePress: { } dismissed } && dismissed == popover)
         {
             return;
         }

@@ -26,7 +26,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         TimedEvents timedEvents = new ();
-        MouseImpl mouseGrabber = new ();
+        ApplicationMouse mouseGrabber = new ();
         view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timedEvents, mouseGrabber);
 
         Mouse mouse = new ()
@@ -64,7 +64,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         TimedEvents timedEvents = new ();
-        MouseImpl mouseGrabber = new ();
+        ApplicationMouse mouseGrabber = new ();
         view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timedEvents, mouseGrabber);
 
         var activatingCount = 0;
@@ -108,7 +108,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         TimedEvents timedEvents = new ();
-        MouseImpl mouseGrabber = new ();
+        ApplicationMouse mouseGrabber = new ();
         view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timedEvents, mouseGrabber);
 
         var activatingCount = 0;
@@ -151,7 +151,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         TimedEvents timedEvents = new ();
-        MouseImpl mouseGrabber = new ();
+        ApplicationMouse mouseGrabber = new ();
         view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timedEvents, mouseGrabber);
 
         var activatingCount = 0;
@@ -199,7 +199,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         TimedEvents timedEvents = new ();
-        MouseImpl mouseGrabber = new ();
+        ApplicationMouse mouseGrabber = new ();
         view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timedEvents, mouseGrabber);
 
         var activatingCount = 0;
@@ -252,7 +252,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         TimedEvents timedEvents = new ();
-        MouseImpl mouseGrabber = new ();
+        ApplicationMouse mouseGrabber = new ();
         view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timedEvents, mouseGrabber);
 
         var activatingCount = 0;

@@ -20,27 +20,23 @@ public class TimeoutTests
         var firstFired = false;
         var secondFired = false;
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             firstFired = true;
 
                             // Add another timeout from within callback
-                            app.AddTimeout (
-                                            TimeSpan.FromMilliseconds (50),
+                            app.AddTimeout (TimeSpan.FromMilliseconds (50),
                                             () =>
                                             {
                                                 secondFired = true;
                                                 app.RequestStop ();
 
                                                 return false;
-                                            }
-                                           );
+                                            });
 
                             return false;
-                        }
-                       );
+                        });
 
         // Defensive: use iteration counter instead of time-based safety timeout
         var iterations = 0;
@@ -80,11 +76,11 @@ public class TimeoutTests
 
         var exceptionThrown = false;
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             exceptionThrown = true;
+
                             throw new InvalidOperationException ("Test exception");
                         });
 
@@ -126,16 +122,14 @@ public class TimeoutTests
         var timeoutFired = false;
 
         // Setup a timeout that will fire
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (timeoutTime),
+        app.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime),
                         () =>
                         {
                             timeoutFired = true;
 
                             // Return false so the timer does not repeat
                             return false;
-                        }
-                       );
+                        });
 
         // The timeout has not fired yet
         Assert.False (timeoutFired);
@@ -221,15 +215,13 @@ public class TimeoutTests
 
         for (var i = 0; i < TIMEOUT_COUNT; i++)
         {
-            app.AddTimeout (
-                            TimeSpan.FromMilliseconds (10 + i * 5),
+            app.AddTimeout (TimeSpan.FromMilliseconds (10 + i * 5),
                             () =>
                             {
                                 Interlocked.Increment (ref firedCount);
 
                                 return false;
-                            }
-                           );
+                            });
         }
 
         // Use iteration counter and event completion instead of time-based safety
@@ -272,8 +264,7 @@ public class TimeoutTests
         var firstCompleted = false;
 
         // Long-running timeout
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             firstStarted = true;
@@ -281,19 +272,16 @@ public class TimeoutTests
                             firstCompleted = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         // This should fire even though first is still running
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (100),
+        app.AddTimeout (TimeSpan.FromMilliseconds (100),
                         () =>
                         {
                             secondFired = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         // Use iteration counter instead of time-based timeout
         var iterations = 0;
@@ -334,8 +322,7 @@ public class TimeoutTests
 
         List<int> executionOrder = new ();
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (300),
+        app.AddTimeout (TimeSpan.FromMilliseconds (300),
                         () =>
                         {
                             executionOrder.Add (3);
@@ -343,8 +330,7 @@ public class TimeoutTests
                             return false;
                         });
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (100),
+        app.AddTimeout (TimeSpan.FromMilliseconds (100),
                         () =>
                         {
                             executionOrder.Add (1);
@@ -352,8 +338,7 @@ public class TimeoutTests
                             return false;
                         });
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (200),
+        app.AddTimeout (TimeSpan.FromMilliseconds (200),
                         () =>
                         {
                             executionOrder.Add (2);
@@ -401,15 +386,13 @@ public class TimeoutTests
 
         for (var i = 0; i < TIMEOUT_COUNT; i++)
         {
-            app.AddTimeout (
-                            TimeSpan.Zero,
+            app.AddTimeout (TimeSpan.Zero,
                             () =>
                             {
                                 Interlocked.Increment (ref firedCount);
 
                                 return false;
-                            }
-                           );
+                            });
         }
 
         var iterations = 0;
@@ -452,42 +435,36 @@ public class TimeoutTests
         var nestedRunCompleted = false;
 
         // Parent timeout - fires after child modal opens
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (200),
+        app.AddTimeout (TimeSpan.FromMilliseconds (200),
                         () =>
                         {
                             parentTimeoutFired = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         // After 100ms, open nested modal
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (100),
+        app.AddTimeout (TimeSpan.FromMilliseconds (100),
                         () =>
                         {
                             var childRunnable = new Runnable ();
 
                             // Child timeout
-                            app.AddTimeout (
-                                            TimeSpan.FromMilliseconds (50),
+                            app.AddTimeout (TimeSpan.FromMilliseconds (50),
                                             () =>
                                             {
                                                 childTimeoutFired = true;
                                                 app.RequestStop (childRunnable);
 
                                                 return false;
-                                            }
-                                           );
+                                            });
 
                             app.Run (childRunnable);
                             nestedRunCompleted = true;
                             childRunnable.Dispose ();
 
                             return false;
-                        }
-                       );
+                        });
 
         // Use iteration counter instead of time-based safety
         var iterations = 0;
@@ -528,15 +505,13 @@ public class TimeoutTests
 
         var fireCount = 0;
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             fireCount++;
 
                             return fireCount < 3; // Repeat 3 times
-                        }
-                       );
+                        });
 
         var iterations = 0;
 
@@ -575,15 +550,13 @@ public class TimeoutTests
 
         var timeoutFired = false;
 
-        app.AddTimeout (
-                        TimeSpan.Zero,
+        app.AddTimeout (TimeSpan.Zero,
                         () =>
                         {
                             timeoutFired = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         app.StopAfterFirstIteration = true;
         app.Run<Runnable> ();
@@ -598,8 +571,7 @@ public class TimeoutTests
         app.Init (DriverRegistry.Names.ANSI);
         var timeoutFired = false;
 
-        app.AddTimeout (
-                        TimeSpan.Zero,
+        app.AddTimeout (TimeSpan.Zero,
                         () =>
                         {
                             timeoutFired = true;
@@ -638,15 +610,13 @@ public class TimeoutTests
 
         var timeoutFired = false;
 
-        object? token = app.AddTimeout (
-                                        TimeSpan.FromMilliseconds (100),
+        object? token = app.AddTimeout (TimeSpan.FromMilliseconds (100),
                                         () =>
                                         {
                                             timeoutFired = true;
 
                                             return false;
-                                        }
-                                       );
+                                        });
 
         // Remove timeout before it fires
         bool removed = app.RemoveTimeout (token!);
@@ -731,15 +701,13 @@ public class TimeoutTests
 
         for (var i = 0; i < 10; i++)
         {
-            app.AddTimeout (
-                            TimeSpan.FromMilliseconds (100),
+            app.AddTimeout (TimeSpan.FromMilliseconds (100),
                             () =>
                             {
                                 Interlocked.Increment (ref firedCount);
 
                                 return false;
-                            }
-                           );
+                            });
         }
 
         Assert.NotEmpty (app.TimedEvents!.Timeouts);
@@ -848,7 +816,6 @@ public class TimeoutTests
         }
     }
 
-
     [Fact]
     public void Invoke_Adds_Idle ()
     {
@@ -859,7 +826,7 @@ public class TimeoutTests
         SessionToken? rs = app.Begin (top);
 
         var actionCalled = 0;
-        app.Invoke ((_) => { actionCalled++; });
+        app.Invoke (_ => { actionCalled++; });
         app.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();

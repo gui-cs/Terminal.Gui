@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 
@@ -138,7 +139,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Activate_FromOptionSelectorCheckBox_ReachesPopoverMenu_Direct ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -167,7 +168,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Activate_FromOptionSelectorCheckBox_ReachesPopoverMenu_Keyboard ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -198,7 +199,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Activate_FromOptionSelectorCheckBox_ReachesPopoverMenu_Mouse ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -233,7 +234,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void OptionSelector_Value_Changes_ExactlyOnce ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -269,7 +270,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Activate_Source_Preserved_AcrossBoundary ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -314,7 +315,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_MenuItem_Activate_Bridges_To_Target_Activated ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -361,7 +362,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_CheckBox_CommandView_Activate_Source_Reaches_Target ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -412,7 +413,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_OptionSelector_CommandView_Activate_Source_Reaches_Target ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -455,7 +456,7 @@ public class PopoverMenuTests (ITestOutputHelper output)
     [Fact]
     public void Target_Activated_Bubbles_To_Target_SuperView ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 

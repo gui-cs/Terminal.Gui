@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 
@@ -529,7 +530,7 @@ public class MenuItemTests (ITestOutputHelper output)
     [Fact]
     public void MenuItem_InvokeCommand_Activate_ContextValue_Contains_Title ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 

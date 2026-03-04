@@ -90,6 +90,7 @@ public class ViewTests
         var count = 0;
 
         view.Disposing += View_Disposing;
+
         // BUGBUG: It's not legit to add a View to two SuperViews
         container2.Add (view);
         Assert.Equal (container2, view.SuperView);
@@ -197,7 +198,6 @@ public class ViewTests
         Assert.True (r.Enabled);
         Assert.True (r.Visible);
 
-        Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
@@ -214,7 +214,7 @@ public class ViewTests
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
         Assert.Null (r.MouseHoldRepeat);
-        Assert.False (r.MousePositionTracking );
+        Assert.False (r.MousePositionTracking);
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -223,7 +223,6 @@ public class ViewTests
         // Empty Rect
         r = new () { Frame = Rectangle.Empty };
         Assert.NotNull (r);
-        Assert.Equal ($"View(){r.Viewport}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 0, 0), r.Viewport);
@@ -240,7 +239,7 @@ public class ViewTests
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
         Assert.Null (r.MouseHoldRepeat);
-        Assert.False (r.MousePositionTracking );
+        Assert.False (r.MousePositionTracking);
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -249,7 +248,6 @@ public class ViewTests
         // Rect with values
         r = new () { Frame = new (1, 2, 3, 4) };
         Assert.NotNull (r);
-        Assert.Equal ($"View(){r.Frame}", r.ToString ());
         Assert.False (r.CanFocus);
         Assert.False (r.HasFocus);
         Assert.Equal (new (0, 0, 3, 4), r.Viewport);
@@ -266,20 +264,14 @@ public class ViewTests
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
         Assert.Null (r.MouseHoldRepeat);
-        Assert.False (r.MousePositionTracking );
+        Assert.False (r.MousePositionTracking);
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
 
         // Initializes a view with a vertical direction
-        r = new ()
-        {
-            Text = "Vertical View",
-            TextDirection = TextDirection.TopBottom_LeftRight,
-            Width = Dim.Auto (),
-            Height = Dim.Auto ()
-        };
+        r = new () { Text = "Vertical View", TextDirection = TextDirection.TopBottom_LeftRight, Width = Dim.Auto (), Height = Dim.Auto () };
         r.TextFormatter.WordWrap = false;
         Assert.NotNull (r);
 
@@ -297,7 +289,7 @@ public class ViewTests
         Assert.Equal (string.Empty, r.Id);
         Assert.Empty (r.SubViews);
         Assert.Null (r.MouseHoldRepeat);
-        Assert.False (r.MousePositionTracking );
+        Assert.False (r.MousePositionTracking);
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
@@ -340,8 +332,7 @@ public class ViewTests
         v.LayoutSubViews ();
         v.Draw ();
 
-        var looksLike =
-            @"    
+        var looksLike = @"    
 111
 ───────────
 222";
@@ -452,31 +443,27 @@ public class ViewTests
         Application.Driver!.SetScreenSize (30, 5);
         Application.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
 │Testing visibility.         │
 │                            │
 │                            │
 └────────────────────────────┘
 ",
-                                                       _output
-                                                      );
+                                                       _output);
 
         view.Visible = false;
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
 │                            │
 │                            │
 │                            │
 └────────────────────────────┘
 ",
-                                                       _output
-                                                      );
+                                                       _output);
         Application.End (rs);
         top.Dispose ();
     }

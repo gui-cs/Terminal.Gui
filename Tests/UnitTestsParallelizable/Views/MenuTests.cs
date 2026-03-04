@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 
@@ -2311,7 +2312,7 @@ public class MenuTests (ITestOutputHelper output)
     [Fact]
     public void Menu_InvokeCommand_PopulatesContextValueWithMenuItem ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2414,7 +2415,7 @@ public class MenuTests (ITestOutputHelper output)
     [Fact]
     public void Menu_OnActivating_BubblingUp_ContextValue_Contains_Title ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2453,7 +2454,7 @@ public class MenuTests (ITestOutputHelper output)
     [Fact]
     public void Menu_OnActivating_Dispatch_InvokesOnFocusedMenuItem ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -2491,7 +2492,7 @@ public class MenuTests (ITestOutputHelper output)
     [Fact]
     public void OptionSelector_CommandView_Activated_Bubbles_Through_Full_Chain ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             ListBackend traceBackend = new ();
             Trace.Backend = traceBackend;
