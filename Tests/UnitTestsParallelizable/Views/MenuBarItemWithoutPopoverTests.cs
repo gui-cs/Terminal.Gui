@@ -1,14 +1,12 @@
 // Claude - Opus 4.6
 
-using Terminal.Gui.Tracing;
-
 namespace ViewsTests;
 
 /// <summary>
 ///     Tests for <see cref="MenuBarItem"/> with <see cref="MenuBarItem.UsePopoverMenu"/> = <see langword="false"/>
 ///     (inline mode), verifying the behavior previously provided by the deleted InlineMenuBarItem class.
 /// </summary>
-public class InlineMenuBarItemTests
+public class MenuBarItemWithoutPopoverTests
 {
     [Fact]
     public void UsePopoverMenu_Default_IsTrue ()
@@ -24,10 +22,7 @@ public class InlineMenuBarItemTests
     {
         // When UsePopoverMenu = false and menu items are provided, EndInit converts
         // the PopoverMenu to a SubMenu.
-        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }, new MenuItem { Title = "Save" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }, new MenuItem { Title = "Save" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
 
@@ -60,10 +55,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void SubMenuGlyph_InlineMode_IsSuppressed ()
     {
-        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
 
@@ -87,10 +79,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void IMenuBarEntry_IsMenuOpen_DefaultFalse ()
     {
-        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
         IMenuBarEntry entry = item;
@@ -103,10 +92,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void IMenuBarEntry_RootMenu_ReturnsSubMenu ()
     {
-        MenuBarItem item = new ("_Edit", [new MenuItem { Title = "Item" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_Edit", [new MenuItem { Title = "Item" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
         IMenuBarEntry entry = item;
@@ -131,10 +117,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void IMenuBarEntry_IsMenuOpen_TogglesSubMenuVisibility ()
     {
-        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
         IMenuBarEntry entry = item;
@@ -151,21 +134,19 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuOpenChanged_FiresOnVisibilityChange ()
     {
-        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
         item.SubscribeToSubMenuVisibility ();
 
         var firedCount = 0;
         bool? lastNewValue = null;
+
         item.MenuOpenChanged += (_, args) =>
-        {
-            firedCount++;
-            lastNewValue = args.NewValue;
-        };
+                                {
+                                    firedCount++;
+                                    lastNewValue = args.NewValue;
+                                };
 
         IMenuBarEntry entry = item;
         entry.IsMenuOpen = true;
@@ -182,10 +163,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void Dispose_CleansUpSubMenu ()
     {
-        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
         item.SubscribeToSubMenuVisibility ();
@@ -220,10 +198,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_Accepts_InlineMenuBarItem ()
     {
-        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }]) { UsePopoverMenu = false };
         MenuBarItem popoverItem = new ("_Popover", [new MenuItem { Title = "B" }]);
 
         MenuBar menuBar = new ([popoverItem, inlineItem]);
@@ -235,10 +210,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_IsOpen_IncludesInlineMenuBarItem ()
     {
-        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]);
         menuBar.BeginInit ();
@@ -259,10 +231,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_GetMenuItemsWith_IncludesInlineItems ()
     {
-        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "Target" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "Target" }]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]);
         menuBar.BeginInit ();
@@ -277,10 +246,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void MenuBar_GetMenuItemsWith_MixedMode ()
     {
-        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "InlineChild" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "InlineChild" }]) { UsePopoverMenu = false };
         MenuBarItem popoverItem = new ("_Popover", [new MenuItem { Title = "PopoverChild" }]);
 
         MenuBar menuBar = new ([popoverItem, inlineItem]);
@@ -296,10 +262,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void OnActivating_Toggles_IsMenuOpen ()
     {
-        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "Open" }]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
         IMenuBarEntry entry = item;
@@ -318,10 +281,7 @@ public class InlineMenuBarItemTests
     [Fact]
     public void HideItem_Works_WithIMenuBarEntry ()
     {
-        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "A" }]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]);
         menuBar.BeginInit ();
@@ -348,10 +308,7 @@ public class InlineMenuBarItemTests
         IRunnable runnable = new Runnable ();
 
         MenuBarItem inlineItem = new ("_Tools",
-                                      [
-                                          new MenuItem { Title = "_Compile", HelpText = "Build project" },
-                                          new MenuItem { Title = "_Run", HelpText = "Execute" }
-                                      ])
+                                      [new MenuItem { Title = "_Compile", HelpText = "Build project" }, new MenuItem { Title = "_Run", HelpText = "Execute" }])
         {
             UsePopoverMenu = false
         };
@@ -384,13 +341,7 @@ public class InlineMenuBarItemTests
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        MenuBarItem inlineItem = new ("_Tools",
-                                      [
-                                          new MenuItem { Title = "_Compile" }
-                                      ])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Tools", [new MenuItem { Title = "_Compile" }]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
         ((View)runnable).Add (menuBar);
@@ -418,20 +369,9 @@ public class InlineMenuBarItemTests
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        MenuBarItem popoverItem = new ("_File",
-                                       [
-                                           new MenuItem { Title = "_New" },
-                                           new MenuItem { Title = "_Open" }
-                                       ]);
+        MenuBarItem popoverItem = new ("_File", [new MenuItem { Title = "_New" }, new MenuItem { Title = "_Open" }]);
 
-        MenuBarItem inlineItem = new ("_Inline",
-                                      [
-                                          new MenuItem { Title = "_Alpha" },
-                                          new MenuItem { Title = "_Beta" }
-                                      ])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Inline", [new MenuItem { Title = "_Alpha" }, new MenuItem { Title = "_Beta" }]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([popoverItem, inlineItem]) { Id = "menuBar" };
         ((View)runnable).Add (menuBar);
@@ -464,13 +404,7 @@ public class InlineMenuBarItemTests
 
         var actionFiredCount = 0;
 
-        MenuBarItem inlineItem = new ("_Actions",
-                                      [
-                                          new MenuItem { Title = "_Do Something", Action = () => actionFiredCount++ }
-                                      ])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem = new ("_Actions", [new MenuItem { Title = "_Do Something", Action = () => actionFiredCount++ }]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
         ((View)runnable).Add (menuBar);
@@ -497,27 +431,13 @@ public class InlineMenuBarItemTests
     {
         // Trace exactly when cascading SubMenu items disappear by
         // manually simulating the EndInit conversion steps.
-        Menu cascadeMenu = new ([
-                                    new MenuItem { Title = "_Auto Save" },
-                                    new MenuItem { Title = "_Overwrite" }
-                                ]);
+        Menu cascadeMenu = new ([new MenuItem { Title = "_Auto Save" }, new MenuItem { Title = "_Overwrite" }]);
 
-        MenuItem optionsItem = new ()
-        {
-            Title = "_Options",
-            SubMenu = cascadeMenu
-        };
+        MenuItem optionsItem = new () { Title = "_Options", SubMenu = cascadeMenu };
 
         Assert.Equal (2, cascadeMenu.SubViews.Count (v => v is MenuItem));
 
-        MenuBarItem item = new ("_File",
-                                [
-                                    new MenuItem { Title = "_New" },
-                                    optionsItem
-                                ])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "_New" }, optionsItem]) { UsePopoverMenu = false };
 
         Assert.Equal (2, cascadeMenu.SubViews.Count (v => v is MenuItem));
 
@@ -533,33 +453,28 @@ public class InlineMenuBarItemTests
         // Step 2: RemoveAll from Root
         root.RemoveAll ();
         int afterRemoveAll = cascadeMenu.SubViews.Count (v => v is MenuItem);
-        Assert.True (afterRemoveAll == 2,
-                     $"After RemoveAll: cascadeMenu has {afterRemoveAll} items (expected 2)");
+        Assert.True (afterRemoveAll == 2, $"After RemoveAll: cascadeMenu has {afterRemoveAll} items (expected 2)");
 
         // Step 3: RemoveAll from PopoverMenu to detach cascading SubMenus, then dispose
         item.PopoverMenu!.RemoveAll ();
         item.PopoverMenu!.Dispose ();
         item.PopoverMenu = null;
         int afterDispose = cascadeMenu.SubViews.Count (v => v is MenuItem);
-        Assert.True (afterDispose == 2,
-                     $"After PopoverMenu.RemoveAll+Dispose: cascadeMenu has {afterDispose} items (expected 2)");
+        Assert.True (afterDispose == 2, $"After PopoverMenu.RemoveAll+Dispose: cascadeMenu has {afterDispose} items (expected 2)");
 
         // Step 4: Create new inline Menu
         Menu inlineMenu = new (menuItems);
         int afterNewMenu = cascadeMenu.SubViews.Count (v => v is MenuItem);
-        Assert.True (afterNewMenu == 2,
-                     $"After new Menu(menuItems): cascadeMenu has {afterNewMenu} items (expected 2)");
+        Assert.True (afterNewMenu == 2, $"After new Menu(menuItems): cascadeMenu has {afterNewMenu} items (expected 2)");
 
         // Step 5: BeginInit + EndInit on inline Menu
         inlineMenu.BeginInit ();
         int afterMenuBeginInit = cascadeMenu.SubViews.Count (v => v is MenuItem);
-        Assert.True (afterMenuBeginInit == 2,
-                     $"After inlineMenu.BeginInit: cascadeMenu has {afterMenuBeginInit} items (expected 2)");
+        Assert.True (afterMenuBeginInit == 2, $"After inlineMenu.BeginInit: cascadeMenu has {afterMenuBeginInit} items (expected 2)");
 
         inlineMenu.EndInit ();
         int afterMenuEndInit = cascadeMenu.SubViews.Count (v => v is MenuItem);
-        Assert.True (afterMenuEndInit == 2,
-                     $"After inlineMenu.EndInit: cascadeMenu has {afterMenuEndInit} items (expected 2)");
+        Assert.True (afterMenuEndInit == 2, $"After inlineMenu.EndInit: cascadeMenu has {afterMenuEndInit} items (expected 2)");
 
         inlineMenu.Dispose ();
         item.Dispose ();
@@ -573,21 +488,10 @@ public class InlineMenuBarItemTests
         // PopoverMenu → inline SubMenu conversion in EndInit.
         MenuItem optionsItem = new ()
         {
-            Title = "_Options",
-            SubMenu = new Menu ([
-                                    new MenuItem { Title = "_Auto Save" },
-                                    new MenuItem { Title = "_Overwrite" }
-                                ])
+            Title = "_Options", SubMenu = new Menu ([new MenuItem { Title = "_Auto Save" }, new MenuItem { Title = "_Overwrite" }])
         };
 
-        MenuBarItem item = new ("_File",
-                                [
-                                    new MenuItem { Title = "_New" },
-                                    optionsItem
-                                ])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem item = new ("_File", [new MenuItem { Title = "_New" }, optionsItem]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
 
@@ -609,17 +513,8 @@ public class InlineMenuBarItemTests
         MenuBarItem inlineItem = new ("_File",
                                       [
                                           new MenuItem { Title = "_New" },
-                                          new MenuItem
-                                          {
-                                              Title = "_Options",
-                                              SubMenu = new Menu ([
-                                                                      new MenuItem { Title = "_Deep Item" }
-                                                                  ])
-                                          }
-                                      ])
-        {
-            UsePopoverMenu = false
-        };
+                                          new MenuItem { Title = "_Options", SubMenu = new Menu ([new MenuItem { Title = "_Deep Item" }]) }
+                                      ]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]);
         menuBar.BeginInit ();
@@ -645,17 +540,11 @@ public class InlineMenuBarItemTests
                                         SubMenu = new Menu ([
                                                                 new MenuItem
                                                                 {
-                                                                    Title = "_Advanced",
-                                                                    SubMenu = new Menu ([
-                                                                                            new MenuItem { Title = "_Debug Mode" }
-                                                                                        ])
+                                                                    Title = "_Advanced", SubMenu = new Menu ([new MenuItem { Title = "_Debug Mode" }])
                                                                 }
                                                             ])
                                     }
-                                ])
-        {
-            UsePopoverMenu = false
-        };
+                                ]) { UsePopoverMenu = false };
         item.BeginInit ();
         item.EndInit ();
 
@@ -690,15 +579,9 @@ public class InlineMenuBarItemTests
                                           new MenuItem
                                           {
                                               Title = "_Options",
-                                              SubMenu = new Menu ([
-                                                                      new MenuItem { Title = "_Setting A" },
-                                                                      new MenuItem { Title = "_Setting B" }
-                                                                  ])
+                                              SubMenu = new Menu ([new MenuItem { Title = "_Setting A" }, new MenuItem { Title = "_Setting B" }])
                                           }
-                                      ])
-        {
-            UsePopoverMenu = false
-        };
+                                      ]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
         ((View)runnable).Add (menuBar);
@@ -717,8 +600,7 @@ public class InlineMenuBarItemTests
         app.InjectKey (Key.CursorRight);
 
         // The cascading SubMenu for "Options" should now be visible
-        MenuItem? optionsItem = inlineItem.SubMenu?.SubViews.OfType<MenuItem> ()
-                                          .FirstOrDefault (mi => mi.Title == "_Options");
+        MenuItem? optionsItem = inlineItem.SubMenu?.SubViews.OfType<MenuItem> ().FirstOrDefault (mi => mi.Title == "_Options");
         Assert.NotNull (optionsItem?.SubMenu);
         Assert.True (optionsItem!.SubMenu!.Visible, "Cascading SubMenu should be visible.");
 
@@ -738,19 +620,8 @@ public class InlineMenuBarItemTests
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        MenuBarItem inlineItem = new ("_File",
-                                      [
-                                          new MenuItem
-                                          {
-                                              Title = "_Options",
-                                              SubMenu = new Menu ([
-                                                                      new MenuItem { Title = "_Setting A" }
-                                                                  ])
-                                          }
-                                      ])
-        {
-            UsePopoverMenu = false
-        };
+        MenuBarItem inlineItem =
+            new ("_File", [new MenuItem { Title = "_Options", SubMenu = new Menu ([new MenuItem { Title = "_Setting A" }]) }]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([inlineItem]) { Id = "menuBar" };
         ((View)runnable).Add (menuBar);
@@ -765,8 +636,7 @@ public class InlineMenuBarItemTests
         // Open cascading SubMenu via Right arrow
         app.InjectKey (Key.CursorRight);
 
-        MenuItem? optionsItem = inlineItem.SubMenu?.SubViews.OfType<MenuItem> ()
-                                          .FirstOrDefault (mi => mi.Title == "_Options");
+        MenuItem? optionsItem = inlineItem.SubMenu?.SubViews.OfType<MenuItem> ().FirstOrDefault (mi => mi.Title == "_Options");
         Assert.True (optionsItem?.SubMenu?.Visible, "Cascading SubMenu should be visible.");
 
         // Escape should close the cascading SubMenu but keep the parent open
@@ -782,11 +652,7 @@ public class InlineMenuBarItemTests
         MenuBarItem popoverItem = new ("_File",
                                        [
                                            new MenuItem { Title = "_New" },
-                                           new MenuItem
-                                           {
-                                               Title = "_Extras",
-                                               SubMenu = new Menu ([new MenuItem { Title = "_Extra1" }])
-                                           }
+                                           new MenuItem { Title = "_Extras", SubMenu = new Menu ([new MenuItem { Title = "_Extra1" }]) }
                                        ]);
 
         MenuBarItem inlineItem = new ("_Tools",
@@ -794,15 +660,9 @@ public class InlineMenuBarItemTests
                                           new MenuItem
                                           {
                                               Title = "_Diagnostics",
-                                              SubMenu = new Menu ([
-                                                                      new MenuItem { Title = "_Run All" },
-                                                                      new MenuItem { Title = "_Network" }
-                                                                  ])
+                                              SubMenu = new Menu ([new MenuItem { Title = "_Run All" }, new MenuItem { Title = "_Network" }])
                                           }
-                                      ])
-        {
-            UsePopoverMenu = false
-        };
+                                      ]) { UsePopoverMenu = false };
 
         MenuBar menuBar = new ([popoverItem, inlineItem]);
         menuBar.BeginInit ();

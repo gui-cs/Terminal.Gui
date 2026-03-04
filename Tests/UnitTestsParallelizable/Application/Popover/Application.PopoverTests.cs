@@ -264,6 +264,39 @@ public class ApplicationPopoverTests
         /// </summary>
         public Func<Key, bool>? OnKeyDownCallback { get; set; }
 
+        public bool GrabsMouseOnPress
+        {
+            get;
+            set
+            {
+                field = value;
+
+                if (value && MouseGrabbingSubView is null)
+                {
+                    MouseGrabbingSubView = new MouseGrabbingView
+                    {
+                        X = 0,
+                        Y = 0,
+                        Width = 10,
+                        Height = 10,
+                        CanFocus = true
+                    };
+                    Add (MouseGrabbingSubView);
+                }
+                else if (!value && MouseGrabbingSubView is not null)
+                {
+                    Remove (MouseGrabbingSubView);
+                    MouseGrabbingSubView.Dispose ();
+                    MouseGrabbingSubView = null;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Gets the SubView that grabs the mouse, if <see cref="GrabsMouseOnPress"/> is <see langword="true"/>.
+        /// </summary>
+        public MouseGrabbingView? MouseGrabbingSubView { get; private set; }
+
         public PopoverTestClass ()
         {
             ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
@@ -320,5 +353,36 @@ public class ApplicationPopoverTests
 
         /// <inheritdoc/>
         public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null) => Visible = true;
+    }
+
+    /// <summary>
+    ///     A View that grabs the mouse on left button press and releases it on left button release.
+    ///     Used for testing drag scenarios where mouse grab should prevent popover dismissal.
+    /// </summary>
+    public class MouseGrabbingView : View
+    {
+        /// <summary>Gets whether this view currently has the mouse grabbed.</summary>
+        public bool IsMouseGrabbed { get; private set; }
+
+        /// <inheritdoc/>
+        protected override bool OnMouseEvent (Mouse mouse)
+        {
+            if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+            {
+                App?.Mouse.GrabMouse (this);
+                IsMouseGrabbed = true;
+
+                return true;
+            }
+
+            if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+            {
+                return base.OnMouseEvent (mouse);
+            }
+            App?.Mouse.UngrabMouse ();
+            IsMouseGrabbed = false;
+
+            return true;
+        }
     }
 }

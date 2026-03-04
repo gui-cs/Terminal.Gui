@@ -2,10 +2,10 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Inline Menus", "Demonstrates MenuBarItem.UsePopoverMenu = false (inline, non-modal menus)")]
+[ScenarioMetadata ("MenuBarsWithoutPopovers", "Demonstrates MenuBarItem.UsePopoverMenu = false (inline, non-modal menus)")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Menus")]
-public class InlineMenus : Scenario
+public class MenuBarsWithoutPopovers : Scenario
 {
     private EventLog? _eventLog;
 

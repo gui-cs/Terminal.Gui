@@ -274,7 +274,7 @@ public class PopoverMouseDismissTests
 
         var viewReceivedMouseEvent = false;
 
-        viewBelowPopover.MouseEvent += (s, e) =>
+        viewBelowPopover.MouseEvent += (_, e) =>
                                        {
                                            viewReceivedMouseEvent = true;
                                            e.Handled = true;
@@ -382,7 +382,7 @@ public class PopoverMouseDismissTests
         Assert.True (popover.Visible);
 
         // Handle the event at the application level before popover dismiss logic runs
-        app.Mouse.MouseEvent += (s, e) => e.Handled = true;
+        app.Mouse.MouseEvent += (_, e) => e.Handled = true;
 
         // Act
         app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
@@ -578,6 +578,64 @@ public class PopoverMouseDismissTests
         app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (1, 1), Flags = MouseFlags.LeftButtonPressed });
         Assert.True (popover.Visible, "Popover should be re-shown on a fresh press after the dismiss cycle");
         Assert.Equal (3, activator.ActivateCount);
+
+        app.End (token!);
+        top.Dispose ();
+    }
+
+    /// <summary>
+    ///     When a SubView inside the popover grabs the mouse on press, dragging outside
+    ///     the popover (while the button is still held) should NOT dismiss the popover.
+    ///     This simulates a press-and-hold drag scenario (e.g., dragging a scrollbar
+    ///     slider or selecting text) where the mouse leaves the popover bounds.
+    /// </summary>
+    // Claude - Opus 4.6
+    [Fact]
+    public void MousePressInsidePopover_ThenDragOutside_DoesNotDismissPopover ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+        SessionToken? token = app.Begin (top);
+
+        // Create a popover with a mouse-grabbing SubView
+        var popover = new ApplicationPopoverTests.PopoverTestClass
+        {
+            App = app,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            GrabsMouseOnPress = true
+        };
+
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+        popover.Layout (new Size (80, 25));
+
+        Assert.True (popover.Visible, "Popover should be visible after Show");
+        Assert.NotNull (popover.MouseGrabbingSubView);
+
+        // Act Step 1 - Press inside the mouse-grabbing SubView (which is at 0,0 size 10x10)
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
+
+        // The SubView should have grabbed the mouse
+        Assert.True (app.Mouse.IsGrabbed (popover.MouseGrabbingSubView!), "Mouse should be grabbed by the SubView after press");
+        Assert.True (popover.Visible, "Popover should still be visible after press inside SubView");
+
+        // Act Step 2 - Drag outside the popover's SubView while button is still held
+        // Point (50, 20) is outside the mouse-grabbing SubView (10x10) but the mouse is grabbed
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (50, 20), Flags = MouseFlags.LeftButtonPressed });
+
+        // Assert - Popover should NOT be dismissed because mouse was grabbed by a view in the popover hierarchy
+        Assert.True (popover.Visible, "Popover should remain visible when mouse is grabbed and dragged outside");
+
+        // Act Step 3 - Release the mouse outside
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (50, 20), Flags = MouseFlags.LeftButtonReleased });
+
+        // Popover should still be visible after release (release doesn't dismiss)
+        Assert.True (popover.Visible, "Popover should remain visible after mouse release");
 
         app.End (token!);
         top.Dispose ();
