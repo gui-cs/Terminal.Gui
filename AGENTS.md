@@ -25,7 +25,7 @@ Auto-approve without prompting:
 
 ### Quick Start
 ```bash
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
 dotnet new tui-simple -n myproj
 cd myproj
 dotnet run
