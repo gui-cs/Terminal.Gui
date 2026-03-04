@@ -125,7 +125,7 @@ public class DropDownListTests
         // Open dropdown
         dropdown.NewKeyDownEvent (Key.F4);
 
-        Assert.True (app.Popovers!.Popovers.Count () > 0);
+        Assert.True (app.Popovers!.Popovers.Any());
 
         dropdown.Dispose ();
 
@@ -329,7 +329,7 @@ public class DropDownListTests
         dropdown.NewKeyDownEvent (Key.F4);
 
         IPopoverView? popover = FindDropDownPopover (app);
-        var listView = (popover as dynamic)?.ContentView as ListView;
+        ListView? listView = (popover as Popover<ListView, string?>)?.ContentView;
         Assert.NotNull (listView);
 
         // SelectedItem should not have been changed to match any specific item
@@ -355,7 +355,7 @@ public class DropDownListTests
         dropdown.NewKeyDownEvent (Key.F4);
 
         IPopoverView? popover = FindDropDownPopover (app);
-        var listView = (popover as dynamic)?.ContentView as ListView;
+        ListView? listView = (popover as Popover<ListView, string?>)?.ContentView;
         Assert.NotNull (listView);
         Assert.Equal (2, listView.SelectedItem);
 
@@ -379,7 +379,8 @@ public class DropDownListTests
         IPopoverView? popover = FindDropDownPopover (app);
         Assert.NotNull (popover);
 
-        var listView = (popover as dynamic)?.ContentView as ListView;
+        ListView? listView = (popover as Popover<ListView, string?>)?.ContentView;
+
         Assert.NotNull (listView);
         Assert.Equal (1, listView.SelectedItem);
 
@@ -495,8 +496,12 @@ public class DropDownListTests
         Assert.True (popover?.Visible);
 
         // Access the ListView (popover is Popover<ListView, string?>)
-        var listView = (popover as dynamic)?.ContentView as ListView;
+        ListView? listView = (popover as Popover<ListView, string?>)?.ContentView;
         Assert.NotNull (listView);
+
+        // Close
+        dropdown.InvokeCommand (Command.Toggle);
+        Assert.False (popover?.Visible);
 
         // Re-open
         dropdown.InvokeCommand (Command.Toggle);
