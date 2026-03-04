@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using Terminal.Gui.Tracing;
-using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
@@ -39,23 +38,22 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
-    #region Native Windows APIs that Should Not Be Needed
-
+    // Equivalent of poll() on Unix — needed because ReadFile blocks and the input loop
+    // requires a non-blocking availability check for throttling and cancellation.
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint hConsoleInput, out uint lpcNumberOfEvents);
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
-
-    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
-    public static extern bool PeekConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
-
 #if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
+    #region Ctrl+Z workaround for Windows bug (https://github.com/microsoft/terminal/issues/4958)
+
     [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
     private static extern bool PeekConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
 
     [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern bool ReadConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+
+    #endregion
+
 #endif
 
     #endregion
@@ -69,8 +67,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
     private const uint ENABLE_MOUSE_INPUT = 0x0010;
     private const uint ENABLE_QUICK_EDIT_MODE = 0x0040;
     private const uint ENABLE_EXTENDED_FLAGS = 0x0080;
-
-    #endregion
 
     private uint _originalConsoleMode;
     private bool _disposed;
@@ -139,7 +135,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             IsEnabled = true;
 
-            Trace.Lifecycle (nameof (AnsiInput), "Init", $"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
+            Trace.Lifecycle (nameof (WindowsVTInputHelper),
+                             "Init",
+                             $"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
         }
@@ -168,20 +166,13 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
-            // Use native API to check for available console input events instead of
-            // relying on Console.KeyAvailable. The latter can miss some control
-            // characters (e.g. Ctrl+Z) when console modes are changed for VT input.
-            if (!GetNumberOfConsoleInputEvents (InputHandle, out uint numberOfEvents) || numberOfEvents == 0)
-            {
-                return false;
-            }
-
 #if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
             // Workaround for Windows bug (since Win8): ReadFile unconditionally treats
             // Ctrl+Z as EOF (returns 0 bytes) even when ENABLE_PROCESSED_INPUT is disabled.
             // See https://github.com/microsoft/terminal/issues/4958
             // We peek the input buffer and, if the front event is a Ctrl+Z key-down,
             // consume it via ReadConsoleInput and synthesize the 0x1A byte ourselves.
+            // This requires GetNumberOfConsoleInputEvents + PeekConsoleInput + ReadConsoleInput.
             if (TryHandleCtrlZ (buffer, out bytesRead))
             {
                 return bytesRead > 0;
@@ -270,18 +261,8 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
-            // Flush the input buffer to clear any pending INPUT_RECORD structures
-            // This prevents residual ANSI responses from lingering in the OS buffer
-            if (!FlushConsoleInputBuffer (InputHandle))
-            {
-                int error = Marshal.GetLastWin32Error ();
-                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Restore", $"FlushConsoleInputBuffer failed with error: {error}");
-            }
-
             SetConsoleMode (InputHandle, _originalConsoleMode);
             IsEnabled = false;
-
-            //Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)
         {
@@ -301,36 +282,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
         _disposed = true;
     }
 
-    public bool Peek ()
-    {
-        const int BUFFER_SIZE = 1; // We only need to check if there's at least one event
-        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);
-
-        try
-        {
-            // Use PeekConsoleInput to inspect the input buffer without removing events
-            if (PeekConsoleInput (InputHandle, pRecord, BUFFER_SIZE, out uint numberOfEventsRead))
-            {
-                // Return true if there's at least one event in the buffer
-                return numberOfEventsRead > 0;
-            }
-            else
-            {
-                // Handle the failure of PeekConsoleInput
-                throw new InvalidOperationException ("Failed to peek console input.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // Optionally log the exception
-            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Peek", $"Error in Peek: {ex.Message}");
-
-            return false;
-        }
-        finally
-        {
-            // Free the allocated memory
-            Marshal.FreeHGlobal (pRecord);
-        }
-    }
+    /// <summary>
+    ///     Checks whether input is available without consuming it.
+    /// </summary>
+    /// <returns><c>true</c> if there is at least one input event available.</returns>
+    public bool Peek () => GetNumberOfConsoleInputEvents (InputHandle, out uint count) && count > 0;
 }
