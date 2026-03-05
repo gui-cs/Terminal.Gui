@@ -873,7 +873,7 @@ Five ",
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.NewKeyDownEvent (Key.PageUp));
         Assert.Equal (0, lv.SelectedItem);
-        
+
         // In standard selection mode (ShowMarks=false), Space doesn't mark
         Assert.False (lv.Source.IsMarked (lv.SelectedItem!.Value));
         lv.NewKeyDownEvent (Key.Space);
@@ -2670,4 +2670,413 @@ Five ",
     }
 
     #endregion
+
+    #region Out-of-range guard tests
+
+    // Claude - Opus 4.6
+    // Verifies that ListView.OnDrawingContent does not call IsMarked with out-of-range indices
+    // when the Viewport is taller than the number of items in the source.
+    [Fact]
+    public void Draw_DoesNotCall_IsMarked_OutOfRange ()
+    {
+        ObservableCollection<string> source = ["one", "two"];
+
+        // Track all indices passed to IsMarked
+        List<int> isMarkedCalls = [];
+        Mock<IListDataSource> mockSource = new (MockBehavior.Strict);
+        mockSource.Setup (s => s.Count).Returns (source.Count);
+
+        mockSource.Setup (s => s.IsMarked (It.IsAny<int> ()))
+                  .Returns ((int item) =>
+                            {
+                                isMarkedCalls.Add (item);
+                                Assert.True (item >= 0 && item < source.Count, $"IsMarked called with out-of-range index {item}");
+
+                                return false;
+                            });
+
+        mockSource.Setup (s => s.Render (It.IsAny<ListView> (),
+                                         It.IsAny<bool> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> ()));
+        mockSource.Setup (s => s.RenderMark (It.IsAny<ListView> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<bool> (), It.IsAny<bool> ())).Returns (false);
+        mockSource.Setup (s => s.MaxItemLength).Returns (5);
+        mockSource.Setup (s => s.ToList ()).Returns (source);
+        mockSource.Setup (s => s.SuspendCollectionChangedEvent).Returns (false);
+        mockSource.As<IDisposable> ().Setup (d => d.Dispose ());
+
+        // Viewport height (10) is much larger than item count (2)
+        ListView lv = new () { Width = 20, Height = 10, Source = mockSource.Object };
+        lv.Layout ();
+        lv.Draw ();
+
+        // Verify IsMarked was only called with valid indices
+        Assert.All (isMarkedCalls, i => Assert.InRange (i, 0, source.Count - 1));
+    }
+
+    // Claude - Opus 4.6
+    // Verifies that ListView.OnDrawingContent does not call Render with out-of-range indices
+    // when the Viewport is taller than the number of items in the source.
+    [Fact]
+    public void Draw_DoesNotCall_Render_OutOfRange ()
+    {
+        ObservableCollection<string> source = ["one", "two"];
+
+        List<int> renderCalls = [];
+        Mock<IListDataSource> mockSource = new (MockBehavior.Strict);
+        mockSource.Setup (s => s.Count).Returns (source.Count);
+        mockSource.Setup (s => s.IsMarked (It.IsAny<int> ())).Returns (false);
+
+        mockSource.Setup (s => s.Render (It.IsAny<ListView> (),
+                                         It.IsAny<bool> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> ()))
+                  .Callback ((ListView _, bool _, int item, int _, int _, int _, int _) =>
+                             {
+                                 renderCalls.Add (item);
+                                 Assert.True (item >= 0 && item < source.Count, $"Render called with out-of-range index {item}");
+                             });
+
+        mockSource.Setup (s => s.RenderMark (It.IsAny<ListView> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<bool> (), It.IsAny<bool> ())).Returns (false);
+        mockSource.Setup (s => s.MaxItemLength).Returns (5);
+        mockSource.Setup (s => s.ToList ()).Returns (source);
+        mockSource.Setup (s => s.SuspendCollectionChangedEvent).Returns (false);
+        mockSource.As<IDisposable> ().Setup (d => d.Dispose ());
+
+        ListView lv = new () { Width = 20, Height = 10, Source = mockSource.Object };
+        lv.Layout ();
+        lv.Draw ();
+
+        // Verify Render was only called with valid indices
+        Assert.All (renderCalls, i => Assert.InRange (i, 0, source.Count - 1));
+    }
+
+    // Claude - Opus 4.6
+    // Verifies that ListView.OnDrawingContent does not call SetMark with out-of-range indices
+    // when the Viewport is taller than the number of items in the source.
+    [Fact]
+    public void Draw_DoesNotCall_SetMark_OutOfRange ()
+    {
+        ObservableCollection<string> source = ["one", "two"];
+
+        List<int> setMarkCalls = [];
+        Mock<IListDataSource> mockSource = new (MockBehavior.Strict);
+        mockSource.Setup (s => s.Count).Returns (source.Count);
+        mockSource.Setup (s => s.IsMarked (It.IsAny<int> ())).Returns (false);
+
+        mockSource.Setup (s => s.Render (It.IsAny<ListView> (),
+                                         It.IsAny<bool> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> (),
+                                         It.IsAny<int> ()));
+        mockSource.Setup (s => s.RenderMark (It.IsAny<ListView> (), It.IsAny<int> (), It.IsAny<int> (), It.IsAny<bool> (), It.IsAny<bool> ())).Returns (false);
+
+        mockSource.Setup (s => s.SetMark (It.IsAny<int> (), It.IsAny<bool> ()))
+                  .Callback ((int item, bool _) =>
+                             {
+                                 setMarkCalls.Add (item);
+                                 Assert.True (item >= 0 && item < source.Count, $"SetMark called with out-of-range index {item}");
+                             });
+
+        mockSource.Setup (s => s.MaxItemLength).Returns (5);
+        mockSource.Setup (s => s.ToList ()).Returns (source);
+        mockSource.Setup (s => s.SuspendCollectionChangedEvent).Returns (false);
+        mockSource.As<IDisposable> ().Setup (d => d.Dispose ());
+
+        ListView lv = new () { Width = 20, Height = 10, ShowMarks = true, Source = mockSource.Object };
+        lv.Layout ();
+        lv.Draw ();
+
+        // SetMark should not have been called at all during Draw, but if it was, only with valid indices
+        Assert.All (setMarkCalls, i => Assert.InRange (i, 0, source.Count - 1));
+    }
+
+    #endregion
+
+    #region IValue<int?> Implementation
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void ValueChanging_Event_Can_Cancel_Selection_Change ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        lv.ValueChanging += (_, args) => args.Handled = true;
+
+        lv.SelectedItem = 1;
+
+        Assert.Equal (0, lv.SelectedItem);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void ValueChanging_Event_Provides_CurrentValue_And_NewValue ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        int? capturedCurrent = null;
+        int? capturedNew = null;
+
+        lv.ValueChanging += (_, args) =>
+                            {
+                                capturedCurrent = args.CurrentValue;
+                                capturedNew = args.NewValue;
+                            };
+
+        lv.SelectedItem = 2;
+
+        Assert.Equal (0, capturedCurrent);
+        Assert.Equal (2, capturedNew);
+        Assert.Equal (2, lv.SelectedItem);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void ValueChanged_Event_Fires_After_Selection_Change ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        int? oldValue = null;
+        int? newValue = null;
+
+        lv.ValueChanged += (_, args) =>
+                           {
+                               oldValue = args.OldValue;
+                               newValue = args.NewValue;
+                           };
+
+        lv.SelectedItem = 2;
+
+        Assert.Equal (0, oldValue);
+        Assert.Equal (2, newValue);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void ValueChanged_DoesNotFire_When_ValueChanging_Cancels ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        var changedFired = false;
+        lv.ValueChanging += (_, args) => args.Handled = true;
+        lv.ValueChanged += (_, _) => changedFired = true;
+
+        lv.SelectedItem = 1;
+
+        Assert.False (changedFired);
+        Assert.Equal (0, lv.SelectedItem);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void ValueChangedUntyped_Event_Fires_After_Selection_Change ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        object? oldValue = null;
+        object? newValue = null;
+
+        lv.ValueChangedUntyped += (_, args) =>
+                                  {
+                                      oldValue = args.OldValue;
+                                      newValue = args.NewValue;
+                                  };
+
+        lv.SelectedItem = 1;
+
+        Assert.Equal (0, oldValue);
+        Assert.Equal (1, newValue);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Value_Property_Is_Alias_For_SelectedItem ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+
+        lv.Value = 2;
+        Assert.Equal (2, lv.SelectedItem);
+        Assert.Equal (2, lv.Value);
+
+        lv.SelectedItem = 0;
+        Assert.Equal (0, lv.Value);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void IValue_GetValue_Returns_SelectedItem ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 1;
+
+        object? value = ((IValue)lv).GetValue ();
+
+        Assert.Equal (1, value);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void IValue_GetValue_Returns_Null_When_No_Selection ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+
+        object? value = ((IValue)lv).GetValue ();
+
+        Assert.Null (value);
+    }
+
+    #endregion IValue<int?> Implementation
+
+    #region Ctrl+A / Ctrl+U SelectAll
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void CtrlA_Marks_All_Items_When_MarkMultiple_True ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three", "four"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source), MarkMultiple = true };
+        lv.SelectedItem = 0;
+
+        lv.NewKeyDownEvent (Key.A.WithCtrl);
+
+        List<int> marked = lv.GetAllMarkedItems ().ToList ();
+        Assert.Equal (4, marked.Count);
+        Assert.Equal ([0, 1, 2, 3], marked);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void CtrlU_Unmarks_All_Items_When_MarkMultiple_True ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source), MarkMultiple = true };
+        lv.SelectedItem = 0;
+
+        // Mark all first
+        lv.NewKeyDownEvent (Key.A.WithCtrl);
+        Assert.Equal (3, lv.GetAllMarkedItems ().Count ());
+
+        // Unmark all
+        lv.NewKeyDownEvent (Key.U.WithCtrl);
+        Assert.Empty (lv.GetAllMarkedItems ());
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void CtrlA_Does_Nothing_When_MarkMultiple_False ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source), MarkMultiple = false };
+        lv.SelectedItem = 0;
+
+        lv.NewKeyDownEvent (Key.A.WithCtrl);
+
+        Assert.Empty (lv.GetAllMarkedItems ());
+    }
+
+    #endregion Ctrl+A / Ctrl+U SelectAll
+
+    #region RowRender RowAttribute Override
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void RowRender_Event_RowAttribute_Applied_To_Specific_Row ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        Attribute customAttr = new (Color.Red, Color.Blue);
+        List<int> renderedRows = [];
+
+        lv.RowRender += (_, args) =>
+                        {
+                            renderedRows.Add (args.Row);
+
+                            if (args.Row == 1)
+                            {
+                                args.RowAttribute = customAttr;
+                            }
+                        };
+
+        Runnable top = new ();
+        top.Add (lv);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Verify the event was called for each visible row
+        Assert.Contains (0, renderedRows);
+        Assert.Contains (1, renderedRows);
+        Assert.Contains (2, renderedRows);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void RowRender_Event_Receives_Correct_Row_Indices ()
+    {
+        ObservableCollection<string> source = ["a", "b", "c", "d", "e"];
+        ListView lv = new () { Width = 10, Height = 3, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        List<int> receivedRows = [];
+
+        lv.RowRender += (_, args) => receivedRows.Add (args.Row);
+
+        lv.Layout ();
+        lv.Draw ();
+
+        // With height=3, only 3 rows visible starting from viewport Y=0
+        Assert.Equal ([0, 1, 2], receivedRows);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void RowRender_Event_Receives_Correct_Row_Indices_After_Scroll ()
+    {
+        ObservableCollection<string> source = ["a", "b", "c", "d", "e"];
+        ListView lv = new () { Width = 10, Height = 3, Source = new ListWrapper<string> (source) };
+        lv.SelectedItem = 0;
+
+        lv.Layout ();
+
+        // Scroll down so viewport starts at row 2
+        lv.Viewport = lv.Viewport with { Y = 2 };
+
+        List<int> receivedRows = [];
+        lv.RowRender += (_, args) => receivedRows.Add (args.Row);
+
+        lv.Draw ();
+
+        // After scrolling, should render items 2, 3, 4
+        Assert.Equal ([2, 3, 4], receivedRows);
+    }
+
+    #endregion RowRender RowAttribute Override
 }
