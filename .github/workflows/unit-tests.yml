@@ -11,21 +11,15 @@ on:
       - '**.md'
 
 jobs:
-  # Call the quick-build workflow to build Debug configuration only
-  build:
-    uses: ./.github/workflows/quick-build.yml
-
   non_parallel_unittests:
     name: Non-Parallel Unit Tests
     runs-on: ${{ matrix.os }}
-    needs: build
     strategy:
-      # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
-    timeout-minutes: 15  # Increased from 10 for Windows
+    timeout-minutes: 15
     steps:
 
     - name: Checkout code
@@ -37,20 +31,11 @@ jobs:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: test-build-artifacts
-        path: .
-
-    # KEEP THIS - It's needed for --no-build to work
     - name: Restore NuGet packages
       run: dotnet restore
 
-    - name: Fix test executable permissions (Linux/macOS)
-      if: runner.os != 'Windows'
-      run: |
-        find Tests -type f \( -name 'UnitTests' -o -name 'UnitTests.Parallelizable' \) -path '*/bin/*' -exec chmod +x {} +
+    - name: Build
+      run: dotnet build --no-restore
 
     # Optimize Windows performance
     - name: Disable Windows Defender (Windows only)
@@ -85,9 +70,7 @@ jobs:
   parallel_unittests:
     name: Parallel Unit Tests
     runs-on: ${{ matrix.os }}
-    needs: build
     strategy:
-      # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
@@ -104,19 +87,11 @@ jobs:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: test-build-artifacts
-        path: .
-
     - name: Restore NuGet packages
       run: dotnet restore
 
-    - name: Fix test executable permissions (Linux/macOS)
-      if: runner.os != 'Windows'
-      run: |
-        find Tests -type f \( -name 'UnitTests' -o -name 'UnitTests.Parallelizable' \) -path '*/bin/*' -exec chmod +x {} +
+    - name: Build
+      run: dotnet build --no-restore
 
     - name: Disable Windows Defender (Windows only)
       if: runner.os == 'Windows'
