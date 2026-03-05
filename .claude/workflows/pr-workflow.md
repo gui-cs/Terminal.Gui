@@ -77,9 +77,7 @@ dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet te
 
 ### 3. Check Coverage
 
-Coverage is automatically collected on Linux runners in CI.
-
-**Verify coverage didn't decrease** by checking Codecov report on PR.
+Coverage collection is temporarily disabled in CI during the xUnit v3 / MTP migration.
 
 ### 4. Format Code
 

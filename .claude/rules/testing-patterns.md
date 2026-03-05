@@ -7,11 +7,8 @@
 - **Never decrease code coverage** - PRs must maintain or increase coverage
 - Target: **70%+ coverage** for new code
 - Coverage collection:
-  - Centralized in `TestResults/` directory at repository root
-  - Collected only on Linux (ubuntu-latest) runners in CI for performance
-  - Windows and macOS runners skip coverage collection to reduce execution time
-  - Coverage reports uploaded to Codecov automatically from Linux runner
-  - CI monitors coverage on each PR
+  - Temporarily disabled in CI during xUnit v3 / MTP migration
+  - Will be re-enabled once an MTP-compatible coverage solution is integrated
 
 ## Test Patterns
 
@@ -84,7 +81,7 @@ dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
 ## Test Configuration Files
 
 - `xunit.runner.json` - xUnit configuration
-- `coverlet.runsettings` - Coverage settings (OpenCover format)
+- `coverlet.runsettings` - Coverage settings (currently unused, pending MTP integration)
 
 ## Example Test Pattern
 

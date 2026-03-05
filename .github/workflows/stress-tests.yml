@@ -94,7 +94,7 @@ jobs:
               --project Tests/UnitTestsParallelizable \
               --no-build \
               --verbosity normal \
-              --diagnostic --diagnostic --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}/run${RUN}
+              --diagnostic --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}/run${RUN}
 
             if [ $? -ne 0 ]; then
               echo "ERROR: Test run $RUN failed!"
