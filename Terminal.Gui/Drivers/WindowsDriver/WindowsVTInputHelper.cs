@@ -96,14 +96,14 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (InputHandle == nint.Zero || InputHandle == new nint (-1))
             {
-                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", "Failed to get Windows console input handle.");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to get Windows console input handle.");
 
                 return false;
             }
 
             if (!GetConsoleMode (InputHandle, out _originalConsoleMode))
             {
-                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", "Failed to get Windows console mode.");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to get Windows console mode.");
 
                 return false;
             }
@@ -118,7 +118,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (!SetConsoleMode (InputHandle, newMode))
             {
-                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", "Failed to set Windows VTS console mode.");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to set Windows VTS console mode.");
 
                 return false;
             }
@@ -135,7 +135,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
         }
         catch (Exception ex)
         {
-            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Init", $"Failed to enable Windows VTS mode: {ex.Message}");
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to enable Windows VTS mode: {ex.Message}");
 
             return false;
         }
@@ -166,7 +166,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
             if (!success)
             {
                 int error = Marshal.GetLastWin32Error ();
-                Trace.Lifecycle (nameof (WindowsVTInputHelper), "Read", $"ReadFile failed with error code: {error}");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: ReadFile failed with error code: {error}");
 
                 return false;
             }
@@ -191,7 +191,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
         }
         catch (Exception ex)
         {
-            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Read", $"Error reading Windows console input: {ex.Message}");
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Error reading Windows console input: {ex.Message}");
 
             return false;
         }
@@ -214,7 +214,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
         }
         catch (Exception ex)
         {
-            Trace.Lifecycle (nameof (WindowsVTInputHelper), "Restore", $"Failed to restore Windows console mode: {ex.Message}");
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to restore Windows console mode: {ex.Message}");
         }
     }
 

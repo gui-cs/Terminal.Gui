@@ -199,7 +199,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                 string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
 
-                Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
+                //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 
                 foreach (char ch in text)
                 {
@@ -260,7 +260,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     {
                         // Error
                         int errno = Marshal.GetLastWin32Error ();
-                        Trace.Lifecycle (nameof (AnsiInput), "Read", $"read() returned {readResult}, errno={errno}");
+                        Logging.Warning ($"{nameof (AnsiInput)}: read() returned {readResult}, errno={errno}");
 
                         yield break;
                     }
@@ -268,7 +268,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             }
             else
             {
-                Trace.Lifecycle (nameof (AnsiInput), "Read", "read() failed");
+                Logging.Warning ($"{nameof (AnsiInput)}: read() failed");
 
                 yield break;
             }
@@ -352,7 +352,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         }
         catch (Exception ex)
         {
-            Trace.Lifecycle (nameof (AnsiInput), "FlushInput", $"Error flushing input: {ex.Message}");
+            Logging.Warning ($"{nameof (AnsiInput)}: Error flushing input: {ex.Message}");
         }
     }
 
