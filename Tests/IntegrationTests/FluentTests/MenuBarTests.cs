@@ -1,7 +1,7 @@
 using System.Drawing;
 using System.Globalization;
-using TerminalGuiFluentTesting;
-using TerminalGuiFluentTestingXunit;
+using AppTestHelpers;
+using AppTestHelpers.XunitHelpers;
 
 namespace IntegrationTests;
 

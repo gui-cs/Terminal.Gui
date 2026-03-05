@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace TerminalGuiFluentTesting;
+namespace AppTestHelpers;
 
 internal class TextWriterLoggerProvider (TextWriter writer) : ILoggerProvider
 {

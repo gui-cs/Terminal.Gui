@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
-using TerminalGuiFluentTesting;
-using TerminalGuiFluentTestingXunit;
+using AppTestHelpers;
+using AppTestHelpers.XunitHelpers;
 
 namespace IntegrationTests;
 

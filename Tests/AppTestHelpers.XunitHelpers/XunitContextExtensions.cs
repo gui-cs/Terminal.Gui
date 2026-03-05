@@ -1,8 +1,7 @@
 ﻿using System.Drawing;
-using TerminalGuiFluentTesting;
 using Xunit;
 
-namespace TerminalGuiFluentTestingXunit;
+namespace AppTestHelpers.XunitHelpers;
 
 public static partial class XunitContextExtensions
 {

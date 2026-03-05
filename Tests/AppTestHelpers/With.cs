@@ -1,5 +1,5 @@
 ﻿
-namespace TerminalGuiFluentTesting;
+namespace AppTestHelpers;
 
 /// <summary>
 ///     Entry point to fluent assertions.

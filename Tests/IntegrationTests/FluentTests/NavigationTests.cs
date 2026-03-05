@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using TerminalGuiFluentTesting;
+using AppTestHelpers;
 
 namespace IntegrationTests;
 

@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
+    <ProjectReference Include="..\AppTestHelpers.XunitHelpers.Generator\AppTestHelpers.XunitHelpers.Generator.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\AppTestHelpers\AppTestHelpers.csproj" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
   </ItemGroup>

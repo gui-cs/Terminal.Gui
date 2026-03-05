@@ -4,7 +4,7 @@ using Terminal.Gui.Time;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace TerminalGuiFluentTesting;
+namespace AppTestHelpers;
 
 public partial class AppTestHelper
 {

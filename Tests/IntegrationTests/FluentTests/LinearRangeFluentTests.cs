@@ -1,4 +1,4 @@
-using TerminalGuiFluentTesting;
+using AppTestHelpers;
 
 namespace IntegrationTests;
 

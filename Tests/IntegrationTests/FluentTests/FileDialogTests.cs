@@ -3,8 +3,8 @@ using System.Globalization;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
-using TerminalGuiFluentTesting;
-using TerminalGuiFluentTestingXunit;
+using AppTestHelpers;
+using AppTestHelpers.XunitHelpers;
 
 namespace IntegrationTests;
 

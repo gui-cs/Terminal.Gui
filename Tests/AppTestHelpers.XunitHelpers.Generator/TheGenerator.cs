@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace TerminalGuiFluentTestingXunit.Generator;
+namespace AppTestHelpers.XunitHelpers.Generator;
 
 [Generator]
 public class TheGenerator : IIncrementalGenerator
@@ -89,10 +89,10 @@ public class TheGenerator : IIncrementalGenerator
 
         var header = """"
                      #nullable enable
-                     using TerminalGuiFluentTesting;
+                     using AppTestHelpers;
                      using Xunit;
 
-                     namespace TerminalGuiFluentTestingXunit;
+                     namespace AppTestHelpers.XunitHelpers;
 
                      public static partial class XunitContextExtensions
                      {
@@ -117,23 +117,23 @@ public class TheGenerator : IIncrementalGenerator
             }
 
             var method = $$"""
-                           {{signature}}
-                           {
-                               try
+                               {{signature}}
                                {
-                                   Xunit.Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
-                               }
-                               catch(Exception ex)
-                               {
-                                   context.HardStop (ex);
+                                   try
+                                   {
+                                       Xunit.Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
+                                   }
+                                   catch(Exception ex)
+                                   {
+                                       context.HardStop (ex);
+                                       
                                    
-                               
-                                   throw;
-                               
+                                       throw;
+                                   
+                                   }
+                                   
+                                   return context;
                                }
-                               
-                               return context;
-                           }
                            """;
 
             sb.AppendLine (method.Replace ("*", ""));
