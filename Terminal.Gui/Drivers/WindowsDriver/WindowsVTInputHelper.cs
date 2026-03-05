@@ -26,6 +26,11 @@ internal sealed class WindowsVTInputHelper : IDisposable
 {
     #region P/Invoke Declarations
 
+    // In ideal world, Windows Console would have a way of setting VTS mode without having to use SetConsoleMode.
+    // It would also provide a non-blocking API for reading input bytes directly as ANSI sequences without having
+    // to use GetNumberOfConsoleInputEvents to poll for availability. With such APIs, this helper class would be unnecessary.
+    // If this were the case, the only API the ANSI driver would require on Windows is GetStdHandle and ReadFile.
+
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern nint GetStdHandle (int nStdHandle);
 
@@ -35,26 +40,13 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
-
     // Equivalent of poll() on Unix — needed because ReadFile blocks and the input loop
     // requires a non-blocking availability check for throttling and cancellation.
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint hConsoleInput, out uint lpcNumberOfEvents);
 
-#if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
-    #region Ctrl+Z workaround for Windows bug (https://github.com/microsoft/terminal/issues/4958)
-
-    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
-    private static extern bool PeekConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
-
-    [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool ReadConsoleInput (nint hConsoleInput, [Out] InputRecord [] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
-
-    #endregion
-
-#endif
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
     #endregion
 
@@ -166,19 +158,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
-#if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
-            // Workaround for Windows bug (since Win8): ReadFile unconditionally treats
-            // Ctrl+Z as EOF (returns 0 bytes) even when ENABLE_PROCESSED_INPUT is disabled.
-            // See https://github.com/microsoft/terminal/issues/4958
-            // We peek the input buffer and, if the front event is a Ctrl+Z key-down,
-            // consume it via ReadConsoleInput and synthesize the 0x1A byte ourselves.
-            // This requires GetNumberOfConsoleInputEvents + PeekConsoleInput + ReadConsoleInput.
-            if (TryHandleCtrlZ (buffer, out bytesRead))
-            {
-                return bytesRead > 0;
-            }
-#endif
-
             // Read the VT byte stream via ReadFile. With ENABLE_VIRTUAL_TERMINAL_INPUT
             // enabled, the Windows console converts all input (keyboard, mouse, etc.)
             // into ANSI escape sequences in this stream.
@@ -192,9 +171,23 @@ internal sealed class WindowsVTInputHelper : IDisposable
                 return false;
             }
 
+            if (numBytesRead == 0)
+            {
+                // Workaround for Windows bug (since Win8, fix pending in microsoft/terminal#19940):
+                // ReadFile unconditionally treats Ctrl+Z as EOF and returns 0 bytes, even when
+                // ENABLE_PROCESSED_INPUT is disabled. Since we have a live console handle with
+                // processed input disabled, 0-byte success can only mean this bug.
+                // Synthesize the 0x1A (SUB) byte that ReadFile should have returned.
+                // See https://github.com/microsoft/terminal/issues/4958
+                buffer [0] = 0x1A;
+                bytesRead = 1;
+
+                return true;
+            }
+
             bytesRead = (int)numBytesRead;
 
-            return bytesRead > 0;
+            return true;
         }
         catch (Exception ex)
         {
@@ -203,51 +196,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
             return false;
         }
     }
-
-#if ANSI_DRIVER_SUPPORT_CTRLZ_ON_WINDOWS
-    /// <summary>
-    ///     Checks whether the front event in the console input buffer is a Ctrl+Z key-down.
-    ///     If so, consumes it via <c>ReadConsoleInput</c> and writes <c>0x1A</c> (SUB) into the buffer.
-    /// </summary>
-    /// <remarks>
-    ///     This works around a Windows bug (since Windows 8) where <c>ReadFile</c> unconditionally
-    ///     treats Ctrl+Z as EOF and returns 0 bytes, even when <c>ENABLE_PROCESSED_INPUT</c> is disabled.
-    ///     See <see href="https://github.com/microsoft/terminal/issues/4958"/>.
-    /// </remarks>
-    /// <param name="buffer">Buffer to write the synthesized byte into.</param>
-    /// <param name="bytesRead">Set to 1 if Ctrl+Z was handled; 0 otherwise.</param>
-    /// <returns><c>true</c> if the front event was Ctrl+Z (handled or discarded); <c>false</c> if it was not Ctrl+Z.</returns>
-    private bool TryHandleCtrlZ (byte [] buffer, out int bytesRead)
-    {
-        bytesRead = 0;
-        InputRecord [] peekBuf = new InputRecord [1];
-
-        if (!PeekConsoleInput (InputHandle, peekBuf, 1, out uint peeked) || peeked == 0)
-        {
-            return false;
-        }
-
-        InputRecord rec = peekBuf [0];
-
-        if (rec.EventType != EventType.Key || rec.KeyEvent.UnicodeChar != '\x1A')
-        {
-            return false;
-        }
-
-        // It's a Ctrl+Z event. Consume it from the input buffer.
-        InputRecord [] consumeBuf = new InputRecord [1];
-        ReadConsoleInput (InputHandle, consumeBuf, 1, out _);
-
-        // Only synthesize the byte for key-down events.
-        if (rec.KeyEvent.bKeyDown)
-        {
-            buffer [0] = 0x1A;
-            bytesRead = 1;
-        }
-
-        return true;
-    }
-#endif
 
     /// <summary>
     ///     Restores the console to its original mode.
