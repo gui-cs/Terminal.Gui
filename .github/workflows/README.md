@@ -30,10 +30,9 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
    - Disables Windows Defender on Windows runners (significant speedup)
    - Collects code coverage **only on Linux** (ubuntu-latest) for performance
    - Windows and macOS skip coverage collection to reduce test time
-   - Increased blame-hang-timeout to 120s for Windows/macOS (60s for Linux)
 5. Runs two test jobs:
-   - **Non-parallel UnitTests**: `Tests/UnitTests` with blame/diag flags; `xunit.stopOnFail=false`
-   - **Parallel UnitTestsParallelizable**: `Tests/UnitTestsParallelizable` with blame/diag flags; `xunit.stopOnFail=false`
+   - **Non-parallel UnitTests**: `Tests/UnitTests` with diagnostic output
+   - **Parallel UnitTestsParallelizable**: `Tests/UnitTestsParallelizable` with diagnostic output
 6. Uploads test logs and diagnostic data from all runners
 7. **Uploads code coverage to Codecov only from Linux runner**
 
@@ -51,8 +50,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 4. **Performance optimizations** (same as unit tests):
    - Disables Windows Defender on Windows runners
    - Collects code coverage **only on Linux**
-   - Increased blame-hang-timeout to 120s for Windows/macOS
-5. Runs IntegrationTests with blame/diag flags; `xunit.stopOnFail=true`
+5. Runs IntegrationTests with diagnostic output
 6. Uploads logs per-OS
 7. **Uploads coverage to Codecov only from Linux runner**
 
@@ -95,7 +93,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 # Full CI sequence:
 dotnet restore
 dotnet build --configuration Debug --no-restore
-dotnet test Tests/UnitTests --no-build --verbosity normal
-dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+dotnet test --project Tests/UnitTests --no-build --verbosity normal
+dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
 dotnet build --configuration Release --no-restore
 ```

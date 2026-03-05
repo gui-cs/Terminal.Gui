@@ -48,41 +48,26 @@ jobs:
         run: |
           Add-MpPreference -ExclusionPath "${{ github.workspace }}"
           Add-MpPreference -ExclusionProcess "dotnet.exe"
-          Add-MpPreference -ExclusionProcess "testhost.exe"
-          Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
-
-      - name: Set VSTEST_DUMP_PATH
-        shell: bash
-        run: echo "VSTEST_DUMP_PATH=logs/IntegrationTests/${{ runner.os }}/" >> $GITHUB_ENV
 
       - name: Run IntegrationTests
         shell: bash
         run: |
           if [ "${{ runner.os }}" == "Linux" ]; then
             # Run with coverage on Linux only
-            dotnet test Tests/IntegrationTests \
+            dotnet test \
+              --project Tests/IntegrationTests \
               --no-build \
               --verbosity minimal \
-              --collect:"XPlat Code Coverage" \
-              --settings Tests/IntegrationTests/runsettings.coverage.xml \
-              --diag:logs/IntegrationTests/${{ runner.os }}/logs.txt \
-              --blame \
-              --blame-crash \
-              --blame-hang \
-              --blame-hang-timeout 60s \
-              --blame-crash-collect-always
+              --coverage \
+              --results-directory TestResults \
+              --diagnostic-output-directory logs/IntegrationTests/${{ runner.os }}
           else
             # Run without coverage on Windows/macOS for speed
-            dotnet test Tests/IntegrationTests \
+            dotnet test \
+              --project Tests/IntegrationTests \
               --no-build \
               --verbosity minimal \
-              --settings Tests/IntegrationTests/runsettings.xml \
-              --diag:logs/IntegrationTests/${{ runner.os }}/logs.txt \
-              --blame \
-              --blame-crash \
-              --blame-hang \
-              --blame-hang-timeout 60s \
-              --blame-crash-collect-always
+              --diagnostic-output-directory logs/IntegrationTests/${{ runner.os }}
           fi
 
       - name: Upload Integration Test Logs
@@ -103,4 +88,3 @@ jobs:
           name: IntegrationTests-${{ runner.os }}
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
-
