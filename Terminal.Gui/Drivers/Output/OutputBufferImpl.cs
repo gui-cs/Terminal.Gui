@@ -225,9 +225,13 @@ public class OutputBufferImpl : IOutputBuffer
                 // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
                 if (Clip.Contains (Col, Row))
                 {
-                    // IMPORTANT: We do NOT modify column N+1's IsDirty or Attribute here.
-                    // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
-                    Contents [Row, Col].Attribute = CurrentAttribute;
+                    // Mark dirty only if the attribute is actually changing, to avoid
+                    // invalidating overlapped content unnecessarily (see #4258).
+                    if (Contents [Row, Col].Attribute != CurrentAttribute)
+                    {
+                        Contents [Row, Col].Attribute = CurrentAttribute;
+                        Contents [Row, Col].IsDirty = true;
+                    }
                 }
 
                 // Advance cursor again for wide character

@@ -1,12 +1,11 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary><see cref="ITableSource"/> implementation that wraps arbitrary data.</summary>
 /// <typeparam name="T"></typeparam>
 public class EnumerableTableSource<T> : IEnumerableTableSource<T>
 {
-    private readonly T [] data;
-    private readonly Dictionary<string, Func<T, object>> lambdas;
+    private readonly T [] _data;
+    private readonly Dictionary<string, Func<T, object>> _lambdas;
 
     /// <summary>Creates a new instance of the class that presents <paramref name="data"/> collection as a table.</summary>
     /// <remarks>
@@ -28,19 +27,19 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T>
     /// </param>
     public EnumerableTableSource (IEnumerable<T> data, Dictionary<string, Func<T, object>> columnDefinitions)
     {
-        this.data = data.ToArray ();
+        _data = data.ToArray ();
         ColumnNames = columnDefinitions.Keys.ToArray ();
-        lambdas = columnDefinitions;
+        _lambdas = columnDefinitions;
     }
 
     /// <summary>Gets the object collection hosted by this wrapper.</summary>
-    public IReadOnlyCollection<T> Data => data.AsReadOnly ();
+    public IReadOnlyCollection<T> Data => _data.AsReadOnly ();
 
     /// <inheritdoc/>
-    public object this [int row, int col] => lambdas [ColumnNames [col]] (data [row]);
+    public object this [int row, int col] => _lambdas [ColumnNames [col]] (_data [row]);
 
     /// <inheritdoc/>
-    public int Rows => data.Length;
+    public int Rows => _data.Length;
 
     /// <inheritdoc/>
     public int Columns => ColumnNames.Length;
@@ -49,8 +48,8 @@ public class EnumerableTableSource<T> : IEnumerableTableSource<T>
     public string [] ColumnNames { get; }
 
     /// <inheritdoc/>
-    public IEnumerable<T> GetAllObjects () { return Data; }
+    public IEnumerable<T> GetAllObjects () => Data;
 
     /// <inheritdoc/>
-    public T GetObjectOnRow (int row) { return Data.ElementAt (row); }
+    public T GetObjectOnRow (int row) => Data.ElementAt (row);
 }

@@ -1,4 +1,3 @@
-#nullable disable
 using System.Data;
 
 namespace Terminal.Gui.Views;
@@ -33,12 +32,12 @@ public partial class TableView
         {
             int oldValue = _selectedColumn;
 
-            // try to prevent this being set to an out of bounds column
-            _selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Columns - 1, Math.Max (0, value));
+            // try to prevent this being set to an out-of-bounds column
+            _selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Columns - 1, Math.Max (0, value));
 
             if (oldValue != _selectedColumn)
             {
-                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table, oldValue, SelectedColumn, SelectedRow, SelectedRow));
+                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, oldValue, SelectedColumn, SelectedRow, SelectedRow));
             }
         }
     }
@@ -52,11 +51,11 @@ public partial class TableView
         set
         {
             int oldValue = _selectedRow;
-            _selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table.Rows - 1, Math.Max (0, value));
+            _selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Rows - 1, Math.Max (0, value));
 
             if (oldValue != _selectedRow)
             {
-                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table, SelectedColumn, SelectedColumn, oldValue, _selectedRow));
+                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, SelectedColumn, SelectedColumn, oldValue, _selectedRow));
             }
         }
     }
@@ -106,7 +105,7 @@ public partial class TableView
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void ChangeSelectionToEndOfRow (bool extend)
     {
-        SetSelection (Table.Columns - 1, SelectedRow, extend);
+        SetSelection (Table!.Columns - 1, SelectedRow, extend);
         Update ();
     }
 
@@ -135,7 +134,7 @@ public partial class TableView
         ColumnToRender [] cellInfos = NonHiddenCellInfos ();
         int headerHeight = GetHeaderHeightIfAny ();
 
-        var selectedColToRender = cellInfos.FirstOrDefault (c => c.Column == SelectedColumn);
+        ColumnToRender? selectedColToRender = cellInfos.FirstOrDefault (c => c.Column == SelectedColumn);
 
         if (SelectedColumn < 0 || selectedColToRender == null || SelectedRow < 0 || SelectedRow >= Table.Rows)
         {
@@ -163,20 +162,21 @@ public partial class TableView
 
         if (SelectedRow < rowStart)
         {
-            Viewport = Viewport with {Y = Viewport.Y - (rowStart - SelectedRow)};
+            Viewport = Viewport with { Y = Viewport.Y - (rowStart - SelectedRow) };
         }
 
         if (SelectedRow > rowEnd)
         {
-            Viewport = Viewport with {Y = Viewport.Y + (SelectedRow - rowEnd)};
+            Viewport = Viewport with { Y = Viewport.Y + (SelectedRow - rowEnd) };
         }
 
         //first column that is visible from start
-        var colStart = cellInfos.FirstOrDefault (c => c.X - 1 > Viewport.Left);
-        //last column that is visible (at least the start)
-        var colEnd = cellInfos.LastOrDefault (c => c.X < Viewport.Right);
+        ColumnToRender? colStart = cellInfos.FirstOrDefault (c => c.X - 1 > Viewport.Left);
 
-        if (colEnd is not null && SelectedColumn >= colEnd.Column)
+        //last column that is visible (at least the start)
+        ColumnToRender? colEnd = cellInfos.LastOrDefault (c => c.X < Viewport.Right);
+
+        if (colEnd is { } && SelectedColumn >= colEnd.Column)
         {
             if (Style.SmoothHorizontalScrolling)
             {
@@ -190,18 +190,20 @@ public partial class TableView
             }
         }
 
-        if (colStart is null || SelectedColumn < colStart.Column)
+        if (colStart is { } && SelectedColumn >= colStart.Column)
         {
-            if (Style.SmoothHorizontalScrolling)
-            {
-                //bring selected col into view
-                Viewport = Viewport with {X = selectedColToRender.X - 1};
-            }
-            else
-            {
-                //bring selected col to end of viewport
-                Viewport = Viewport with { X = selectedColToRender.X - Math.Max(Viewport.Width - selectedColToRender.Width, 0) };
-            }
+            return;
+        }
+
+        if (Style.SmoothHorizontalScrolling)
+        {
+            //bring selected col into view
+            Viewport = Viewport with { X = selectedColToRender.X - 1 };
+        }
+        else
+        {
+            //bring selected col to end of viewport
+            Viewport = Viewport with { X = selectedColToRender.X - Math.Max (Viewport.Width - selectedColToRender.Width, 0) };
         }
     }
 
@@ -223,7 +225,7 @@ public partial class TableView
             return;
         }
 
-        SelectedColumn = Math.Max (Math.Min (SelectedColumn, Table.Columns - 1), 0);
+        SelectedColumn = Math.Max (Math.Min (SelectedColumn, Table!.Columns - 1), 0);
         SelectedRow = Math.Max (Math.Min (SelectedRow, Table.Rows - 1), 0);
 
         // If SelectedColumn is invisible move it to a visible one
@@ -265,7 +267,7 @@ public partial class TableView
     /// <returns></returns>
     public IEnumerable<Point> GetAllSelectedCells ()
     {
-        if (TableIsNullOrInvisible () || Table.Rows == 0)
+        if (TableIsNullOrInvisible () || Table!.Rows == 0)
         {
             return Enumerable.Empty<Point> ();
         }
@@ -345,7 +347,7 @@ public partial class TableView
     /// </summary>
     public void SelectAll ()
     {
-        if (TableIsNullOrInvisible () || !MultiSelect || Table.Rows == 0)
+        if (TableIsNullOrInvisible () || !MultiSelect || Table!.Rows == 0)
         {
             return;
         }
@@ -354,7 +356,7 @@ public partial class TableView
 
         // Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right
         // behaves properly
-        MultiSelectedRegions.Push (new TableSelection (new Point (SelectedColumn, SelectedRow), new Rectangle (0, 0, Table.Columns, _table.Rows)));
+        MultiSelectedRegions.Push (new TableSelection (new Point (SelectedColumn, SelectedRow), new Rectangle (0, 0, Table.Columns, _table!.Rows)));
         Update ();
     }
 
@@ -399,6 +401,7 @@ public partial class TableView
         SelectedRow = row;
     }
 
+    // TODO: Refactor to use CWP
     /// <summary>Invokes the <see cref="SelectedCellChanged"/> event</summary>
     private void RaiseSelectedCellChanged (SelectedCellChangedEventArgs args) => SelectedCellChanged?.Invoke (this, args);
 
@@ -440,7 +443,7 @@ public partial class TableView
 
     private bool? ToggleCurrentCellSelection ()
     {
-        var e = new CellToggledEventArgs (Table, _selectedColumn, _selectedRow);
+        var e = new CellToggledEventArgs (Table!, _selectedColumn, _selectedRow);
         OnCellToggled (e);
 
         if (e.Cancel)

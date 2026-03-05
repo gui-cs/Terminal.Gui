@@ -38,7 +38,7 @@ Allows the user to pick an <xref:Terminal.Gui.Drawing.Attribute> by selecting fo
 
 ## [Bar](xref:Terminal.Gui.Views.Bar)
 
-Provides a horizontally or vertically oriented container for <xref:Terminal.Gui.Views.Shortcut>s to be used as a menu, toolbar, or status bar.
+A container for <xref:Terminal.Gui.Views.Shortcut> items that arranges them horizontally or vertically. Serves as the base class for <xref:Terminal.Gui.Views.Menu>, <xref:Terminal.Gui.Views.MenuBar>, and <xref:Terminal.Gui.Views.StatusBar>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -137,23 +137,6 @@ A sinple color picker that supports the legacy 16 ANSI colors
 </pre>
 
 
-## [ComboBox](xref:Terminal.Gui.Views.ComboBox)
-
-Provides a drop-down list of items the user can select from.
-
-
-<pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                             </span><span style='color:#000000;background:#FFFFFF'>▼</span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
-
-</pre>
-
-
 ## [DateField](xref:Terminal.Gui.Views.DateField)
 
 Provides date editing functionality with specialized cursor behavior for date entry.
@@ -173,20 +156,36 @@ Lets the user pick a date from a visual calendar.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌────────────────────────────┐</span>
-<span style='color:#FFFFFF;background:#000000'>│Date: </span><span style='color:#000000;background:#808080;font-weight:900'> 02/25/2026</span><span style='color:#FFFFFF;background:#808080'>           </span><span style='color:#FFFFFF;background:#000000'>│</span>
-<span style='color:#FFFFFF;background:#000000'>│┌───┬───┬───┬───┬───┬───┬──┐│</span>
-<span style='color:#FFFFFF;background:#000000'>││Sun│Mon│Tue│Wed│Thu│Fri│Sa││</span>
-<span style='color:#FFFFFF;background:#000000'>│├───┼───┼───┼───┼───┼───┼──┤│</span>
-<span style='color:#FFFFFF;background:#000000'>││1  │2  │3  │4  │5  │6  │7 ││</span>
-<span style='color:#FFFFFF;background:#000000'>││8  │9  │10 │11 │12 │13 │14││</span>
-<span style='color:#FFFFFF;background:#000000'>││15 │16 │17 │18 │19 │20 │21││</span>
-<span style='color:#FFFFFF;background:#000000'>││22 │23 │24 │</span><span style='color:#000000;background:#808080;font-weight:900'>25 </span><span style='color:#FFFFFF;background:#000000'>│26 │27 │28││</span>
-<span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │-  │-  │- ││</span>
-<span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │-  │-  │- ││</span>
-<span style='color:#FFFFFF;background:#000000'>│└───┴───┴───┴───┴───┴───┴──┘│</span>
-<span style='color:#FFFFFF;background:#000000'>│           ◄◄  ►►           │</span>
-<span style='color:#FFFFFF;background:#000000'>└────────────────────────────┘</span>
+<span style='color:#FFFFFF;background:#000000'>┌─────────────────────────────┐</span>
+<span style='color:#FFFFFF;background:#000000'>│Date: </span><span style='color:#000000;background:#808080;font-weight:900'> 03/04/2026</span><span style='color:#FFFFFF;background:#808080'>            </span><span style='color:#FFFFFF;background:#000000'>│</span>
+<span style='color:#FFFFFF;background:#000000'>│┌───┬───┬───┬───┬───┬───┬───┐│</span>
+<span style='color:#FFFFFF;background:#000000'>││Sun│Mon│Tue│Wed│Thu│Fri│Sat││</span>
+<span style='color:#FFFFFF;background:#000000'>│├───┼───┼───┼───┼───┼───┼───┤│</span>
+<span style='color:#FFFFFF;background:#000000'>││1  │2  │3  │</span><span style='color:#000000;background:#808080;font-weight:900'>4  </span><span style='color:#FFFFFF;background:#000000'>│5  │6  │7  ││</span>
+<span style='color:#FFFFFF;background:#000000'>││8  │9  │10 │11 │12 │13 │14 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││15 │16 │17 │18 │19 │20 │21 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││22 │23 │24 │25 │26 │27 │28 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││29 │30 │31 │-  │-  │-  │-  ││</span>
+<span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │-  │-  │-  ││</span>
+<span style='color:#FFFFFF;background:#000000'>│└───┴───┴───┴───┴───┴───┴───┘│</span>
+<span style='color:#FFFFFF;background:#000000'>│           ◄◄  ►►            │</span>
+<span style='color:#FFFFFF;background:#000000'>└─────────────────────────────┘</span>
+
+</pre>
+
+
+## [Dialog](xref:Terminal.Gui.Views.Dialog)
+
+A modal dialog window with buttons across the bottom. When a button is pressed, <xref:Terminal.Gui.App.IRunnable%601.Result> is set to the button's index (0-based).
+
+
+<pre style='color:#FFFFFF;background:#000000'>
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Dialog Title</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='text-decoration:underline 1px solid'>E</span>xample: <span style='color:#000000;background:#FFFFFF;font-weight:900'>Type and press ENTER to accept.</span><span style='color:#CCCCCC;background:#4C4C4C'>         </span> ┃
+┃                                                  ┃
+┃                                                  ┃
+┃                               ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧ ⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
 
@@ -197,18 +196,15 @@ A generic modal dialog window with buttons across the bottom. Derive from this c
 
 
 
-## [Dialog](xref:Terminal.Gui.Views.Dialog)
+## [DropDownList](xref:Terminal.Gui.Views.DropDownList)
 
-A modal dialog window with buttons across the bottom. When a button is pressed, <xref:Terminal.Gui.App.IRunnable%601.Result> is set to the button's index (0-based).
+A dropdown/combo-box control that combines a <xref:Terminal.Gui.Views.TextField> with a popover <xref:Terminal.Gui.Views.ListView> for selecting from a list of items.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#000000;background:#FFFFFF'>Dialog Title</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓<span style='color:#FFFFFF;background:#000000'> </span>
-┃◄<span style='text-decoration:underline 1px solid'>█████████████████████████████████████████████</span>░► ┃<span style='color:#FFFFFF;background:#000000'> </span>
-┃                                                 ┃<span style='color:#FFFFFF;background:#000000'> </span>
-┃                              ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧ ⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃<span style='color:#FFFFFF;background:#000000'> </span>
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛<span style='color:#FFFFFF;background:#000000'> </span>
-<span style='color:#FFFFFF;background:#000000'>                                                    </span>
+<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┐</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>Germany  </span><span style='color:#FFFFFF;background:#000000'>▼┊</span>
+<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
@@ -219,34 +215,28 @@ The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.V
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#000000;background:#FFFFFF'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#808080;font-weight:900'>D:\s\gui-cs\Terminal.Gui\.claude\worktrees\docfx-views-fix\docfx</span><span style='color:#FFFFFF;background:#808080'>           </span>┃
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#CCCCCC;background:#4C4C4C'>                                   </span>┃
 ┃⟦▲⟧                                                                        ┃
-┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃
-┃│Filename (▲)        │Size      │Modified                                 │┃
-┃├────────────────────┼──────────┼─────────────────────────────────────────►┃
-┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                                         </span>│┃
-┃│\_exported_templates│          │2026-02-25T09:13:54                      │┃
-┃│\api                │          │2026-02-25T09:15:30                      │┃
-┃│\apispec            │          │2026-02-25T09:13:54                      │┃
-┃│\docs               │          │2026-02-25T09:13:54                      │┃
-┃│\images             │          │2026-02-25T09:13:54                      │┃
-┃│\includes           │          │2026-02-25T09:13:54                      │┃
-┃│\schemas            │          │2026-02-25T09:13:54                      │┃
-┃│\scripts            │          │2026-02-25T09:14:22                      │┃
-┃│aboutbox.png        │14.06 KB  │2026-02-25T09:13:54                      │┃
-┃│docfx.json          │2.01 KB   │2026-02-25T09:13:54                      │┃
+┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
+┃│Filename (▲)        │Size      │Modified                      │Type       ┃
+┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
+┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
+┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-04T12:17:44           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-04T12:17:11           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-01-25T15:20:42           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-04T12:16:47           │&lt;Directory&gt;┃
+┃│\images             │          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-02-25T08:14:30           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-02-26T09:24:26           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
-
-
-## [FlagSelector\<T\>](xref:Terminal.Gui.Views.FlagSelector`1)
-
-Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way. <xref:Terminal.Gui.Views.FlagSelector> provides a non-type-safe version. `TFlagsEnum` must be a valid enum type with the '[Flags]' attribute.
-
 
 
 ## [FlagSelector](xref:Terminal.Gui.Views.FlagSelector)
@@ -265,6 +255,12 @@ Provides a user interface for displaying and selecting non-mutually-exclusive fl
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
+
+
+## [FlagSelector\<T\>](xref:Terminal.Gui.Views.FlagSelector`1)
+
+Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way. <xref:Terminal.Gui.Views.FlagSelector> provides a non-type-safe version. `TFlagsEnum` must be a valid enum type with the '[Flags]' attribute.
+
 
 
 ## [FrameView](xref:Terminal.Gui.Views.FrameView)
@@ -411,12 +407,6 @@ Draws a single line using the <xref:Terminal.Gui.Drawing.LineStyle> specified by
 </pre>
 
 
-## [LinearRange\<T\>](xref:Terminal.Gui.Views.LinearRange`1)
-
-Provides a type-safe linear range control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
-
-
-
 ## [LinearRange](xref:Terminal.Gui.Views.LinearRange)
 
 Provides a linear range control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
@@ -429,6 +419,12 @@ Provides a linear range control letting the user navigate from a set of typed op
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
+
+
+## [LinearRange\<T\>](xref:Terminal.Gui.Views.LinearRange`1)
+
+Provides a type-safe linear range control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
+
 
 
 ## [ListView](xref:Terminal.Gui.Views.ListView)
@@ -463,7 +459,7 @@ Provides a scrollable list of data where each item can be activated to perform a
 
 ## [Menu](xref:Terminal.Gui.Views.Menu)
 
-A <xref:Terminal.Gui.Views.Bar>-derived object to be used as a vertically-oriented menu. Each subview is a <xref:Terminal.Gui.Views.MenuItem>.
+A vertically-oriented <xref:Terminal.Gui.Views.Bar> that contains <xref:Terminal.Gui.Views.MenuItem> items, supporting cascading sub-menus, selection tracking, and the <xref:Terminal.Gui.ViewBase.IValue%601> pattern.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -479,7 +475,7 @@ A <xref:Terminal.Gui.Views.Bar>-derived object to be used as a vertically-orient
 
 ## [MenuBar](xref:Terminal.Gui.Views.MenuBar)
 
-A horizontal list of <xref:Terminal.Gui.Views.MenuBarItem>s. Each <xref:Terminal.Gui.Views.MenuBarItem> can have a <xref:Terminal.Gui.Views.PopoverMenu> that is shown when the <xref:Terminal.Gui.Views.MenuBarItem> is selected.
+A horizontal <xref:Terminal.Gui.Views.Menu> that contains <xref:Terminal.Gui.Views.MenuBarItem> items. Each <xref:Terminal.Gui.Views.MenuBarItem> owns a <xref:Terminal.Gui.Views.PopoverMenu> that is displayed as a drop-down when the item is selected. Typically placed at the top of a window or view.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -490,7 +486,7 @@ A horizontal list of <xref:Terminal.Gui.Views.MenuBarItem>s. Each <xref:Terminal
 
 ## [MenuBarItem](xref:Terminal.Gui.Views.MenuBarItem)
 
-A <xref:Terminal.Gui.Views.Shortcut>-derived object to be used as items in a <xref:Terminal.Gui.Views.MenuBar>. MenuBarItems hold a <xref:Terminal.Gui.Views.MenuBarItem.PopoverMenu> instead of a <xref:Terminal.Gui.Views.MenuBarItem.SubMenu>.
+A <xref:Terminal.Gui.Views.MenuItem>-derived item for use in a <xref:Terminal.Gui.Views.MenuBar>. Each <xref:Terminal.Gui.Views.MenuBarItem> holds either a <xref:Terminal.Gui.Views.MenuBarItem.PopoverMenu> (modal, default) or an inline <xref:Terminal.Gui.Views.MenuItem.SubMenu> (non-modal) that is displayed as a drop-down menu when the item is selected. The behavior is controlled by the <xref:Terminal.Gui.Views.MenuBarItem.UsePopoverMenu> property.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -503,7 +499,7 @@ A <xref:Terminal.Gui.Views.Shortcut>-derived object to be used as items in a <xr
 
 ## [MenuItem](xref:Terminal.Gui.Views.MenuItem)
 
-A <xref:Terminal.Gui.Views.Shortcut>-derived object to be used as a menu item in a <xref:Terminal.Gui.Views.Menu>. Has title, an associated help text, and an action to execute on activation.
+A <xref:Terminal.Gui.Views.Shortcut>-derived item for use in a <xref:Terminal.Gui.Views.Menu>. Displays a command, help text, and key binding and supports nested <xref:Terminal.Gui.Views.MenuItem.SubMenu>s for cascading menu hierarchies.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -512,12 +508,6 @@ A <xref:Terminal.Gui.Views.Shortcut>-derived object to be used as a menu item in
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
-
-
-## [NumericUpDown\<T\>](xref:Terminal.Gui.Views.NumericUpDown`1)
-
-Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
-
 
 
 ## [NumericUpDown](xref:Terminal.Gui.Views.NumericUpDown)
@@ -533,40 +523,40 @@ Enables the user to increase or decrease an int by clicking on the up or down bu
 </pre>
 
 
+## [NumericUpDown\<T\>](xref:Terminal.Gui.Views.NumericUpDown`1)
+
+Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
+
+
+
 ## [OpenDialog](xref:Terminal.Gui.Views.OpenDialog)
 
 Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or directories for opening
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#000000;background:#FFFFFF'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#808080;font-weight:900'>D:\s\gui-cs\Terminal.Gui\.claude\worktrees\docfx-views-fix\docfx</span><span style='color:#FFFFFF;background:#808080'>           </span>┃
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#CCCCCC;background:#4C4C4C'>                                   </span>┃
 ┃⟦▲⟧                                                                        ┃
-┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃
-┃│Filename (▲)        │Size      │Modified                                 │┃
-┃├────────────────────┼──────────┼─────────────────────────────────────────►┃
-┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                                         </span>│┃
-┃│\_exported_templates│          │2026-02-25T09:13:54                      │┃
-┃│\api                │          │2026-02-25T09:15:30                      │┃
-┃│\apispec            │          │2026-02-25T09:13:54                      │┃
-┃│\docs               │          │2026-02-25T09:13:54                      │┃
-┃│\images             │          │2026-02-25T09:13:54                      │┃
-┃│\includes           │          │2026-02-25T09:13:54                      │┃
-┃│\schemas            │          │2026-02-25T09:13:54                      │┃
-┃│\scripts            │          │2026-02-25T09:14:22                      │┃
-┃│aboutbox.png        │14.06 KB  │2026-02-25T09:13:54                      │┃
-┃│docfx.json          │2.01 KB   │2026-02-25T09:13:54                      │┃
+┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
+┃│Filename (▲)        │Size      │Modified                      │Type       ┃
+┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
+┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
+┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-04T12:17:44           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-04T12:17:11           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-01-25T15:20:42           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-04T12:16:47           │&lt;Directory&gt;┃
+┃│\images             │          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-02-25T08:14:30           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-02-26T09:24:26           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
-
-
-## [OptionSelector\<T\>](xref:Terminal.Gui.Views.OptionSelector`1)
-
-Provides a user interface for displaying and selecting a single item from a list of options in a type-safe way. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector> provides a non-type-safe version.
-
 
 
 ## [OptionSelector](xref:Terminal.Gui.Views.OptionSelector)
@@ -583,6 +573,12 @@ Provides a user interface for displaying and selecting a single item from a list
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
+
+
+## [OptionSelector\<T\>](xref:Terminal.Gui.Views.OptionSelector`1)
+
+Provides a user interface for displaying and selecting a single item from a list of options in a type-safe way. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector> provides a non-type-safe version.
+
 
 
 ## [PopoverMenu](xref:Terminal.Gui.Views.PopoverMenu)
@@ -634,12 +630,6 @@ A dialog that wraps any <xref:Terminal.Gui.ViewBase.View> with Ok/Cancel buttons
 
 
 
-## [Runnable\<T\>](xref:Terminal.Gui.Views.Runnable`1)
-
-Base implementation of <xref:Terminal.Gui.App.IRunnable%601> for views that can be run as blocking sessions.
-
-
-
 ## [Runnable](xref:Terminal.Gui.Views.Runnable)
 
 Base implementation of <xref:Terminal.Gui.App.IRunnable> for views that can be run as blocking sessions without returning a result.
@@ -647,7 +637,7 @@ Base implementation of <xref:Terminal.Gui.App.IRunnable> for views that can be r
 
 <pre style='color:#FFFFFF;background:#000000'>
 ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-┊<span style='color:#000000;background:#FFFFFF'>This is some demo text.</span>                                                       ┊
+┊<span style='color:#0C0C0C;background:#CCCCCC'>This is some demo text.</span>                                                       ┊
 ┊                                                                              ┊
 ┊                                                                              ┊
 ┊                                                                              ┊
@@ -670,29 +660,35 @@ Base implementation of <xref:Terminal.Gui.App.IRunnable> for views that can be r
 </pre>
 
 
+## [Runnable\<T\>](xref:Terminal.Gui.Views.Runnable`1)
+
+Base implementation of <xref:Terminal.Gui.App.IRunnable%601> for views that can be run as blocking sessions.
+
+
+
 ## [SaveDialog](xref:Terminal.Gui.Views.SaveDialog)
 
 Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or directories for saving
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#000000;background:#FFFFFF'>Save</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#808080;font-weight:900'>D:\s\gui-cs\Terminal.Gui\.claude\worktrees\docfx-views-fix\docfx</span><span style='color:#FFFFFF;background:#808080'>           </span>┃
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Save</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#CCCCCC;background:#4C4C4C'>                                   </span>┃
 ┃⟦▲⟧                                                                        ┃
-┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃
-┃│Filename (▲)        │Size      │Modified                                 │┃
-┃├────────────────────┼──────────┼─────────────────────────────────────────►┃
-┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                                         </span>│┃
-┃│\_exported_templates│          │2026-02-25T09:13:54                      │┃
-┃│\api                │          │2026-02-25T09:15:30                      │┃
-┃│\apispec            │          │2026-02-25T09:13:54                      │┃
-┃│\docs               │          │2026-02-25T09:13:54                      │┃
-┃│\images             │          │2026-02-25T09:13:54                      │┃
-┃│\includes           │          │2026-02-25T09:13:54                      │┃
-┃│\schemas            │          │2026-02-25T09:13:54                      │┃
-┃│\scripts            │          │2026-02-25T09:14:22                      │┃
-┃│aboutbox.png        │14.06 KB  │2026-02-25T09:13:54                      │┃
-┃│docfx.json          │2.01 KB   │2026-02-25T09:13:54                      │┃
+┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
+┃│Filename (▲)        │Size      │Modified                      │Type       ┃
+┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
+┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
+┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-04T12:17:44           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-04T12:17:11           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-01-25T15:20:42           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-04T12:16:47           │&lt;Directory&gt;┃
+┃│\images             │          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-02-25T08:14:30           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-02-26T09:24:26           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>S</span>ave ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -753,7 +749,7 @@ The abstract base class for <xref:Terminal.Gui.Views.OptionSelector%601> and <xr
 
 ## [Shortcut](xref:Terminal.Gui.Views.Shortcut)
 
-Displays a command, help text, and a key binding. When the key specified by <xref:Terminal.Gui.Views.Shortcut.Key> is pressed, the command will be invoked. Useful for displaying a command in <xref:Terminal.Gui.Views.Bar> such as a menu, toolbar, or status bar.
+Displays a command, help text, and a key binding. Serves as the foundational building block for <xref:Terminal.Gui.Views.Bar>, <xref:Terminal.Gui.Views.Menu>, <xref:Terminal.Gui.Views.MenuBar>, and <xref:Terminal.Gui.Views.StatusBar>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -825,14 +821,14 @@ Displays and enables infinite scrolling through tabular data based on a <xref:Te
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊┌──────────────────┬──────────────────────┬──────┬───────────────────────────┐┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│StrCol            │DateCol               │IntCol│DoubleCol                  │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊├──────────────────┼──────────────────────┼──────┼───────────────────────────►┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│</span><span style='color:#000000;background:#FFFFFF'>Demo text in row 0</span><span style='color:#FFFFFF;background:#000000'>│12/25/2000 12:00:00 AM│0     │-0.5                       │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 1│12/25/2001 12:00:00 AM│0     │0.40245424998107093        │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 2│12/25/2002 12:00:00 AM│0     │1.3973309257520972         │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 3│12/25/2003 12:00:00 AM│2     │1.3318544644079424         │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 4│12/25/2004 12:00:00 AM│1     │0.09525688765349649        │┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊┌──────────────────┬──────────────────────┬──────┬───────────────────┬────────┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│StrCol            │DateCol               │IntCol│DoubleCol          │NullsCol┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊├──────────────────┼──────────────────────┼──────┼───────────────────┼────────┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│</span><span style='color:#000000;background:#FFFFFF'>Demo text in row 0</span><span style='color:#FFFFFF;background:#000000'>│12/25/2000 12:00:00 AM│0     │-0.5               │-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 1│12/25/2001 12:00:00 AM│0     │0.40245424998107093│-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 2│12/25/2002 12:00:00 AM│0     │1.3973309257520972 │-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 3│12/25/2003 12:00:00 AM│2     │1.3318544644079424 │-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 4│12/25/2004 12:00:00 AM│1     │0.09525688765349649│-       ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
@@ -947,12 +943,6 @@ Provides time editing functionality with specialized cursor behavior for time en
 </pre>
 
 
-## [TreeView\<T\>](xref:Terminal.Gui.Views.TreeView`1)
-
-Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined <xref:Terminal.Gui.Views.ITreeBuilder%601>. See TreeView Deep Dive for more information.
-
-
-
 ## [TreeView](xref:Terminal.Gui.Views.TreeView)
 
 Convenience implementation of generic <xref:Terminal.Gui.Views.TreeView%601> for any tree were all nodes implement <xref:Terminal.Gui.Views.ITreeNode>. See TreeView Deep Dive for more information.
@@ -983,6 +973,12 @@ Convenience implementation of generic <xref:Terminal.Gui.Views.TreeView%601> for
 </pre>
 
 
+## [TreeView\<T\>](xref:Terminal.Gui.Views.TreeView`1)
+
+Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined <xref:Terminal.Gui.Views.ITreeBuilder%601>. See TreeView Deep Dive for more information.
+
+
+
 ## [Window](xref:Terminal.Gui.Views.Window)
 
 An overlapped container for other views with a border and optional title.
@@ -990,7 +986,7 @@ An overlapped container for other views with a border and optional title.
 
 <pre style='color:#FFFFFF;background:#000000'>
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│<span style='color:#000000;background:#FFFFFF'>This is some demo text.</span>                                                       │
+│<span style='color:#0C0C0C;background:#CCCCCC'>This is some demo text.</span>                                                       │
 │                                                                              │
 │                                                                              │
 │                                                                              │
@@ -1019,18 +1015,18 @@ A multi-step dialog for collecting related data across sequential steps.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┌┤<span style='color:#000000;background:#FFFFFF'>Wizard Title - Example Step</span>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-┊<span style='text-decoration:underline 1px solid'>E</span>nter Text: <span style='color:#FFFFFF;background:#808080'>                    </span>                  <span style='color:#808080;background:#808080'>This is some help text  </span>┊
-┊                                                  <span style='color:#808080;background:#808080'>for the WizardStep.     </span>┊
-┊    <span style='text-decoration:underline 1px solid'>A</span> List: ┌╌╌╌╌╌╌╌╌┐                            <span style='color:#808080;background:#808080'>You can provide         </span>┊
-┊            ┆<span style='color:#000000;background:#808080;font-weight:900'>Item 1  </span>┆                            <span style='color:#808080;background:#808080'>instructions or         </span>┊
-┊            ┆Item 2  ┆                            <span style='color:#808080;background:#808080'>information to guide the</span>┊
-┊            ┆Item 3  ┆                            <span style='color:#808080;background:#808080'>user through this step  </span>┊
-┊            ┆Item 4  ┆                            <span style='color:#808080;background:#808080'>of the wizard.          </span>┊
-┊            ┆Item 5  ┆                            <span style='color:#808080;background:#808080'>                        </span>┊
-┊            └╌╌╌╌╌╌╌╌┘                            <span style='color:#808080;background:#808080'>                        </span>┊
-┊                                                  <span style='color:#808080;background:#808080'>                        </span>┊
-┊                                                  <span style='color:#808080;background:#808080'>                        </span>┊
+┌┤<span style='color:#0C0C0C;background:#CCCCCC'>Wizard Title - Example Step</span>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊<span style='text-decoration:underline 1px solid'>E</span>nter Text: <span style='color:#CCCCCC;background:#4C4C4C'>                    </span>                  <span style='color:#B2B2B2;background:#4C4C4C'>This is some help text  </span>┊
+┊                                                  <span style='color:#B2B2B2;background:#4C4C4C'>for the WizardStep.     </span>┊
+┊    <span style='text-decoration:underline 1px solid'>A</span> List: ┌╌╌╌╌╌╌╌╌┐                            <span style='color:#B2B2B2;background:#4C4C4C'>You can provide         </span>┊
+┊            ┆<span style='color:#000000;background:#FFFFFF;font-weight:900'>Item 1  </span>┆                            <span style='color:#B2B2B2;background:#4C4C4C'>instructions or         </span>┊
+┊            ┆Item 2  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>information to guide the</span>┊
+┊            ┆Item 3  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>user through this step  </span>┊
+┊            ┆Item 4  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>of the wizard.          </span>┊
+┊            ┆Item 5  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
+┊            └╌╌╌╌╌╌╌╌┘                            <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
+┊                                                  <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
+┊                                                  <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
 ┊                                                                          ┊
 ┊                                                             ⟦► <span style='text-decoration:underline 1px solid'>N</span>ext... ◄⟧┊
 └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
