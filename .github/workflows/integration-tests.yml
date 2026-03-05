@@ -42,6 +42,11 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore
 
+      - name: Fix test executable permissions (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          find Tests -type f -name 'IntegrationTests' -path '*/bin/*' -exec chmod +x {} +
+
       - name: Disable Windows Defender (Windows only)
         if: runner.os == 'Windows'
         shell: powershell
