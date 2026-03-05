@@ -76,22 +76,22 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 1. **Non-parallel tests** (depend on static state, ~10 min timeout):
    ```bash
-   dotnet test Tests/UnitTests --no-build --verbosity normal
+   dotnet test --project Tests/UnitTests --no-build --verbosity normal
    ```
    - Uses `Application.Init` and static state
    - Cannot run in parallel
-   - Includes `--blame` flags for crash diagnostics
+   - Includes `--diagnostic` flag for logging
 
 2. **Parallel tests** (can run concurrently, ~10 min timeout):
    ```bash
-   dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+   dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
    ```
    - No dependencies on static state
    - **Preferred for new tests**
 
 3. **Integration tests**:
    ```bash
-   dotnet test Tests/IntegrationTests --no-build --verbosity normal
+   dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
    ```
 
 ### Common Build Issues

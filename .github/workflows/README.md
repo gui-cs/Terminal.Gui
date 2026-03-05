@@ -2,12 +2,16 @@
 
 The repository uses multiple GitHub Actions workflows. What runs and when:
 
-### 1) Build Solution (`.github/workflows/build.yml`)
+> **Note:** Tests use xUnit v3 with Microsoft Testing Platform (MTP). The test runner is
+> configured in `global.json` via `"test": { "runner": "Microsoft.Testing.Platform" }`.
+> MTP runs test projects as standalone executables, so each OS must build its own binaries.
 
-- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`); supports `workflow_call`
+### 1) Build Validation (`.github/workflows/build-validation.yml`)
+
+- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
 - **Runner/timeout**: `ubuntu-latest`, 10 minutes
 - **Steps**:
-- Checkout and setup .NET 8.x GA
+- Checkout and setup .NET 10.x GA
 - `dotnet restore`
 - Build Debug: `dotnet build --configuration Debug --no-restore -property:NoWarn=0618%3B0612`
 - Build Release (library): `dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force -property:NoWarn=0618%3B0612`
@@ -15,26 +19,20 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 - Restore NativeAot/SelfContained examples, then restore solution again
 - Build Release for `Examples/NativeAot` and `Examples/SelfContained`
 - Build Release solution
-- Upload artifacts named `build-artifacts`, retention 1 day
 
 ### 2) Build & Run Unit Tests (`.github/workflows/unit-tests.yml`)
 
 - **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
 - **Matrix**: Ubuntu/Windows/macOS
-- **Timeout**: 15 minutes per job
+- **Timeout**: 15 minutes (non-parallel), 60 minutes (parallel)
 - **Process**:
-1. Calls build workflow to build solution once
-2. Downloads build artifacts
-3. Runs `dotnet restore` (required for `--no-build` to work)
-4. **Performance optimizations**:
+1. Each OS checks out code, restores, and builds locally
+2. **Performance optimizations**:
    - Disables Windows Defender on Windows runners (significant speedup)
-   - Collects code coverage **only on Linux** (ubuntu-latest) for performance
-   - Windows and macOS skip coverage collection to reduce test time
-5. Runs two test jobs:
+3. Runs two test jobs:
    - **Non-parallel UnitTests**: `Tests/UnitTests` with diagnostic output
    - **Parallel UnitTestsParallelizable**: `Tests/UnitTestsParallelizable` with diagnostic output
-6. Uploads test logs and diagnostic data from all runners
-7. **Uploads code coverage to Codecov only from Linux runner**
+4. Uploads test logs and diagnostic data from all runners
 
 **Test results**: All tests output to unified `TestResults/` directory at repository root
 
@@ -44,15 +42,11 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 - **Matrix**: Ubuntu/Windows/macOS
 - **Timeout**: 15 minutes
 - **Process**:
-1. Calls build workflow
-2. Downloads build artifacts
-3. Runs `dotnet restore`
-4. **Performance optimizations** (same as unit tests):
+1. Each OS checks out code, restores, and builds locally
+2. **Performance optimizations**:
    - Disables Windows Defender on Windows runners
-   - Collects code coverage **only on Linux**
-5. Runs IntegrationTests with diagnostic output
-6. Uploads logs per-OS
-7. **Uploads coverage to Codecov only from Linux runner**
+3. Runs IntegrationTests with diagnostic output
+4. Uploads logs per-OS
 
 ### 4) Create Release (`.github/workflows/release.yml`)
 

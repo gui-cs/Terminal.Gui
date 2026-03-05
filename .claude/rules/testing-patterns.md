@@ -47,11 +47,11 @@
 - ~10 min timeout
 - Uses `Application.Init` and static state
 - Cannot run in parallel
-- Includes `--blame` flags for crash diagnostics
+- Includes `--diagnostic` flag for logging
 
 **Command:**
 ```bash
-dotnet test Tests/UnitTests --no-build --verbosity normal
+dotnet test --project Tests/UnitTests --no-build --verbosity normal
 ```
 
 ### 2. Parallel Tests (`Tests/UnitTestsParallelizable/`) - **PREFERRED**
@@ -67,7 +67,7 @@ dotnet test Tests/UnitTests --no-build --verbosity normal
 
 **Command:**
 ```bash
-dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
 ```
 
 ### 3. Integration Tests (`Tests/IntegrationTests/`)
@@ -78,7 +78,7 @@ dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
 
 **Command:**
 ```bash
-dotnet test Tests/IntegrationTests --no-build --verbosity normal
+dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
 ```
 
 ## Test Configuration Files

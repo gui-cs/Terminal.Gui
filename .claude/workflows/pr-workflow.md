@@ -27,7 +27,7 @@ Before submitting a PR, ensure:
 
 - [ ] **Build passes** locally: `dotnet build --no-restore`
 
-- [ ] **Tests pass** locally: `dotnet test --no-build`
+- [ ] **Tests pass** locally: `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
 
 ## PR Description Template
 
@@ -70,7 +70,7 @@ dotnet build --configuration Debug --no-restore
 ### 2. Run Tests
 
 ```bash
-dotnet test --no-build --verbosity normal
+dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
 ```
 
 **Expected:** All tests pass
