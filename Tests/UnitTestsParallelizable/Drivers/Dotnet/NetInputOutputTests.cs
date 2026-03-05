@@ -207,6 +207,20 @@ public class NetInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
+    public void NetOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new NetOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
     public void NetInputProcessor_Constructor_DoesNotThrow ()
     {
         // Arrange & Act

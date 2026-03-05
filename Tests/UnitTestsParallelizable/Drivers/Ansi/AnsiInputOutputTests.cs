@@ -60,6 +60,20 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
+    public void AnsiOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new AnsiOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
     public void AnsiComponentFactory_CreateInput_DoesNotThrow ()
     {
         // Arrange

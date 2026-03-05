@@ -122,7 +122,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 throw new ApplicationException ($"Failed to get screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
             }
 
+#pragma warning disable IDE1006 // Naming Styles
             const uint ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002;
+#pragma warning restore IDE1006 // Naming Styles
 
             mode &= ~ENABLE_WRAP_AT_EOL_OUTPUT; // Disable wrap
 
@@ -620,5 +622,12 @@ internal partial class WindowsOutput : OutputBase, IOutput
         }
 
         _isDisposed = true;
+    }
+
+    /// <inheritdoc/>
+    public void Suspend ()
+    {
+        // Suspends are not supported on Windows consoles in this implementation.
+        // No-op to match prior behavior where DriverImpl skipped suspend on Windows.
     }
 }
