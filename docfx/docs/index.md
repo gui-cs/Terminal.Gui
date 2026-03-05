@@ -1,7 +1,7 @@
 # Terminal.Gui Deep Dives 
 
 > [!IMPORTANT]
-> Terminal.Gui v2 "Alpha" has been released.
+> Terminal.Gui v2 "Beta" has been released.
 
 Welcome to the Terminal.Gui documentation! This comprehensive guide covers everything you need to know about building modern terminal user interfaces with Terminal.Gui.
 

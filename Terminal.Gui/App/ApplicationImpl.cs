@@ -210,7 +210,7 @@ internal partial class ApplicationImpl : IApplication
     {
         get
         {
-            _keyboard ??= new KeyboardImpl { App = this };
+            _keyboard ??= new ApplicationKeyboard { App = this };
 
             return _keyboard;
         }
@@ -224,7 +224,7 @@ internal partial class ApplicationImpl : IApplication
     {
         get
         {
-            _mouse ??= new MouseImpl { App = this };
+            _mouse ??= new ApplicationMouse { App = this };
 
             return _mouse;
         }

@@ -14,12 +14,12 @@ namespace Terminal.Gui.App;
 ///         See <see cref="IKeyboard"/> for usage details.
 ///     </para>
 /// </summary>
-internal class KeyboardImpl : IKeyboard, IDisposable
+internal class ApplicationKeyboard : IKeyboard, IDisposable
 {
     /// <summary>
     ///     Initializes keyboard bindings and subscribes to Application configuration property events.
     /// </summary>
-    public KeyboardImpl ()
+    public ApplicationKeyboard ()
     {
         // DON'T access Application static properties here - they trigger ApplicationImpl.Instance
         // which sets ModelUsage to LegacyStatic, breaking parallel tests.

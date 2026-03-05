@@ -22,7 +22,7 @@ namespace Terminal.Gui.App;
 ///         reusable popover behavior for any view type.
 ///     </para>
 ///     <para>
-///         <b>Registration:</b> Popovers are automatically registered with <see cref="Application.Popover"/> when
+///         <b>Registration:</b> Popovers are automatically registered with <see cref="Application.Popovers"/> when
 ///         <see cref="MakeVisible"/> is called. Manual registration via <see cref="ApplicationPopover.Register"/>
 ///         is not required.
 ///     </para>
@@ -73,6 +73,13 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
         Border?.Settings &= ~BorderSettings.Title;
 
         base.Visible = false;
+
+#if DEBUG
+        if (string.IsNullOrEmpty (contentView?.Id))
+        {
+            contentView?.Id = $"popoverContentView_{Id}";
+        }
+#endif
 
         ContentView = contentView;
     }
@@ -128,7 +135,7 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
 
             // Bridge Activate from ContentView → Popover across the non-containment boundary.
             _contentCommandBridge?.Dispose ();
-            _contentCommandBridge = CommandBridge.Connect (this, field, [Command.Activate, Command.Accept]);
+            _contentCommandBridge = CommandBridge.Connect (this, field, Command.Activate, Command.Accept);
         }
     }
 
@@ -292,7 +299,32 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     /// </remarks>
     protected virtual Point GetAdjustedPosition (View view, Point idealLocation)
     {
-        GetLocationEnsuringFullVisibility (view, idealLocation.X, idealLocation.Y, out int nx, out int ny);
+        int screenWidth = App?.Screen.Width ?? 0;
+        int screenHeight = App?.Screen.Height ?? 0;
+
+        int viewWidth = view.Frame.Width;
+        int viewHeight = view.Frame.Height;
+
+        // Clamp horizontally: prefer idealLocation.X, but shift left if it would overflow
+        int nx = idealLocation.X;
+
+        if (nx + viewWidth > screenWidth)
+        {
+            nx = Math.Max (screenWidth - viewWidth, 0);
+        }
+
+        nx = Math.Max (nx, 0);
+
+        // Vertically: prefer below idealLocation
+        int ny = idealLocation.Y;
+
+        if (ny + viewHeight > screenHeight)
+        {
+            // Doesn't fit below — position so bottom is 1 row above the ideal Y
+            ny = idealLocation.Y - viewHeight - 1;
+        }
+
+        ny = Math.Max (ny, 0);
 
         return new Point (nx, ny);
     }
@@ -379,10 +411,9 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
     {
         if (disposing)
         {
-            if (ContentView is { } contentView)
-            {
-                contentView.VisibleChanged -= ContentViewOnVisibleChanged;
-            }
+            ContentView?.VisibleChanged -= ContentViewOnVisibleChanged;
+            ContentView?.Dispose ();
+            ContentView = null;
 
             _contentCommandBridge?.Dispose ();
             _contentCommandBridge = null;

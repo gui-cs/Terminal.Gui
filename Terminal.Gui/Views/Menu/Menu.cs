@@ -175,7 +175,6 @@ public class Menu : Bar, IValue<MenuItem?>
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
-
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }
 
@@ -183,7 +182,7 @@ public class Menu : Bar, IValue<MenuItem?>
     ///     Gets the currently selected menu item. This is a helper that
     ///     tracks <see cref="View.Focused"/>.
     /// </summary>
-    public MenuItem? SelectedMenuItem => Focused as MenuItem;
+    public MenuItem? SelectedMenuItem => (Focused ?? PreviouslyFocused) as MenuItem;
 
     internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {
@@ -463,6 +462,9 @@ public class Menu : Bar, IValue<MenuItem?>
                                     new MenuItem { Title = "_Italic", Text = "Italic text", Key = Key.I.WithAlt },
                                     new MenuItem { Title = "_Underline", Text = "Underline text", Key = Key.U.WithCtrl }
                                 ])
+            {
+                Id = "FormatingSubMenu"
+            }
         };
 
         MenuItem viewItem = new ()
@@ -481,8 +483,14 @@ public class Menu : Bar, IValue<MenuItem?>
                                                                 new MenuItem { Title = "_Horizontal", Text = "Horizontal layout" },
                                                                 new MenuItem { Title = "_Vertical", Text = "Vertical layout" }
                                                             ])
+                                        {
+                                            Id = "LayoutSubMenu"
+                                        }
                                     }
                                 ])
+            {
+                Id = "ViewSubMenu"
+            }
         };
 
         MenuItem aboutItem = new () { Title = "_About", Text = "About this demo" };

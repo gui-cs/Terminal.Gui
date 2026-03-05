@@ -740,7 +740,7 @@ public sealed class UICatalogRunnable : Runnable
                            |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
                         """);
         msg.AppendLine ();
-        msg.AppendLine ("v2 - Pre-Alpha");
+        msg.AppendLine ("v2 - Beta");
         msg.AppendLine ();
         msg.Append ("https://github.com/gui-cs/Terminal.Gui");
 

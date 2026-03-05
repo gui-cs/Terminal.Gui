@@ -21,16 +21,18 @@ Instead of embedding descriptions, it points to actual source files that agents 
 [Terminal.Gui Source Index]|root: ./Terminal.Gui
 |IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning. Read files when needed.
 |.:{ModuleInitializers.cs}
-|App:{Application.Clipboard.cs,Application.cs,Application.Driver.cs,Application.Keyboard.cs,Application.Lifecycle.cs,Application.Mouse.cs,Application.Navigation.cs,Application.Popover.cs,Application.Run.cs,Application.Screen.cs,Application.TopRunnable.cs,ApplicationImpl.cs,ApplicationImpl.Driver.cs,ApplicationImpl.Lifecycle.cs,ApplicationImpl.Run.cs,ApplicationImpl.Screen.cs,ApplicationModelUsage.cs,ApplicationNavigation.cs,ApplicationPopover.cs,IApplication.cs,IPopover.cs,Logging.cs,NotInitializedException.cs,PopoverImpl.cs}
+|App:{Application.cs,ApplicationImpl.cs,ApplicationImpl.Driver.cs,ApplicationImpl.Lifecycle.cs,ApplicationImpl.Run.cs,ApplicationImpl.Screen.cs,ApplicationModelUsage.cs,ApplicationNavigation.cs,ApplicationPopover.cs,IApplication.cs,Logging.cs,NotInitializedException.cs}
 |App/Clipboard:{Clipboard.cs,ClipboardBase.cs,ClipboardProcessRunner.cs,IClipboard.cs}
 |App/CWP:{CancelEventArgs.cs,CWPEventHelper.cs,CWPPropertyHelper.cs,CWPWorkflowHelper.cs,EventArgs.cs,ResultEventArgs.cs,ValueChangedEventArgs.cs,ValueChangingEventArgs.cs}
-|App/Keyboard:{IKeyboard.cs,KeyboardImpl.cs}
+|App/Keyboard:{ApplicationKeyboard.cs,IKeyboard.cs}
+|App/Legacy:{Application.Clipboard.cs,Application.Driver.cs,Application.Keyboard.cs,Application.Lifecycle.cs,Application.Mouse.cs,Application.Navigation.cs,Application.Popovers.cs,Application.Run.cs,Application.Screen.cs,Application.TopRunnable.cs}
 |App/MainLoop:{ApplicationMainLoop.cs,IApplicationMainLoop.cs,IMainLoopCoordinator.cs,MainLoopCoordinator.cs,MainLoopSyncContext.cs}
-|App/Mouse:{IMouse.cs,IMouseGrabHandler.cs,MouseImpl.cs}
+|App/Mouse:{ApplicationMouse.cs,IMouse.cs,IMouseGrabHandler.cs}
+|App/Popovers:{IPopover.cs,IPopoverView.cs,Popover.cs,PopoverImpl.cs}
 |App/Runnable:{IRunnable.cs,SessionToken.cs,SessionTokenEventArgs.cs}
 |App/Timeout:{ITimedEvents.cs,LogarithmicTimeout.cs,SmoothAcceleratingTimeout.cs,TimedEvents.cs,Timeout.cs,TimeoutEventArgs.cs}
-|App/Tracing:{ITraceBackend.cs,ListBackend.cs,LoggingBackend.cs,NullBackend.cs,Trace.cs,TraceCategory.cs,TraceEntry.cs}
-|Configuration:{AppSettingsScope.cs,AttributeJsonConverter.cs,ColorJsonConverter.cs,ConcurrentDictionaryJsonConverter.cs,ConfigLocations.cs,ConfigProperty.cs,ConfigurationManager.cs,ConfigurationManagerEventArgs.cs,ConfigurationManagerNotEnabledException.cs,ConfigurationPropertyAttribute.cs,DeepCloner.cs,DictionaryJsonConverter.cs,KeyCodeJsonConverter.cs,KeyJsonConverter.cs,RuneJsonConverter.cs,SchemeJsonConverter.cs,SchemeManager.cs,Scope.cs,ScopeJsonConverter.cs,SettingsScope.cs,SourceGenerationContext.cs,SourcesManager.cs,ThemeManager.cs,ThemeScope.cs}
+|App/Tracing:{ITraceBackend.cs,ListBackend.cs,LoggingBackend.cs,NullBackend.cs,Trace.cs,TraceCategory.cs,TraceEntry.cs,TraceScope.cs}
+|Configuration:{AppSettingsScope.cs,AttributeJsonConverter.cs,ColorJsonConverter.cs,ConcurrentDictionaryJsonConverter.cs,ConfigLocations.cs,ConfigProperty.cs,ConfigurationManager.cs,ConfigurationManagerEventArgs.cs,ConfigurationManagerNotEnabledException.cs,ConfigurationPropertyAttribute.cs,DeepCloner.cs,DictionaryJsonConverter.cs,KeyCodeJsonConverter.cs,KeyJsonConverter.cs,RuneJsonConverter.cs,SchemeJsonConverter.cs,SchemeManager.cs,Scope.cs,ScopeJsonConverter.cs,SettingsScope.cs,SourceGenerationContext.cs,SourcesManager.cs,ThemeManager.cs,ThemeScope.cs,TraceCategoryJsonConverter.cs}
 |Drawing:{Attribute.cs,Cell.cs,CellEventArgs.cs,FillPair.cs,Glyphs.cs,Gradient.cs,GradientFill.cs,GraphemeHelper.cs,IFill.cs,Region.cs,RegionOp.cs,Ruler.cs,Scheme.cs,Schemes.cs,SolidFill.cs,TextStyle.cs,Thickness.cs,VisualRole.cs,VisualRoleEventArgs.cs}
 |Drawing/Color:{AnsiColorCode.cs,Color.ColorExtensions.cs,Color.ColorName.cs,Color.ColorParseException.cs,Color.cs,Color.Formatting.cs,Color.Operators.cs,ColorModel.cs,ColorQuantizer.cs,ColorStrings.cs,IColorDistance.cs,IColorNameResolver.cs,ICustomColorFormatter.cs,StandardColor.cs,StandardColors.cs,StandardColorsNameResolver.cs}
 |Drawing/LineCanvas:{IntersectionDefinition.cs,IntersectionRuneType.cs,IntersectionType.cs,LineCanvas.cs,LineStyle.cs,StraightLine.cs,StraightLineExtensions.cs}
@@ -57,33 +59,33 @@ Instead of embedding descriptions, it points to actual source files that agents 
 |Text:{NerdFonts.cs,RuneExtensions.cs,StringExtensions.cs,TextDirection.cs,TextFormatter.cs}
 |Time:{FuncTimeProvider.cs,ITimeProvider.cs,ITimer.cs,SystemTimeProvider.cs,VirtualTimeProvider.cs}
 |ViewBase:{DrawAdornmentsEventArgs.cs,DrawContext.cs,DrawEventArgs.cs,IDesignable.cs,IValue.cs,View.Adornments.cs,View.Arrangement.cs,View.Command.cs,View.Content.cs,View.cs,View.Cursor.cs,View.Diagnostics.cs,View.Drawing.Attribute.cs,View.Drawing.Clipping.cs,View.Drawing.cs,View.Drawing.Primitives.cs,View.Drawing.Scheme.cs,View.Hierarchy.cs,View.Keyboard.cs,View.Layout.cs,View.Navigation.cs,View.NeedsDraw.cs,View.ScrollBars.cs,View.Text.cs,ViewCollectionHelpers.cs,ViewDiagnosticFlags.cs,ViewEventArgs.cs,ViewExtensions.cs,ViewportSettingsFlags.cs,WeakReferenceExtensions.cs}
-|ViewBase/Adornment:{Adornment.cs,ArrangeButtons.cs,Arranger.cs,Border.Arrangment.cs,Border.cs,BorderSettings.cs,Margin.cs,Padding.cs,ParentManipulator.cs,ShadowStyle.cs,ShadowView.cs}
+|ViewBase/Adornment:{Adornment.cs,ArrangeButtons.cs,Arranger.cs,ArrangerButton.cs,Border.Arrangment.cs,Border.cs,BorderSettings.cs,Margin.cs,Padding.cs,ParentManipulator.cs,ShadowStyle.cs,ShadowView.cs}
 |ViewBase/EnumExtensions:{AddOrSubtractExtensions.cs,AlignmentExtensions.cs,AlignmentModesExtensions.cs,BorderSettingsExtensions.cs,DimAutoStyleExtensions.cs,DimensionExtensions.cs,DimPercentModeExtensions.cs,SideExtensions.cs,ViewDiagnosticFlagsExtensions.cs}
 |ViewBase/Helpers:{StackExtensions.cs}
 |ViewBase/Layout:{AddOrSubtract.cs,Aligner.cs,Alignment.cs,AlignmentModes.cs,Dim.cs,DimAbsolute.cs,DimAuto.cs,DimAutoStyle.cs,DimCombine.cs,Dimension.cs,DimFill.cs,DimFunc.cs,DimPercent.cs,DimPercentMode.cs,DimView.cs,LayoutEventArgs.cs,LayoutException.cs,Pos.cs,PosAbsolute.cs,PosAlign.cs,PosAnchorEnd.cs,PosCenter.cs,PosCombine.cs,PosFunc.cs,PosPercent.cs,PosView.cs,Side.cs,SizeChangedEventArgs.cs,SuperViewChangedEventArgs.cs,ViewArrangement.cs,ViewManipulator.cs}
 |ViewBase/Mouse:{IMouseHoldRepeater.cs,MouseHoldRepeaterImpl.cs,MouseState.cs,View.Mouse.cs}
 |ViewBase/Navigation:{AdvanceFocusEventArgs.cs,FocusEventArgs.cs,NavigationDirection.cs,TabBehavior.cs}
 |ViewBase/Orientation:{IOrientation.cs,Orientation.cs,OrientationHelper.cs}
-|Views:{Bar.cs,Button.cs,CheckBox.cs,CheckState.cs,ComboBox.cs,DatePicker.cs,Dialog.cs,DialogTResult.cs,FrameView.cs,HexView.cs,HexViewEventArgs.cs,Label.cs,Line.cs,MessageBox.cs,NumericUpDown.cs,ProgressBar.cs,Prompt.cs,PromptExtensions.cs,ReadOnlyCollectionExtensions.cs,Shortcut.cs,StatusBar.cs,Window.cs}
+|Views:{Bar.cs,Button.cs,CheckBox.cs,CheckState.cs,DatePicker.cs,Dialog.cs,DialogTResult.cs,DropDownList.cs,FrameView.cs,HexView.cs,HexViewEventArgs.cs,Label.cs,Line.cs,MessageBox.cs,NumericUpDown.cs,ProgressBar.cs,Prompt.cs,PromptExtensions.cs,ReadOnlyCollectionExtensions.cs,Shortcut.cs,StatusBar.cs,Window.cs}
 |Views/Autocomplete:{AppendAutocomplete.cs,AutocompleteBase.cs,AutocompleteContext.cs,AutocompleteFilepathContext.cs,IAutocomplete.cs,ISuggestionGenerator.cs,PopupAutocomplete.cs,PopupAutocomplete.PopUp.cs,SingleWordSuggestionGenerator.cs,Suggestion.cs}
 |Views/CharMap:{CharMap.cs,UcdApiClient.cs,UnicodeRange.cs}
 |Views/CollectionNavigation:{CollectionNavigator.cs,CollectionNavigatorBase.cs,DefaultCollectionNavigatorMatcher.cs,ICollectionNavigator.cs,ICollectionNavigatorMatcher.cs,IListCollectionNavigator.cs,TableCollectionNavigator.cs}
 |Views/Color:{AttributePicker.cs,BBar.cs,ColorBar.cs,ColorModelStrategy.cs,ColorPicker.16.cs,ColorPicker.cs,ColorPicker.Style.cs,GBar.cs,HueBar.cs,IColorBar.cs,LightnessBar.cs,RBar.cs,SaturationBar.cs,ValueBar.cs}
-|Views/FileDialogs:{AllowedType.cs,DefaultFileOperations.cs,FileDialog.cs,FileDialogCollectionNavigator.cs,FileDialogHistory.cs,FileDialogState.cs,FileDialogStyle.cs,FileDialogTableSource.cs,FilesSelectedEventArgs.cs,OpenDialog.cs,OpenMode.cs,SaveDialog.cs}
+|Views/FileDialogs:{AllowedType.cs,DefaultFileOperations.cs,FileDialog.cs,FileDialogCollectionNavigator.cs,FileDialogHistory.cs,FileDialogState.cs,FileDialogStyle.cs,FileDialogTableSource.cs,FilesSelectedEventArgs.cs,FileSystemCollectionNavigationMatcher.cs,OpenDialog.cs,OpenMode.cs,SaveDialog.cs}
 |Views/GraphView:{Axis.cs,AxisIncrementToRender.cs,BarSeriesBar.cs,GraphCellToRender.cs,GraphView.cs,HorizontalAxis.cs,IAnnotation.cs,ISeries.cs,LegendAnnotation.cs,LineF.cs,MultiBarSeries.cs,PathAnnotation.cs,ScatterSeries.cs,Series.cs,TextAnnotation.cs,VerticalAxis.cs}
 |Views/LinearRange:{LinearRange.cs,LinearRangeAttributes.cs,LinearRangeConfiguration.cs,LinearRangeEventArgs.cs,LinearRangeOption.cs,LinearRangeOptionEventArgs.cs,LinearRangeStyle.cs,LinearRangeType.cs}
 |Views/ListView:{IListDataSource.cs,ListView.Commands.cs,ListView.cs,ListView.Drawing.cs,ListView.Movement.cs,ListView.Selection.cs,ListViewEventArgs.cs,ListWrapper.cs}
-|Views/Menu:{Menu.cs,MenuBar.cs,MenuBarItem.cs,MenuItem.cs,PopoverMenu.cs}
+|Views/Menu:{IMenuBarEntry.cs,Menu.cs,MenuBar.cs,MenuBarItem.cs,MenuItem.cs,PopoverMenu.cs}
 |Views/Runnable:{Runnable.cs,RunnableTResult.cs}
 |Views/ScrollBar:{ScrollBar.cs,ScrollBarVisibilityMode.cs,ScrollSlider.cs}
 |Views/Selectors:{FlagSelector.cs,FlagSelectorTEnum.cs,OptionSelector.cs,OptionSelectorTEnum.cs,SelectorBase.cs,SelectorStyles.cs}
 |Views/SpinnerView:{SpinnerStyle.cs,SpinnerView.cs}
-|Views/TableView:{CellActivatedEventArgs.cs,CellColorGetterArgs.cs,CellToggledEventArgs.cs,CheckBoxTableSourceWrapper.cs,CheckBoxTableSourceWrapperByIndex.cs,CheckBoxTableSourceWrapperByObject.cs,ColumnStyle.cs,DataTableSource.cs,EnumerableTableSource.cs,IEnumerableTableSource.cs,ITableSource.cs,ListColumnStyle.cs,ListTableSource.cs,RowColorGetterArgs.cs,SelectedCellChangedEventArgs.cs,TableSelection.cs,TableStyle.cs,TableView.cs,TableView.Drawing.cs,TableView.Mouse.cs,TableView.Navigation.cs,TableView.Selection.cs,TreeTableSource.cs}
+|Views/TableView:{CellActivatedEventArgs.cs,CellColorGetterArgs.cs,CellToggledEventArgs.cs,CheckBoxTableSourceWrapper.cs,CheckBoxTableSourceWrapperByIndex.cs,CheckBoxTableSourceWrapperByObject.cs,ColumnStyle.cs,DataTableSource.cs,EnumerableTableSource.cs,IEnumerableTableSource.cs,ITableSource.cs,ListColumnStyle.cs,ListTableSource.cs,RowColorGetterArgs.cs,SelectedCellChangedEventArgs.cs,TableSelection.cs,TableStyle.cs,TableView.CellMapping.cs,TableView.cs,TableView.Drawing.cs,TableView.Mouse.cs,TableView.Navigation.cs,TableView.Selection.cs,TreeTableSource.cs}
 |Views/TabView:{Tab.cs,TabChangedEventArgs.cs,TabMouseEventArgs.cs,TabRow.cs,TabStyle.cs,TabView.cs}
 |Views/TextInput:{ContentsChangedEventArgs.cs,DateField.cs,HistoryText.cs,HistoryTextItemEventArgs.cs,ITextValidateProvider.cs,NetMaskedTextProvider.cs,TextEditingLineStatus.cs,TextModel.cs,TextRegexProvider.cs,TextValidateField.cs,TimeField.cs}
 |Views/TextInput/TextField:{TextField.Commands.cs,TextField.cs,TextField.Drawing.cs,TextField.History.cs,TextField.Keyboard.cs,TextField.Mouse.cs,TextField.Selection.cs,TextField.Text.cs,TextFieldAutocomplete.cs}
 |Views/TextInput/TextView:{TextView.Commands.cs,TextView.cs,TextView.Drawing.cs,TextView.Files.cs,TextView.Find.cs,TextView.History.cs,TextView.Keyboard.cs,TextView.Mouse.cs,TextView.Movement.cs,TextView.Scrolling.cs,TextView.Selection.cs,TextView.Text.cs,TextView.WordWrap.cs,TextViewAutocomplete.cs,WordWrapManager.cs}
-|Views/TreeView:{AspectGetterDelegate.cs,Branch.cs,DelegateTreeBuilder.cs,DrawTreeViewLineEventArgs.cs,ITreeBuilder.cs,ITreeViewFilter.cs,ObjectActivatedEventArgs.cs,SelectionChangedEventArgs.cs,TreeBuilder.cs,TreeNode.cs,TreeNodeBuilder.cs,TreeStyle.cs,TreeView.cs,TreeViewTextFilter.cs}
+|Views/TreeView:{AspectGetterDelegate.cs,Branch.cs,DelegateTreeBuilder.cs,DrawTreeViewLineEventArgs.cs,ITreeBuilder.cs,ITreeViewFilter.cs,ObjectActivatedEventArgs.cs,SelectionChangedEventArgs.cs,TreeBuilder.cs,TreeNode.cs,TreeNodeBuilder.cs,TreeStyle.cs,TreeView.cs,TreeViewCollectionNavigatorMatcher.cs,TreeViewTextFilter.cs}
 |Views/Wizard:{Wizard.cs,WizardStep.cs}
 
 

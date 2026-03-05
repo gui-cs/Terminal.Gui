@@ -7,8 +7,7 @@ public static partial class Application // Keyboard handling
     public static IKeyboard Keyboard
     {
         get => ApplicationImpl.Instance.Keyboard;
-        set => ApplicationImpl.Instance.Keyboard = value ??
-                                                           throw new ArgumentNullException(nameof(value));
+        set => ApplicationImpl.Instance.Keyboard = value ?? throw new ArgumentNullException (nameof (value));
     }
 
     /// <inheritdoc cref="IKeyboard.RaiseKeyDownEvent"/>

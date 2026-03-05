@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 
@@ -706,7 +707,7 @@ public partial class ShortcutTests
     [Fact]
     public void BubbleUp_Activate_Event_Ordering_CommandView_Completes_Before_Shortcut_Activated ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -820,7 +821,7 @@ public partial class ShortcutTests
     [Fact]
     public void BubbleDown_Activate_Event_Ordering_With_Binding_Source ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
