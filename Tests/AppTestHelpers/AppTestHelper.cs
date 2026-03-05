@@ -9,7 +9,7 @@ using Terminal.Gui.Time;
 namespace AppTestHelpers;
 
 /// <summary>
-///     Fluent API context for testing a Terminal.Gui application. Create
+///     Helper for building integration tests for Terminal.Gui applications. Create
 ///     an instance using <see cref="With"/> static class.
 /// </summary>
 public partial class AppTestHelper : IDisposable
