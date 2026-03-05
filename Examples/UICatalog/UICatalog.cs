@@ -11,6 +11,7 @@ global using Terminal.Gui.Text;
 global using Terminal.Gui.FileServices;
 global using Terminal.Gui.Resources;
 using System.CommandLine;
+using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
@@ -187,14 +188,20 @@ public class UICatalog
 
         var helpShown = false;
 
-        rootCommand.Parse (args).Invoke ();
+        ParseResult parseResult = rootCommand.Parse (args);
+
+        // Check if the analysis results indicate that help should be displayed
+        if (parseResult.Errors.Count == 0 && parseResult.Action is HelpAction)
+        {
+            helpShown = true;
+        }
+
+        parseResult.Invoke ();
 
         if (helpShown)
         {
             return 0;
         }
-
-        ParseResult parseResult = rootCommand.Parse (args);
 
         if (parseResult.Errors.Count > 0)
         {
