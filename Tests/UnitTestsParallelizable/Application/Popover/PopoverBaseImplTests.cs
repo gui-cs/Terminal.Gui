@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 using Xunit.Abstractions;
@@ -5,10 +6,10 @@ using Xunit.Abstractions;
 namespace ApplicationTests.Popover;
 
 [Collection ("Application Tests")]
-public class PopoverBaseImplTests (ITestOutputHelper output)
+public class PopoverImplTests (ITestOutputHelper output)
 {
     // Minimal concrete implementation for testing
-    private class TestPopover : PopoverBaseImpl
+    private class TestPopover : PopoverImpl
     { }
 
     [Fact]
@@ -16,7 +17,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     {
         var popover = new TestPopover ();
 #if DEBUG
-        Assert.Equal ("popoverBaseImpl", popover.Id);
+        Assert.Equal ("popoverImpl", popover.Id);
 #endif
         Assert.True (popover.CanFocus);
         Assert.Equal (Dim.Fill (), popover.Width);
@@ -94,7 +95,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     [Fact]
     public void Target_Set_Creates_Bridge_Activated_Reaches_Target ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -124,7 +125,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     [Fact]
     public void Target_Set_Creates_Bridge_Accepted_Reaches_Target ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -154,7 +155,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     [Fact]
     public void Target_Activated_Bubbles_Through_Target_SuperView_Chain ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -179,7 +180,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     [Fact]
     public void Target_Changed_Disposes_Old_Bridge_Uses_New ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -209,7 +210,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     [Fact]
     public void Target_Set_Null_Disposes_Bridge ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
@@ -234,7 +235,7 @@ public class PopoverBaseImplTests (ITestOutputHelper output)
     [Fact]
     public void Dispose_Cleans_Up_Target_Bridge ()
     {
-        using (TestLogging.Verbose (output))
+        using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             Trace.EnabledCategories = TraceCategory.Command;
 

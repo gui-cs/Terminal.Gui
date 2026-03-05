@@ -65,7 +65,7 @@ internal partial class ApplicationImpl
         }
 
         // Preserve existing keyboard settings if they exist
-        // BUGBUG: These should not be needed; KeyboardImpl subscribes to Application static property changes
+        // BUGBUG: These should not be needed; ApplicationKeyboard subscribes to Application static property changes
         // BUGBUG: and should set these automatically.
         bool hasExistingKeyboard = _keyboard is { };
         Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
@@ -76,7 +76,7 @@ internal partial class ApplicationImpl
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Application.PrevTabGroupKey;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new KeyboardImpl { App = this };
+        _keyboard = new ApplicationKeyboard { App = this };
 
         // Sync keys from Application static properties (or existing keyboard if it had custom values)
         // This ensures we respect any Application.QuitKey etc changes made before Init()
@@ -251,13 +251,6 @@ internal partial class ApplicationImpl
         }
 
         // === 2. Close and dispose popover ===
-        if (Popovers?.GetActivePopover () is View popover)
-        {
-            // This forcefully closes the popover; invoking Command.Quit would be more graceful
-            // but since this is shutdown, doing this is ok.
-            popover.Visible = false;
-        }
-
         // Any popovers added to Popover have their lifetime controlled by Popover
         Popovers?.Dispose ();
         Popovers = null;

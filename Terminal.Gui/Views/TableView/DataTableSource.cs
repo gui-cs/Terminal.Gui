@@ -1,5 +1,4 @@
-#nullable disable
-﻿using System.Data;
+using System.Data;
 
 namespace Terminal.Gui.Views;
 
@@ -11,7 +10,7 @@ public class DataTableSource : ITableSource
 {
     /// <summary>Creates a new instance based on the data in <paramref name="table"/>.</summary>
     /// <param name="table"></param>
-    public DataTableSource (DataTable table) { DataTable = table; }
+    public DataTableSource (DataTable table) => DataTable = table;
 
     /// <summary>The data table this source wraps.</summary>
     public DataTable DataTable { get; }

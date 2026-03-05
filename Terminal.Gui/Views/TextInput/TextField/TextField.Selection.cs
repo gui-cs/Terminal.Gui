@@ -175,30 +175,18 @@ public partial class TextField
     {
         x = x + ScrollOffset < -1 ? 0 : x;
 
-        _selectionAnchor = _selectionAnchor == -1 && _text.Count > 0 && x >= 0 && x <= _text.Count
-                             ? x
-                             : _selectionAnchor;
+        _selectionAnchor = _selectionAnchor == -1 && _text.Count > 0 && x >= 0 && x <= _text.Count ? x : _selectionAnchor;
 
         if (_selectionAnchor > -1)
         {
-            SelectedLength = Math.Abs (
-                                       x + direction <= _text.Count
-                                           ? x + direction - _selectionAnchor
-                                           : _text.Count - _selectionAnchor
-                                      );
+            SelectedLength = Math.Abs (x + direction <= _text.Count ? x + direction - _selectionAnchor : _text.Count - _selectionAnchor);
             SetSelectedStartSelectedLength ();
 
             if (_selectionStart > -1 && SelectedLength > 0)
             {
                 _selectedText = SelectedLength > 0
-                                    ? StringExtensions.ToString (
-                                                                 _text.GetRange (
-                                                                                 _selectionStart < 0 ? 0 : _selectionStart,
-                                                                                 SelectedLength > _text.Count
-                                                                                     ? _text.Count
-                                                                                     : SelectedLength
-                                                                                )
-                                                                )
+                                    ? StringExtensions.ToString (_text.GetRange (_selectionStart < 0 ? 0 : _selectionStart,
+                                                                                 SelectedLength > _text.Count ? _text.Count : SelectedLength))
                                     : "";
 
                 if (ScrollOffset > _selectionStart)

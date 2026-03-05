@@ -69,7 +69,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                                        │   ║   | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | | ║    │
                                        │   ║   |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_| ║    │
                                        │   ║                                                           ║    │
-                                       │   ║                      v2 - Pre-Alpha                       ║    │
+                                       │   ║                         v2 - Beta                         ║    │
                                        │   ║                                                           ║    │
                                        │   ║          https://github.com/gui-cs/Terminal.Gui           ║    │
                                        │   ║                                                           ║    │
