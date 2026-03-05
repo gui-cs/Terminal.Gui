@@ -160,4 +160,54 @@ public class NetOutput : OutputBase, IOutput
 
     /// <inheritdoc/>
     public void Dispose () { }
+
+    /// <inheritdoc/>
+    public void Suspend ()
+    {
+        if (PlatformDetection.IsWindows ())
+        {
+            return;
+        }
+
+        // Best-effort: mirror behavior of ANSI/Unix outputs for consoles that accept CSI sequences.
+        try
+        {
+            // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
+            Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            // Check if we have a real console first
+            if (Console.IsInputRedirected || Console.IsOutputRedirected)
+            {
+                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+
+                return;
+            }
+
+            Console.ResetColor ();
+            Console.Clear ();
+
+            //Disable alternative screen buffer.
+            Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Write (EscSeqUtils.CSI_ShowCursor);
+
+            if (!SuspendHelper.Suspend ())
+            {
+                return;
+            }
+
+            //Enable alternative screen buffer.
+            Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+        }
+        catch (Exception ex)
+        {
+            Logging.Error ($"Error suspending terminal: {ex.Message}");
+        }
+        finally
+        {
+            // Enable mouse events to allow mouse events to be sent to the application when it is resumed.
+            Write (EscSeqUtils.CSI_EnableMouseEvents);
+        }
+    }
 }

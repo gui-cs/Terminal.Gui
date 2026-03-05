@@ -77,4 +77,18 @@ public class WindowsInputOutputTests (ITestOutputHelper output)
 
         Assert.Null (exception);
     }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void WindowsOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new WindowsOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
+    }
 }
