@@ -11,6 +11,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<UseAppHost>true</UseAppHost>
+		<IsTestProject>true</IsTestProject>
 		<IsPackable>false</IsPackable>
 		<UseDataCollector />
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -41,6 +42,8 @@
 		<PackageReference Include="Moq" />
 		<PackageReference Include="ReportGenerator" />
 		<PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="xunit.runner.visualstudio" />
 		<PackageReference Include="xunit.v3" />
 		<PackageReference Include="Xunit.Combinatorial" />
 		<PackageReference Include="coverlet.collector">
