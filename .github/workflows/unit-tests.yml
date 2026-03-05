@@ -63,23 +63,11 @@ jobs:
     - name: Run UnitTests
       shell: bash
       run: |
-        if [ "${{ runner.os }}" == "Linux" ]; then
-          # Run with coverage on Linux only
-          dotnet test \
-            --project Tests/UnitTests \
-            --no-build \
-            --verbosity normal \
-            --coverage \
-            --results-directory TestResults \
-            --diagnostic-output-directory logs/UnitTests/${{ runner.os }}
-        else
-          # Run without coverage on Windows/macOS for speed
-          dotnet test \
-            --project Tests/UnitTests \
-            --no-build \
-            --verbosity normal \
-            --diagnostic-output-directory logs/UnitTests/${{ runner.os }}
-        fi
+        dotnet test \
+          --project Tests/UnitTests \
+          --no-build \
+          --verbosity normal \
+          --diagnostic-output-directory logs/UnitTests/${{ runner.os }}
 
     - name: Upload Test Logs
       if: always()
@@ -93,16 +81,6 @@ jobs:
           **/*.dmp
         if-no-files-found: ignore
         retention-days: 7
-
-    - name: Upload Non-Parallel UnitTests Coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && always()
-      uses: codecov/codecov-action@v4
-      with:
-        files: TestResults/**/coverage.cobertura.xml
-        flags: unittests-nonparallel
-        name: UnitTests-${{ runner.os }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false
 
   parallel_unittests:
     name: Parallel Unit Tests
@@ -135,6 +113,11 @@ jobs:
     - name: Restore NuGet packages
       run: dotnet restore
 
+    - name: Fix test executable permissions (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: |
+        find Tests -type f \( -name 'UnitTests' -o -name 'UnitTests.Parallelizable' \) -path '*/bin/*' -exec chmod +x {} +
+
     - name: Disable Windows Defender (Windows only)
       if: runner.os == 'Windows'
       shell: powershell
@@ -145,21 +128,11 @@ jobs:
     - name: Run UnitTestsParallelizable
       shell: bash
       run: |
-        if [ "${{ runner.os }}" == "Linux" ]; then
-          dotnet test \
-            --project Tests/UnitTestsParallelizable \
-            --no-build \
-            --verbosity normal \
-            --coverage \
-            --results-directory TestResults \
-            --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}
-        else
-          dotnet test \
-            --project Tests/UnitTestsParallelizable \
-            --no-build \
-            --verbosity normal \
-            --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}
-        fi
+        dotnet test \
+          --project Tests/UnitTestsParallelizable \
+          --no-build \
+          --verbosity normal \
+          --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}
 
         echo "============================================"
         echo "Parallel unit tests completed successfully!"
@@ -177,13 +150,3 @@ jobs:
           **/*.dmp
         if-no-files-found: ignore
         retention-days: 7
-
-    - name: Upload Parallelizable UnitTests Coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && always()
-      uses: codecov/codecov-action@v4
-      with:
-        files: TestResults/**/coverage.cobertura.xml
-        flags: unittests-parallel
-        name: UnitTestsParallelizable-${{ runner.os }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false
