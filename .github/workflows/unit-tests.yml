@@ -52,7 +52,7 @@ jobs:
           --project Tests/UnitTests \
           --no-build \
           --verbosity normal \
-          --diagnostic-output-directory logs/UnitTests/${{ runner.os }}
+          --diagnostic --diagnostic-output-directory logs/UnitTests/${{ runner.os }}
 
     - name: Upload Test Logs
       if: always()
@@ -107,7 +107,7 @@ jobs:
           --project Tests/UnitTestsParallelizable \
           --no-build \
           --verbosity normal \
-          --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}
+          --diagnostic --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}
 
         echo "============================================"
         echo "Parallel unit tests completed successfully!"

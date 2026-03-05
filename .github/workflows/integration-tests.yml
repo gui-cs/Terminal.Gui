@@ -49,7 +49,7 @@ jobs:
             --project Tests/IntegrationTests \
             --no-build \
             --verbosity minimal \
-            --diagnostic-output-directory logs/IntegrationTests/${{ runner.os }}
+            --diagnostic --diagnostic-output-directory logs/IntegrationTests/${{ runner.os }}
 
       - name: Upload Integration Test Logs
         if: always()

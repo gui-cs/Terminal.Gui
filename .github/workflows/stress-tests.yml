@@ -37,7 +37,7 @@ jobs:
         run: |
           end=$((SECONDS+900))
           while [ $SECONDS -lt $end ]; do
-            dotnet test --project Tests/StressTests --no-build --verbosity normal --diagnostic-output-directory logs/${{ runner.os }}
+            dotnet test --project Tests/StressTests --no-build --verbosity normal --diagnostic --diagnostic-output-directory logs/${{ runner.os }}
           done
 
       - name: Upload Test Logs
@@ -94,7 +94,7 @@ jobs:
               --project Tests/UnitTestsParallelizable \
               --no-build \
               --verbosity normal \
-              --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}/run${RUN}
+              --diagnostic --diagnostic --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}/run${RUN}
 
             if [ $? -ne 0 ]; then
               echo "ERROR: Test run $RUN failed!"
