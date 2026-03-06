@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using static Terminal.Gui.Drivers.WindowsConsole;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
@@ -26,6 +26,11 @@ internal sealed class WindowsVTInputHelper : IDisposable
 {
     #region P/Invoke Declarations
 
+    // In ideal world, Windows Console would have a way of setting VTS mode without having to use SetConsoleMode.
+    // It would also provide a non-blocking API for reading input bytes directly as ANSI sequences without having
+    // to use GetNumberOfConsoleInputEvents to poll for availability. With such APIs, this helper class would be unnecessary.
+    // If this were the case, the only API the ANSI driver would require on Windows is GetStdHandle and ReadFile.
+
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern nint GetStdHandle (int nStdHandle);
 
@@ -35,20 +40,15 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
-    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
-    public static extern bool PeekConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
-
+    // Equivalent of poll() on Unix — needed because ReadFile blocks and the input loop
+    // requires a non-blocking availability check for throttling and cancellation.
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool GetNumberOfConsoleInputEvents (nint hConsoleInput, out uint lpcNumberOfEvents);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
+    private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
-    [DllImport ("kernel32.dll")]
-    internal static extern uint GetConsoleCP ();
+    #endregion
 
     // Console mode flags
     private const int STD_INPUT_HANDLE = -10;
@@ -59,8 +59,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
     private const uint ENABLE_MOUSE_INPUT = 0x0010;
     private const uint ENABLE_QUICK_EDIT_MODE = 0x0040;
     private const uint ENABLE_EXTENDED_FLAGS = 0x0080;
-
-    #endregion
 
     private uint _originalConsoleMode;
     private bool _disposed;
@@ -98,14 +96,14 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (InputHandle == nint.Zero || InputHandle == new nint (-1))
             {
-                Logging.Warning ("Failed to get Windows console input handle.");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to get Windows console input handle.");
 
                 return false;
             }
 
             if (!GetConsoleMode (InputHandle, out _originalConsoleMode))
             {
-                Logging.Warning ("Failed to get Windows console mode.");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to get Windows console mode.");
 
                 return false;
             }
@@ -120,7 +118,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (!SetConsoleMode (InputHandle, newMode))
             {
-                Logging.Warning ("Failed to set Windows VTS console mode.");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to set Windows VTS console mode.");
 
                 return false;
             }
@@ -128,13 +126,16 @@ internal sealed class WindowsVTInputHelper : IDisposable
             Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
             IsEnabled = true;
-            //Logging.Information ($"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
+
+            Trace.Lifecycle (nameof (WindowsVTInputHelper),
+                             "Init",
+                             $"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to enable Windows VTS mode: {ex.Message}");
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to enable Windows VTS mode: {ex.Message}");
 
             return false;
         }
@@ -150,26 +151,38 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         bytesRead = 0;
 
-        if (!IsEnabled || InputHandle == nint.Zero || !Console.KeyAvailable)
+        if (!IsEnabled || InputHandle == nint.Zero)
         {
             return false;
         }
 
         try
         {
-            //Logging.Trace ("ReadFile...");
+            // Read the VT byte stream via ReadFile. With ENABLE_VIRTUAL_TERMINAL_INPUT
+            // enabled, the Windows console converts all input (keyboard, mouse, etc.)
+            // into ANSI escape sequences in this stream.
             bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
-#pragma warning disable IL3050
-
-            //Logging.Trace ($"...{JsonSerializer.Serialize (Encoding.UTF8.GetString (buffer, 0, (int)numBytesRead))}");
-#pragma warning restore IL3050
 
             if (!success)
             {
                 int error = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"ReadFile failed with error code: {error}");
+                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: ReadFile failed with error code: {error}");
 
                 return false;
+            }
+
+            if (numBytesRead == 0)
+            {
+                // Workaround for Windows bug (since Win8, fix pending in microsoft/terminal#19940):
+                // ReadFile unconditionally treats Ctrl+Z as EOF and returns 0 bytes, even when
+                // ENABLE_PROCESSED_INPUT is disabled. Since we have a live console handle with
+                // processed input disabled, 0-byte success can only mean this bug.
+                // Synthesize the 0x1A (SUB) byte that ReadFile should have returned.
+                // See https://github.com/microsoft/terminal/issues/4958
+                buffer [0] = 0x1A;
+                bytesRead = 1;
+
+                return true;
             }
 
             bytesRead = (int)numBytesRead;
@@ -178,7 +191,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Error reading Windows console input: {ex.Message}");
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Error reading Windows console input: {ex.Message}");
 
             return false;
         }
@@ -196,21 +209,12 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
-            // Flush the input buffer to clear any pending INPUT_RECORD structures
-            // This prevents residual ANSI responses from lingering in the OS buffer
-            if (!FlushConsoleInputBuffer (InputHandle))
-            {
-                int error = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"FlushConsoleInputBuffer failed with error: {error}");
-            }
-
             SetConsoleMode (InputHandle, _originalConsoleMode);
             IsEnabled = false;
-            //Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to restore Windows console mode: {ex.Message}");
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to restore Windows console mode: {ex.Message}");
         }
     }
 
@@ -226,36 +230,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
         _disposed = true;
     }
 
-    public bool Peek ()
-    {
-        const int BUFFER_SIZE = 1; // We only need to check if there's at least one event
-        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);
-
-        try
-        {
-            // Use PeekConsoleInput to inspect the input buffer without removing events
-            if (PeekConsoleInput (InputHandle, pRecord, BUFFER_SIZE, out uint numberOfEventsRead))
-            {
-                // Return true if there's at least one event in the buffer
-                return numberOfEventsRead > 0;
-            }
-            else
-            {
-                // Handle the failure of PeekConsoleInput
-                throw new InvalidOperationException ("Failed to peek console input.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // Optionally log the exception
-            Logging.Error (@$"Error in Peek: {ex.Message}");
-
-            return false;
-        }
-        finally
-        {
-            // Free the allocated memory
-            Marshal.FreeHGlobal (pRecord);
-        }
-    }
+    /// <summary>
+    ///     Checks whether input is available without consuming it.
+    /// </summary>
+    /// <returns><c>true</c> if there is at least one input event available.</returns>
+    public bool Peek () => GetNumberOfConsoleInputEvents (InputHandle, out uint count) && count > 0;
 }

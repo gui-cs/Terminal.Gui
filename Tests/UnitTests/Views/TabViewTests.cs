@@ -1,6 +1,4 @@
 ﻿using System.Globalization;
-using UnitTests;
-using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 

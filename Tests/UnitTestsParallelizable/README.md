@@ -90,7 +90,7 @@ public void Focus_Test ()
 Tests in this project run in parallel automatically. To run them:
 
 ```bash
-dotnet test Tests/UnitTestsParallelizable/UnitTests.Parallelizable.csproj
+dotnet test --project Tests/UnitTestsParallelizable
 ```
 
 ## See Also

@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace DriverTests.Keyboard;
+﻿namespace DriverTests.Keyboard;
 
 [Collection ("Driver Tests")]
 public class KeyCodeTests

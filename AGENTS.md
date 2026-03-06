@@ -56,7 +56,7 @@ dotnet run
 **Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 12, net8.0)
 
 **Build:** `dotnet restore && dotnet build --no-restore`
-**Test:** `dotnet test --no-build`
+**Test:** `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
 **Details:** [Build & Test Workflow](.claude/workflows/build-test-workflow.md)
 
 ## Quick Rules
