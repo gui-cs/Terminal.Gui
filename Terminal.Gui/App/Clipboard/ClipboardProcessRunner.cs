@@ -31,6 +31,11 @@ internal static class ClipboardProcessRunner
     {
         var output = string.Empty;
 
+        if (Console.IsInputRedirected || Console.IsOutputRedirected)
+        {
+            return (-1, output);
+        }
+
         using var process = new Process ();
 
         process.StartInfo = new()

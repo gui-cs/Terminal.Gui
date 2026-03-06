@@ -76,22 +76,22 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 1. **Non-parallel tests** (depend on static state, ~10 min timeout):
    ```bash
-   dotnet test Tests/UnitTests --no-build --verbosity normal
+   dotnet test --project Tests/UnitTests --no-build --verbosity normal
    ```
    - Uses `Application.Init` and static state
    - Cannot run in parallel
-   - Includes `--blame` flags for crash diagnostics
+   - Includes `--diagnostic` flag for logging
 
 2. **Parallel tests** (can run concurrently, ~10 min timeout):
    ```bash
-   dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+   dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
    ```
    - No dependencies on static state
    - **Preferred for new tests**
 
 3. **Integration tests**:
    ```bash
-   dotnet test Tests/IntegrationTests --no-build --verbosity normal
+   dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
    ```
 
 ### Common Build Issues
@@ -176,11 +176,8 @@ Welcome! This guide provides everything you need to know to contribute effective
 - **Never decrease code coverage** - PRs must maintain or increase coverage
 - Target: 70%+ coverage for new code
 - **Coverage collection**:
-- Centralized in `TestResults/` directory at repository root
-- Collected only on Linux (ubuntu-latest) runners in CI for performance
-- Windows and macOS runners skip coverage collection to reduce execution time
-- Coverage reports uploaded to Codecov automatically from Linux runner
-- CI monitors coverage on each PR
+- Temporarily disabled in CI during xUnit v3 / MTP migration
+- Will be re-enabled once an MTP-compatible coverage solution is integrated
 
 ### Test Patterns
 
@@ -195,7 +192,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 ### Test Configuration
 
 - `xunit.runner.json` - xUnit configuration
-- `coverlet.runsettings` - Coverage settings (OpenCover format)
+- `coverlet.runsettings` - Coverage settings (currently unused, pending MTP integration)
 
 ## API Documentation Requirements
 

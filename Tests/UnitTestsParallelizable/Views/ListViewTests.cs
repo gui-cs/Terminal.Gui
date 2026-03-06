@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Text;
 using Moq;
 using UnitTests;
-using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
 
@@ -1240,7 +1239,7 @@ Five ",
         Assert.Equal (0, changed);
     }
 
-    public static TheoryData<ObservableCollection<string>?> GetSources () => [null, [], ["Item1", "Item2"]];
+    public static TheoryData<ObservableCollection<string>?> GetSources () => new (null, [], ["Item1", "Item2"]);
 
     [Fact]
     public void CollectionChanged_Event ()

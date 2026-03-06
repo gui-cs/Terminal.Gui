@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using UICatalog;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewsTests;
 

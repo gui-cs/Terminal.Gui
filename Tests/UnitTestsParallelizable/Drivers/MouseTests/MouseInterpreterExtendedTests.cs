@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-// ReSharper disable AccessToModifiedClosure
+﻿// ReSharper disable AccessToModifiedClosure
 #pragma warning disable CS9113 // Parameter is unread
 
 namespace DriverTests.MouseTests;

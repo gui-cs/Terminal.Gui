@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace TerminalGuiFluentTesting;
+namespace AppTestHelpers;
 
 class ThreadSafeStringWriter : StringWriter
 {

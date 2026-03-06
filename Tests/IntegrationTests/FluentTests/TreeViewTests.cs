@@ -1,6 +1,5 @@
-﻿using TerminalGuiFluentTesting;
-using TerminalGuiFluentTestingXunit;
-using Xunit.Abstractions;
+﻿using AppTestHelpers;
+using AppTestHelpers.XunitHelpers;
 
 namespace IntegrationTests;
 
@@ -33,7 +32,7 @@ public class TreeViewTests (ITestOutputHelper outputHelper) : TestsAllDrivers
         };
         tv.AddObject (root);
 
-        using TestContext context =
+        using AppTestHelper helper =
             With.A<Window> (40, 10, d,  _out)
                 .Add (tv)
                 .Focus (tv)
@@ -68,7 +67,7 @@ public class TreeViewTests (ITestOutputHelper outputHelper) : TestsAllDrivers
                                  })
                 .WriteOutLogs (_out);
 
-        context.Stop ();
+        helper.Stop ();
     }
 
     [Theory]
@@ -126,7 +125,7 @@ public class TreeViewTests (ITestOutputHelper outputHelper) : TestsAllDrivers
         tv.AddObject (root);
         tv.ExpandAll ();
 
-        using TestContext context =
+        using AppTestHelper helper =
             With.A<Window> (40, 13, d)
                 .Add (tv)
                 .WaitIteration ()
@@ -165,6 +164,6 @@ public class TreeViewTests (ITestOutputHelper outputHelper) : TestsAllDrivers
                                  })
                 .WriteOutLogs (_out);
 
-        context.Stop ();
+        helper.Stop ();
     }
 }

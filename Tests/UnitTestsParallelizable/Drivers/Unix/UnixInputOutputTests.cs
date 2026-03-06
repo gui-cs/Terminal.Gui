@@ -1,5 +1,4 @@
 #nullable enable
-using Xunit.Abstractions;
 
 namespace DriverTests.UnixDriver;
 

@@ -1,5 +1,3 @@
-using Xunit.Abstractions;
-
 namespace ApplicationTests.RunnableTests;
 
 /// <summary>

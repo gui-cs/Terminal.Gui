@@ -112,9 +112,11 @@ public class ResourceManagerTests : TestDriverBase
         CultureInfo.CurrentCulture = new (NO_EXISTENT_CULTURE);
         CultureInfo.CurrentUICulture = new (NO_EXISTENT_CULTURE);
 
-        Assert.Equal (NO_TRANSLATED_VALUE, _stringsNoTranslatedKey);
-
+        Assert.Equal (NO_TRANSLATED_VALUE, GlobalResources.GetString (NO_TRANSLATED_KEY, CultureInfo.CurrentCulture));
+        
         ResetCultureInfo ();
+
+        Assert.Equal (NO_TRANSLATED_VALUE, _stringsNoTranslatedKey);
     }
 
     [Fact]

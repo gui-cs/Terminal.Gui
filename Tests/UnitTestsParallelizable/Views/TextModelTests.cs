@@ -1,6 +1,5 @@
 // CoPilot - Claude 3.5 Sonnet
 using System.Text;
-using Xunit.Abstractions;
 
 namespace TextTests;
 

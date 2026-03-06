@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Concurrent;
-using Xunit.Abstractions;
 
 namespace DriverTests.DotnetDriver;
 

@@ -50,9 +50,9 @@ Run these for each commit:
 
 ```bash
 dotnet build --no-restore
-dotnet test Tests/IntegrationTests --no-build
-dotnet test Tests/UnitTests --no-build
-dotnet test Tests/UnitTestsParallelizable --no-build
+dotnet test --project Tests/IntegrationTests --no-build
+dotnet test --project Tests/UnitTests --no-build
+dotnet test --project Tests/UnitTestsParallelizable --no-build
 ```
 
 ## Terminal.Gui Specific Requirements

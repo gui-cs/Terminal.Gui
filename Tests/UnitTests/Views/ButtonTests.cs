@@ -1,7 +1,3 @@
-using TerminalGuiFluentTesting;
-using UnitTests;
-using Xunit.Abstractions;
-
 namespace UnitTests.ViewsTests;
 
 public class ButtonTests (ITestOutputHelper output)

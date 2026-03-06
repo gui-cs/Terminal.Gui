@@ -1,4 +1,4 @@
-﻿namespace TerminalGuiFluentTesting;
+﻿namespace AppTestHelpers;
 
 /// <summary>
 ///     Which driver simulation should be used for testing
