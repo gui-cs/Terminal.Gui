@@ -1,7 +1,5 @@
-#nullable enable
 using JetBrains.Annotations;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewsTests;
 
@@ -12,12 +10,10 @@ namespace ViewsTests;
 [TestSubject (typeof (Link))]
 public class LinkTests (ITestOutputHelper output) : TestDriverBase
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public void Constructor_Defaults ()
     {
-        Link link = new();
+        Link link = new ();
 
         Assert.Equal (Link.DEFAULT_URL, link.Url);
         Assert.Equal (Link.DEFAULT_URL, link.Text);
@@ -46,7 +42,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Url_Set_Validates_Uri ()
     {
-        Link link = new() { Url = "https://github.com" };
+        Link link = new () { Url = "https://github.com" };
 
         link.Url = "not a valid url";
         Assert.Equal (Link.DEFAULT_URL, link.Url); // Url should not change on invalid
@@ -54,22 +50,22 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         link.Url = "";
         Assert.Equal (Link.DEFAULT_URL, link.Url); // Url should not change on invalid
     }
-    
+
     [Fact]
     public void Url_Set_Fires_UrlChanged_Event ()
     {
-        string oldUrl = "http://oldvalue.io";
-        string newUrl = "http://newvalue.io";
+        var oldUrl = "http://oldvalue.io";
+        var newUrl = "http://newvalue.io";
 
-        Link link = new() { Url = oldUrl };
-        bool eventFired = false;
-        bool eventArgsValid = false;
+        Link link = new () { Url = oldUrl };
+        var eventFired = false;
+        var eventArgsValid = false;
 
         link.UrlChanged += (s, e) =>
-        {
-            eventFired = true;
-            eventArgsValid = e.OldValue == oldUrl && e.NewValue == newUrl;
-        };
+                           {
+                               eventFired = true;
+                               eventArgsValid = e.OldValue == oldUrl && e.NewValue == newUrl;
+                           };
         link.Url = newUrl;
 
         Assert.True (eventFired);
@@ -80,21 +76,22 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Url_Set_Fires_UrlChanging_Event ()
     {
-        string oldUrl = "http://oldvalue.io";
-        string newUrl = "http://newvalue.io";
+        var oldUrl = "http://oldvalue.io";
+        var newUrl = "http://newvalue.io";
 
         Link link = new () { Url = oldUrl };
-        bool eventFired = false;
-        bool eventArgsValid = false;
-        bool valueChanged = false;
+        var eventFired = false;
+        var eventArgsValid = false;
+        var valueChanged = false;
 
         link.UrlChanging += (s, e) =>
-        {
-            eventFired = true;
-            eventArgsValid = e.CurrentValue == oldUrl && e.NewValue == newUrl;
-            // Should be false since the change hasn't happened yet
-            valueChanged = e.CurrentValue == newUrl || link.Url == newUrl;
-        };
+                            {
+                                eventFired = true;
+                                eventArgsValid = e.CurrentValue == oldUrl && e.NewValue == newUrl;
+
+                                // Should be false since the change hasn't happened yet
+                                valueChanged = e.CurrentValue == newUrl || link.Url == newUrl;
+                            };
         link.Url = newUrl;
 
         Assert.True (eventFired);
@@ -111,8 +108,8 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Clipboard = new FakeClipboard ();
 
         Link link = new () { App = app, Url = "https://github.com" };
-        
-        var copied = link.Copy ();
+
+        bool copied = link.Copy ();
 
         Assert.True (copied);
         Assert.Equal ("https://github.com", app.Clipboard?.GetClipboardData ());
@@ -124,19 +121,9 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        using Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        Link link = new ()
-        {
-            App = app,
-            Url = "https://github.com/gui-cs/Terminal.Gui",
-            Text = "Terminal.Gui"
-        };
+        Link link = new () { App = app, Url = "https://github.com/gui-cs/Terminal.Gui", Text = "Terminal.Gui" };
         window.Add (link);
 
         app.Begin (window);
@@ -165,18 +152,9 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        using Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        Link link = new ()
-        {
-            App = app,
-            Text = "Not a link"
-        };
+        Link link = new () { App = app, Text = "Not a link" };
         window.Add (link);
 
         app.Begin (window);
@@ -201,7 +179,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         View superView = new () { CanFocus = true };
         Link link = new () { Text = "_Link", CanFocus = false };
         View nextView = new () { CanFocus = true };
-        
+
         superView.Add (link, nextView);
         superView.BeginInit ();
         superView.EndInit ();
@@ -225,12 +203,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (40, 2);
 
-        using Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         // ✅ Ajouter les DEUX liens dès le début
         Link link1 = new ()
@@ -277,19 +250,9 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        using Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        Link link = new ()
-        {
-            App = app,
-            Url = "https://example.com",
-            Text = "Example"
-        };
+        Link link = new () { App = app, Url = "https://example.com", Text = "Example" };
         window.Add (link);
 
         app.Begin (window);
@@ -317,12 +280,10 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        using Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+        window.BorderStyle = LineStyle.None;
 
         // ✅ Add a dummy view to take initial focus
         View dummyView = new () { CanFocus = true, Width = 1, Height = 1 };
@@ -334,7 +295,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Url = "https://github.com",
             Text = "GitHub",
             CanFocus = true,
-            Y = 1  // Place it below dummyView
+            Y = 1 // Place it below dummyView
         };
         window.Add (link);
 
@@ -363,10 +324,10 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void IDesignable_EnableForDesign_Sets_Default_Text ()
     {
-        Link link = new();
-        IDesignable designable = link as IDesignable;
+        Link link = new ();
+        var designable = link as IDesignable;
 
-        var result = designable.EnableForDesign ();
+        bool result = designable.EnableForDesign ();
 
         Assert.True (result);
         Assert.Equal ("_Link", link.Text);
@@ -380,7 +341,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         View superView = new () { CanFocus = true, Height = 1, Width = 15 };
         Link link = new () { X = 0, HotKey = Key.L.WithAlt, CanFocus = false };
         View nextView = new () { CanFocus = true, X = 10, Width = 4, Height = 1 };
-        
+
         superView.Add (link, nextView);
         superView.BeginInit ();
         superView.EndInit ();
@@ -389,8 +350,8 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         Assert.False (nextView.HasFocus);
 
         // Click on the link
-        link.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonReleased });
-        
+        link.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased });
+
         Assert.False (link.HasFocus);
         Assert.True (nextView.HasFocus);
 
@@ -400,8 +361,8 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Link_Osc8_Emits_StartTextEnd_And_Outputs_Correctly ()
     {
-        string text = "GitHub";
-        string url = "https://github.com";
+        var text = "GitHub";
+        var url = "https://github.com";
 
         // Arrange
         using IApplication app = Application.Create ();
@@ -409,13 +370,8 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.Driver!.SetScreenSize (40, 1);
         app.Driver.Force16Colors = true;
 
-        using Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
-        window.SetScheme (new (new Attribute (Color.Black, Color.White)));
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
         Link link = new ()
         {
@@ -424,16 +380,18 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
             Width = 60,
             Height = 1,
             Text = text,
-            Url = url,
+            Url = url
         };
         window.Add (link);
 
-        app.Begin(window);
+        app.Begin (window);
         app.LayoutAndDraw ();
         app.Driver.Refresh ();
 
         DriverAssert.AssertDriverOutputIs ("""
-            \x1b]8;;https://github.com\x1b\\\x1b[97m\x1b[40mGitHub\x1b]8;;\x1b\\\x1b[30m\x1b[107m
-            """, _output, app.Driver);
+                                           \x1b]8;;https://github.com\x1b\\\x1b[97m\x1b[40mGitHub\x1b]8;;\x1b\\\x1b[30m\x1b[107m
+                                           """,
+                                           output,
+                                           app.Driver);
     }
 }

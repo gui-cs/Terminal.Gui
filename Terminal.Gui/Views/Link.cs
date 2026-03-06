@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.Views;
+﻿using System.Diagnostics;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Displays a clickable link with text and url.
@@ -15,37 +17,101 @@ public class Link : View, IDesignable
 
         // On HotKey, pass it to the next view
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
+
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
     }
 
     /// <inheritdoc/>
-    public override string Text
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        get => string.IsNullOrWhiteSpace (Title) ? Url : Title;
-        set
+        // If Link can't focus and is activated, invoke HotKey on next peer
+        if (!CanFocus)
         {
-            Title = value;
-            base.Text = string.IsNullOrWhiteSpace (value) ? Url : value;
+            return InvokeCommand (Command.HotKey, args.Context) == true;
+        }
+
+        return base.OnActivating (args);
+    }
+
+    /// <summary>
+    ///     Opens <see cref="Url"/>.
+    /// </summary>
+    protected override void OnAccepted (ICommandContext? ctx)
+    {
+        base.OnAccepted (ctx);
+
+        OpenUrl (Url);
+    }
+
+    /// <summary>
+    ///     Opens the specified URL in the default web browser. The implementation is platform-specific:
+    /// </summary>
+    /// <param name="url"></param>
+    public static void OpenUrl (string url)
+    {
+        if (PlatformDetection.IsWindows ())
+        {
+            url = url.Replace ("&", "^&");
+            Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
+        }
+        else if (PlatformDetection.IsMac ())
+        {
+            Process.Start ("open", url);
+        }
+        else if (PlatformDetection.IsLinux ())
+        {
+            using Process process = new ();
+
+            process.StartInfo = new ProcessStartInfo
+            {
+                FileName = "xdg-open",
+                Arguments = url,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            process.Start ();
         }
     }
 
     /// <summary>
-    /// Represents the default URL used when no specific URL is provided.
+    ///     Updates the text displayed by the text formatter based on the current value of the control's text property.
     /// </summary>
     /// <remarks>
-    /// An empty string indicates that no URL is associated with the link.
+    ///     If the base text is null or empty, the formatter displays the URL instead. Otherwise, the
+    ///     base implementation is used. This method is used by the Layout engine to determine the text Size.
+    /// </remarks>
+    protected override void UpdateTextFormatterText ()
+    {
+        if (string.IsNullOrEmpty (base.Text))
+        {
+            TextFormatter.Text = Url;
+            TextFormatter.ConstrainToWidth = null;
+            TextFormatter.ConstrainToHeight = null;
+        }
+        else
+        {
+            base.UpdateTextFormatterText ();
+        }
+    }
+
+    /// <summary>
+    ///     Represents the default URL used when no specific URL is provided.
+    /// </summary>
+    /// <remarks>
+    ///     An empty string indicates that no URL is associated with the link.
     /// </remarks>
     public const string DEFAULT_URL = "";
 
     private string _url = DEFAULT_URL;
 
     /// <summary>
-    /// Gets or sets the URL associated with this instance.
+    ///     Gets or sets the URL associated with this instance. If <see cref="Text"/> is empty, the URL will be displayed as a
+    ///     clickable link. If <see cref="Text"/> is set,
+    ///     it will be displayed as a clickable link.
     /// </summary>
-    public string Url
-    {
-        get => _url;
-        set => SetUrl (value);
-    }
+    public string Url { get => _url; set => SetUrl (value); }
 
     /// <summary>
     ///     Raised when <see cref="Url"/> is about to change.
@@ -100,21 +166,10 @@ public class Link : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnActivating (CommandEventArgs args)
-    {
-        // If Link can't focus and is clicked, invoke HotKey on next peer
-        if (!CanFocus)
-        {
-            return InvokeCommand (Command.HotKey, args.Context) == true;
-        }
-
-        return base.OnActivating (args);
-    }
-
-    /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Text = "_Link";
+        Title = "_Link";
+        Text = "https://github.com/gui-cs";
 
         return true;
     }
@@ -122,96 +177,99 @@ public class Link : View, IDesignable
     /// <summary>Copy the URL to the clipboard contents.</summary>
     public bool Copy ()
     {
-        SetClipboard (Url);
+        SetClipboard (Text);
 
         return true;
     }
 
     private void SetClipboard (string text) => App?.Clipboard?.SetClipboardData (text);
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Draws the Link. If <see cref="Text"/> is empty, the <see cref="Url"/> will be drawn; otherwise <see cref="Text"/>
+    ///     will be drawn.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
     protected override bool OnDrawingText (DrawContext? context)
     {
-        // Set the URL for cells that will be drawn (only if URL is not empty)
-        if (!string.IsNullOrEmpty (Url) && Driver is { })
+        if (Driver is null)
         {
-            Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
-
-            // Use GetDrawRegion to get precise drawn areas
-            Region textRegion = TextFormatter.GetDrawRegion (drawRect);
-
-            // Report the drawn area to the context
-            context?.AddDrawnRegion (textRegion);
-
-            Attribute normalAttr = HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal);
-            Attribute hotAttr = HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
-
-            // Set the URL in the driver so all cells drawn will have this URL
-            Driver.CurrentUrl = Url;
-
-            try
-            {
-                // Draw the text using TextFormatter - all cells will now have the URL
-                TextFormatter.Draw (
-                                    Driver,
-                                    drawRect,
-                                    normalAttr,
-                                    hotAttr,
-                                    Rectangle.Empty);
-            }
-            finally
-            {
-                // Clear the URL after drawing
-                Driver.CurrentUrl = null;
-            }
-
-            // We assume that the text has been drawn over the entire area; ensure that the SubViews are redrawn.
-            SetSubViewNeedsDrawDownHierarchy ();
-
-            return true; // We handled the drawing
+            return base.OnDrawingText (context);
         }
 
-        return base.OnDrawingText (context);
+        Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
+
+        Region textDrawRegion = TextFormatter.GetDrawRegion (drawRect);
+
+        // Report the drawn area to the context
+        context?.AddDrawnRegion (textDrawRegion);
+
+        Attribute normalAttr = HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal);
+        Attribute hotAttr = HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
+
+        string? url = Url;
+
+        // If the URL is not valid, don't set CurrentUrl, and adjust the attributes to indicate it's not well-formed
+        if (!Uri.IsWellFormedUriString (Url, UriKind.Absolute))
+        {
+            normalAttr = GetAttributeForRole (VisualRole.Disabled);
+            normalAttr = normalAttr with { Background = HasFocus ? GetAttributeForRole (VisualRole.Focus).Background : normalAttr.Background };
+            url = null;
+        }
+
+        // Set the URL in the driver so all cells drawn will have this URL
+        Driver.CurrentUrl = url;
+
+        try
+        {
+            // Draw the Title using TextFormatter - all cells will now have the URL
+            TextFormatter.Draw (Driver, drawRect, normalAttr, hotAttr, Rectangle.Empty);
+        }
+        finally
+        {
+            // Always clear the URL after drawing
+            Driver.CurrentUrl = null;
+        }
+
+        // We assume that the text has been drawn over the entire area; ensure that the SubViews are redrawn.
+        SetSubViewNeedsDrawDownHierarchy ();
+
+        return true; // We handled the drawing
     }
 
-    private void SetUrl(string value)
+    private void SetUrl (string value)
     {
-        // Do not crash on invalid URLs, instead default to a blank page
-        if (!Uri.TryCreate (value, UriKind.Absolute, out _))
+        if (_url == value)
         {
-            value = DEFAULT_URL;
+            return;
+        }
+        string oldValue = _url;
+
+        // CWP: Fire ValueChanging (allows cancellation)
+        ValueChangingEventArgs<string> changingArgs = new (oldValue, value);
+
+        if (OnUrlChanging (changingArgs) || changingArgs.Handled)
+        {
+            return;
         }
 
-        if (_url != value)
+        UrlChanging?.Invoke (this, changingArgs);
+
+        if (changingArgs.Handled)
         {
-            string oldValue = _url;
-
-            // CWP: Fire ValueChanging (allows cancellation)
-            ValueChangingEventArgs<string> changingArgs = new (oldValue, value);
-
-            if (OnUrlChanging (changingArgs) || changingArgs.Handled)
-            {
-                return;
-            }
-
-            UrlChanging?.Invoke (this, changingArgs);
-
-            if (changingArgs.Handled)
-            {
-                return;
-            }
-
-            // Do the work
-            _url = value;
-
-            // CWP: Fire ValueChanged
-            ValueChangedEventArgs<string> changedArgs = new (oldValue, value);
-            OnUrlChanged (changedArgs);
-            UrlChanged?.Invoke (this, changedArgs);
-
-            // Mark as needing redraw since URL changed
-            SetNeedsDraw ();
+            return;
         }
+
+        // Do the work
+        _url = value;
+
+        // CWP: Fire ValueChanged
+        ValueChangedEventArgs<string> changedArgs = new (oldValue, value);
+        OnUrlChanged (changedArgs);
+        UrlChanged?.Invoke (this, changedArgs);
+
+        // Indicate the formatter needs formatting, which will cause UpdateTextFormatterText to be invoked
+        TextFormatter.NeedsFormat = true;
+        SetNeedsLayout ();
     }
 }
-
