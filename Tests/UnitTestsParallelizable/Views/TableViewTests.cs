@@ -1,10 +1,11 @@
 ﻿using System.Data;
 using JetBrains.Annotations;
+using UnitTests;
 
 namespace ViewsTests;
 
 [TestSubject (typeof (TableView))]
-public class TableViewTests
+public class TableViewTests : TestDriverBase
 {
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Left ()
@@ -321,5 +322,57 @@ public class TableViewTests
         Assert.True (result);
 
         tableView.Dispose ();
+    }
+
+    [Fact]
+    public void Test_SumColumnWidth_GraphemeClusters ()
+    {
+        string family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
+        Assert.Equal (8, family.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (2, family.GetColumns ());
+
+        string technologist = "\U0001F469\u200D\U0001F4BB"; // 👩‍💻
+        Assert.Equal (4, technologist.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (2, technologist.GetColumns ());
+    }
+
+    [Fact]
+    public void Test_CalculateMaxCellWidth_UsesGraphemeWidth ()
+    {
+        // setup
+        IDriver driver = CreateTestDriver ();
+        string family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
+
+        var tableView = new TableView { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = "Runnable";
+        tableView.Viewport = new (0, 0, 25, 5);
+        tableView.Style.ShowHorizontalHeaderUnderline = true;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+
+        var dt = new DataTable ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+        dt.Rows.Add (family, "ok");
+        tableView.Table = new DataTableSource (dt);
+
+        // execute
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        // verify
+        string actual = driver.ToString ()!;
+        string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
+        string headerRow = lines.First (l => l.Contains ('A') && l.Contains ('B'));
+        int separatorIndex = headerRow.IndexOf ('│', 1);
+        int separatorColumn = headerRow [..separatorIndex].GetColumns ();
+
+        Assert.True (
+                     separatorColumn <= 5,
+                     $"Column A should be narrow (grapheme width 2), but separator at column {separatorColumn} suggests over-sized column. Header: '{headerRow}'"
+                    );
     }
 }
