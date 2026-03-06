@@ -56,6 +56,13 @@ public interface IOutput : IDisposable
     void Write (ReadOnlySpan<char> text);
 
     /// <summary>
+    ///     Suspend the application / terminal (e.g. SIGTSTP on Unix) and perform any
+    ///     driver-specific state save/restore required across the suspend/resume cycle.
+    ///     Implementations on platforms that do not support suspension may be a no-op.
+    /// </summary>
+    void Suspend ();
+
+    /// <summary>
     ///     Write the contents of the <paramref name="buffer"/> to the console
     /// </summary>
     /// <param name="buffer"></param>

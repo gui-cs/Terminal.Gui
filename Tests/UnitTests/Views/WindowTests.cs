@@ -1,6 +1,3 @@
-using UnitTests;
-using Xunit.Abstractions;
-
 namespace UnitTests.ViewsTests;
 
 public class WindowTests ()

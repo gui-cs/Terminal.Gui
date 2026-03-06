@@ -23,8 +23,7 @@ public class ApplicationKeyboardThreadSafetyTests
 
         for (var i = 0; i < NUM_THREADS; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -42,11 +41,12 @@ public class ApplicationKeyboardThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -88,7 +88,8 @@ public class ApplicationKeyboardThreadSafetyTests
                                                     break;
                                                 }
                                             }
-                                        });
+                                        },
+                                        TestContext.Current.CancellationToken);
 
         // Give operations a chance to start
         Thread.Sleep (10);
@@ -98,7 +99,7 @@ public class ApplicationKeyboardThreadSafetyTests
         continueRunning = false;
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        operationsTask.Wait (TimeSpan.FromSeconds (2));
+        operationsTask.Wait (TimeSpan.FromSeconds (2), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -123,8 +124,7 @@ public class ApplicationKeyboardThreadSafetyTests
 
         for (var i = 0; i < NUM_THREADS; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -138,11 +138,12 @@ public class ApplicationKeyboardThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -168,8 +169,7 @@ public class ApplicationKeyboardThreadSafetyTests
 
         for (var i = 0; i < NUM_THREADS; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -182,11 +182,12 @@ public class ApplicationKeyboardThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -213,8 +214,7 @@ public class ApplicationKeyboardThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -237,11 +237,12 @@ public class ApplicationKeyboardThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -266,8 +267,7 @@ public class ApplicationKeyboardThreadSafetyTests
         // Threads subscribing to events
         for (var i = 0; i < NUM_THREADS; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -276,18 +276,18 @@ public class ApplicationKeyboardThreadSafetyTests
                                              EventHandler<Key> handler = (s, e) => { Interlocked.Increment (ref keyDownCount); };
                                              keyboard.KeyDown += handler;
                                              keyboard.KeyDown -= handler;
-
                                          }
                                          catch (Exception ex)
                                          {
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -314,8 +314,7 @@ public class ApplicationKeyboardThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -328,22 +327,27 @@ public class ApplicationKeyboardThreadSafetyTests
                                                      keyboard.QuitKey = Key.Q.WithCtrl;
 
                                                      break;
+
                                                  case 1:
                                                      keyboard.ArrangeKey = Key.F6.WithCtrl;
 
                                                      break;
+
                                                  case 2:
                                                      keyboard.NextTabKey = Key.Tab;
 
                                                      break;
+
                                                  case 3:
                                                      keyboard.PrevTabKey = Key.Tab.WithShift;
 
                                                      break;
+
                                                  case 4:
                                                      keyboard.NextTabGroupKey = Key.F6;
 
                                                      break;
+
                                                  case 5:
                                                      keyboard.PrevTabGroupKey = Key.F6.WithShift;
 
@@ -355,11 +359,12 @@ public class ApplicationKeyboardThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -382,8 +387,7 @@ public class ApplicationKeyboardThreadSafetyTests
         List<Task> tasks = new ();
 
         // Thread 1: Add bindings with unique keys
-        tasks.Add (
-                   Task.Run (() =>
+        tasks.Add (Task.Run (() =>
                              {
                                  for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                  {
@@ -406,11 +410,11 @@ public class ApplicationKeyboardThreadSafetyTests
                                          exceptions.Add (ex);
                                      }
                                  }
-                             }));
+                             },
+                             TestContext.Current.CancellationToken));
 
         // Thread 2: Invoke commands
-        tasks.Add (
-                   Task.Run (() =>
+        tasks.Add (Task.Run (() =>
                              {
                                  for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                  {
@@ -423,11 +427,11 @@ public class ApplicationKeyboardThreadSafetyTests
                                          exceptions.Add (ex);
                                      }
                                  }
-                             }));
+                             },
+                             TestContext.Current.CancellationToken));
 
         // Thread 3: Read bindings
-        tasks.Add (
-                   Task.Run (() =>
+        tasks.Add (Task.Run (() =>
                              {
                                  for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                  {
@@ -442,11 +446,11 @@ public class ApplicationKeyboardThreadSafetyTests
                                          exceptions.Add (ex);
                                      }
                                  }
-                             }));
+                             },
+                             TestContext.Current.CancellationToken));
 
         // Thread 4: Change key properties
-        tasks.Add (
-                   Task.Run (() =>
+        tasks.Add (Task.Run (() =>
                              {
                                  for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                  {
@@ -459,10 +463,11 @@ public class ApplicationKeyboardThreadSafetyTests
                                          exceptions.Add (ex);
                                      }
                                  }
-                             }));
+                             },
+                             TestContext.Current.CancellationToken));
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -488,8 +493,7 @@ public class ApplicationKeyboardThreadSafetyTests
 
         for (var i = 0; i < NUM_THREADS; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -502,11 +506,12 @@ public class ApplicationKeyboardThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert

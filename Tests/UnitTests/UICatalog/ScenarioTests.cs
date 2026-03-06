@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UICatalog;
-using Xunit.Abstractions;
 using Timeout = System.Threading.Timeout;
 
 namespace UnitTests.UICatalog;

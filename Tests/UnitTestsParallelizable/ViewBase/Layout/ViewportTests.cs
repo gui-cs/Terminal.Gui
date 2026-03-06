@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace ViewBaseTests.Viewport;
+﻿namespace ViewBaseTests.Viewport;
 
 /// <summary>
 ///     Test the <see cref="View.Viewport"/>.

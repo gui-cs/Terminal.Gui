@@ -3,7 +3,6 @@
 // Claude - Opus 4.5
 using Microsoft.Extensions.Logging;
 using UICatalog;
-using Xunit.Abstractions;
 
 namespace UnitTests.UICatalog;
 
@@ -303,8 +302,7 @@ public class ScenarioLogCaptureTests (ITestOutputHelper output)
         {
             int threadId = t;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      ILogger logger = capture.CreateLogger ($"Thread{threadId}");
 
@@ -312,7 +310,8 @@ public class ScenarioLogCaptureTests (ITestOutputHelper output)
                                      {
                                          logger.LogInformation ($"Thread {threadId} Log {i}");
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
         await Task.WhenAll (tasks);

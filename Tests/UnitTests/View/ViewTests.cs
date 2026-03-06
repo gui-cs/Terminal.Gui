@@ -1,5 +1,3 @@
-using Xunit.Abstractions;
-
 namespace UnitTests.ViewBaseTests;
 
 public class ViewTests

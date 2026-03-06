@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace ViewBaseTests;
+﻿namespace ViewBaseTests;
 
 /// <summary>Tests View BeginInit/EndInit/Initialized functionality.</summary>
 public class InitTests

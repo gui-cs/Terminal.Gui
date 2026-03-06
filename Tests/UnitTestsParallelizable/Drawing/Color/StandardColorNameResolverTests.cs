@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace DrawingTests.ColorTests;
+﻿namespace DrawingTests.ColorTests;
 
 public class StandardColorNameResolverTests (ITestOutputHelper output)
 {

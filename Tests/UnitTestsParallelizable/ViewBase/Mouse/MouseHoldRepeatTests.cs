@@ -1,5 +1,4 @@
-﻿using Xunit.Abstractions;
-using Timeout = Terminal.Gui.App.Timeout;
+﻿using Timeout = Terminal.Gui.App.Timeout;
 
 namespace ViewBaseTests.MouseTests;
 

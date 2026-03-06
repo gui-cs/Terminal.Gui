@@ -113,11 +113,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "Tests\Stress
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Parallelizable", "Tests\UnitTestsParallelizable\UnitTests.Parallelizable.csproj", "{DE780834-190A-8277-51FD-750CC666E82D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTesting", "Tests\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj", "{2DBA7BDC-17AE-474B-A507-00807D087607}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTestHelpers", "Tests\AppTestHelpers\AppTestHelpers.csproj", "{2DBA7BDC-17AE-474B-A507-00807D087607}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit", "Tests\TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj", "{F56BAFFD-F227-4B0A-96F0-C800FAEF2036}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTestHelpers.XunitHelpers", "Tests\AppTestHelpers.XunitHelpers\AppTestHelpers.XunitHelpers.csproj", "{F56BAFFD-F227-4B0A-96F0-C800FAEF2036}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TerminalGuiFluentTestingXunit.Generator", "Tests\TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj", "{199F27D8-A905-4DDC-82CA-1FE1A90B1788}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTestHelpers.XunitHelpers.Generator", "Tests\AppTestHelpers.XunitHelpers.Generator\AppTestHelpers.XunitHelpers.Generator.csproj", "{199F27D8-A905-4DDC-82CA-1FE1A90B1788}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1A3CBA89-EDAB-4F75-811E-FE81B13A4836}"
 	ProjectSection(SolutionItems) = preProject
