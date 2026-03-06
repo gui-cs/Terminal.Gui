@@ -169,7 +169,7 @@ public class Link : View, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         Title = "_Link";
-        Text = "https://github.com/gui-cs";
+        Url = "https://github.com/gui-cs";
 
         return true;
     }
@@ -177,7 +177,7 @@ public class Link : View, IDesignable
     /// <summary>Copy the URL to the clipboard contents.</summary>
     public bool Copy ()
     {
-        SetClipboard (Text);
+        SetClipboard (Url);
 
         return true;
     }

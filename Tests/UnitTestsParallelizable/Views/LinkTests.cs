@@ -10,45 +10,154 @@ namespace ViewsTests;
 [TestSubject (typeof (Link))]
 public class LinkTests (ITestOutputHelper output) : TestDriverBase
 {
+    // Claude - Opus 4.6
+
     [Fact]
     public void Constructor_Defaults ()
     {
         Link link = new ();
 
         Assert.Equal (Link.DEFAULT_URL, link.Url);
-        Assert.Equal (Link.DEFAULT_URL, link.Text);
+        Assert.Equal (string.Empty, link.Text);
         Assert.Equal (Dim.Auto (DimAutoStyle.Text), link.Height);
         Assert.Equal (Dim.Auto (DimAutoStyle.Text), link.Width);
         Assert.True (link.CanFocus);
     }
 
     [Fact]
-    public void Text_Set_Updates_Title ()
+    public void Text_And_Title_Are_Independent ()
     {
-        Link link = new () { Text = "Click here" };
+        Link link = new () { Text = "Click here", Title = "My Link" };
 
         Assert.Equal ("Click here", link.Text);
-        Assert.Equal ("Click here", link.Title);
+        Assert.Equal ("My Link", link.Title);
     }
 
     [Fact]
-    public void Text_Returns_Url_When_Title_Is_Empty ()
+    public void Text_Set_Does_Not_Change_Url ()
     {
-        Link link = new () { Url = "https://github.com" };
+        Link link = new () { Url = "https://github.com", Text = "Click here" };
 
-        Assert.Equal ("https://github.com", link.Text);
+        Assert.Equal ("Click here", link.Text);
+        Assert.Equal ("https://github.com", link.Url);
     }
 
     [Fact]
-    public void Url_Set_Validates_Uri ()
+    public void Url_Set_Does_Not_Change_Text ()
     {
         Link link = new () { Url = "https://github.com" };
+
+        Assert.Equal (string.Empty, link.Text);
+        Assert.Equal ("https://github.com", link.Url);
+    }
+
+    [Fact]
+    public void TextFormatter_Uses_Url_When_Text_Is_Empty ()
+    {
+        Link link = new () { Url = "https://github.com" };
+
+        // Trigger layout so UpdateTextFormatterText runs
+        link.BeginInit ();
+        link.EndInit ();
+        link.SetRelativeLayout (new Size (80, 25));
+
+        Assert.Equal ("https://github.com", link.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void TextFormatter_Uses_Text_When_Text_Is_Set ()
+    {
+        Link link = new () { Url = "https://github.com", Text = "Click here" };
+
+        link.BeginInit ();
+        link.EndInit ();
+        link.SetRelativeLayout (new Size (80, 25));
+
+        Assert.Equal ("Click here", link.TextFormatter.Text);
+    }
+
+    [Fact]
+    public void DimAuto_Uses_Text_Width_When_Text_Is_Set ()
+    {
+        Link link = new () { Text = "Click", Url = "https://github.com/gui-cs/Terminal.Gui" };
+
+        link.BeginInit ();
+        link.EndInit ();
+        link.SetRelativeLayout (new Size (80, 25));
+
+        // Width should be based on Text ("Click" = 5), not Url
+        Assert.Equal (5, link.Frame.Width);
+    }
+
+    [Fact]
+    public void DimAuto_Uses_Text_Width_When_Text_Has_Wide_Chars ()
+    {
+        // "ターミナル" = 5 CJK chars × 2 columns each = 10 columns
+        Link link = new () { Text = "ターミナル", Url = "https://example.com" };
+
+        link.BeginInit ();
+        link.EndInit ();
+        link.SetRelativeLayout (new Size (80, 25));
+
+        Assert.Equal (10, link.Frame.Width);
+    }
+
+    [Fact]
+    public void DimAuto_Uses_Url_Width_When_Text_Is_Empty ()
+    {
+        Link link = new () { Url = "https://github.com" };
+
+        link.BeginInit ();
+        link.EndInit ();
+        link.SetRelativeLayout (new Size (80, 25));
+
+        // Width should be based on Url since Text is empty
+        Assert.Equal ("https://github.com".Length, link.Frame.Width);
+    }
+
+    [Fact]
+    public void DimAuto_Uses_Url_Width_When_Url_Has_Wide_Chars ()
+    {
+        // IRI with CJK path: "https://例え.jp/テスト"
+        // "https://" = 8, "例え" = 4, ".jp/" = 4, "テスト" = 6 → 22 columns
+        Link link = new () { Url = "https://例え.jp/テスト" };
+
+        link.BeginInit ();
+        link.EndInit ();
+        link.SetRelativeLayout (new Size (80, 25));
+
+        Assert.Equal ("https://例え.jp/テスト".GetColumns (), link.Frame.Width);
+    }
+
+    [Fact]
+    public void Url_Accepts_Any_String ()
+    {
+        Link link = new ();
 
         link.Url = "not a valid url";
-        Assert.Equal (Link.DEFAULT_URL, link.Url); // Url should not change on invalid
+        Assert.Equal ("not a valid url", link.Url);
 
         link.Url = "";
-        Assert.Equal (Link.DEFAULT_URL, link.Url); // Url should not change on invalid
+        Assert.Equal ("", link.Url);
+
+        link.Url = "https://github.com";
+        Assert.Equal ("https://github.com", link.Url);
+    }
+
+    [Fact]
+    public void Url_Set_Same_Value_Does_Not_Fire_Events ()
+    {
+        Link link = new () { Url = "https://github.com" };
+        var changingFired = false;
+        var changedFired = false;
+
+        link.UrlChanging += (_, _) => changingFired = true;
+        link.UrlChanged += (_, _) => changedFired = true;
+
+        link.Url = "https://github.com";
+
+        Assert.False (changingFired);
+        Assert.False (changedFired);
     }
 
     [Fact]
@@ -61,7 +170,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         var eventFired = false;
         var eventArgsValid = false;
 
-        link.UrlChanged += (s, e) =>
+        link.UrlChanged += (_, e) =>
                            {
                                eventFired = true;
                                eventArgsValid = e.OldValue == oldUrl && e.NewValue == newUrl;
@@ -84,7 +193,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         var eventArgsValid = false;
         var valueChanged = false;
 
-        link.UrlChanging += (s, e) =>
+        link.UrlChanging += (_, e) =>
                             {
                                 eventFired = true;
                                 eventArgsValid = e.CurrentValue == oldUrl && e.NewValue == newUrl;
@@ -98,6 +207,18 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (eventArgsValid);
         Assert.False (valueChanged);
         Assert.Equal (newUrl, link.Url);
+    }
+
+    [Fact]
+    public void UrlChanging_Can_Cancel_Change ()
+    {
+        Link link = new () { Url = "https://original.com" };
+
+        link.UrlChanging += (_, e) => e.Handled = true;
+
+        link.Url = "https://newurl.com";
+
+        Assert.Equal ("https://original.com", link.Url);
     }
 
     [Fact]
@@ -174,10 +295,34 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Link_Invalid_Url_Renders_With_Disabled_Style ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Link link = new () { App = app, Url = "not a valid url", Text = "Bad Link" };
+        window.Add (link);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver!.Refresh ();
+
+        string? look = app.Driver.GetOutput ().GetLastOutput ();
+
+        // Invalid URL should NOT produce OSC 8 hyperlink sequences
+        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink ("not a valid url"), look);
+        Assert.Contains ("Bad Link", look);
+
+        window.Dispose ();
+    }
+
+    [Fact]
     public void Link_With_HotKey_Passes_To_Next_View ()
     {
         View superView = new () { CanFocus = true };
-        Link link = new () { Text = "_Link", CanFocus = false };
+        Link link = new () { Title = "_Link", CanFocus = false };
         View nextView = new () { CanFocus = true };
 
         superView.Add (link, nextView);
@@ -205,7 +350,6 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
 
         using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        // ✅ Ajouter les DEUX liens dès le début
         Link link1 = new ()
         {
             App = app,
@@ -285,7 +429,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         window.Height = Dim.Fill ();
         window.BorderStyle = LineStyle.None;
 
-        // ✅ Add a dummy view to take initial focus
+        // Add a dummy view to take initial focus
         View dummyView = new () { CanFocus = true, Width = 1, Height = 1 };
         window.Add (dummyView);
 
@@ -303,7 +447,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         app.LayoutAndDraw ();
         app.Driver!.Refresh ();
 
-        // ✅ Without focus - dummyView has focus instead
+        // Without focus - dummyView has focus instead
         Assert.False (link.HasFocus);
         Assert.True (dummyView.HasFocus);
 
@@ -322,15 +466,16 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void IDesignable_EnableForDesign_Sets_Default_Text ()
+    public void IDesignable_EnableForDesign_Sets_Title_And_Url ()
     {
         Link link = new ();
-        var designable = link as IDesignable;
+        IDesignable designable = link;
 
         bool result = designable.EnableForDesign ();
 
         Assert.True (result);
-        Assert.Equal ("_Link", link.Text);
+        Assert.Equal ("_Link", link.Title);
+        Assert.Equal ("https://github.com/gui-cs", link.Url);
 
         link.Dispose ();
     }
