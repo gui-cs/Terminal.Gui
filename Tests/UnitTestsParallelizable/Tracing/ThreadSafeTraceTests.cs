@@ -2,7 +2,6 @@
 
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
-using Xunit.Abstractions;
 #pragma warning disable xUnit1031
 
 namespace ApplicationTests;
@@ -205,12 +204,12 @@ public class ThreadSafeTraceTests
             using (Trace.PushScope (TraceCategory.Command, backend))
             {
                 // Simulate some async work
-                await Task.Delay (10);
+                await Task.Delay (10, TestContext.Current.CancellationToken);
 
                 View view = new () { Id = "parallel-test-1" };
                 Trace.Command (view, Command.Accept, CommandRouting.Direct, "Test1");
 
-                await Task.Delay (10);
+                await Task.Delay (10, TestContext.Current.CancellationToken);
 
 #if DEBUG
                 // This test should only see its own traces
@@ -238,12 +237,12 @@ public class ThreadSafeTraceTests
             using (Trace.PushScope (TraceCategory.Mouse, backend))
             {
                 // Simulate some async work
-                await Task.Delay (10);
+                await Task.Delay (10, TestContext.Current.CancellationToken);
 
                 View view = new () { Id = "parallel-test-2" };
                 Trace.Mouse (view, MouseFlags.LeftButtonClicked, Point.Empty, "Test2");
 
-                await Task.Delay (10);
+                await Task.Delay (10, TestContext.Current.CancellationToken);
 
 #if DEBUG
                 // This test should only see its own traces
@@ -273,15 +272,16 @@ public class ThreadSafeTraceTests
 
             // Task.Run flows ExecutionContext by default, so the async-local value is visible in the task.
             // The key isolation behavior is that changes in the task don't affect the parent context.
-            Task.Run (
-                      () =>
+            Task.Run (() =>
                       {
                           // Task sees parent's value due to ExecutionContext flow
                           capturedCategories = Trace.EnabledCategories;
 
                           // Set different categories in task context
                           Trace.EnabledCategories = TraceCategory.Mouse;
-                      }).Wait ();
+                      },
+                      TestContext.Current.CancellationToken)
+                .Wait (TestContext.Current.CancellationToken);
 
             // Parent context is unchanged despite modifications in the task
             Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
@@ -305,14 +305,15 @@ public class ThreadSafeTraceTests
             ITraceBackend? capturedBackend = null;
 
             // Use Task.Run which may or may not flow ExecutionContext
-            Task.Run (
-                      () =>
+            Task.Run (() =>
                       {
                           capturedBackend = Trace.Backend;
 
                           // Set different backend in this context
                           Trace.Backend = new ListBackend ();
-                      }).Wait ();
+                      },
+                      TestContext.Current.CancellationToken)
+                .Wait (TestContext.Current.CancellationToken);
 
             // Main thread backend should be unchanged
             Assert.Same (mainBackend, Trace.Backend);
@@ -335,7 +336,7 @@ public class ThreadSafeTraceTests
                 Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
 
                 // EnabledCategories should flow across await
-                await Task.Delay (1);
+                await Task.Delay (1, TestContext.Current.CancellationToken);
 
                 Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
                 Assert.Same (backend, Trace.Backend);

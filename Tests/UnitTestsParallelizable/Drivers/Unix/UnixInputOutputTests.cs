@@ -1,5 +1,4 @@
 #nullable enable
-using Xunit.Abstractions;
 
 namespace DriverTests.UnixDriver;
 
@@ -105,5 +104,19 @@ public class UnixInputOutputTests (ITestOutputHelper output)
         Assert.Null (exception);
         Assert.Equal (80, size.Width);
         Assert.Equal (25, size.Height);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void UnixOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new UnixOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
     }
 }

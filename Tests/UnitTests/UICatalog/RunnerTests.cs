@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using UICatalog;
-using Xunit.Abstractions;
 using Timeout = System.Threading.Timeout;
 
 namespace UnitTests.UICatalog;

@@ -77,11 +77,11 @@ public class StandardColorsTests
                                       IReadOnlyList<string> names = StandardColors.GetColorNames ();
                                       Assert.NotNull (names);
                                       Assert.NotEmpty (names);
-                                  }
-                                 );
+                                  },
+                                  TestContext.Current.CancellationToken);
         }
 
-        Task.WaitAll (tasks);
+        Task.WaitAll (tasks, TestContext.Current.CancellationToken);
     }
 
     [Fact]

@@ -1,7 +1,5 @@
 // Claude - Opus 4.5
 
-using Xunit.Abstractions;
-
 namespace ViewsTests;
 
 /// <summary>

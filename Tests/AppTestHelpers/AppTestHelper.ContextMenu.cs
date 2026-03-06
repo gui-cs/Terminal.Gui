@@ -2,9 +2,9 @@ using System.Diagnostics;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace TerminalGuiFluentTesting;
+namespace AppTestHelpers;
 
-public partial class TestContext
+public partial class AppTestHelper
 {
     /// <summary>
     ///     Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
@@ -12,7 +12,7 @@ public partial class TestContext
     /// </summary>
     /// <param name="contextMenu"></param>
     /// <returns></returns>
-    public TestContext WithContextMenu (PopoverMenu? contextMenu)
+    public AppTestHelper WithContextMenu (PopoverMenu? contextMenu)
     {
         if (contextMenu?.App is null)
         {

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace ViewBaseTests.Keyboard;
 
 /// <summary>
@@ -251,6 +253,8 @@ public class AutoHotKeyAssignmentTests
     [Fact]
     public void AssignHotKeys_HandlesConflictingExistingHotKey ()
     {
+        Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture; // Ensure consistent test results
+
         View superView = new () { AssignHotKeys = true };
 
         View button1 = new () { Title = Strings.cmdSave }; // Uses 'S'

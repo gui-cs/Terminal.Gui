@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.Commands;
 

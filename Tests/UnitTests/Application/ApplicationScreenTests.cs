@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace UnitTests.ApplicationTests;
+﻿namespace UnitTests.ApplicationTests;
 
 public class ApplicationScreenTests
 {
