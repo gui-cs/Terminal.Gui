@@ -175,7 +175,7 @@ internal class Branch<T> where T : class
         }
 
         // If body of line is too long
-        if (lineBody.EnumerateRunes ().Sum (l => l.GetColumns ()) > availableWidth)
+        if (lineBody.GetColumns () > availableWidth)
         {
             // remaining space is zero and truncate the line
             lineBody = new (
@@ -313,7 +313,7 @@ internal class Branch<T> where T : class
     public virtual int GetWidth ()
     {
         return
-            GetLinePrefix ().Sum (r => r.GetColumns ()) + GetExpandableSymbol ().GetColumns () + (_tree.AspectGetter (Model) ?? "").Length;
+            GetLinePrefix ().Sum (r => r.GetColumns ()) + GetExpandableSymbol ().GetColumns () + (_tree.AspectGetter (Model) ?? "").GetColumns ();
     }
 
     /// <summary>Refreshes cached knowledge in this branch e.g. what children an object has.</summary>

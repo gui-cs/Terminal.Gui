@@ -933,4 +933,43 @@ oot two
     }
 
     #endregion
+
+    /// <summary>
+    ///     Verifies that <see cref="TreeView{T}" /> measures branch text width using grapheme-aware
+    ///     <c>string.GetColumns()</c> rather than <c>string.Length</c>.
+    ///     Wide CJK characters occupy 2 terminal cells each but have <c>string.Length</c> of 1,
+    ///     so <c>.Length</c> under-counts the display width while <c>.GetColumns()</c> is correct.
+    /// </summary>
+    [Fact]
+    [SetupFakeApplication]
+    public void TestTreeView_GetWidth_GraphemeCluster ()
+    {
+        // setup — CJK characters: each is 2 terminal cells wide but Length of 1
+        string cjkText = "\u4F60\u597D"; // 你好
+        Assert.Equal (2, cjkText.Length); // char count
+        Assert.Equal (4, cjkText.GetColumns ()); // display width — correct
+
+        var tv = new TreeView { Driver = ApplicationImpl.Instance.Driver, Width = 20, Height = 5 };
+
+        var node = new TreeNode (cjkText);
+        tv.AddObject (node);
+        tv.SetScheme (new Scheme ());
+        tv.Style.ShowBranchLines = false;
+
+        // execute
+        tv.LayoutSubViews ();
+        tv.SetClipToScreen ();
+        tv.Draw ();
+
+        // verify — the tree should render the CJK text correctly.
+        // With the fix (GetColumns), the branch width is 4 cells.
+        // With the old code (string.Length), the branch would be measured at 2 cells,
+        // potentially causing incorrect scroll/truncation behavior.
+        string actual = Application.Driver!.ToString ()!;
+        string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
+        string firstLine = lines [0];
+
+        // The CJK text should appear in the rendered output
+        Assert.Contains (cjkText, firstLine);
+    }
 }

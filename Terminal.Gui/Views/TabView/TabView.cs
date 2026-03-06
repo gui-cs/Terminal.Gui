@@ -532,7 +532,7 @@ public class TabView : View
             tab.Y = 0;
 
             // while there is space for the tab
-            int tabTextWidth = tab.DisplayText.EnumerateRunes ().Sum (c => c.GetColumns ());
+            int tabTextWidth = tab.DisplayText.GetColumns ();
 
             // The maximum number of characters to use for the tab name as specified
             // by the user (MaxTabTextWidth).  But not more than the width of the view
