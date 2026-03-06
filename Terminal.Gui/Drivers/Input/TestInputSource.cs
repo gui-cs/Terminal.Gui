@@ -11,7 +11,7 @@ public class TestInputSource : IInputSource
     ///     Initializes a new instance of the <see cref="TestInputSource"/> class.
     /// </summary>
     /// <param name="timeProvider">The time provider for timestamps.</param>
-    public TestInputSource (ITimeProvider timeProvider) { TimeProvider = timeProvider; }
+    public TestInputSource (ITimeProvider timeProvider) => TimeProvider = timeProvider;
 
     /// <inheritdoc/>
     public ITimeProvider TimeProvider { get; }
