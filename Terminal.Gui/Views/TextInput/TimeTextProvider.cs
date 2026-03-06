@@ -80,7 +80,11 @@ public class TimeTextProvider : ITextValidateProvider
     public TimeSpan TimeValue
     {
         get => _timeValue;
-        set => _timeValue = value;
+        set
+        {
+            _timeValue = value;
+            _isPm = value.Hours >= 12;
+        }
     }
 
     /// <inheritdoc/>
