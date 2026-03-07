@@ -96,42 +96,14 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public void Suspend ()
     {
-        if (PlatformDetection.IsWindows ())
-        {
-            return;
-        }
-
-        _output.Write (EscSeqUtils.CSI_DisableMouseEvents);
-
         try
         {
-            // BUGBUG: We should NOT be calling Console. APIs here. We should use native
-            // BUGBUG: OS capabilities or ANSI sequences
-            Console.ResetColor ();
-
-            // BUGBUG: We should NOT be calling Console. APIs here. We should use native
-            // BUGBUG: OS capabilities or ANSI sequences
-            Console.Clear ();
-
-            //Disable alternative screen buffer.
-            _output.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-
-            //Set cursor key to cursor.
-            _output.Write (EscSeqUtils.CSI_ShowCursor);
-
-            // BUGBUG: This is unix-specific and should not be implemented here.
-            if (SuspendHelper.Suspend ())
-            {
-                //Enable alternative screen buffer.
-                _output.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-            }
+            _output.Suspend ();
         }
         catch (Exception ex)
         {
             Logging.Error ($"Error suspending terminal: {ex.Message}");
         }
-
-        _output.Write (EscSeqUtils.CSI_EnableMouseEvents);
     }
 
     /// <inheritdoc/>

@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
-
 namespace DrawingTests.Lines;
 
 /// <summary>

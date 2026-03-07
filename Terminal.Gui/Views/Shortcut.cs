@@ -1,52 +1,89 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Displays a command, help text, and a key binding. When the key specified by <see cref="Key"/> is pressed, the
-///     command will be invoked. Useful for
-///     displaying a command in <see cref="Bar"/> such as a
-///     menu, toolbar, or status bar.
+///     Displays a command, help text, and a key binding. Serves as the foundational building block for
+///     <see cref="Bar"/>, <see cref="Menu"/>, <see cref="MenuBar"/>, and <see cref="StatusBar"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The following user actions will invoke the <see cref="Command.Accept"/>, causing the
-///         <see cref="View.Accepting"/> event to be fired:
-///         - Clicking on the <see cref="Shortcut"/>.
-///         - Pressing the key specified by <see cref="Key"/>.
-///         - Pressing the HotKey specified by <see cref="CommandView"/>.
+///         A <see cref="Shortcut"/> is a composite view containing three subviews:
+///         <see cref="CommandView"/> (command text and hotkey, left side by default),
+///         <see cref="HelpView"/> (help text, middle), and
+///         <see cref="KeyView"/> (key binding display, right side).
+///         From the user's perspective, a <see cref="Shortcut"/> acts as a single control—clicking anywhere
+///         on it produces the same result regardless of which subview was hit.
 ///     </para>
 ///     <para>
-///         If <see cref="BindKeyToApplication"/> is <see langword="true"/>, <see cref="Key"/> will invoke
-///         <see cref="Command.Accept"/>
-///         regardless of what View has focus, enabling an application-wide keyboard shortcut.
+///         <b>Commands:</b> <see cref="Shortcut"/> participates in the standard <see cref="Command"/> system:
+///     </para>
+///     <list type="table">
+///         <listheader>
+///             <term>Command</term>
+///             <description>Trigger and behavior</description>
+///         </listheader>
+///         <item>
+///             <term><see cref="Command.Activate"/></term>
+///             <description>
+///                 Triggered by <c>Space</c>, mouse click, or <see cref="Key"/> press. Changes state
+///                 (e.g., toggles a <see cref="CheckBox"/>) and invokes <see cref="Action"/>.
+///             </description>
+///         </item>
+///         <item>
+///             <term><see cref="Command.Accept"/></term>
+///             <description>
+///                 Triggered by <c>Enter</c> or double-click. When initiated from a key binding,
+///                 <see cref="Command.Accept"/> is converted to <see cref="Command.Activate"/> so it flows
+///                 through the menu/bridge architecture correctly.
+///             </description>
+///         </item>
+///         <item>
+///             <term><see cref="Command.HotKey"/></term>
+///             <description>
+///                 Triggered by the HotKey letter in <see cref="CommandView"/> or by <see cref="Key"/>.
+///                 Sets focus, then invokes <see cref="Command.Activate"/>.
+///             </description>
+///         </item>
+///     </list>
+///     <para>
+///         <b>Relay Dispatch:</b> <see cref="Shortcut"/> uses relay dispatch
+///         (<c>GetDispatchTarget =&gt; <see cref="CommandView"/></c>, <c>ConsumeDispatch = false</c>).
+///         Commands dispatched to <see cref="CommandView"/> complete normally (e.g., <see cref="CheckBox"/>
+///         toggles), then <see cref="Shortcut"/> is notified via a deferred callback.
+///         Sets <see cref="View.CommandsToBubbleUp"/> to
+///         [<see cref="Command.Activate"/>, <see cref="Command.Accept"/>], enabling commands from
+///         <see cref="CommandView"/> to bubble up to the <see cref="Shortcut"/> for centralized handling.
 ///     </para>
 ///     <para>
-///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key
-///         binding on the
-///         right side. Set <see cref="AlignmentModes"/> to <see cref="ViewBase.AlignmentModes.EndToStart"/> to reverse the
-///         order.
+///         <b>Replaceable CommandView:</b> The <see cref="CommandView"/> can be replaced with any
+///         <see cref="View"/> (e.g., <see cref="CheckBox"/>, <see cref="Button"/>). The
+///         <see cref="Shortcut"/> automatically adapts its activation behavior to the <see cref="CommandView"/>.
 ///     </para>
 ///     <para>
-///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting
-///         <see cref="View.Title"/>.
+///         <b>Application-Wide Key:</b> If <see cref="BindKeyToApplication"/> is <see langword="true"/>,
+///         <see cref="Key"/> will invoke <see cref="Command.HotKey"/> (and thus <see cref="Command.Activate"/>)
+///         regardless of what <see cref="View"/> has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
 ///     <para>
-///         The help text can be set by setting the <see cref="HelpText"/> property or by setting <see cref="View.Text"/>.
+///         <b>Layout:</b> By default, a <see cref="Shortcut"/> displays the command text on the left,
+///         help text in the middle, and key binding on the right. Set <see cref="AlignmentModes"/> to
+///         <see cref="ViewBase.AlignmentModes.EndToStart"/> to reverse the order.
+///         The command text can be set via <see cref="View.Title"/> or the <see cref="CommandView"/>'s
+///         <see cref="View.Text"/> property. The help text can be set via <see cref="HelpText"/> or
+///         <see cref="View.Text"/>. The key text is set via <see cref="Key"/>; if <see cref="Key"/> is
+///         <see cref="Key.Empty"/>, the key text is not displayed.
 ///     </para>
 ///     <para>
-///         The key text is set by setting the <see cref="Key"/> property.
-///         If the <see cref="Key"/> is <see cref="Key.Empty"/>, the <see cref="Key"/> text is not displayed.
+///         <see cref="View.MouseHighlightStates"/> defaults to <see cref="MouseState.In"/>, causing the
+///         <see cref="Shortcut"/> to highlight when the mouse is over it.
 ///     </para>
 ///     <para>
-///         <see cref="View.MouseHighlightStates"/> defaults to <see cref="MouseState.In"/>, causing the Shortcut to
-///         highlight when the mouse is over it.
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
+///         for detailed information on command routing, the BubbleDown pattern, dispatch flows, and
+///         <see cref="CommandView"/> variant behaviors.
 ///     </para>
 ///     <para>
-///         When the <see cref="CommandView"/> raises <see cref="View.Activating"/> (e.g., when clicked), the Shortcut
-///         will also raise <see cref="View.Activating"/>. Similarly, when the <see cref="CommandView"/> raises
-///         <see cref="View.Accepting"/> (e.g., double-click on a <see cref="CheckBox"/>), the Shortcut will also raise
-///         <see cref="View.Accepting"/>.
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
+///         how <see cref="Shortcut"/> fits into the menu system class hierarchy.
 ///     </para>
 /// </remarks>
 public class Shortcut : View, IOrientation, IDesignable
@@ -292,7 +329,6 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     <list type="bullet">
     ///         <item>Source guard (skip if source is already within CommandView)</item>
     ///         <item>Programmatic guard (skip if no binding)</item>
-    ///         <item>Deferred completion (Shortcut.Activated fires after CommandView.Activated)</item>
     ///     </list>
     /// </summary>
     protected override View GetDispatchTarget (ICommandContext? ctx) => CommandView;
@@ -301,20 +337,8 @@ public class Shortcut : View, IOrientation, IDesignable
     // (e.g., CheckBox.OnActivated calls AdvanceCheckState).
 
     /// <inheritdoc/>
-    protected override bool OnActivating (CommandEventArgs args)
-    {
-        // Reset the deferred-completion flag at the start of each activation cycle.
-        // Without this, a programmatic InvokeCommand (no binding → dispatch skipped) leaves the
-        // flag stuck at true, causing the next CommandView_Activated callback to skip RaiseActivated.
-        _activatedFiredThisCycle = false;
-
-        return base.OnActivating (args);
-    }
-
-    /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
-        _activatedFiredThisCycle = true;
         base.OnActivated (ctx);
 
         Action?.Invoke ();
@@ -460,7 +484,6 @@ public class Shortcut : View, IOrientation, IDesignable
             ArgumentNullException.ThrowIfNull (value);
 
             // Clean up old
-            _commandView.Activated -= CommandView_Activated;
             _commandView.GettingAttributeForRole -= SubViewOnGettingAttributeForRole;
             Remove (_commandView);
             _commandView.Dispose ();
@@ -475,7 +498,6 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 #endif
             _commandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
-            _commandView.Activated += CommandView_Activated;
 
             // If the CommandView has a hotkey, we use that. Otherwise, we use '_' to indicate the hotkey is in the Title.
             if (_commandView.HotKey != Key.Empty)
@@ -586,35 +608,6 @@ public class Shortcut : View, IOrientation, IDesignable
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
-
-    // Tracks whether Shortcut.RaiseActivated already fired during the current activation
-    // cycle (from DefaultActivateHandler's direct path). Prevents double-firing when
-    // CommandView.Activated would also trigger it.
-    private bool _activatedFiredThisCycle;
-
-    /// <summary>
-    ///     Deferred completion: when CommandView.Activated fires (e.g., CheckBox toggled),
-    ///     fire RaiseActivated on the Shortcut so Action and InvokeOnTargetOrApp run
-    ///     AFTER the CommandView has finished its own activation.
-    /// </summary>
-    private void CommandView_Activated (object? sender, EventArgs<ICommandContext?> e)
-    {
-        if (!_activatedFiredThisCycle)
-        {
-            RaiseActivated (e.Value);
-
-            // When CommandView received a BubblingUp command and consumed it (ConsumeDispatch=true,
-            // e.g., OptionSelector/FlagSelector), Activating was blocked from propagating further
-            // up the hierarchy. Propagate Activated (not Activating) to SuperView so it is notified
-            // that the composite completed its state change (e.g., Menu.Activated → PopoverMenu closes).
-            if (e.Value?.Routing == CommandRouting.BubblingUp && SuperView is { })
-            {
-                SuperView.RaiseActivated (e.Value);
-            }
-        }
-
-        _activatedFiredThisCycle = false;
-    }
 
     /// <summary>
     ///     Gets or sets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on
@@ -887,7 +880,6 @@ public class Shortcut : View, IOrientation, IDesignable
         if (disposing)
         {
             TitleChanged -= Shortcut_TitleChanged;
-            CommandView.Activated -= CommandView_Activated;
 
             if (CommandView.SuperView is null)
             {

@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using DriverTests.Input;
-using Xunit.Abstractions;
 
 namespace InputTests;
 
@@ -183,7 +182,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (new Key ('Õ'), options);
 
         // BUGBUG: This is a hack; we need to figure out how to enable this without delay
-        await Task.Delay (50); // Allow some time for processing
+        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
         // Assert - Should raise exactly 3 KeyDown events
@@ -252,7 +251,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (Key.C, options);
 
         // BUGBUG: This is a hack; we need to figure out how to enable this without delay
-        await Task.Delay (50); // Allow some time for processing
+        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
         // Assert - Should raise exactly 3 KeyDown events

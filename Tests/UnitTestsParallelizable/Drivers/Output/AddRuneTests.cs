@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 
@@ -282,6 +281,49 @@ public class AddRuneTests (ITestOutputHelper output) : TestDriverBase
         // \x1b[91m\x1b[103m🍎 (red-on-yellow for both columns 1 and 2)
         DriverAssert.AssertDriverOutputIs (
             "\x1b[97m\x1b[40m \x1b[91m\x1b[103m🍎",
+            output,
+            driver);
+    }
+
+    [Fact]
+    public void AddStr_WideGlyph_Continuation_Cell_Dirty_On_Attribute_Change ()
+    {
+        // Verifies fix for #4780: when a wide character is redrawn with a different attribute
+        // on a SECOND frame (after Refresh has cleared dirty flags), the continuation cell
+        // must be marked dirty so the attribute change is flushed to the terminal.
+        //
+        // Without the fix, after the first Refresh clears IsDirty, redrawing the same glyph
+        // with a new attribute updates column N but the continuation cell (N+1) is not marked
+        // dirty. The second Refresh then skips it, leaving a stale attribute mid-glyph.
+        using IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (4, 1);
+        driver.Force16Colors = true;
+
+        // Frame 1: Draw a wide glyph with white-on-black
+        driver.CurrentAttribute = new Attribute (Color.White, Color.Black);
+        driver.Move (0, 0);
+        driver.AddStr ("🍎ab");
+
+        driver.Refresh ();
+
+        // Frame 2: Redraw the SAME glyph with a new attribute (simulates highlight/selection change)
+        driver.CurrentAttribute = new Attribute (Color.BrightRed, Color.BrightYellow);
+        driver.Move (0, 0);
+        driver.AddStr ("🍎");
+
+        // The continuation cell (column 1) must be dirty for Refresh to output the new attribute
+        Assert.True (driver.Contents! [0, 1].IsDirty,
+            "Continuation cell must be dirty when attribute changes");
+        Assert.Equal (new Attribute (Color.BrightRed, Color.BrightYellow),
+            driver.Contents [0, 1].Attribute);
+
+        driver.Refresh ();
+
+        // The second Refresh must output the attribute change for the wide glyph.
+        // Without the fix, column 1 is not dirty, so Refresh skips it and the output
+        // has a stale attribute change mid-glyph or omits the glyph entirely.
+        DriverAssert.AssertDriverOutputIs (
+            "\x1b[91m\x1b[103m🍎",
             output,
             driver);
     }

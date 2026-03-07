@@ -83,14 +83,14 @@ public class NumericUpDownTests
     [Fact]
     public void WhenCreatedWithInvalidTypeObject_ShouldNotThrowInvalidOperationException ()
     {
-        Exception exception = Record.Exception (() => new NumericUpDown<object> ());
+        Exception? exception = Record.Exception (() => new NumericUpDown<object> ());
         Assert.Null (exception);
     }
 
     [Fact]
     public void WhenCreatedWithValidNumberType_ShouldThrowInvalidOperationException_UnlessTheyAreRegisterAsValid ()
     {
-        Exception exception = Record.Exception (() => new NumericUpDown<short> ());
+        Exception? exception = Record.Exception (() => new NumericUpDown<short> ());
         Assert.NotNull (exception);
     }
 

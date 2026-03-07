@@ -58,7 +58,7 @@ public class VirtualTimeProviderTests
         // Copilot - Test that delays complete when time is advanced past their completion time
         VirtualTimeProvider timeProvider = new ();
 
-        Task delayTask = timeProvider.Delay (TimeSpan.FromSeconds (5));
+        Task delayTask = timeProvider.Delay (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken);
 
         // Delay should not be completed yet
         Assert.False (delayTask.IsCompleted);

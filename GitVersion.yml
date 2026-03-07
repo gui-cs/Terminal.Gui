@@ -34,7 +34,7 @@ branches:
     # Matches the v2_release branch
     regex: ^v2_release$
     # Uses 'alpha' as pre-release label before `beta`
-    label: alpha
+    label: beta
     # Increments patch version (x.y.z+1) on commits
     increment: Patch
     # Specifies v2_develop as the source branch

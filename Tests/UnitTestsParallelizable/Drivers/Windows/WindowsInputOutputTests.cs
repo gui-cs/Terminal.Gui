@@ -1,5 +1,4 @@
 #nullable enable
-using Xunit.Abstractions;
 
 namespace DriverTests.WindowsDriver;
 
@@ -76,6 +75,20 @@ public class WindowsInputOutputTests (ITestOutputHelper output)
             _output.WriteLine ($"Stack trace: {exception.StackTrace}");
         }
 
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void WindowsOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new WindowsOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
         Assert.Null (exception);
     }
 }

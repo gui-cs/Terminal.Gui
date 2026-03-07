@@ -47,19 +47,19 @@ dotnet build --configuration Release --no-restore
 **Time:** ~10 min timeout
 
 ```bash
-dotnet test Tests/UnitTests --no-build --verbosity normal
+dotnet test --project Tests/UnitTests --no-build --verbosity normal
 ```
 
 - Uses `Application.Init` and static state
 - Cannot run in parallel
-- Includes `--blame` flags for crash diagnostics
+- Includes `--diagnostic` flag for logging
 
 ### Run Parallel Tests (Preferred)
 
 **Time:** ~10 min timeout
 
 ```bash
-dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
 ```
 
 - No dependencies on static state
@@ -69,13 +69,13 @@ dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
 ### Run Integration Tests
 
 ```bash
-dotnet test Tests/IntegrationTests --no-build --verbosity normal
+dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
 ```
 
 ### Run All Tests
 
 ```bash
-dotnet test --no-build --verbosity normal
+dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
 ```
 
 ## Common Build Issues
@@ -94,7 +94,7 @@ dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
 **For clean builds, always run in this order:**
 
 ```bash
-dotnet restore && dotnet build --no-restore && dotnet test --no-build
+dotnet restore && dotnet build --no-restore && dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build
 ```
 
 This ensures:

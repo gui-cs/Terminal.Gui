@@ -155,7 +155,7 @@ public class MainLoopCoordinatorTests : IDisposable
         cts.Cancel ();
 
         // Wait for task to complete
-        bool completed = inputTask.Wait (TimeSpan.FromSeconds (10));
+        bool completed = inputTask.Wait (TimeSpan.FromSeconds (10), TestContext.Current.CancellationToken);
         Assert.True (completed, "Input task did not complete within timeout");
 
         // Assert - The key insight: throttle prevents CPU spinning

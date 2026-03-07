@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace ViewBaseTests;
+﻿namespace ViewBaseTests;
 
 /// <summary>
 /// Test the <see cref="Adornment.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.

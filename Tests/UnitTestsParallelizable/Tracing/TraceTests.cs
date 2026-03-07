@@ -1,37 +1,52 @@
+// Claude - Opus 4.5
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
 
 namespace ApplicationTests;
 
 /// <summary>
 ///     Tests for the unified <see cref="Trace"/> system.
+///     All tests work correctly in both Debug and Release builds.
+///     In Release, <c>[Conditional("DEBUG")]</c> trace methods are no-ops,
+///     so capture-based assertions verify entries are empty instead.
 /// </summary>
 public class TraceTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public TraceTests (ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     [Fact]
     public void CommandEnabled_Default_IsFalse ()
     {
         // Clean state
-        Trace.CommandEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
-        Assert.False (Trace.CommandEnabled);
+        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
     }
 
     [Fact]
     public void MouseEnabled_Default_IsFalse ()
     {
         // Clean state
-        Trace.MouseEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
-        Assert.False (Trace.MouseEnabled);
+        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
     }
 
     [Fact]
     public void KeyboardEnabled_Default_IsFalse ()
     {
         // Clean state
-        Trace.KeyboardEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
-        Assert.False (Trace.KeyboardEnabled);
+        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard));
     }
 
     [Fact]
@@ -48,21 +63,26 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command;
 
         try
         {
             View view = new () { Id = "test" };
             Trace.Command (view, Command.Accept, CommandRouting.Direct, "TestPhase", "TestMessage");
 
+#if DEBUG
             Assert.Single (backend.Entries);
             Assert.Equal (TraceCategory.Command, backend.Entries [0].Category);
             Assert.Contains ("test", backend.Entries [0].Id);
             Assert.Equal ("TestPhase", backend.Entries [0].Phase);
+#else
+            // In Release, [Conditional("DEBUG")] removes Trace.Command calls entirely
+            Assert.Empty (backend.Entries);
+#endif
         }
         finally
         {
-            Trace.CommandEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -72,21 +92,25 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.MouseEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Mouse;
 
         try
         {
             View view = new () { Id = "mouseTest" };
             Trace.Mouse (view, MouseFlags.LeftButtonClicked, new Point (10, 20), "Click");
 
+#if DEBUG
             Assert.Single (backend.Entries);
             Assert.Equal (TraceCategory.Mouse, backend.Entries [0].Category);
             Assert.Contains ("mouseTest", backend.Entries [0].Id);
             Assert.Equal ("Click", backend.Entries [0].Phase);
+#else
+            Assert.Empty (backend.Entries);
+#endif
         }
         finally
         {
-            Trace.MouseEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -96,21 +120,25 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.KeyboardEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Keyboard;
 
         try
         {
             View view = new () { Id = "keyTest" };
             Trace.Keyboard (view, Key.A, "KeyDown");
 
+#if DEBUG
             Assert.Single (backend.Entries);
             Assert.Equal (TraceCategory.Keyboard, backend.Entries [0].Category);
             Assert.Contains ("keyTest", backend.Entries [0].Id);
             Assert.Equal ("KeyDown", backend.Entries [0].Phase);
+#else
+            Assert.Empty (backend.Entries);
+#endif
         }
         finally
         {
-            Trace.KeyboardEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -120,9 +148,7 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = false;
-        Trace.MouseEnabled = false;
-        Trace.KeyboardEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
         try
         {
@@ -131,6 +157,7 @@ public class TraceTests
             Trace.Mouse (view, MouseFlags.LeftButtonClicked, Point.Empty, "Test");
             Trace.Keyboard (view, Key.A, "Test");
 
+            // Empty in both Debug (disabled categories) and Release (conditional compilation)
             Assert.Empty (backend.Entries);
         }
         finally
@@ -144,9 +171,7 @@ public class TraceTests
     {
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = true;
-        Trace.MouseEnabled = false;
-        Trace.KeyboardEnabled = true;
+        Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Keyboard;
 
         try
         {
@@ -156,15 +181,18 @@ public class TraceTests
             Trace.Mouse (view, MouseFlags.LeftButtonClicked, Point.Empty, "Mouse");
             Trace.Keyboard (view, Key.A, "Key");
 
+#if DEBUG
             Assert.Equal (2, backend.Entries.Count);
             Assert.Contains (backend.Entries, e => e.Category == TraceCategory.Command);
             Assert.Contains (backend.Entries, e => e.Category == TraceCategory.Keyboard);
             Assert.DoesNotContain (backend.Entries, e => e.Category == TraceCategory.Mouse);
+#else
+            Assert.Empty (backend.Entries);
+#endif
         }
         finally
         {
-            Trace.CommandEnabled = false;
-            Trace.KeyboardEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -223,25 +251,15 @@ public class TraceTests
     public void Clear_RemovesAllEntries ()
     {
         ListBackend backend = new ();
-        Trace.Backend = backend;
-        Trace.CommandEnabled = true;
 
-        try
-        {
-            View view = new () { Id = "test" };
-            Trace.Command (view, Command.Accept, CommandRouting.Direct, "Test");
+        // Directly add an entry to the backend to test Clear independently of Trace methods
+        backend.Log (new TraceEntry (TraceCategory.Command, "test", "Test", "TestMethod", null, DateTime.UtcNow, null));
 
-            Assert.Single (backend.Entries);
+        Assert.Single (backend.Entries);
 
-            backend.Clear ();
+        backend.Clear ();
 
-            Assert.Empty (backend.Entries);
-        }
-        finally
-        {
-            Trace.CommandEnabled = false;
-            Trace.Backend = new NullBackend ();
-        }
+        Assert.Empty (backend.Entries);
     }
 
     [Fact]
@@ -249,9 +267,7 @@ public class TraceTests
     {
         // Reset to NullBackend
         Trace.Backend = new NullBackend ();
-        Trace.CommandEnabled = false;
-        Trace.MouseEnabled = false;
-        Trace.KeyboardEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
         // Verify starting state
         Assert.IsType<NullBackend> (Trace.Backend);
@@ -259,13 +275,13 @@ public class TraceTests
         try
         {
             // Enable a category - should auto-switch to LoggingBackend
-            Trace.MouseEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Mouse;
 
             Assert.IsType<LoggingBackend> (Trace.Backend);
         }
         finally
         {
-            Trace.MouseEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -276,19 +292,239 @@ public class TraceTests
         // Set explicit ListBackend
         ListBackend backend = new ();
         Trace.Backend = backend;
-        Trace.CommandEnabled = false;
+        Trace.EnabledCategories = TraceCategory.None;
 
         try
         {
             // Enable a category - should NOT overwrite explicit backend
-            Trace.CommandEnabled = true;
+            Trace.EnabledCategories = TraceCategory.Command;
 
             Assert.Same (backend, Trace.Backend);
         }
         finally
         {
-            Trace.CommandEnabled = false;
+            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
+
+    [Theory]
+    [InlineData (TraceCategory.None, "\"None\"")]
+    [InlineData (TraceCategory.Command, "\"Command\"")]
+    [InlineData (TraceCategory.Mouse, "\"Mouse\"")]
+    [InlineData (TraceCategory.All, "\"All\"")]
+    [InlineData (TraceCategory.Command | TraceCategory.Mouse, "[\"Command\",\"Mouse\"]")]
+    [InlineData (TraceCategory.Command | TraceCategory.Keyboard | TraceCategory.Navigation, "[\"Command\",\"Keyboard\",\"Navigation\"]")]
+    public void TraceCategoryJsonConverter_RoundTrip (TraceCategory category, string expectedJson)
+    {
+        // Arrange
+        var options = new JsonSerializerOptions ();
+        options.Converters.Add (new TraceCategoryJsonConverter ());
+
+        // Act - Serialize
+        string json = JsonSerializer.Serialize (category, options);
+
+        // Assert - Verify JSON format
+        Assert.Equal (expectedJson, json);
+
+        // Act - Deserialize
+        var deserialized = JsonSerializer.Deserialize<TraceCategory> (json, options);
+
+        // Assert - Verify round-trip
+        Assert.Equal (category, deserialized);
+    }
+
+    [Fact]
+    public void TraceCategoryJsonConverter_DeserializeFromNumber ()
+    {
+        // Arrange
+        var options = new JsonSerializerOptions ();
+        options.Converters.Add (new TraceCategoryJsonConverter ());
+        var json = "6"; // Command (2) | Mouse (4)
+
+        // Act
+        var deserialized = JsonSerializer.Deserialize<TraceCategory> (json, options);
+
+        // Assert
+        Assert.Equal (TraceCategory.Command | TraceCategory.Mouse, deserialized);
+    }
+
+    [Fact]
+    public void EnabledCategories_ConfigurationManager_RoundTrip ()
+    {
+        try
+        {
+            // Save original state
+            TraceCategory originalCategories = Trace.EnabledCategories;
+
+            // Test setting via property
+            Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
+            Assert.Equal (TraceCategory.Command | TraceCategory.Mouse, Trace.EnabledCategories);
+
+            // Test that ConfigurationProperty attribute is present
+            PropertyInfo? property = typeof (Trace).GetProperty (nameof (Trace.EnabledCategories));
+            Assert.NotNull (property);
+
+            ConfigurationPropertyAttribute? attr = property.GetCustomAttributes (typeof (ConfigurationPropertyAttribute), false)
+                                                           .Cast<ConfigurationPropertyAttribute> ()
+                                                           .FirstOrDefault ();
+
+            Assert.NotNull (attr);
+            Assert.Equal (typeof (SettingsScope), attr.Scope);
+
+            // Test that JsonConverter attribute is present
+            JsonConverterAttribute? converterAttr = property.GetCustomAttributes (typeof (JsonConverterAttribute), false)
+                                                            .Cast<JsonConverterAttribute> ()
+                                                            .FirstOrDefault ();
+
+            Assert.NotNull (converterAttr);
+            Assert.Equal (typeof (TraceCategoryJsonConverter), converterAttr.ConverterType);
+
+            // Restore original state
+            Trace.EnabledCategories = originalCategories;
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+        }
+    }
+
+    #region Scenario Tests (merged from IssueScenarioTraceTests)
+
+    /// <summary>
+    ///     Demonstrates using TestLogging.Verbose with TraceFlags parameter.
+    /// </summary>
+    [Fact]
+    public void Example_Test_With_Tracing_Enabled ()
+    {
+        using (TestLogging.Verbose (traceCategories: TraceCategory.Command, output: _output))
+        {
+            CheckBox checkbox = new () { Id = "checkbox" };
+
+            checkbox.InvokeCommand (Command.Activate);
+
+            _output.WriteLine ("Command tracing enabled successfully without affecting other tests");
+        }
+    }
+
+    /// <summary>
+    ///     This test can run in parallel with Example_Test_With_Tracing_Enabled.
+    ///     Even if it sets tracing to disabled, it won't affect the other test.
+    /// </summary>
+    [Fact]
+    public void Parallel_Test_With_Tracing_Disabled ()
+    {
+        // Explicitly disable tracing in this test's async context
+        using (Trace.PushScope (TraceCategory.None))
+        {
+            CheckBox checkbox = new () { Id = "parallel-checkbox" };
+
+            checkbox.InvokeCommand (Command.Accept);
+
+            // No trace output expected
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+        }
+    }
+
+    /// <summary>
+    ///     Another parallel test that enables different trace categories.
+    /// </summary>
+    [Fact]
+    public void Parallel_Test_With_Mouse_Tracing ()
+    {
+        using (TestLogging.Verbose (_output, TraceCategory.Mouse))
+        {
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates using Trace.PushScope directly with a custom backend.
+    /// </summary>
+    [Fact]
+    public void Direct_PushScope_Usage ()
+    {
+        ListBackend backend = new ();
+
+        using (Trace.PushScope (TraceCategory.Command | TraceCategory.Keyboard, backend))
+        {
+            CheckBox checkbox = new () { Id = "scope-test" };
+            checkbox.InvokeCommand (Command.Accept);
+
+#if DEBUG
+            // Verify traces were captured
+            Assert.NotEmpty (backend.Entries);
+            Assert.All (backend.Entries, e => Assert.True (e.Category == TraceCategory.Command || e.Category == TraceCategory.Keyboard));
+#else
+            // In Release, [Conditional("DEBUG")] removes trace calls, so nothing is captured
+            Assert.Empty (backend.Entries);
+#endif
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates EnabledCategories property for flags-based API.
+    /// </summary>
+    [Fact]
+    public void EnabledCategories_FlagsAPI ()
+    {
+        using (Trace.PushScope (TraceCategory.Command | TraceCategory.Mouse | TraceCategory.Keyboard))
+        {
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard));
+            Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Navigation));
+        }
+    }
+
+    /// <summary>
+    ///     Simulates a parallel test scenario where tests run concurrently.
+    ///     This would have failed with the old static implementation.
+    /// </summary>
+    [Fact]
+    public async Task Concurrent_Tests_Are_Isolated ()
+    {
+        // Run multiple tasks concurrently, each with different trace settings
+        Task task1 = Task.Run (async () =>
+                               {
+                                   using (Trace.PushScope (TraceCategory.Command))
+                                   {
+                                       await Task.Delay (10);
+                                       Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+                                       await Task.Delay (10);
+                                   }
+                               },
+                               TestContext.Current.CancellationToken);
+
+        Task task2 = Task.Run (async () =>
+                               {
+                                   using (Trace.PushScope (TraceCategory.Mouse))
+                                   {
+                                       await Task.Delay (10);
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                                       Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+                                       await Task.Delay (10);
+                                   }
+                               },
+                               TestContext.Current.CancellationToken);
+
+        Task task3 = Task.Run (async () =>
+                               {
+                                   using (Trace.PushScope (TraceCategory.None))
+                                   {
+                                       await Task.Delay (10);
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
+                                       Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
+                                       await Task.Delay (10);
+                                   }
+                               },
+                               TestContext.Current.CancellationToken);
+
+        // Wait for all tasks - they should all succeed without interfering
+        await Task.WhenAll (task1, task2, task3);
+    }
+
+    #endregion
 }

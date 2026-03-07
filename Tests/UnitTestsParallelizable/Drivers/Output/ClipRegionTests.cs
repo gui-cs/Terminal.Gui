@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 

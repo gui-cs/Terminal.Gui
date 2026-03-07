@@ -121,7 +121,7 @@ public class AppendAutocomplete : AutocompleteBase
         string fragment = suggestion.Replacement.Substring (suggestion.Remove);
 
         int spaceAvailable = _textField.Viewport.Width - _textField.Text.GetColumns ();
-        int spaceRequired = fragment.EnumerateRunes ().Sum (c => c.GetColumns ());
+        int spaceRequired = fragment.GetColumns ();
 
         if (spaceAvailable < spaceRequired)
         {

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace ViewsTests;
 
 [TestSubject (typeof (Shortcut))]
-public partial class ShortcutTests
+public partial class ShortcutTests (ITestOutputHelper output)
 {
     // CommandView Test view for Shortcut tests
     private sealed class TestCommandView : View, IValue<int?>
@@ -76,17 +76,23 @@ public partial class ShortcutTests
 
         // CommandView defaults
         Assert.NotNull (shortcut.CommandView);
+#if DEBUG
         Assert.Equal ("CommandView", shortcut.CommandView.Id);
+#endif
 
         // HelpView defaults
         Assert.NotNull (shortcut.HelpView);
+#if DEBUG
         Assert.Equal ("_helpView", shortcut.HelpView.Id);
+#endif
         Assert.Equal (string.Empty, shortcut.HelpView.Text);
         Assert.True (shortcut.HelpView.Visible);
 
         // KeyView defaults
         Assert.NotNull (shortcut.KeyView);
+#if DEBUG
         Assert.Equal ("_keyView", shortcut.KeyView.Id);
+#endif
         Assert.Equal (string.Empty, shortcut.KeyView.Text);
         Assert.True (shortcut.KeyView.Visible);
 

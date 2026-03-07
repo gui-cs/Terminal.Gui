@@ -149,13 +149,12 @@ protected override void OnActivated (ICommandContext? ctx)
 }
 ```
 
-### CommandView_Activated — Deferred Activation
+### BubbleActivatedUp — Post-Completion Notification
 
-<xref:Terminal.Gui.Views.Shortcut> subscribes to `CommandView.Activated`. When a command bubbles up from within CommandView and reaches Shortcut's `HandleActivate` with `IsBubblingUp = true`, <xref:Terminal.Gui.Views.Shortcut> defers its own `RaiseActivated` until `CommandView.Activated` fires. This ensures the CommandView completes its state change (e.g., <xref:Terminal.Gui.Views.CheckBox> toggles) before <xref:Terminal.Gui.Views.Shortcut> raises its own <xref:Terminal.Gui.ViewBase.View.Activated> event.
+When a command completes activation (either via the normal path or after ConsumeDispatch), the framework walks up the SuperView chain and fires `RaiseActivated` on ancestors that subscribe via `CommandsToBubbleUp`. This ensures:
 
-`CommandView_Activated` handles two cases:
-1. **Deferred path**: `HandleActivate` set `_activationBubbledUp = true` — fires deferred `RaiseActivated` with the saved context.
-2. **Consumed-by-CommandView path**: The CommandView (e.g., `OptionSelector`, `FlagSelector`) consumed the bubble in its `OnActivating` (before it reached Shortcut's `HandleActivate`), then called `RaiseActivated` directly. In this case, the event context has `IsBubblingUp = true` — Shortcut's `CommandView_Activated` detects this and fires `RaiseActivated`.
+1. **Relay-dispatch path** (e.g., Shortcut with CheckBox): After the CheckBox completes its state change (e.g., toggles), `BubbleActivatedUp` fires `RaiseActivated` on composite ancestors (Shortcut). This guarantees `Action` sees the updated state.
+2. **Consume-dispatch path** (e.g., MenuItem with OptionSelector/FlagSelector): After the OptionSelector consumes the command and updates its value, `BubbleActivatedUp` fires `RaiseActivated` on all ancestors in the chain (MenuItem → Menu → SuperView), enabling full-chain notification.
 
 ## Detailed Command Flows
 

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
-using Xunit.Abstractions;
+using Xunit.v3;
 
 namespace UnitTests.ViewsTests;
 
@@ -1675,21 +1675,21 @@ Les Miśerables",
     [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
     public class TextFieldTestsAutoInitShutdown : AutoInitShutdownAttribute
     {
-        public override void After (MethodInfo methodUnderTest)
+        public override void After (MethodInfo methodUnderTest, IXunitTest test)
         {
             _textField.Dispose ();
             _textField = null;
-            base.After (methodUnderTest);
+            base.After (methodUnderTest, test);
         }
 
-        public override void Before (MethodInfo methodUnderTest)
+        public override void Before (MethodInfo methodUnderTest, IXunitTest test)
         {
-            base.Before (methodUnderTest);
+            base.Before (methodUnderTest, test);
 
             //Application.TopRunnable.Scheme = Colors.Schemes ["Base"];
             _textField = new TextField
             {
-                //                1         2         3 
+                //                1         2         3
                 //      01234567890123456789012345678901=32 (Length)
                 Text = "TAB to jump between text fields.", Width = 32, App = ApplicationImpl.Instance
             };

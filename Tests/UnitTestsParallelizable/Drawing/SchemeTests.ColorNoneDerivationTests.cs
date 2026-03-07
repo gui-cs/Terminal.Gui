@@ -2,7 +2,6 @@
 
 using System.Collections.Immutable;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace DrawingTests;
 

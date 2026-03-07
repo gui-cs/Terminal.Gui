@@ -9,7 +9,7 @@ public class ApplicationPopoverTests
     public void Register_AddsPopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
 
         // Act
@@ -23,7 +23,7 @@ public class ApplicationPopoverTests
     public void DeRegister_RemovesPopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
         popoverManager.Register (popover);
 
@@ -54,7 +54,7 @@ public class ApplicationPopoverTests
     public void Hide_ClearsActivePopover ()
     {
         // Arrange
-        IPopover popover = new Mock<IPopover> ().Object;
+        IPopoverView popover = new Mock<IPopoverView> ().Object;
         var popoverManager = new ApplicationPopover ();
         popoverManager.Register (popover);
         popoverManager.Show (popover);
@@ -77,7 +77,7 @@ public class ApplicationPopoverTests
         popoverManager.Show (popover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.A);
+        popoverManager.DispatchKeyDownToActivePopover (Key.A);
 
         // Assert
         Assert.Contains (KeyCode.A, popover.HandledKeys);
@@ -93,7 +93,7 @@ public class ApplicationPopoverTests
         popoverManager.Show (popover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.N.WithCtrl);
+        popoverManager.DispatchKeyDownToActivePopover (Key.N.WithCtrl);
 
         // Assert
         Assert.Equal (1, popover.NewCommandInvokeCount);
@@ -104,17 +104,20 @@ public class ApplicationPopoverTests
     public void DispatchKeyDown_InactivePopoverGetsHotKey ()
     {
         // Arrange
-        var activePopover = new PopoverTestClass { Id = "activePopover" };
-        var inactivePopover = new PopoverTestClass { Id = "inactivePopover" };
+        // Arrange
+        ApplicationImpl app = new ();
+        ApplicationPopover popoverManager = new () { App = app };
+        app.Popovers = popoverManager;
 
-        var popoverManager = new ApplicationPopover ();
+        var activePopover = new PopoverTestClass { Id = "activePopover", HandleNewCommand = false };
+        var inactivePopover = new PopoverTestClass { Id = "inactivePopover", HandleNewCommand = true };
 
         popoverManager.Register (activePopover);
         popoverManager.Show (activePopover);
         popoverManager.Register (inactivePopover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.N.WithCtrl);
+        app.Keyboard.RaiseKeyDownEvent (Key.N.WithCtrl);
 
         // Assert
         Assert.Equal (1, activePopover.NewCommandInvokeCount);
@@ -124,7 +127,29 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void DispatchKeyDown_InactivePopoverDoesGetKey ()
+    public void DispatchKeyDown_InactivePopoverDoesNotGetHotKey_If_Active_Handles ()
+    {
+        // Arrange
+        var activePopover = new PopoverTestClass { Id = "activePopover", HandleNewCommand = true };
+        var inactivePopover = new PopoverTestClass { Id = "inactivePopover", HandleNewCommand = false };
+
+        var popoverManager = new ApplicationPopover ();
+
+        popoverManager.Register (activePopover);
+        popoverManager.Show (activePopover);
+        popoverManager.Register (inactivePopover);
+
+        // Act
+        popoverManager.DispatchKeyDownToActivePopover (Key.N.WithCtrl);
+
+        // Assert
+        Assert.Equal (1, activePopover.NewCommandInvokeCount);
+        Assert.Equal (0, inactivePopover.NewCommandInvokeCount);
+        Assert.Empty (inactivePopover.HandledKeys);
+    }
+
+    [Fact]
+    public void DispatchKeyDown_InactivePopoverDoesNotGetKeyDown ()
     {
         // Arrange
         var activePopover = new PopoverTestClass ();
@@ -136,11 +161,11 @@ public class ApplicationPopoverTests
         popoverManager.Register (inactivePopover);
 
         // Act
-        popoverManager.DispatchKeyDown (Key.A);
+        popoverManager.DispatchKeyDownToActivePopover (Key.A);
 
         // Assert
         Assert.Contains (Key.A, activePopover.HandledKeys);
-        Assert.NotEmpty (inactivePopover.HandledKeys);
+        Assert.Empty (inactivePopover.HandledKeys);
     }
 
     // Claude - Opus 4.5
@@ -168,7 +193,7 @@ public class ApplicationPopoverTests
                                   };
 
         // Act & Assert — should not throw InvalidOperationException
-        Exception? ex = Record.Exception (() => popoverManager.DispatchKeyDown (Key.A));
+        Exception? ex = Record.Exception (() => popoverManager.DispatchKeyDownToActivePopover (Key.A));
         Assert.Null (ex);
     }
 
@@ -225,16 +250,52 @@ public class ApplicationPopoverTests
         Assert.Equal (initialVisibleState, popover2.Visible);
     }
 
-    public class PopoverTestClass : View, IPopover
+    public class PopoverTestClass : View, IPopoverView
     {
         public List<Key> HandledKeys { get; } = [];
+
         public int NewCommandInvokeCount { get; private set; }
+
+        public bool HandleNewCommand { get; set; }
 
         /// <summary>
         ///     Optional callback invoked during OnKeyDown. Can be used to test
         ///     modification of popover state during key dispatch.
         /// </summary>
         public Func<Key, bool>? OnKeyDownCallback { get; set; }
+
+        public bool GrabsMouseOnPress
+        {
+            get;
+            set
+            {
+                field = value;
+
+                if (value && MouseGrabbingSubView is null)
+                {
+                    MouseGrabbingSubView = new MouseGrabbingView
+                    {
+                        X = 0,
+                        Y = 0,
+                        Width = 10,
+                        Height = 10,
+                        CanFocus = true
+                    };
+                    Add (MouseGrabbingSubView);
+                }
+                else if (!value && MouseGrabbingSubView is not null)
+                {
+                    Remove (MouseGrabbingSubView);
+                    MouseGrabbingSubView.Dispose ();
+                    MouseGrabbingSubView = null;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Gets the SubView that grabs the mouse, if <see cref="GrabsMouseOnPress"/> is <see langword="true"/>.
+        /// </summary>
+        public MouseGrabbingView? MouseGrabbingSubView { get; private set; }
 
         public PopoverTestClass ()
         {
@@ -264,7 +325,7 @@ public class ApplicationPopoverTests
             {
                 NewCommandInvokeCount++;
 
-                return false;
+                return HandleNewCommand;
             }
         }
 
@@ -283,5 +344,45 @@ public class ApplicationPopoverTests
 
         /// <inheritdoc/>
         public IRunnable? Owner { get; set; }
+
+        /// <inheritdoc/>
+        public Func<Rectangle?>? Anchor { get; set; }
+
+        /// <inheritdoc/>
+        public WeakReference<View>? Target { get; set; }
+
+        /// <inheritdoc/>
+        public void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null) => Visible = true;
+    }
+
+    /// <summary>
+    ///     A View that grabs the mouse on left button press and releases it on left button release.
+    ///     Used for testing drag scenarios where mouse grab should prevent popover dismissal.
+    /// </summary>
+    public class MouseGrabbingView : View
+    {
+        /// <summary>Gets whether this view currently has the mouse grabbed.</summary>
+        public bool IsMouseGrabbed { get; private set; }
+
+        /// <inheritdoc/>
+        protected override bool OnMouseEvent (Mouse mouse)
+        {
+            if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+            {
+                App?.Mouse.GrabMouse (this);
+                IsMouseGrabbed = true;
+
+                return true;
+            }
+
+            if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+            {
+                return base.OnMouseEvent (mouse);
+            }
+            App?.Mouse.UngrabMouse ();
+            IsMouseGrabbed = false;
+
+            return true;
+        }
     }
 }

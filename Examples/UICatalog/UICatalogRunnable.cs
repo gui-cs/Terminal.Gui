@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using Terminal.Gui;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 using Trace = Terminal.Gui.Tracing.Trace;
 
@@ -101,7 +102,7 @@ public sealed class UICatalogRunnable : Runnable
 
             if (_scenarioList is { })
             {
-                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
+                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
             }
 
             UICatalog.LogCapture.HasErrors = false;
@@ -289,28 +290,113 @@ public sealed class UICatalogRunnable : Runnable
             menuItems.Add (new Line ());
 
             // Trace toggles
-            CheckBox lifecycleTraceCheckBox = new () { Text = "_Lifecycle", Value = Trace.LifecycleEnabled ? CheckState.Checked : CheckState.UnChecked };
-            lifecycleTraceCheckBox.ValueChanging += (_, e) => { Trace.LifecycleEnabled = e.NewValue == CheckState.Checked; };
+            CheckBox lifecycleTraceCheckBox = new ()
+            {
+                Text = "_Lifecycle",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Lifecycle) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
+
+            lifecycleTraceCheckBox.ValueChanging += (_, e) =>
+                                                    {
+                                                        if (e.NewValue == CheckState.Checked)
+                                                        {
+                                                            Trace.EnabledCategories |= TraceCategory.Lifecycle;
+                                                        }
+                                                        else
+                                                        {
+                                                            Trace.EnabledCategories &= ~TraceCategory.Lifecycle;
+                                                        }
+                                                    };
+
             menuItems.Add (new MenuItem { CommandView = lifecycleTraceCheckBox, HelpText = "Toggle App & Driver lifecycle tracing", Key = Key.L.WithCtrl });
 
             // ReSharper disable once StringLiteralTypo
-            CheckBox commandTraceCheckBox = new () { Text = "C_ommand", Value = Trace.CommandEnabled ? CheckState.Checked : CheckState.UnChecked };
-            commandTraceCheckBox.ValueChanging += (_, e) => { Trace.CommandEnabled = e.NewValue == CheckState.Checked; };
+            CheckBox commandTraceCheckBox = new ()
+            {
+                Text = "C_ommand",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Command) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
+
+            commandTraceCheckBox.ValueChanging += (_, e) =>
+                                                  {
+                                                      if (e.NewValue == CheckState.Checked)
+                                                      {
+                                                          Trace.EnabledCategories |= TraceCategory.Command;
+                                                      }
+                                                      else
+                                                      {
+                                                          Trace.EnabledCategories &= ~TraceCategory.Command;
+                                                      }
+                                                  };
+
             menuItems.Add (new MenuItem { CommandView = commandTraceCheckBox, HelpText = "Toggle Command tracing", Key = Key.C.WithCtrl });
 
-            CheckBox mouseTraceCheckBox = new () { Text = "_Mouse", Value = Trace.MouseEnabled ? CheckState.Checked : CheckState.UnChecked };
-            mouseTraceCheckBox.ValueChanging += (_, e) => { Trace.MouseEnabled = e.NewValue == CheckState.Checked; };
+            CheckBox mouseTraceCheckBox = new ()
+            {
+                Text = "_Mouse", Value = Trace.EnabledCategories.HasFlag (TraceCategory.Mouse) ? CheckState.Checked : CheckState.UnChecked, CanFocus = false
+            };
+
+            mouseTraceCheckBox.ValueChanging += (_, e) =>
+                                                {
+                                                    if (e.NewValue == CheckState.Checked)
+                                                    {
+                                                        Trace.EnabledCategories |= TraceCategory.Mouse;
+                                                    }
+                                                    else
+                                                    {
+                                                        Trace.EnabledCategories &= ~TraceCategory.Mouse;
+                                                    }
+                                                };
+
             menuItems.Add (new MenuItem { CommandView = mouseTraceCheckBox, HelpText = "Toggle Mouse event tracing", Key = Key.U.WithCtrl });
 
-            CheckBox keyboardTraceCheckBox = new () { Text = "_Keyboard", Value = Trace.KeyboardEnabled ? CheckState.Checked : CheckState.UnChecked };
-            keyboardTraceCheckBox.ValueChanging += (_, e) => { Trace.KeyboardEnabled = e.NewValue == CheckState.Checked; };
+            CheckBox keyboardTraceCheckBox = new ()
+            {
+                Text = "_Keyboard",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Keyboard) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
+
+            keyboardTraceCheckBox.ValueChanging += (_, e) =>
+                                                   {
+                                                       if (e.NewValue == CheckState.Checked)
+                                                       {
+                                                           Trace.EnabledCategories |= TraceCategory.Keyboard;
+                                                       }
+                                                       else
+                                                       {
+                                                           Trace.EnabledCategories &= ~TraceCategory.Keyboard;
+                                                       }
+                                                   };
+
             menuItems.Add (new MenuItem { CommandView = keyboardTraceCheckBox, HelpText = "Toggle Keyboard event tracing", Key = Key.K.WithCtrl });
 
-            CheckBox navTraceCheckBox = new () { Text = "_Navigation", Value = Trace.NavigationEnabled ? CheckState.Checked : CheckState.UnChecked };
-            navTraceCheckBox.ValueChanging += (_, e) => { Trace.NavigationEnabled = e.NewValue == CheckState.Checked; };
+            CheckBox navTraceCheckBox = new ()
+            {
+                Text = "_Navigation",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Navigation) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
 
-           // TODO: Implement Trace.Navigation and enable this
-            menuItems.Add (new MenuItem { Enabled = false, CommandView = navTraceCheckBox, HelpText = "Toggle Focus & TabBehavior tracing", Key = Key.K.WithCtrl });
+            navTraceCheckBox.ValueChanging += (_, e) =>
+                                              {
+                                                  if (e.NewValue == CheckState.Checked)
+                                                  {
+                                                      Trace.EnabledCategories |= TraceCategory.Navigation;
+                                                  }
+                                                  else
+                                                  {
+                                                      Trace.EnabledCategories &= ~TraceCategory.Navigation;
+                                                  }
+                                              };
+
+            // TODO: Implement Trace.Navigation and enable this
+            menuItems.Add (new MenuItem
+            {
+                Enabled = false, CommandView = navTraceCheckBox, HelpText = "Toggle Focus & TabBehavior tracing", Key = Key.K.WithCtrl
+            });
 
             // add a separator
             menuItems.Add (new Line ());
@@ -407,7 +493,7 @@ public sealed class UICatalogRunnable : Runnable
         scenarioList.Style.ShowHeaders = false;
         scenarioList.Style.ShowHorizontalHeaderOverline = false;
         scenarioList.Style.ShowHorizontalHeaderUnderline = false;
-        scenarioList.Style.ShowHorizontalBottomline = false;
+        scenarioList.Style.ShowHorizontalBottomLine = false;
         scenarioList.Style.ShowVerticalCellLines = false;
         scenarioList.Style.ShowVerticalHeaderLines = false;
 
@@ -454,7 +540,7 @@ public sealed class UICatalogRunnable : Runnable
         _cachedScenarioIndex = _scenarioList!.SelectedRow;
 
         // Set the Result to the selected scenario name
-        Result = (string)_scenarioList.Table [_scenarioList.SelectedRow, 0];
+        Result = (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0];
         Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
         App?.RequestStop ();
     }
@@ -654,7 +740,7 @@ public sealed class UICatalogRunnable : Runnable
                            |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
                         """);
         msg.AppendLine ();
-        msg.AppendLine ("v2 - Pre-Alpha");
+        msg.AppendLine ("v2 - Beta");
         msg.AppendLine ();
         msg.Append ("https://github.com/gui-cs/Terminal.Gui");
 

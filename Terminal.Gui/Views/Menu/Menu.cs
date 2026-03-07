@@ -3,10 +3,49 @@ using Terminal.Gui.Tracing;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
-///     <see cref="MenuItem"/>.
+///     A vertically-oriented <see cref="Bar"/> that contains <see cref="MenuItem"/> items, supporting cascading
+///     sub-menus, selection tracking, and the <see cref="IValue{T}"/> pattern.
 /// </summary>
-public class Menu : Bar, IDesignable
+/// <remarks>
+///     <para>
+///         <see cref="Menu"/> extends <see cref="Bar"/> with vertical orientation and specializes it for
+///         <see cref="MenuItem"/> items. It supports <see cref="Line"/> separators between items and uses the
+///         <see cref="SchemeManager.SchemesToSchemeName">Schemes.Menu</see> color scheme by default.
+///     </para>
+///     <para>
+///         <b>Selection Tracking:</b> The <see cref="SelectedMenuItem"/> property tracks the currently focused
+///         <see cref="MenuItem"/>. The <see cref="SelectedMenuItemChanged"/> event fires when the selection changes.
+///         <see cref="OnSelectedMenuItemChanged"/> automatically hides peer SubMenus and shows the selected item's
+///         <see cref="MenuItem.SubMenu"/> with positioning relative to the parent <see cref="Menu"/>.
+///     </para>
+///     <para>
+///         <b>Command Propagation:</b> Sets <see cref="View.CommandsToBubbleUp"/> to
+///         [<see cref="Command.Accept"/>, <see cref="Command.Activate"/>], enabling commands from
+///         <see cref="MenuItem"/> items to propagate up through the menu hierarchy (e.g., through
+///         <see cref="PopoverMenu"/> and back to a <see cref="MenuBarItem"/>). Overrides
+///         <see cref="View.OnActivating"/> to dispatch <see cref="Command.Activate"/> to the focused
+///         <see cref="MenuItem"/>.
+///     </para>
+///     <para>
+///         <b>IValue Support:</b> Implements <see cref="IValue{T}"/> where <c>T</c> is <see cref="MenuItem"/>.
+///         The <see cref="Value"/> property is automatically set when a <see cref="MenuItem"/> is activated or
+///         accepted, enabling callers to determine which item triggered the command.
+///     </para>
+///     <para>
+///         <b>Hierarchy Traversal:</b> Use <see cref="GetAllSubMenus"/> for depth-first traversal of the
+///         SubMenu hierarchy, and <see cref="GetMenuItemsOfAllSubMenus"/> to collect all <see cref="MenuItem"/>s
+///         across the hierarchy with an optional predicate filter.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         details on the <see cref="Shortcut"/> base class and command routing patterns.
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         full menu system architecture, class hierarchy, command routing, and usage examples.
+///     </para>
+/// </remarks>
+public class Menu : Bar, IValue<MenuItem?>
 {
     /// <summary>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
@@ -57,6 +96,19 @@ public class Menu : Bar, IDesignable
     public MenuItem? SuperMenuItem { get; set; }
 
     /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        // When a MenuItem's Accept command bubbles up, capture it as our Value
+        // before calling base, which will bubble it further.
+        if (args.Context?.Routing == CommandRouting.BubblingUp && args.Context.Source?.TryGetTarget (out View? source) == true && source is MenuItem menuItem)
+        {
+            Value = menuItem;
+        }
+
+        return base.OnAccepting (args);
+    }
+
+    /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         Trace.Command (this, args.Context, "Entry", $"Routing={args.Context?.Routing} Cmd={args.Context?.Command}");
@@ -66,22 +118,29 @@ public class Menu : Bar, IDesignable
             return true;
         }
 
-        // When a MenuItem's activation bubbles up, don't re-dispatch — let normal bubbling proceed.
+        // When a MenuItem's activation bubbles up, capture it as our Value and let normal bubbling proceed.
+        // MenuItem now implements IValue (returning Title), so ctx.Value is already populated by the framework.
         if (args.Context?.Routing == CommandRouting.BubblingUp)
         {
+            if (args.Context.Source?.TryGetTarget (out View? source) == true && source is MenuItem menuItem)
+            {
+                Value = menuItem;
+            }
+
             return false;
         }
 
         // Dispatch Activate to the focused MenuItem. This enables callers to invoke
         // menu.InvokeCommand(Activate) and have it reach the selected MenuItem and its CommandView.
-        if (Focused is not MenuItem menuItem)
+        if (Focused is not MenuItem focusedMenuItem)
         {
             return false;
         }
+
         KeyBinding binding = new ([Command.Activate]);
-        WeakReference<View> source = new (this);
-        CommandContext ctx = new (Command.Activate, source, binding);
-        menuItem.InvokeCommand (Command.Activate, ctx);
+        WeakReference<View> sourceRef = new (this);
+        CommandContext ctx = new (Command.Activate, sourceRef, binding);
+        focusedMenuItem.InvokeCommand (Command.Activate, ctx);
 
         return true;
     }
@@ -116,7 +175,6 @@ public class Menu : Bar, IDesignable
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
-
         RaiseSelectedMenuItemChanged (SelectedMenuItem);
     }
 
@@ -124,7 +182,7 @@ public class Menu : Bar, IDesignable
     ///     Gets the currently selected menu item. This is a helper that
     ///     tracks <see cref="View.Focused"/>.
     /// </summary>
-    public MenuItem? SelectedMenuItem => Focused as MenuItem;
+    public MenuItem? SelectedMenuItem => (Focused ?? PreviouslyFocused) as MenuItem;
 
     internal void RaiseSelectedMenuItemChanged (MenuItem? selected)
     {
@@ -260,7 +318,6 @@ public class Menu : Bar, IDesignable
         // IMPORTANT: This must be done after adding the menu to the SuperView or Add will try
         // to set focus to it.
         Visible = true;
-        Enabled = true;
     }
 
     private bool _isHiding;
@@ -289,7 +346,6 @@ public class Menu : Bar, IDesignable
             }
 
             Visible = false;
-            Enabled = false;
 
             ClearFocus ();
         }
@@ -300,6 +356,94 @@ public class Menu : Bar, IDesignable
     }
 
     #endregion ShowMenu / HideMenu
+
+    #region IValue<MenuItem?> Implementation
+
+    private MenuItem? _value;
+
+    /// <summary>
+    ///     Gets or sets the most recently activated <see cref="MenuItem"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is automatically set when a <see cref="MenuItem"/> within this menu raises
+    ///         the <see cref="View.Accepted"/> event (e.g., when the user presses Enter or double-clicks on a menu item).
+    ///     </para>
+    ///     <para>
+    ///         The value is captured before the <see cref="Command.Accept"/> command propagates up the hierarchy,
+    ///         enabling command handlers to access <see cref="ICommandContext.Value"/> to determine which
+    ///         menu item triggered the command.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property programmatically will raise <see cref="ValueChanging"/> and <see cref="ValueChanged"/>
+    ///         events following the Cancellable Work Pattern (CWP).
+    ///     </para>
+    /// </remarks>
+    public MenuItem? Value { get => _value; set => ChangeValue (value); }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<MenuItem?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<MenuItem?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<MenuItem?> args) => false;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<MenuItem?> args) { }
+
+    /// <summary>
+    ///     INTERNAL Sets Value.
+    /// </summary>
+    /// <param name="newValue">The new value.</param>
+    /// <returns>
+    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
+    ///     <see langword="null"/> if the state was not changed for some other reason.
+    /// </returns>
+    private void ChangeValue (MenuItem? newValue)
+    {
+        if (_value == newValue)
+        {
+            return;
+        }
+
+        MenuItem? oldValue = _value;
+
+        ValueChangingEventArgs<MenuItem?> changingArgs = new (oldValue, newValue);
+
+        if (OnValueChanging (changingArgs) || changingArgs.Handled)
+        {
+            return;
+        }
+
+        ValueChanging?.Invoke (this, changingArgs);
+
+        if (changingArgs.Handled)
+        {
+            return;
+        }
+
+        _value = newValue;
+
+        ValueChangedEventArgs<MenuItem?> changedArgs = new (oldValue, _value);
+        OnValueChanged (changedArgs);
+        ValueChanged?.Invoke (this, changedArgs);
+
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
+    }
+
+    #endregion IValue<MenuItem?> Implementation
 
     /// <inheritdoc/>
     public override bool EnableForDesign ()
@@ -318,6 +462,9 @@ public class Menu : Bar, IDesignable
                                     new MenuItem { Title = "_Italic", Text = "Italic text", Key = Key.I.WithAlt },
                                     new MenuItem { Title = "_Underline", Text = "Underline text", Key = Key.U.WithCtrl }
                                 ])
+            {
+                Id = "FormatingSubMenu"
+            }
         };
 
         MenuItem viewItem = new ()
@@ -336,8 +483,14 @@ public class Menu : Bar, IDesignable
                                                                 new MenuItem { Title = "_Horizontal", Text = "Horizontal layout" },
                                                                 new MenuItem { Title = "_Vertical", Text = "Vertical layout" }
                                                             ])
+                                        {
+                                            Id = "LayoutSubMenu"
+                                        }
                                     }
                                 ])
+            {
+                Id = "ViewSubMenu"
+            }
         };
 
         MenuItem aboutItem = new () { Title = "_About", Text = "About this demo" };
