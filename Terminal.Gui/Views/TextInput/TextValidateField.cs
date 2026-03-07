@@ -101,8 +101,7 @@ public class TextValidateField : View, IDesignable
 
             if (_provider!.Fixed)
             {
-                // Add one so there is always a space at the end to show the cursor.
-                Width = (_provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length) + 1;
+                Width = _provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length;
             }
 
             // HomeKeyHandler already call SetNeedsDisplay
@@ -153,19 +152,7 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        int cursorPos = mouse.Position!.Value.X - GetMargins (Viewport.Width).left;
-
-        if (cursorPos > _provider!.CursorEnd ())
-        {
-            InsertionPoint = cursorPos;
-            SetFocus ();
-            SetNeedsDraw ();
-            UpdateCursor ();
-
-            return true;
-        }
-
-        int c = _provider!.Cursor (cursorPos);
+        int c = _provider!.Cursor (mouse.Position!.Value.X - GetMargins (Viewport.Width).left);
 
         if (!_provider.Fixed && TextAlignment == Alignment.End && Text.Length > 0)
         {
@@ -240,22 +227,23 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        Rune rune = key.AsRune;
-
-        if (!_provider.VerifyChar ((char)rune.Value, InsertionPoint, out _))
+        if (key.AsRune == default (Rune) || key == Application.QuitKey)
         {
-            // Not a valid char. If it's a letter or, return true to eat it to prevent hotkeys from triggering.
-            return Rune.IsLetterOrDigit (rune);
+            return false;
         }
+
+        Rune rune = key.AsRune;
 
         bool inserted = _provider.InsertAt ((char)rune.Value, InsertionPoint);
 
         if (inserted)
         {
             CursorRight ();
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>
@@ -264,14 +252,12 @@ public class TextValidateField : View, IDesignable
     {
         if (!_provider!.Fixed && TextAlignment == Alignment.End && InsertionPoint <= 1)
         {
-            //return false;
+            return false;
         }
 
         _insertionPoint = _provider.CursorLeft (InsertionPoint);
         _provider.Delete (InsertionPoint);
-
         SetNeedsDraw ();
-        UpdateCursor ();
 
         return true;
     }
@@ -302,17 +288,8 @@ public class TextValidateField : View, IDesignable
         }
 
         int current = InsertionPoint;
-
-        InsertionPoint = _provider.CursorRight (current);
-
-        if (current == InsertionPoint && current <= _provider.CursorEnd ())
-        {
-            // Allow to move the cursor after the last char in this special case.
-            InsertionPoint++;
-        }
-
+        InsertionPoint = _provider.CursorRight (InsertionPoint);
         SetNeedsDraw ();
-        UpdateCursor ();
 
         return current != InsertionPoint;
     }
@@ -336,7 +313,7 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool EndKeyHandler ()
     {
-        InsertionPoint = _provider!.CursorEnd () + 1;
+        InsertionPoint = _provider!.CursorEnd ();
         SetNeedsDraw ();
 
         return true;
@@ -354,7 +331,7 @@ public class TextValidateField : View, IDesignable
                {
                    Alignment.Start => (0, total),
                    Alignment.Center => (total / 2, total / 2 + total % 2),
-                   Alignment.End => (total - 1, 1),
+                   Alignment.End => (total, 0),
                    _ => (0, total)
                };
     }

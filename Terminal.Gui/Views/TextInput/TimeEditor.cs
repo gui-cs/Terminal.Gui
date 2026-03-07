@@ -54,7 +54,7 @@ namespace Terminal.Gui.Views;
 ///         </code>
 ///     </para>
 /// </remarks>
-public class TimeEditor : TextValidateField, IValue<TimeSpan>
+public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 {
     private TimeTextProvider TimeProvider => (TimeTextProvider)Provider!;
     private TimeSpan _lastKnownValue = TimeSpan.Zero;
@@ -175,6 +175,14 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>
     /// </summary>
     /// <param name="args">The event arguments.</param>
     protected virtual void OnValueChanged (ValueChangedEventArgs<TimeSpan> args) { }
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        Value = new TimeSpan (14, 30, 0);
+
+        return true;
+    }
 
     /// <summary>
     ///     Raises value events when the text changes through user input.
