@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+#nullable enable
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -6,6 +7,61 @@ namespace UnitTests.ApplicationTests;
 
 public class MainLoopCoordinatorTests
 {
+    [Fact]
+    public async Task StartInputTaskAsync_EnablesAndDisablesKittyKeyboard_WhenTerminalResponds ()
+    {
+        ConcurrentQueue<char> inputQueue = new ();
+        TimedEvents timedEvents = new ();
+        ApplicationMainLoop<char> loop = new ();
+        TestAnsiInput input = new ("\u001B[?31u");
+        AnsiOutput output = new ();
+        TestAnsiComponentFactory factory = new (input, output);
+        MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
+        Mock<IApplication> appMock = new ();
+
+        appMock.SetupProperty (a => a.Driver);
+        appMock.SetupProperty (a => a.MainThreadId, 123);
+
+        await coordinator.StartInputTaskAsync (appMock.Object);
+
+        Assert.True (SpinWait.SpinUntil (() => input.ResponseSent, TimeSpan.FromSeconds (1)));
+        loop.InputProcessor.ProcessQueue ();
+
+        DriverImpl driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+        Assert.True (driver.KittyKeyboardProtocol.IsSupported);
+        Assert.Equal (31, driver.KittyKeyboardProtocol.SupportedFlags);
+        Assert.Equal (EscSeqUtils.KittyKeyboardPhase1Flags, driver.KittyKeyboardProtocol.EnabledFlags);
+        Assert.Contains (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags), output.GetLastOutput (), StringComparison.Ordinal);
+
+        coordinator.Stop ();
+
+        Assert.Contains (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task StartInputTaskAsync_DoesNotEnableKittyKeyboard_ForLegacyConsole ()
+    {
+        ConcurrentQueue<char> inputQueue = new ();
+        TimedEvents timedEvents = new ();
+        ApplicationMainLoop<char> loop = new ();
+        TestAnsiInput input = new (null);
+        AnsiOutput output = new () { IsLegacyConsole = true };
+        TestAnsiComponentFactory factory = new (input, output);
+        MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
+        Mock<IApplication> appMock = new ();
+
+        appMock.SetupProperty (a => a.Driver);
+        appMock.SetupProperty (a => a.MainThreadId, 456);
+
+        await coordinator.StartInputTaskAsync (appMock.Object);
+
+        DriverImpl driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+        Assert.False (driver.KittyKeyboardProtocol.IsSupported);
+        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags), output.GetLastOutput (), StringComparison.Ordinal);
+
+        coordinator.Stop ();
+    }
+
     [Fact]
     public async Task TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
     {
@@ -16,75 +72,81 @@ public class MainLoopCoordinatorTests
 
         Mock<IComponentFactory<char>> m = new ();
 
-        // Runs on a separate thread (input thread)
         m.Setup (f => f.CreateInput ()).Throws (new Exception ("Crash on boot"));
 
         MainLoopCoordinator<char> c = new (new TimedEvents (),
-
-                                           // Rest runs on main thread
                                            new ConcurrentQueue<char> (),
                                            Mock.Of<IApplicationMainLoop<char>> (),
                                            m.Object);
 
-        // StartAsync boots the main loop and the input thread. But if the input class bombs
-        // on startup it is important that the exception surface at the call site and not lost
-        var ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
+        AggregateException ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
         Assert.Equal ("Crash on boot", ex.InnerExceptions [0].Message);
 
-        // Restore the original null logger to be polite to other tests
         Logging.Logger = beforeLogger;
 
-        // Logs should explicitly call out that input loop crashed.
         mockLogger.Verify (l => l.Log (LogLevel.Critical,
                                        It.IsAny<EventId> (),
-                                       It.Is<It.IsAnyType> ((v, t) => v.ToString ().Contains ("Input loop crashed")),
+                                       It.Is<It.IsAnyType> ((v, t) => v.ToString ()!.Contains ("Input loop crashed")),
                                        It.IsAny<Exception> (),
-                                       It.IsAny<Func<It.IsAnyType, Exception, string>> ()),
+                                       It.IsAny<Func<It.IsAnyType, Exception?, string>> ()),
                            Times.Once);
     }
-    /*
-    [Fact]
-    public void TestMainLoopCoordinator_InputExitsImmediately_ExceptionRaisedInMainThread ()
+
+    private sealed class TestAnsiComponentFactory : ComponentFactoryImpl<char>
     {
+        private readonly TestAnsiInput _input;
+        private readonly AnsiOutput _output;
 
-        // Runs on a separate thread (input thread)
-        // But because it's just a mock it immediately exists
-        var mockInputFactoryMethod = () => Mock.Of<IConsoleInput<char>> ();
+        public TestAnsiComponentFactory (TestAnsiInput input, AnsiOutput output)
+        {
+            _input = input;
+            _output = output;
+        }
 
+        public override string? GetDriverName () => DriverRegistry.Names.ANSI;
 
-        var mockOutput = Mock.Of<IConsoleOutput> ();
-        var mockInputProcessor = Mock.Of<IInputProcessor> ();
-        var inputQueue = new ConcurrentQueue<char> ();
-        var timedEvents = new TimedEvents ();
+        public override IInput<char> CreateInput () => _input;
 
-        var mainLoop = new MainLoop<char> ();
-        mainLoop.Initialize (timedEvents,
-                      inputQueue,
-                      mockInputProcessor,
-                      mockOutput
-                      );
+        public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null) => new AnsiInputProcessor (inputBuffer, timeProvider);
 
-        var c = new MainLoopCoordinator<char> (timedEvents,
-                                               mockInputFactoryMethod,
-                                               inputQueue,
-                                               mockInputProcessor,
-                                               ()=>mockOutput,
-                                               mainLoop
-                                               );
+        public override IOutput CreateOutput () => _output;
 
-        // TODO: This test has race condition
-        //
-        // * When the input loop exits it can happen
-        // * - During boot
-        // * - After boot
-        // *
-        // * If it happens in boot you get input exited
-        // * If it happens after you get "Input loop exited early (stop not called)"
-        //
+        public override ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer) => new SizeMonitorImpl (consoleOutput);
+    }
 
-        // Because the console input class does not block - i.e. breaks contract
-        // We need to let the user know input has silently exited and all has gone bad.
-        var ex = Assert.ThrowsAsync<Exception> (c.StartAsync).Result;
-        Assert.Equal ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)", ex.Message);
-    }*/
+    private sealed class TestAnsiInput : IInput<char>
+    {
+        private ConcurrentQueue<char>? _inputQueue;
+        private bool _responseSent;
+        private readonly string? _response;
+
+        public TestAnsiInput (string? response)
+        {
+            _response = response;
+        }
+
+        public CancellationTokenSource? ExternalCancellationTokenSource { get; set; }
+
+        public bool ResponseSent => _responseSent;
+
+        public void Initialize (ConcurrentQueue<char> inputQueue) => _inputQueue = inputQueue;
+
+        public void Run (CancellationToken runCancellationToken)
+        {
+            if (!_responseSent && !string.IsNullOrEmpty (_response) && _inputQueue is { } inputQueue)
+            {
+                foreach (char ch in _response)
+                {
+                    inputQueue.Enqueue (ch);
+                }
+
+                _responseSent = true;
+            }
+
+            WaitHandle.WaitAny ([runCancellationToken.WaitHandle]);
+            throw new OperationCanceledException (runCancellationToken);
+        }
+
+        public void Dispose () { }
+    }
 }

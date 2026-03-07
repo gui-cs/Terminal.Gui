@@ -104,6 +104,24 @@ public class AnsiKeyboardParserTests
         yield return ["\u001b[1;3Q", Key.F2.WithAlt];
         yield return ["\u001b[1;5R", Key.F3.WithCtrl];
 
+        // Kitty CSI u printable keys
+        yield return ["\u001b[97u", Key.A];
+        yield return ["\u001b[65;2u", Key.A.WithShift];
+        yield return ["\u001b[97;3u", Key.A.WithAlt];
+        yield return ["\u001b[97;5u", Key.A.WithCtrl];
+        yield return ["\u001b[49;6u", Key.D1.WithCtrl.WithShift];
+
+        // Kitty CSI u special keys
+        yield return ["\u001b[9u", Key.Tab];
+        yield return ["\u001b[13u", Key.Enter];
+        yield return ["\u001b[127u", Key.Backspace];
+        yield return ["\u001b[57376u", Key.F13];
+        yield return ["\u001b[57387;3u", Key.F24.WithAlt];
+
+        // Malformed kitty sequences
+        yield return ["\u001b[?31u", null!];
+        yield return ["\u001b[notkittyu", null!];
+
         // Keys with Alt modifiers
         yield return ["\u001ba", Key.A.WithAlt, true];
         yield return ["\u001bA", Key.A.WithShift.WithAlt, true];

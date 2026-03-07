@@ -41,6 +41,7 @@ public class AnsiOutput : OutputBase, IOutput
 
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;
+    private int _kittyKeyboardEnabledFlags;
 
     private readonly WindowsVTOutputHelper? _windowsVTOutput;
 
@@ -178,14 +179,16 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        StringBuilder capturedOutput = new ();
+        capturedOutput.Append (text);
+        base.Write (capturedOutput);
+
         try
         {
             switch (_platform)
             {
                 case AnsiPlatform.WindowsVT:
-                    StringBuilder sb = new ();
-                    sb.Append (text);
-                    _windowsVTOutput!.Write (sb);
+                    _windowsVTOutput!.Write (capturedOutput);
 
                     break;
 
@@ -206,6 +209,42 @@ public class AnsiOutput : OutputBase, IOutput
 
             // ignore for unit tests
         }
+    }
+
+    /// <summary>
+    ///     Gets the kitty keyboard flags currently enabled on the terminal.
+    /// </summary>
+    internal int KittyKeyboardEnabledFlags => _kittyKeyboardEnabledFlags;
+
+    /// <summary>
+    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard flags to enable.</param>
+    internal void EnableKittyKeyboard (int flags)
+    {
+        if (flags <= 0)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing enable sequence for flags {flags}");
+        Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
+        _kittyKeyboardEnabledFlags = flags;
+    }
+
+    /// <summary>
+    ///     Restores the previous kitty keyboard flag state if kitty mode was enabled.
+    /// </summary>
+    internal void DisableKittyKeyboard ()
+    {
+        if (_kittyKeyboardEnabledFlags <= 0)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing disable sequence for flags {_kittyKeyboardEnabledFlags}");
+        Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
+        _kittyKeyboardEnabledFlags = 0;
     }
 
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
@@ -310,13 +349,15 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
-        if (_platform == AnsiPlatform.Degraded)
-        {
-            return;
-        }
-
         try
         {
+            DisableKittyKeyboard ();
+
+            if (_platform == AnsiPlatform.Degraded)
+            {
+                return;
+            }
+
             // Restore terminal state: disable mouse, restore buffer, show cursor
             // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
