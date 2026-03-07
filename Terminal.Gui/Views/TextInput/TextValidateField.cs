@@ -291,6 +291,13 @@ public class TextValidateField : View, IDesignable
         }
 
         int current = InsertionPoint;
+
+        if (_provider.Fixed && current > _provider.CursorEnd ())
+        {
+            // Already in the blank cell past the last editable position. Don't move.
+            return false;
+        }
+
         InsertionPoint = _provider.CursorRight (InsertionPoint);
 
         if (current == InsertionPoint && _provider.Fixed && current == _provider.CursorEnd ())

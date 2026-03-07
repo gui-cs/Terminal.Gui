@@ -379,6 +379,58 @@ public class TextValidateField_NET_Provider_Tests : TestDriverBase
         Assert.False (field.IsValid);
     }
 
+    // Claude - Opus 4.6
+    [Fact]
+    public void Right_Key_From_BlankCell_DoesNotMoveBackward ()
+    {
+        var field = new TextValidateField
+        {
+            TextAlignment = Alignment.Center,
+            Width = 20,
+
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
+        };
+
+        // Navigate to end, then one past into blank cell
+        field.NewKeyDownEvent (Key.End);
+        field.NewKeyDownEvent (Key.CursorRight);
+
+        // Now in blank cell. Pressing right again should NOT move backward.
+        // It should stay put (return false, allowing focus to move to next view).
+        field.NewKeyDownEvent (Key.CursorRight);
+
+        // Verify cursor didn't move backward by pressing left once and typing.
+        // If cursor was in the blank cell, left goes to CursorEnd (position 6).
+        // If cursor wrongly moved back, left would go somewhere else.
+        field.NewKeyDownEvent (Key.CursorLeft);
+        field.NewKeyDownEvent (Key.D9);
+        Assert.Equal ("--(1239)--", field.Provider.DisplayText);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Backspace_From_BlankCell_Deletes_Last_Editable_Character ()
+    {
+        var field = new TextValidateField
+        {
+            TextAlignment = Alignment.Center,
+            Width = 20,
+
+            //                                          0123456789
+            Provider = new NetMaskedTextProvider ("--(0000)--") { Text = "1234" }
+        };
+
+        // Navigate to end, then one past into blank cell
+        field.NewKeyDownEvent (Key.End);
+        field.NewKeyDownEvent (Key.CursorRight);
+
+        // Backspace from blank cell should delete the last editable character
+        field.NewKeyDownEvent (Key.Backspace);
+        Assert.Equal ("--(123_)--", field.Provider.DisplayText);
+        Assert.False (field.IsValid);
+    }
+
     [Fact]
     public void Set_Text_After_Initialization ()
     {
@@ -644,6 +696,31 @@ public class TextValidateField_Regex_Provider_Tests : TestDriverBase
         field.Text = text;
 
         Assert.False (field.IsValid);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Right_Key_At_End_DoesNotMoveBackward ()
+    {
+        // Regex provider is not Fixed, so no blank cell. Verify cursor stays at end.
+        var field = new TextValidateField
+        {
+            TextAlignment = Alignment.Center, Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+        };
+
+        field.Text = "123";
+
+        // Navigate to end
+        field.NewKeyDownEvent (Key.End);
+
+        // Pressing right multiple times should not cause issues
+        field.NewKeyDownEvent (Key.CursorRight);
+        field.NewKeyDownEvent (Key.CursorRight);
+        field.NewKeyDownEvent (Key.CursorRight);
+
+        // Text should be unchanged
+        Assert.Equal ("123", field.Text);
+        Assert.True (field.IsValid);
     }
 
     // Claude - Opus 4.5

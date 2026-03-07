@@ -65,7 +65,8 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
     public TimeEditor ()
     {
         Provider = new TimeTextProvider ();
-        Width = Dim.Auto (minimumContentDim: Provider!.DisplayText.Length);
+        // Add one so there is always a blank cell after the last editable character for the cursor.
+        Width = Dim.Auto (minimumContentDim: Provider!.DisplayText.Length + 1);
 
 
         // Subscribe to provider's text changed to raise our value events
@@ -93,7 +94,8 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
         set
         {
             TimeProvider.Format = value;
-            Width = TimeProvider.DisplayText.Length + 2;
+            // Add one so there is always a blank cell after the last editable character for the cursor.
+            Width = TimeProvider.DisplayText.Length + 1;
             SetNeedsDraw ();
         }
     }

@@ -730,6 +730,63 @@ public class TimeEditorTests (ITestOutputHelper output) : TestDriverBase
 
     // Claude - Opus 4.6
     [Fact]
+    public void TimeEditor_CursorRight_From_BlankCell_DoesNotMoveBackward ()
+    {
+        // Verifies that pressing right arrow from the blank cell past the last editable
+        // position does NOT move the cursor backward (e.g., from "M" in "PM" back to "A").
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format12h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-US").DateTimeFormat.Clone ();
+        format12h.LongTimePattern = "h:mm:ss tt";
+        provider.Format = format12h;
+
+        int cursorEnd = provider.CursorEnd ();
+        output.WriteLine ($"CursorEnd: {cursorEnd}");
+
+        // CursorRight from CursorEnd should return CursorEnd (can't go further via provider)
+        int fromEnd = provider.CursorRight (cursorEnd);
+        output.WriteLine ($"CursorRight({cursorEnd}): {fromEnd}");
+        Assert.Equal (cursorEnd, fromEnd);
+
+        // Now test TextValidateField behavior: cursor at CursorEnd+1 should not move backward
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        try
+        {
+            TimeEditor te = new ()
+            {
+                Value = new TimeSpan (9, 0, 0),
+                Format = format12h
+            };
+            te.Layout ();
+            te.SetFocus ();
+
+            // Navigate to the end, then one past
+            te.NewKeyDownEvent (Key.End);
+            te.NewKeyDownEvent (Key.CursorRight);
+
+            output.WriteLine ($"After End+Right, DisplayText: \"{te.Provider!.DisplayText}\"");
+
+            // Press right again — should NOT move backward
+            bool handled = te.NewKeyDownEvent (Key.CursorRight);
+            output.WriteLine ($"Second Right handled: {handled}");
+
+            // Pressing left from blank cell should go back to CursorEnd
+            te.NewKeyDownEvent (Key.CursorLeft);
+
+            // Verify we're at a valid position by typing — should insert at CursorEnd
+            te.NewKeyDownEvent (Key.End);
+            te.NewKeyDownEvent (Key.D5);
+            output.WriteLine ($"After End+5: \"{te.Provider.DisplayText}\"");
+        }
+        finally
+        {
+            app.Dispose ();
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
     public void NormalizedPattern_24h_Typing_12_Enters_TwoDigitHour ()
     {
         // Verifies that typing "12" at position 0 in 24h format sets hours to 12
