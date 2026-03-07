@@ -37,7 +37,7 @@ namespace Terminal.Gui.Drivers;
 public class AnsiOutput : OutputBase, IOutput
 {
     // Tracks which underlying platform APIs are in use
-    private readonly AnsiPlatform _platform;
+    internal readonly AnsiPlatform _platform;
 
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;

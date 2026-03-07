@@ -180,7 +180,9 @@ public class InputInjectorTests (ITestOutputHelper output)
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
-        // Assert - Should raise exactly 3 KeyDown events
+        Assert.NotEqual (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
+
+        // Assert - Should raise exactly 34 KeyDown events
         Assert.Equal (34, receivedKeys.Count);
         Assert.Equal (new Key ('á'), receivedKeys [0]);
         Assert.Equal (new Key ('é'), receivedKeys [1]);
