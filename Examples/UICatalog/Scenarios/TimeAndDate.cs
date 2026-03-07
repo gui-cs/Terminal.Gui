@@ -76,20 +76,39 @@ public class TimeAndDate : Scenario
         defaultTimeEditor.ValueChanged += TimeEditorChanged;
         win.Add (defaultTimeEditor);
 
+        Label defaultPatternLabel = new ()
+        {
+            X = Pos.Right (defaultTimeEditor) + 1,
+            Y = Pos.Top (defaultTimeEditor),
+            Text = $"Pattern: {CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern}"
+        };
+        win.Add (defaultPatternLabel);
+
         // 24-hour format time editor
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+
         TimeEditor time24Editor = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (defaultTimeEditor) + 1,
             Value = DateTime.Now.TimeOfDay,
-            Format = (DateTimeFormatInfo)System.Globalization.CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ()
+            Format = format24h
         };
         time24Editor.ValueChanged += TimeEditorChanged;
         win.Add (time24Editor);
 
+        Label time24PatternLabel = new ()
+        {
+            X = Pos.Right (time24Editor) + 1,
+            Y = Pos.Top (time24Editor),
+            Text = $"Pattern: {format24h.LongTimePattern}"
+        };
+        win.Add (time24PatternLabel);
+
         // Short time format time editor
-        DateTimeFormatInfo shortFormat = (DateTimeFormatInfo)System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Clone ();
+        DateTimeFormatInfo shortFormat = (DateTimeFormatInfo)CultureInfo.CurrentCulture.DateTimeFormat.Clone ();
         shortFormat.LongTimePattern = shortFormat.ShortTimePattern;
+
         TimeEditor shortTimeEditor = new ()
         {
             X = Pos.Center (),
@@ -99,6 +118,14 @@ public class TimeAndDate : Scenario
         };
         shortTimeEditor.ValueChanged += TimeEditorChanged;
         win.Add (shortTimeEditor);
+
+        Label shortPatternLabel = new ()
+        {
+            X = Pos.Right (shortTimeEditor) + 1,
+            Y = Pos.Top (shortTimeEditor),
+            Text = $"Pattern: {shortFormat.LongTimePattern}"
+        };
+        win.Add (shortPatternLabel);
 
         DateField shortDate = new (DateTime.Now)
         {

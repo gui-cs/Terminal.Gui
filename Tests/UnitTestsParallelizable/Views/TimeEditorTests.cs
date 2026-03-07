@@ -660,6 +660,76 @@ public class TimeEditorTests (ITestOutputHelper output) : TestDriverBase
 
     // Claude - Opus 4.6
     [Fact]
+    public void TimeEditor_12h_DisplayText_Shows_Full_AM_PM ()
+    {
+        // Verifies that AM/PM is fully visible (not clipped to just "A")
+        // Uses default constructor without overriding Width to test the real scenario
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 1);
+
+        try
+        {
+            Runnable<bool> runnable = new () { Width = 30, Height = 1 };
+            app.Begin (runnable);
+
+            TimeEditor te = new ()
+            {
+                Height = 1,
+                Value = new TimeSpan (9, 0, 0)
+            };
+
+            // Explicitly set 12-hour format AFTER construction to simulate the scenario
+            DateTimeFormatInfo format12h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-US").DateTimeFormat.Clone ();
+            format12h.LongTimePattern = "h:mm:ss tt";
+            te.Format = format12h;
+
+            runnable.Add (te);
+            app.LayoutAndDraw ();
+
+            output.WriteLine ($"DisplayText: \"{te.Provider!.DisplayText}\"");
+            output.WriteLine ($"Frame: {te.Frame}");
+            output.WriteLine ($"Viewport: {te.Viewport}");
+
+            // DisplayText should be "09:00:00 AM" (normalized to 2-digit hours)
+            Assert.Equal ("09:00:00 AM", te.Provider.DisplayText);
+
+            // The view must be wide enough to show the full display text including "AM"
+            Assert.True (te.Frame.Width >= te.Provider.DisplayText.Length,
+                         $"Frame width {te.Frame.Width} is too narrow for DisplayText \"{te.Provider.DisplayText}\" ({te.Provider.DisplayText.Length} chars)");
+
+            DriverAssert.AssertDriverContentsWithFrameAre (
+                @"09:00:00 AM",
+                output,
+                app.Driver);
+        }
+        finally
+        {
+            app.Dispose ();
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TimeEditor_Default_Constructor_Width_Fits_DisplayText ()
+    {
+        // Verifies that the default constructor produces a Width that fits the full DisplayText
+        TimeEditor te = new ()
+        {
+            Value = new TimeSpan (9, 0, 0)
+        };
+        te.Layout ();
+
+        output.WriteLine ($"DisplayText: \"{te.Provider!.DisplayText}\"");
+        output.WriteLine ($"DisplayText.Length: {te.Provider.DisplayText.Length}");
+        output.WriteLine ($"Frame.Width: {te.Frame.Width}");
+
+        Assert.True (te.Frame.Width >= te.Provider.DisplayText.Length,
+                     $"Frame width {te.Frame.Width} is too narrow for DisplayText \"{te.Provider.DisplayText}\" ({te.Provider.DisplayText.Length} chars)");
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
     public void NormalizedPattern_24h_Typing_12_Enters_TwoDigitHour ()
     {
         // Verifies that typing "12" at position 0 in 24h format sets hours to 12

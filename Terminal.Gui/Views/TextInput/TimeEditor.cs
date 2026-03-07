@@ -65,7 +65,7 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
     public TimeEditor ()
     {
         Provider = new TimeTextProvider ();
-        Width = Dim.Auto (minimumContentDim: 10);
+        Width = Dim.Auto (minimumContentDim: Provider!.DisplayText.Length);
 
 
         // Subscribe to provider's text changed to raise our value events

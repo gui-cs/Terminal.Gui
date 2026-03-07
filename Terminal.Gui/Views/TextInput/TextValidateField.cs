@@ -101,7 +101,8 @@ public class TextValidateField : View, IDesignable
 
             if (_provider!.Fixed)
             {
-                Width = _provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length;
+                // Add one so there is always a blank cell after the last editable character for the cursor.
+                Width = (_provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length) + 1;
             }
 
             // HomeKeyHandler already call SetNeedsDisplay
@@ -257,7 +258,9 @@ public class TextValidateField : View, IDesignable
 
         _insertionPoint = _provider.CursorLeft (InsertionPoint);
         _provider.Delete (InsertionPoint);
+
         SetNeedsDraw ();
+        UpdateCursor ();
 
         return true;
     }
@@ -289,6 +292,13 @@ public class TextValidateField : View, IDesignable
 
         int current = InsertionPoint;
         InsertionPoint = _provider.CursorRight (InsertionPoint);
+
+        if (current == InsertionPoint && _provider.Fixed && current == _provider.CursorEnd ())
+        {
+            // Allow cursor to move one past the last editable position (blank cell for cursor).
+            InsertionPoint = current + 1;
+        }
+
         SetNeedsDraw ();
 
         return current != InsertionPoint;

@@ -71,7 +71,8 @@ public class TextValidateField_NET_Provider_Tests : TestDriverBase
         // A-Alphanumeric, required. a-Alphanumeric, optional.
         var field = new TextValidateField { Provider = new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa") };
         field.Layout ();
-        Assert.Equal (field.Viewport.Width, field.Provider.DisplayText.Length);
+        // Width is DisplayText.Length + 1 to provide a blank cell for the cursor past the last editable char.
+        Assert.Equal (field.Viewport.Width, field.Provider.DisplayText.Length + 1);
         Assert.NotEqual (field.Provider.DisplayText.Length, field.Provider.Text.Length);
         Assert.Equal (new string (' ', field.Text.Length), field.Provider.Text);
     }
@@ -349,7 +350,7 @@ public class TextValidateField_NET_Provider_Tests : TestDriverBase
     }
 
     [Fact]
-    public void Right_Key_Stops_In_Last_Editable_Character ()
+    public void Right_Key_Goes_One_Past_Last_Editable_Character ()
     {
         var field = new TextValidateField
         {
@@ -366,8 +367,13 @@ public class TextValidateField_NET_Provider_Tests : TestDriverBase
             field.NewKeyDownEvent (Key.CursorRight);
         }
 
+        // Cursor is now one past CursorEnd (blank cell). Typing here does not insert.
         field.NewKeyDownEvent (Key.D1);
+        Assert.Equal ("--(____)--", field.Provider.DisplayText);
 
+        // Use End key to go to last editable position, where typing works.
+        field.NewKeyDownEvent (Key.End);
+        field.NewKeyDownEvent (Key.D1);
         Assert.Equal ("--(___1)--", field.Provider.DisplayText);
         Assert.Equal ("--(   1)--", field.Text);
         Assert.False (field.IsValid);
