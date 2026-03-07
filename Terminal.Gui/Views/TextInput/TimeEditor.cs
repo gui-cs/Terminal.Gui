@@ -35,17 +35,17 @@ namespace Terminal.Gui.Views;
 ///         TimeEditor timeEditor = new () { Value = TimeSpan.FromHours (14.5) };
 ///         // en-US displays: " 2:30:00 PM"
 ///         // en-GB displays: " 14:30:00"
-///         
+/// 
 ///         // Use specific culture's format
 ///         timeEditor.Format = CultureInfo.GetCultureInfo ("de-DE").DateTimeFormat;
 ///         // Displays: " 14:30:00"
-///         
+/// 
 ///         // Want short time? Modify the LongTimePattern
 ///         DateTimeFormatInfo format = (DateTimeFormatInfo)CultureInfo.CurrentCulture.DateTimeFormat.Clone ();
 ///         format.LongTimePattern = format.ShortTimePattern;
 ///         timeEditor.Format = format;
 ///         // en-US displays: " 2:30 PM"
-///         
+/// 
 ///         // Custom pattern with milliseconds
 ///         DateTimeFormatInfo customFormat = (DateTimeFormatInfo)CultureInfo.CurrentCulture.DateTimeFormat.Clone ();
 ///         customFormat.LongTimePattern = "HH:mm:ss.fff";
@@ -57,7 +57,8 @@ namespace Terminal.Gui.Views;
 public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 {
     private TimeTextProvider TimeProvider => (TimeTextProvider)Provider!;
-    private TimeSpan _lastKnownValue;
+
+    private TimeSpan _value;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TimeEditor"/> class.
@@ -68,12 +69,7 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 
         // Add one so there is always a blank cell after the last editable character for the cursor.
         Width = Dim.Auto (minimumContentDim: Provider!.DisplayText.Length + 1);
-
-        // Subscribe to provider's text changed to raise our value events
-        TimeProvider.TextChanged += (_, _) => RaiseValueChangedEvents ();
-
-        // Initialize last known value
-        _lastKnownValue = TimeProvider.TimeValue;
+        _value = TimeProvider.TimeValue;
     }
 
     /// <summary>
@@ -101,71 +97,61 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
         }
     }
 
+    #region IValue<TimeSpan> Implementation
+
     /// <summary>
     ///     Gets or sets the current time value.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Setting this property raises <see cref="ValueChanging"/> (cancellable) and <see cref="ValueChanged"/> events.
+    ///         Setting this property follows the Cancellable Work Pattern (CWP) using
+    ///         <see cref="CWPPropertyHelper.ChangeProperty{T}"/>.
     ///         The change can be prevented by handling <see cref="ValueChanging"/> and setting
     ///         <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/>.
     ///     </para>
     /// </remarks>
-    public TimeSpan Value
+    public new TimeSpan Value
     {
-        get => TimeProvider.TimeValue;
-        set
-        {
-            TimeSpan oldValue = TimeProvider.TimeValue;
-
-            if (oldValue == value)
-            {
-                return;
-            }
-
-            ValueChangingEventArgs<TimeSpan> changingArgs = new (oldValue, value);
-
-            if (OnValueChanging (changingArgs) || changingArgs.Handled)
-            {
-                return;
-            }
-
-            ValueChanging?.Invoke (this, changingArgs);
-
-            if (changingArgs.Handled)
-            {
-                return;
-            }
-
-            // Update _lastKnownValue before setting to prevent double-firing from TextChanged handler
-            _lastKnownValue = value;
-
-            TimeProvider.TimeValue = value;
-            Text = TimeProvider.Text;
-
-            ValueChangedEventArgs<TimeSpan> changedArgs = new (oldValue, value);
-            OnValueChanged (changedArgs);
-            ValueChanged?.Invoke (this, changedArgs);
-            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
-
-            SetNeedsDraw ();
-        }
+        get => _value;
+        set =>
+            CWPPropertyHelper.ChangeProperty (this,
+                                              ref _value,
+                                              value,
+                                              OnValueChanging,
+                                              ValueChanging,
+                                              newValue =>
+                                              {
+                                                  SuppressValueEvents = true;
+                                                  TimeProvider.TimeValue = newValue;
+                                                  base.Text = TimeProvider.Text;
+                                                  SuppressValueEvents = false;
+                                                  SetNeedsDraw ();
+                                              },
+                                              OnValueChanged,
+                                              ValueChanged,
+                                              out _);
     }
 
     /// <inheritdoc/>
-    public event EventHandler<ValueChangingEventArgs<TimeSpan>>? ValueChanging;
+    public new event EventHandler<ValueChangingEventArgs<TimeSpan>>? ValueChanging;
 
     /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<TimeSpan>>? ValueChanged;
+    public new event EventHandler<ValueChangedEventArgs<TimeSpan>>? ValueChanged;
 
     /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+    public new event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <inheritdoc/>
-    object IValue.GetValue () => Value;
+    object? IValue.GetValue () => Value;
 
     /// <summary>
-    ///     Called when the <see cref="Value"/> is changing.
+    ///     Synchronizes the <see cref="TimeSpan"/> backing field when the base class
+    ///     <see cref="TextValidateField.Text"/> property changes programmatically.
+    /// </summary>
+    protected override void OnValueChanged (ValueChangedEventArgs<string?> args) => _value = TimeProvider.TimeValue;
+
+    /// <summary>
+    ///     Called when the <see cref="Value"/> is about to change.
     ///     Allows derived classes to cancel the change.
     /// </summary>
     /// <param name="args">The event arguments.</param>
@@ -177,7 +163,57 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
     ///     Allows derived classes to react to value changes.
     /// </summary>
     /// <param name="args">The event arguments.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<TimeSpan> args) { }
+    protected virtual void OnValueChanged (ValueChangedEventArgs<TimeSpan> args) =>
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue));
+
+    #endregion
+
+    /// <summary>
+    ///     Handles provider text changes for TimeEditor by raising <see cref="TimeSpan"/>-typed
+    ///     value events instead of string-typed events.
+    /// </summary>
+    protected override void HandleProviderTextChanged (string oldText, string newText)
+    {
+        TimeSpan newTimeValue = TimeProvider.TimeValue;
+
+        if (_value == newTimeValue)
+        {
+            return;
+        }
+
+        TimeSpan oldTimeValue = _value;
+        ValueChangingEventArgs<TimeSpan> args = new (oldTimeValue, newTimeValue);
+
+        if (OnValueChanging (args) || args.Handled)
+        {
+            RevertTimeValue (oldTimeValue);
+
+            return;
+        }
+
+        ValueChanging?.Invoke (this, args);
+
+        if (args.Handled)
+        {
+            RevertTimeValue (oldTimeValue);
+
+            return;
+        }
+
+        _value = newTimeValue;
+        ValueChangedEventArgs<TimeSpan> changedArgs = new (oldTimeValue, newTimeValue);
+        OnValueChanged (changedArgs);
+        ValueChanged?.Invoke (this, changedArgs);
+    }
+
+    private void RevertTimeValue (TimeSpan oldValue)
+    {
+        SuppressValueEvents = true;
+        TimeProvider.TimeValue = oldValue;
+        base.Text = TimeProvider.Text;
+        SuppressValueEvents = false;
+        SetNeedsDraw ();
+    }
 
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
@@ -185,49 +221,5 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
         Value = new TimeSpan (14, 30, 0);
 
         return true;
-    }
-
-    /// <summary>
-    ///     Raises value events when the text changes through user input.
-    /// </summary>
-    private void RaiseValueChangedEvents ()
-    {
-        TimeSpan currentValue = TimeProvider.TimeValue;
-
-        if (_lastKnownValue == currentValue)
-        {
-            return;
-        }
-
-        // Raise ValueChanging to allow cancellation
-        ValueChangingEventArgs<TimeSpan> changingArgs = new (_lastKnownValue, currentValue);
-
-        if (OnValueChanging (changingArgs) || changingArgs.Handled)
-        {
-            // Revert the change if cancelled
-            TimeProvider.TimeValue = _lastKnownValue;
-            Text = TimeProvider.Text;
-            SetNeedsDraw ();
-
-            return;
-        }
-
-        ValueChanging?.Invoke (this, changingArgs);
-
-        if (changingArgs.Handled)
-        {
-            // Revert the change if cancelled
-            TimeProvider.TimeValue = _lastKnownValue;
-            Text = TimeProvider.Text;
-            SetNeedsDraw ();
-
-            return;
-        }
-
-        ValueChangedEventArgs<TimeSpan> changedArgs = new (_lastKnownValue, currentValue);
-        _lastKnownValue = currentValue;
-        OnValueChanged (changedArgs);
-        ValueChanged?.Invoke (this, changedArgs);
-        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (_lastKnownValue, currentValue));
     }
 }

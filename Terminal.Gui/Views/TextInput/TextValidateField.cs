@@ -1,11 +1,19 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
-public class TextValidateField : View, IDesignable
+public class TextValidateField : View, IDesignable, IValue<string>
 {
     private const int DEFAULT_LENGTH = 10;
 
     private ITextValidateProvider? _provider;
+    private string _lastKnownText = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets whether value change events are suppressed.
+    ///     Subclasses set this to <see langword="true"/> when programmatically updating the provider
+    ///     to prevent re-entrant event firing.
+    /// </summary>
+    protected bool SuppressValueEvents { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextValidateField"/> class.
@@ -97,7 +105,18 @@ public class TextValidateField : View, IDesignable
         get => _provider;
         set
         {
+            if (_provider is { })
+            {
+                _provider.TextChanged -= ProviderOnTextChanged;
+            }
+
             _provider = value;
+
+            if (_provider is { })
+            {
+                _provider.TextChanged += ProviderOnTextChanged;
+                _lastKnownText = _provider.Text;
+            }
 
             if (_provider!.Fixed)
             {
@@ -110,6 +129,43 @@ public class TextValidateField : View, IDesignable
         }
     }
 
+    #region IValue<string> Implementation
+
+    /// <summary>
+    ///     Gets or sets the value. This is an alias for <see cref="Text"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property enables <see cref="TextValidateField"/> to be used with the <see cref="IValue{TValue}"/> pattern
+    ///     for generic value access and command propagation.
+    /// </remarks>
+    public string? Value { get => Text; set => Text = value ?? string.Empty; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<string?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> is about to change.
+    ///     Allows derived classes to cancel the change.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<string?> args) => false;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    ///     Allows derived classes to react to value changes.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<string?> args) { }
+
+    #endregion
+
     /// <summary>Text</summary>
     public override string Text
     {
@@ -121,7 +177,43 @@ public class TextValidateField : View, IDesignable
                 return;
             }
 
+            string oldValue = _provider.Text;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            if (!SuppressValueEvents)
+            {
+                ValueChangingEventArgs<string?> args = new (oldValue, value);
+
+                if (OnValueChanging (args) || args.Handled)
+                {
+                    return;
+                }
+
+                ValueChanging?.Invoke (this, args);
+
+                if (args.Handled)
+                {
+                    return;
+                }
+
+                // Allow subscribers to modify the new value
+                value = args.NewValue ?? string.Empty;
+            }
+
+            _lastKnownText = value;
             _provider.Text = value;
+
+            if (!SuppressValueEvents)
+            {
+                ValueChangedEventArgs<string?> changedArgs = new (oldValue, value);
+                OnValueChanged (changedArgs);
+                ValueChanged?.Invoke (this, changedArgs);
+                ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
+            }
 
             SetNeedsDraw ();
         }
@@ -143,6 +235,67 @@ public class TextValidateField : View, IDesignable
 
             UpdateCursor ();
         }
+    }
+
+    /// <summary>
+    ///     Called when the provider's text changes through user input (InsertAt/Delete).
+    ///     The base implementation raises <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events
+    ///     following the Cancellable Work Pattern.
+    /// </summary>
+    /// <param name="oldText">The text before the change.</param>
+    /// <param name="newText">The text after the change.</param>
+    protected virtual void HandleProviderTextChanged (string oldText, string newText)
+    {
+        ValueChangingEventArgs<string?> args = new (oldText, newText);
+
+        if (OnValueChanging (args) || args.Handled)
+        {
+            RevertProviderText (oldText);
+
+            return;
+        }
+
+        ValueChanging?.Invoke (this, args);
+
+        if (args.Handled)
+        {
+            RevertProviderText (oldText);
+
+            return;
+        }
+
+        ValueChangedEventArgs<string?> changedArgs = new (oldText, newText);
+        OnValueChanged (changedArgs);
+        ValueChanged?.Invoke (this, changedArgs);
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldText, newText));
+    }
+
+    private void ProviderOnTextChanged (object? sender, EventArgs<string> e)
+    {
+        if (SuppressValueEvents)
+        {
+            return;
+        }
+
+        string currentText = _provider!.Text;
+
+        if (_lastKnownText == currentText)
+        {
+            return;
+        }
+
+        HandleProviderTextChanged (_lastKnownText, currentText);
+
+        // Sync _lastKnownText with actual provider state (may have been reverted by handler)
+        _lastKnownText = _provider.Text;
+    }
+
+    private void RevertProviderText (string oldText)
+    {
+        SuppressValueEvents = true;
+        _provider!.Text = oldText;
+        SuppressValueEvents = false;
+        SetNeedsDraw ();
     }
 
     /// <inheritdoc/>
@@ -214,6 +367,7 @@ public class TextValidateField : View, IDesignable
         {
             return true;
         }
+
         SetAttributeForRole (VisualRole.Focus);
         Move (InsertionPoint + marginLeft, 0);
         AddRune ((Rune)_provider.DisplayText [InsertionPoint]);
@@ -242,10 +396,10 @@ public class TextValidateField : View, IDesignable
         {
             return false;
         }
+
         CursorRight ();
 
         return true;
-
     }
 
     /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>
