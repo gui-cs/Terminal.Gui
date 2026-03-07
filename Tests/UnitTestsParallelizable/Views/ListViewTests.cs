@@ -1128,7 +1128,7 @@ Five ",
         var lv = new ListView ();
         var top = new View ();
         top.Add (lv);
-        Exception exception = Record.Exception (() => lv.SetFocus ());
+        Exception? exception = Record.Exception (() => lv.SetFocus ());
         Assert.Null (exception);
     }
 
@@ -1138,7 +1138,7 @@ Five ",
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.Null (lv.SelectedItem);
         Assert.Throws<ArgumentException> (() => lv.SelectedItem = 3);
-        Exception exception = Record.Exception (() => lv.SelectedItem = null);
+        Exception? exception = Record.Exception (() => lv.SelectedItem = null);
         Assert.Null (exception);
     }
 
