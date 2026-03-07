@@ -216,18 +216,20 @@ public class ScopeTests
         for (int t = 0; t < threadCount; t++)
         {
             int threadId = t;
+
             tasks.Add (Task.Run (() =>
                                  {
-                                     for (int i = 0; i < itemsPerThread; i++)
+                                     for (var i = 0; i < itemsPerThread; i++)
                                      {
-                                         string key = $"Thread{threadId}_Item{i}";
+                                         var key = $"Thread{threadId}_Item{i}";
                                          scope.TryAdd (key, new ConfigProperty { PropertyValue = i });
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert

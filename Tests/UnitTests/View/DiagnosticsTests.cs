@@ -1,6 +1,4 @@
 #nullable enable
-using Xunit.Abstractions;
-
 namespace UnitTests.ViewBaseTests;
 
 /// <summary>

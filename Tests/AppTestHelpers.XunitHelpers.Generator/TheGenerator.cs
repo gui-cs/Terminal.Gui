@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace TerminalGuiFluentTestingXunit.Generator;
+namespace AppTestHelpers.XunitHelpers.Generator;
 
 [Generator]
 public class TheGenerator : IIncrementalGenerator
@@ -89,10 +89,10 @@ public class TheGenerator : IIncrementalGenerator
 
         var header = """"
                      #nullable enable
-                     using TerminalGuiFluentTesting;
+                     using AppTestHelpers;
                      using Xunit;
 
-                     namespace TerminalGuiFluentTestingXunit;
+                     namespace AppTestHelpers.XunitHelpers;
 
                      public static partial class XunitContextExtensions
                      {
@@ -117,26 +117,26 @@ public class TheGenerator : IIncrementalGenerator
             }
 
             var method = $$"""
-                           {{signature}}
-                           {
-                               try
+                               {{signature}}
                                {
-                                   Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
-                               }
-                               catch(Exception ex)
-                               {
-                                   context.HardStop (ex);
+                                   try
+                                   {
+                                       Xunit.Assert.{{methodName}}{{typeParams}} ({{string.Join (",", paramNames)}});
+                                   }
+                                   catch(Exception ex)
+                                   {
+                                       context.HardStop (ex);
+                                       
                                    
-                               
-                                   throw;
-                               
+                                       throw;
+                                   
+                                   }
+                                   
+                                   return context;
                                }
-                               
-                               return context;
-                           }
                            """;
 
-            sb.AppendLine (method);
+            sb.AppendLine (method.Replace ("*", ""));
         }
 
         sb.AppendLine (tail);
@@ -154,9 +154,9 @@ public class TheGenerator : IIncrementalGenerator
     {
         typeParams = string.Empty;
 
-        // Create the "this TestContext context" parameter
+        // Create the "this AppTestHelper context" parameter
         ParameterSyntax contextParam = SyntaxFactory.Parameter (SyntaxFactory.Identifier ("context"))
-                                                    .WithType (SyntaxFactory.ParseTypeName ("TestContext"))
+                                                    .WithType (SyntaxFactory.ParseTypeName ("AppTestHelper"))
                                                     .AddModifiers (SyntaxFactory.Token (SyntaxKind.ThisKeyword)); // Add the "this" keyword
 
         // Extract the parameter names (expected and actual)
@@ -182,8 +182,8 @@ public class TheGenerator : IIncrementalGenerator
 
         parameters.Insert (0, contextParam); // Insert 'context' as the first parameter
 
-        // Change the return type to TestContext
-        TypeSyntax returnType = SyntaxFactory.ParseTypeName ("TestContext");
+        // Change the return type to AppTestHelper
+        TypeSyntax returnType = SyntaxFactory.ParseTypeName ("AppTestHelper");
 
         // Change the method name to AssertEqual
         SyntaxToken newMethodName = SyntaxFactory.Identifier ($"Assert{methodName}");

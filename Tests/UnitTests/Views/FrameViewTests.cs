@@ -1,7 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
-
-namespace UnitTests.ViewsTests;
+﻿namespace UnitTests.ViewsTests;
 
 public class FrameViewTests (ITestOutputHelper output)
 {

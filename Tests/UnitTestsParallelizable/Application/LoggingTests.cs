@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Terminal.Gui.Tests;
-using Xunit.Abstractions;
 
 namespace ApplicationTests;
 
@@ -85,7 +84,7 @@ public class LoggingTests : IDisposable
 
         using (Logging.PushLogger (scopedLogger))
         {
-            await Task.Run (() => Logging.Trace ("async-message"));
+            await Task.Run (() => Logging.Trace ("async-message"), TestContext.Current.CancellationToken);
         }
 
         Assert.True (scopedLogger.Contains ("async-message"));
@@ -175,7 +174,7 @@ public class LoggingTests : IDisposable
             // Each parallel test logs its own ID
             Logging.Information ($"Starting {testId}");
 
-            await Task.Delay (10); // Simulate async work
+            await Task.Delay (10, TestContext.Current.CancellationToken); // Simulate async work
 
             Logging.Information ($"Finishing {testId}");
         }

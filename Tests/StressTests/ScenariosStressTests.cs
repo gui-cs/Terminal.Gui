@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using UICatalog;
-using Xunit.Abstractions;
 
 namespace StressTests;
 

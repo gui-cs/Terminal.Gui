@@ -1,6 +1,4 @@
-﻿using System.Text;
-using UnitTests;
-using Xunit.Abstractions;
+﻿using UnitTests;
 
 namespace ViewBaseTests.Drawing;
 

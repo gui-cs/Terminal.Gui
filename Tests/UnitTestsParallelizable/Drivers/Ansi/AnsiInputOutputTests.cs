@@ -1,5 +1,4 @@
 #nullable enable
-using Xunit.Abstractions;
 
 namespace DriverTests.AnsiDriver;
 
@@ -56,6 +55,20 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
         // Assert
         Assert.True (size.Width > 0);
         Assert.True (size.Height > 0);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void AnsiOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new AnsiOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
     }
 
     [Fact]
