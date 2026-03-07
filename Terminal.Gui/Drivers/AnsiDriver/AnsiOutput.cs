@@ -61,7 +61,7 @@ public class AnsiOutput : OutputBase, IOutput
         try
         {
             // Check if we have a real console first
-            if (Application.IsRunningInTest ())
+            if (DriverImpl.IsRunningInTest)
             {
                 Trace.Lifecycle (nameof (AnsiInput), "Init", "Console is running unit tests. Running in degraded mode.");
 

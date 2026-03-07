@@ -31,7 +31,7 @@ internal static class ClipboardProcessRunner
     {
         var output = string.Empty;
 
-        if (Application.IsRunningInTest ())
+        if (DriverImpl.IsRunningInTest)
         {
             return (-1, output);
         }
