@@ -177,8 +177,9 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (new Key ('Ã'), options);
         injector.InjectKey (new Key ('Õ'), options);
 
+        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
-        await Task.Delay (100, TestContext.Current.CancellationToken); // Allow some time for processing
+        await WaitUntilAsync (() => receivedKeys.Count == 34, TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken);
 
         Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
 
@@ -220,6 +221,18 @@ public class InputInjectorTests (ITestOutputHelper output)
         Assert.Equal (new Key ('Õ'), receivedKeys [33]);
     }
 
+    private static async Task WaitUntilAsync (Func<bool> condition, TimeSpan timeout, CancellationToken ct)
+    {
+        using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource (ct);
+        cts.CancelAfter (timeout);
+
+        while (!condition ())
+        {
+            // In .NET 10/Ubuntu, 10-20ms is a healthy range for polling.
+            await Task.Delay (20, cts.Token);
+        }
+    }
+
     [Fact]
     public async Task InjectKey_PipelineMode_MultipleKeys_RaisesAllEvents ()
     {
@@ -244,8 +257,9 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (Key.B, options);
         injector.InjectKey (Key.C, options);
 
-        injector.ProcessQueue ();
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
+        injector.ProcessQueue ();
+        await WaitUntilAsync (() => receivedKeys.Count == 3, TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken);
 
         Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
 
