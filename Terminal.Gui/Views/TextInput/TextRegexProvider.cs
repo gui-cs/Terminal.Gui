@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Views;
@@ -98,12 +97,13 @@ public class TextRegexProvider : ITextValidateProvider
     /// <inheritdoc/>
     public bool Delete (int pos)
     {
-        if (_text.Count > 0 && pos < _text.Count)
+        if (_text.Count <= 0 || pos >= _text.Count)
         {
-            string oldValue = Text;
-            _text.RemoveAt (pos);
-            OnTextChanged (new (in oldValue));
+            return true;
         }
+        string oldValue = Text;
+        _text.RemoveAt (pos);
+        OnTextChanged (new EventArgs<string> (in oldValue));
 
         return true;
     }
@@ -114,56 +114,34 @@ public class TextRegexProvider : ITextValidateProvider
         List<Rune> aux = _text.ToList ();
         aux.Insert (pos, (Rune)ch);
 
-        if (Validate (aux) || !ValidateOnInput)
+        if (!Validate (aux) && ValidateOnInput)
         {
-            string oldValue = Text;
-            _text.Insert (pos, (Rune)ch);
-            OnTextChanged (new (in oldValue));
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public bool VerifyChar (char input, int position, out MaskedTextResultHint hint)
-    {
-        if (position < 0 || position > _text.Count)
-        {
-            hint = MaskedTextResultHint.PositionOutOfRange;
-
             return false;
         }
+        string oldValue = Text;
+        _text.Insert (pos, (Rune)ch);
+        OnTextChanged (new EventArgs<string> (in oldValue));
 
-        List<Rune> aux = _text.ToList ();
-        aux.Insert (position, (Rune)input);
-
-        if (Validate (aux))
-        {
-            hint = MaskedTextResultHint.Success;
-
-            return true;
-        }
-        hint = MaskedTextResultHint.InvalidInput;
-
-        return false;
+        return true;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Raises the TextChanged event to notify subscribers that the text has changed.
+    /// </summary>
+    /// <param name="args">An EventArgs<string> object that contains the event data representing the new text value.</param>
     public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
 
     /// <summary>Compiles the regex pattern for validation./></summary>
-    private void CompileMask () => _regex = new (StringExtensions.ToString (_pattern), RegexOptions.Compiled);
+    private void CompileMask () => _regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled);
 
     private void SetupText ()
     {
-        if (_text is { } && IsValid)
+        if (_text is not null && IsValid)
         {
             return;
         }
 
-        _text = new ();
+        _text = [];
     }
 
     private bool Validate (List<Rune> text)

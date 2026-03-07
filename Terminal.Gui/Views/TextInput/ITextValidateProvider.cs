@@ -1,7 +1,3 @@
-
-
-using System.ComponentModel;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>TextValidateField Providers Interface. All TextValidateField are created with a ITextValidateProvider.</summary>
@@ -52,16 +48,6 @@ public interface ITextValidateProvider
     /// <param name="pos"></param>
     /// <returns>true if the character was successfully inserted, otherwise false.</returns>
     bool InsertAt (char ch, int pos);
-
-    /// <summary>
-    /// Tests whether the specified character would be set successfully at the specified position.
-    /// </summary>
-    public bool VerifyChar (char input, int position, out MaskedTextResultHint hint);
-
-    /// <summary>Method that invoke the <see cref="TextChanged"/> event if it's defined.</summary>
-    /// <param name="oldValue">The previous text before replaced.</param>
-    /// <returns>Returns the <see cref="EventArgs{T}"/></returns>
-    void OnTextChanged (EventArgs<string> oldValue);
 
     /// <summary>
     ///     Changed event, raised when the text has changed.

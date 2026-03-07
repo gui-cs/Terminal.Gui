@@ -57,7 +57,7 @@ namespace Terminal.Gui.Views;
 public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 {
     private TimeTextProvider TimeProvider => (TimeTextProvider)Provider!;
-    private TimeSpan _lastKnownValue = TimeSpan.Zero;
+    private TimeSpan _lastKnownValue;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TimeEditor"/> class.
@@ -65,9 +65,9 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
     public TimeEditor ()
     {
         Provider = new TimeTextProvider ();
+
         // Add one so there is always a blank cell after the last editable character for the cursor.
         Width = Dim.Auto (minimumContentDim: Provider!.DisplayText.Length + 1);
-
 
         // Subscribe to provider's text changed to raise our value events
         TimeProvider.TextChanged += (_, _) => RaiseValueChangedEvents ();
@@ -94,6 +94,7 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
         set
         {
             TimeProvider.Format = value;
+
             // Add one so there is always a blank cell after the last editable character for the cursor.
             Width = TimeProvider.DisplayText.Length + 1;
             SetNeedsDraw ();
@@ -138,7 +139,7 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 
             // Update _lastKnownValue before setting to prevent double-firing from TextChanged handler
             _lastKnownValue = value;
-            
+
             TimeProvider.TimeValue = value;
             Text = TimeProvider.Text;
 
@@ -161,7 +162,7 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <inheritdoc/>
-    object? IValue.GetValue () => Value;
+    object IValue.GetValue () => Value;
 
     /// <summary>
     ///     Called when the <see cref="Value"/> is changing.
@@ -198,7 +199,6 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
             return;
         }
 
-
         // Raise ValueChanging to allow cancellation
         ValueChangingEventArgs<TimeSpan> changingArgs = new (_lastKnownValue, currentValue);
 
@@ -223,7 +223,6 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 
             return;
         }
-
 
         ValueChangedEventArgs<TimeSpan> changedArgs = new (_lastKnownValue, currentValue);
         _lastKnownValue = currentValue;

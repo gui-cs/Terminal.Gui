@@ -47,7 +47,7 @@ public class TimeTextProvider : ITextValidateProvider
     private bool _is12Hour;
     private bool _hasAmPm;
     private int _fieldLength;
-    private HashSet<int> _separatorPositions = [];
+    private readonly HashSet<int> _separatorPositions = [];
     private int _amPmPosition = -1;
     private bool _isPm;
 
@@ -71,7 +71,7 @@ public class TimeTextProvider : ITextValidateProvider
             _format = value;
             _separator = value.TimeSeparator;
             AnalyzePattern ();
-            OnTextChanged (new (in string.Empty));
+            OnTextChanged (new EventArgs<string> (in string.Empty));
         }
     }
 
@@ -97,17 +97,17 @@ public class TimeTextProvider : ITextValidateProvider
         get => FormatTimeValue ();
         set
         {
-            if (TryParseTimeValue (value, out TimeSpan parsedValue))
+            if (!TryParseTimeValue (value, out TimeSpan parsedValue))
             {
-                string oldValue = Text;
-                _timeValue = parsedValue;
-                _isPm = _timeValue.Hours >= 12;
+                return;
+            }
+            string oldValue = Text;
+            _timeValue = parsedValue;
+            _isPm = _timeValue.Hours >= 12;
 
-
-                if (oldValue != Text)
-                {
-                    OnTextChanged (new (in oldValue));
-                }
+            if (oldValue != Text)
+            {
+                OnTextChanged (new EventArgs<string> (in oldValue));
             }
         }
     }
@@ -234,21 +234,20 @@ public class TimeTextProvider : ITextValidateProvider
         // Replace digit with '0'
         string currentText = FormatTimeValue ();
 
-        if (pos >= 0 && pos < currentText.Length && char.IsDigit (currentText [pos]))
+        if (pos < 0 || pos >= currentText.Length || !char.IsDigit (currentText [pos]))
         {
-            StringBuilder sb = new (currentText);
-            sb [pos] = '0';
-
-            if (TryParseTimeValue (sb.ToString (), out TimeSpan newValue))
-            {
-                _timeValue = newValue;
-                OnTextChanged (new (in oldValue));
-
-                return true;
-            }
+            return false;
         }
+        StringBuilder sb = new (currentText) { [pos] = '0' };
 
-        return false;
+        if (!TryParseTimeValue (sb.ToString (), out TimeSpan newValue))
+        {
+            return false;
+        }
+        _timeValue = newValue;
+        OnTextChanged (new EventArgs<string> (in oldValue));
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -259,26 +258,24 @@ public class TimeTextProvider : ITextValidateProvider
         // Handle AM/PM toggle
         if (_hasAmPm && pos == _amPmPosition)
         {
-            if (char.ToUpperInvariant (ch) == 'A' || char.ToUpperInvariant (ch) == 'P')
+            if (char.ToUpperInvariant (ch) != 'A' && char.ToUpperInvariant (ch) != 'P')
             {
-                _isPm = char.ToUpperInvariant (ch) == 'P';
+                return false;
+            }
+            _isPm = char.ToUpperInvariant (ch) == 'P';
 
-                // Update the time value hours to reflect AM/PM change
-                int hours = _timeValue.Hours % 12;
+            // Update the time value hours to reflect AM/PM change
+            int hours = _timeValue.Hours % 12;
 
-                if (_isPm && hours < 12)
-                {
-                    hours += 12;
-                }
-
-
-                _timeValue = new TimeSpan (hours, _timeValue.Minutes, _timeValue.Seconds);
-                OnTextChanged (new (in oldValue));
-
-                return true;
+            if (_isPm && hours < 12)
+            {
+                hours += 12;
             }
 
-            return false;
+            _timeValue = new TimeSpan (hours, _timeValue.Minutes, _timeValue.Seconds);
+            OnTextChanged (new EventArgs<string> (in oldValue));
+
+            return true;
         }
 
         // Only accept digits for time positions
@@ -290,52 +287,28 @@ public class TimeTextProvider : ITextValidateProvider
         // Replace digit at position
         string currentText = FormatTimeValue ();
 
-        if (pos >= 0 && pos < currentText.Length)
+        if (pos < 0 || pos >= currentText.Length)
         {
-            StringBuilder sb = new (currentText);
-            sb [pos] = ch;
-
-            if (TryParseTimeValue (sb.ToString (), out TimeSpan newValue))
-            {
-                _timeValue = newValue;
-                OnTextChanged (new (in oldValue));
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public bool VerifyChar (char input, int position, out MaskedTextResultHint hint)
-    {
-        hint = MaskedTextResultHint.Success;
-
-        // Handle AM/PM toggle
-        if (_hasAmPm && position == _amPmPosition)
-        {
-            if (char.ToUpperInvariant (input) == 'A' || char.ToUpperInvariant (input) == 'P')
-            {
-                return true;
-            }
-            hint = MaskedTextResultHint.InvalidInput;
-
             return false;
         }
+        StringBuilder sb = new (currentText) { [pos] = ch };
 
-        // Only accept digits for time positions
-        if (!char.IsDigit (input))
+        if (!TryParseTimeValue (sb.ToString (), out TimeSpan newValue))
         {
-            hint = MaskedTextResultHint.InvalidInput;
-
             return false;
         }
+        _timeValue = newValue;
+        OnTextChanged (new EventArgs<string> (in oldValue));
 
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Raises the TextChanged event to notify subscribers that the text has changed.
+    /// </summary>
+    /// <remarks>Call this method to trigger the TextChanged event when the text value is updated. Subscribers
+    /// can use this event to respond to changes in the text.</remarks>
+    /// <param name="args">An EventArgs<string> object that contains the event data for the text change.</param>
     public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
 
     /// <summary>
@@ -368,16 +341,17 @@ public class TimeTextProvider : ITextValidateProvider
         }
 
         // Find AM/PM position
-        if (_hasAmPm)
+        if (!_hasAmPm)
         {
-            string amDesignator = _format.AMDesignator;
-            string pmDesignator = _format.PMDesignator;
-
-            int amIndex = formatted.IndexOf (amDesignator, StringComparison.Ordinal);
-            int pmIndex = formatted.IndexOf (pmDesignator, StringComparison.Ordinal);
-
-            _amPmPosition = Math.Max (amIndex, pmIndex);
+            return;
         }
+        string amDesignator = _format.AMDesignator;
+        string pmDesignator = _format.PMDesignator;
+
+        int amIndex = formatted.IndexOf (amDesignator, StringComparison.Ordinal);
+        int pmIndex = formatted.IndexOf (pmDesignator, StringComparison.Ordinal);
+
+        _amPmPosition = Math.Max (amIndex, pmIndex);
     }
 
     /// <summary>
@@ -417,30 +391,30 @@ public class TimeTextProvider : ITextValidateProvider
         DateTime dt = DateTime.Today.Add (_timeValue);
 
         // For 12-hour format, adjust the hours if needed
-        if (_is12Hour && _hasAmPm)
+        if (!_is12Hour || !_hasAmPm)
         {
-            int hours = _timeValue.Hours % 12;
+            return dt.ToString (_normalizedPattern, _format);
+        }
+        int hours = _timeValue.Hours % 12;
 
-            if (hours == 0)
-            {
-                hours = 12;
-            }
-
-            // Convert to 24-hour format for DateTime construction
-            int hours24;
-
-            if (_isPm)
-            {
-                hours24 = hours == 12 ? 12 : hours + 12;
-            }
-            else
-            {
-                hours24 = hours == 12 ? 0 : hours;
-            }
-
-            dt = new DateTime (BASE_YEAR, BASE_MONTH, BASE_DAY, hours24, _timeValue.Minutes, _timeValue.Seconds);
+        if (hours == 0)
+        {
+            hours = 12;
         }
 
+        // Convert to 24-hour format for DateTime construction
+        int hours24;
+
+        if (_isPm)
+        {
+            hours24 = hours == 12 ? 12 : hours + 12;
+        }
+        else
+        {
+            hours24 = hours == 12 ? 0 : hours;
+        }
+
+        dt = new DateTime (BASE_YEAR, BASE_MONTH, BASE_DAY, hours24, _timeValue.Minutes, _timeValue.Seconds);
 
         return dt.ToString (_normalizedPattern, _format);
     }
@@ -460,15 +434,15 @@ public class TimeTextProvider : ITextValidateProvider
         text = text.Trim ();
 
         // Try to parse using the current pattern
-        if (DateTime.TryParseExact (text, _normalizedPattern, _format, DateTimeStyles.None, out DateTime dt))
+        if (!DateTime.TryParseExact (text, _normalizedPattern, _format, DateTimeStyles.None, out DateTime dt))
         {
-            result = dt.TimeOfDay;
-
-            return true;
+            return TryManualParse (text, out result);
         }
+        result = dt.TimeOfDay;
+
+        return true;
 
         // Fallback: try manual parsing for partial/invalid input
-        return TryManualParse (text, out result);
     }
 
     /// <summary>
@@ -496,12 +470,12 @@ public class TimeTextProvider : ITextValidateProvider
                 if (lastPart.EndsWith (_format.PMDesignator, StringComparison.OrdinalIgnoreCase))
                 {
                     isPm = true;
-                    lastPart = lastPart.Substring (0, lastPart.Length - _format.PMDesignator.Length).Trim ();
+                    lastPart = lastPart [..^_format.PMDesignator.Length].Trim ();
                 }
                 else if (lastPart.EndsWith (_format.AMDesignator, StringComparison.OrdinalIgnoreCase))
                 {
                     isPm = false;
-                    lastPart = lastPart.Substring (0, lastPart.Length - _format.AMDesignator.Length).Trim ();
+                    lastPart = lastPart [..^_format.AMDesignator.Length].Trim ();
                 }
 
                 parts [^1] = lastPart;
@@ -556,7 +530,6 @@ public class TimeTextProvider : ITextValidateProvider
 
             result = new TimeSpan (hours, minutes, seconds);
             _isPm = hours >= 12;
-
 
             return true;
         }

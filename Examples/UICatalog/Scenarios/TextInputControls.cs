@@ -247,15 +247,10 @@ public class TextInputControls : Scenario
         label = new Label { Text = "T_imeEditor:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
         win.Add (label);
 
-        _timeEditor = new TimeEditor ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (dateField),
-            Value = DateTime.Now.TimeOfDay
-        };
+        _timeEditor = new TimeEditor { X = Pos.Right (label) + 1, Y = Pos.Top (dateField), Value = DateTime.Now.TimeOfDay };
         win.Add (_timeEditor);
 
-        _labelMirroringTimeEditor = new Label ()
+        _labelMirroringTimeEditor = new Label
         {
             X = Pos.Right (_timeEditor) + 1,
             Y = Pos.Top (_timeEditor),

@@ -31,10 +31,8 @@ public class NetMaskedTextProvider : ITextValidateProvider
         get => _provider!.Mask;
         set
         {
-            string current = _provider != null
-                                 ? _provider.ToString (false, false)
-                                 : string.Empty;
-            _provider = new (value == string.Empty ? "&&&&&&" : value);
+            string current = _provider != null ? _provider.ToString (false, false) : string.Empty;
+            _provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value);
 
             if (!string.IsNullOrEmpty (current))
             {
@@ -47,11 +45,7 @@ public class NetMaskedTextProvider : ITextValidateProvider
     public event EventHandler<EventArgs<string>>? TextChanged;
 
     /// <inheritdoc/>
-    public string Text
-    {
-        get => _provider!.ToString ();
-        set => _provider!.Set (value);
-    }
+    public string Text { get => _provider!.ToString (); set => _provider!.Set (value); }
 
     /// <inheritdoc/>
     public bool IsValid => _provider!.MaskCompleted;
@@ -86,20 +80,11 @@ public class NetMaskedTextProvider : ITextValidateProvider
     }
 
     /// <inheritdoc/>
-    public int CursorStart ()
-    {
-        return _provider!.IsEditPosition (0)
-                   ? 0
-                   : _provider.FindEditPositionFrom (0, true);
-    }
+    public int CursorStart () => _provider!.IsEditPosition (0) ? 0 : _provider.FindEditPositionFrom (0, true);
 
     /// <inheritdoc/>
-    public int CursorEnd ()
-    {
-        return _provider!.IsEditPosition (_provider.Length - 1)
-                   ? _provider.Length - 1
-                   : _provider.FindEditPositionFrom (_provider.Length, false);
-    }
+    public int CursorEnd () =>
+        _provider!.IsEditPosition (_provider.Length - 1) ? _provider.Length - 1 : _provider.FindEditPositionFrom (_provider.Length, false);
 
     /// <inheritdoc/>
     public int CursorLeft (int pos)
@@ -125,7 +110,7 @@ public class NetMaskedTextProvider : ITextValidateProvider
 
         if (result)
         {
-            OnTextChanged (new (in oldValue));
+            OnTextChanged (new EventArgs<string> (in oldValue));
         }
 
         return result;
@@ -139,18 +124,17 @@ public class NetMaskedTextProvider : ITextValidateProvider
 
         if (result)
         {
-            OnTextChanged (new (in oldValue));
+            OnTextChanged (new EventArgs<string> (in oldValue));
         }
 
         return result;
     }
 
-    /// <inheritdoc />
-    public bool VerifyChar (char input, int position, out MaskedTextResultHint hint)
-    {
-        return _provider!.VerifyChar (input, position, out hint);
-    }
-
-    /// <inheritdoc/>
-    public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
+    /// <summary>
+    /// Raises the TextChanged event to notify subscribers that the text has changed.
+    /// </summary>
+    /// <remarks>Call this method to trigger the TextChanged event when the text value is updated. Subscribers
+    /// can use this event to respond to changes in the text.</remarks>
+    /// <param name="args">An EventArgs<string> object that contains the event data for the text change.</param>
+    public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
 }

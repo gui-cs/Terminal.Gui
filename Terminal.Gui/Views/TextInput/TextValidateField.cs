@@ -178,7 +178,7 @@ public class TextValidateField : View, IDesignable
             return true;
         }
 
-        VisualRole role = VisualRole.Editable;
+        var role = VisualRole.Editable;
         Attribute textColor = IsValid ? GetAttributeForRole (role) : SchemeManager.GetScheme (Schemes.Error).GetAttributeForRole (role);
 
         (int marginLeft, int marginRight) = GetMargins (Viewport.Width);
@@ -210,12 +210,13 @@ public class TextValidateField : View, IDesignable
             AddRune ((Rune)' ');
         }
 
-        if (HasFocus && _provider.DisplayText.Length > 0 && InsertionPoint < _provider.DisplayText.Length)
+        if (!HasFocus || _provider.DisplayText.Length <= 0 || InsertionPoint >= _provider.DisplayText.Length)
         {
-            SetAttributeForRole (VisualRole.Focus);
-            Move (InsertionPoint + marginLeft, 0);
-            AddRune ((Rune)_provider.DisplayText [InsertionPoint]);
+            return true;
         }
+        SetAttributeForRole (VisualRole.Focus);
+        Move (InsertionPoint + marginLeft, 0);
+        AddRune ((Rune)_provider.DisplayText [InsertionPoint]);
 
         return true;
     }
@@ -237,14 +238,14 @@ public class TextValidateField : View, IDesignable
 
         bool inserted = _provider.InsertAt ((char)rune.Value, InsertionPoint);
 
-        if (inserted)
+        if (!inserted)
         {
-            CursorRight ();
-
-            return true;
+            return false;
         }
+        CursorRight ();
 
-        return false;
+        return true;
+
     }
 
     /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>

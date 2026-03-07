@@ -71,6 +71,7 @@ public class TextValidateField_NET_Provider_Tests : TestDriverBase
         // A-Alphanumeric, required. a-Alphanumeric, optional.
         var field = new TextValidateField { Provider = new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa") };
         field.Layout ();
+
         // Width is DisplayText.Length + 1 to provide a blank cell for the cursor past the last editable char.
         Assert.Equal (field.Viewport.Width, field.Provider.DisplayText.Length + 1);
         Assert.NotEqual (field.Provider.DisplayText.Length, field.Provider.Text.Length);
