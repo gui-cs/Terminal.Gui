@@ -930,9 +930,9 @@ Fully featured multi-line text editor
 </pre>
 
 
-## [TimeField](xref:Terminal.Gui.Views.TimeField)
+## [TimeEditor](xref:Terminal.Gui.Views.TimeEditor)
 
-Provides time editing functionality with specialized cursor behavior for time entry.
+Provides time editing functionality using `TextValidateField` with culture-aware formatting.
 
 
 <pre style='color:#FFFFFF;background:#000000'>

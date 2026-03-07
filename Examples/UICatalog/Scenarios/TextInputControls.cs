@@ -13,8 +13,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("DateTime")]
 public class TextInputControls : Scenario
 {
-    private Label? _labelMirroringTimeField;
-    private TimeField? _timeField;
+    private Label? _labelMirroringTimeEditor;
+    private TimeEditor? _timeEditor;
 
     public override void Main ()
     {
@@ -243,31 +243,29 @@ public class TextInputControls : Scenario
 
         dateField.TextChanged += (_, _) => { labelMirroringDateField.Text = dateField.Text; };
 
-        // TimeField
-        label = new Label { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
+        // TimeEditor
+        label = new Label { Text = "T_imeEditor:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
         win.Add (label);
 
-        _timeField = new TimeField
+        _timeEditor = new TimeEditor ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (dateField),
-            Width = 20,
-            IsShortFormat = false,
             Value = DateTime.Now.TimeOfDay
         };
-        win.Add (_timeField);
+        win.Add (_timeEditor);
 
-        _labelMirroringTimeField = new Label
+        _labelMirroringTimeEditor = new Label ()
         {
-            X = Pos.Right (_timeField) + 1,
-            Y = Pos.Top (_timeField),
-            Width = Dim.Width (_timeField),
-            Height = Dim.Height (_timeField),
-            Text = _timeField.Text
+            X = Pos.Right (_timeEditor) + 1,
+            Y = Pos.Top (_timeEditor),
+            Width = Dim.Width (_timeEditor),
+            Height = Dim.Height (_timeEditor),
+            Text = _timeEditor.Text
         };
-        win.Add (_labelMirroringTimeField);
+        win.Add (_labelMirroringTimeEditor);
 
-        _timeField.ValueChanged += TimeChanged;
+        _timeEditor.ValueChanged += TimeChanged;
 
         // MaskedTextProvider - uses .NET MaskedTextProvider
         NetMaskedTextProvider netProvider = new ("+99 (000) 000-0000");
@@ -471,9 +469,9 @@ public class TextInputControls : Scenario
 
     private void TimeChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
     {
-        if (_labelMirroringTimeField is { } && _timeField is { })
+        if (_labelMirroringTimeEditor is { } && _timeEditor is { })
         {
-            _labelMirroringTimeField.Text = _timeField.Text;
+            _labelMirroringTimeEditor.Text = _timeEditor.Text;
         }
     }
 }

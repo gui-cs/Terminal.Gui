@@ -486,7 +486,7 @@ public interface IValue<TValue> : IValue
 | <xref:Terminal.Gui.Views.TextField> | `string` | Text content |
 | <xref:Terminal.Gui.Views.TextView> | `string` | Full text content |
 | `DateField` | `DateTime?` | Selected date and time |
-| `TimeField` | `TimeSpan` | Selected time |
+| `TimeEditor` | `TimeSpan` | Selected time |
 | `ScrollBar` | `int` | Current scroll position |
 | `Slider` | `int` | Current slider value |
 | <xref:Terminal.Gui.Views.ListView> | `int` | Selected item index |

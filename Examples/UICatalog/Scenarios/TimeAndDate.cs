@@ -4,17 +4,14 @@ using System.Globalization;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Time And Date", "Illustrates TimeField and time & date handling")]
+[ScenarioMetadata ("Time And Date", "Illustrates TimeEditor and time & date handling")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("DateTime")]
 public class TimeAndDate : Scenario
 {
     private Label? _lblDateFmt;
     private Label? _lblNewDate;
-    private Label? _lblNewTime;
     private Label? _lblOldDate;
-    private Label? _lblOldTime;
-    private Label? _lblTimeFmt;
     private Label? _lblTimeEditorValue;
 
     public override void Main ()
@@ -26,43 +23,12 @@ public class TimeAndDate : Scenario
 
         using Window win = new () { Title = GetQuitKeyAndName () };
 
-        // TimeField examples (existing)
-        Label tfLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = 1,
-            Text = "TimeField (Legacy):"
-        };
-        win.Add (tfLabel);
-
-        TimeField longTime = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (tfLabel),
-            IsShortFormat = false,
-            ReadOnly = false,
-            Value = DateTime.Now.TimeOfDay
-        };
-        longTime.ValueChanged += TimeChanged;
-        win.Add (longTime);
-
-        TimeField shortTime = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (longTime) + 1,
-            IsShortFormat = true,
-            ReadOnly = false,
-            Value = DateTime.Now.TimeOfDay
-        };
-        shortTime.ValueChanged += TimeChanged;
-        win.Add (shortTime);
-
-        // TimeEditor examples (new)
+        // TimeEditor examples
         Label teLabel = new ()
         {
             X = Pos.Center (),
-            Y = Pos.Bottom (shortTime) + 1,
-            Text = "TimeEditor (New - based on TextValidateField):"
+            Y = 1,
+            Text = "TimeEditor (based on TextValidateField):"
         };
         win.Add (teLabel);
 
@@ -141,43 +107,10 @@ public class TimeAndDate : Scenario
         longDate.ValueChanged += DateChanged;
         win.Add (longDate);
 
-        _lblOldTime = new()
+        _lblTimeEditorValue = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (longDate) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "Old Time: "
-        };
-        win.Add (_lblOldTime);
-
-        _lblNewTime = new()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblOldTime) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "New Time: "
-        };
-        win.Add (_lblNewTime);
-
-        _lblTimeFmt = new()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblNewTime) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "Time Format: "
-        };
-        win.Add (_lblTimeFmt);
-
-        _lblTimeEditorValue = new()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblTimeFmt) + 1,
             TextAlignment = Alignment.Center,
 
             Width = Dim.Fill (),
@@ -185,7 +118,7 @@ public class TimeAndDate : Scenario
         };
         win.Add (_lblTimeEditorValue);
 
-        _lblOldDate = new()
+        _lblOldDate = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblTimeEditorValue) + 1,
@@ -196,7 +129,7 @@ public class TimeAndDate : Scenario
         };
         win.Add (_lblOldDate);
 
-        _lblNewDate = new()
+        _lblNewDate = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblOldDate) + 1,
@@ -207,7 +140,7 @@ public class TimeAndDate : Scenario
         };
         win.Add (_lblNewDate);
 
-        _lblDateFmt = new()
+        _lblDateFmt = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (_lblNewDate) + 1,
@@ -220,17 +153,11 @@ public class TimeAndDate : Scenario
 
         Button swapButton = new ()
         {
-            X = Pos.Center (), Y = Pos.Bottom (win) - 5, Text = "Swap Long/Short & Read/Read Only"
+            X = Pos.Center (), Y = Pos.Bottom (win) - 5, Text = "Swap Date Read/Read Only"
         };
 
         swapButton.Accepting += (_, _) =>
                              {
-                                 longTime.ReadOnly = !longTime.ReadOnly;
-                                 shortTime.ReadOnly = !shortTime.ReadOnly;
-
-                                 longTime.IsShortFormat = !longTime.IsShortFormat;
-                                 shortTime.IsShortFormat = !shortTime.IsShortFormat;
-
                                  longDate.ReadOnly = !longDate.ReadOnly;
                                  shortDate.ReadOnly = !shortDate.ReadOnly;
                              };
@@ -242,11 +169,6 @@ public class TimeAndDate : Scenario
     private void DateChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
     {
         _lblNewDate!.Text = $"New Date: {e.NewValue}";
-    }
-
-    private void TimeChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
-    {
-        _lblNewTime!.Text = $"New Time: {e.NewValue}";
     }
 
     private void TimeEditorChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
