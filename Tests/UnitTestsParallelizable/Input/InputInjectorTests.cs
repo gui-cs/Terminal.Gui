@@ -179,7 +179,6 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
-        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
 
         Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
 
@@ -247,7 +246,6 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
-        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
 
         Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
 

@@ -242,14 +242,6 @@ public class InputInjector : IInputInjector
     {
         _processor.ProcessQueue ();
 
-        if (_testSource is { IsAvailable: true })
-        {
-            foreach (InputEventRecord _ in _testSource.ReadAvailable ())
-            {
-                _processor.ProcessQueue ();
-            }
-        }
-
         // If using virtual time and parser has stale escape sequences, advance time and process again
         if (_timeProvider is not VirtualTimeProvider vtp)
         {
