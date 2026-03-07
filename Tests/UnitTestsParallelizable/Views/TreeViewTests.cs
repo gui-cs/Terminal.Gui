@@ -437,7 +437,7 @@ public class TreeViewTests : TestDriverBase
     {
         var tree = new TreeView ();
 
-        Exception exception = Record.Exception (() => tree.GoToEnd ());
+        Exception? exception = Record.Exception (() => tree.GoToEnd ());
 
         Assert.Null (exception);
     }
