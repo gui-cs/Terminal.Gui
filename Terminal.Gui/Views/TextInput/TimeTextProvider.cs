@@ -42,6 +42,7 @@ public class TimeTextProvider : ITextValidateProvider
 
     private DateTimeFormatInfo _format = CultureInfo.CurrentCulture.DateTimeFormat;
     private string _separator = CultureInfo.CurrentCulture.DateTimeFormat.TimeSeparator;
+    private string _normalizedPattern = string.Empty;
     private TimeSpan _timeValue = TimeSpan.Zero;
     private bool _is12Hour;
     private bool _hasAmPm;
@@ -112,7 +113,7 @@ public class TimeTextProvider : ITextValidateProvider
     }
 
     /// <inheritdoc/>
-    public string DisplayText => " " + FormatTimeValue ();
+    public string DisplayText => FormatTimeValue ();
 
     /// <inheritdoc/>
     public bool IsValid =>
@@ -348,9 +349,12 @@ public class TimeTextProvider : ITextValidateProvider
         _is12Hour = pattern.Contains ('h');
         _hasAmPm = pattern.Contains ("tt");
 
+        // Normalize to 2-digit specifiers for consistent fixed-width fields
+        _normalizedPattern = NormalizePattern (pattern);
+
         // Build a sample time to determine field positions
         DateTime sampleTime = new (BASE_YEAR, BASE_MONTH, BASE_DAY, SAMPLE_HOUR, SAMPLE_MINUTE, SAMPLE_SECOND);
-        var formatted = sampleTime.ToString (pattern, _format);
+        var formatted = sampleTime.ToString (_normalizedPattern, _format);
 
         _fieldLength = formatted.Length;
 
@@ -374,6 +378,35 @@ public class TimeTextProvider : ITextValidateProvider
 
             _amPmPosition = Math.Max (amIndex, pmIndex);
         }
+    }
+
+    /// <summary>
+    ///     Normalizes the time pattern to always use 2-digit specifiers (e.g. h → hh, m → mm)
+    ///     so that field positions are consistent regardless of the current time value.
+    /// </summary>
+    private static string NormalizePattern (string pattern)
+    {
+        if (!pattern.Contains ("hh") && pattern.Contains ('h'))
+        {
+            pattern = pattern.Replace ("h", "hh");
+        }
+
+        if (!pattern.Contains ("HH") && pattern.Contains ('H'))
+        {
+            pattern = pattern.Replace ("H", "HH");
+        }
+
+        if (!pattern.Contains ("mm") && pattern.Contains ('m'))
+        {
+            pattern = pattern.Replace ("m", "mm");
+        }
+
+        if (!pattern.Contains ("ss") && pattern.Contains ('s'))
+        {
+            pattern = pattern.Replace ("s", "ss");
+        }
+
+        return pattern;
     }
 
     /// <summary>
@@ -409,7 +442,7 @@ public class TimeTextProvider : ITextValidateProvider
         }
 
 
-        return dt.ToString (_format.LongTimePattern, _format);
+        return dt.ToString (_normalizedPattern, _format);
     }
 
     /// <summary>
@@ -427,7 +460,7 @@ public class TimeTextProvider : ITextValidateProvider
         text = text.Trim ();
 
         // Try to parse using the current pattern
-        if (DateTime.TryParseExact (text, _format.LongTimePattern, _format, DateTimeStyles.None, out DateTime dt))
+        if (DateTime.TryParseExact (text, _normalizedPattern, _format, DateTimeStyles.None, out DateTime dt))
         {
             result = dt.TimeOfDay;
 

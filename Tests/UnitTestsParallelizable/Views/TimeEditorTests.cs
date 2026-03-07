@@ -1,10 +1,11 @@
 using System.Globalization;
+using Terminal.Gui.Tests;
 using UnitTests;
 
 namespace ViewsTests;
 
 // Claude - Sonnet 4.6
-public class TimeEditorTests : TestDriverBase
+public class TimeEditorTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -645,15 +646,256 @@ public class TimeEditorTests : TestDriverBase
     public void TimeTextProvider_CursorRight_FromEnd ()
     {
         TimeTextProvider provider = new ();
-        
+
         // Use 24-hour format
         DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
         provider.Format = format24h;
-        
+
         int endPos = provider.CursorEnd ();
-        
+
         // CursorRight from end should return end
         int pos = provider.CursorRight (endPos);
         Assert.Equal (endPos, pos);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void NormalizedPattern_24h_Typing_12_Enters_TwoDigitHour ()
+    {
+        // Verifies that typing "12" at position 0 in 24h format sets hours to 12
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        format24h.LongTimePattern = "HH:mm:ss";
+        provider.Format = format24h;
+        provider.TimeValue = new TimeSpan (9, 0, 0);
+
+        output.WriteLine ($"Initial DisplayText: \"{provider.DisplayText}\"");
+        Assert.Equal ("09:00:00", provider.DisplayText);
+
+        // Type '1' at position 0 (tens digit of hours)
+        bool inserted = provider.InsertAt ('1', 0);
+        Assert.True (inserted);
+        output.WriteLine ($"After '1' at pos 0: \"{provider.DisplayText}\"");
+        Assert.Equal ("19:00:00", provider.DisplayText);
+
+        // Type '2' at position 1 (ones digit of hours)
+        inserted = provider.InsertAt ('2', 1);
+        Assert.True (inserted);
+        output.WriteLine ($"After '2' at pos 1: \"{provider.DisplayText}\"");
+        Assert.Equal ("12:00:00", provider.DisplayText);
+        Assert.Equal (new TimeSpan (12, 0, 0), provider.TimeValue);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void NormalizedPattern_DisplayText_Has_No_LeadingSpace ()
+    {
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        format24h.LongTimePattern = "HH:mm:ss";
+        provider.Format = format24h;
+        provider.TimeValue = new TimeSpan (9, 0, 0);
+
+        string display = provider.DisplayText;
+        output.WriteLine ($"DisplayText: \"{display}\"");
+
+        Assert.Equal ("09:00:00", display);
+        Assert.False (display.StartsWith (' '));
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void NormalizedPattern_SingleDigitHourFormat_PadsToTwoDigits ()
+    {
+        // Verifies that "h:mm:ss tt" is normalized to "hh:mm:ss tt"
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format12h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-US").DateTimeFormat.Clone ();
+        format12h.LongTimePattern = "h:mm:ss tt";
+        provider.Format = format12h;
+        provider.TimeValue = new TimeSpan (9, 0, 0);
+
+        string display = provider.DisplayText;
+        output.WriteLine ($"DisplayText for 9 AM with 'h:mm:ss tt': \"{display}\"");
+
+        // Should be padded to 2 digits: "09:00:00 AM"
+        Assert.StartsWith ("09", display);
+        Assert.Equal (11, display.Length);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void NormalizedPattern_FieldPositions_AreConsistent ()
+    {
+        // Verifies separator positions don't shift based on time value
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        format24h.LongTimePattern = "H:mm:ss"; // Single-digit H
+        provider.Format = format24h;
+
+        // Single-digit hour value
+        provider.TimeValue = new TimeSpan (9, 30, 45);
+        string display1 = provider.DisplayText;
+        output.WriteLine ($"9:30:45 → \"{display1}\"");
+
+        // Double-digit hour value
+        provider.TimeValue = new TimeSpan (14, 30, 45);
+        string display2 = provider.DisplayText;
+        output.WriteLine ($"14:30:45 → \"{display2}\"");
+
+        // Both should have the same length due to normalization
+        Assert.Equal (display1.Length, display2.Length);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TimeEditor_Typing_12_At_Start_Renders_Correctly ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 1);
+
+        try
+        {
+            Runnable<bool> runnable = new () { Width = 20, Height = 1 };
+            app.Begin (runnable);
+
+            DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+            format24h.LongTimePattern = "HH:mm:ss";
+
+            TimeEditor te = new ()
+            {
+                Width = 10,
+                Height = 1,
+                Value = new TimeSpan (9, 0, 0),
+                Format = format24h
+            };
+            runnable.Add (te);
+            app.LayoutAndDraw ();
+
+            output.WriteLine ($"Initial Text: \"{te.Text}\"");
+            output.WriteLine ($"Initial DisplayText: \"{te.Provider!.DisplayText}\"");
+
+            DriverAssert.AssertDriverContentsWithFrameAre (
+                @"09:00:00",
+                output,
+                app.Driver);
+
+            // Simulate focus and typing "1" then "2"
+            te.SetFocus ();
+            te.NewKeyDownEvent (Key.Home);
+            te.NewKeyDownEvent (Key.D1);
+            app.LayoutAndDraw ();
+
+            output.WriteLine ($"After '1': Text=\"{te.Text}\", DisplayText=\"{te.Provider.DisplayText}\"");
+
+            te.NewKeyDownEvent (Key.D2);
+            app.LayoutAndDraw ();
+
+            output.WriteLine ($"After '2': Text=\"{te.Text}\", DisplayText=\"{te.Provider.DisplayText}\"");
+
+            Assert.Equal (new TimeSpan (12, 0, 0), te.Value);
+
+            DriverAssert.AssertDriverContentsWithFrameAre (
+                @"12:00:00",
+                output,
+                app.Driver);
+        }
+        finally
+        {
+            app.Dispose ();
+        }
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TimeEditor_CursorRight_SkipsSeparator_24h ()
+    {
+        // Verifies cursor movement: after typing at pos 1, cursor skips separator to pos 3
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        format24h.LongTimePattern = "HH:mm:ss";
+        provider.Format = format24h;
+
+        // Position 0 = H tens, 1 = H ones, 2 = ':', 3 = m tens
+        int nextPos = provider.CursorRight (1);
+        output.WriteLine ($"CursorRight(1) = {nextPos}");
+
+        // Should skip separator at position 2 and land on 3
+        Assert.Equal (3, nextPos);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TimeEditor_CursorLeft_SkipsSeparator_24h ()
+    {
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        format24h.LongTimePattern = "HH:mm:ss";
+        provider.Format = format24h;
+
+        // CursorLeft from position 3 (m tens) should skip separator at 2 to position 1
+        int prevPos = provider.CursorLeft (3);
+        output.WriteLine ($"CursorLeft(3) = {prevPos}");
+        Assert.Equal (1, prevPos);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TimeEditor_FullNavigation_24h_AllPositions ()
+    {
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        format24h.LongTimePattern = "HH:mm:ss";
+        provider.Format = format24h;
+
+        // Expected editable positions for "HH:mm:ss": 0,1, 3,4, 6,7
+        List<int> visitedPositions = [provider.CursorStart ()];
+        int pos = provider.CursorStart ();
+
+        while (pos < provider.CursorEnd ())
+        {
+            pos = provider.CursorRight (pos);
+            visitedPositions.Add (pos);
+        }
+
+        output.WriteLine ($"Forward positions: [{string.Join (", ", visitedPositions)}]");
+
+        // Should visit: 0, 1, 3, 4, 6, 7
+        Assert.Equal ([0, 1, 3, 4, 6, 7], visitedPositions);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TimeEditor_InsertAt_AllDigitPositions_24h ()
+    {
+        TimeTextProvider provider = new ();
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+        format24h.LongTimePattern = "HH:mm:ss";
+        provider.Format = format24h;
+        provider.TimeValue = TimeSpan.Zero; // "00:00:00"
+
+        output.WriteLine ($"Initial: \"{provider.DisplayText}\"");
+
+        // Type at each editable position
+        Assert.True (provider.InsertAt ('1', 0)); // "10:00:00"
+        output.WriteLine ($"After InsertAt('1', 0): \"{provider.DisplayText}\"");
+
+        Assert.True (provider.InsertAt ('4', 1)); // "14:00:00"
+        output.WriteLine ($"After InsertAt('4', 1): \"{provider.DisplayText}\"");
+
+        Assert.True (provider.InsertAt ('3', 3)); // "14:30:00"
+        output.WriteLine ($"After InsertAt('3', 3): \"{provider.DisplayText}\"");
+
+        Assert.True (provider.InsertAt ('5', 4)); // "14:35:00"
+        output.WriteLine ($"After InsertAt('5', 4): \"{provider.DisplayText}\"");
+
+        Assert.True (provider.InsertAt ('4', 6)); // "14:35:40"
+        output.WriteLine ($"After InsertAt('4', 6): \"{provider.DisplayText}\"");
+
+        Assert.True (provider.InsertAt ('2', 7)); // "14:35:42"
+        output.WriteLine ($"After InsertAt('2', 7): \"{provider.DisplayText}\"");
+
+        Assert.Equal ("14:35:42", provider.DisplayText);
+        Assert.Equal (new TimeSpan (14, 35, 42), provider.TimeValue);
     }
 }
