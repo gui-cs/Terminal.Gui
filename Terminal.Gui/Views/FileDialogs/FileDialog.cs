@@ -400,7 +400,7 @@ public class FileDialog : Dialog, IDesignable
     {
         if (!string.IsNullOrWhiteSpace (_feedback))
         {
-            int feedbackWidth = _feedback.EnumerateRunes ().Sum (c => c.GetColumns ());
+            int feedbackWidth = _feedback.GetColumns ();
             int feedbackPadLeft = (Viewport.Width - feedbackWidth) / 2 - 1;
 
             feedbackPadLeft = Math.Min (Viewport.Width, feedbackPadLeft);
