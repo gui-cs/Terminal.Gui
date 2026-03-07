@@ -31,7 +31,7 @@ internal static class ClipboardProcessRunner
     {
         var output = string.Empty;
 
-        if (Console.IsInputRedirected || Console.IsOutputRedirected)
+        if (Application.IsRunningInTest ())
         {
             return (-1, output);
         }

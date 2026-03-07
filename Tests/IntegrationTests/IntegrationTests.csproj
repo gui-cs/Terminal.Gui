@@ -20,7 +20,14 @@
         <Optimize>true</Optimize>
     </PropertyGroup>
 
-    <ItemGroup>
+		<ItemGroup>
+			<RuntimeHostConfigurationOption
+				Include="Runtime.IsTestProject"
+				Value="true"
+				Trim="false" />
+		</ItemGroup>
+
+		<ItemGroup>
         <PackageReference Include="coverlet.collector">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

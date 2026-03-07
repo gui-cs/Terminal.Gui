@@ -81,6 +81,27 @@ public static partial class Application
         return app;
     }
 
+    /// <summary>
+    ///     Determines whether the current execution context is within a unit test project.
+    /// </summary>
+    /// <remarks>
+    ///     This method leverages <see cref="AppContext"/> switches to ensure compatibility with
+    ///     <b>Native AOT</b> and avoids trimming-related issues associated with reflection.
+    ///     <para>
+    ///         For this to return <c>true</c>, the test project (e.g., xUnit v3) must define the
+    ///         switch in its <c>.csproj</c> file:
+    ///         <code>
+    /// &lt;ItemGroup&gt;
+    ///   &lt;RuntimeHostConfigurationOption Include="Runtime.IsTestProject" Value="true" Trim="false" /&gt;
+    /// &lt;/ItemGroup&gt;
+    /// </code>
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if the test execution flag is set; otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool IsRunningInTest () => AppContext.TryGetSwitch ("Runtime.IsTestProject", out bool isTest) && isTest;
+
     #region Modern Instance-Based Model Events (Thread-Local)
 
     // Thread-local backing fields for events - each thread has its own subscribers

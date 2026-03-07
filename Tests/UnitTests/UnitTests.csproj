@@ -29,7 +29,15 @@
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<Optimize>true</Optimize>
 	</PropertyGroup>
+
 	<ItemGroup>
+		<RuntimeHostConfigurationOption
+			Include="Runtime.IsTestProject"
+			Value="true"
+			Trim="false" />
+	</ItemGroup>
+
+  <ItemGroup>
 	  <Compile Remove="Application\Keyboard\**" />
 	  <Compile Remove="Drivers\**" />
 	  <EmbeddedResource Remove="Application\Keyboard\**" />

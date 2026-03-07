@@ -180,7 +180,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
-        Assert.NotEqual (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
+        Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
 
         // Assert - Should raise exactly 34 KeyDown events
         Assert.Equal (34, receivedKeys.Count);
@@ -247,7 +247,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
-        Assert.NotEqual (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
+        Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
 
         // Assert - Should raise exactly 3 KeyDown events
         Assert.Equal (3, receivedKeys.Count);

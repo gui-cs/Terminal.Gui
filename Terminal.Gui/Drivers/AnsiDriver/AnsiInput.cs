@@ -88,9 +88,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         try
         {
             // Check if we have a real console first
-            if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            if (Application.IsRunningInTest ())
             {
-                Trace.Lifecycle (nameof (AnsiInput), "Init", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiInput), "Init", "Console is running unit tests. Running in degraded mode.");
 
                 return;
             }

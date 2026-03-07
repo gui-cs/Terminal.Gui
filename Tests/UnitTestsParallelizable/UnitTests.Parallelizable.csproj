@@ -24,6 +24,13 @@
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
 
+	<ItemGroup>
+		<RuntimeHostConfigurationOption
+			Include="Runtime.IsTestProject"
+			Value="true"
+			Trim="false" />
+	</ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineDebug>true</DefineDebug>
     <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
