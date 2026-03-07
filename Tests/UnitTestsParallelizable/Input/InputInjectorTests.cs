@@ -177,7 +177,6 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (new Key ('Ã'), options);
         injector.InjectKey (new Key ('Õ'), options);
 
-        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
         await WaitUntilAsync (() => receivedKeys.Count == 34, TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken);
 
@@ -257,7 +256,6 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (Key.B, options);
         injector.InjectKey (Key.C, options);
 
-        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
         await WaitUntilAsync (() => receivedKeys.Count == 3, TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken);
 
