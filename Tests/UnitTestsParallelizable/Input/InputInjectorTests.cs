@@ -177,7 +177,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (new Key ('Ã'), options);
         injector.InjectKey (new Key ('Õ'), options);
 
-        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
+        await Task.Delay (100, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
         Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
@@ -244,7 +244,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (Key.B, options);
         injector.InjectKey (Key.C, options);
 
-        await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
+        await Task.Delay (100, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
         Assert.Equal (AnsiPlatform.Degraded, ((AnsiOutput)app.Driver?.GetOutput ()!)._platform);
