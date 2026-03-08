@@ -134,9 +134,35 @@ Phase 1 is successful when:
 
 Phase 1 explicitly does not require new public keyboard APIs yet, but it should avoid painting later phases into a corner.
 
+## Progress Status
+
+### Phase 1 summary
+
+Status: In progress
+
+Completed:
+
+- kitty protocol query, enable, and disable constants were added to `EscSeqUtils`
+- a dedicated `KittyKeyboardProtocolDetector` was added with structured results
+- ANSI driver state now persists detected and enabled kitty protocol flags
+- startup wiring now probes for kitty support, enables kitty mode only after a positive response, and records the enabled state
+- `AnsiOutput` now owns kitty enable/disable emission and restores keyboard mode during dispose
+- `AnsiKeyboardParser` now checks a dedicated `KittyKeyboardPattern` before broader CSI patterns
+- phase-1 kitty CSI `u` parsing now maps printable keys, modifiers, and a first compatibility subset of function keys into the current `Key` model
+- focused detector, parser, input, lifecycle, and startup tests were added
+- targeted lifecycle traces were added for kitty probe, response, enable, skip, and disable flow in `DEBUG`
+
+Remaining for phase 1:
+
+- broaden kitty compatibility mapping beyond the current first subset of kitty special-key codes
+- run the non-parallel unit test/build validation that should accompany the full phase-1 completion
+- update the PR body as follow-on work lands so it stays aligned with actual scope
+
 ## Phase 1 Implementation Steps
 
 ### 1. Add kitty protocol constants and response metadata
+
+Status: Completed
 
 Extend `Terminal.Gui/Drivers/AnsiHandling/EscSeqUtils/EscSeqUtils.cs` with:
 
@@ -152,6 +178,8 @@ Notes:
 - Phase 1 should choose flags that are compatible with current Terminal.Gui behavior while still giving the parser the disambiguated stream it needs.
 
 ### 2. Introduce a focused detector object
+
+Status: Completed
 
 Add `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardProtocolDetector.cs`, following the style of `TerminalColorDetector` and `SixelSupportDetector`.
 
@@ -172,6 +200,8 @@ Even if phase 1 enables only a subset of flags, retain the reported capability s
 
 ### 3. Persist detected capability on the driver side
 
+Status: Completed
+
 Add ANSI-driver-visible state rather than burying kitty support inside the detector callback.
 
 Recommended direction:
@@ -186,6 +216,8 @@ This is needed so:
 - later phases have somewhere to hang richer keyboard capabilities without rediscovering them
 
 ### 4. Wire detection into startup after the driver exists
+
+Status: Completed
 
 Extend `Terminal.Gui/App/MainLoop/MainLoopCoordinator.cs` after driver construction, near existing terminal capability detection.
 
@@ -204,6 +236,8 @@ Constraints:
 
 ### 5. Keep enable/disable in the ANSI output lifecycle
 
+Status: Completed
+
 Keep terminal mode mutation in the ANSI driver lifecycle, not in the detector.
 
 Recommended split:
@@ -218,6 +252,8 @@ Concrete changes:
 - call disable from `AnsiOutput.Dispose ()` only if kitty mode was enabled
 
 ### 6. Extend the keyboard parser with kitty CSI `u` support
+
+Status: Partially completed
 
 Add a new parser pattern, e.g. `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardPattern.cs`, and register it in `AnsiKeyboardParser`.
 
@@ -235,6 +271,8 @@ Implementation detail:
 - keep kitty parsing isolated in a dedicated `AnsiKeyboardParserPattern` subclass instead of expanding `CsiKeyPattern`
 
 ### 7. Use a deliberate compatibility mapping into today’s `Key`
+
+Status: Partially completed
 
 Phase 1 should map kitty events into current `Terminal.Gui.Input.Key` as a compatibility layer, not as the final architecture.
 
@@ -257,6 +295,8 @@ The parser should document which kitty fields are dropped in phase 1 and point b
 
 ### 8. Make parser ordering explicit
 
+Status: Completed
+
 Update `AnsiKeyboardParser` so kitty sequences are checked before broader CSI patterns.
 
 Reason:
@@ -265,6 +305,8 @@ Reason:
 - ordering mistakes will cause partial or incorrect matches
 
 ### 9. Add end-to-end injection support only if needed
+
+Status: Completed for phase 1
 
 `AnsiInputProcessor.InjectKeyDownEvent ()` currently uses `AnsiKeyboardEncoder.Encode (key)`, which emits legacy ANSI sequences for tests.
 
@@ -276,6 +318,20 @@ Reason:
 - injection encoding can be added later behind a dedicated kitty-aware path if phase 2 or phase 3 needs richer event simulation
 
 ### 10. Add tests in three layers
+
+Status: Mostly completed
+
+Completed:
+
+- parser tests added for representative kitty printable, modifier, function-key, and malformed inputs
+- detector tests added for supported, unsupported, abandoned, and legacy-console cases
+- ANSI lifecycle tests added for enable/disable behavior
+- startup wiring tests added for positive detection and legacy-console skip behavior
+- integration-style `AnsiInputProcessor` test added for kitty sequence parsing
+
+Still useful before closing phase 1:
+
+- broader parser coverage for additional kitty navigation/function-code variants
 
 Parser tests:
 
