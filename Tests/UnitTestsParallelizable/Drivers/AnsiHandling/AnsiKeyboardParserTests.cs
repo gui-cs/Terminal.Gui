@@ -115,6 +115,20 @@ public class AnsiKeyboardParserTests
         yield return ["\u001b[9u", Key.Tab];
         yield return ["\u001b[13u", Key.Enter];
         yield return ["\u001b[127u", Key.Backspace];
+        yield return ["\u001b[57344u", Key.CursorUp];
+        yield return ["\u001b[57345;3u", Key.CursorDown.WithAlt];
+        yield return ["\u001b[57346;5u", Key.CursorLeft.WithCtrl];
+        yield return ["\u001b[57347;2u", Key.CursorRight.WithShift];
+        yield return ["\u001b[57348u", Key.PageUp];
+        yield return ["\u001b[57349;6u", Key.PageDown.WithCtrl.WithShift];
+        yield return ["\u001b[57350u", Key.Home];
+        yield return ["\u001b[57351;4u", Key.End.WithAlt.WithShift];
+        yield return ["\u001b[57352u", Key.InsertChar];
+        yield return ["\u001b[57353;5u", Key.Delete.WithCtrl];
+        yield return ["\u001b[57354u", Key.Clear];
+        yield return ["\u001b[57364u", Key.F1];
+        yield return ["\u001b[57368;2u", Key.F5.WithShift];
+        yield return ["\u001b[57375;5u", Key.F12.WithCtrl];
         yield return ["\u001b[57376u", Key.F13];
         yield return ["\u001b[57387;3u", Key.F24.WithAlt];
 

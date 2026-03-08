@@ -138,7 +138,7 @@ Phase 1 explicitly does not require new public keyboard APIs yet, but it should 
 
 ### Phase 1 summary
 
-Status: In progress
+Status: Completed
 
 Completed:
 
@@ -148,15 +148,10 @@ Completed:
 - startup wiring now probes for kitty support, enables kitty mode only after a positive response, and records the enabled state
 - `AnsiOutput` now owns kitty enable/disable emission and restores keyboard mode during dispose
 - `AnsiKeyboardParser` now checks a dedicated `KittyKeyboardPattern` before broader CSI patterns
-- phase-1 kitty CSI `u` parsing now maps printable keys, modifiers, and a first compatibility subset of function keys into the current `Key` model
+- phase-1 kitty CSI `u` parsing now maps printable keys, modifiers, navigation keys, editing keys, and kitty function-key codes through `F24` into the current `Key` model
 - focused detector, parser, input, lifecycle, and startup tests were added
 - targeted lifecycle traces were added for kitty probe, response, enable, skip, and disable flow in `DEBUG`
-
-Remaining for phase 1:
-
-- broaden kitty compatibility mapping beyond the current first subset of kitty special-key codes
-- run the non-parallel unit test/build validation that should accompany the full phase-1 completion
-- update the PR body as follow-on work lands so it stays aligned with actual scope
+- full phase-1 validation passed in `Tests/UnitTestsParallelizable` and focused `MainLoopCoordinator` unit tests
 
 ## Phase 1 Implementation Steps
 
@@ -253,7 +248,7 @@ Concrete changes:
 
 ### 6. Extend the keyboard parser with kitty CSI `u` support
 
-Status: Partially completed
+Status: Completed
 
 Add a new parser pattern, e.g. `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardPattern.cs`, and register it in `AnsiKeyboardParser`.
 
@@ -272,7 +267,7 @@ Implementation detail:
 
 ### 7. Use a deliberate compatibility mapping into today’s `Key`
 
-Status: Partially completed
+Status: Completed
 
 Phase 1 should map kitty events into current `Terminal.Gui.Input.Key` as a compatibility layer, not as the final architecture.
 
@@ -319,19 +314,16 @@ Reason:
 
 ### 10. Add tests in three layers
 
-Status: Mostly completed
+Status: Completed
 
 Completed:
 
 - parser tests added for representative kitty printable, modifier, function-key, and malformed inputs
+- parser coverage broadened for kitty navigation, editing, and `F1`-`F12` private-use key codes
 - detector tests added for supported, unsupported, abandoned, and legacy-console cases
 - ANSI lifecycle tests added for enable/disable behavior
 - startup wiring tests added for positive detection and legacy-console skip behavior
 - integration-style `AnsiInputProcessor` test added for kitty sequence parsing
-
-Still useful before closing phase 1:
-
-- broader parser coverage for additional kitty navigation/function-code variants
 
 Parser tests:
 
