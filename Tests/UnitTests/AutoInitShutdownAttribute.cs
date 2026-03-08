@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using Xunit.Sdk;
+using Xunit.v3;
 
 namespace UnitTests;
 
@@ -38,7 +38,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private readonly string _forceDriver;
     private IDisposable _v2Cleanup;
 
-    public override void After (MethodInfo methodUnderTest)
+    public override void After (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"After: {methodUnderTest?.Name ?? "Unknown Test"}");
 
@@ -84,7 +84,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         CM.Disable (true);
     }
 
-    public override void Before (MethodInfo methodUnderTest)
+    public override void Before (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"Before: {methodUnderTest?.Name ?? "Unknown Test"}");
 

@@ -1,6 +1,4 @@
 using System.Collections.Concurrent;
-using Xunit.Abstractions;
-
 namespace DrawingTests.RegionTests;
 
 /// <summary>

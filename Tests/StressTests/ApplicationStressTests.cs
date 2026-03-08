@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Xunit.Abstractions;
 
 // ReSharper disable AccessToDisposedClosure
 
@@ -47,7 +46,7 @@ public class ApplicationStressTests
         _tbCounter = 0;
 
         int pollMs = Debugger.IsAttached ? POLL_MS_DEBUGGER : POLL_MS_NORMAL;
-        Task task = Task.Run (() => RunTest (app, r, tf, NUM_PASSES, NUM_INCREMENTS, pollMs));
+        Task task = Task.Run (() => RunTest (app, r, tf, NUM_PASSES, NUM_INCREMENTS, pollMs), TestContext.Current.CancellationToken);
 
         // blocks here until the RequestStop is processed at the end of the test
         app.Run (top);

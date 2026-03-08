@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 

@@ -1,8 +1,7 @@
 using System.Drawing;
 using System.Globalization;
-using TerminalGuiFluentTesting;
-using TerminalGuiFluentTestingXunit;
-using Xunit.Abstractions;
+using AppTestHelpers;
+using AppTestHelpers.XunitHelpers;
 
 namespace IntegrationTests;
 
@@ -23,16 +22,16 @@ public class MenuBarTests : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void Initializes_WithNoItems (string d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
-                                  .Then (_ =>
-                                         {
-                                             // Create a menu bar with no items
-                                             var menuBar = new MenuBar ();
-                                             Assert.Empty (menuBar.SubViews);
-                                             Assert.False (menuBar.CanFocus);
-                                             Assert.Equal (Orientation.Horizontal, menuBar.Orientation);
-                                             Assert.Equal (Key.F9, MenuBar.DefaultKey);
-                                         });
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
+                                        .Then (_ =>
+                                               {
+                                                   // Create a menu bar with no items
+                                                   var menuBar = new MenuBar ();
+                                                   Assert.Empty (menuBar.SubViews);
+                                                   Assert.False (menuBar.CanFocus);
+                                                   Assert.Equal (Orientation.Horizontal, menuBar.Orientation);
+                                                   Assert.Equal (Key.F9, MenuBar.DefaultKey);
+                                               });
     }
 
     [Theory]
@@ -41,113 +40,113 @@ public class MenuBarTests : TestsAllDrivers
     {
         MenuBarItem [] menuItems = [];
 
-        using TestContext c = With.A<Window> (80, 25, d, _out)
-                                  .Then (_ =>
-                                         {
-                                             // Create items for the menu bar
-                                             menuItems =
-                                             [
-                                                 new MenuBarItem (Strings.menuFile, [new MenuItem (Strings.cmdOpen, "Opens a file", () => { })]),
-                                                 new MenuBarItem ("_Edit", [new MenuItem (Strings.cmdCopy, "Copies selection", () => { })])
-                                             ];
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
+                                        .Then (_ =>
+                                               {
+                                                   // Create items for the menu bar
+                                                   menuItems =
+                                                   [
+                                                       new MenuBarItem (Strings.menuFile, [new MenuItem (Strings.cmdOpen, "Opens a file", () => { })]),
+                                                       new MenuBarItem ("_Edit", [new MenuItem (Strings.cmdCopy, "Copies selection", () => { })])
+                                                   ];
 
-                                             var menuBar = new MenuBar (menuItems);
-                                             Assert.Equal (2, menuBar.SubViews.Count);
+                                                   var menuBar = new MenuBar (menuItems);
+                                                   Assert.Equal (2, menuBar.SubViews.Count);
 
-                                             // First item should be the File menu
-                                             var fileMenu = menuBar.SubViews.ElementAt (0) as MenuBarItem;
-                                             Assert.NotNull (fileMenu);
-                                             Assert.Equal (Strings.menuFile, fileMenu.Title);
+                                                   // First item should be the File menu
+                                                   var fileMenu = menuBar.SubViews.ElementAt (0) as MenuBarItem;
+                                                   Assert.NotNull (fileMenu);
+                                                   Assert.Equal (Strings.menuFile, fileMenu.Title);
 
-                                             // Second item should be the Edit menu
-                                             var editMenu = menuBar.SubViews.ElementAt (1) as MenuBarItem;
-                                             Assert.NotNull (editMenu);
-                                             Assert.Equal ("_Edit", editMenu.Title);
-                                         });
+                                                   // Second item should be the Edit menu
+                                                   var editMenu = menuBar.SubViews.ElementAt (1) as MenuBarItem;
+                                                   Assert.NotNull (editMenu);
+                                                   Assert.Equal ("_Edit", editMenu.Title);
+                                               });
     }
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void AddsItems_WithMenusProperty (string d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
-                                  .Then (_ =>
-                                         {
-                                             var menuBar = new MenuBar ();
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
+                                        .Then (_ =>
+                                               {
+                                                   var menuBar = new MenuBar ();
 
-                                             // Set items through Menus property
-                                             menuBar.Menus = [new MenuBarItem (Strings.menuFile), new MenuBarItem ("_Edit"), new MenuBarItem ("_View")];
+                                                   // Set items through Menus property
+                                                   menuBar.Menus = [new MenuBarItem (Strings.menuFile), new MenuBarItem ("_Edit"), new MenuBarItem ("_View")];
 
-                                             Assert.Equal (3, menuBar.SubViews.Count);
-                                         });
+                                                   Assert.Equal (3, menuBar.SubViews.Count);
+                                               });
     }
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void ChangesKey_RaisesEvent (string d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
-                                  .Then (_ =>
-                                         {
-                                             var menuBar = new MenuBar ();
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
+                                        .Then (_ =>
+                                               {
+                                                   var menuBar = new MenuBar ();
 
-                                             var oldKeyValue = Key.Empty;
-                                             var newKeyValue = Key.Empty;
-                                             var eventRaised = false;
+                                                   var oldKeyValue = Key.Empty;
+                                                   var newKeyValue = Key.Empty;
+                                                   var eventRaised = false;
 
-                                             menuBar.KeyChanged += (_, args) =>
-                                                                   {
-                                                                       eventRaised = true;
-                                                                       oldKeyValue = args.OldKey;
-                                                                       newKeyValue = args.NewKey;
-                                                                   };
+                                                   menuBar.KeyChanged += (_, args) =>
+                                                                         {
+                                                                             eventRaised = true;
+                                                                             oldKeyValue = args.OldKey;
+                                                                             newKeyValue = args.NewKey;
+                                                                         };
 
-                                             // Default key should be F9
-                                             Assert.Equal (Key.F9, menuBar.Key);
+                                                   // Default key should be F9
+                                                   Assert.Equal (Key.F9, menuBar.Key);
 
-                                             // Change key to F1
-                                             menuBar.Key = Key.F1;
+                                                   // Change key to F1
+                                                   menuBar.Key = Key.F1;
 
-                                             // Verify event was raised
-                                             Assert.True (eventRaised);
-                                             Assert.Equal (Key.F9, oldKeyValue);
-                                             Assert.Equal (Key.F1, newKeyValue);
+                                                   // Verify event was raised
+                                                   Assert.True (eventRaised);
+                                                   Assert.Equal (Key.F9, oldKeyValue);
+                                                   Assert.Equal (Key.F1, newKeyValue);
 
-                                             // Verify key was changed
-                                             Assert.Equal (Key.F1, menuBar.Key);
-                                         });
+                                                   // Verify key was changed
+                                                   Assert.Equal (Key.F1, menuBar.Key);
+                                               });
     }
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void EnableForDesign_CreatesMenuItems (string d)
     {
-        using TestContext c = With.A<Window> (80, 25, d, _out)
-                                  .Then (app =>
-                                         {
-                                             var menuBar = new MenuBar ();
-                                             app.TopRunnableView!.Add (menuBar);
+        using AppTestHelper c = With.A<Window> (80, 25, d, _out)
+                                        .Then (app =>
+                                               {
+                                                   var menuBar = new MenuBar ();
+                                                   app.TopRunnableView!.Add (menuBar);
 
-                                             // Call EnableForDesign
-                                             View top = app.TopRunnableView!;
-                                             bool result = menuBar.EnableForDesign (ref top);
+                                                   // Call EnableForDesign
+                                                   View top = app.TopRunnableView!;
+                                                   bool result = menuBar.EnableForDesign (ref top);
 
-                                             // Should return true
-                                             Assert.True (result);
+                                                   // Should return true
+                                                   Assert.True (result);
 
-                                             // Should have created menu items
-                                             Assert.True (menuBar.SubViews.Count > 0);
+                                                   // Should have created menu items
+                                                   Assert.True (menuBar.SubViews.Count > 0);
 
-                                             // Should have File, Edit and Help menus
-                                             View? fileMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuFile);
-                                             View? editMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_Edit");
-                                             View? helpMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuHelp);
+                                                   // Should have File, Edit and Help menus
+                                                   View? fileMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuFile);
+                                                   View? editMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_Edit");
+                                                   View? helpMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuHelp);
 
-                                             Assert.NotNull (fileMenu);
-                                             Assert.NotNull (editMenu);
-                                             Assert.NotNull (helpMenu);
-                                         })
-                                  .ScreenShot ("MenuBar EnableForDesign", _out);
+                                                   Assert.NotNull (fileMenu);
+                                                   Assert.NotNull (editMenu);
+                                                   Assert.NotNull (helpMenu);
+                                               })
+                                        .ScreenShot ("MenuBar EnableForDesign", _out);
     }
 
     [Theory]
@@ -157,36 +156,36 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (a =>
-                                         {
-                                             app = a;
-                                             menuBar = new MenuBar ();
-                                             View top = app.TopRunnableView!;
-                                             menuBar.EnableForDesign (ref top);
-                                             app.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .WaitIteration ()
-                                  .ScreenShot ("MenuBar initial state", _out)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertTrue (menuBar?.IsOpen ())
-                                  .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .KeyDown (Key.CursorRight)
-                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .ScreenShot ("After right arrow", _out)
-                                  .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
-                                  .KeyDown (Key.CursorRight)
-                                  .ScreenShot ("After second right arrow", _out)
-                                  .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title)
-                                  .ScreenShot ("After third right arrow", _out)
-                                  .KeyDown (Key.CursorRight)
-                                  .ScreenShot ("After fourth right arrow", _out)
-                                  .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
-                                  .KeyDown (Key.CursorLeft)
-                                  .ScreenShot ("After left arrow", _out)
-                                  .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title);
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
+                                        .Then (a =>
+                                               {
+                                                   app = a;
+                                                   menuBar = new MenuBar ();
+                                                   View top = app.TopRunnableView!;
+                                                   menuBar.EnableForDesign (ref top);
+                                                   app.TopRunnableView!.Add (menuBar);
+                                               })
+                                        .WaitIteration ()
+                                        .ScreenShot ("MenuBar initial state", _out)
+                                        .KeyDown (MenuBar.DefaultKey)
+                                        .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .AssertTrue (menuBar?.IsOpen ())
+                                        .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
+                                        .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
+                                        .KeyDown (Key.CursorRight)
+                                        .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .ScreenShot ("After right arrow", _out)
+                                        .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
+                                        .KeyDown (Key.CursorRight)
+                                        .ScreenShot ("After second right arrow", _out)
+                                        .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title)
+                                        .ScreenShot ("After third right arrow", _out)
+                                        .KeyDown (Key.CursorRight)
+                                        .ScreenShot ("After fourth right arrow", _out)
+                                        .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
+                                        .KeyDown (Key.CursorLeft)
+                                        .ScreenShot ("After left arrow", _out)
+                                        .AssertEqual ("_Online Help...", app?.Navigation?.GetFocused ()!.Title);
     }
 
     [Theory]
@@ -196,28 +195,28 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (a =>
-                                         {
-                                             app = a;
-                                             menuBar = new MenuBar ();
-                                             View top = app.TopRunnableView!;
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
+                                        .Then (a =>
+                                               {
+                                                   app = a;
+                                                   menuBar = new MenuBar ();
+                                                   View top = app.TopRunnableView!;
 
-                                             top.Add (new View { CanFocus = true, Id = "focusableView" });
-                                             menuBar.EnableForDesign (ref top);
-                                             app.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
-                                  .ScreenShot ("MenuBar initial state", _out)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .AssertEqual ("_New", app.Navigation!.GetFocused ()!.Title)
-                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertTrue (menuBar?.IsOpen ())
-                                  .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ());
+                                                   top.Add (new View { CanFocus = true, Id = "focusableView" });
+                                                   menuBar.EnableForDesign (ref top);
+                                                   app.TopRunnableView!.Add (menuBar);
+                                               })
+                                        .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
+                                        .ScreenShot ("MenuBar initial state", _out)
+                                        .KeyDown (MenuBar.DefaultKey)
+                                        .AssertEqual ("_New", app.Navigation!.GetFocused ()!.Title)
+                                        .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .AssertTrue (menuBar?.IsOpen ())
+                                        .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
+                                        .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
+                                        .KeyDown (Application.QuitKey)
+                                        .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ());
     }
 
     [Theory]
@@ -227,29 +226,29 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Add (new View { CanFocus = true, Id = "focusableView" })
-                                  .Then (a =>
-                                         {
-                                             app = a;
-                                             menuBar = new MenuBar ();
-                                             View? runnable = app.TopRunnableView;
-                                             menuBar.EnableForDesign (ref runnable!);
-                                             app.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .WaitIteration ()
-                                  .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
-                                  .ScreenShot ("MenuBar initial state", _out)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .KeyDown (Key.CursorRight)
-                                  .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
-                                  .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertTrue (menuBar?.IsOpen ())
-                                  .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertIsNotType<MenuItem> (app?.Navigation?.GetFocused ());
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
+                                        .Add (new View { CanFocus = true, Id = "focusableView" })
+                                        .Then (a =>
+                                               {
+                                                   app = a;
+                                                   menuBar = new MenuBar ();
+                                                   View? runnable = app.TopRunnableView;
+                                                   menuBar.EnableForDesign (ref runnable!);
+                                                   app.TopRunnableView!.Add (menuBar);
+                                               })
+                                        .WaitIteration ()
+                                        .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
+                                        .ScreenShot ("MenuBar initial state", _out)
+                                        .KeyDown (MenuBar.DefaultKey)
+                                        .KeyDown (Key.CursorRight)
+                                        .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
+                                        .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .AssertTrue (menuBar?.IsOpen ())
+                                        .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
+                                        .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
+                                        .KeyDown (Application.QuitKey)
+                                        .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .AssertIsNotType<MenuItem> (app?.Navigation?.GetFocused ());
     }
 
     [Theory]
@@ -259,27 +258,27 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (a =>
-                                         {
-                                             app = a;
-                                             menuBar = new MenuBar ();
-                                             View top = app.TopRunnableView!;
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
+                                        .Then (a =>
+                                               {
+                                                   app = a;
+                                                   menuBar = new MenuBar ();
+                                                   View top = app.TopRunnableView!;
 
-                                             top.Add (new View { CanFocus = true, Id = "focusableView" });
-                                             menuBar.EnableForDesign (ref top);
-                                             app.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .WaitIteration ()
-                                  .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
-                                  .ScreenShot ("MenuBar initial state", _out)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .AssertEqual ("_New", app.Navigation!.GetFocused ()!.Title)
-                                  .AssertTrue (app?.TopRunnable!.IsRunning)
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertTrue (app!.TopRunnable!.IsRunning);
+                                                   top.Add (new View { CanFocus = true, Id = "focusableView" });
+                                                   menuBar.EnableForDesign (ref top);
+                                                   app.TopRunnableView!.Add (menuBar);
+                                               })
+                                        .WaitIteration ()
+                                        .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ())
+                                        .ScreenShot ("MenuBar initial state", _out)
+                                        .KeyDown (MenuBar.DefaultKey)
+                                        .AssertEqual ("_New", app.Navigation!.GetFocused ()!.Title)
+                                        .AssertTrue (app?.TopRunnable!.IsRunning)
+                                        .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
+                                        .KeyDown (Application.QuitKey)
+                                        .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .AssertTrue (app!.TopRunnable!.IsRunning);
     }
 
     [Theory]
@@ -289,33 +288,33 @@ public class MenuBarTests : TestsAllDrivers
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (a =>
-                                         {
-                                             app = a;
-                                             menuBar = new MenuBar ();
-                                             View top = app.TopRunnableView!;
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
+                                        .Then (a =>
+                                               {
+                                                   app = a;
+                                                   menuBar = new MenuBar ();
+                                                   View top = app.TopRunnableView!;
 
-                                             top.Add (new View { CanFocus = true, Id = "focusableView" });
-                                             menuBar.EnableForDesign (ref top);
-                                             IEnumerable<MenuItem> items = menuBar.GetMenuItemsWith (mi => mi.Title == Strings.cmdQuit);
+                                                   top.Add (new View { CanFocus = true, Id = "focusableView" });
+                                                   menuBar.EnableForDesign (ref top);
+                                                   IEnumerable<MenuItem> items = menuBar.GetMenuItemsWith (mi => mi.Title == Strings.cmdQuit);
 
-                                             foreach (MenuItem item in items)
-                                             {
-                                                 item.Key = Key.Empty;
-                                             }
+                                                   foreach (MenuItem item in items)
+                                                   {
+                                                       item.Key = Key.Empty;
+                                                   }
 
-                                             app.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .WaitIteration ()
-                                  .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
-                                  .ScreenShot ("MenuBar initial state", _out)
-                                  .KeyDown (MenuBar.DefaultKey)
-                                  .AssertEqual ("_New", app?.Navigation!.GetFocused ()!.Title)
-                                  .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                  .KeyDown (Application.QuitKey)
-                                  .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                  .AssertTrue (app?.TopRunnable!.IsRunning);
+                                                   app.TopRunnableView!.Add (menuBar);
+                                               })
+                                        .WaitIteration ()
+                                        .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ())
+                                        .ScreenShot ("MenuBar initial state", _out)
+                                        .KeyDown (MenuBar.DefaultKey)
+                                        .AssertEqual ("_New", app?.Navigation!.GetFocused ()!.Title)
+                                        .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
+                                        .KeyDown (Application.QuitKey)
+                                        .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
+                                        .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 
     // Claude - Opus 4.6
@@ -336,34 +335,34 @@ public class MenuBarTests : TestsAllDrivers
         var shortcut3ActivatedCount = 0;
         Shortcut? shortcut2 = null;
 
-        TestContext c = With.A<Window> (80, 30, d, _out)
-                            .Then (a =>
-                                   {
-                                       app = a;
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
+                                  .Then (a =>
+                                         {
+                                             app = a;
 
-                                       Shortcut s1 = new () { Title = "First", Key = Key.F1, Id = "s1" };
-                                       s1.Activated += (_, _) => shortcut1ActivatedCount++;
+                                             Shortcut s1 = new () { Title = "First", Key = Key.F1, Id = "s1" };
+                                             s1.Activated += (_, _) => shortcut1ActivatedCount++;
 
-                                       shortcut2 = new Shortcut { Title = "Second", Key = Key.F2, Id = "s2" };
-                                       shortcut2.Activated += (_, _) => shortcut2ActivatedCount++;
+                                             shortcut2 = new Shortcut { Title = "Second", Key = Key.F2, Id = "s2" };
+                                             shortcut2.Activated += (_, _) => shortcut2ActivatedCount++;
 
-                                       Shortcut s3 = new () { Title = "Third", Key = Key.F3, Id = "s3" };
-                                       s3.Activated += (_, _) => shortcut3ActivatedCount++;
+                                             Shortcut s3 = new () { Title = "Third", Key = Key.F3, Id = "s3" };
+                                             s3.Activated += (_, _) => shortcut3ActivatedCount++;
 
-                                       Bar bar = new () { Orientation = Orientation.Vertical };
-                                       bar.Add (s1, shortcut2, s3);
+                                             Bar bar = new () { Orientation = Orientation.Vertical };
+                                             bar.Add (s1, shortcut2, s3);
 
-                                       menuBar = new MenuBar
-                                       {
-                                           Menus =
-                                               [
-                                                   new MenuBarItem ("_Test",
-                                                                    [new MenuItem { Id = "barItem", HelpText = "Bar with shortcuts", CommandView = bar }])
-                                               ]
-                                       };
+                                             menuBar = new MenuBar
+                                             {
+                                                 Menus =
+                                                 [
+                                                     new MenuBarItem ("_Test",
+                                                                      [new MenuItem { Id = "barItem", HelpText = "Bar with shortcuts", CommandView = bar }])
+                                                 ]
+                                             };
 
-                                       app.TopRunnableView!.Add (menuBar);
-                                   });
+                                             app.TopRunnableView!.Add (menuBar);
+                                         });
 
         c = c.WaitIteration ();
 
@@ -412,36 +411,36 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        TestContext c = With.A<Window> (80, 30, d, _out)
-                            .Then (a =>
-                                   {
-                                       app = a;
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
+                                  .Then (a =>
+                                         {
+                                             app = a;
 
-                                       // Must have CanFocus=true for keyboard nav to work in a selector
-                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+                                             // Must have CanFocus=true for keyboard nav to work in a selector
+                                             optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
 
-                                       menuBar = new MenuBar
-                                       {
-                                           Menus =
-                                               [
-                                                   new MenuBarItem ("_Test",
-                                                                    [
-                                                                        new MenuItem
+                                             menuBar = new MenuBar
+                                             {
+                                                 Menus =
+                                                 [
+                                                     new MenuBarItem ("_Test",
+                                                                      [
+                                                                          new MenuItem
+                                                                          {
+                                                                              Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
+                                                                          }
+                                                                      ])
+                                                 ]
+                                             };
+
+                                             app.TopRunnableView!.Add (menuBar);
+
+                                             optionSelector.ValueChanged += (_, args) =>
                                                                             {
-                                                                                Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
-                                                                            }
-                                                                    ])
-                                               ]
-                                       };
-
-                                       app.TopRunnableView!.Add (menuBar);
-
-                                       optionSelector.ValueChanged += (_, args) =>
-                                                                      {
-                                                                          capturedNewValue = args.Value;
-                                                                          valueChangedCount++;
-                                                                      };
-                                   });
+                                                                                capturedNewValue = args.Value;
+                                                                                valueChangedCount++;
+                                                                            };
+                                         });
 
         c = c.WaitIteration ();
 
@@ -489,24 +488,24 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        TestContext c = With.A<Window> (80, 30, d, _out)
-                            .Then (a =>
-                                   {
-                                       app = a;
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
+                                  .Then (a =>
+                                         {
+                                             app = a;
 
-                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+                                             optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
 
-                                       menu = new Menu ([new MenuItem { Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector }]);
+                                             menu = new Menu ([new MenuItem { Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector }]);
 
-                                       app.TopRunnableView!.Add (menu);
+                                             app.TopRunnableView!.Add (menu);
 
-                                       optionSelector.ValueChanged += (_, args) =>
-                                                                      {
-                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
-                                                                          capturedNewValue = args.Value;
-                                                                          valueChangedCount++;
-                                                                      };
-                                   });
+                                             optionSelector.ValueChanged += (_, args) =>
+                                                                            {
+                                                                                Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
+                                                                                capturedNewValue = args.Value;
+                                                                                valueChangedCount++;
+                                                                            };
+                                         });
 
         c = c.WaitIteration ();
 
@@ -554,36 +553,36 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        TestContext c = With.A<Window> (80, 30, d, _out)
-                            .Then (a =>
-                                   {
-                                       app = a;
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
+                                  .Then (a =>
+                                         {
+                                             app = a;
 
-                                       optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
+                                             optionSelector = new OptionSelector<Schemes> { Title = "Scheme", CanFocus = true };
 
-                                       menuBar = new MenuBar
-                                       {
-                                           Menus =
-                                               [
-                                                   new MenuBarItem ("_Test",
-                                                                    [
-                                                                        new MenuItem
+                                             menuBar = new MenuBar
+                                             {
+                                                 Menus =
+                                                 [
+                                                     new MenuBarItem ("_Test",
+                                                                      [
+                                                                          new MenuItem
+                                                                          {
+                                                                              Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
+                                                                          }
+                                                                      ])
+                                                 ]
+                                             };
+
+                                             app.TopRunnableView!.Add (menuBar);
+
+                                             optionSelector.ValueChanged += (_, args) =>
                                                                             {
-                                                                                Id = "selectorItem", HelpText = "Pick a scheme", CommandView = optionSelector
-                                                                            }
-                                                                    ])
-                                               ]
-                                       };
-
-                                       app.TopRunnableView!.Add (menuBar);
-
-                                       optionSelector.ValueChanged += (_, args) =>
-                                                                      {
-                                                                          Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
-                                                                          capturedNewValue = args.Value;
-                                                                          valueChangedCount++;
-                                                                      };
-                                   });
+                                                                                Logging.Debug ($"OptionSelector ValueChanged event fired with new value: {args.Value}");
+                                                                                capturedNewValue = args.Value;
+                                                                                valueChangedCount++;
+                                                                            };
+                                         });
 
         c = c.WaitIteration ();
 
@@ -632,27 +631,27 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        TestContext c = With.A<Window> (80, 30, d, _out)
-                            .Then (a =>
-                                   {
-                                       app = a;
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
+                                  .Then (a =>
+                                         {
+                                             app = a;
 
-                                       checkBox = new CheckBox { Title = "_Checkbox", CanFocus = true };
+                                             checkBox = new CheckBox { Title = "_Checkbox", CanFocus = true };
 
-                                       menuBar = new MenuBar
-                                       {
-                                           Menus = [new MenuBarItem ("_Test", [new MenuItem { Id = "czechMi", HelpText = "Czech me", CommandView = checkBox }])]
-                                       };
+                                             menuBar = new MenuBar
+                                             {
+                                                 Menus = [new MenuBarItem ("_Test", [new MenuItem { Id = "czechMi", HelpText = "Czech me", CommandView = checkBox }])]
+                                             };
 
-                                       app.TopRunnableView!.Add (menuBar);
+                                             app.TopRunnableView!.Add (menuBar);
 
-                                       checkBox.ValueChanged += (_, args) =>
-                                                                {
-                                                                    Logging.Debug ($"Checkbox ValueChanged event fired with new value: {args.NewValue}");
-                                                                    capturedNewValue = args.NewValue;
-                                                                    valueChangedCount++;
-                                                                };
-                                   });
+                                             checkBox.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          Logging.Debug ($"Checkbox ValueChanged event fired with new value: {args.NewValue}");
+                                                                          capturedNewValue = args.NewValue;
+                                                                          valueChangedCount++;
+                                                                      };
+                                         });
 
         c = c.WaitIteration ();
 
@@ -699,27 +698,27 @@ public class MenuBarTests : TestsAllDrivers
         var valueChangedCount = 0;
 
         // Step 1: Build a simple MenuBar with an OptionSelector directly in the root Menu
-        TestContext c = With.A<Window> (80, 30, d, _out)
-                            .Then (a =>
-                                   {
-                                       app = a;
+        AppTestHelper c = With.A<Window> (80, 30, d, _out)
+                                  .Then (a =>
+                                         {
+                                             app = a;
 
-                                       checkBox = new CheckBox { Title = "_Checkbox", CanFocus = true };
+                                             checkBox = new CheckBox { Title = "_Checkbox", CanFocus = true };
 
-                                       menuBar = new MenuBar
-                                       {
-                                           Menus = [new MenuBarItem ("_Test", [new MenuItem { Id = "czechMi", HelpText = "Czech me", CommandView = checkBox }])]
-                                       };
+                                             menuBar = new MenuBar
+                                             {
+                                                 Menus = [new MenuBarItem ("_Test", [new MenuItem { Id = "czechMi", HelpText = "Czech me", CommandView = checkBox }])]
+                                             };
 
-                                       app.TopRunnableView!.Add (menuBar);
+                                             app.TopRunnableView!.Add (menuBar);
 
-                                       checkBox.ValueChanged += (_, args) =>
-                                                                {
-                                                                    Logging.Debug ($"Checkbox ValueChanged event fired with new value: {args.NewValue}");
-                                                                    capturedNewValue = args.NewValue;
-                                                                    valueChangedCount++;
-                                                                };
-                                   });
+                                             checkBox.ValueChanged += (_, args) =>
+                                                                      {
+                                                                          Logging.Debug ($"Checkbox ValueChanged event fired with new value: {args.NewValue}");
+                                                                          capturedNewValue = args.NewValue;
+                                                                          valueChangedCount++;
+                                                                      };
+                                         });
 
         c = c.WaitIteration ();
 
@@ -772,19 +771,19 @@ public class MenuBarTests : TestsAllDrivers
                                 }
                             };
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (a =>
-                                         {
-                                             var menuBar = new MenuBar ();
-                                             View top = a.TopRunnableView!;
-                                             menuBar.EnableForDesign (ref top);
-                                             a.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .Add (testView)
-                                  .WaitIteration ()
-                                  .Focus (testView)
-                                  .KeyDown (Key.Space)
-                                  .AssertEqual (1, spaceKeyDownCount);
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
+                                        .Then (a =>
+                                               {
+                                                   var menuBar = new MenuBar ();
+                                                   View top = a.TopRunnableView!;
+                                                   menuBar.EnableForDesign (ref top);
+                                                   a.TopRunnableView!.Add (menuBar);
+                                               })
+                                        .Add (testView)
+                                        .WaitIteration ()
+                                        .Focus (testView)
+                                        .KeyDown (Key.Space)
+                                        .AssertEqual (1, spaceKeyDownCount);
     }
 
     [Theory]
@@ -802,19 +801,19 @@ public class MenuBarTests : TestsAllDrivers
                                 }
                             };
 
-        using TestContext c = With.A<Window> (50, 20, d, _out)
-                                  .Then (a =>
-                                         {
-                                             var menuBar = new MenuBar ();
-                                             View top = a.TopRunnableView!;
-                                             menuBar.EnableForDesign (ref top);
-                                             a.TopRunnableView!.Add (menuBar);
-                                         })
-                                  .Add (testView)
-                                  .WaitIteration ()
-                                  .Focus (testView)
-                                  .KeyDown (Key.Enter)
-                                  .AssertEqual (1, enterKeyDownCount);
+        using AppTestHelper c = With.A<Window> (50, 20, d, _out)
+                                        .Then (a =>
+                                               {
+                                                   var menuBar = new MenuBar ();
+                                                   View top = a.TopRunnableView!;
+                                                   menuBar.EnableForDesign (ref top);
+                                                   a.TopRunnableView!.Add (menuBar);
+                                               })
+                                        .Add (testView)
+                                        .WaitIteration ()
+                                        .Focus (testView)
+                                        .KeyDown (Key.Enter)
+                                        .AssertEqual (1, enterKeyDownCount);
     }
 
     // Claude - Opus 4.6
@@ -834,7 +833,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBarItem? inlineItem = null;
         MenuBarItem? popoverItem = null;
 
-        TestContext c = With.A<Window> (60, 20, d, _out)
+        AppTestHelper c = With.A<Window> (60, 20, d, _out)
                             .Then (a =>
                                    {
                                        app = a;
@@ -927,7 +926,7 @@ public class MenuBarTests : TestsAllDrivers
         IApplication? app = null;
         MenuBarItem? inlineItem = null;
 
-        TestContext c = With.A<Window> (60, 20, d, _out)
+        AppTestHelper c = With.A<Window> (60, 20, d, _out)
                             .Then (a =>
                                    {
                                        app = a;
@@ -986,7 +985,7 @@ public class MenuBarTests : TestsAllDrivers
         MenuBarItem? inlineItem = null;
         var actionFiredCount = 0;
 
-        TestContext c = With.A<Window> (60, 20, d, _out)
+        AppTestHelper c = With.A<Window> (60, 20, d, _out)
                             .Then (a =>
                                    {
                                        app = a;

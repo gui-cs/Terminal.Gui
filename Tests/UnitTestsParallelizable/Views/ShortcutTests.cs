@@ -1,7 +1,5 @@
 using System.Text;
 using JetBrains.Annotations;
-using Terminal.Gui.Tests;
-using Xunit.Abstractions;
 
 namespace ViewsTests;
 

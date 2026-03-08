@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using Terminal.Gui.App;
 
 namespace ApplicationTests.Keyboard;
 
@@ -10,7 +9,6 @@ namespace ApplicationTests.Keyboard;
 [Collection("Application Tests")]
 public class KeyboardTests
 {
-
     [Fact]
     public void Init_CreatesKeybindings ()
     {
@@ -474,5 +472,19 @@ public class KeyboardTests
         // Assert - new key should have the same commands
         Assert.True (keyboard.KeyBindings.TryGet (newKey, out KeyBinding newBinding));
         Assert.Equal (oldCommands, newBinding.Commands);
+    }
+
+    [Fact]
+    public void InvokeCommandsBoundToKey_Suspend_ReturnsNotNull ()
+    {
+        // Arrange
+        var keyboard = new ApplicationKeyboard ();
+        Key key = Key.Z.WithCtrl;
+
+        // Act
+        bool? result = keyboard.InvokeCommandsBoundToKey (key);
+
+        // Assert
+        Assert.True (result);
     }
 }

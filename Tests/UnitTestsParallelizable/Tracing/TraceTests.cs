@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
-using Xunit.Abstractions;
 
 namespace ApplicationTests;
 
@@ -487,8 +486,7 @@ public class TraceTests
     public async Task Concurrent_Tests_Are_Isolated ()
     {
         // Run multiple tasks concurrently, each with different trace settings
-        Task task1 = Task.Run (
-                               async () =>
+        Task task1 = Task.Run (async () =>
                                {
                                    using (Trace.PushScope (TraceCategory.Command))
                                    {
@@ -497,10 +495,10 @@ public class TraceTests
                                        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
                                        await Task.Delay (10);
                                    }
-                               });
+                               },
+                               TestContext.Current.CancellationToken);
 
-        Task task2 = Task.Run (
-                               async () =>
+        Task task2 = Task.Run (async () =>
                                {
                                    using (Trace.PushScope (TraceCategory.Mouse))
                                    {
@@ -509,10 +507,10 @@ public class TraceTests
                                        Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
                                        await Task.Delay (10);
                                    }
-                               });
+                               },
+                               TestContext.Current.CancellationToken);
 
-        Task task3 = Task.Run (
-                               async () =>
+        Task task3 = Task.Run (async () =>
                                {
                                    using (Trace.PushScope (TraceCategory.None))
                                    {
@@ -521,7 +519,8 @@ public class TraceTests
                                        Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
                                        await Task.Delay (10);
                                    }
-                               });
+                               },
+                               TestContext.Current.CancellationToken);
 
         // Wait for all tasks - they should all succeed without interfering
         await Task.WhenAll (task1, task2, task3);

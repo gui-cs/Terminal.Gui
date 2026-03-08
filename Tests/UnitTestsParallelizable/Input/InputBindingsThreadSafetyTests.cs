@@ -104,7 +104,8 @@ public class CommandBindingsThreadSafetyTests
                                                   // Expected
                                               }
                                           }
-                                      });
+                                      },
+                                      TestContext.Current.CancellationToken);
 
         // Act - Reader threads
         List<Task> readerTasks = new ();
@@ -128,13 +129,14 @@ public class CommandBindingsThreadSafetyTests
 
                                                Thread.Sleep (1); // Small delay between iterations
                                            }
-                                       }));
+                                       },
+                                       TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (readerTasks.ToArray ());
+        Task.WaitAll (readerTasks.ToArray (), TestContext.Current.CancellationToken);
         continueRunning = false;
-        modifierTask.Wait (TimeSpan.FromSeconds (5)); // Add timeout to prevent indefinite hang
+        modifierTask.Wait (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken); // Add timeout to prevent indefinite hang
 #pragma warning restore xUnit1031
 
         // Assert
@@ -183,7 +185,8 @@ public class CommandBindingsThreadSafetyTests
 
                                               Thread.Sleep (1); // Small delay to prevent CPU spinning
                                           }
-                                      });
+                                      },
+                                      TestContext.Current.CancellationToken);
 
         // Act - Start reader threads
         List<Task> readerTasks = new ();
@@ -212,14 +215,15 @@ public class CommandBindingsThreadSafetyTests
 
                                                Thread.Sleep (1); // Small delay between iterations
                                            }
-                                       }));
+                                       },
+                                       TestContext.Current.CancellationToken));
         }
 
         // Wait for readers to complete
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (readerTasks.ToArray ());
+        Task.WaitAll (readerTasks.ToArray (), TestContext.Current.CancellationToken);
         continueRunning = false;
-        modifierTask.Wait (TimeSpan.FromSeconds (5)); // Add timeout to prevent indefinite hang
+        modifierTask.Wait (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken); // Add timeout to prevent indefinite hang
 #pragma warning restore xUnit1031
 
         // Assert
@@ -265,11 +269,12 @@ public class CommandBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -313,7 +318,8 @@ public class CommandBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
         // Reader threads
@@ -334,7 +340,8 @@ public class CommandBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
         // Remover threads
@@ -355,11 +362,12 @@ public class CommandBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -405,11 +413,12 @@ public class CommandBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert

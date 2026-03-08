@@ -1,7 +1,5 @@
 ﻿using System.Text;
-using Terminal.Gui.Drivers;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace DrawingTests;
 

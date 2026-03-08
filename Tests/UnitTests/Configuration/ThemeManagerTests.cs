@@ -1,9 +1,5 @@
 ﻿#nullable enable
 using System.Collections.Concurrent;
-using System.Diagnostics.Metrics;
-using System.Text;
-using UnitTests.ConfigurationTests;
-using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
 namespace UnitTests.ConfigurationTests;

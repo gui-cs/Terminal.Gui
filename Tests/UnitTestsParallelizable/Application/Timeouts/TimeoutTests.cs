@@ -1,4 +1,3 @@
-
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
 
@@ -171,7 +170,8 @@ public class TimeoutTests
                                                           return false;
                                                       });
                                   });
-                  });
+                  },
+                  TestContext.Current.CancellationToken);
 
         // Use iteration counter for safety instead of time
         var iterations = 0;
@@ -182,7 +182,7 @@ public class TimeoutTests
             app.Run<Runnable> ();
 
             // Defensive: wait with timeout
-            Assert.True (taskCompleted.Wait (TimeSpan.FromSeconds (5)), "Timeout from background thread should have completed");
+            Assert.True (taskCompleted.Wait (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken), "Timeout from background thread should have completed");
             Assert.True (timeoutFired);
         }
         finally
@@ -774,7 +774,8 @@ public class TimeoutTests
 
                                           tasksCompleted.Signal ();
                                       });
-                      });
+                      },
+                      TestContext.Current.CancellationToken);
         }
 
         // Use iteration counter to stop when all tasks complete

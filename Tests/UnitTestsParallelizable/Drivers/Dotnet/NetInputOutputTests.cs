@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Concurrent;
-using Xunit.Abstractions;
 
 namespace DriverTests.DotnetDriver;
 
@@ -202,6 +201,20 @@ public class NetInputOutputTests (ITestOutputHelper output)
             _output.WriteLine ($"Stack trace: {exception.StackTrace}");
         }
 
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void NetOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new NetOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
         Assert.Null (exception);
     }
 

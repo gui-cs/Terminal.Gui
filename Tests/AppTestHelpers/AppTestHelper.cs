@@ -6,13 +6,13 @@ using Terminal.Gui.Time;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace TerminalGuiFluentTesting;
+namespace AppTestHelpers;
 
 /// <summary>
-///     Fluent API context for testing a Terminal.Gui application. Create
+///     Helper for building integration tests for Terminal.Gui applications. Create
 ///     an instance using <see cref="With"/> static class.
 /// </summary>
-public partial class TestContext : IDisposable
+public partial class AppTestHelper : IDisposable
 {
     // ===== Threading & Synchronization =====
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
@@ -60,7 +60,7 @@ public partial class TestContext : IDisposable
     ///     Constructor for tests that only need Application.Init without running the main loop.
     ///     Uses the driver's default screen size instead of forcing a specific size.
     /// </summary>
-    public TestContext (string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    public AppTestHelper (string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
         _driverName = driverName;
         _logWriter = logWriter;
@@ -110,7 +110,7 @@ public partial class TestContext : IDisposable
     /// <summary>
     ///     Constructor for tests that need to run the application with Application.Run.
     /// </summary>
-    internal TestContext (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    internal AppTestHelper (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
         _driverName = driverName;
         _logWriter = logWriter;
@@ -283,7 +283,7 @@ public partial class TestContext : IDisposable
     /// </summary>
     /// <param name="doAction"></param>
     /// <returns></returns>
-    public TestContext Then (Action<IApplication> doAction)
+    public AppTestHelper Then (Action<IApplication> doAction)
     {
         try
         {
@@ -307,7 +307,7 @@ public partial class TestContext : IDisposable
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    public TestContext WaitIteration (Action<IApplication>? action = null)
+    public AppTestHelper WaitIteration (Action<IApplication>? action = null)
     {
         // If application has already exited don't wait!
         if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _ansiInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
@@ -355,9 +355,9 @@ public partial class TestContext : IDisposable
         return this;
     }
 
-    public TestContext WaitUntil (Func<bool> condition)
+    public AppTestHelper WaitUntil (Func<bool> condition)
     {
-        TestContext? c = null;
+        AppTestHelper? c = null;
         var sw = Stopwatch.StartNew ();
 
         //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
@@ -397,9 +397,9 @@ public partial class TestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public TestContext ResizeConsole (int width, int height) => WaitIteration (app => { app.Driver!.SetScreenSize (width, height); });
+    public AppTestHelper ResizeConsole (int width, int height) => WaitIteration (app => { app.Driver!.SetScreenSize (width, height); });
 
-    public TestContext ScreenShot (string title, TextWriter? writer) =>
+    public AppTestHelper ScreenShot (string title, TextWriter? writer) =>
 
         //Logging.Trace ($"{this.ToIdentifyingString ()}");
         WaitIteration (app =>
@@ -410,7 +410,7 @@ public partial class TestContext : IDisposable
                            writer?.WriteLine (text);
                        });
 
-    public TestContext AnsiScreenShot (string title, TextWriter? writer) =>
+    public AppTestHelper AnsiScreenShot (string title, TextWriter? writer) =>
 
         //Logging.Trace ($"{this.ToIdentifyingString ()}");
         WaitIteration (app =>
@@ -424,7 +424,7 @@ public partial class TestContext : IDisposable
     /// <summary>
     ///     Stops the application and waits for the background thread to exit.
     /// </summary>
-    public TestContext Stop ()
+    public AppTestHelper Stop ()
     {
         Logging.Trace ($"Stopping application for driver: {_driverName}");
 
@@ -513,7 +513,7 @@ public partial class TestContext : IDisposable
     /// </summary>
     /// <param name="writer"></param>
     /// <returns></returns>
-    public TestContext WriteOutLogs (TextWriter? writer)
+    public AppTestHelper WriteOutLogs (TextWriter? writer)
     {
         if (writer is null)
         {
@@ -554,7 +554,7 @@ public partial class TestContext : IDisposable
     /// </summary>
     public void Dispose ()
     {
-        //Logging.Trace ($"Disposing TestContext");
+        //Logging.Trace ($"Disposing AppTestHelper");
         Stop ();
 
         var shouldThrow = false;

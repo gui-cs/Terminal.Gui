@@ -1,6 +1,5 @@
 ﻿using Moq;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.Viewport;
 

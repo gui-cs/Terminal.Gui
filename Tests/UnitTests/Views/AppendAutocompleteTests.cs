@@ -1,6 +1,3 @@
-using UnitTests;
-using Xunit.Abstractions;
-
 namespace UnitTests.TextTests;
 
 public class AppendAutocompleteTests (ITestOutputHelper output)
