@@ -20,6 +20,8 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     timeout-minutes: 15
+    env:
+      DisableRealDriverIO: "1"
     steps:
 
     - name: Checkout code
@@ -76,6 +78,8 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     timeout-minutes: 60
+    env:
+      DisableRealDriverIO: "1"
     steps:
 
     - name: Checkout code
