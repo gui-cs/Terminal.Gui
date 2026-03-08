@@ -287,4 +287,18 @@ public class NetInputOutputTests (ITestOutputHelper output)
 
         Assert.Null (exception);
     }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void NetDriver_IsAttachedToTerminal_ReturnsFalse_InTestHarness ()
+    {
+        // Copilot - generated.
+        // Act — Driver.IsAttachedToTerminal is the shared entry point all drivers use.
+        bool result = Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached);
+
+        // Assert
+        Assert.False (result, "NetDriver: IsAttachedToTerminal should return false in test harness");
+        Assert.False (inputAttached);
+        Assert.False (outputAttached);
+    }
 }

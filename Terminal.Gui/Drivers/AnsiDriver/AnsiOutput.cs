@@ -62,7 +62,7 @@ public class AnsiOutput : OutputBase, IOutput
         try
         {
             // Check if we have a real console first
-            if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            if (!Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
             {
                 Trace.Lifecycle (nameof (AnsiOutput), "Init", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
 
