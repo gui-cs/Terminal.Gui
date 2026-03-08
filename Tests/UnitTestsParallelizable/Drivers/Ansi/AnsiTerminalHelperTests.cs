@@ -8,15 +8,13 @@ namespace DriverTests;
 /// </summary>
 public class DriverIsAttachedToTerminalTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
     public void DisableRealDriverIO_EnvironmentVariable_IsSet ()
     {
         // Diagnostic: verify the env var actually reaches the test process.
         string? value = Environment.GetEnvironmentVariable ("DisableRealDriverIO");
-        _output.WriteLine ($"DisableRealDriverIO = '{value ?? "(null)"}'");
+        output.WriteLine ($"DisableRealDriverIO = '{value ?? "(null)"}'");
 
         Assert.Equal ("1", value);
     }
@@ -27,7 +25,7 @@ public class DriverIsAttachedToTerminalTests (ITestOutputHelper output)
     {
         // Arrange – the env var should already be "1" via the test harness.
         string? value = Environment.GetEnvironmentVariable ("DisableRealDriverIO");
-        _output.WriteLine ($"DisableRealDriverIO = '{value ?? "(null)"}'");
+        output.WriteLine ($"DisableRealDriverIO = '{value ?? "(null)"}'");
 
         // Act
         bool result = Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached);
