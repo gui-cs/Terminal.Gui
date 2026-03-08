@@ -1,4 +1,6 @@
 #nullable disable
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -12,14 +14,14 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// <summary>
     ///     Creates a new instance of the class. Implicitly sends
     ///     console mode settings that enable virtual input (mouse
-    ///     reporting etc).
+    ///     reporting etc.).
     /// </summary>
     public NetInput ()
     {
         // Check if we have a real console first
         if (!IsAttachedToTerminal)
         {
-            Tracing.Trace.Lifecycle (nameof (NetInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
+            Trace.Lifecycle (nameof (NetInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
 
             return;
         }

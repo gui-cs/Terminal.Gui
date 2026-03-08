@@ -509,7 +509,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
             _lastWindowSizeBeforeMaximized = null;
         }
 
-        if (_lastSize != null && _lastSize == newSize)
+        if (_lastSize == newSize)
         {
             return newSize;
         }
