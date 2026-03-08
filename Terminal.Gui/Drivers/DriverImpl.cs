@@ -81,7 +81,7 @@ internal class DriverImpl : IDriver
     /// <returns>
     ///     <see langword="true"/> if the test execution flag is set; otherwise, <see langword="false"/>.
     /// </returns>
-    public static bool IsRunningInTest => AppContext.TryGetSwitch ("Runtime.IsTestProject", out bool isTest) && isTest;
+    public static bool DisableDriverRealIO => AppContext.TryGetSwitch ("Runtime.IsTestProject", out bool isTest) && isTest;
 
     /// <inheritdoc/>
     public void Init () => throw new NotSupportedException ();

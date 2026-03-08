@@ -37,7 +37,7 @@ public class NetOutput : OutputBase, IOutput
     {
         try
         {
-            if (DriverImpl.IsRunningInTest)
+            if (DriverImpl.DisableDriverRealIO)
             {
                 return new Size (80, 25);
             }
@@ -176,7 +176,7 @@ public class NetOutput : OutputBase, IOutput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             // Check if we have a real console first
-            if (DriverImpl.IsRunningInTest)
+            if (DriverImpl.DisableDriverRealIO)
             {
                 Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
