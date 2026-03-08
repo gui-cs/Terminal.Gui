@@ -103,7 +103,7 @@ internal static class UnixTerminalHelper
             // Check if we have a real console first
             if (DriverImpl.DisableDriverRealIO)
             {
-                Trace.Lifecycle (nameof (AnsiInput), "Init", "Console is running unit tests. Running in degraded mode.");
+                Trace.Lifecycle (nameof (UnixTerminalHelper), "Suspend", "Console is running unit tests. Running in degraded mode.");
 
                 return;
             }
