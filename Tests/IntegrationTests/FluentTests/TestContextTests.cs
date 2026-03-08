@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 using AppTestHelpers;
 using AppTestHelpers.XunitHelpers;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace IntegrationTests;
 
