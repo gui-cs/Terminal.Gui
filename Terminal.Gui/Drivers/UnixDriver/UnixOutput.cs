@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+using Terminal.Gui.Tracing;
 
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
@@ -10,12 +11,33 @@ namespace Terminal.Gui.Drivers;
 
 internal class UnixOutput : OutputBase, IOutput
 {
+    public UnixOutput ()
+    {
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (UnixOutput), "Init", "No real terminal attached. Output operations will be no-op.");
+        }
+    }
+
     /// <inheritdoc/>
-    public void Suspend () => UnixTerminalHelper.Suspend (this);
+    public void Suspend ()
+    {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
+        UnixTerminalHelper.Suspend (this);
+    }
 
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
         UnixIOHelper.TryWriteStdout (utf8);
     }
@@ -23,6 +45,11 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         base.Write (output);
 
         byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
@@ -37,6 +64,13 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
+        if (!IsAttachedToTerminal)
+        {
+            _currentCursor = cursor;
+
+            return;
+        }
+
         try
         {
             if (!cursor.IsVisible)
@@ -68,6 +102,11 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return false;
+        }
+
         if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == screenPositionX && _currentCursor.Position.Value.Y == screenPositionY)
         {
             return false;
@@ -123,6 +162,11 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
+        if (!IsAttachedToTerminal)
+        {
+            return new Size (80, 25);
+        }
+
         if (UnixIOHelper.TryGetTerminalSize (out Size size))
         {
             return size;

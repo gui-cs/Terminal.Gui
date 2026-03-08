@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -14,6 +16,13 @@ public class NetOutput : OutputBase, IOutput
     public NetOutput ()
     {
         // Logging.Information ($"Creating {nameof (NetOutput)}");
+
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (NetOutput), "Init", "No real terminal attached. Output operations will be no-op.");
+
+            return;
+        }
 
         try
         {
@@ -35,6 +44,11 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
+        if (!IsAttachedToTerminal)
+        {
+            return new Size (80, 25);
+        }
+
         try
         {
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
@@ -61,6 +75,11 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         try
         {
             Console.Out.Write (text);
@@ -74,6 +93,11 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         base.Write (output);
 
         try
@@ -94,6 +118,13 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
+        if (!IsAttachedToTerminal)
+        {
+            _currentCursor = cursor;
+
+            return;
+        }
+
         try
         {
             if (!cursor.IsVisible)
@@ -125,6 +156,11 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return false;
+        }
+
         if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
@@ -157,6 +193,11 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Suspend ()
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         if (PlatformDetection.IsWindows ())
         {
             return;
