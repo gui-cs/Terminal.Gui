@@ -145,11 +145,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
         base.Write (output);
 
         try
@@ -183,11 +178,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
         StringBuilder capturedOutput = new ();
         capturedOutput.Append (text);
         base.Write (capturedOutput);
@@ -271,13 +261,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
-        if (!IsAttachedToTerminal)
-        {
-            _currentCursor = cursor;
-
-            return;
-        }
-
         try
         {
             if (!cursor.IsVisible)
@@ -309,11 +292,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return false;
-        }
-
         if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
@@ -370,15 +348,15 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
-        DisableKittyKeyboard ();
-
         try
         {
+            DisableKittyKeyboard ();
+
+            if (_platform == AnsiPlatform.Degraded)
+            {
+                return;
+            }
+
             // Restore terminal state: disable mouse, restore buffer, show cursor
             // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_DisableMouseEvents);

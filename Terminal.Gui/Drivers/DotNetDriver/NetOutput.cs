@@ -93,12 +93,12 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
+        base.Write (output);
+
         if (!IsAttachedToTerminal)
         {
             return;
         }
-
-        base.Write (output);
 
         try
         {
@@ -118,13 +118,6 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
-        if (!IsAttachedToTerminal)
-        {
-            _currentCursor = cursor;
-
-            return;
-        }
-
         try
         {
             if (!cursor.IsVisible)
@@ -156,11 +149,6 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return false;
-        }
-
         if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
@@ -193,12 +181,7 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Suspend ()
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
-        if (PlatformDetection.IsWindows ())
+        if (PlatformDetection.IsWindows () && !IsAttachedToTerminal)
         {
             return;
         }

@@ -156,13 +156,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
     // <inheritdoc />
     public void SetCursor (Cursor cursor)
     {
-        if (!IsAttachedToTerminal)
-        {
-            _currentCursor = cursor;
-
-            return;
-        }
-
         try
         {
             if (IsLegacyConsole)
@@ -223,11 +216,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return false;
-        }
-
         if (Force16Colors && IsLegacyConsole)
         {
             SetConsoleCursorPosition (_screenBuffer, new WindowsConsole.Coord ((short)screenPositionX, (short)screenPositionY));
@@ -287,11 +275,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public Size ResizeBuffer (Size size)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return size;
-        }
-
         Size newSize = size;
 
         try
@@ -308,12 +291,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     internal Size SetConsoleWindow (short cols, short rows)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return new Size (cols, rows);
-        }
-
-        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows) || !IsAttachedToTerminal)
         {
             return new Size (cols, rows);
         }
@@ -362,11 +340,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public override void Write (IOutputBuffer outputBuffer)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
         _everythingStringBuilder.Clear ();
 
         // for 16 color mode we will write to a backing buffer, then flip it to the active one at the end to avoid jitter.
@@ -384,6 +357,11 @@ internal partial class WindowsOutput : OutputBase, IOutput
         try
         {
             base.Write (outputBuffer);
+
+            if (!IsAttachedToTerminal)
+            {
+                return;
+            }
 
             ReadOnlySpan<char> span = _everythingStringBuilder.ToString ().AsSpan (); // still allocates the string
 
@@ -425,17 +403,17 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
         if (output.Length == 0)
         {
             return;
         }
 
         base.Write (output);
+
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
 
         var str = output.ToString ();
 
@@ -489,11 +467,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
         if (Force16Colors && IsLegacyConsole)
         {
             // Legacy Windows console doesn't support ANSI — use Win32 API directly
@@ -514,11 +487,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public Size GetSize ()
     {
-        if (!IsAttachedToTerminal)
-        {
-            return new Size (80, 25);
-        }
-
         if (_lockResize)
         {
             return _lastSize!.Value;

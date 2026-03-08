@@ -45,12 +45,12 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
+        base.Write (output);
+
         if (!IsAttachedToTerminal)
         {
             return;
         }
-
-        base.Write (output);
 
         byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
         UnixIOHelper.TryWriteStdout (utf8);
@@ -64,13 +64,6 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
-        if (!IsAttachedToTerminal)
-        {
-            _currentCursor = cursor;
-
-            return;
-        }
-
         try
         {
             if (!cursor.IsVisible)
@@ -102,11 +95,6 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return false;
-        }
-
         if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == screenPositionX && _currentCursor.Position.Value.Y == screenPositionY)
         {
             return false;
