@@ -151,7 +151,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         bytesRead = 0;
 
-        if (!IsEnabled || InputHandle == nint.Zero || !Console.KeyAvailable)
+        if (!IsEnabled || InputHandle == nint.Zero)
         {
             return false;
         }

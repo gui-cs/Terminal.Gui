@@ -123,7 +123,7 @@ public class InputInjectorTests (ITestOutputHelper output)
     #region InjectKey Tests - Pipeline Mode
 
     [Fact]
-    public async Task InjectKey_Pipeline_AccentedKeys_RaisesAllEvents ()
+    public async Task InjectKey_Pipeline_AutoProcess_False_AccentedKeys_RaisesAllEvents ()
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
@@ -139,7 +139,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         TestInputSource testSource = new (timeProvider);
         InputInjector injector = new (app.Driver?.GetInputProcessor ()!, timeProvider, testSource);
 
-        InputInjectionOptions options = new () { Mode = InputInjectionMode.Pipeline, AutoProcess = true, TimeProvider = timeProvider };
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Pipeline, AutoProcess = false, TimeProvider = timeProvider };
 
         // Act
         injector.InjectKey (new Key ('á'), options);
@@ -221,7 +221,7 @@ public class InputInjectorTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task InjectKey_PipelineMode_MultipleKeys_RaisesAllEvents ()
+    public async Task InjectKey_PipelineMode_AutoProcess_True_MultipleKeys_RaisesAllEvents ()
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();

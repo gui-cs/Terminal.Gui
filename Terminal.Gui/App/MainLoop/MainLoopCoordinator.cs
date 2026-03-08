@@ -111,15 +111,8 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         _runCancellationTokenSource.Cancel ();
         _output?.Dispose ();
 
-        try
-        {
-            // Wait for input infinite loop to exit
-            _inputTask?.Wait (_runCancellationTokenSource.Token);
-        }
-        catch
-        {
-            // ignored
-        }
+        // Wait for input infinite loop to exit
+        _inputTask?.Wait ();
     }
 
     private void BootMainLoop (IApplication? app)
