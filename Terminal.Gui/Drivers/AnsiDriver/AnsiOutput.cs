@@ -146,12 +146,12 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
+        base.Write (output);
+
         if (!IsAttachedToTerminal)
         {
             return;
         }
-
-        base.Write (output);
 
         try
         {
@@ -184,14 +184,14 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        StringBuilder capturedOutput = new ();
+        capturedOutput.Append (text);
+        base.Write (capturedOutput);
+
         if (!IsAttachedToTerminal)
         {
             return;
         }
-
-        StringBuilder capturedOutput = new ();
-        capturedOutput.Append (text);
-        base.Write (capturedOutput);
 
         try
         {
@@ -284,13 +284,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
-        if (!IsAttachedToTerminal)
-        {
-            _currentCursor = cursor;
-
-            return;
-        }
-
         try
         {
             if (!cursor.IsVisible)
@@ -322,11 +315,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return false;
-        }
-
         if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
@@ -383,13 +371,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
-        if (!IsAttachedToTerminal)
-        {
-            DisableKittyKeyboard ();
-
-            return;
-        }
-
         try
         {
             DisableKittyKeyboard ();
