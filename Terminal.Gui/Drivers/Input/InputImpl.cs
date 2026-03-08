@@ -17,7 +17,7 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
     protected InputImpl () => IsAttachedToTerminal = Driver.IsAttachedToTerminal (out _, out _);
 
     /// <summary>
-    ///     Gets whether this output instance is attached to a real terminal device.
+    ///     Gets whether this input instance is attached to a real terminal device.
     /// </summary>
     protected bool IsAttachedToTerminal { get; }
 
