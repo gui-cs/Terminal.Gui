@@ -224,30 +224,30 @@ public class TextInputControls : Scenario
                             };
         win.Add (labelMirroringHexEditor);
 
-        // DateField
-        label = new Label { Text = " _DateField:", Y = Pos.Bottom (hexEditor) + 1 };
+        // DateEditor
+        label = new Label { Text = "_DateEditor:", Y = Pos.Bottom (hexEditor) + 1 };
         win.Add (label);
 
-        DateField dateField = new (DateTime.Now) { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Width = 20 };
-        win.Add (dateField);
+        DateEditor dateEditor = new () { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Value = DateTime.Today };
+        win.Add (dateEditor);
 
-        Label labelMirroringDateField = new ()
+        Label labelMirroringDateEditor = new ()
         {
-            X = Pos.Right (dateField) + 1,
-            Y = Pos.Top (dateField),
-            Width = Dim.Width (dateField),
-            Height = Dim.Height (dateField),
-            Text = dateField.Text
+            X = Pos.Right (dateEditor) + 1,
+            Y = Pos.Top (dateEditor),
+            Width = Dim.Width (dateEditor),
+            Height = Dim.Height (dateEditor),
+            Text = dateEditor.Text
         };
-        win.Add (labelMirroringDateField);
+        win.Add (labelMirroringDateEditor);
 
-        dateField.TextChanged += (_, _) => { labelMirroringDateField.Text = dateField.Text; };
+        dateEditor.ValueChanged += (_, _) => { labelMirroringDateEditor.Text = dateEditor.Text; };
 
         // TimeEditor
-        label = new Label { Text = "T_imeEditor:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
+        label = new Label { Text = "T_imeEditor:", Y = Pos.Top (dateEditor), X = Pos.Right (labelMirroringDateEditor) + 5 };
         win.Add (label);
 
-        _timeEditor = new TimeEditor { X = Pos.Right (label) + 1, Y = Pos.Top (dateField), Value = DateTime.Now.TimeOfDay };
+        _timeEditor = new TimeEditor { X = Pos.Right (label) + 1, Y = Pos.Top (dateEditor), Value = DateTime.Now.TimeOfDay };
         win.Add (_timeEditor);
 
         _labelMirroringTimeEditor = new Label
@@ -264,7 +264,7 @@ public class TextInputControls : Scenario
 
         // MaskedTextProvider - uses .NET MaskedTextProvider
         NetMaskedTextProvider netProvider = new ("+99 (000) 000-0000");
-        Label netProviderLabel = new () { X = Pos.Left (dateField), Y = Pos.Bottom (dateField) + 1, Text = $"_NetMaskedTextProvider ({netProvider.Mask}):" };
+        Label netProviderLabel = new () { X = Pos.Left (dateEditor), Y = Pos.Bottom (dateEditor) + 1, Text = $"_NetMaskedTextProvider ({netProvider.Mask}):" };
         win.Add (netProviderLabel);
 
         TextValidateField netProviderField = new () { X = Pos.Right (netProviderLabel) + 1, Y = Pos.Y (netProviderLabel), Provider = netProvider };

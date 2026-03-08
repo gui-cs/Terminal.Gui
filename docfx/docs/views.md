@@ -137,9 +137,9 @@ A sinple color picker that supports the legacy 16 ANSI colors
 </pre>
 
 
-## [DateField](xref:Terminal.Gui.Views.DateField)
+## [DateEditor](xref:Terminal.Gui.Views.DateEditor)
 
-Provides date editing functionality with specialized cursor behavior for date entry.
+Provides date editing functionality using [TextValidateField](xref:Terminal.Gui.Views.TextValidateField) with culture-aware formatting.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
