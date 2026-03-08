@@ -7,8 +7,6 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public sealed class Driver
 {
-    private static bool _force16Colors = false; // Resources/config.json overrides
-
     // NOTE: Force16Colors is a configuration property (Driver.Force16Colors).
     // NOTE: IDriver also has a Force16Colors property, which is an instance property
     // NOTE: set whenever this static property is set.
@@ -19,12 +17,12 @@ public sealed class Driver
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool Force16Colors
     {
-        get => _force16Colors;
+        get;
         set
         {
-            bool oldValue = _force16Colors;
-            _force16Colors = value;
-            Force16ColorsChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, _force16Colors));
+            bool oldValue = field;
+            field = value;
+            Force16ColorsChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, field));
         }
     }
 
@@ -33,7 +31,9 @@ public sealed class Driver
 
     /// <summary>
     ///     Determines whether the process is attached to a real terminal (i.e. stdin/stdout
-    ///     are connected to a console device rather than redirected or running inside a test harness).
+    ///     are connected to a console device rather than redirected or running inside a test harness). Set the environment
+    ///     variable "DisableRealDriverIO=1" to skip real terminal detection and force this method to return false, which is
+    ///     required for running in test harnesses that do not have a real terminal attached.
     /// </summary>
     /// <param name="inputAttached">
     ///     When this method returns, <see langword="true"/> if standard input is connected to a console device;

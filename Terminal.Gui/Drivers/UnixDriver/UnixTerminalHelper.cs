@@ -103,7 +103,9 @@ internal static class UnixTerminalHelper
             // Check if we have a real console first
             if (!Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
             {
-                Trace.Lifecycle (nameof (UnixTerminalHelper), "Suspend", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (UnixTerminalHelper),
+                                 "Suspend",
+                                 $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
 
                 return;
             }

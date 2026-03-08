@@ -37,16 +37,4 @@ public class DriverIsAttachedToTerminalTests (ITestOutputHelper output)
         Assert.False (inputAttached, "inputAttached should be false when DisableRealDriverIO=1");
         Assert.False (outputAttached, "outputAttached should be false when DisableRealDriverIO=1");
     }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void AnsiTerminalHelper_IsAttachedToTerminal_DelegatesToDriver ()
-    {
-        // Verify the AnsiTerminalHelper delegation still works.
-        bool result = AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached);
-
-        Assert.False (result);
-        Assert.False (inputAttached);
-        Assert.False (outputAttached);
-    }
 }

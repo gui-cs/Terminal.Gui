@@ -78,7 +78,7 @@ internal static class UnixIOHelper
     /// <param name="timeout">Timeout in milliseconds (0 = non-blocking, -1 = infinite)</param>
     /// <returns>Number of file descriptors with events, or -1 on error</returns>
     [DllImport ("libc", SetLastError = true)]
-    public static extern int poll ([In][Out] Pollfd [] ufds, uint nfds, int timeout);
+    public static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
 
     /// <summary>
     ///     Read bytes from a file descriptor.
@@ -157,10 +157,9 @@ internal static class UnixIOHelper
     ///     Get window/terminal size using ioctl.
     ///     Platform-specific constant (different on Darwin/BSD vs Linux).
     /// </summary>
-    public static readonly uint TIOCGWINSZ =
-        RuntimeInformation.IsOSPlatform (OSPlatform.OSX) || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD)
-            ? 0x40087468u // Darwin/BSD
-            : 0x5413u; // Linux
+    public static readonly uint TIOCGWINSZ = RuntimeInformation.IsOSPlatform (OSPlatform.OSX) || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD)
+                                                 ? 0x40087468u // Darwin/BSD
+                                                 : 0x5413u; // Linux
 
     /// <summary>
     ///     I/O control operations on file descriptors.
@@ -173,8 +172,8 @@ internal static class UnixIOHelper
     public static extern int ioctl (int fd, uint request, out WinSize ws);
 
     /// <summary>
-    /// ioctl definition for Darwin/FreeBSD on ARM64.
-    /// See https://github.com/dotnet/runtime/issues/48796#issuecomment-3695794860.
+    ///     ioctl definition for Darwin/FreeBSD on ARM64.
+    ///     See https://github.com/dotnet/runtime/issues/48796#issuecomment-3695794860.
     /// </summary>
     /// <param name="fd">File descriptor</param>
     /// <param name="request">Request code (e.g., TIOCGWINSZ)</param>
@@ -187,7 +186,15 @@ internal static class UnixIOHelper
     /// <param name="ws">Window size structure (output)</param>
     /// <returns>0 on success, -1 on error</returns>
     [DllImport ("libc", EntryPoint = "ioctl", SetLastError = true)]
-    public static extern int ioctl_arm64 (int fd, ulong request, nint r3, nint r4, nint r5, nint r6, nint r7, nint r8, out WinSize ws);
+    public static extern int ioctl_arm64 (int fd,
+                                          ulong request,
+                                          nint r3,
+                                          nint r4,
+                                          nint r5,
+                                          nint r6,
+                                          nint r7,
+                                          nint r8,
+                                          out WinSize ws);
 
     #endregion
 
@@ -298,12 +305,21 @@ internal static class UnixIOHelper
     {
         try
         {
-            int ioctlResult = 0;
+            var ioctlResult = 0;
             WinSize ws;
-            if (RuntimeInformation.OSArchitecture == Architecture.Arm64 &&
-              (RuntimeInformation.IsOSPlatform (OSPlatform.OSX) || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD)))
+
+            if (RuntimeInformation.OSArchitecture == Architecture.Arm64
+                && (RuntimeInformation.IsOSPlatform (OSPlatform.OSX) || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD)))
             {
-                ioctlResult = ioctl_arm64 (STDOUT_FILENO, TIOCGWINSZ, 0, 0, 0, 0, 0, 0, out ws);
+                ioctlResult = ioctl_arm64 (STDOUT_FILENO,
+                                           TIOCGWINSZ,
+                                           0,
+                                           0,
+                                           0,
+                                           0,
+                                           0,
+                                           0,
+                                           out ws);
             }
             else
             {
@@ -312,9 +328,9 @@ internal static class UnixIOHelper
 
             if (ioctlResult == 0)
             {
-                if (ws.ws_col > 0 && ws.ws_row > 0)
+                if (ws is { ws_col: > 0, ws_row: > 0 })
                 {
-                    size = new (ws.ws_col, ws.ws_row);
+                    size = new Size (ws.ws_col, ws.ws_row);
 
                     return true;
                 }
@@ -325,7 +341,7 @@ internal static class UnixIOHelper
             // ignore
         }
 
-        size = new (80, 25); // fallback
+        size = new Size (80, 25); // fallback
 
         return false;
     }
