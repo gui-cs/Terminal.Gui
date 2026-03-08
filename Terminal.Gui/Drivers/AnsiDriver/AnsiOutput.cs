@@ -79,7 +79,9 @@ public class AnsiOutput : OutputBase, IOutput
                     _windowsVTOutput.Dispose ();
                     _windowsVTOutput = null;
 
-                    Trace.Lifecycle (nameof (AnsiOutput), "Init", "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiOutput),
+                                     "Init",
+                                     "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }

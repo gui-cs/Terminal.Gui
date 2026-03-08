@@ -1,4 +1,6 @@
 #nullable disable
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -12,7 +14,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// <summary>
     ///     Creates a new instance of the class. Implicitly sends
     ///     console mode settings that enable virtual input (mouse
-    ///     reporting etc).
+    ///     reporting etc.).
     /// </summary>
     public NetInput ()
     {

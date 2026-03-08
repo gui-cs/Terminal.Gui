@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Terminal.Gui.Tracing;
 
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
