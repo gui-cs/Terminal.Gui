@@ -4,8 +4,7 @@ using Terminal.Gui.Tracing;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     <see cref="IInput{TInputRecord}"/> implementation that uses native dotnet methods e.g. <see cref="System.Console"/>
-///     .
+///     <see cref="IInput{TInputRecord}"/> implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
 ///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
 ///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>.
 /// </summary>
