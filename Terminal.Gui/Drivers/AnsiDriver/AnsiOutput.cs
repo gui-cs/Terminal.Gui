@@ -62,9 +62,9 @@ public class AnsiOutput : OutputBase, IOutput
         try
         {
             // Check if we have a real console first
-            if (!Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            if (!IsAttachedToTerminal)
             {
-                Trace.Lifecycle (nameof (AnsiOutput), "Init", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiOutput), "Init", "No real terminal attached. Running in degraded mode.");
 
                 return;
             }
@@ -146,6 +146,11 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         base.Write (output);
 
         try
@@ -179,6 +184,11 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         StringBuilder capturedOutput = new ();
         capturedOutput.Append (text);
         base.Write (capturedOutput);
@@ -222,6 +232,11 @@ public class AnsiOutput : OutputBase, IOutput
     /// <param name="flags">The kitty keyboard flags to enable.</param>
     internal void EnableKittyKeyboard (int flags)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         if (flags <= 0)
         {
             return;
@@ -237,6 +252,13 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     internal void DisableKittyKeyboard ()
     {
+        if (!IsAttachedToTerminal)
+        {
+            _kittyKeyboardEnabledFlags = 0;
+
+            return;
+        }
+
         if (_kittyKeyboardEnabledFlags <= 0)
         {
             return;
@@ -262,6 +284,13 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
+        if (!IsAttachedToTerminal)
+        {
+            _currentCursor = cursor;
+
+            return;
+        }
+
         try
         {
             if (!cursor.IsVisible)
@@ -293,6 +322,11 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return false;
+        }
+
         if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
@@ -349,6 +383,13 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
+        if (!IsAttachedToTerminal)
+        {
+            DisableKittyKeyboard ();
+
+            return;
+        }
+
         try
         {
             DisableKittyKeyboard ();

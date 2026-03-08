@@ -7,6 +7,16 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="OutputBase"/> class and detects
+    /// </summary>
+    protected OutputBase () => IsAttachedToTerminal = Driver.IsAttachedToTerminal (out _, out _);
+
+    /// <summary>
+    ///     Gets whether this output instance is attached to a real terminal device.
+    /// </summary>
+    protected bool IsAttachedToTerminal { get; }
+
     /// <inheritdoc cref="IOutput.Force16Colors"/>
     public bool Force16Colors
     {
