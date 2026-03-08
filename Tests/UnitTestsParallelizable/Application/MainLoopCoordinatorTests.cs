@@ -214,64 +214,6 @@ public class MainLoopCoordinatorTests : IDisposable
     }
 
     [Fact]
-    public async Task StartInputTaskAsync_EnablesAndDisablesKittyKeyboard_WhenTerminalResponds ()
-    {
-        ConcurrentQueue<char> inputQueue = new ();
-        TimedEvents timedEvents = new ();
-        ApplicationMainLoop<char> loop = new ();
-        TestAnsiInput input = new ("\u001B[?31u");
-        AnsiOutput output = new ();
-        TestAnsiComponentFactory factory = new (input, output);
-        MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
-        Mock<IApplication> appMock = new ();
-
-        appMock.SetupProperty (a => a.Driver);
-        appMock.SetupProperty (a => a.MainThreadId, 123);
-
-        await coordinator.StartInputTaskAsync (appMock.Object);
-
-        Assert.True (SpinWait.SpinUntil (() => input.ResponseSent, TimeSpan.FromSeconds (1)));
-        loop.InputProcessor.ProcessQueue ();
-
-        var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
-        Assert.True (driver.KittyKeyboardProtocol.IsSupported);
-        Assert.Equal (31, driver.KittyKeyboardProtocol.SupportedFlags);
-        Assert.Equal (EscSeqUtils.KittyKeyboardPhase1Flags, driver.KittyKeyboardProtocol.EnabledFlags);
-        Assert.Contains (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags), output.GetLastOutput (), StringComparison.Ordinal);
-
-        coordinator.Stop ();
-
-        Assert.Contains (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task StartInputTaskAsync_DoesNotEnableKittyKeyboard_ForLegacyConsole ()
-    {
-        ConcurrentQueue<char> inputQueue = new ();
-        TimedEvents timedEvents = new ();
-        ApplicationMainLoop<char> loop = new ();
-        TestAnsiInput input = new (null);
-        AnsiOutput output = new () { IsLegacyConsole = true };
-        TestAnsiComponentFactory factory = new (input, output);
-        MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
-        Mock<IApplication> appMock = new ();
-
-        appMock.SetupProperty (a => a.Driver);
-        appMock.SetupProperty (a => a.MainThreadId, 456);
-
-        await coordinator.StartInputTaskAsync (appMock.Object);
-
-        var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
-        Assert.False (driver.KittyKeyboardProtocol.IsSupported);
-
-        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags),
-                               output.GetLastOutput (),
-                               StringComparison.Ordinal);
-
-        coordinator.Stop ();
-    }
-
-    [Fact]
     public async Task TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
     {
         Mock<ILogger> mockLogger = new ();
