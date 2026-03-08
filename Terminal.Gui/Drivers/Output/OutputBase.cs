@@ -50,7 +50,6 @@ public abstract class OutputBase
     private readonly ConcurrentQueue<SixelToRender> _sixels = [];
 
     /// <inheritdoc cref="IOutput.GetSixels"/>
-    /// >
     public ConcurrentQueue<SixelToRender> GetSixels () => _sixels;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
