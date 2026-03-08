@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Terminal.Gui.Tests;
 
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
@@ -14,7 +15,7 @@ namespace ApplicationTests;
 ///     are created, initialized, and disposed.
 /// </summary>
 [Collection ("Application Tests")]
-public class MainLoopCoordinatorTests : IDisposable
+public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDisposable
 {
     private readonly List<IApplication> _createdApps = [];
 
@@ -216,6 +217,10 @@ public class MainLoopCoordinatorTests : IDisposable
     [Fact]
     public async Task StartInputTaskAsync_EnablesAndDisablesKittyKeyboard_WhenTerminalResponds ()
     {
+        TestLogging.Verbose (outputHelper);
+
+        Terminal.Gui.Tracing.Trace.EnabledCategories = TraceCategory.Lifecycle;
+
         ConcurrentQueue<char> inputQueue = new ();
         TimedEvents timedEvents = new ();
         ApplicationMainLoop<char> loop = new ();
@@ -274,10 +279,7 @@ public class MainLoopCoordinatorTests : IDisposable
     [Fact]
     public async Task TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
     {
-        Mock<ILogger> mockLogger = new ();
-
-        ILogger beforeLogger = Logging.Logger;
-        Logging.Logger = mockLogger.Object;
+        using IDisposable logScope = TestLogging.BindTo (outputHelper, LogLevel.Critical);
 
         Mock<IComponentFactory<char>> m = new ();
 
@@ -285,17 +287,8 @@ public class MainLoopCoordinatorTests : IDisposable
 
         MainLoopCoordinator<char> c = new (new TimedEvents (), new ConcurrentQueue<char> (), Mock.Of<IApplicationMainLoop<char>> (), m.Object);
 
-        var ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
+        AggregateException ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
         Assert.Equal ("Crash on boot", ex.InnerExceptions [0].Message);
-
-        Logging.Logger = beforeLogger;
-
-        mockLogger.Verify (l => l.Log (LogLevel.Critical,
-                                       It.IsAny<EventId> (),
-                                       It.Is<It.IsAnyType> ((v, t) => v.ToString ()!.Contains ("Input loop crashed")),
-                                       It.IsAny<Exception> (),
-                                       It.IsAny<Func<It.IsAnyType, Exception?, string>> ()),
-                           Times.Once);
     }
 
     private sealed class TestAnsiComponentFactory (TestAnsiInput input, AnsiOutput output) : ComponentFactoryImpl<char>
