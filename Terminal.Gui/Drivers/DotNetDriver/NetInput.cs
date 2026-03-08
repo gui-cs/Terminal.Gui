@@ -16,11 +16,17 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// </summary>
     public NetInput ()
     {
-        //Logging.Information ($"Creating {nameof (NetInput)}");
+        // Check if we have a real console first
+        if (!IsAttachedToTerminal)
+        {
+            Tracing.Trace.Lifecycle (nameof (NetInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
+
+            return;
+        }
 
         PlatformID p = Environment.OSVersion.Platform;
 
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
         {
             try
             {

@@ -20,7 +20,13 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 
     public UnixInput ()
     {
-        //Logging.Information ($"Creating {nameof (UnixInput)}");
+        // Check if we have a real console first
+        if (!IsAttachedToTerminal)
+        {
+            Tracing.Trace.Lifecycle (nameof (UnixInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
+
+            return;
+        }
 
         try
         {

@@ -41,6 +41,7 @@ public class AnsiOutput : OutputBase, IOutput
 
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;
+    private int _kittyKeyboardEnabledFlags;
 
     private readonly WindowsVTOutputHelper? _windowsVTOutput;
 
