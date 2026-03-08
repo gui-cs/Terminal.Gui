@@ -8,7 +8,7 @@ namespace Terminal.Gui.Drivers;
 public abstract class OutputBase
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="OutputBase"/> class and detects
+    ///     Initializes a new instance of the <see cref="OutputBase"/> class and detects whether the output is attached to a real terminal device.
     /// </summary>
     protected OutputBase () => IsAttachedToTerminal = Driver.IsAttachedToTerminal (out _, out _);
 
