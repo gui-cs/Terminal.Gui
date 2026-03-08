@@ -4,12 +4,6 @@ namespace Terminal.Gui.Drivers;
 
 internal static class AnsiTerminalHelper
 {
-    /// <summary>
-    ///     Delegates to <see cref="Driver.IsAttachedToTerminal"/>.
-    /// </summary>
-    public static bool IsAttachedToTerminal (out bool inputAttached, out bool outputAttached)
-        => Driver.IsAttachedToTerminal (out inputAttached, out outputAttached);
-
     public static void FlushNative (AnsiPlatform platform)
     {
         try
