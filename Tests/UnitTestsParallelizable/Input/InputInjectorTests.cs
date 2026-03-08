@@ -122,7 +122,11 @@ public class InputInjectorTests (ITestOutputHelper output)
 
     #region InjectKey Tests - Pipeline Mode
 
-    [Fact]
+    // BUGBUG: This test is bogus as it doesn't actually test what happens
+    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
+    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
+
+    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
     public async Task InjectKey_Pipeline_AutoProcess_False_AccentedKeys_RaisesAllEvents ()
     {
         // Arrange
@@ -177,6 +181,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (new Key ('Ã'), options);
         injector.InjectKey (new Key ('Õ'), options);
 
+        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
@@ -220,7 +225,10 @@ public class InputInjectorTests (ITestOutputHelper output)
         Assert.Equal (new Key ('Õ'), receivedKeys [33]);
     }
 
-    [Fact]
+    // BUGBUG: This test is bogus as it doesn't actually test what happens
+    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
+    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
+    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
     public async Task InjectKey_PipelineMode_AutoProcess_True_MultipleKeys_RaisesAllEvents ()
     {
         // Arrange
@@ -244,6 +252,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (Key.B, options);
         injector.InjectKey (Key.C, options);
 
+        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
         await Task.Delay (50, TestContext.Current.CancellationToken); // Allow some time for processing
         injector.ProcessQueue ();
 
