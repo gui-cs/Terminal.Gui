@@ -88,11 +88,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         try
         {
             // Check if we have a real console first
-            if (!Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            if (!IsAttachedToTerminal)
             {
-                Trace.Lifecycle (nameof (AnsiInput),
-                                 "Init",
-                                 $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
 
                 return;
             }

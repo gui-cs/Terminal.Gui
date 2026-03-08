@@ -148,11 +148,6 @@ public class AnsiOutput : OutputBase, IOutput
     {
         base.Write (output);
 
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
         try
         {
             switch (_platform)
@@ -187,11 +182,6 @@ public class AnsiOutput : OutputBase, IOutput
         StringBuilder capturedOutput = new ();
         capturedOutput.Append (text);
         base.Write (capturedOutput);
-
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
 
         try
         {
@@ -232,12 +222,7 @@ public class AnsiOutput : OutputBase, IOutput
     /// <param name="flags">The kitty keyboard flags to enable.</param>
     internal void EnableKittyKeyboard (int flags)
     {
-        if (!IsAttachedToTerminal)
-        {
-            return;
-        }
-
-        if (flags <= 0)
+        if (!IsAttachedToTerminal || flags <= 0)
         {
             return;
         }
@@ -252,13 +237,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     internal void DisableKittyKeyboard ()
     {
-        if (!IsAttachedToTerminal)
-        {
-            _kittyKeyboardEnabledFlags = 0;
-
-            return;
-        }
-
         if (_kittyKeyboardEnabledFlags <= 0)
         {
             return;
