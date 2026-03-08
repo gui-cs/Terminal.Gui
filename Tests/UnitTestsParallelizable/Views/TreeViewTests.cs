@@ -1,9 +1,10 @@
 ﻿using JetBrains.Annotations;
+using UnitTests;
 
 namespace ViewsTests;
 
 [TestSubject (typeof (TreeView))]
-public class TreeViewTests
+public class TreeViewTests : TestDriverBase
 {
     [Fact]
     public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
@@ -906,4 +907,37 @@ public class TreeViewTests
     }
 
     #endregion
+
+    /// <summary>
+    ///     Verifies that <see cref="TreeView{T}" /> measures branch text width using grapheme-aware
+    ///     <c>string.GetColumns()</c> rather than <c>string.Length</c>.
+    ///     Wide CJK characters occupy 2 terminal cells each but have <c>string.Length</c> of 1,
+    ///     so <c>.Length</c> under-counts the display width while <c>.GetColumns()</c> is correct.
+    /// </summary>
+    [Fact]
+    public void TestTreeView_GetWidth_GraphemeCluster ()
+    {
+        // setup
+        IDriver driver = CreateTestDriver ();
+        string cjkText = "\u4F60\u597D"; // 你好
+        Assert.Equal (2, cjkText.Length);
+        Assert.Equal (4, cjkText.GetColumns ());
+
+        var tv = new TreeView { Driver = driver, Width = 20, Height = 5 };
+        var node = new TreeNode (cjkText);
+        tv.AddObject (node);
+        tv.SetScheme (new Scheme ());
+        tv.Style.ShowBranchLines = false;
+
+        // execute
+        tv.LayoutSubViews ();
+        tv.SetClipToScreen ();
+        tv.Draw ();
+
+        // verify
+        string actual = driver.ToString ()!;
+        string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
+        string firstLine = lines [0];
+        Assert.Contains (cjkText, firstLine);
+    }
 }
