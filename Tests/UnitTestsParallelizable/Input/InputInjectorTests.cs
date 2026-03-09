@@ -121,13 +121,9 @@ public class InputInjectorTests (ITestOutputHelper output)
     #endregion
 
     #region InjectKey Tests - Pipeline Mode
-
-    // BUGBUG: This test is bogus as it doesn't actually test what happens
-    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
-    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
-
+    
     [Fact]
-    public void InjectKey_Pipeline_AccentedKeys_RaisesAllEvents ()
+    public void InjectKey_Pipeline_AutoProcess_True_AccentedKeys_RaisesAllEvents ()
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
@@ -221,11 +217,8 @@ public class InputInjectorTests (ITestOutputHelper output)
         Assert.Equal (new Key ('Õ'), receivedKeys [33]);
     }
 
-    // BUGBUG: This test is bogus as it doesn't actually test what happens
-    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
-    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
     [Fact]
-    public void InjectKey_PipelineMode_MultipleKeys_RaisesAllEvents ()
+    public void InjectKey_PipelineMode_AutoProcess_True_MultipleKeys_RaisesAllEvents ()
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
