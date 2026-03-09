@@ -126,7 +126,7 @@ public class InputInjectorTests (ITestOutputHelper output)
     // BUGBUG: when an accented char comes into the actual stdIn stream, only.
     // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
 
-    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
+    [Fact]
     public async Task InjectKey_Pipeline_AccentedKeys_RaisesAllEvents ()
     {
         // Arrange
@@ -226,7 +226,7 @@ public class InputInjectorTests (ITestOutputHelper output)
     // BUGBUG: This test is bogus as it doesn't actually test what happens
     // BUGBUG: when an accented char comes into the actual stdIn stream, only.
     // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
-    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
+    [Fact]
     public async Task InjectKey_PipelineMode_MultipleKeys_RaisesAllEvents ()
     {
         // Arrange
