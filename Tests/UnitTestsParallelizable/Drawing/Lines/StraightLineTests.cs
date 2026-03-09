@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace DrawingTests.Lines;
+﻿namespace DrawingTests.Lines;
 
 public class StraightLineTests (ITestOutputHelper output)
 {

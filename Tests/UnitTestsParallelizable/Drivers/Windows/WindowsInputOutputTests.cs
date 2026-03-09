@@ -1,5 +1,4 @@
 #nullable enable
-using Xunit.Abstractions;
 
 namespace DriverTests.WindowsDriver;
 
@@ -77,5 +76,33 @@ public class WindowsInputOutputTests (ITestOutputHelper output)
         }
 
         Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void WindowsOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new WindowsOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void WindowsDriver_IsAttachedToTerminal_ReturnsFalse_InTestHarness ()
+    {
+        // Copilot - generated.
+        // Act — Driver.IsAttachedToTerminal is the shared entry point all drivers use.
+        bool result = Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached);
+
+        // Assert
+        Assert.False (result, "WindowsDriver: IsAttachedToTerminal should return false in test harness");
+        Assert.False (inputAttached);
+        Assert.False (outputAttached);
     }
 }

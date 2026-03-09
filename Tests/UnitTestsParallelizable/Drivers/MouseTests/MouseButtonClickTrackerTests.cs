@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-// ReSharper disable AccessToModifiedClosure
+﻿// ReSharper disable AccessToModifiedClosure
 // ReSharper disable InconsistentNaming
 
 namespace DriverTests.MouseTests;

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
-using Xunit.Abstractions;
 
 // ReSharper disable InconsistentNaming
 
@@ -297,7 +296,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         // Test render doesn't throw
         listView.BeginInit ();
         listView.EndInit ();
-        Exception ex = Record.Exception (() => customSource.Render (listView, false, 0, 0, 0, 20));
+        Exception? ex = Record.Exception (() => customSource.Render (listView, false, 0, 0, 0, 20));
         Assert.Null (ex);
     }
 
@@ -397,7 +396,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         ObservableCollection<string> source = ["Item1"];
         ListWrapper<string> wrapper = new (source);
 
-        Exception ex = Record.Exception (() => wrapper.SetMark (-1, true));
+        Exception? ex = Record.Exception (() => wrapper.SetMark (-1, true));
         Assert.Null (ex);
 
         ex = Record.Exception (() => wrapper.SetMark (100, true));

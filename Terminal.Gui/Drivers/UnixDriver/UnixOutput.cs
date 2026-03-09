@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+using Terminal.Gui.Tracing;
 
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
@@ -10,9 +11,33 @@ namespace Terminal.Gui.Drivers;
 
 internal class UnixOutput : OutputBase, IOutput
 {
+    public UnixOutput ()
+    {
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (UnixOutput), "Init", "No real terminal attached. Output operations will be no-op.");
+        }
+    }
+
+    /// <inheritdoc/>
+    public void Suspend ()
+    {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
+        UnixTerminalHelper.Suspend (this);
+    }
+
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
         UnixIOHelper.TryWriteStdout (utf8);
     }
@@ -22,19 +47,21 @@ internal class UnixOutput : OutputBase, IOutput
     {
         base.Write (output);
 
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
         UnixIOHelper.TryWriteStdout (utf8);
     }
 
     private Cursor _currentCursor = new ();
 
-    /// <inheritdoc />
-    public Cursor GetCursor ()
-    {
-        return _currentCursor;
-    }
+    /// <inheritdoc/>
+    public Cursor GetCursor () => _currentCursor;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
         try
@@ -45,7 +72,7 @@ internal class UnixOutput : OutputBase, IOutput
             }
             else
             {
-                if (_currentCursor!.Style != cursor.Style)
+                if (_currentCursor.Style != cursor.Style)
                 {
                     Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                 }
@@ -59,10 +86,7 @@ internal class UnixOutput : OutputBase, IOutput
         }
         finally
         {
-            SetCursorPositionImpl (
-                                   cursor.Position?.X ?? 0,
-                                   cursor.Position?.Y ?? 0
-                                  );
+            SetCursorPositionImpl (cursor.Position?.X ?? 0, cursor.Position?.Y ?? 0);
 
             _currentCursor = cursor;
         }
@@ -71,7 +95,7 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
-        if (_currentCursor!.Position is { } && _currentCursor.Position.Value.X == screenPositionX && _currentCursor.Position.Value.Y == screenPositionY)
+        if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == screenPositionX && _currentCursor.Position.Value.Y == screenPositionY)
         {
             return false;
         }
@@ -113,10 +137,7 @@ internal class UnixOutput : OutputBase, IOutput
             // create FileStream from the safe handle
             var stream = new FileStream (handle, FileAccess.Write);
 
-            return new StreamWriter (stream)
-            {
-                AutoFlush = true
-            };
+            return new StreamWriter (stream) { AutoFlush = true };
         }
         catch (Exception ex)
         {
@@ -129,12 +150,17 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
+        if (!IsAttachedToTerminal)
+        {
+            return new Size (80, 25);
+        }
+
         if (UnixIOHelper.TryGetTerminalSize (out Size size))
         {
             return size;
         }
 
-        return new (80, 25); // fallback
+        return new Size (80, 25); // fallback
     }
 
     /// <inheritdoc/>

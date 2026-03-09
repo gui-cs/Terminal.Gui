@@ -76,22 +76,22 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 1. **Non-parallel tests** (depend on static state, ~10 min timeout):
    ```bash
-   dotnet test Tests/UnitTests --no-build --verbosity normal
+   dotnet test --project Tests/UnitTests --no-build --verbosity normal
    ```
    - Uses `Application.Init` and static state
    - Cannot run in parallel
-   - Includes `--blame` flags for crash diagnostics
+   - Includes `--diagnostic` flag for logging
 
 2. **Parallel tests** (can run concurrently, ~10 min timeout):
    ```bash
-   dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal
+   dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
    ```
    - No dependencies on static state
    - **Preferred for new tests**
 
 3. **Integration tests**:
    ```bash
-   dotnet test Tests/IntegrationTests --no-build --verbosity normal
+   dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
    ```
 
 ### Common Build Issues
@@ -169,6 +169,36 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 **⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, documentation, and samples.**
 
+### Unicode and Grapheme Handling
+
+**Think in graphemes, not runes.** A grapheme cluster is what the user perceives as a single character, but it may consist of multiple `Rune` values (e.g., base character + combining marks, or ZWJ emoji sequences).
+
+- **Always use `string.GetColumns()`** to measure display width — never `EnumerateRunes().Sum(r => r.GetColumns())` (inflates multi-rune clusters) or `string.Length` (counts chars, not terminal cells)
+- **Iterate by grapheme** using `GraphemeHelper.GetGraphemes()` when rendering text — never iterate by `Rune` and call `AddRune` for each (breaks combining marks and ZWJ sequences)
+- **Render with `AddStr`** passing complete grapheme strings — `AddRune` with individual runes from a cluster will not compose correctly
+
+```csharp
+// ✅ CORRECT — grapheme-aware width measurement
+int width = text.GetColumns ();
+
+// ❌ WRONG — inflates width for ZWJ emoji (e.g., 👨‍👩‍👦‍👦 → 8 instead of 2)
+int width = text.EnumerateRunes ().Sum (r => r.GetColumns ());
+
+// ✅ CORRECT — grapheme-aware rendering
+foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
+{
+    AddStr (grapheme);
+}
+
+// ❌ WRONG — breaks combining marks (é rendered as e + ́ separately)
+foreach (Rune rune in text.EnumerateRunes ())
+{
+    AddRune (rune);
+}
+```
+
+**Exception:** Rune-level iteration is appropriate when inspecting individual Unicode scalar values (e.g., counting zero-width runes for vertical text layout), not for rendering or measurement.
+
 ## Testing Requirements
 
 ### Code Coverage
@@ -176,11 +206,8 @@ Welcome! This guide provides everything you need to know to contribute effective
 - **Never decrease code coverage** - PRs must maintain or increase coverage
 - Target: 70%+ coverage for new code
 - **Coverage collection**:
-- Centralized in `TestResults/` directory at repository root
-- Collected only on Linux (ubuntu-latest) runners in CI for performance
-- Windows and macOS runners skip coverage collection to reduce execution time
-- Coverage reports uploaded to Codecov automatically from Linux runner
-- CI monitors coverage on each PR
+- Temporarily disabled in CI during xUnit v3 / MTP migration
+- Will be re-enabled once an MTP-compatible coverage solution is integrated
 
 ### Test Patterns
 
@@ -195,7 +222,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 ### Test Configuration
 
 - `xunit.runner.json` - xUnit configuration
-- `coverlet.runsettings` - Coverage settings (OpenCover format)
+- `coverlet.runsettings` - Coverage settings (currently unused, pending MTP integration)
 
 ## API Documentation Requirements
 
@@ -327,5 +354,7 @@ The workflow will:
 - ❌ **Don't use `var` for anything but built-in simple types** (use explicit types)
 - ❌ **Don't use redundant type names with `new`** (**ALWAYS PREFER** target-typed `new ()`)
 - ❌ **Don't introduce new warnings** (fix warnings in files you modify; exception: `[Obsolete]` warnings)
+- ❌ **Don't use `EnumerateRunes().Sum(GetColumns)`** for display width — use `string.GetColumns()`
+- ❌ **Don't use `AddRune` in a rune loop** to render text — iterate by grapheme with `GraphemeHelper.GetGraphemes()` and use `AddStr`
 
 **Thank you for contributing to Terminal.Gui!** 🎉

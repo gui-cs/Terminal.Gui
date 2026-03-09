@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Text;
 using Moq;
 using UnitTests;
-using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
 
@@ -1129,7 +1128,7 @@ Five ",
         var lv = new ListView ();
         var top = new View ();
         top.Add (lv);
-        Exception exception = Record.Exception (() => lv.SetFocus ());
+        Exception? exception = Record.Exception (() => lv.SetFocus ());
         Assert.Null (exception);
     }
 
@@ -1139,7 +1138,7 @@ Five ",
         var lv = new ListView { Source = new ListWrapper<string> (["One", "Two", "Three"]) };
         Assert.Null (lv.SelectedItem);
         Assert.Throws<ArgumentException> (() => lv.SelectedItem = 3);
-        Exception exception = Record.Exception (() => lv.SelectedItem = null);
+        Exception? exception = Record.Exception (() => lv.SelectedItem = null);
         Assert.Null (exception);
     }
 
@@ -1240,7 +1239,7 @@ Five ",
         Assert.Equal (0, changed);
     }
 
-    public static TheoryData<ObservableCollection<string>?> GetSources () => [null, [], ["Item1", "Item2"]];
+    public static TheoryData<ObservableCollection<string>?> GetSources () => new (null, [], ["Item1", "Item2"]);
 
     [Fact]
     public void CollectionChanged_Event ()

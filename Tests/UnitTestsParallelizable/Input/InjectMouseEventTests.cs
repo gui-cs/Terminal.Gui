@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Xunit.Abstractions;
 
 namespace DriverTests.MouseTests;
 

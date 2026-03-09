@@ -1,5 +1,3 @@
-using Xunit.Abstractions;
-
 namespace DriverTests.AnsiHandling;
 
 /// <summary>

@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+	  <OutputType>Exe</OutputType>
+	  <UseAppHost>true</UseAppHost>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -9,11 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TerminalGuiFluentTestingXunit.Generator\TerminalGuiFluentTestingXunit.Generator.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" />
+    <ProjectReference Include="..\AppTestHelpers.XunitHelpers.Generator\AppTestHelpers.XunitHelpers.Generator.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\AppTestHelpers\AppTestHelpers.csproj" />
+    <PackageReference Include="xunit.v3" />
     <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
   </ItemGroup>
 

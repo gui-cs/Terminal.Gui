@@ -10,6 +10,17 @@ namespace Terminal.Gui.Drivers;
 /// <typeparam name="TInputRecord"></typeparam>
 public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="InputImpl{TInputRecord}"/> class and detects if we are attached to a
+    ///     real terminal device. If not, the input implementation will run in a degraded mode where all operations are no-op.
+    /// </summary>
+    protected InputImpl () => IsAttachedToTerminal = Driver.IsAttachedToTerminal (out _, out _);
+
+    /// <summary>
+    ///     Gets whether this input instance is attached to a real terminal device.
+    /// </summary>
+    protected bool IsAttachedToTerminal { get; }
+
     private ConcurrentQueue<TInputRecord>? _inputQueue;
 
     /// <summary>

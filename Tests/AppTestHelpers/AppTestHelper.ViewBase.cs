@@ -1,8 +1,8 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace TerminalGuiFluentTesting;
+namespace AppTestHelpers;
 
-public partial class TestContext
+public partial class AppTestHelper
 {
     /// <summary>
     ///     Adds the given <paramref name="v"/> to the current top level view
@@ -10,7 +10,7 @@ public partial class TestContext
     /// </summary>
     /// <param name="v"></param>
     /// <returns></returns>
-    public TestContext Add (View v)
+    public AppTestHelper Add (View v)
     {
         WaitIteration ((app) =>
                        {

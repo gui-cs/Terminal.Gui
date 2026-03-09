@@ -315,6 +315,31 @@ public class AnsiInputTestableTests
         Assert.Equal (new Point (15, 15), wheelEvent.ScreenPosition);
     }
 
+    [Fact]
+    public void Read_ReturnsInjectedTestInput ()
+    {
+        var input = new AnsiInput ();
+        var queue = new ConcurrentQueue<char> ();
+        input.Initialize (queue);
+
+        ITestableInput<char> testable = input;
+
+        // Inject characters, including Ctrl+Z
+        testable.InjectInput ('a');
+        testable.InjectInput ('\x1A');
+
+        // Peek should report available input
+        Assert.True (input.Peek ());
+
+        // Read should return injected characters in FIFO order
+        var read = input.Read ().ToList ();
+        Assert.Equal (2, read.Count);
+        Assert.Equal ('a', read [0]);
+        Assert.Equal ('\x1A', read [1]);
+
+        input.Dispose ();
+    }
+
     #region AnsiInput InjectKeyDownEvent Tests
 
     [Fact]

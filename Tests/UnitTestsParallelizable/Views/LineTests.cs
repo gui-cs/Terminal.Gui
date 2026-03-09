@@ -142,7 +142,7 @@ public class LineTests : TestDriverBase
         app.Layout ();
 
         // Just verify the line can be drawn without errors
-        Exception exception = Record.Exception (() => app.Draw ());
+        Exception? exception = Record.Exception (() => app.Draw ());
         Assert.Null (exception);
     }
 
@@ -160,7 +160,7 @@ public class LineTests : TestDriverBase
         app.Layout ();
 
         // Just verify the line and border can be drawn together without errors
-        Exception exception = Record.Exception (() => app.Draw ());
+        Exception? exception = Record.Exception (() => app.Draw ());
         Assert.Null (exception);
     }
 
@@ -184,7 +184,7 @@ public class LineTests : TestDriverBase
         app.Layout ();
 
         // Just verify multiple intersecting lines can be drawn without errors
-        Exception exception = Record.Exception (() => app.Draw ());
+        Exception? exception = Record.Exception (() => app.Draw ());
         Assert.Null (exception);
     }
 

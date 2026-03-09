@@ -1,6 +1,4 @@
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace DrawingTests;
 

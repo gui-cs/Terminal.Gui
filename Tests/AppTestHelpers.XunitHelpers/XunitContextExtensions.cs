@@ -1,8 +1,7 @@
 ﻿using System.Drawing;
-using TerminalGuiFluentTesting;
 using Xunit;
 
-namespace TerminalGuiFluentTestingXunit;
+namespace AppTestHelpers.XunitHelpers;
 
 public static partial class XunitContextExtensions
 {
@@ -15,7 +14,7 @@ public static partial class XunitContextExtensions
     /// <param name="context"></param>
     /// <param name="expected"></param>
     /// <returns></returns>
-    public static TestContext AssertCursorPosition (this TestContext context, Point expected)
+    public static AppTestHelper AssertCursorPosition (this AppTestHelper context, Point expected)
     {
         try
         {

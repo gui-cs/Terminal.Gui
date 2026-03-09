@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Text;
-using Xunit.Abstractions;
+using Xunit.v3;
 
 namespace UnitTests.ViewsTests;
 
@@ -3516,17 +3516,17 @@ line.
     {
         public static string Txt = "TAB to jump between text fields.";
 
-        public override void After (MethodInfo methodUnderTest)
+        public override void After (MethodInfo methodUnderTest, IXunitTest test)
         {
             _textView = null;
-            base.After (methodUnderTest);
+            base.After (methodUnderTest, test);
         }
 
-        public override void Before (MethodInfo methodUnderTest)
+        public override void Before (MethodInfo methodUnderTest, IXunitTest test)
         {
-            base.Before (methodUnderTest);
+            base.Before (methodUnderTest, test);
 
-            //                   1         2         3 
+            //                   1         2         3
             //         01234567890123456789012345678901=32 (Length)
             byte [] buff = Encoding.Unicode.GetBytes (Txt);
             byte [] ms = new MemoryStream (buff).ToArray ();

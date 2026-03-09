@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace UnitTests.ViewBaseTests;
+﻿namespace UnitTests.ViewBaseTests;
 
 public class SubViewTests
 {

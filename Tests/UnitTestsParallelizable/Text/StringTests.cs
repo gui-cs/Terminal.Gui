@@ -85,6 +85,33 @@ public class StringTests
         Assert.Equal (expectedWidth, str.GetColumns ());
     }
 
+    /// <summary>
+    ///     Documents that <c>EnumerateRunes().Sum(GetColumns)</c> produces inflated widths for multi-rune grapheme
+    ///     clusters (e.g., ZWJ emoji), while <c>string.GetColumns()</c> correctly clamps each cluster to max 2 columns.
+    ///     This is the core issue fixed by replacing rune-sum width measurement with grapheme-aware
+    ///     <c>string.GetColumns()</c> in widget code (TableView, TabView, TreeView, FileDialog, ColorBar,
+    ///     AppendAutocomplete).
+    /// </summary>
+    [Theory]
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466", 8, 2)] // ZWJ family 👨‍👩‍👦‍👦: 4 × width-2 emoji + 3 × ZWJ(0) = 8 vs grapheme = 2
+    [InlineData ("\U0001F469\u200D\U0001F4BB", 4, 2)] // Woman technologist 👩‍💻: 2 × width-2 emoji + ZWJ(0) = 4 vs grapheme = 2
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 8, 2)] // ZWJ family variant 👨‍👩‍👧‍👦
+    [InlineData ("\U0001F642", 2, 2)] // Single emoji 🙂: rune width = grapheme width (no difference)
+    [InlineData ("abc", 3, 3)] // ASCII: rune width = grapheme width (no difference)
+    [InlineData ("a\u0301", 1, 1)] // a + combining acute: both give 1 (combining mark is width 0)
+    [InlineData ("\u5C71", 2, 2)] // CJK 山: both give 2 (single wide rune)
+    public void TestGetColumns_RuneSum_Inflated_For_GraphemeClusters (string str, int expectedRuneSum, int expectedGetColumns)
+    {
+        // setup
+        int runeSum = str.EnumerateRunes ().Sum (r => r.GetColumns ());
+        int graphemeWidth = str.GetColumns ();
+
+        // verify — shows the discrepancy that caused bugs in widget width calculations
+        Assert.Equal (expectedRuneSum, runeSum);
+        Assert.Equal (expectedGetColumns, graphemeWidth);
+        Assert.True (graphemeWidth <= runeSum, "GetColumns should never exceed rune sum");
+    }
+
     [Theory]
     [InlineData (null)]
     [InlineData ("")]
