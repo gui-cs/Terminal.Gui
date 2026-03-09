@@ -1,4 +1,3 @@
-
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Views;
@@ -8,10 +7,10 @@ public class TextRegexProvider : ITextValidateProvider
 {
     private List<Rune> _pattern = null!;
     private Regex _regex = null!;
-    private List<Rune> _text = null!;
+    private List<Rune> _text = [];
 
     /// <summary>Empty Constructor.</summary>
-    public TextRegexProvider (string pattern) { Pattern = pattern; }
+    public TextRegexProvider (string pattern) => Pattern = pattern;
 
     /// <summary>Regex pattern property.</summary>
     public string Pattern
@@ -29,7 +28,7 @@ public class TextRegexProvider : ITextValidateProvider
     public bool ValidateOnInput { get; set; } = true;
 
     /// <inheritdoc/>
-    public event EventHandler<EventArgs<string>> TextChanged = null!;
+    public event EventHandler<EventArgs<string>>? TextChanged;
 
     /// <inheritdoc/>
     public string Text
@@ -37,7 +36,7 @@ public class TextRegexProvider : ITextValidateProvider
         get => StringExtensions.ToString (_text);
         set
         {
-            _text = (value != string.Empty ? value.ToRuneList () : null)!;
+            _text = value != string.Empty ? value.ToRuneList () : [];
             SetupText ();
         }
     }
@@ -68,10 +67,10 @@ public class TextRegexProvider : ITextValidateProvider
     }
 
     /// <inheritdoc/>
-    public int CursorStart () { return 0; }
+    public int CursorStart () => 0;
 
     /// <inheritdoc/>
-    public int CursorEnd () { return _text.Count; }
+    public int CursorEnd () => _text.Count;
 
     /// <inheritdoc/>
     public int CursorLeft (int pos)
@@ -98,12 +97,13 @@ public class TextRegexProvider : ITextValidateProvider
     /// <inheritdoc/>
     public bool Delete (int pos)
     {
-        if (_text.Count > 0 && pos < _text.Count)
+        if (_text.Count <= 0 || pos >= _text.Count)
         {
-            string oldValue = Text;
-            _text.RemoveAt (pos);
-            OnTextChanged (new (in oldValue));
+            return true;
         }
+        string oldValue = Text;
+        _text.RemoveAt (pos);
+        RaiseTextChanged (new EventArgs<string> (in oldValue));
 
         return true;
     }
@@ -114,32 +114,44 @@ public class TextRegexProvider : ITextValidateProvider
         List<Rune> aux = _text.ToList ();
         aux.Insert (pos, (Rune)ch);
 
-        if (Validate (aux) || ValidateOnInput == false)
+        if (!Validate (aux) && ValidateOnInput)
         {
-            string oldValue = Text;
-            _text.Insert (pos, (Rune)ch);
-            OnTextChanged (new (in oldValue));
-
-            return true;
+            return false;
         }
+        string oldValue = Text;
+        _text.Insert (pos, (Rune)ch);
+        RaiseTextChanged (new EventArgs<string> (in oldValue));
 
-        return false;
+        return true;
     }
 
-    /// <inheritdoc/>
-    public void OnTextChanged (EventArgs<string> args) { TextChanged?.Invoke (this, args); }
+    /// <summary>
+    ///     Called when the text has changed. Subclasses can override this to perform custom actions.
+    /// </summary>
+    /// <param name="args">Contains the event data representing the new text value.</param>
+    public virtual void OnTextChanged (EventArgs<string> args) { }
+
+    /// <summary>
+    ///     Raises the <see cref="TextChanged"/> event.
+    /// </summary>
+    /// <param name="args">Contains the event data representing the new text value.</param>
+    private void RaiseTextChanged (EventArgs<string> args)
+    {
+        OnTextChanged (args);
+        TextChanged?.Invoke (this, args);
+    }
 
     /// <summary>Compiles the regex pattern for validation./></summary>
-    private void CompileMask () { _regex = new (StringExtensions.ToString (_pattern), RegexOptions.Compiled); }
+    private void CompileMask () => _regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled);
 
     private void SetupText ()
     {
-        if (_text is { } && IsValid)
+        if (IsValid)
         {
             return;
         }
 
-        _text = new ();
+        _text = [];
     }
 
     private bool Validate (List<Rune> text)
