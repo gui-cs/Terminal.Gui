@@ -17,6 +17,8 @@ jobs:
         os: [ ubuntu-latest ]
 
     timeout-minutes: 70 # Allow some buffer time beyond the 1-hour test duration
+    env:
+      DisableRealDriverIO: "1"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,6 +60,8 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     timeout-minutes: 90
+    env:
+      DisableRealDriverIO: "1"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
