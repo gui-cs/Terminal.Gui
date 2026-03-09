@@ -36,6 +36,12 @@ public class DatePicker : View, IValue<DateTime>
             {
                 CultureInfo.CurrentCulture = value;
                 Text = Value.ToString (Format);
+
+                // Propagate format to embedded editor
+                if (_dateEditor is { })
+                {
+                    _dateEditor.Format = value.DateTimeFormat;
+                }
             }
         }
     }
@@ -83,6 +89,12 @@ public class DatePicker : View, IValue<DateTime>
             }
 
             _date = value;
+
+            // Propagate value to embedded editor
+            if (_dateEditor is { })
+            {
+                _dateEditor.Value = value;
+            }
 
             ValueChangedEventArgs<DateTime> changedArgs = new (oldValue, _date);
             OnValueChanged (changedArgs);
@@ -269,7 +281,7 @@ public class DatePicker : View, IValue<DateTime>
             Y = 0,
             Width = Dim.Width (_calendar) - Dim.Width (_dateLabel),
             Height = 1,
-            Value = DateTime.Now
+            Value = date
         };
 
         _previousMonthButton = new Button
