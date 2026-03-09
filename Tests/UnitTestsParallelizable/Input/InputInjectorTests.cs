@@ -121,9 +121,9 @@ public class InputInjectorTests (ITestOutputHelper output)
     #endregion
 
     #region InjectKey Tests - Pipeline Mode
-    
+
     [Fact]
-    public void InjectKey_Pipeline_AutoProcess_True_AccentedKeys_RaisesAllEvents ()
+    public void InjectKey_Pipeline_AutoProcess_False_AccentedKeys_RaisesAllEvents ()
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
